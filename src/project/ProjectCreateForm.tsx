@@ -27,6 +27,7 @@ import { WorkspaceType } from '@waldur/workspace/types';
 
 import * as api from './api';
 import { ProjectNameField } from './ProjectNameField';
+import { ProjectShortNameField } from './ProjectShortNameField';
 
 export interface ProjectCreateFormData {
   name: string;
@@ -77,6 +78,7 @@ export const ProjectCreateForm = reduxForm<
     <form onSubmit={props.handleSubmit(props.onSubmit)}>
       <FormContainer submitting={props.submitting}>
         {ProjectNameField({ customer })}
+        {ProjectShortNameField({ customer })}
         <TextField
           label={translate('Project description')}
           name="description"

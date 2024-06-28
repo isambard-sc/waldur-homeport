@@ -22,6 +22,7 @@ export const getCustomer = (customerId: string) =>
 export const createProject = (project) => {
   const data = {
     name: project.name,
+    short_name: project.short_name,
     description: project.description,
     end_date: project.end_date ? formatDate(project.end_date) : undefined,
     customer: project.customer.url,
