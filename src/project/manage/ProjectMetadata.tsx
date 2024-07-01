@@ -37,6 +37,10 @@ export const ProjectMetadata: React.FC<ProjectMetadataProps> = ({
           value={project.backend_id || 'N/A'}
           actions={<FieldEditButton project={project} name="backend_id" />}
         />
+        <FormTable.Item
+          label={translate('Short name')}
+          value={project.short_name}
+        />
       </FormTable>
     </FormTable.Card>
   );

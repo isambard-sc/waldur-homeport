@@ -13,6 +13,7 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { createProject } from './api';
 import { ProjectNameField } from './ProjectNameField';
+import { ProjectShortNameField } from './ProjectShortNameField';
 
 export const GlobalProjectCreateDialog = reduxForm<
   { customer; name },
@@ -61,6 +62,7 @@ export const GlobalProjectCreateDialog = reduxForm<
             noOptionsMessage={() => translate('No organizations')}
           />
           {ProjectNameField({ customer: formValues?.customer })}
+          {ProjectShortNameField({ customer: formValues?.customer })}
         </FormContainer>
       </Modal.Body>
       <Modal.Footer>

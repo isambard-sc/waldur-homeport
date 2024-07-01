@@ -88,6 +88,7 @@ interface BillingPriceEstimate {
 export interface Project {
   name: string;
   uuid: string;
+  short_name: string;
   url: string;
   permissions: Permission[];
   quotas: Quota[];
