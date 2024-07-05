@@ -27,6 +27,7 @@ describe('UserEditForm', () => {
     expect(wrapper.find({ label: 'Job position' }).length).toBe(1);
     expect(wrapper.find({ label: 'Description' }).length).toBe(1);
     expect(wrapper.find({ label: 'Phone number' }).length).toBe(1);
+    expect(wrapper.find({ label: 'UNIX user name' }).length).toBe(1);
     expect(wrapper.find(TermsOfService).length).toBe(1);
   });
 

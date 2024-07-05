@@ -14,6 +14,7 @@ export const updateUser = (user) => {
     phone_number: user.phone_number,
     agree_with_policy: user.agree_with_policy,
     token_lifetime: user.token_lifetime.value,
+    unix_username: user.unix_username,
   };
   if (!user.image) {
     // If user tries to remove image

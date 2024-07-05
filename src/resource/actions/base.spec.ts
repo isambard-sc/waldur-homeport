@@ -15,6 +15,7 @@ const user = {
   is_staff: true,
   url: 'Valid URL',
   uuid: 'Valid UUID',
+  unix_username: 'Valid UNIX username',
 };
 const ctx = { resource, user };
 
