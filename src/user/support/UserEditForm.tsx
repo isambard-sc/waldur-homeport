@@ -27,6 +27,7 @@ interface UserEditFormData {
   job_position: string;
   description: string;
   phone_number: string;
+  unix_username: string;
 }
 interface OwnProps {
   updateUser(data: UserEditFormData): Promise<void>;
@@ -37,6 +38,20 @@ interface OwnProps {
   nativeNameIsVisible: boolean;
   user: UserDetails;
   fieldIsProtected(field: string): boolean;
+}
+
+function validateUnixUsername(value) {
+  if (!value) {
+    return undefined;
+  } else if (value.length > 20) {
+    return 'Must be 20 characters or less';
+  } else if (value.length < 5) {
+    return 'Must be 5 characters or more';
+  } else if (!value.match(/^[a-z][a-z0-9]+$/)) {
+    return 'Must only contain numbers and lowercase-letters and start with a letter.';
+  } else {
+    return undefined;
+  }
 }
 
 export const PureUserEditForm: FunctionComponent<
@@ -74,6 +89,24 @@ export const PureUserEditForm: FunctionComponent<
           label={translate('Native name')}
           value={props.user.native_name}
           protected
+          disabled
+        />
+      )}
+      {!props.user.unix_username && (
+        <StringField
+          label={translate('UNIX user name')}
+          name="unix_username"
+          required={props.isRequired('unix_username')}
+          description={translate(
+            'A short, unique name for you. It will be used to form your local username on any systems. Should only contain lower-case letters and digits and must start with a letter. Must be between 5-20 characters long.',
+          )}
+          validate={[validateUnixUsername]}
+        />
+      )}
+      {props.user.unix_username && (
+        <StaticField
+          label={translate('UNIX user name')}
+          value={props.user.unix_username}
           disabled
         />
       )}

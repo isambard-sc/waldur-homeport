@@ -3,6 +3,7 @@ import { UserDetails } from '@waldur/workspace/types';
 export const USER_PROFILE_COMPLETION_FIELDS: Array<keyof UserDetails> = [
   'first_name',
   'last_name',
+  'unix_username',
   'email',
   'job_title',
   'organization',

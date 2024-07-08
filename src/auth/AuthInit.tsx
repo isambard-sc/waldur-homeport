@@ -24,6 +24,7 @@ const formatInitialData = pick([
   'job_title',
   'description',
   'phone_number',
+  'unix_username',
 ]);
 
 export const AuthInit: FunctionComponent = () => {

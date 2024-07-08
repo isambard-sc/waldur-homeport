@@ -25,6 +25,7 @@ export interface User {
   email?: string;
   job_title?: string;
   organization?: string;
+  unix_username: string;
 }
 
 export interface UserDetails extends User {
