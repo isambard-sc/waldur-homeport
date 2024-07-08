@@ -22,6 +22,7 @@ const LOGOS = [
   'HERO_IMAGE',
   'SIDEBAR_LOGO',
   'SIDEBAR_LOGO_MOBILE',
+  'SIDEBAR_LOGO_DARK',
   'FAVICON',
 ];
 
@@ -60,6 +61,7 @@ export const AdministrationBranding = () => {
         'BRAND_LABEL_COLOR',
         'HERO_LINK_LABEL',
         'HERO_LINK_URL',
+        'SIDEBAR_STYLE',
         ...LOGOS,
       ])(ENV.plugins.WALDUR_CORE),
     [],

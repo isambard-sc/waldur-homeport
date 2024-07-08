@@ -1,5 +1,7 @@
+import classNames from 'classnames';
 import React, { PropsWithChildren, useEffect, useRef } from 'react';
 
+import { ENV } from '@waldur/configs/default';
 import {
   DrawerComponent,
   MenuComponent,
@@ -10,6 +12,7 @@ import { useLayout } from '@waldur/metronic/layout/core';
 
 import { BrandName } from './BrandName';
 import { SidebarFooter } from './SidebarFooter';
+
 import './Sidebar.scss';
 
 export const Sidebar: React.FC<PropsWithChildren> = (props) => {
@@ -25,10 +28,22 @@ export const Sidebar: React.FC<PropsWithChildren> = (props) => {
     }
   }, [sidebarRef, layout]);
 
+  const sidebarStyle = ENV.plugins.WALDUR_CORE.SIDEBAR_STYLE || 'dark';
+  const asideClassNames = {
+    'aside-dark': sidebarStyle === 'dark',
+    'aside-light': sidebarStyle === 'light',
+    'aside-accent': sidebarStyle === 'accent',
+  };
+  const menuClassNames = {
+    'menu-title-gray-800': sidebarStyle === 'dark',
+    'menu-title-dark-always': sidebarStyle === 'light',
+    'menu-title-white': sidebarStyle === 'accent',
+  };
+
   return (
     <nav
       ref={sidebarRef}
-      className="aside aside-dark aside-hoverable"
+      className={classNames('aside aside-hoverable', asideClassNames)}
       data-kt-drawer="true"
       data-kt-drawer-name="aside"
       data-kt-drawer-activate="{default: true, lg: false}"
@@ -51,7 +66,10 @@ export const Sidebar: React.FC<PropsWithChildren> = (props) => {
           data-kt-scroll-offset="0"
         >
           <div
-            className="menu menu-column menu-title-gray-800 menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-500"
+            className={classNames(
+              'menu menu-column menu-state-title-primary menu-state-icon-primary menu-state-bullet-primary menu-arrow-gray-500',
+              menuClassNames,
+            )}
             id="kt_aside_menu"
             data-kt-menu="true"
           >
@@ -59,7 +77,7 @@ export const Sidebar: React.FC<PropsWithChildren> = (props) => {
           </div>
         </div>
       </div>
-      <SidebarFooter />
+      <SidebarFooter menuClassNames={menuClassNames} />
     </nav>
   );
 };

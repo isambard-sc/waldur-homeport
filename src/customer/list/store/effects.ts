@@ -1,5 +1,4 @@
-import { triggerTransition } from '@uirouter/redux';
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { call, put, select, takeEvery } from 'redux-saga/effects';
 
 import { format } from '@waldur/core/ErrorMessageFormatter';
 import * as api from '@waldur/customer/list/api';
@@ -7,31 +6,21 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showError, showSuccess } from '@waldur/store/notify';
 import { fetchListStart } from '@waldur/table/actions';
+import { setCurrentCustomer } from '@waldur/workspace/actions';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 import * as constants from '../constants';
 
-function* organizationUpdate(action) {
-  try {
-    const { ...payload } = action.payload;
-    yield call(api.updateOrganization, payload);
-    yield put(
-      showSuccess(translate('Organization has been updated successfully.')),
-    );
-    yield put(triggerTransition('admin.customers', {}));
-  } catch (error) {
-    const errorMessage = `${translate(
-      'Unable to update organization.',
-    )} ${format(error)}`;
-    yield put(showError(errorMessage));
-  }
-}
-
 function* organizationLocation(action) {
   try {
-    yield call(api.updateOrganization, action.payload);
+    const response = yield call(api.updateOrganization, action.payload);
     yield put(showSuccess(translate('Location has been saved successfully.')));
     yield put(closeModalDialog());
     yield put(fetchListStart(constants.SUPPORT_CUSTOMER_LIST));
+    const currentCustomer = yield select(getCustomer);
+    if (response.data.uuid === currentCustomer?.uuid) {
+      yield put(setCurrentCustomer(response.data));
+    }
   } catch (error) {
     const errorMessage = `${translate('Unable to save location.')} ${format(
       error,
@@ -41,6 +30,5 @@ function* organizationLocation(action) {
 }
 
 export default function* () {
-  yield takeEvery(constants.UPDATE_ORGANIZATION, organizationUpdate);
   yield takeEvery(constants.SET_ORGANIZATION_LOCATION, organizationLocation);
 }

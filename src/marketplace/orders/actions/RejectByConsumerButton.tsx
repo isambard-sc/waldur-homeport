@@ -1,3 +1,4 @@
+import { Prohibit } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,15 +8,15 @@ import { translate } from '@waldur/i18n';
 import { rejectOrderByConsumer } from '@waldur/marketplace/common/api';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { OrderActionProps } from './types';
 
-export const RejectByConsumerButton: FC<OrderActionProps> = ({
-  order,
-  refetch,
-}) => {
+export const RejectByConsumerButton: FC<
+  OrderActionProps & { className?: string }
+> = ({ order, as, className, refetch }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const { mutate, isLoading } = useMutation(async () => {
@@ -39,14 +40,19 @@ export const RejectByConsumerButton: FC<OrderActionProps> = ({
     return null;
   }
   return (
-    <button
-      type="button"
-      className="btn btn-danger btn-sm"
-      onClick={() => mutate()}
-      disabled={isLoading}
-    >
-      <i className="fa fa-ban" /> {translate('Reject')}{' '}
-      {isLoading && <LoadingSpinnerIcon className="me-1" />}
-    </button>
+    <>
+      {isLoading ? (
+        <LoadingSpinnerIcon className="me-1" />
+      ) : (
+        <ActionItem
+          as={as}
+          className={className}
+          title={translate('Reject')}
+          action={mutate}
+          disabled={isLoading}
+          iconNode={<Prohibit />}
+        />
+      )}
+    </>
   );
 };

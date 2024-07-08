@@ -40,6 +40,9 @@
     // Logo
     .aside-logo {
       background-color: get($aside-config, logo-bg-color);
+      h3 {
+        color: white;
+      }
     }
 
     // Aside toggle
@@ -79,6 +82,24 @@
   // Light theme
   &.aside-light {
     background-color: $white;
+
+    .menu-state-title-primary .add-resource-toggle .menu-link:hover {
+      background-color: var(--waldur-aside-bg-color);
+      color: white !important;
+      .menu-title {
+        color: white !important;
+      }
+    }
+  }
+
+  &.aside-accent {
+    background-color: var(--waldur-aside-bg-color);
+
+    .aside-logo {
+      h3 {
+        color: white;
+      }
+    }
   }
 }
 

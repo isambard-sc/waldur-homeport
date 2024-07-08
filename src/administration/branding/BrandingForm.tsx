@@ -6,11 +6,27 @@ import { ENV } from '@waldur/configs/default';
 import {
   FieldError,
   FormContainer,
+  SelectField,
   StringField,
   SubmitButton,
 } from '@waldur/form';
 import { ImageField } from '@waldur/form/ImageField';
 import { translate } from '@waldur/i18n';
+
+const SIDEBAR_STYLES = [
+  {
+    label: translate('Primary accent'),
+    value: 'accent',
+  },
+  {
+    label: translate('Dark'),
+    value: 'dark',
+  },
+  {
+    label: translate('Light'),
+    value: 'light',
+  },
+];
 
 const PureBrandingForm: FunctionComponent<any> = (props) => (
   <form onSubmit={props.handleSubmit(props.saveConfig)}>
@@ -28,7 +44,7 @@ const PureBrandingForm: FunctionComponent<any> = (props) => (
       <StringField
         name="BRAND_COLOR"
         label={translate(
-          'Hex color definition is used in landing page for login button.',
+          'Hex color definition is used for sidebar background.',
         )}
         disabled={props.disabled}
       />
@@ -87,9 +103,24 @@ const PureBrandingForm: FunctionComponent<any> = (props) => (
       />
       <ImageField
         floating={false}
+        label={translate(
+          'Image rendered at the top of sidebar menu in dark mode.',
+        )}
+        name="SIDEBAR_LOGO_DARK"
+        initialValue={ENV.plugins.WALDUR_CORE.SIDEBAR_LOGO_DARK}
+      />
+      <ImageField
+        floating={false}
         label={translate('Custom favicon .png image file')}
         name="FAVICON"
         initialValue={ENV.plugins.WALDUR_CORE.FAVICON}
+      />
+      <SelectField
+        floating={false}
+        name="SIDEBAR_STYLE"
+        label={translate('Sidebar style')}
+        options={SIDEBAR_STYLES}
+        simpleValue
       />
     </FormContainer>
     <Form.Group>

@@ -3,14 +3,17 @@ import { UIView } from '@uirouter/react';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
-import { CustomerFeatures } from '@waldur/FeaturesEnums';
+import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
 import { OrganizationUIView } from '@waldur/organization/OrganizationUIView';
+import { getConfig } from '@waldur/store/config';
+import { RootState } from '@waldur/store/reducers';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
+import { CustomerManageContainer } from './details/CustomerManageContainer';
 import { fetchCustomer } from './workspace/CustomerWorkspace';
 
 const ProjectsList = lazyComponent(
@@ -76,6 +79,10 @@ const OrganizationResourcesAllList = lazyComponent(
   () => import('../marketplace/resources/list/OrganizationResourcesAllList'),
   'OrganizationResourcesAllList',
 );
+const CustomerChecklistOverview = lazyComponent(
+  () => import('../marketplace-checklist/CustomerChecklistOverview'),
+  'CustomerChecklistOverview',
+);
 
 export const states: StateDeclaration[] = [
   {
@@ -106,6 +113,7 @@ export const states: StateDeclaration[] = [
     component: OrganizationResourcesAllList,
     data: {
       breadcrumb: () => translate('Resources'),
+      priority: 110,
     },
   },
   {
@@ -116,6 +124,7 @@ export const states: StateDeclaration[] = [
     url: '',
     data: {
       breadcrumb: () => translate('Team'),
+      priority: 130,
     },
   },
 
@@ -124,7 +133,7 @@ export const states: StateDeclaration[] = [
     url: 'dashboard/',
     component: CustomerDashboard,
     data: {
-      breadcrumb: () => translate('Dashboard'),
+      breadcrumb: () => translate('Organization dashboard'),
       priority: 100,
     },
   },
@@ -135,7 +144,7 @@ export const states: StateDeclaration[] = [
     component: CustomerEventsList,
     data: {
       breadcrumb: () => translate('Audit logs'),
-      skipBreadcrumb: true,
+      priority: 180,
     },
   },
 
@@ -197,6 +206,10 @@ export const states: StateDeclaration[] = [
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Group invitations'),
+      permissions: [
+        (state: RootState) =>
+          !getConfig(state).plugins.WALDUR_CORE.INVITATION_USE_WEBHOOKS,
+      ],
     },
   },
 
@@ -221,9 +234,17 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'organization.manage',
-    url: 'manage/',
+    name: 'organization-manage-container',
+    url: '',
+    abstract: true,
+    parent: 'organization',
+    component: CustomerManageContainer,
+  },
+  {
+    name: 'organization-manage',
+    url: 'manage/?tab',
     component: CustomerManage,
+    parent: 'organization-manage-container',
     data: {
       breadcrumb: () => translate('Settings'),
       skipBreadcrumb: true,
@@ -238,6 +259,7 @@ export const states: StateDeclaration[] = [
     url: '',
     data: {
       breadcrumb: () => translate('Payments'),
+      priority: 140,
       permissions: [
         (state) => {
           if (isFeatureVisible(CustomerFeatures.payments_for_staff_only)) {
@@ -284,6 +306,18 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Cost policies'),
       permissions: [isOwnerOrStaff],
+      priority: 130,
+    },
+  },
+
+  {
+    name: 'organization.checklists',
+    url: 'checklists/',
+    component: CustomerChecklistOverview,
+    data: {
+      breadcrumb: () => translate('Checklists'),
+      feature: MarketplaceFeatures.show_experimental_ui_components,
+      priority: 130,
     },
   },
 ];
