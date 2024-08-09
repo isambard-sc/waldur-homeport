@@ -1,5 +1,4 @@
 import { FunctionComponent, useMemo } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
@@ -10,6 +9,7 @@ import { PROJECTS_LIST } from '@waldur/project/constants';
 import { ProjectsListActions } from '@waldur/project/ProjectsListActions';
 import { createFetcher, Table } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
+import { Column } from '@waldur/table/types';
 import { formatLongText, useTable } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
@@ -47,27 +47,25 @@ export const ProjectsList: FunctionComponent<{}> = () => {
     fetchData: createFetcher('projects'),
     queryField: 'query',
     filter,
-    exportRow: (row) => [
-      row.name,
-      row.description,
-      formatDateTime(row.created),
-    ],
-    exportFields: ['Name', 'Description', 'Created'],
   });
-  const columns = [
+  const columns: Column[] = [
     {
       title: translate('Name'),
       render: ProjectLink,
       orderField: 'name',
+      export: 'name',
     },
     {
       title: translate('Description'),
       render: ({ row }) => <>{formatLongText(row.description)}</>,
+      export: 'description',
     },
     {
       title: translate('Created'),
       render: ({ row }) => <>{formatDateTime(row.created)}</>,
       orderField: 'created',
+      export: (row) => formatDateTime(row.created),
+      exportKeys: ['created'],
     },
     {
       title: translate('End date'),
@@ -75,12 +73,14 @@ export const ProjectsList: FunctionComponent<{}> = () => {
         <>{row.end_date ? formatDate(row.end_date) : DASH_ESCAPE_CODE}</>
       ),
       orderField: 'end_date',
+      export: false,
     },
   ];
   if (isFeatureVisible(ProjectFeatures.estimated_cost)) {
     columns.push({
       title: translate('Estimated cost'),
       render: ProjectCostField,
+      export: false,
     });
   }
 
@@ -95,10 +95,10 @@ export const ProjectsList: FunctionComponent<{}> = () => {
       showPageSizeSelector={true}
       actions={<ProjectCreateButton />}
       hoverableRow={({ row }) => (
-        <ButtonGroup>
+        <>
           <ProjectsListActions project={row} />
           <ProjectDetailsButton project={row} />
-        </ButtonGroup>
+        </>
       )}
       expandableRow={ProjectExpandableRowContainer}
       enableExport={true}

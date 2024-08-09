@@ -16,7 +16,6 @@ import {
   sendForm,
 } from '@waldur/core/api';
 import { GeolocationPoint } from '@waldur/map/types';
-import { SubmitCartRequest } from '@waldur/marketplace/cart/types';
 import { OrderDetailsType } from '@waldur/marketplace/orders/types';
 import {
   Category,
@@ -246,22 +245,10 @@ export const updateOfferingSecretOptions = (offeringId, data) =>
     data,
   );
 
-export const getCartItems = (projectUrl: string) =>
-  getAll('/marketplace-cart-items/', { params: { project: projectUrl } });
-
-export const addCartItem = (data: object) =>
-  post('/marketplace-cart-items/', data).then((response) => response.data);
-
-export const removeCartItem = (id: string) =>
-  deleteById('/marketplace-cart-items/', id);
-
-export const submitCart = (data: object) =>
-  post<SubmitCartRequest>('/marketplace-cart-items/submit/', data).then(
-    (response) => response.data,
-  );
-
 export const getOrder = (id) =>
   getById<OrderDetailsType>('/marketplace-orders/', id);
+
+export const createOrder = (payload) => post(`/marketplace-orders/`, payload);
 
 export const cancelOrder = (id) => post(`/marketplace-orders/${id}/cancel/`);
 
@@ -463,6 +450,9 @@ export const updateOfferingLogo = (offeringUuid: string, formData) =>
 
 export const createOfferingUser = (payload) =>
   post(`/marketplace-offering-users/`, payload);
+
+export const updateOfferingUserRestrictionStatus = (uuid, data) =>
+  post(`/marketplace-offering-users/${uuid}/update_restricted/`, data);
 
 export const pullRemoteOfferingDetails = (uuid) =>
   post(`/remote-waldur-api/pull_offering_details/${uuid}/`);

@@ -1,5 +1,11 @@
 import { TableFiltersGroup } from './TableFilterService';
-import { DisplayMode, ExportConfig, FilterItem, Sorting } from './types';
+import {
+  DisplayMode,
+  ExportConfig,
+  FilterItem,
+  FilterPosition,
+  Sorting,
+} from './types';
 
 export const FETCH_LIST_START = 'waldur/table/FETCH_START';
 export const FETCH_LIST_DONE = 'waldur/table/FETCH_DONE';
@@ -17,6 +23,7 @@ export const ENTITY_DELETE = 'waldur/table/ENTITY_DELETE';
 export const PAGE_SIZE_UPDATE = 'waldur/table/PAGE_SIZE_UPDATE';
 export const SORT_LIST_START = 'waldur/table/SORT_LIST_START';
 export const SORT_LIST_DONE = 'waldur/table/SORT_LIST_DONE';
+export const SET_FILTER_POSITION = 'waldur/table/SET_FILTER_POSITION';
 export const SET_FILTER = 'waldur/table/SET_FILTER';
 export const SET_SAVED_FILTERS = 'waldur/table/SET_SAVED_FILTERS';
 export const SELECT_SAVED_FILTER = 'waldur/table/SELECT_SAVED_FILTER';
@@ -26,6 +33,8 @@ export const SELECT_ROW = 'waldur/table/SELECT_ROW';
 export const SELECT_ALL_ROWS = 'waldur/table/SELECT_ALL_ROWS';
 export const RESET_SELECTION = 'waldur/table/RESET_SELECTION';
 export const TOGGLE_COLUMN = 'waldur/table/TOGGLE_COLUMN';
+export const INIT_COLUMN_POSITIONS = 'waldur/table/INIT_COLUMN_POSITIONS';
+export const SWAP_COLUMNS = 'waldur/table/SWAP_COLUMNS';
 
 export const fetchListStart = (
   table: string,
@@ -166,6 +175,17 @@ export const sortListDone = (table: string) => ({
   },
 });
 
+export const setFilterPosition = (
+  table: string,
+  filterPosition: FilterPosition,
+) => ({
+  type: SET_FILTER_POSITION,
+  payload: {
+    table,
+    filterPosition,
+  },
+});
+
 export const setFilter = (table: string, item: FilterItem) => ({
   type: SET_FILTER,
   payload: {
@@ -229,17 +249,36 @@ export const resetSelection = (table: string) => ({
   },
 });
 
-export const toggleColumn = (
-  table: string,
-  index,
-  column,
-  value?: boolean,
-) => ({
+export const toggleColumn = (table: string, id, column, value?: boolean) => ({
   type: TOGGLE_COLUMN,
   payload: {
     table,
-    index,
+    id,
     column,
     value,
+  },
+});
+
+export const initColumnPositions = (
+  table: string,
+  columnPositions: string[],
+) => ({
+  type: INIT_COLUMN_POSITIONS,
+  payload: {
+    table,
+    columnPositions,
+  },
+});
+
+export const swapColumns = (
+  table: string,
+  column1: string,
+  column2: string,
+) => ({
+  type: SWAP_COLUMNS,
+  payload: {
+    table,
+    column1,
+    column2,
   },
 });

@@ -12,7 +12,7 @@ import { useTitle } from '@waldur/navigation/title';
 
 import { ProviderDetailsBody } from './ProviderDetailsBody';
 
-async function loadData(customerId) {
+export async function loadProviderData(customerId) {
   const provider = await getServiceProviderByCustomer({
     customer_uuid: customerId,
   });
@@ -26,7 +26,7 @@ export const ProviderDetails: FunctionComponent = () => {
   } = useCurrentStateAndParams();
 
   const { loading, value, error } = useAsync(
-    () => loadData(customer_uuid),
+    () => loadProviderData(customer_uuid),
     [customer_uuid],
   );
 

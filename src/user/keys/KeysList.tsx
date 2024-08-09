@@ -1,7 +1,7 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
+import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
 import { Table, createFetcher } from '@waldur/table';
 import { Column } from '@waldur/table/types';
@@ -27,10 +27,6 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
   const props = useTable({
     table: 'keysList',
     fetchData: createFetcher('keys'),
-    exportRow: (row) => [row.name, row.fingerprint],
-    exportAll: true,
-    exportFields: ['Title', 'Fingerprint'],
-    exportKeys: ['name', 'fingerprint'],
     queryField: 'name',
     filter,
   });
@@ -38,22 +34,37 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
     {
       title: translate('Title'),
       render: ({ row }) => row.name,
+      export: 'name',
     },
     {
-      title: translate('Fingerprint'),
-      render: ({ row }) => (
-        <>
-          {row.fingerprint}
-          <CopyToClipboardButton
-            value={row.fingerprint}
-            className="ms-1 text-hover-primary cursor-pointer d-inline-block"
-          />
-        </>
-      ),
+      visible: false,
+      title: translate('Public key'),
+      render: null,
+      export: 'public_key',
     },
     {
       title: translate('Type'),
       render: ({ row }) => row.type,
+      export: 'type',
+    },
+    {
+      visible: false,
+      title: translate('Fingerprint (MD5)'),
+      render: null,
+      export: 'fingerprint_md5',
+    },
+    {
+      title: translate('Fingerprint (SHA256)'),
+      render: ({ row }) => (
+        <CopyToClipboardContainer value={row.fingerprint_sha256} />
+      ),
+      export: 'fingerprint_sha256',
+    },
+    {
+      visible: false,
+      title: translate('Fingerprint (SHA512)'),
+      render: null,
+      export: 'fingerprint_sha512',
     },
   ];
 
@@ -64,6 +75,7 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
         <KeyRemoveButton uuid={row.uuid} refetch={props.fetch} />
       ),
       className: 'text-center col-md-2',
+      export: false,
     });
   }
 

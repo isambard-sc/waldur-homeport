@@ -50,6 +50,7 @@ export const ResourceDetailsPage: FunctionComponent<{}> = () => {
         to: 'organization.dashboard',
         params: { uuid: data.resource.customer_uuid },
         ellipsis: 'xl',
+        maxLength: 11,
       },
       {
         key: 'organization.projects',
@@ -64,6 +65,7 @@ export const ResourceDetailsPage: FunctionComponent<{}> = () => {
         to: 'project.dashboard',
         params: { uuid: data.resource.project_uuid },
         ellipsis: 'xl',
+        maxLength: 11,
       },
       {
         key: 'project.resources',
@@ -75,7 +77,9 @@ export const ResourceDetailsPage: FunctionComponent<{}> = () => {
       {
         key: 'resource',
         text: data.resource.name,
-        dropdown: <ResourceBreadcrumbPopover resource={data.resource} />,
+        dropdown: (close) => (
+          <ResourceBreadcrumbPopover resource={data.resource} close={close} />
+        ),
         truncate: true,
         active: true,
       },

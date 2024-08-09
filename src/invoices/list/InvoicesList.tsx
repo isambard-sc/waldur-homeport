@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
@@ -11,6 +10,7 @@ import { INVOICES_TABLE } from '@waldur/invoices/constants';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 import { MarkAsPaidButton } from '@waldur/invoices/list/MarkAsPaidButton';
 import { Table, createFetcher } from '@waldur/table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
@@ -25,12 +25,10 @@ export const InvoicesList: FunctionComponent = () => {
   const props = useTable({
     table: `${INVOICES_TABLE}-${customer.uuid}`,
     fetchData: createFetcher('invoices'),
-    exportRow,
-    exportFields,
     filter,
     queryField: 'number',
   });
-  const columns = [
+  const columns: Column[] = [
     {
       title: translate('Invoice number'),
       render: ({ row }) => (
@@ -41,18 +39,23 @@ export const InvoicesList: FunctionComponent = () => {
           {row.number}
         </Link>
       ),
+      export: 'number',
     },
     {
       title: translate('State'),
       render: ({ row }) => row.state,
+      filter: 'state',
+      export: 'state',
     },
     {
       title: translate('Invoice date'),
       render: ({ row }) => row.invoice_date || 'N/A',
+      export: 'invoice_date',
     },
     {
       title: translate('Due date'),
       render: ({ row }) => row.due_date || 'N/A',
+      export: 'due_date',
     },
   ];
   const activeFixedPriceProfile = getActiveFixedPricePaymentProfile(
@@ -63,14 +66,20 @@ export const InvoicesList: FunctionComponent = () => {
       {
         title: translate('Price'),
         render: ({ row }) => defaultCurrency(row.price),
+        export: (row) => defaultCurrency(row.price),
+        exportKeys: ['price'],
       },
       {
         title: translate('Tax'),
         render: ({ row }) => defaultCurrency(row.tax),
+        export: (row) => defaultCurrency(row.tax),
+        exportKeys: ['tax'],
       },
       {
         title: translate('Total'),
         render: ({ row }) => defaultCurrency(row.total),
+        export: (row) => defaultCurrency(row.total),
+        exportKeys: ['total'],
       },
     );
   }
@@ -82,35 +91,15 @@ export const InvoicesList: FunctionComponent = () => {
       verboseName={translate('invoices')}
       enableExport={true}
       hoverableRow={({ row }) => (
-        <ButtonGroup>
+        <>
           <SendNotificationButton row={row} />
           <MarkAsPaidButton row={row} refetch={props.fetch} />
           <InvoicePayButton invoice={row} />
-        </ButtonGroup>
+        </>
       )}
     />
   );
 };
-
-const exportRow = (row) => [
-  row.number,
-  row.state,
-  row.invoice_date,
-  row.due_date,
-  defaultCurrency(row.price),
-  defaultCurrency(row.tax),
-  defaultCurrency(row.total),
-];
-
-const exportFields = [
-  'Invoice number',
-  'State',
-  'Invoice date',
-  'Due date',
-  'Price',
-  'Tax',
-  'Total',
-];
 
 const mapsStateToFilter = createSelector(
   getCustomer,

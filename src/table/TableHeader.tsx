@@ -1,6 +1,6 @@
 import { CaretDown, CaretUp, CaretUpDown } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { FC } from 'react';
+import { FC, useEffect, useMemo, useRef } from 'react';
 import { FormCheck } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
@@ -8,6 +8,7 @@ import { translate } from '@waldur/i18n';
 import './TableHeader.scss';
 
 import { TableProps } from './Table';
+import { TableFiltersMenu } from './TableFiltersMenu';
 import { Column, Sorting } from './types';
 
 interface TableHeaderProps {
@@ -22,6 +23,11 @@ interface TableHeaderProps {
   selectedRows?: any[];
   fieldType?: TableProps['fieldType'];
   activeColumns?: Record<string, boolean>;
+  filters?: TableProps['filters'];
+  setFilter?: TableProps['setFilter'];
+  applyFiltersFn?: TableProps['applyFiltersFn'];
+  columnPositions: string[];
+  hasOptionalColumns?: boolean;
 }
 
 function handleOrdering(currentSorting: Sorting, field: string): Sorting {
@@ -48,7 +54,14 @@ function renderSortingIcon(column: Column, sorting: Sorting) {
   }
 }
 
-const TableTh = ({ column, onSortClick, currentSorting }) => (
+const TableTh = ({
+  column,
+  onSortClick,
+  currentSorting,
+  filters,
+  setFilter,
+  applyFiltersFn,
+}) => (
   <th
     className={
       classNames(column.className, column.orderField && 'sorting-column') ||
@@ -61,11 +74,21 @@ const TableTh = ({ column, onSortClick, currentSorting }) => (
   >
     {column.title}
     {renderSortingIcon(column, currentSorting)}
+    {column.filter && filters && (
+      <TableFiltersMenu
+        filters={filters}
+        filterPosition="menu"
+        setFilter={setFilter}
+        applyFiltersFn={applyFiltersFn}
+        openName={column.filter}
+      />
+    )}
   </th>
 );
 
 export const TableHeader: FC<TableHeaderProps> = ({
   columns,
+  columnPositions,
   onSortClick,
   currentSorting,
   expandableRow = false,
@@ -75,8 +98,29 @@ export const TableHeader: FC<TableHeaderProps> = ({
   onSelectAllRows,
   selectedRows,
   fieldType,
+  filters,
+  setFilter,
+  applyFiltersFn,
+  hasOptionalColumns,
 }) => {
   const isAllSelected = selectedRows?.length >= rows?.length;
+
+  const columnMap = useMemo(
+    () =>
+      columns.reduce(
+        (result, column) => ({ ...result, [column.id]: column }),
+        {},
+      ),
+    [columns],
+  );
+
+  const refCheck = useRef<HTMLInputElement>();
+  useEffect(() => {
+    if (refCheck?.current) {
+      refCheck.current.indeterminate =
+        !isAllSelected && selectedRows?.length > 0;
+    }
+  }, [refCheck?.current, isAllSelected, selectedRows]);
 
   return (
     <thead>
@@ -86,6 +130,7 @@ export const TableHeader: FC<TableHeaderProps> = ({
         ) : enableMultiSelect ? (
           <th style={{ width: '10px' }}>
             <FormCheck
+              ref={refCheck}
               className="form-check form-check-custom form-check-sm"
               checked={isAllSelected}
               onChange={() => onSelectAllRows(rows)}
@@ -93,17 +138,37 @@ export const TableHeader: FC<TableHeaderProps> = ({
           </th>
         ) : null}
         {expandableRow && <th style={{ width: '10px' }} />}
-        {columns.map(
-          (column, index) =>
-            (column.visible ?? true) && (
-              <TableTh
-                key={index}
-                column={column}
-                onSortClick={onSortClick}
-                currentSorting={currentSorting}
-              />
-            ),
-        )}
+        {hasOptionalColumns
+          ? columnPositions
+              .filter((id) => columnMap[id])
+              .map(
+                (id) =>
+                  (columnMap[id].visible ?? true) && (
+                    <TableTh
+                      key={id}
+                      column={columnMap[id]}
+                      onSortClick={onSortClick}
+                      currentSorting={currentSorting}
+                      filters={filters}
+                      setFilter={setFilter}
+                      applyFiltersFn={applyFiltersFn}
+                    />
+                  ),
+              )
+          : columns.map(
+              (column, index) =>
+                (column.visible ?? true) && (
+                  <TableTh
+                    key={index}
+                    column={column}
+                    onSortClick={onSortClick}
+                    currentSorting={currentSorting}
+                    filters={filters}
+                    setFilter={setFilter}
+                    applyFiltersFn={applyFiltersFn}
+                  />
+                ),
+            )}
         {showActions ? (
           <th className="header-actions">{translate('Actions')}</th>
         ) : null}

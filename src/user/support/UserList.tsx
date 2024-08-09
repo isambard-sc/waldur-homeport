@@ -1,10 +1,11 @@
 import { Question } from '@phosphor-icons/react';
 import { cloneDeep } from 'lodash';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
+import { ENV } from '@waldur/configs/default';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
@@ -13,6 +14,7 @@ import { formatRole } from '@waldur/permissions/utils';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { Table, createFetcher } from '@waldur/table/index';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/utils';
 import { User } from '@waldur/workspace/types';
 
@@ -128,173 +130,196 @@ const mapStateToFilter = createSelector(
   },
 );
 
+const DEFAULT_ENABLED_COLUMNS = [
+  'full_name',
+  'email',
+  'phone_number',
+  'organization',
+  'organization_roles',
+  'project_roles',
+  'is_active',
+];
+
 export const UserList: FunctionComponent = () => {
-  const filter = useSelector(mapStateToFilter);
+  const filterValues = useSelector(mapStateToFilter);
+  const filter = useMemo(() => {
+    return {
+      ...filterValues,
+      field: ['uuid', 'url', 'identity_provider_fields', 'registration_method'],
+    };
+  }, [filterValues]);
+
   const props = useTable({
     table: `userList`,
     fetchData: createFetcher('users'),
     queryField: 'query',
     filter,
-    exportFields: [
-      'Full name',
-      'Username',
-      'Email',
-      'Phone number',
-      'Organization',
-      'Organizations owner',
-    ],
-    exportAll: true,
-    exportRow: (row) => [
-      row.full_name,
-      row.username,
-      row.email,
-      row.phone_number,
-      row.organization,
-      getOrganizationsWhereOwner(row),
-    ],
-    exportKeys: [
-      'full_name',
-      'username',
-      'email',
-      'phone_number',
-      'organization',
-      'permissions',
-    ],
   });
 
-  const columns = [
+  const columns: Column[] = [
     {
       title: translate('Full name'),
       render: FullNameField,
       orderField: 'full_name',
       keys: ['full_name'],
+      id: 'full_name',
     },
     {
       title: translate('Email'),
       render: EmailField,
       orderField: 'email',
       keys: ['email'],
+      id: 'email',
     },
     {
       title: translate('Phone number'),
       render: PhoneNumberField,
       orderField: 'phone_number',
       keys: ['phone_number'],
+      id: 'phone_number',
     },
     {
       title: translate('Organization'),
       render: OrganizationField,
       orderField: 'organization',
+      filter: 'organization',
+      id: 'organization',
+      export: 'organization',
     },
     {
       title: translate('Organization roles'),
       render: OrganizationRolesField,
       keys: ['permissions'],
+      id: 'organization_roles',
+      exportTitle: translate('Organizations owner'),
+      export: (row) => getOrganizationsWhereOwner(row),
     },
     {
       title: translate('Project roles'),
       render: ProjectRolesField,
       keys: ['permissions'],
+      id: 'project_roles',
+      export: false,
     },
     {
       title: translate('Staff'),
       render: StaffStatusField,
       className: 'text-center',
       keys: ['is_staff'],
-      optional: true,
+      id: 'is_staff',
+      export: (row) => (row.is_staff ? translate('Yes') : translate('No')),
     },
     {
       title: translate('Support'),
       render: SupportStatusField,
       className: 'text-center',
       keys: ['is_support'],
-      optional: true,
+      id: 'is_support',
+      export: (row) => (row.is_support ? translate('Yes') : translate('No')),
     },
     {
       title: translate('Status'),
       render: UserStatusField,
       className: 'text-center',
       keys: ['is_active'],
+      filter: 'is_active',
+      id: 'is_active',
+      export: (row) =>
+        row.is_active ? translate('Active') : translate('Inactive'),
     },
     {
       title: translate('Affiliations'),
       render: ({ row }) => renderListOrDash(row.affiliations),
       keys: ['affiliations'],
-      optional: true,
+      id: 'affiliations',
     },
     {
       title: translate('Civil number'),
       render: ({ row }) => renderFieldOrDash(row.civil_number),
       keys: ['civil_number'],
-      optional: true,
+      id: 'civil_number',
     },
     {
       title: translate('Job title'),
       render: ({ row }) => renderFieldOrDash(row.job_title),
       keys: ['job_title'],
-      optional: true,
+      id: 'job_title',
     },
     {
       title: translate('Date joined'),
       render: ({ row }) => formatDateTime(row.date_joined),
       keys: ['date_joined'],
-      optional: true,
+      id: 'date_joined',
+      export: (row) => formatDateTime(row.date_joined),
     },
     {
-      title: translate('Aggreement date'),
+      title: translate('Agreement date'),
       render: ({ row }) => formatDateTime(row.agreement_date),
       keys: ['agreement_date'],
-      optional: true,
+      id: 'agreement_date',
+      export: (row) => formatDateTime(row.agreement_date),
     },
     {
       title: translate('Username'),
       render: ({ row }) => renderFieldOrDash(row.username),
       keys: ['username'],
-      optional: true,
+      id: 'username',
     },
     {
       title: translate('UUID'),
       render: ({ row }) => <>{row.uuid}</>,
       keys: ['uuid'],
-      optional: true,
+      id: 'uuid',
     },
     {
       title: translate('Description'),
       render: ({ row }) => renderFieldOrDash(row.description),
       keys: ['description'],
-      optional: true,
+      id: 'description',
     },
     {
       title: translate('Identity provider name'),
       render: ({ row }) => renderFieldOrDash(row.identity_provider_name),
       keys: ['identity_provider_name'],
-      optional: true,
+      id: 'identity_provider_name',
     },
     {
       title: translate('Identity provider fields'),
       render: ({ row }) => renderListOrDash(row.identity_provider_fields),
       keys: ['identity_provider_fields'],
-      optional: true,
+      id: 'identity_provider_fields',
     },
     {
       title: translate('Requested email'),
       render: ({ row }) => renderFieldOrDash(row.requested_email),
       keys: ['requested_email'],
-      optional: true,
+      id: 'requested_email',
     },
     {
       title: translate('Registration method'),
       render: ({ row }) => renderFieldOrDash(row.registration_method),
       keys: ['registration_method'],
-      optional: true,
+      id: 'registration_method',
     },
     {
       title: translate('Preferred language'),
       render: ({ row }) => renderFieldOrDash(row.preferred_language),
       keys: ['preferred_language'],
-      optional: true,
+      id: 'preferred_language',
     },
   ];
+
+  const validColumns = columns.map((column) => column.id);
+  const enabledColumns = ENV.plugins.WALDUR_CORE.USER_TABLE_COLUMNS
+    ? ENV.plugins.WALDUR_CORE.USER_TABLE_COLUMNS.split(',')
+        .map((column) => column.trim())
+        .filter((column) => validColumns.includes(column))
+    : DEFAULT_ENABLED_COLUMNS;
+  if (enabledColumns) {
+    columns.forEach((column) => {
+      column.optional = !enabledColumns.includes(column.id);
+    });
+  }
 
   return (
     <Table
@@ -330,6 +355,8 @@ export const formatRoleFilter = (filter) => {
 
 export const getOrganizationsWhereOwner = (user: Partial<User>) =>
   user.permissions
-    .filter((perm) => perm.role_name === RoleEnum.CUSTOMER_OWNER)
-    .map((perm) => perm.scope_name)
-    .join(', ');
+    ? user.permissions
+        .filter((perm) => perm.role_name === RoleEnum.CUSTOMER_OWNER)
+        .map((perm) => perm.scope_name)
+        .join(', ')
+    : DASH_ESCAPE_CODE;

@@ -53,6 +53,7 @@ const InvitationsListComponent: FunctionComponent = () => {
           title: translate('Status'),
           orderField: 'state',
           render: ({ row }) => row.state,
+          filter: 'state',
         },
         {
           title: translate('Created at'),
@@ -67,8 +68,8 @@ const InvitationsListComponent: FunctionComponent = () => {
       ]}
       hoverableRow={({ row }) => (
         <>
-          <InvitationSendButton invitation={row} />
-          <InvitationCancelButton invitation={row} refetch={props.fetch} />
+          <InvitationSendButton row={row} />
+          <InvitationCancelButton row={row} refetch={props.fetch} />
         </>
       )}
       verboseName={translate('Team invitations')}
@@ -77,6 +78,7 @@ const InvitationsListComponent: FunctionComponent = () => {
           project={project}
           roleTypes={['project']}
           refetch={props.fetch}
+          enableBulkUpload={true}
         />
       }
       hasQuery={true}

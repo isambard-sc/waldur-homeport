@@ -5,7 +5,7 @@ import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures, SupportFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
-import { isStaffOrSupport } from '@waldur/workspace/selectors';
+import { isStaff, isStaffOrSupport } from '@waldur/workspace/selectors';
 
 const AdministrationDashboard = lazyComponent(
   () => import('./dashboard/AdministrationDashboard'),
@@ -13,7 +13,7 @@ const AdministrationDashboard = lazyComponent(
 );
 
 const AdministrationBranding = lazyComponent(
-  () => import('./branding/AdministrationBranding'),
+  () => import('./settings/AdministrationBranding'),
   'AdministrationBranding',
 );
 
@@ -57,6 +57,11 @@ const UserList = lazyComponent(
   'UserList',
 );
 
+const InvitationList = lazyComponent(
+  () => import('./InvitationList'),
+  'InvitationList',
+);
+
 const IdentityProvidersList = lazyComponent(
   () => import('./providers/IdentityProvidersList'),
   'IdentityProvidersList',
@@ -81,9 +86,19 @@ const OrganizationGroupTypesList = lazyComponent(
   'OrganizationGroupTypesList',
 );
 
+const OrganizationCostPoliciesList = lazyComponent(
+  () => import('./organizations/OrganizationCostPoliciesList'),
+  'OrganizationCostPoliciesList',
+);
+
 const AdministrationLanguages = lazyComponent(
   () => import('./languages/AdministrationLanguages'),
   'AdministrationLanguages',
+);
+
+const OfferingUsersList = lazyComponent(
+  () => import('./users/OfferingUsersList'),
+  'OfferingUsersList',
 );
 
 export const states: StateDeclaration[] = [
@@ -229,6 +244,15 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'admin-user-offering-users',
+    url: 'offering-users/',
+    component: OfferingUsersList,
+    parent: 'admin-accounts',
+    data: {
+      breadcrumb: () => translate('Offering users'),
+    },
+  },
+  {
     name: 'admin-user-lexis-links-list',
     url: 'lexis-links/',
     component: BasicLexisLinkList,
@@ -242,6 +266,16 @@ export const states: StateDeclaration[] = [
           }
         },
       ],
+    },
+  },
+
+  {
+    name: 'admin-invitations',
+    url: 'invitations/',
+    component: InvitationList,
+    parent: 'admin-accounts',
+    data: {
+      breadcrumb: () => translate('Invitations'),
     },
   },
 
@@ -290,6 +324,16 @@ export const states: StateDeclaration[] = [
     component: OrganizationGroupTypesList,
     data: {
       breadcrumb: () => translate('Organization group types'),
+    },
+  },
+  {
+    name: 'admin-organization-cost-policies',
+    url: 'organization-cost-policies/',
+    parent: 'admin-organizations',
+    component: OrganizationCostPoliciesList,
+    data: {
+      breadcrumb: () => translate('Cost policies'),
+      permissions: [isStaff],
     },
   },
   {

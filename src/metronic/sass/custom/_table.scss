@@ -7,6 +7,7 @@
     color: $dark;
     text-transform: uppercase;
     font-weight: 500;
+    white-space: nowrap;
   }
 
   tbody > tr > td {
@@ -26,15 +27,9 @@
 
   /* TR */
   &.table-expandable tr {
-    th:first-child,
-    td:first-child {
-      border-left: 4px solid transparent;
-    }
     &.expanded,
     &.expanded + tr {
-      > td:first-child {
-        border-left-color: $gray-500;
-      }
+      background-color: $gray-50;
     }
   }
   thead > tr > th.header-actions {
@@ -49,6 +44,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 0.75rem;
 
         .btn {
           white-space: nowrap;
@@ -56,7 +52,7 @@
       }
     }
 
-    > td.row-control {
+    > td.row-control > div {
       display: flex;
       align-items: center;
 
@@ -77,7 +73,7 @@
 
 // Shadow hover
 .table-container.table-hover-shadow {
-  tbody > tr:hover {
+  tbody > tr:not(.expanded + tr):hover {
     border-top: 1px solid $border-color;
     border-bottom: 1px solid $border-color;
     border-radius: $border-radius-lg;
@@ -90,7 +86,7 @@
   }
 
   // On grid view
-  .card:hover {
+  .card:not(.card-table):hover {
     box-shadow: if(
       isDarkMode(),
       0 0.1rem 1rem 0.25rem rgba($white, 0.05),
@@ -102,6 +98,11 @@
 
 .table-responsive {
   overflow: inherit;
+  overflow-x: auto;
+
+  .table-container {
+    width: 100%;
+  }
 }
 
 /* TABLE IN CARD */
@@ -201,18 +202,18 @@
         td:first-child,
         th:first-child,
         tr:first-child {
-          padding-left: 2.5rem;
+          padding-left: $card-px;
         }
         td:last-child,
         th:last-child,
         tr:last-child {
-          padding-right: 2.5rem;
+          padding-right: $card-px;
         }
       }
 
       .table-filters {
-        padding-left: 2.5rem;
-        padding-right: 2.5rem;
+        padding-left: $card-px;
+        padding-right: $card-px;
       }
 
       .search-no-result,
@@ -222,7 +223,29 @@
     }
 
     .table-pagination {
-      padding: 0 2.5rem !important;
+      padding: 0 $card-px !important;
+
+      .page-item {
+        .page-link {
+          color: $grey-500;
+          width: 40px;
+          height: 40px;
+        }
+        .page-link:focus,
+        .page-link:hover,
+        &.active .page-link {
+          color: $primary;
+          background-color: $primary-50;
+        }
+      }
+
+      .form-select {
+        color: $dark;
+
+        option {
+          background-color: $body-bg;
+        }
+      }
     }
   }
 
@@ -252,6 +275,105 @@
         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$primary}'/></svg>")
       );
       background-color: $dark-inverse;
+    }
+  }
+}
+
+// Filters menu and its inputs
+.drawer .filter-container,
+.card.card-table .table-filters-menu {
+  white-space: normal;
+
+  .filter-field {
+    padding-top: 0;
+  }
+
+  // Select
+  .metronic-select-container {
+    margin: 0 -1rem -0.65rem;
+
+    .metronic-select {
+      &__control {
+        border-radius: 0;
+        border: 0;
+        border-bottom: 1px solid $border-color;
+        padding-bottom: 0.5rem;
+        box-shadow: none;
+      }
+
+      &__dropdown-indicator {
+        display: none;
+      }
+    }
+  }
+
+  // Select Menu/List
+  .metronic-select__menu {
+    position: relative;
+    box-shadow: unset;
+    margin: 0;
+
+    .metronic-select__option {
+      padding-top: 2px;
+      padding-bottom: 2px;
+      height: 50px;
+
+      > * {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+    }
+  }
+
+  // Sidebar accordion items
+  .accordion-item {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  // Column filter
+  &.column-filter {
+    text-transform: none;
+    text-align: start;
+    height: 0;
+    width: 0;
+
+    .menu-link {
+      display: none;
+    }
+  }
+}
+.card.card-table th:not(:first-child) .table-filters-menu.column-filter {
+  .menu-sub-dropdown {
+    margin-left: -125px !important;
+  }
+}
+
+// Mobile mode
+$mobile-spacing: get($content-spacing, tablet-and-mobile);
+@include media-breakpoint-down(sm) {
+  .card.card-table.full-width {
+    margin-left: -$mobile-spacing;
+    margin-right: -$mobile-spacing;
+    border-radius: 0;
+
+    .card-header,
+    .table-pagination {
+      padding-left: $mobile-spacing !important;
+      padding-right: $mobile-spacing !important;
+    }
+
+    td:first-child,
+    th:first-child {
+      padding-left: $mobile-spacing !important;
+    }
+    td:last-child,
+    th:last-child {
+      padding-right: $mobile-spacing !important;
     }
   }
 }

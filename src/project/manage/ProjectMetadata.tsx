@@ -41,6 +41,7 @@ export const ProjectMetadata: React.FC<ProjectMetadataProps> = ({
           label={translate('Short name')}
           value={project.short_name}
         />
+        <FormTable.Item label={translate('Slug')} value={project.slug} />
       </FormTable>
     </FormTable.Card>
   );

@@ -79,6 +79,7 @@ const ProjectContainerWithHero = (props) => {
         to: 'organization.dashboard',
         params: { uuid: project.customer_uuid },
         ellipsis: 'md',
+        maxLength: 11,
       },
       {
         key: 'organization.projects',
@@ -90,7 +91,9 @@ const ProjectContainerWithHero = (props) => {
       {
         key: 'project',
         text: project.name,
-        dropdown: <ProjectBreadcrumbPopover project={project} />,
+        dropdown: (close) => (
+          <ProjectBreadcrumbPopover project={project} close={close} />
+        ),
         truncate: true,
         active: true,
       },

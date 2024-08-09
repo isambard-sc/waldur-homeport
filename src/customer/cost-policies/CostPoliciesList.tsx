@@ -50,7 +50,7 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
           title: translate('Project'),
           render: ({ row }) => (
             <ProjectLink
-              row={{ ...row, name: row.project_name, uuid: row.project_uuid }}
+              row={{ ...row, name: row.scope_name, uuid: row.scope_uuid }}
             />
           ),
         },
@@ -107,11 +107,17 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
       verboseName={translate('Cost policies')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       hoverableRow={({ row }) => (
-        <CostPolicyDeleteButton row={row} refetch={tableProps.fetch} />
+        <CostPolicyDeleteButton
+          row={row}
+          type="project"
+          refetch={tableProps.fetch}
+        />
       )}
       hasQuery={true}
       showPageSizeSelector={true}
-      actions={<CostPolicyCreateButton refetch={tableProps.fetch} />}
+      actions={
+        <CostPolicyCreateButton type="project" refetch={tableProps.fetch} />
+      }
       {...props}
     />
   );

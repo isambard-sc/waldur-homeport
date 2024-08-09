@@ -20,6 +20,7 @@ import {
   DisplayMode,
   ExportConfig,
   FilterItem,
+  FilterPosition,
   Sorting,
   TableOptionsType,
 } from './types';
@@ -182,6 +183,19 @@ export const useTable = (options: TableOptionsType) => {
     (query) => dispatch(actions.setFilterQuery(table, query)),
     [dispatch, table],
   );
+  const setFilterPosition = useCallback(
+    (filterPosition: FilterPosition) =>
+      dispatch(actions.setFilterPosition(table, filterPosition)),
+    [dispatch, table],
+  );
+  const setFilter = useCallback(
+    (item: FilterItem) => dispatch(actions.setFilter(table, item)),
+    [dispatch, table],
+  );
+  const applyFiltersFn = useCallback(
+    (apply: boolean) => dispatch(actions.applyFilters(table, apply)),
+    [dispatch, table],
+  );
   const updatePageSize = useCallback(
     (size) => dispatch(actions.updatePageSize(table, size)),
     [dispatch, table],
@@ -211,8 +225,17 @@ export const useTable = (options: TableOptionsType) => {
     [dispatch, table],
   );
   const toggleColumn = useCallback(
-    (index: number, column: any, value?: boolean) =>
-      dispatch(actions.toggleColumn(table, index, column, value)),
+    (id: string, column: any, value?: boolean) =>
+      dispatch(actions.toggleColumn(table, id, column, value)),
+    [dispatch, table],
+  );
+  const initColumnPositions = useCallback(
+    (ids: string[]) => dispatch(actions.initColumnPositions(table, ids)),
+    [dispatch, table],
+  );
+  const swapColumns = useCallback(
+    (column1: string, column2: string) =>
+      dispatch(actions.swapColumns(table, column1, column2)),
     [dispatch, table],
   );
 
@@ -230,6 +253,9 @@ export const useTable = (options: TableOptionsType) => {
     renderFiltersDrawer,
     setDisplayMode,
     setQuery,
+    setFilterPosition,
+    setFilter,
+    applyFiltersFn,
     updatePageSize,
     resetPagination,
     sortList,
@@ -238,7 +264,10 @@ export const useTable = (options: TableOptionsType) => {
     selectAllRows,
     resetSelection,
     toggleColumn,
+    initColumnPositions,
+    swapColumns,
     ...tableState,
+    table,
     rows,
     alterTitle,
   };

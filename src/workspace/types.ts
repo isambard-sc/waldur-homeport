@@ -37,7 +37,6 @@ export interface UserDetails extends User {
   requested_email?: string;
   registration_method: string;
   preferred_language: string;
-  competence: string;
   date_joined: string;
   organization: string;
   job_title: string;
@@ -87,6 +86,7 @@ interface BillingPriceEstimate {
 }
 
 export interface Project {
+  slug?: string;
   name: string;
   uuid: string;
   short_name: string;
@@ -118,6 +118,7 @@ export type PhoneNumber =
 
 // Customer has only two mandatory fields: name and email, rest are optional.
 export interface Customer {
+  slug?: string;
   projects_count?: number;
   url?: string;
   uuid?: string;

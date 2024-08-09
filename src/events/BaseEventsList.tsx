@@ -7,7 +7,7 @@ import { translate } from '@waldur/i18n';
 import { Table, createFetcher } from '@waldur/table';
 import { useTable } from '@waldur/table/utils';
 
-import { EventTypesButton } from './EventTypesButton';
+import { EventTypesButton, EventTypesDropdownItem } from './EventTypesButton';
 import { ExpandableEventDetails } from './ExpandableEventDetails';
 
 const EventDateField = ({ row }) => <>{formatDateTime(row.created)}</>;
@@ -39,14 +39,15 @@ export const BaseEventsList: FunctionComponent<{
       filter,
       fetchData: createFetcher('events'),
       queryField: 'message',
-      exportFields: ['message', 'created'],
-      exportRow: (row) => [row.message, row.created],
-      exportKeys: ['message', 'created'],
       pullInterval: ENV.countersTimerInterval * 1000,
     }),
     [table, filter],
   );
   const props = useTable(options);
+
+  const dropdownActions = useMemo(() => {
+    return actions ? [] : [EventTypesDropdownItem()];
+  }, [actions]);
 
   return (
     <Table
@@ -54,17 +55,20 @@ export const BaseEventsList: FunctionComponent<{
         {
           title: translate('Message'),
           render: ({ row }) => eventsRegistry.formatEvent(row),
+          export: 'message',
         },
         {
           title: translate('Timestamp'),
           render: EventDateField,
           orderField: 'created',
+          export: 'created',
         },
       ]}
       hasQuery={true}
       title={title || translate('Events')}
       verboseName={translate('events')}
       actions={actions || <EventTypesButton />}
+      dropdownActions={dropdownActions}
       enableExport={true}
       expandableRow={ExpandableEventDetails}
       filters={filters}

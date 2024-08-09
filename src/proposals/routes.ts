@@ -22,6 +22,10 @@ const PublicCallDetailsContainer = lazyComponent(
   () => import('./details/PublicCallDetailsContainer'),
   'PublicCallDetailsContainer',
 );
+const PublicCallDetails = lazyComponent(
+  () => import('./details/PublicCallDetails'),
+  'PublicCallDetails',
+);
 
 const CallUpdateContainer = lazyComponent(
   () => import('./update/CallUpdateContainer'),
@@ -175,6 +179,13 @@ export const states: StateDeclaration[] = [
     parent: 'call-management',
   },
 
+  {
+    name: 'proposal-review-view',
+    url: 'review/:review_uuid/view/',
+    component: ProposalReviewCreatePage,
+    parent: 'reviews',
+  },
+
   // Public calls
   {
     name: 'calls-for-proposals',
@@ -237,6 +248,12 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'proposals-call-proposals',
+    url: 'call/:call',
+    parent: 'proposals',
+    component: UserProposalsList,
+  },
+  {
     name: 'reviews-all-reviews',
     url: '',
     parent: 'reviews',
@@ -271,9 +288,16 @@ export const states: StateDeclaration[] = [
     },
   },
   {
-    name: 'public-calls.details',
-    url: ':call_uuid/?tab',
+    name: 'public-call',
+    url: ':call_uuid/',
+    abstract: true,
     component: PublicCallDetailsContainer,
+    parent: 'public-calls',
+  },
+  {
+    name: 'public-call.details',
+    url: '?tab',
+    component: PublicCallDetails,
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
     },

@@ -10,11 +10,12 @@ export interface PageBarTab {
 export interface IBreadcrumbItem {
   key: string;
   text: string;
-  dropdown?: ReactNode;
+  dropdown?: ReactNode | ((close: () => void) => ReactNode);
   hideDropdownArrow?: boolean;
   active?: boolean;
   to?: string;
   params?: object;
   ellipsis?: 'md' | 'xl' | 'xxl';
   truncate?: boolean;
+  maxLength?: number;
 }

@@ -1,3 +1,4 @@
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
@@ -34,6 +35,10 @@ const filtersSelector = createSelector(
 );
 
 export const UserProposalsList: FC = () => {
+  const {
+    params: { call },
+  } = useCurrentStateAndParams();
+  const callObj = call ? JSON.parse(decodeURIComponent(call)) : undefined;
   const filter = useSelector(filtersSelector);
 
   const tableProps = useTable({
@@ -48,8 +53,9 @@ export const UserProposalsList: FC = () => {
       state: getProposalStateOptions().filter(
         (option) => option.value !== 'canceled' && option.value !== 'rejected',
       ),
+      call: callObj,
     }),
-    [],
+    [callObj],
   );
 
   const columns = [
@@ -57,28 +63,35 @@ export const UserProposalsList: FC = () => {
       title: translate('Proposal'),
       render: ({ row }) => <>{row.name}</>,
       keys: ['name'],
+      id: 'proposal',
     },
     {
       title: translate('Call'),
       render: ({ row }) => <>{renderFieldOrDash(row.call_name)}</>,
       keys: ['call_name'],
+      filter: 'call',
+      id: 'call',
     },
     {
       title: translate('Ending'),
       render: ({ row }) => <EndingField endDate={row.round?.cutoff_time} />,
       keys: ['round'],
+      id: 'ending',
     },
     {
       title: translate('State'),
       render: ({ row }) => <ProposalBadge state={row.state} />,
       keys: ['state'],
       orderField: 'state',
+      filter: 'state',
+      id: 'state',
     },
     {
       title: translate('UUID'),
       render: ({ row }) => <>{row.uuid}</>,
       keys: ['uuid'],
       optional: true,
+      id: 'uuid',
     },
     {
       title: translate('Created'),
@@ -86,14 +99,17 @@ export const UserProposalsList: FC = () => {
       keys: ['created'],
       orderField: 'created',
       optional: true,
+      id: 'created',
     },
     {
       title: translate('Duration in days'),
       render: ({ row }) => <>{row.duration_in_days || DASH_ESCAPE_CODE}</>,
       keys: ['duration_in_days'],
       optional: true,
+      id: 'duration_in_days',
     },
   ];
+
   if (isFeatureVisible(ProjectFeatures.oecd_fos_2007_code)) {
     columns.push({
       title: translate('OECD FoS code'),
@@ -106,6 +122,7 @@ export const UserProposalsList: FC = () => {
       ),
       optional: true,
       keys: ['oecd_fos_2007_code', 'oecd_fos_2007_label'],
+      id: 'oecd_fos_code',
     });
   }
 
@@ -123,7 +140,7 @@ export const UserProposalsList: FC = () => {
           params={{
             proposal_uuid: row.uuid,
           }}
-          className="btn btn-primary"
+          className="btn btn-outline btn-outline-dark btn-sm border-gray-400 btn-active-secondary px-2"
         >
           {translate('View')}
         </Link>

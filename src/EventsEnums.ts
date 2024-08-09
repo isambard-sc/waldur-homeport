@@ -242,6 +242,10 @@ export const ResourcesEnum = {
   resource_update_succeeded: 'resource_update_succeeded',
 };
 
+export const ReviewEnum = {
+  review_canceled: 'review_canceled',
+};
+
 export const SshEnum = {
   ssh_key_creation_succeeded: 'ssh_key_creation_succeeded',
   ssh_key_deletion_succeeded: 'ssh_key_deletion_succeeded',
@@ -266,6 +270,7 @@ export const UsersEnum = {
   freeipa_profile_enabled: 'freeipa_profile_enabled',
   marketplace_offering_user_created: 'marketplace_offering_user_created',
   marketplace_offering_user_deleted: 'marketplace_offering_user_deleted',
+  marketplace_offering_user_restriction_updated: 'marketplace_offering_user_restriction_updated',
   ssh_key_creation_succeeded: 'ssh_key_creation_succeeded',
   ssh_key_deletion_succeeded: 'ssh_key_deletion_succeeded',
   user_activated: 'user_activated',

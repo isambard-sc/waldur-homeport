@@ -13,14 +13,13 @@ import { HookCreateButton } from './HookCreateButton';
 import { HookRemoveButton } from './HookRemoveButton';
 import { HookUpdateButton } from './HookUpdateButton';
 import { formatEventTitle } from './utils';
-import './HookList.scss';
 
 const StateField = ({ row }) => {
   const cls = row.is_active ? 'bg-success' : 'bg-danger';
   const title = row.is_active ? translate('Enabled') : translate('Disabled');
   return (
     <span
-      className={`status-circle d-inline-block rounded square ${cls}`}
+      className={`status-circle d-inline-block rounded w-10px h-10px ${cls}`}
       title={title}
     />
   );
@@ -40,14 +39,6 @@ export const HooksList: FunctionComponent = () => {
     table: HOOK_LIST_ID,
     fetchData: createFetcher('hooks'),
     filter,
-    exportRow: (row) => [
-      titleCase(row.hook_type),
-      getDestinationField(row),
-      getEventsField(row),
-    ],
-    exportAll: true,
-    exportFields: ['Method', 'Destination', 'Events'],
-    exportKeys: ['hook_type', 'destination_url', 'email', 'event_groups'],
   });
   return (
     <Table
@@ -57,31 +48,38 @@ export const HooksList: FunctionComponent = () => {
           title: translate('State'),
           className: 'text-center all',
           render: StateField,
+          export: false,
         },
         {
           title: translate('Method'),
           className: 'min-tablet-l',
           render: ({ row }) => titleCase(row.hook_type),
+          export: (row) => titleCase(row.hook_type),
+          exportKeys: ['hook_type'],
         },
         {
           title: translate('Destination'),
           className: 'min-tablet-l',
           render: ({ row }) => getDestinationField(row),
+          export: (row) => getDestinationField(row),
+          exportKeys: ['destination_url', 'email'],
         },
         {
           title: translate('Events'),
           className: 'min-tablet-l',
           render: ({ row }) => getEventsField(row),
+          export: (row) => getEventsField(row),
+          exportKeys: ['event_groups'],
         },
       ]}
       showPageSizeSelector={true}
       verboseName={translate('Notifications')}
       actions={<HookCreateButton />}
       hoverableRow={({ row }) => (
-        <div className="list_active_button_container">
+        <>
           <HookUpdateButton row={row} />
           <HookRemoveButton url={row.url} refetch={props.fetch} />
-        </div>
+        </>
       )}
       enableExport={true}
     />
