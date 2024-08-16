@@ -5,6 +5,7 @@ import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import Avatar from '@waldur/core/Avatar';
+import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
@@ -41,6 +42,7 @@ const InvitationsListComponent: FunctionComponent = () => {
                 size={25}
               />
               {row.email}
+              <CopyToClipboardButton value={row.email} />
             </div>
           ),
           orderField: 'email',
@@ -66,14 +68,14 @@ const InvitationsListComponent: FunctionComponent = () => {
           render: ({ row }) => formatDate(row.expires),
         },
       ]}
-      hoverableRow={({ row }) => (
+      rowActions={({ row }) => (
         <>
           <InvitationSendButton row={row} />
           <InvitationCancelButton row={row} refetch={props.fetch} />
         </>
       )}
       verboseName={translate('Team invitations')}
-      actions={
+      tableActions={
         <InvitationCreateButton
           project={project}
           roleTypes={['project']}

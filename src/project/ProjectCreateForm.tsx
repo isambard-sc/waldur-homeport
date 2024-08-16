@@ -25,6 +25,7 @@ import { getCustomer, getWorkspace } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
 import * as api from './api';
+import { OECD_FOS_2007_CODES } from './OECD_FOS_2007_CODES';
 import { ProjectNameField } from './ProjectNameField';
 import { ProjectShortNameField } from './ProjectShortNameField';
 
@@ -37,10 +38,8 @@ export interface ProjectCreateFormData {
 
 const loadData = async () => {
   const projectTypes = await api.loadProjectTypes();
-  const oecdCodes = await api.loadOecdCodes();
   return {
     projectTypes,
-    oecdCodes,
   };
 };
 
@@ -89,7 +88,7 @@ export const ProjectCreateForm = reduxForm<
               'Please select OECD code corresponding to field of science and technology',
             )}
             name="oecd_fos_2007_code"
-            options={value.oecdCodes}
+            options={OECD_FOS_2007_CODES}
             getOptionValue={(option) => option.value}
             getOptionLabel={(option) => `${option.value}. ${option.label}`}
             isClearable={true}
@@ -117,6 +116,16 @@ export const ProjectCreateForm = reduxForm<
               isClearable={true}
             />
           )}
+        {isFeatureVisible(ProjectFeatures.show_start_date_in_create_dialog) && (
+          <DateField
+            name="start_date"
+            label={translate('Start date')}
+            description={translate(
+              'Once start date is reached, invitations and orders are processed.',
+            )}
+            minDate={DateTime.now().plus({ days: 1 }).toISO()}
+          />
+        )}
         {isFeatureVisible(ProjectFeatures.show_end_date_in_create_dialog) && (
           <DateField
             name="end_date"

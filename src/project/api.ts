@@ -11,8 +11,6 @@ import { formatDate } from '@waldur/core/dateUtils';
 import { InvoiceSummary } from '@waldur/dashboard/types';
 import { Customer, Project } from '@waldur/workspace/types';
 
-import { OecdCode } from './types';
-
 export const getProject = (projectId: string) =>
   getById<Project>('/projects/', projectId);
 
@@ -25,6 +23,7 @@ export const createProject = (project) => {
     short_name: project.short_name,
     description: project.description,
     end_date: project.end_date ? formatDate(project.end_date) : undefined,
+    start_date: project.start_date ? formatDate(project.start_date) : undefined,
     customer: project.customer.url,
     type: project.type?.url,
     oecd_fos_2007_code: project.oecd_fos_2007_code?.value,
@@ -48,6 +47,9 @@ export const updateProjectPartially = (
   const data = { ...values };
   if ('end_date' in data) {
     data.end_date = formatDate(data.end_date);
+  }
+  if ('start_date' in data) {
+    data.start_date = formatDate(data.start_date);
   }
   if ('oecd_fos_2007_code' in data) {
     data.oecd_fos_2007_code = data.oecd_fos_2007_code?.value;
@@ -77,9 +79,6 @@ export const deleteProject = (projectId: string) =>
 
 export const loadProjectTypes = () =>
   get<{ url; name }[]>(`/project-types/`).then((response) => response.data);
-
-export const loadOecdCodes = () =>
-  get<OecdCode[]>(`/projects/oecd_codes/`).then((response) => response.data);
 
 export const dangerouslyUpdateProject = (cache, project) => {
   cache.name = project.name;

@@ -70,6 +70,19 @@ export const BaseProjectsList: FunctionComponent<{
       export: (row) => row.resources_count || 0,
     },
     {
+      title: translate('Start date'),
+      orderField: 'start_date',
+      render: ({ row }) => (
+        <>{row.start_date ? formatDate(row.start_date) : DASH_ESCAPE_CODE}</>
+      ),
+      keys: ['start_date'],
+      id: 'start_date',
+      export: (row) =>
+        row.start_date ? formatDate(row.start__date) : DASH_ESCAPE_CODE,
+      optional: true,
+    },
+
+    {
       title: translate('End date'),
       orderField: 'end_date',
       render: ({ row }) => (
@@ -172,7 +185,7 @@ export const BaseProjectsList: FunctionComponent<{
       filters={filters}
       standalone={standalone}
       hasOptionalColumns
-      actions={<GlobalProjectCreateButton refetch={props.fetch} />}
+      tableActions={<GlobalProjectCreateButton refetch={props.fetch} />}
     />
   );
 };

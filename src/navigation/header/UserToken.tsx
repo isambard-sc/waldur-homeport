@@ -1,3 +1,4 @@
+import { Copy } from '@phosphor-icons/react';
 import copy from 'copy-to-clipboard';
 import { useCallback } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
@@ -24,7 +25,7 @@ export const UserToken = ({ token }) => {
           <FormControl
             value={token}
             readOnly={true}
-            className="form-control-solid"
+            className="form-control-solid h-30px"
             size="sm"
             placeholder={translate('Token')}
             style={{
@@ -37,7 +38,7 @@ export const UserToken = ({ token }) => {
             className="px-3"
             onClick={onClick}
           >
-            <i className="fa fa-copy" />
+            <Copy />
             {translate('Copy')}
           </Button>
         </InputGroup>

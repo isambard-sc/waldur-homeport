@@ -145,7 +145,7 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       {isFeatureVisible(MarketplaceFeatures.import_resources) && (
         <ResourceImportButton category_uuid={ownProps.category_uuid} />
       )}
-      <CreateResourceButton category_uuid={ownProps.category_uuid} />
+      <CreateResourceButton categoryUuid={ownProps.category_uuid} />
     </>
   );
 
@@ -155,10 +155,10 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       title={ownProps.category_title}
       columns={columns}
       verboseName={translate('Resources')}
-      hoverableRow={({ row }) => (
+      rowActions={({ row }) => (
         <ResourceActionsButton row={row} refetch={props.fetch} />
       )}
-      actions={tableActions}
+      tableActions={tableActions}
       initialSorting={{ field: 'created', mode: 'desc' }}
       hasQuery={true}
       showPageSizeSelector={true}

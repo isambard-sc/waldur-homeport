@@ -54,11 +54,13 @@ const savePermissions = async (
         expiration_time: formData.expiration_time,
       });
     } else {
-      await deleteCustomerUser({
-        customer: customer.uuid,
-        user: resolve.customer.uuid,
-        role: resolve.customer.role_name,
-      });
+      if (resolve.customer.role_name) {
+        await deleteCustomerUser({
+          customer: customer.uuid,
+          user: resolve.customer.uuid,
+          role: resolve.customer.role_name,
+        });
+      }
       await addCustomerUser({
         customer: customer.uuid,
         user: resolve.customer.uuid,
@@ -103,7 +105,7 @@ export const EditUserDialog = connect(
     return (
       <form onSubmit={handleSubmit(saveUser)}>
         <Modal.Header>
-          <Modal.Title>{translate('Edit customer member')}</Modal.Title>
+          <Modal.Title>{translate('Edit organization member')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <FormContainer submitting={submitting}>

@@ -110,6 +110,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Show industry flag.'),
       },
       {
+        key: 'show_start_date_in_create_dialog',
+        description: translate('Show start date field in project create dialog.'),
+      },
+      {
         key: 'show_type_in_create_dialog',
         description: translate('Show type field in project create dialog.'),
       },
@@ -176,12 +180,20 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('User workspace'),
     items: [
       {
+        key: 'disable_user_termination',
+        description: translate('Disable user termination in user workspace.'),
+      },
+      {
         key: 'notifications',
         description: translate('Enable email and webhook notifications management in user workspace.'),
       },
       {
         key: 'preferred_language',
         description: translate('Render preferred language column in users list.'),
+      },
+      {
+        key: 'show_slug',
+        description: translate('Enable display of slug field in user summary.'),
       },
       {
         key: 'ssh_keys',

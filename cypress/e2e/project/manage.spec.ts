@@ -70,7 +70,6 @@ describe('Project manage', { testIsolation: false }, () => {
       .mockChecklists()
       .mockCustomers()
       .setToken()
-      .intercept('GET', '/api/projects/oecd_codes/', [])
       .fixture(projectFixturePath)
       .then((project) => {
         // Assume next year date as project end date, because the date-picker does not accept the date before today.
@@ -92,6 +91,7 @@ describe('Project manage', { testIsolation: false }, () => {
 
   it('Assure that image tab view is present', () => {
     cy.fixture(projectFixturePath).then((project) => {
+      cy.visit(`/projects/${project.uuid}/manage/?tab=avatar`).waitForPage();
       cy.get('form .card-body div.image-input').should(
         project.image ? 'not.have.class' : 'have.class',
         'image-input-empty',

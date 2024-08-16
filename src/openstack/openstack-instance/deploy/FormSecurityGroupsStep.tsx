@@ -1,4 +1,4 @@
-import { Eye } from '@phosphor-icons/react';
+import { Eye, Plus } from '@phosphor-icons/react';
 import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { Button, FormControl } from 'react-bootstrap';
@@ -132,7 +132,9 @@ export const FormSecurityGroupsStep = (props: FormStepProps) => {
             <ShowPreviewButton />
             {showExperimentalUiComponents && (
               <Button variant="light" className="text-nowrap" size="sm">
-                <i className="fa fa-plus" />
+                <span className="svg-icon svg-icon-2">
+                  <Plus />
+                </span>
                 {translate('New security group')}
               </Button>
             )}
@@ -171,7 +173,7 @@ export const FormSecurityGroupsStep = (props: FormStepProps) => {
         ]}
         verboseName={translate('Security groups')}
         hasActionBar={false}
-        hoverableRow={ShowSecurityGroupsButton}
+        rowActions={ShowSecurityGroupsButton}
         hoverable
         fieldType="checkbox"
         fieldName="attributes.security_groups"

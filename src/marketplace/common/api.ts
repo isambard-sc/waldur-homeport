@@ -200,6 +200,9 @@ export const submitResourceOptions = (resourceId: string, payload) =>
 export const setBackendId = (resourceId: string, payload) =>
   post(`/marketplace-resources/${resourceId}/set_backend_id/`, payload);
 
+export const setSlug = (resourceId: string, payload) =>
+  post(`/marketplace-resources/${resourceId}/set_slug/`, payload);
+
 export const updateOfferingLocation = (offeringId, data) =>
   post<GeolocationPoint>(
     `/marketplace-provider-offerings/${offeringId}/update_location/`,
@@ -530,3 +533,6 @@ export const createLexisLink = (data) =>
 
 export const deleteLexisLink = (lexisLinkURL: string) =>
   Axios.delete(lexisLinkURL);
+
+export const unlinkOrder = (orderUuid: string) =>
+  post(`/marketplace-orders/${orderUuid}/unlink/`);

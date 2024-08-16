@@ -49,6 +49,7 @@ export interface UserDetails extends User {
   identity_provider_label?: string;
   identity_provider_management_url?: string;
   identity_provider_fields?: string[];
+  slug?: string;
 }
 
 interface PaymentProfileAttributes {
@@ -95,6 +96,7 @@ export interface Project {
   quotas: Quota[];
   description?: string;
   created?: string;
+  start_date?: string;
   end_date?: string;
   billing_price_estimate?: BillingPriceEstimate;
   customer_uuid?: string;
