@@ -29,7 +29,7 @@ export class SecretField extends Component<
   getValue = () =>
     this.state.showSecret
       ? this.props.value
-      : this.props.value
+      : (this.props.value || '')
           .split('')
           .map(() => '*')
           .join('');
