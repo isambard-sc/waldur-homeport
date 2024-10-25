@@ -45,7 +45,7 @@ export const OrganizationCreditsList: FC<{}> = () => {
             row.offerings.map((offering) => offering.name).join(', '),
         },
         {
-          title: translate('Consumption logic'),
+          title: translate('Minimal consumption logic'),
           render: ({ row }) => startCase(row.minimal_consumption_logic),
           export: 'minimal_consumption_logic',
         },

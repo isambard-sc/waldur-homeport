@@ -139,7 +139,7 @@ export const CreditFormDialog = connect(
               required
             />
             <CustomRadioButton
-              label={translate('Consumption logic')}
+              label={translate('Minimal consumption logic')}
               name="minimal_consumption_logic"
               direction="horizontal"
               choices={[
