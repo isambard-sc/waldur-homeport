@@ -420,7 +420,7 @@
     "message": "Add {category}"
   },
   "Add": {
-    "description": "administration/providers/CreateProviderDialog.tsx, core/AddButton.tsx, customer/list/OrganizationCreateButton.tsx, customer/team/AddProjectUserButton.tsx, customer/team/UserAddButton.tsx, issues/comments/IssueCommentsForm.tsx, marketplace/deploy/DeployPage.tsx, openstack/openstack-backup/actions/NetworksList.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpsList.tsx, openstack/openstack-instance/deploy/FormNetworkStep.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/GlobalProjectCreateButton.tsx, project/ProjectCreateButton.tsx, rancher/cluster/create/FormNodesStep.tsx",
+    "description": "administration/providers/CreateProviderDialog.tsx, core/AddButton.tsx, customer/list/OrganizationCreateButton.tsx, customer/team/AddProjectUserButton.tsx, customer/team/UserAddButton.tsx, issues/comments/IssueCommentsForm.tsx, marketplace/deploy/DeployPage.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-backup/actions/NetworksList.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpsList.tsx, openstack/openstack-instance/deploy/FormNetworkStep.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/GlobalProjectCreateButton.tsx, project/ProjectCreateButton.tsx, rancher/cluster/create/FormNodesStep.tsx",
     "message": "Add"
   },
   "Additional account description invisible to user": {
@@ -3796,7 +3796,7 @@
     "message": "Extending"
   },
   "External IP": {
-    "description": "azure/vm/AzureVirtualMachineSummary.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, resource/summary/VirtualMachineSummary.tsx",
+    "description": "azure/vm/AzureVirtualMachineSummary.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/OpenStackExternalIpsField.tsx, resource/summary/VirtualMachineSummary.tsx",
     "message": "External IP"
   },
   "External IPs": {
@@ -4004,7 +4004,7 @@
     "message": "Floating IP count"
   },
   "Floating IP": {
-    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-floating-ips/FloatingIpsList.tsx",
+    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-floating-ips/FloatingIpsList.tsx",
     "message": "Floating IP"
   },
   "Floating IPs update has been scheduled.": {
@@ -5326,6 +5326,10 @@
   "Managers": {
     "description": "proposals/update/CallUpdateContainer.tsx",
     "message": "Managers"
+  },
+  "Mapping of floating to external IPs": {
+    "description": "openstack/OpenStackSecretOptionsForm.tsx",
+    "message": "Mapping of floating to external IPs"
   },
   "Mark as paid": {
     "description": "invoices/list/MarkAsPaidButton.tsx",

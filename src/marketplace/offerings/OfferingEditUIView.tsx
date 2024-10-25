@@ -138,13 +138,11 @@ const getTabs = (offering: Offering): PageBarTab[] => {
               title: translate('Credentials'),
             }
           : null,
-        PluginOptionsForm
-          ? {
-              key: 'lifecycle-policy',
-              component: LifecyclePolicySection,
-              title: translate('Lifecycle policy'),
-            }
-          : null,
+        {
+          key: 'lifecycle-policy',
+          component: LifecyclePolicySection,
+          title: translate('Lifecycle policy'),
+        },
         SecretOptionsForm || PluginOptionsForm
           ? {
               key: 'user-management',

@@ -1,7 +1,7 @@
-import { pick } from 'lodash';
-import { useCallback } from 'react';
-import { connect } from 'react-redux';
-import { Field, SubmissionError, reduxForm } from 'redux-form';
+import { get, pick } from 'lodash';
+import { useCallback, useEffect } from 'react';
+import { connect, useDispatch } from 'react-redux';
+import { Field, SubmissionError, change, reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
@@ -16,13 +16,29 @@ import { EditOfferingProps } from './types';
 type FormData = Record<string, any>;
 
 export const EditFieldDialog = connect<{}, {}, { resolve: EditOfferingProps }>(
-  (_, ownProps) => ({
-    initialValues: pick(ownProps.resolve.scope, ownProps.resolve.name),
-  }),
+  (_, ownProps) => {
+    const current = get(ownProps.resolve.scope, ownProps.resolve.name);
+    // It seems that there is a bug on redux-form initialization, cannot properly remove elements of an array field.
+    // We initialize array fields with `change` function.
+    return {
+      current,
+      initialValues: Array.isArray(current)
+        ? {}
+        : pick(ownProps.resolve.scope, ownProps.resolve.name),
+    };
+  },
 )(
-  reduxForm<FormData, { resolve: EditOfferingProps }>({
+  reduxForm<FormData, { resolve: EditOfferingProps; current }>({
     form: EDIT_INTEGRATION_FORM_ID,
+    destroyOnUnmount: true,
   })((props) => {
+    const dispatch = useDispatch();
+    useEffect(() => {
+      if (Array.isArray(props.current)) {
+        dispatch(change(props.form, props.resolve.name, props.current));
+      }
+    }, []);
+
     const processRequest = useCallback(
       (values: FormData, dispatch) => {
         return props.resolve

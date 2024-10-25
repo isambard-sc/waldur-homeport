@@ -6,7 +6,6 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { DateField } from '@waldur/form/DateField';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { getPluginOptionsForm } from '@waldur/marketplace/common/registry';
 
 import { FieldEditButton } from './FieldEditButton';
 import { OfferingEditPanelProps } from './types';
@@ -19,7 +18,6 @@ export const LifecyclePolicySection: FC<OfferingEditPanelProps> = (props) => {
     props.offering,
     props.refetch,
   );
-  const PluginOptionsForm = getPluginOptionsForm(props.offering.type);
 
   const fields = useMemo(
     () => [
@@ -79,24 +77,23 @@ export const LifecyclePolicySection: FC<OfferingEditPanelProps> = (props) => {
   return (
     <FormTable.Card title={TITLE} className="card-bordered mb-7">
       <FormTable>
-        {PluginOptionsForm &&
-          fields.map((field) => (
-            <FormTable.Item
-              key={field.key}
-              label={field.label}
-              value={field.value || 'N/A'}
-              actions={
-                <FieldEditButton
-                  title={TITLE}
-                  scope={props.offering}
-                  name={field.key}
-                  callback={update}
-                  fieldComponent={field.component}
-                  hideLabel={field.component === AwesomeCheckboxField}
-                />
-              }
-            />
-          ))}
+        {fields.map((field) => (
+          <FormTable.Item
+            key={field.key}
+            label={field.label}
+            value={field.value || 'N/A'}
+            actions={
+              <FieldEditButton
+                title={TITLE}
+                scope={props.offering}
+                name={field.key}
+                callback={update}
+                fieldComponent={field.component}
+                hideLabel={field.component === AwesomeCheckboxField}
+              />
+            }
+          />
+        ))}
       </FormTable>
     </FormTable.Card>
   );

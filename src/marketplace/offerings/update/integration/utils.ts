@@ -48,7 +48,9 @@ export const useUpdateOfferingIntegration = (offering: Offering, refetch?) => {
       // Replace edited field(s)
       const flattenKeys = flattenObject(formData);
       Object.entries(flattenKeys).map(([key, value]) => {
-        if (value || [0, false].includes(value)) {
+        if (Array.isArray(value) && value.length === 0) {
+          unset(payload, key);
+        } else if (value || [0, false].includes(value)) {
           set(payload, key, value);
         } else {
           unset(payload, key);
