@@ -3335,6 +3335,10 @@
     "description": "project/OECD_FOS_2007_CODES.ts",
     "message": "Electrical engineering, electronic engineering, information engineering"
   },
+  "Eligible offerings": {
+    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/ProjectCreditsList.tsx",
+    "message": "Eligible offerings"
+  },
   "Email address": {
     "description": "user/hooks/HookForm.tsx",
     "message": "Email address"
@@ -6432,7 +6436,7 @@
     "message": "Offerings images"
   },
   "Offerings": {
-    "description": "administration/dashboard/AdminStatistics.tsx, administration/organizations/OrganizationCreditsList.tsx, broadcasts/BroadcastExpandableRow.tsx, broadcasts/BroadcastForm.tsx, broadcasts/RecipientsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/category/utils.ts, marketplace/landing/OfferingsGroup.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/service-providers/CampaignForm.tsx, marketplace/service-providers/CampaignUpdateForm.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace/utils.ts, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx, proposals/details/CallOfferingsCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/offerings/CallOfferingsSection.tsx",
+    "description": "administration/dashboard/AdminStatistics.tsx, broadcasts/BroadcastExpandableRow.tsx, broadcasts/BroadcastForm.tsx, broadcasts/RecipientsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/category/utils.ts, marketplace/landing/OfferingsGroup.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/service-providers/CampaignForm.tsx, marketplace/service-providers/CampaignUpdateForm.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace/utils.ts, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx, proposals/details/CallOfferingsCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/offerings/CallOfferingsSection.tsx",
     "message": "Offerings"
   },
   "Ok": {
@@ -10695,13 +10699,13 @@
     "description": "SettingsDescription.ts",
     "message": "The image rendered at the top of mobile sidebar menu in HomePort."
   },
-  "The image rendered at the top of sidebar menu in HomePort.": {
-    "description": "SettingsDescription.ts",
-    "message": "The image rendered at the top of sidebar menu in HomePort."
-  },
   "The image rendered at the top of sidebar menu in dark mode.": {
     "description": "SettingsDescription.ts",
     "message": "The image rendered at the top of sidebar menu in dark mode."
+  },
+  "The image rendered at the top of sidebar menu in light mode.": {
+    "description": "SettingsDescription.ts",
+    "message": "The image rendered at the top of sidebar menu in light mode."
   },
   "The image used in marketplace order header.": {
     "description": "SettingsDescription.ts",
