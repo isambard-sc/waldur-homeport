@@ -1,3 +1,4 @@
+import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { FunctionComponent, useState, useLayoutEffect, useRef } from 'react';
 import { Button } from 'react-bootstrap';
 
@@ -15,14 +16,18 @@ const TabsScrollArrows: FunctionComponent = () => (
       size="sm"
       className="px-2 top-0 start-0 position-absolute h-100"
     >
-      <i className="fa fa-chevron-left" />
+      <span className="svg-icon svg-icon-3">
+        <CaretLeft weight="bold" />
+      </span>
     </Button>
     <Button
       variant="flush"
       size="sm"
       className="px-2 top-0 end-0 position-absolute h-100"
     >
-      <i className="fa fa-chevron-right" />
+      <span className="svg-icon svg-icon-3">
+        <CaretRight weight="bold" />
+      </span>
     </Button>
   </>
 );

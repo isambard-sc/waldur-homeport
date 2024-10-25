@@ -1,3 +1,4 @@
+import { X } from '@phosphor-icons/react';
 import { DateTime } from 'luxon';
 import { FunctionComponent } from 'react';
 import Flatpickr from 'react-flatpickr';
@@ -42,7 +43,9 @@ export const DateField: FunctionComponent<any> = (props) => (
           label={translate('Remove')}
           className="w-100"
         >
-          <i className="fa fa-times fs-6" />
+          <span className="svg-icon svg-icon-2">
+            <X weight="bold" />
+          </span>
         </Tip>
       </button>
     )}

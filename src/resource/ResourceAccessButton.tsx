@@ -1,4 +1,4 @@
-import { Copy } from '@phosphor-icons/react';
+import { CaretDown, Copy } from '@phosphor-icons/react';
 import copy from 'copy-to-clipboard';
 import { FC, useCallback, useMemo } from 'react';
 import { Button, OverlayTrigger, Popover, Table } from 'react-bootstrap';
@@ -116,8 +116,8 @@ export const ResourceAccessButton: FC<ResourceAccessButtonProps> = ({
         className="d-flex btn-outline btn-active-secondary border-gray-400"
       >
         <div className="me-2">{translate('Access resource')}</div>
-        <div>
-          <i className="fa fa-caret-down fa-lg" />
+        <div className="svg-icon svg-icon-2">
+          <CaretDown />
         </div>
       </Button>
     </OverlayTrigger>

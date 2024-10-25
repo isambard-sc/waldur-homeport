@@ -1,4 +1,3 @@
-import { Eye } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
 
 import { translate } from '@waldur/i18n/translate';
@@ -13,7 +12,6 @@ export const ProjectDetailsButton = ({ project }: { project: Project }) => {
       action={() =>
         router.stateService.go('project-manage', { uuid: project.uuid })
       }
-      iconNode={<Eye />}
       size="sm"
     />
   );

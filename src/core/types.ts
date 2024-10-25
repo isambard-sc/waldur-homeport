@@ -57,7 +57,7 @@ export interface ApplicationConfigurationOptions {
   pageSize: number;
   defaultErrorMessage: string;
   buildId: string;
-  accountingMode: string;
+  accountingMode: 'billing' | 'accounting';
   defaultPullInterval: number;
   countersTimerInterval: number;
   roles: Role[];

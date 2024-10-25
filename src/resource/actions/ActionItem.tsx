@@ -11,7 +11,6 @@ import { ResourceActionMenuContext } from '@waldur/marketplace/resources/actions
 export interface ActionItemProps {
   title: string;
   action: () => void;
-  icon?: string;
   iconNode?: ReactNode;
   iconColor?: Variant;
   staff?: boolean;

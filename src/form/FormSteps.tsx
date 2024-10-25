@@ -1,3 +1,4 @@
+import { WarningCircle, XCircle } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, useMemo } from 'react';
 import { FormCheck } from 'react-bootstrap';
@@ -83,7 +84,7 @@ export const FormSteps: FC<{
                     placement="left"
                     autoWidth
                   >
-                    <i className="fa fa-times-circle" />
+                    <XCircle />
                   </Tip>
                 ) : step.fields &&
                   step.fields.some((key) => nonRequiredErrors[key]) ? (
@@ -101,7 +102,7 @@ export const FormSteps: FC<{
                     placement="left"
                     autoWidth
                   >
-                    <i className="fa fa-exclamation-circle" />
+                    <WarningCircle />
                   </Tip>
                 ) : (
                   <FormCheck className="stepper-icon form-check form-check-custom form-check-sm">

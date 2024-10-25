@@ -1,3 +1,4 @@
+import { X } from '@phosphor-icons/react';
 import { FC, PropsWithChildren, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BaseFieldProps, Field } from 'redux-form';
@@ -120,7 +121,9 @@ export const FormNodeStorageRow: FC<FormNodeStorageRowProps> = (props) => {
             className="btn-icon btn-active-light-danger"
             onClick={props.onDeleteRow}
           >
-            <i className="fa fa-times fs-4" />
+            <span className="svg-icon svg-icon-2">
+              <X weight="bold" />
+            </span>
           </Button>
         </td>
       )}

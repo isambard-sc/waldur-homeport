@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { PlusCircle, Trash } from '@phosphor-icons/react';
 import { Fragment } from 'react';
 import { Button, Form, FormLabel } from 'react-bootstrap';
 import { BaseFieldArrayProps, Field, FieldArray } from 'redux-form';
@@ -117,7 +117,9 @@ const FieldsListGroup = ({ fields, components }: ComponentLimitsFieldProps) => {
       {fields.length < components.length && (
         <div>
           <Button variant="light" className="btn-icon" onClick={addRow}>
-            <i className="fa fa-plus fs-4" />
+            <span className="svg-icon svg-icon-2">
+              <PlusCircle />
+            </span>
           </Button>
         </div>
       )}

@@ -1,62 +1,36 @@
-import { PureComponent } from 'react';
-import { connect } from 'react-redux';
+import { WarningCircle } from '@phosphor-icons/react';
+import { FC } from 'react';
 
+import { ENV } from '@waldur/configs/default';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
-
-type AccountingMode = 'billing' | 'accounting';
 
 interface PriceTooltipProps {
   estimated?: boolean;
-  accountingMode: AccountingMode;
-  iconClassName?: string;
 }
 
-class PurePriceTooltip extends PureComponent<PriceTooltipProps> {
-  getTooltipMessage() {
-    const { accountingMode, estimated } = this.props;
-
-    // VAT is not included only when accounting mode is activated
-    const vatNotIncluded = accountingMode === 'accounting';
-    const vatMessage = translate('VAT is not included.');
-    const estimatedMessage = translate('Price is estimated.');
-
-    let message = '';
-    if (vatNotIncluded) {
-      message += vatMessage;
-    }
-
-    if (estimated) {
-      message += message ? ' ' + estimatedMessage : estimatedMessage;
-    }
-
-    return message;
+export const PriceTooltip: FC<PriceTooltipProps> = ({ estimated }) => {
+  // VAT is not included only when accounting mode is activated
+  const parts = [];
+  if (ENV.accountingMode === 'accounting') {
+    parts.push(translate('VAT is not included.'));
   }
 
-  render() {
-    const message = this.getTooltipMessage();
-    if (!message) {
-      return null;
-    }
+  if (estimated) {
+    parts.push(translate('Price is estimated.'));
+  }
 
-    return (
+  const message = parts.join(' ');
+
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <span className="ms-1 hidden-print">
       <Tip label={message} id="price-tooltip">
-        <i
-          className={
-            'fa fa-exclamation-circle ms-1 hidden-print ' +
-            this.props.iconClassName
-          }
-        />
+        <WarningCircle weight="bold" size={15} />
       </Tip>
-    );
-  }
-}
-
-const mapStateToProps = (state: RootState) => ({
-  accountingMode: state.config.accountingMode,
-});
-
-const enhance = connect(mapStateToProps);
-
-export const PriceTooltip = enhance(PurePriceTooltip);
+    </span>
+  );
+};

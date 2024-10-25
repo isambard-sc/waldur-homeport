@@ -1,3 +1,21 @@
+import {
+  Calendar,
+  Database,
+  Folders,
+  HardDrives,
+  YoutubeLogo,
+  Image,
+  UsersThree,
+  CubeFocus,
+  Laptop,
+  TreeStructure,
+  FileText,
+  SealQuestion,
+  Microphone,
+  Ambulance,
+  Copy,
+  SignOut,
+} from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -6,39 +24,35 @@ interface ReferralTypeIconProps {
   resourceType: string;
 }
 
+const Components = {
+  Audiovisual: YoutubeLogo,
+  Collection: Folders,
+  DataPaper: HardDrives,
+  Dataset: Database,
+  Event: Calendar,
+  Image,
+  InteractiveResource: UsersThree,
+  Model: Copy,
+  PhysicalObject: CubeFocus,
+  Service: Ambulance,
+  Software: Laptop,
+  Sound: Microphone,
+  Text: FileText,
+  Workflow: TreeStructure,
+  Other: SignOut,
+  Default: SealQuestion,
+};
+
 export const ReferralTypeIcon: FunctionComponent<ReferralTypeIconProps> = (
   props,
 ) => {
   /* Available values of resource type:
    * https://schema.datacite.org/meta/kernel-4.1/include/datacite-resourceType-v4.1.xsd
    */
-  const resourceTypeDict = {
-    Audiovisual: 'fa fa-volume-up',
-    Collection: 'fa fa-object-group',
-    DataPaper: 'fa fa-server',
-    Dataset: 'fa fa-database',
-    Event: 'fa fa-calendar',
-    Image: 'fa fa-image',
-    InteractiveResource: 'fa fa-users',
-    Model: 'fa fa-clone',
-    PhysicalObject: 'fa fa-cube',
-    Service: 'fa fa-ambulance',
-    Software: 'fa fa-laptop',
-    Sound: 'fa fa-microphone',
-    Text: 'fa fa-file-text-o',
-    Workflow: 'fa fa-briefcase',
-    Other: 'fa fa-sign-out',
-    Default: 'fa fa-question-circle-o',
-  };
+  const Component = Components[props.resourceType] || Components.Default;
   return (
     <Tip label={props.resourceType} id="resource-type-label">
-      <i
-        className={
-          resourceTypeDict[props.resourceType]
-            ? resourceTypeDict[props.resourceType]
-            : resourceTypeDict.Default
-        }
-      />{' '}
+      <Component />
     </Tip>
   );
 };

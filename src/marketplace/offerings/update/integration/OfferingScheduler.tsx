@@ -1,4 +1,4 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { PlusCircle, X } from '@phosphor-icons/react';
 import { Duration } from 'luxon';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import { Button, Card } from 'react-bootstrap';
@@ -118,7 +118,9 @@ const PureOfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
                 className="btn-icon btn-active-light-danger"
                 onClick={() => props.fields.remove(index)}
               >
-                <i className="fa fa-times fs-4" />
+                <span className="svg-icon svg-icon-2">
+                  <X weight="bold" />
+                </span>
               </Button>
             </div>
             <Field

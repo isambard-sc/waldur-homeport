@@ -1,3 +1,4 @@
+import { X } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 import { Field, FormSection } from 'redux-form';
@@ -40,7 +41,9 @@ export const EnvironmentVariablePanel: FunctionComponent<OwnProps> = (
             className="btn-active-color-danger"
             onClick={() => props.onRemove(props.index)}
           >
-            <i className="fa fa-times fs-6" />
+            <span className="svg-icon svg-icon-2">
+              <X weight="bold" />
+            </span>
           </Button>
         </td>
       </tr>

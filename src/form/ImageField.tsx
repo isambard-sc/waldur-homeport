@@ -1,3 +1,4 @@
+import { ArrowClockwise, PencilSimple, X } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FunctionComponent, useCallback, useEffect, useRef } from 'react';
 
@@ -99,7 +100,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             label={translate('Change avatar')}
             className="w-100"
           >
-            <i className="fa fa-pencil fs-6" />
+            <PencilSimple />
           </Tip>
 
           <input
@@ -123,7 +124,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             label={translate('Reset avatar')}
             className="w-100"
           >
-            <i className="fa fa-repeat fs-6" />
+            <ArrowClockwise />
           </Tip>
         </button>
 
@@ -139,7 +140,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             label={translate('Remove avatar')}
             className="w-100"
           >
-            <i className="fa fa-times fs-6" />
+            <X />
           </Tip>
         </button>
       </div>

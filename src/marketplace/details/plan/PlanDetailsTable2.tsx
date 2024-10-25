@@ -156,9 +156,7 @@ export const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (
                 : shouldConcealPrices
                   ? translate('Annual')
                   : translate('Annual cost')}
-              {!shouldConcealPrices && (
-                <PriceTooltip iconClassName="text-dark" />
-              )}
+              {!shouldConcealPrices && <PriceTooltip />}
             </h5>
             {props.periods.length > 1 && (
               <button
@@ -262,7 +260,7 @@ export const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (
             ) : (
               <>
                 {translate('One time cost')}
-                <PriceTooltip iconClassName="text-dark" />
+                <PriceTooltip />
               </>
             )}
           </h5>

@@ -1,4 +1,4 @@
-import { Plus } from '@phosphor-icons/react';
+import { Plus, X } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { uniqueId } from 'lodash';
 import { DateTime, Duration } from 'luxon';
@@ -118,7 +118,9 @@ const renderScheduleRows = ({
               className="btn-icon btn-active-light-danger"
               onClick={() => fields.remove(index)}
             >
-              <i className="fa fa-times fs-4" />
+              <span className="svg-icon svg-icon-2">
+                <X weight="bold" />
+              </span>
             </Button>
           </div>
           <Field
