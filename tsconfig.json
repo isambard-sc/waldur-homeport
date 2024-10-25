@@ -39,7 +39,11 @@
     "./cypress/**/*",
     "./cypress.config.ts",
     "node_modules/@types/webpack",
-    "node_modules/@types/enzyme"
+    "**/*.spec.tsx",
+    "**/*.fixture.tsx",
+    "./src/core/testUtils.ts",
+    "./src/form/testUtils.tsx",
+    "./src/table/testUtils.tsx"
   ],
   "typeRoots": [
     "./node_modules/@types",

@@ -19,13 +19,11 @@ module.exports = {
     '\\.(css|scss|svg)$': '<rootDir>/test/style-mock.js',
   },
   setupFiles: [
-    '<rootDir>/test/enzyme-setup.js',
     '<rootDir>/test/react-setup.js',
     'jest-date-mock',
     'mock-match-media/jest-setup',
   ],
   modulePathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/cypress/'],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
   coverageReporters: ['cobertura'],
   testEnvironment: 'jsdom',
   reporters: ['default', 'jest-junit'],

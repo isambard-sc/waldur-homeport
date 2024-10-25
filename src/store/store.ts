@@ -1,9 +1,6 @@
-import { createRouterMiddleware } from '@uirouter/redux';
 import { createStore, applyMiddleware, compose } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import thunk from 'redux-thunk';
-
-import { router } from '@waldur/router';
 
 import sagas from './effects';
 import { rootReducer } from './reducers';
@@ -24,9 +21,7 @@ const composeEnhancers =
 
 const sagaMiddleware = createSagaMiddleware();
 
-const routerMiddleware = createRouterMiddleware(router);
-
-const middlewares = [sagaMiddleware, routerMiddleware, thunk];
+const middlewares = [sagaMiddleware, thunk];
 let enhancedMiddlewares;
 
 if (process.env.NODE_ENV !== 'production') {

@@ -1,4 +1,3 @@
-import { routerReducer } from '@uirouter/redux';
 import { reducer as notificationsReducer } from 'reapop';
 import { combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
@@ -18,7 +17,6 @@ import { reducer as config } from './config';
 export const rootReducer = combineReducers({
   form: formReducer,
   notifications: notificationsReducer(),
-  router: routerReducer,
   config,
   modal,
   drawer,
