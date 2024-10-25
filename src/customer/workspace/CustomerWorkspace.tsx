@@ -1,8 +1,8 @@
 import { Transition } from '@uirouter/react';
-import { triggerTransition } from '@uirouter/redux';
 
 import { getFirst } from '@waldur/core/api';
 import { getCustomer } from '@waldur/project/api';
+import { router } from '@waldur/router';
 import store from '@waldur/store/store';
 import {
   setCurrentCustomer,
@@ -23,9 +23,8 @@ export async function fetchCustomer(transition: Transition) {
   const project = getProjectSelector(store.getState());
   const currentUser = getUser(store.getState());
   const customerId = transition.params()?.uuid;
-
   if (!customerId) {
-    store.dispatch(triggerTransition('errorPage.notFound', {}));
+    router.stateService.go('errorPage.notFound');
   } else {
     try {
       const currentCustomer = await getCustomer(customerId);
@@ -51,10 +50,10 @@ export async function fetchCustomer(transition: Transition) {
         !currentUser.is_support &&
         !projectPermissions?.length
       ) {
-        store.dispatch(triggerTransition('errorPage.notFound', {}));
+        router.stateService.go('errorPage.notFound');
       }
     } catch {
-      store.dispatch(triggerTransition('errorPage.notFound', {}));
+      router.stateService.go('errorPage.notFound');
     }
   }
 }
