@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { PencilSimple, Question } from '@phosphor-icons/react';
 import { uniqueId } from 'lodash';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
@@ -56,7 +56,9 @@ export const NotificationList = () => {
             <>
               {row.key}
               {hasOverriddenTemplate(row) && (
-                <i className="fa fa-pencil" style={{ marginLeft: '5px' }} />
+                <span className="svg-icon svg-icon-5 ms-3">
+                  <PencilSimple />
+                </span>
               )}
               {row.description && (
                 <Tip

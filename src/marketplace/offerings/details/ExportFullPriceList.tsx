@@ -1,3 +1,4 @@
+import { DownloadSimple } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
 
@@ -7,6 +8,7 @@ import { translate } from '@waldur/i18n';
 import { Offering, PlanComponent } from '@waldur/marketplace/types';
 import { ANONYMOUS_CONFIG } from '@waldur/table/api';
 import exportExcel from '@waldur/table/excel';
+
 import './ExportFullPriceList.scss';
 
 interface ExportFullPriceListProps {
@@ -78,7 +80,9 @@ export const ExportFullPriceList: FunctionComponent<
           type="button"
           onClick={() => onExport(offering.name, components)}
         >
-          <i className="fa fa-download" />
+          <span className="svg-icon svg-icon-2">
+            <DownloadSimple />
+          </span>{' '}
           {translate('Download full price list')}
         </button>
       ) : null}

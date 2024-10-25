@@ -1,3 +1,4 @@
+import { File, FileArrowUp } from '@phosphor-icons/react/dist/ssr';
 import { FC, useMemo } from 'react';
 import { DropzoneOptions, useDropzone } from 'react-dropzone';
 
@@ -55,7 +56,9 @@ export const DropzoneFiles: FC<OwnProps> = (props) => {
       <div {...getRootProps({ style, className: 'dropzone mb-3' })}>
         <div className="dropzone-message">
           <input {...getInputProps()} />
-          <i className="fa fa-file" aria-hidden="true" />
+          <span className="me-3" aria-hidden="true">
+            <FileArrowUp size={30} />
+          </span>
           <span>{message}</span>
         </div>
         <div className="dropzone-attachments">
@@ -66,7 +69,7 @@ export const DropzoneFiles: FC<OwnProps> = (props) => {
               className="dropzone-item btn btn-icon btn-light btn-active-secondary"
               title={`${file.name} - ${file.size} bytes`}
             >
-              <i className="fa fa-file fs-4" />
+              <File size={20} />
             </button>
           ))}
         </div>

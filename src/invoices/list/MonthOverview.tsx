@@ -1,3 +1,4 @@
+import { ArrowDown, ArrowUp, Minus } from '@phosphor-icons/react';
 import { FunctionComponent, useMemo } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 
@@ -74,13 +75,15 @@ export const MonthOverview: FunctionComponent<MonthOverviewProps> = ({
                   <EstimatedCost />
                   <h4 className="mb-4">{date}</h4>
                 </div>
-                {costTrend === -1 ? (
-                  <i className="fa fa-arrow-down fa-3x text-dark ms-4" />
-                ) : costTrend === 1 ? (
-                  <i className="fa fa-arrow-up fa-3x text-dark ms-4" />
-                ) : (
-                  <i className="fa fa-minus fa-3x text-dark ms-4" />
-                )}
+                <span className="text-dark ms-4 svg-icon svg-icon-2">
+                  {costTrend === -1 ? (
+                    <ArrowDown size={20} />
+                  ) : costTrend === 1 ? (
+                    <ArrowUp size={20} />
+                  ) : (
+                    <Minus size={20} />
+                  )}
+                </span>
               </div>
             ) : (
               <h2 className="mb-6">{date}</h2>

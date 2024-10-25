@@ -1,4 +1,4 @@
-import { CaretDown } from '@phosphor-icons/react';
+import { CaretDown, WarningCircle } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { FormCheck } from 'react-bootstrap';
@@ -223,7 +223,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
                         id={`tableErrorTip-${rowIndex}`}
                         className="error-mark"
                       >
-                        <i className="fa fa-exclamation-circle" />
+                        <WarningCircle />
                       </Tip>
                     )}
                   <FormCheck

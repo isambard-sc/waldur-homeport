@@ -1,4 +1,4 @@
-import { Question, Trash } from '@phosphor-icons/react';
+import { PlusCircle, Question, Trash } from '@phosphor-icons/react';
 import { Fragment, useCallback, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Field } from 'redux-form';
@@ -199,7 +199,9 @@ export const EmailsListGroup = ({
           disabled={warn}
           onClick={addRow}
         >
-          <i className="fa fa-plus fs-4" />
+          <div className="svg-icon svg-icon-2">
+            <PlusCircle />
+          </div>
         </Button>
         {warn && (
           <span className="text-danger ms-2">

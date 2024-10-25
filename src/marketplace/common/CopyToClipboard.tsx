@@ -1,3 +1,4 @@
+import { Copy } from '@phosphor-icons/react';
 import copy from 'copy-to-clipboard';
 import { FunctionComponent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
@@ -5,11 +6,9 @@ import { useDispatch } from 'react-redux';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { showSuccess } from '@waldur/store/notify';
+
 import './CopyToClipboard.scss';
 
-/**
- * @param value Which is copied to the clipboard
- */
 interface CopyToClipboardProps {
   value: string;
 }
@@ -26,7 +25,7 @@ export const CopyToClipboard: FunctionComponent<CopyToClipboardProps> = ({
     <div className="copyToClipboard">
       <button className="text-btn" type="button" onClick={onClick}>
         <Tip label={translate('Copy to clipboard')} id="copyToClipboard">
-          <i className="fa fa-clone fa-lg" />
+          <Copy />
         </Tip>
       </button>
     </div>
