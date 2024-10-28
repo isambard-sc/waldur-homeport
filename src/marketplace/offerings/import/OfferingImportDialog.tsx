@@ -1,4 +1,4 @@
-import { triggerTransition } from '@uirouter/redux';
+import { useRouter } from '@uirouter/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
@@ -29,6 +29,7 @@ export const OfferingImportDialog = reduxForm<OfferingImportFormData, any>({
   );
   const customer = useSelector(getCustomer);
   const dispatch = useDispatch();
+  const router = useRouter();
   const saveOffering = async (formData: OfferingImportFormData) => {
     try {
       const response = await importOffering({
@@ -39,11 +40,9 @@ export const OfferingImportDialog = reduxForm<OfferingImportFormData, any>({
         local_category_uuid: formData.category.uuid,
         local_customer_uuid: customer.uuid,
       });
-      dispatch(
-        triggerTransition('marketplace-offering-update', {
-          offering_uuid: response.data.uuid,
-        }),
-      );
+      router.stateService.go('marketplace-offering-update', {
+        offering_uuid: response.data.uuid,
+      });
       dispatch(showSuccess(translate('Offering has been imported.')));
       dispatch(closeModalDialog());
     } catch (e) {

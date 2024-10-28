@@ -1,4 +1,3 @@
-import { triggerTransition } from '@uirouter/redux';
 import { SubmissionError } from 'redux-form';
 import { takeEvery, put, call, select } from 'redux-saga/effects';
 
@@ -6,6 +5,7 @@ import { format } from '@waldur/core/ErrorMessageFormatter';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { PROJECTS_LIST } from '@waldur/project/constants';
+import { router } from '@waldur/router';
 import { showSuccess, showError } from '@waldur/store/notify';
 import { deleteEntity, fetchListStart } from '@waldur/table/actions';
 import {
@@ -33,7 +33,9 @@ function* handleCreateProject(action) {
       customer,
     });
     const project = response.data;
-    yield put(triggerTransition('project.dashboard', { uuid: project.uuid }));
+    yield call(router.stateService.go, 'project.dashboard', {
+      uuid: project.uuid,
+    });
     yield put(createProject.success());
     yield put(showSuccess(successMessage));
     yield put(fetchListStart(PROJECTS_LIST));
@@ -152,7 +154,7 @@ function* handleProjectDelete(action) {
     // Refresh the current customer to update ui for other modules
     yield put(refreshCurrentCustomer());
     if (isCurrentProject) {
-      yield put(triggerTransition('projects', {}));
+      yield call(router.stateService.go, 'projects');
       yield put(setCurrentProject(undefined));
     }
   } catch (error) {

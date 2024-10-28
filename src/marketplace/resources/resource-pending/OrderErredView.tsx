@@ -1,6 +1,6 @@
 import { ArrowsClockwise, Info, XCircle } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
-import { triggerTransition } from '@uirouter/redux';
+import { useRouter } from '@uirouter/react';
 import { FC } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -99,6 +99,7 @@ const getSteps = (resource: Resource) => {
 
 export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { mutate, isLoading } = useMutation(async () => {
     await waitForConfirmation(
       dispatch,
@@ -126,11 +127,9 @@ export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
     try {
       const order: any = await createOrder(formatOrderForCreate(item));
       dispatch(showSuccess(translate('Order has been submitted.')));
-      dispatch(
-        triggerTransition('marketplace-resource-details', {
-          resource_uuid: order.data.marketplace_resource_uuid,
-        }),
-      );
+      router.stateService.go('marketplace-resource-details', {
+        resource_uuid: order.data.marketplace_resource_uuid,
+      });
     } catch (error) {
       dispatch(showErrorResponse(error, translate('Unable to submit order.')));
     }

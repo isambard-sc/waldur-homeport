@@ -1,4 +1,4 @@
-import { triggerTransition } from '@uirouter/redux';
+import { useRouter } from '@uirouter/react';
 import { useEffect, FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -7,7 +7,6 @@ import { post } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { wait } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { router } from '@waldur/router';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { setCurrentUser } from '@waldur/workspace/actions';
 
@@ -15,6 +14,7 @@ import { getCurrentUser } from '../UsersService';
 
 export const UserEmailChangeCallback: FunctionComponent = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   useEffect(() => {
     async function load() {
@@ -30,7 +30,7 @@ export const UserEmailChangeCallback: FunctionComponent = () => {
       }
 
       if (!AuthService.isAuthenticated()) {
-        dispatch(triggerTransition('login', {}));
+        router.stateService.go('login');
         return;
       }
 
@@ -47,7 +47,7 @@ export const UserEmailChangeCallback: FunctionComponent = () => {
         dispatch(setCurrentUser(currentUser));
         await wait(1000);
       }
-      dispatch(triggerTransition('profile-manage', {}));
+      router.stateService.go('profile-manage');
     }
     load();
   }, [dispatch]);

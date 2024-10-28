@@ -8,10 +8,6 @@ const OpenStackPackageDetails = lazyComponent(
   () => import('./OpenStackPackageDetails'),
   'OpenStackPackageDetails',
 );
-const OpenStackPluginOptionsForm = lazyComponent(
-  () => import('./OpenStackPluginOptionsForm'),
-  'OpenStackPluginOptionsForm',
-);
 const OpenStackProvisioningConfigForm = lazyComponent(
   () => import('./OpenStackProvisioningConfigForm'),
   'OpenStackProvisioningConfigForm',
@@ -66,7 +62,6 @@ registerOfferingType({
   },
   orderFormComponent: OpenstackTenantOrder,
   detailsComponent: OpenStackPackageDetails,
-  pluginOptionsForm: OpenStackPluginOptionsForm,
   provisioningConfigForm: OpenStackProvisioningConfigForm,
   limitSerializer,
   limitParser,

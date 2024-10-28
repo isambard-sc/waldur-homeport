@@ -7,3 +7,8 @@ src/EventsEnums.ts
 src/FeaturesEnums.ts
 src/SettingsDescription.ts
 src/features/FeaturesDescription.ts
+*.spec.tsx
+*.fixture.tsx
+src/core/testUtils.ts
+src/form/testUtils.tsx
+src/table/testUtils.tsx

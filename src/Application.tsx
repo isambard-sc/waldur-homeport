@@ -1,6 +1,6 @@
 import { ErrorBoundary } from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { UIView } from '@uirouter/react';
+import { UIRouter, UIView } from '@uirouter/react';
 import { AxiosError } from 'axios';
 import { FunctionComponent } from 'react';
 import { Provider } from 'react-redux';
@@ -18,7 +18,6 @@ import { MasterInit } from './metronic/layout/MasterInit';
 import { NotificationContainer } from './NotificationContainer';
 import { router } from './router';
 import { ThemeSelector } from './ThemeSelector';
-import { UIRouter } from './UIRouter';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -40,20 +39,20 @@ export const Application: FunctionComponent = () => {
 
   return (
     <ErrorBoundary fallback={ErrorMessage}>
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <LayoutProvider>
-            <ThemeSelector />
-            <NotificationContainer />
-            <UIRouter>
+      <UIRouter router={router}>
+        <QueryClientProvider client={queryClient}>
+          <Provider store={store}>
+            <LayoutProvider>
+              <ThemeSelector />
+              <NotificationContainer />
               <ModalRoot />
               <DrawerRoot />
               <UIView />
-            </UIRouter>
-            <MasterInit />
-          </LayoutProvider>
-        </Provider>
-      </QueryClientProvider>
+              <MasterInit />
+            </LayoutProvider>
+          </Provider>
+        </QueryClientProvider>
+      </UIRouter>
     </ErrorBoundary>
   );
 };

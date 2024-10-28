@@ -1,4 +1,4 @@
-import { triggerTransition } from '@uirouter/redux';
+import { useRouter } from '@uirouter/react';
 import { Form } from 'react-bootstrap';
 import ReactStars from 'react-rating-stars-component';
 import { connect, useDispatch } from 'react-redux';
@@ -18,6 +18,7 @@ import './SupportFeedback.scss';
 const SupportFeedbackContainer = (props) => {
   useTitle(translate('Feedback'));
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const submitRequest = async (formData) => {
     try {
@@ -26,7 +27,7 @@ const SupportFeedbackContainer = (props) => {
         token: router.globals.params.token,
       });
       dispatch(showSuccess(translate('Thank you for your response!')));
-      dispatch(triggerTransition('login', {}));
+      router.stateService.go('login');
     } catch (error) {
       dispatch(showErrorResponse(error, translate('Unable to send feedback.')));
     }
