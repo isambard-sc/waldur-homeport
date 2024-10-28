@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 
 import { formatFilesize } from '@waldur/core/utils';
-import { ResourceDetailsLink } from '@waldur/marketplace/resources/details/ResourceDetailsLink';
 import { CategoryColumn } from '@waldur/marketplace/types';
 import { validateIP } from '@waldur/marketplace/utils';
 import { IPList } from '@waldur/resource/IPList';
@@ -36,17 +35,8 @@ export const CategoryColumnField: FunctionComponent<
       return formatFilesize(value);
 
     case 'attached_instance':
-      return (
-        <ResourceDetailsLink
-          item={{
-            resource_uuid: metadata.instance_uuid,
-            backend_id: metadata.backend_id,
-            end_date: metadata.backend_id,
-          }}
-        >
-          {metadata.instance_name}
-        </ResourceDetailsLink>
-      );
+      // TODO: render as a link to the instance after - building different resource relationships architecture
+      return metadata.instance_name;
 
     default:
       return value || 'N/A';
