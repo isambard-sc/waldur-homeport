@@ -1,6 +1,9 @@
 import { getList } from '@waldur/core/api';
 import { formatCostChart, getTeamSizeChart } from '@waldur/dashboard/api';
-import { getLineChartOptions } from '@waldur/dashboard/chart';
+import {
+  getLineChartOptions,
+  getLineChartOptionsWithAxis,
+} from '@waldur/dashboard/chart';
 import { Scope, Chart, InvoiceSummary } from '@waldur/dashboard/types';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 
@@ -20,16 +23,26 @@ async function getCustomerCostChart(customer: Scope): Promise<Chart> {
   return null;
 }
 
-export const loadSummary = async (customer) => {
+export async function getCustomerCostChartData(
+  customer: Scope,
+  withAxis = false,
+) {
   const costChart = await getCustomerCostChart(customer);
+  return costChart
+    ? {
+        chart: costChart,
+        options: withAxis
+          ? getLineChartOptionsWithAxis(costChart)
+          : getLineChartOptions(costChart),
+      }
+    : null;
+}
+
+export const loadSummary = async (customer) => {
+  const costChartData = await getCustomerCostChartData(customer);
   const teamChart = await getTeamSizeChart(customer);
   return {
-    costChart: costChart
-      ? {
-          chart: costChart,
-          options: getLineChartOptions(costChart),
-        }
-      : null,
+    costChart: costChartData,
     teamChart: teamChart
       ? {
           chart: teamChart,

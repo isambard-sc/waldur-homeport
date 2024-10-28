@@ -28,7 +28,9 @@ const formatCostChart = (records: EstimatedRevenueSummary[]): Chart => {
   }));
 
   items = padMissingValues(items);
+  let total = 0;
   const data = items.map((item, index) => {
+    total += item.value;
     const isEstimate = index === items.length - 1;
     const date = isEstimate
       ? DateTime.now().endOf('month')
@@ -52,6 +54,7 @@ const formatCostChart = (records: EstimatedRevenueSummary[]): Chart => {
     title: translate('Estimated revenue'),
     data,
     current: defaultCurrency(items[items.length - 1].value),
+    total,
     changes,
   };
 };
