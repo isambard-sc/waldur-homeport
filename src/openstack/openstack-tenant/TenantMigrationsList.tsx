@@ -10,14 +10,14 @@ import { ExecuteMigrationAction } from './actions/ExecuteMigrationAction';
 import { CreateMigrationButton } from './CreateMigrationButton';
 import { MigrationExpandableRow } from './MigrationExpandableRow';
 
-export const TenantMigrationsList: FunctionComponent<{ resource }> = ({
-  resource,
+export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
+  resourceScope,
 }) => {
   const filter = useMemo(
     () => ({
-      src_resource_uuid: resource.uuid,
+      src_resource_uuid: resourceScope.marketplace_resource_uuid,
     }),
-    [resource],
+    [resourceScope],
   );
   const props = useTable({
     table: 'openstack-migrations',
@@ -55,7 +55,7 @@ export const TenantMigrationsList: FunctionComponent<{ resource }> = ({
         <ExecuteMigrationAction resource={row} refetch={props.fetch} />
       )}
       tableActions={
-        <CreateMigrationButton resource={resource} refetch={props.fetch} />
+        <CreateMigrationButton resource={resourceScope} refetch={props.fetch} />
       }
       expandableRow={MigrationExpandableRow}
     />

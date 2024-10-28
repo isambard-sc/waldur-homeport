@@ -49,7 +49,7 @@ export const MigrateTenantDialog = connect<
       const submitForm = async (formData) => {
         try {
           await createMigration({
-            src_resource: resource.uuid,
+            src_resource: resource.marketplace_resource_uuid,
             dst_offering: formData.offering.uuid,
             dst_plan: formData.plan.uuid,
             mappings: {
