@@ -31,6 +31,7 @@ export const DateField: FunctionComponent<any> = (props) => (
       className={
         props.solid ? 'form-control form-control-solid' : 'form-control'
       }
+      placeholder={props.placeholder}
     />
     {props.input.value && typeof props.input.value === 'string' && (
       <button

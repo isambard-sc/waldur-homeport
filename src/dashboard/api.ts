@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon';
 
+import { ENV } from '@waldur/configs/default';
 import { get } from '@waldur/core/api';
 import { parseDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
@@ -47,6 +48,7 @@ const formatTeamSizeChart = (values: number[]): Chart => {
     title: translate('Team size'),
     units: null,
     current: currentCount,
+    total: currentCount,
     data,
     changes: changesPercent,
   };
@@ -103,7 +105,9 @@ export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
 
   items.reverse();
   items = padMissingValues(items);
+  let total = 0;
   const data = items.map((item, index) => {
+    total += item.value;
     const isEstimate = index === items.length - 1;
     const date = isEstimate
       ? DateTime.now().endOf('month')
@@ -111,6 +115,7 @@ export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
     return {
       label: formatCostChartLabel(item.value, date, isEstimate),
       value: item.value,
+      xAxisValue: date.monthShort,
     };
   });
 
@@ -126,6 +131,10 @@ export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
     title: translate('Estimated cost'),
     data,
     current: defaultCurrency(items[items.length - 1].value),
+    total,
     changes: changesPercent,
+    yAxisLabel: translate('Cost ({currency})', {
+      currency: ENV.plugins.WALDUR_CORE.CURRENCY_NAME,
+    }),
   };
 };

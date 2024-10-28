@@ -3,14 +3,18 @@ import { PaymentProfile } from '@waldur/workspace/types';
 export type ChartData = Array<{
   label: string;
   value: number | string;
+  xAxisValue?: any;
 }>;
 
 export interface Chart {
   title: string;
   units?: string;
   current: number | string;
+  total: number;
   data: ChartData;
   changes?: number;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
 }
 
 export interface Scope {

@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { Form } from 'react-bootstrap';
+import { Accordion, Form } from 'react-bootstrap';
 import { useSelector, connect } from 'react-redux';
-import { reduxForm } from 'redux-form';
+import { formValueSelector, reduxForm } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
+import { EChart } from '@waldur/core/EChart';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { lessThanOrEqual, required } from '@waldur/core/validators';
@@ -18,6 +19,7 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { loadChart } from '@waldur/project/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { OrganizationProjectSelectField } from '../team/OrganizationProjectSelectField';
@@ -65,6 +67,21 @@ export const ProjectCreditFormDialog = connect(
         organizationCredit?.value ?? 0
       ),
     };
+
+    const project = useSelector((state) =>
+      formValueSelector(props.formId)(state, 'project'),
+    );
+
+    const {
+      data: dataChart,
+      isLoading: isLoadingChart,
+      error: errorChart,
+      refetch: refetchChart,
+    } = useQuery(
+      ['ProjectDashboardChart', project?.uuid, true],
+      () => (isEdit && project ? loadChart(project, true) : null),
+      { staleTime: 5 * 60 * 1000 },
+    );
 
     const exceeds = useMemo(
       () => lessThanOrEqual(Number(organizationCredit?.value ?? 0)),
@@ -129,6 +146,27 @@ export const ProjectCreditFormDialog = connect(
               )}
               hideLabel={true}
             />
+            {isEdit && (
+              <Accordion className="mb-7">
+                <Accordion.Item eventKey="0">
+                  <Accordion.Header>
+                    <div className="fw-bolder">
+                      {translate('Project cost history')}
+                      {isLoadingChart && (
+                        <LoadingSpinnerIcon className="ms-2" />
+                      )}
+                    </div>
+                  </Accordion.Header>
+                  <Accordion.Body>
+                    {errorChart ? (
+                      <LoadingErred loadData={refetchChart} />
+                    ) : dataChart?.options ? (
+                      <EChart options={dataChart.options} height="150px" />
+                    ) : null}
+                  </Accordion.Body>
+                </Accordion.Item>
+              </Accordion>
+            )}
             <Form.Group>
               <FieldError error={props.error} />
             </Form.Group>

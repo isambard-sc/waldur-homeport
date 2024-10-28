@@ -68,6 +68,84 @@ export const getScopeChartOptions = (
   ],
 });
 
+export const getScopeChartOptionsWithAxis = ({
+  dates,
+  values,
+  color,
+  xAxisValues,
+  xAxisLabel,
+  yAxisLabel,
+}: {
+  dates: string[];
+  values: Value[];
+  color?: string;
+  xAxisValues?: string[];
+  xAxisLabel?: string;
+  yAxisLabel?: string;
+}) => ({
+  tooltip: {
+    trigger: 'axis',
+    formatter: function (params) {
+      params = params[0];
+      return dates[params.dataIndex];
+    },
+    axisPointer: {
+      animation: false,
+    },
+  },
+  grid: {
+    left: 45,
+    top: 10,
+    right: 0,
+    bottom: 30,
+    containLabel: false,
+  },
+  xAxis: {
+    data: xAxisValues || dates,
+    show: true,
+    name: xAxisLabel,
+    splitLine: { show: false },
+    axisLine: { show: false, onZero: false },
+    axisTick: { show: false },
+  },
+  yAxis: {
+    show: true,
+    name: yAxisLabel,
+    nameLocation: 'center',
+    nameGap: 30,
+    splitLine: { lineStyle: { color: '#f5f8fa' } },
+    axisLine: { show: false },
+    axisTick: { show: false },
+  },
+  series: [
+    {
+      type: 'line',
+      data: values,
+      color,
+      areaStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            {
+              offset: 0,
+              color: color + '44', // color at 0% position
+            },
+            {
+              offset: 1,
+              color: color + '00', // color at 100% position - add '00' at the end of color hex for a 0 opacity
+            },
+          ],
+          global: false, // false by default
+        },
+      },
+    },
+  ],
+});
+
 export const getResourceChartOptions = (
   dates,
   usages,
@@ -131,6 +209,15 @@ export const getLineChartOptions = (chart: Chart, hLines?: HLine[]) =>
     hLines,
     LINE_CHART_COLOR,
   );
+
+export const getLineChartOptionsWithAxis = (chart: Chart) =>
+  getScopeChartOptionsWithAxis({
+    dates: chart.data.map((item) => item.label),
+    values: chart.data.map((item) => item.value),
+    color: LINE_CHART_COLOR,
+    xAxisValues: chart.data.map((item) => item.xAxisValue),
+    yAxisLabel: chart.yAxisLabel,
+  });
 
 export const getRingChartOptions = (
   props: RingChartOption,

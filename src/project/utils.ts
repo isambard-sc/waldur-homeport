@@ -1,7 +1,10 @@
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { getProjectCostPolicies } from '@waldur/customer/cost-policies/api';
 import { formatCostChart, getTeamSizeChart } from '@waldur/dashboard/api';
-import { getLineChartOptions } from '@waldur/dashboard/chart';
+import {
+  getLineChartOptions,
+  getLineChartOptionsWithAxis,
+} from '@waldur/dashboard/chart';
 import { translate } from '@waldur/i18n';
 import { Category } from '@waldur/marketplace/types';
 import { Project } from '@waldur/workspace/types';
@@ -9,7 +12,7 @@ import { Project } from '@waldur/workspace/types';
 import { fetchLast12MonthProjectCosts } from './api';
 import { ProjectCounterResourceItem } from './types';
 
-export async function loadChart(project: Project) {
+export async function loadChart(project: Project, withAxis = false) {
   const [invoices, costPolicies] = await Promise.all([
     fetchLast12MonthProjectCosts(project.uuid),
     getProjectCostPolicies({
@@ -21,15 +24,17 @@ export async function loadChart(project: Project) {
   const chart = formatCostChart(invoices);
   return {
     chart,
-    options: getLineChartOptions(
-      chart,
-      (costPolicies || []).map((item, i) => ({
-        label: `${translate('Policy')}  #${i + 1} (${defaultCurrency(
-          item.limit_cost,
-        )})`,
-        value: item.limit_cost,
-      })),
-    ),
+    options: !withAxis
+      ? getLineChartOptions(
+          chart,
+          (costPolicies || []).map((item, i) => ({
+            label: `${translate('Policy')}  #${i + 1} (${defaultCurrency(
+              item.limit_cost,
+            )})`,
+            value: item.limit_cost,
+          })),
+        )
+      : getLineChartOptionsWithAxis(chart),
   };
 }
 
