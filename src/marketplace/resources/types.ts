@@ -59,9 +59,9 @@ export interface Resource extends ResourceReference {
   is_usage_based?: boolean;
   is_limit_based?: boolean;
 
-  requested_downscaling: boolean;
+  downscaled: boolean;
   restrict_member_access: boolean;
-  requested_pausing: boolean;
+  paused: boolean;
   backend_id?: string;
   effective_id?: string;
   access_url?: string;

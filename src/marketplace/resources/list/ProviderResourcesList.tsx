@@ -129,7 +129,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
     {
       title: translate('Requested downscaling'),
       render: ({ row }) =>
-        !row.requested_downscaling ? (
+        !row.downscaled ? (
           <Badge variant="danger" outline pill size="sm">
             <X size={12} className="text-danger me-2" />
             {translate('No')}
@@ -140,11 +140,11 @@ const TableComponent: FunctionComponent<any> = (props) => {
             {translate('Yes')}
           </Badge>
         ),
-      export: 'requested_downscaling',
-      keys: ['requested_downscaling'],
-      exportKeys: ['requested_downscaling'],
+      export: 'downscaled',
+      keys: ['downscaled'],
+      exportKeys: ['downscaled'],
       optional: true,
-      id: 'requested_downscaling',
+      id: 'downscaled',
     },
     {
       title: translate('Restrict member access'),
@@ -169,7 +169,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
     {
       title: translate('Requested pausing'),
       render: ({ row }) =>
-        !row.requested_pausing ? (
+        !row.paused ? (
           <Badge variant="danger" outline pill size="sm">
             <X size={12} className="text-danger me-2" />
             {translate('No')}
@@ -180,11 +180,11 @@ const TableComponent: FunctionComponent<any> = (props) => {
             {translate('Yes')}
           </Badge>
         ),
-      export: 'requested_pausing',
-      keys: ['requested_pausing'],
-      exportKeys: ['requested_pausing'],
+      export: 'paused',
+      keys: ['paused'],
+      exportKeys: ['paused'],
       optional: true,
-      id: 'requested_pausing',
+      id: 'paused',
     },
     {
       title: translate('Created at'),

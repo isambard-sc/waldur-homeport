@@ -53,6 +53,14 @@ export const ResourceSummary: FunctionComponent<
     <Field label={translate('Backend ID')} value={resource.backend_id} />
     <Field label={translate('Effective ID')} value={resource.effective_id} />
     <Field label={translate('Plugin ID')} value={resource.resource_uuid} />
+
+    <Field label={translate('Paused')} value={resource.paused} />
+    <Field label={translate('Downscaled')} value={resource.downscaled} />
+    <Field
+      label={translate('Restrict member access')}
+      value={resource.restrict_member_access}
+    />
+
     <Field
       label={translate('Sync state')}
       value={resource.state}
