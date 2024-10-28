@@ -38,5 +38,5 @@ export interface ProjectCredit {
 export interface ProjectCreditFormData {
   value: string;
   project: string;
-  use_organisation_credit: string;
+  use_organisation_credit: boolean;
 }
