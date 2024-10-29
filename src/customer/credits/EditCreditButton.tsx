@@ -41,7 +41,9 @@ export const EditCreditButton = ({ row, refetch }) => {
             const payload: CustomerCreditFormData = {
               ...formData,
               customer: formData.customer.url,
-              offerings: formData.offerings.map((offering) => offering.url),
+              offerings: formData.offerings
+                ? formData.offerings.map((offering) => offering.url)
+                : undefined,
             };
             if (!payload.minimal_consumption) {
               payload.minimal_consumption = '0';
