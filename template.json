@@ -963,6 +963,10 @@
     "description": "customer/credits/DeleteCreditButton.tsx",
     "message": "Are you sure you want to delete this credit?"
   },
+  "Are you sure you want to delete this filter? This action cannot be undone.": {
+    "description": "table/SavedFilterSelect.tsx",
+    "message": "Are you sure you want to delete this filter? This action cannot be undone."
+  },
   "Are you sure you want to delete this offering?": {
     "description": "marketplace/offerings/list/DeleteOfferingButton.tsx",
     "message": "Are you sure you want to delete this offering?"
@@ -2527,6 +2531,10 @@
     "description": "customer/details/CustomerErrorDialog.tsx",
     "message": "Current email: {value}."
   },
+  "Current filters": {
+    "description": "table/TableFiltersMenu.tsx",
+    "message": "Current filters"
+  },
   "Current flavor": {
     "description": "openstack/openstack-instance/OpenStackInstanceCurrentFlavor.tsx",
     "message": "Current flavor"
@@ -2786,6 +2794,10 @@
   "Delete customer permission": {
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "Delete customer permission"
+  },
+  "Delete filter": {
+    "description": "table/SavedFilterSelect.tsx",
+    "message": "Delete filter"
   },
   "Delete offering endpoint": {
     "description": "administration/roles/PermissionOptions.tsx",
@@ -3910,6 +3922,10 @@
   "Filter saved": {
     "description": "table/SaveFilterDialog.tsx",
     "message": "Filter saved"
+  },
+  "Filter updated successfully": {
+    "description": "table/SaveFilterDialog.tsx",
+    "message": "Filter updated successfully"
   },
   "Filtered by": {
     "description": "marketplace/landing/filter/PageBarFilters.tsx",
@@ -9139,6 +9155,10 @@
     "description": "broadcasts/BroadcastFooter.tsx",
     "message": "Save as draft"
   },
+  "Save as": {
+    "description": "table/TableFiltersMenu.tsx",
+    "message": "Save as"
+  },
   "Save changes": {
     "description": "customer/details/CustomerBillingPanel.tsx, user/api-key/UserEditTokenContainer.tsx",
     "message": "Save changes"
@@ -9148,7 +9168,7 @@
     "message": "Save draft"
   },
   "Save filter": {
-    "description": "table/SaveFilterDialog.tsx, table/TableFilterActions.tsx, table/TableFiltersMenu.tsx",
+    "description": "table/SaveFilterDialog.tsx, table/TableFilterActions.tsx",
     "message": "Save filter"
   },
   "Save summary": {
@@ -11983,6 +12003,10 @@
     "description": "marketplace/offerings/update/roles/DeleteRoleButton.tsx",
     "message": "Unable to remove role."
   },
+  "Unable to remove the filter.": {
+    "description": "table/SavedFilterSelect.tsx",
+    "message": "Unable to remove the filter."
+  },
   "Unable to remove the location.": {
     "description": "customer/details/CustomerDetailsPanel.tsx",
     "message": "Unable to remove the location."
@@ -12484,7 +12508,7 @@
     "message": "Update customer permission"
   },
   "Update filter": {
-    "description": "table/TableFilterActions.tsx, table/TableFiltersMenu.tsx",
+    "description": "table/SaveFilterDialog.tsx, table/TableFilterActions.tsx",
     "message": "Update filter"
   },
   "Update floating IPs in {name} virtual machine": {
@@ -12648,7 +12672,7 @@
     "message": "Update {resourceType}"
   },
   "Update": {
-    "description": "administration/hooks/HookUpdateButton.tsx, administration/service-desk/AdministrationServiceDeskUpdateDialog.tsx, broadcasts/BroadcastUpdateButton.tsx, customer/details/AccessSubnetEditDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, marketplace/offerings/update/integration/EditSchedulesDialog.tsx, marketplace/offerings/update/overview/EditGettingStartedDialog.tsx, marketplace/offerings/update/overview/EditOverviewDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/options/UpdateResourceOptionDialog.tsx, marketplace/service-providers/UpdateOfferingPermissionExpirationTimeDialog.tsx, openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx, openstack/openstack-tenant/SetRoutesDialog.tsx, user/hooks/HookDetailsDialog.tsx, user/hooks/HookUpdateButton.tsx",
+    "description": "administration/hooks/HookUpdateButton.tsx, administration/service-desk/AdministrationServiceDeskUpdateDialog.tsx, broadcasts/BroadcastUpdateButton.tsx, customer/details/AccessSubnetEditDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, marketplace/offerings/update/integration/EditSchedulesDialog.tsx, marketplace/offerings/update/overview/EditGettingStartedDialog.tsx, marketplace/offerings/update/overview/EditOverviewDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/options/UpdateResourceOptionDialog.tsx, marketplace/service-providers/UpdateOfferingPermissionExpirationTimeDialog.tsx, openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx, openstack/openstack-tenant/SetRoutesDialog.tsx, table/SaveFilterDialog.tsx, table/TableFiltersMenu.tsx, user/hooks/HookDetailsDialog.tsx, user/hooks/HookUpdateButton.tsx",
     "message": "Update"
   },
   "Updates": {

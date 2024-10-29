@@ -7,40 +7,45 @@ import { FormContainer } from '@waldur/form/FormContainer';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 import { showSuccess } from '@waldur/store/notify';
 
 interface SaveFilterDialogProps {
   resolve: {
-    saveFilter(name): void;
+    saveFilter(name, update: boolean): void;
   };
 }
 
 export const SaveFilterDialog = reduxForm<{ name }, SaveFilterDialogProps>({
   form: 'tableSaveFilterForm',
 })((props) => {
+  const isEdit = Boolean(props.initialValues);
+
   const callback = useCallback(
     (formData: { name }, dispatch) => {
-      props.resolve.saveFilter(formData.name);
-      dispatch(showSuccess(translate('Filter saved')));
+      props.resolve.saveFilter(formData.name, isEdit);
+      if (!isEdit) {
+        dispatch(showSuccess(translate('Filter saved')));
+      } else {
+        dispatch(showSuccess(translate('Filter updated successfully')));
+      }
       dispatch(closeModalDialog());
     },
     [props.resolve.saveFilter],
   );
+
   return (
     <form onSubmit={props.handleSubmit(callback)}>
-      <ModalDialog
-        title={translate('Save filter')}
+      <MetronicModalDialog
+        title={isEdit ? translate('Update filter') : translate('Save filter')}
         subtitle={translate('Filters can be saved and reused on any pages')}
-        headerClassName="border-0 pb-0"
-        footerClassName="border-0 pt-0 gap-2"
         footer={
           <>
             <CloseDialogButton className="flex-equal" />
             <SubmitButton
-              disabled={props.invalid || !props.dirty}
+              disabled={props.invalid}
               submitting={props.submitting}
-              label={translate('Save')}
+              label={isEdit ? translate('Update') : translate('Save')}
               className="btn btn-primary flex-equal"
             />
           </>
@@ -56,7 +61,7 @@ export const SaveFilterDialog = reduxForm<{ name }, SaveFilterDialogProps>({
             spaceless
           />
         </FormContainer>
-      </ModalDialog>
+      </MetronicModalDialog>
     </form>
   );
 });

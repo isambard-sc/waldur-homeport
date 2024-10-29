@@ -5,9 +5,9 @@ import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
 const getOptions = () => [
+  { value: undefined, label: translate('All') },
   { value: true, label: translate('Yes') },
   { value: false, label: translate('No') },
-  { value: undefined, label: translate('All') },
 ];
 
 export const ServiceProviderFilter: FunctionComponent = () => (

@@ -6,9 +6,9 @@ import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
 export const getOptions = () => [
+  { value: undefined, label: translate('All') },
   { value: true, label: translate('Running accounting') },
   { value: false, label: translate('Not running accounting') },
-  { value: undefined, label: translate('All') },
 ];
 
 interface AccountingRunningFieldProps {
