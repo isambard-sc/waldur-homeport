@@ -169,8 +169,7 @@ export const CreditFormDialog = connect(
             <AsyncSelectField
               name="offerings"
               label={translate('Offering(s)')}
-              validate={required}
-              required
+              placeholder={translate('All')}
               loadOptions={(query, prevOptions, { page }) =>
                 offeringsAutocomplete(
                   { name: query, billable: true },

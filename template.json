@@ -584,7 +584,7 @@
     "message": "All users"
   },
   "All": {
-    "description": "customer/list/AccountingRunningField.tsx, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsFilter.tsx, marketplace/offerings/update/attributes/utils.tsx, rancher/node/NodeRoleField.tsx",
+    "description": "customer/credits/CreditFormDialog.tsx, customer/list/AccountingRunningField.tsx, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsFilter.tsx, marketplace/offerings/update/attributes/utils.tsx, rancher/node/NodeRoleField.tsx",
     "message": "All"
   },
   "Allocate credit ({currency})": {
@@ -2111,10 +2111,6 @@
     "description": "openstack/OpenStackProvisioningConfigForm.tsx",
     "message": "Console type"
   },
-  "Consumption logic": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
-    "message": "Consumption logic"
-  },
   "Contact details": {
     "description": "customer/details/CustomerContactPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Contact details"
@@ -3118,6 +3114,10 @@
   "Download": {
     "description": "invitations/actions/create/BulkUpload.tsx, proposals/proposal/create/DocumentationFiles.tsx, proposals/update/documents/CallDocumentsSection.tsx",
     "message": "Download"
+  },
+  "Downscaled": {
+    "description": "marketplace/resources/details/ResourceSummary.tsx",
+    "message": "Downscaled"
   },
   "Draft": {
     "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/service-providers/ProviderCampaignStateFilter.tsx, proposals/utils.ts",
@@ -5551,6 +5551,10 @@
     "description": "customer/credits/CreditFormDialog.tsx",
     "message": "Minimal consumption (per month)"
   },
+  "Minimal consumption logic": {
+    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
+    "message": "Minimal consumption logic"
+  },
   "Minimal consumption": {
     "description": "administration/organizations/OrganizationCreditsList.tsx",
     "message": "Minimal consumption"
@@ -6920,7 +6924,7 @@
     "message": "Pause"
   },
   "Paused": {
-    "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx",
+    "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/resources/details/ResourceSummary.tsx",
     "message": "Paused"
   },
   "Pay": {
@@ -8800,7 +8804,7 @@
     "message": "Restore"
   },
   "Restrict member access": {
-    "description": "marketplace/resources/list/ProviderResourcesList.tsx",
+    "description": "marketplace/resources/details/ResourceSummary.tsx, marketplace/resources/list/ProviderResourcesList.tsx",
     "message": "Restrict member access"
   },
   "Restrict": {

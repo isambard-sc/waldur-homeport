@@ -10,7 +10,7 @@ import { CreditHistoryLogButton } from '@waldur/customer/credits/CreditHistoryLo
 import { CustomerCredit } from '@waldur/customer/credits/types';
 import { translate } from '@waldur/i18n';
 import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { renderFieldOrDash, useTable } from '@waldur/table/utils';
 
 const OrganizationField = ({ row }) => (
   <Link
@@ -39,7 +39,11 @@ export const OrganizationCreditsList: FC<{}> = () => {
         {
           title: translate('Eligible offerings'),
           render: ({ row }) => (
-            <>{row.offerings.map((offering) => offering.name).join(', ')}</>
+            <>
+              {renderFieldOrDash(
+                row.offerings.map((offering) => offering.name).join(', '),
+              )}
+            </>
           ),
           export: (row) =>
             row.offerings.map((offering) => offering.name).join(', '),
