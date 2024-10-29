@@ -1,4 +1,10 @@
-import { CaretRight, FunnelSimple, Plus, Star } from '@phosphor-icons/react';
+import {
+  ArrowsClockwise,
+  CaretRight,
+  FunnelSimple,
+  Plus,
+  Star,
+} from '@phosphor-icons/react';
 import { debounce, isEqual, throttle } from 'lodash';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
@@ -15,7 +21,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { selectSavedFilter, setSavedFilters } from './actions';
 import { COLUMN_FILTER_TOGGLE_CLASS } from './constants';
 import { SavedFilterSelect } from './SavedFilterSelect';
-import { selectSelectedSavedFilter } from './selectors';
+import {
+  selectSelectedSavedFilter,
+  selectTableSavedFilters,
+} from './selectors';
 import { TableProps } from './Table';
 import { TableFilterContext } from './TableFilterContainer';
 import { TableFilterService } from './TableFilterService';
@@ -35,18 +44,23 @@ const SaveFilterItems = ({ table, formId, apply }) => {
   );
   const key = useMemo(() => getSavedFiltersKey(table, formId), [table, formId]);
 
+  const list = useSelector((state: any) =>
+    selectTableSavedFilters(state, table),
+  );
+
   const saveFilter = useCallback(
-    (name) => {
+    (name, update: boolean) => {
       let newItem;
       Object.entries(formValues).forEach(([key, value]) => {
         if (Array.isArray(value) && value.length === 0) {
           delete formValues[key];
         }
       });
-      if (selectedSavedFilter) {
+      if (update && selectedSavedFilter) {
         // Update
         newItem = {
           ...selectedSavedFilter,
+          title: name,
           date: new Date().toISOString(),
           values: formValues,
         };
@@ -68,56 +82,70 @@ const SaveFilterItems = ({ table, formId, apply }) => {
     [key, formValues, selectedSavedFilter, setSavedFilters, selectSavedFilter],
   );
 
-  const onSaveFilter = (e) => {
+  const onSaveFilter = (e, update = false) => {
     dispatch(
       openModalDialog(SaveFilterDialog, {
         resolve: {
           saveFilter,
         },
         size: 'sm',
+        initialValues:
+          update && selectedSavedFilter
+            ? { name: selectedSavedFilter.title }
+            : undefined,
       }),
     );
     e.stopPropagation();
   };
 
-  const isDirty = useMemo(
-    () =>
-      selectedSavedFilter
-        ? !isEqual(selectedSavedFilter.values, formValues)
-        : false,
-    [selectedSavedFilter, formValues],
-  );
+  const hasFiltersApplied = Object.values(formValues || {}).filter(
+    (f) => Boolean(f) || f === false,
+  ).length;
 
   return (
     <>
-      <div
-        className="menu-item"
-        data-kt-menu-trigger="click"
-        data-kt-menu-placement="right-start"
-      >
-        {selectedSavedFilter ? (
-          <span
-            className="menu-link"
-            aria-hidden="true"
-            onClick={isDirty ? saveFilter : null}
-          >
-            {isDirty ? translate('Update filter') : translate('Save filter')}
-            <Star size={18} className="ms-auto text-warning" weight="fill" />
+      {(hasFiltersApplied || selectedSavedFilter) && (
+        <div
+          className="menu-item"
+          data-kt-menu-trigger="click"
+          data-kt-menu-placement="right-start"
+        >
+          <span className="menu-link" aria-hidden="true">
+            <span className="menu-title">{translate('Current filters')}</span>
+            <CaretRight size={18} className="ms-auto" weight="bold" />
           </span>
-        ) : (
-          <span className="menu-link" aria-hidden="true" onClick={onSaveFilter}>
-            {translate('Save filter')}
-            <Star size={18} className="ms-auto" weight="bold" />
-          </span>
-        )}
-      </div>
+
+          <div className="menu-sub menu-sub-dropdown w-250px py-3">
+            <span
+              className="menu-link"
+              aria-hidden="true"
+              onClick={onSaveFilter}
+            >
+              <span className="menu-title">{translate('Save as')}</span>
+              <Star size={18} className="ms-auto" weight="bold" />
+            </span>
+            {selectedSavedFilter ? (
+              <span
+                className="menu-link"
+                aria-hidden="true"
+                onClick={(e) => onSaveFilter(e, true)}
+              >
+                {translate('Update')}
+                <ArrowsClockwise size={18} className="ms-auto" weight="bold" />
+              </span>
+            ) : null}
+          </div>
+        </div>
+      )}
       <div
         className="menu-item"
         data-kt-menu-trigger="click"
         data-kt-menu-placement="right-start"
       >
         <span className="menu-link" aria-hidden="true">
-          <span className="menu-title">{translate('Saved filters')}</span>
+          <span className="menu-title">
+            {translate('Saved filters') + ` (${list.length})`}
+          </span>
           <CaretRight size={18} className="ms-auto" weight="bold" />
         </span>
 
@@ -224,7 +252,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
     if (hideMenu) {
       // A small delay is needed for the popup listener to be updated with new filters data and then fired
       setTimeout(() => {
-        menuInstance.current.hide(menuInstance.current.getElement());
+        MenuComponent.hideDropdowns(null);
       }, 100);
     }
     props.toggleFilterMenu && props.toggleFilterMenu(true);
