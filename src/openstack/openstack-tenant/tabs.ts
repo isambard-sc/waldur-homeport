@@ -42,6 +42,10 @@ const TenantVolumesList = lazyComponent(
   () => import('../openstack-volume/TenantVolumesList'),
   'TenantVolumesList',
 );
+const TenantVolumeTypesList = lazyComponent(
+  () => import('../openstack-volume/TenantVolumeTypesList'),
+  'TenantVolumeTypesList',
+);
 const TenantSnapshotsList = lazyComponent(
   () => import('../openstack-snapshot/TenantSnapshotsList'),
   'TenantSnapshotsList',
@@ -122,6 +126,11 @@ NestedResourceTabsConfiguration.register('OpenStack.Tenant', () => [
         key: 'volumes',
         title: translate('Volumes'),
         component: TenantVolumesList,
+      },
+      {
+        key: 'volume-types',
+        title: translate('Volume types'),
+        component: TenantVolumeTypesList,
       },
       {
         key: 'snapshots',
