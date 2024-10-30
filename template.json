@@ -1819,10 +1819,6 @@
     "description": "project/ProjectCreateForm.tsx",
     "message": "Choose a science code identifying project activities."
   },
-  "Choose if you want to use the organization's credits, or pay for any extra usage": {
-    "description": "customer/credits/ProjectCreditFormDialog.tsx",
-    "message": "Choose if you want to use the organization's credits, or pay for any extra usage"
-  },
   "Civil engineering": {
     "description": "project/OECD_FOS_2007_CODES.ts",
     "message": "Civil engineering"
@@ -12774,14 +12770,6 @@
   "Use an existing namespace": {
     "description": "rancher/template/NamespaceField.tsx",
     "message": "Use an existing namespace"
-  },
-  "Use organization credit after exceeding allocated amount": {
-    "description": "customer/credits/ProjectCreditFormDialog.tsx",
-    "message": "Use organization credit after exceeding allocated amount"
-  },
-  "Use organization credit": {
-    "description": "customer/credits/ProjectCreditsList.tsx",
-    "message": "Use organization credit"
   },
   "Use sudo": {
     "description": "slurm/SlurmForm.tsx",

@@ -28,9 +28,6 @@ export const ProjectCreateCreditButton = ({ refetch }) => {
             const payload: ProjectCreditFormData = {
               project: formData.project.url,
               value: formData.value,
-              use_organisation_credit: Boolean(
-                formData.use_organisation_credit,
-              ),
             };
             return createProjectCredit(payload)
               .then(() => {
