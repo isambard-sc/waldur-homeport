@@ -8,6 +8,11 @@ COPY package.json yarn.lock /app/
 RUN apk add --no-cache git && yarn install --frozen-lockfile
 
 COPY . /app
+
+ARG COMMIT_INFO="local-build"
+# Create build-info directory and file if run locally
+RUN mkdir -p /app/build-info && echo "$COMMIT_INFO" > /app/build-info/COMMIT_INFO
+
 ARG VERSION=latest
 ARG ASSET_PATH="/"
 RUN sed -i "s/buildId: 'develop'/buildId: '$VERSION'/" src/configs/default.ts
