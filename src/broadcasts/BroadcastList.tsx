@@ -12,11 +12,23 @@ import { BroadcastSendButton } from './BroadcastSendButton';
 import { BroadcastUpdateButton } from './BroadcastUpdateButton';
 import { BroadcastResponseData } from './types';
 
+const mandatoryFields = [
+  'uuid',
+  'author_full_name',
+  'subject',
+  'state',
+  'created',
+  'body',
+  'query',
+  'send_at',
+];
+
 export const BroadcastList: FunctionComponent<{}> = () => {
   const props = useTable({
     table: 'broadcast',
     fetchData: createFetcher('broadcast-messages'),
     queryField: 'subject',
+    mandatoryFields,
   });
   return (
     <Table
