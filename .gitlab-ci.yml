@@ -159,10 +159,6 @@ Build artifact:
     expire_in: 1 week
 
 Publish latest docker image:
-  before_script:
-    - echo '[+] Build and publish latest docker image'
-    - mkdir build-info
-    - echo $CI_COMMIT_SHA > build-info/COMMIT_SHA
   script:
     - AUTH=$(echo -n "${WALDUR_DOCKER_HUB_USER}:${WALDUR_DOCKER_HUB_PASSWORD}" | base64)
     - |
@@ -179,14 +175,11 @@ Publish latest docker image:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --build-arg="DOCKER_REGISTRY=${DOCKER_REGISTRY}"
+      --build-arg="COMMIT_INFO=${CI_COMMIT_SHA}"
       --build-arg="VERSION=latest"
       --destination "opennode/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}"
 
 Publish docker image with specific version:
-  before_script:
-    - echo "[+] Build and publish $CI_COMMIT_TAG docker image"
-    - mkdir build-info
-    - echo $CI_COMMIT_TAG > build-info/COMMIT_TAG
   script:
     - AUTH=$(echo -n "${WALDUR_DOCKER_HUB_USER}:${WALDUR_DOCKER_HUB_PASSWORD}" | base64)
     - |
@@ -203,6 +196,7 @@ Publish docker image with specific version:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --build-arg="DOCKER_REGISTRY=${DOCKER_REGISTRY}"
+      --build-arg="COMMIT_INFO=${CI_COMMIT_TAG}"
       --build-arg="VERSION=$CI_COMMIT_TAG"
       --destination "opennode/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}"
 
