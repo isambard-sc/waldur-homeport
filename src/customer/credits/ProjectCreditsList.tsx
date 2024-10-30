@@ -1,7 +1,6 @@
 import { FC } from 'react';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
-import { formatYesNo } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { createFetcher, Table } from '@waldur/table';
 import { renderFieldOrDash, useTable } from '@waldur/table/utils';
@@ -40,12 +39,6 @@ export const ProjectCreditsList: FC = () => {
           ),
           export: (row) =>
             row.offerings.map((offering) => offering.name).join(', '),
-        },
-        {
-          title: translate('Use organization credit'),
-          render: ({ row }) => <>{formatYesNo(row.use_organisation_credit)}</>,
-          orderField: 'use_organisation_credit',
-          export: (row) => formatYesNo(row.use_organisation_credit),
         },
       ]}
       title={translate('Credit management')}

@@ -32,13 +32,11 @@ export const ProjectEditCreditButton = ({ row, refetch }) => {
               name: row.project_name,
               url: row.project,
             },
-            use_organisation_credit: row.use_organisation_credit,
           },
           onSubmit: (formData) => {
             const payload: ProjectCreditFormData = {
               project: formData.project.url,
               value: formData.value,
-              use_organisation_credit: formData.use_organisation_credit,
             };
             return updateProjectCredit(row.uuid, payload)
               .then(() => {

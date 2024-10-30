@@ -15,7 +15,6 @@ import {
   NumberField,
   SubmitButton,
 } from '@waldur/form';
-import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
@@ -135,16 +134,6 @@ export const ProjectCreditFormDialog = connect(
               unit={ENV.plugins.WALDUR_CORE.CURRENCY_NAME}
               validate={[required, exceeds]}
               required
-            />
-            <AwesomeCheckboxField
-              name="use_organisation_credit"
-              label={translate(
-                'Use organization credit after exceeding allocated amount',
-              )}
-              description={translate(
-                "Choose if you want to use the organization's credits, or pay for any extra usage",
-              )}
-              hideLabel={true}
             />
             {isEdit && (
               <Accordion className="mb-7">

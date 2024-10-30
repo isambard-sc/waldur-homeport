@@ -31,12 +31,10 @@ export interface ProjectCredit {
   project_name: string;
   offerings: Pick<Offering, 'uuid' | 'name' | 'type' | 'url'>[];
   value: string; // number
-  use_organisation_credit: boolean;
   consumption_last_month: number;
 }
 
 export interface ProjectCreditFormData {
   value: string;
   project: string;
-  use_organisation_credit: boolean;
 }
