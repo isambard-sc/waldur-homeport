@@ -63,5 +63,12 @@ export const ProviderForm = () => (
         label={translate('Verify SSL')}
       />
     </Form.Group>
+    <Form.Group className="mb-7">
+      <Field
+        name="enable_post_logout_redirect"
+        component={AwesomeCheckboxField}
+        label={translate('Enable post logout redirect')}
+      />
+    </Form.Group>
   </>
 );
