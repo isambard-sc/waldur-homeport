@@ -36,6 +36,8 @@ export const CustomersEnum = {
   payment_removed: 'payment_removed',
   reduction_of_credit: 'reduction_of_credit',
   reduction_of_credit_due_to_minimal_consumption: 'reduction_of_credit_due_to_minimal_consumption',
+  roll_back_customer_credit: 'roll_back_customer_credit',
+  roll_back_project_credit: 'roll_back_project_credit',
   set_to_zero_overdue_credit: 'set_to_zero_overdue_credit',
   update_of_credit_by_staff: 'update_of_credit_by_staff',
 };
@@ -55,6 +57,8 @@ export const InvoicesEnum = {
   payment_removed: 'payment_removed',
   reduction_of_credit: 'reduction_of_credit',
   reduction_of_credit_due_to_minimal_consumption: 'reduction_of_credit_due_to_minimal_consumption',
+  roll_back_customer_credit: 'roll_back_customer_credit',
+  roll_back_project_credit: 'roll_back_project_credit',
   set_to_zero_overdue_credit: 'set_to_zero_overdue_credit',
   update_of_credit_by_staff: 'update_of_credit_by_staff',
 };
