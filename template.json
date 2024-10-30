@@ -3427,6 +3427,10 @@
     "description": "marketplace/offerings/update/components/ComponentLimitEnableField.tsx",
     "message": "Enable limit"
   },
+  "Enable post logout redirect": {
+    "description": "administration/providers/ProviderForm.tsx",
+    "message": "Enable post logout redirect"
+  },
   "Enable profile after creation": {
     "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx",
     "message": "Enable profile after creation"
