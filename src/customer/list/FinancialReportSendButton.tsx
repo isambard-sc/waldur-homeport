@@ -17,7 +17,8 @@ export const FinancialReportSendButton = () => {
   return (
     <Button
       onClick={() => dispatch(openModalDialog(ExportAsEmailDialog))}
-      variant="light"
+      variant="outline-default"
+      className="btn-outline"
     >
       <span className="svg-icon svg-icon-2">
         <Share />
