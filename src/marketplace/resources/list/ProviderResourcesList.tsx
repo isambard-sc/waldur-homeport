@@ -1,15 +1,19 @@
 import { Check, X } from '@phosphor-icons/react';
 import React, { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
+import { Button } from 'react-bootstrap';
+import { useSelector, useDispatch } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { Badge } from '@waldur/core/Badge';
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { lazyComponent } from '@waldur/core/lazyComponent';
+import { BackendIdTip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { ExpandableResourceSummary } from '@waldur/marketplace/resources/list/ExpandableResourceSummary';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { Category, Offering } from '@waldur/marketplace/types';
+import { openModalDialog } from '@waldur/modal/actions';
 import { createFetcher, Table } from '@waldur/table';
 import { useTable } from '@waldur/table/utils';
 import {
@@ -24,9 +28,9 @@ import {
   PROVIDER_RESOURCES_LIST_FILTER_FORM_ID,
   TABLE_PUBLIC_RESOURCE,
 } from './constants';
+import { EndDateTooltip } from './EndDateTooltip';
 import { ProviderResourceActions } from './ProviderResourceActions';
 import { ProviderResourcesFilter } from './ProviderResourcesFilter';
-import { PublicResourceLink } from './PublicResourceLink';
 import { PublicResourcesLimits } from './PublicResourcesLimits';
 import { ResourceStateField } from './ResourceStateField';
 import { NON_TERMINATED_STATES } from './ResourceStateFilter';
@@ -40,6 +44,31 @@ interface ResourceFilter {
   include_terminated?: boolean;
 }
 
+const ResourceDetailsDialog = lazyComponent(
+  () => import('../details/popup/ResourceDetailsDialog'),
+  'ResourceDetailsDialog',
+);
+
+const ResourceField = ({ row }) => {
+  const dispatch = useDispatch();
+  const callback = () => {
+    dispatch(
+      openModalDialog(ResourceDetailsDialog, {
+        resolve: { resource: row },
+      }),
+    );
+  };
+  return (
+    <>
+      <Button variant="flush" className="text-anchor" onClick={callback}>
+        {row.name || row.offering_name}
+      </Button>
+      <BackendIdTip backendId={row.backend_id} />
+      <EndDateTooltip end_date={row.end_date} />
+    </>
+  );
+};
+
 const TableComponent: FunctionComponent<any> = (props) => {
   React.useEffect(() => {
     props.resetPagination();
@@ -47,7 +76,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
   const columns = [
     {
       title: translate('Name'),
-      render: PublicResourceLink,
+      render: ResourceField,
       copyField: (row) => row.name || row.offering_name,
       orderField: 'name',
       id: 'name',

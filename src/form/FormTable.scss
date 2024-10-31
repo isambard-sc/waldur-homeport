@@ -44,3 +44,17 @@
     padding-bottom: 1rem;
   }
 }
+
+.table.form-table.details-table {
+  th,
+  td {
+    font-size: 1.075rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    vertical-align: middle;
+    width: auto;
+  }
+  .col-actions {
+    display: none;
+  }
+}

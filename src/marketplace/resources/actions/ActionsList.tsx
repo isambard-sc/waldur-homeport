@@ -13,6 +13,7 @@ import { SetErredActionItem } from '@waldur/resource/actions/SetErredActionItem'
 import { UnlinkActionItem } from '@waldur/resource/actions/UnlinkActionItem';
 
 import { ChangeLimitsAction } from '../change-limits/ChangeLimitsAction';
+import { ResourceDetailsAction } from '../details/popup/ResourceDetailsAction';
 import { ReportUsageAction } from '../list/ReportUsageAction';
 import { ShowUsageAction } from '../list/ShowUsageAction';
 
@@ -56,6 +57,7 @@ export const ProviderActionsList = [
   CreateRobotAccountAction,
   SetErredActionItem,
   EditResourceEndDateByProviderAction,
+  ResourceDetailsAction,
 ];
 
 export const StaffActions = [

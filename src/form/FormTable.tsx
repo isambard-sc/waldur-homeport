@@ -89,12 +89,19 @@ const FormTableCard: FormTableCardProps = (props) => {
   );
 };
 
-const FormTable: FC<PropsWithChildren> & {
+const FormTable: FC<PropsWithChildren<{ detailsTable?: boolean }>> & {
   Item: FC<FormTableItemProps>;
   Card: FormTableCardProps;
 } = (props) => {
   return (
-    <Table bordered={true} responsive={true} className="form-table">
+    <Table
+      bordered={true}
+      responsive={true}
+      className={classNames(
+        'form-table',
+        props.detailsTable && 'details-table',
+      )}
+    >
       <tbody>{props.children}</tbody>
     </Table>
   );
