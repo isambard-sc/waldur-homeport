@@ -8,6 +8,7 @@ import { useTable } from '@waldur/table/utils';
 
 import { ExecuteMigrationAction } from './actions/ExecuteMigrationAction';
 import { CreateMigrationButton } from './CreateMigrationButton';
+import { DeleteMigrationAction } from './DeleteMigrationAction';
 import { MigrationExpandableRow } from './MigrationExpandableRow';
 
 export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
@@ -52,7 +53,10 @@ export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
       ]}
       verboseName={translate('migrations')}
       rowActions={({ row }) => (
-        <ExecuteMigrationAction resource={row} refetch={props.fetch} />
+        <>
+          <ExecuteMigrationAction resource={row} refetch={props.fetch} />
+          <DeleteMigrationAction resource={row} refetch={props.fetch} />
+        </>
       )}
       tableActions={
         <CreateMigrationButton resource={resourceScope} refetch={props.fetch} />

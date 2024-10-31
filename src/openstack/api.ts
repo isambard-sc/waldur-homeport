@@ -332,3 +332,6 @@ export const createMigration = (payload) =>
   post(`/openstack-migrations/`, payload);
 
 export const runMigration = (id) => post(`/openstack-migrations/${id}/run/`);
+
+export const deleteMigration = (id: string) =>
+  deleteById('/openstack-migrations/', id);
