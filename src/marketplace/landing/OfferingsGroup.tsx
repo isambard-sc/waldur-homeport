@@ -80,7 +80,10 @@ export const OfferingsGroup = () => {
       verboseName={translate('Offerings')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       tableActions={
-        <Link state="public.offerings" className="btn btn-light">
+        <Link
+          state="public.offerings"
+          className="btn btn-outline btn-outline-default"
+        >
           {translate('All offerings')}
         </Link>
       }
