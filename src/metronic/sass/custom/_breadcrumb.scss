@@ -9,6 +9,11 @@
     &:last-child {
       flex-grow: 1;
     }
+
+    &:hover a {
+      color: $primary;
+      text-decoration: underline !important;
+    }
   }
 }
 
