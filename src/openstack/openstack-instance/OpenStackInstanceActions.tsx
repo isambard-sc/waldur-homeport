@@ -5,7 +5,6 @@ import { ProviderActionsGroup } from '@waldur/marketplace/resources/actions/Prov
 import { ChangeLimitsAction } from '@waldur/marketplace/resources/change-limits/ChangeLimitsAction';
 import { ChangePlanAction } from '@waldur/marketplace/resources/change-plan/ChangePlanAction';
 import { ShowUsageAction } from '@waldur/marketplace/resources/list/ShowUsageAction';
-import { SetErredActionItem } from '@waldur/resource/actions/SetErredActionItem';
 import { UnlinkActionItem } from '@waldur/resource/actions/UnlinkActionItem';
 
 import { ChangeFlavorAction } from './actions/ChangeFlavorAction';
@@ -47,7 +46,6 @@ export const OpenStackInstanceActions = (props) => (
     <ActionGroup title={translate('Staff actions')}>
       <MoveResourceAction {...props} />
       <UnlinkActionItem {...props} />
-      <SetErredActionItem {...props} />
     </ActionGroup>
 
     <ActionGroup title={translate('Dangerous actions')}>

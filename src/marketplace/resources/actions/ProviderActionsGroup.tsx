@@ -5,6 +5,7 @@ import { CreateLexisLinkAction } from '@waldur/marketplace/resources/lexis/Creat
 import { ReportUsageAction } from '@waldur/marketplace/resources/list/ReportUsageAction';
 import { SubmitReportAction } from '@waldur/marketplace/resources/report/SubmitReportAction';
 import { SetBackendIdAction } from '@waldur/marketplace/resources/SetBackendIdAction';
+import { SetErredActionItem } from '@waldur/resource/actions/SetErredActionItem';
 
 export const ProviderActionsGroup = (props) => (
   <ActionGroup title={translate('Provider actions')}>
@@ -13,5 +14,6 @@ export const ProviderActionsGroup = (props) => (
     <SubmitReportAction {...props} />
     <EditResourceEndDateAction {...props} />
     <CreateLexisLinkAction {...props} />
+    <SetErredActionItem {...props} />
   </ActionGroup>
 );
