@@ -60,6 +60,18 @@
     transform: translate(-50%, -20%);
     margin-right: 3px;
   }
+
+  &.has-left-icon {
+    position: relative;
+    padding-left: 1.6em;
+
+    .left-icon {
+      position: absolute;
+      transform: translateY(-50%);
+      left: 5px;
+      top: 50%;
+    }
+  }
 }
 
 @each $name, $value in $theme-colors {
@@ -71,6 +83,9 @@
     &.has-bullet::before {
       background-color: theme-inverse-color($name);
     }
+    .left-icon {
+      @include svg-icon-color(theme-inverse-color($name));
+    }
   }
 
   .badge-light-#{$name} {
@@ -80,6 +95,9 @@
 
     &.has-bullet::before {
       background-color: $value;
+    }
+    .left-icon {
+      @include svg-icon-color($value);
     }
   }
 
@@ -91,6 +109,9 @@
     &.has-bullet::before {
       background-color: theme-active-color($name);
     }
+    .left-icon {
+      @include svg-icon-color(theme-active-color($name));
+    }
   }
 }
 
@@ -101,5 +122,8 @@
 
   &.has-bullet::before {
     background-color: $gray-700;
+  }
+  .left-icon {
+    @include svg-icon-color($gray-700);
   }
 }
