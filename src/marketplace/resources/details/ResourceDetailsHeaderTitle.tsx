@@ -6,6 +6,7 @@ import { ResourceStateField } from '../list/ResourceStateField';
 import { Resource } from '../types';
 
 import { ParentResourceLink } from './ParentResourceLink';
+import { ResourceFlags } from './ResourceFlags';
 
 interface ResourceDetailsHeaderTitleProps {
   resource: Resource;
@@ -24,6 +25,7 @@ export const ResourceDetailsHeaderTitle: FunctionComponent<
           size={20}
         />
         <ResourceStateField resource={resource} pill outline hasBullet />
+        <ResourceFlags resource={resource} />
       </div>
       <ParentResourceLink resource={resource} />
     </>

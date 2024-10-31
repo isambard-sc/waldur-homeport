@@ -139,6 +139,10 @@
     "description": "resource/ResourceAccessButton.tsx",
     "message": "Access resource"
   },
+  "Access restricted": {
+    "description": "marketplace/resources/details/ResourceFlags.tsx",
+    "message": "Access restricted"
+  },
   "Access subnet has been created.": {
     "description": "customer/details/AccessSubnetCreateForm.tsx",
     "message": "Access subnet has been created."
@@ -3124,7 +3128,7 @@
     "message": "Download"
   },
   "Downscaled": {
-    "description": "marketplace/resources/details/ResourceSummary.tsx",
+    "description": "marketplace/resources/details/ResourceFlags.tsx, marketplace/resources/details/ResourceSummary.tsx",
     "message": "Downscaled"
   },
   "Draft": {
@@ -6940,7 +6944,7 @@
     "message": "Pause"
   },
   "Paused": {
-    "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/resources/details/ResourceSummary.tsx",
+    "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/resources/details/ResourceFlags.tsx, marketplace/resources/details/ResourceSummary.tsx",
     "message": "Paused"
   },
   "Pay": {
