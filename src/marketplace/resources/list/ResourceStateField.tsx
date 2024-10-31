@@ -10,6 +10,7 @@ export const ResourceStateField = ({
   outline,
   pill,
   hasBullet,
+  size,
 }: {
   resource: Resource;
   roundless?: boolean;
@@ -17,6 +18,7 @@ export const ResourceStateField = ({
   outline?: boolean;
   pill?: boolean;
   hasBullet?: boolean;
+  size?: 'sm' | 'lg';
 }) => {
   const runtimeState = resource.backend_metadata?.runtime_state;
   const backendState = resource.backend_metadata?.state;
@@ -47,6 +49,7 @@ export const ResourceStateField = ({
       outline={outline}
       pill={pill}
       hasBullet={hasBullet}
+      size={size}
       tooltip={
         resource.backend_metadata?.action
           ? translate('{action} in progress', {
