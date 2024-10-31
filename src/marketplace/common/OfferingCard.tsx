@@ -99,10 +99,10 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
         }
         footer={
           !isRestricted ? (
-            <div className="d-flex justify-content-end gap-4">
+            <div className="d-flex justify-content-end align-items-center gap-2 my-n3 me-n3">
               <OfferingLink
                 offering_uuid={props.offering.uuid}
-                className="btn btn-flush text-btn"
+                className="btn btn-text-primary btn-active-secondary"
               >
                 {translate('Deploy')}
               </OfferingLink>
@@ -111,13 +111,13 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
                 params={{
                   uuid: props.offering.uuid,
                 }}
-                className="btn btn-flush text-anchor"
+                className="btn text-gray-700 btn-active-light"
               >
                 {translate('View offering')}
               </Link>
             </div>
           ) : (
-            <div className="d-flex justify-content-between gap-4">
+            <div className="d-flex justify-content-between align-items-center gap-4 my-n3 me-n3">
               {isRestricted && (
                 <Tip
                   id={`tip-restricted-${props.offering.uuid}`}
@@ -138,10 +138,10 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
                   <Question size={20} className="text-muted ms-1" />
                 </Tip>
               )}
-              <div className="flex-grow-1 d-flex justify-content-end gap-4">
+              <div className="flex-grow-1 d-flex justify-content-end gap-2">
                 <OfferingLink
                   offering_uuid={props.offering.uuid}
-                  className="btn btn-flush text-btn"
+                  className="btn btn-text-primary btn-active-secondary"
                   disabled={!isAllowed}
                 >
                   {translate('Deploy')}
@@ -152,12 +152,15 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
                     params={{
                       uuid: props.offering.uuid,
                     }}
-                    className="btn btn-flush text-anchor"
+                    className="btn text-gray-700 btn-active-light"
                   >
                     {translate('View offering')}
                   </Link>
                 ) : (
-                  <button className="btn btn-flush text-anchor" disabled>
+                  <button
+                    className="btn text-gray-700 btn-active-light"
+                    disabled
+                  >
                     {translate('View offering')}
                   </button>
                 )}
