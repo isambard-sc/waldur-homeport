@@ -1,10 +1,10 @@
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getCustomerContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
 import { PaymentsEnum } from '../EventsEnums';
 
-eventsRegistry.registerGroup({
+export const PaymentEvents: EventGroup = {
   title: gettext('Payment events'),
   context: getCustomerContext,
   events: [
@@ -21,4 +21,4 @@ eventsRegistry.registerGroup({
       title: gettext('Created a new payment for {customer_link}.'),
     },
   ],
-});
+};

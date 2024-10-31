@@ -1,6 +1,5 @@
 import { UISref } from '@uirouter/react';
 
-import eventsRegistry from '@waldur/events/registry';
 import { getUserContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
@@ -23,7 +22,7 @@ const getResourceContext = (event) => ({
   ),
 });
 
-eventsRegistry.registerGroup({
+export const ResourceEvents = {
   title: gettext('Resource events'),
   context: getResourceContext,
   events: [
@@ -106,4 +105,4 @@ eventsRegistry.registerGroup({
       title: gettext('{resource_link} has been updated by {user_link}.'),
     },
   ],
-});
+};

@@ -1,10 +1,10 @@
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getCustomerContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
 import { CustomersEnum } from '../EventsEnums';
 
-eventsRegistry.registerGroup({
+export const OrganizationEvents: EventGroup = {
   title: gettext('Organization events'),
   context: getCustomerContext,
   events: [
@@ -21,4 +21,4 @@ eventsRegistry.registerGroup({
       title: gettext('Organization {customer_link} has been updated.'),
     },
   ],
-});
+};

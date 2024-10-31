@@ -1,6 +1,6 @@
 import { UISref } from '@uirouter/react';
 
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getCallerContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
@@ -16,7 +16,7 @@ const getIssueContext = (event) => ({
   ),
 });
 
-eventsRegistry.registerGroup({
+export const IssueEvents: EventGroup = {
   title: gettext('Support request events'),
   context: getIssueContext,
   events: [
@@ -25,4 +25,4 @@ eventsRegistry.registerGroup({
       title: gettext('Issue {issue_link} has been created by {caller_link}.'),
     },
   ],
-});
+};

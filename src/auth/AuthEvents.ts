@@ -1,10 +1,10 @@
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getUserContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
 import { AuthEnum, UsersEnum } from '../EventsEnums';
 
-eventsRegistry.registerGroup({
+export const AuthEvents: EventGroup = {
   title: gettext('Authentication events'),
   context: getUserContext,
   events: [
@@ -23,4 +23,4 @@ eventsRegistry.registerGroup({
       title: gettext('User {user_link} logged out successfully with SAML2.'),
     },
   ],
-});
+};

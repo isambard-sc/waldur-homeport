@@ -1,4 +1,13 @@
+import { AuthEvents } from '@waldur/auth/AuthEvents';
+import { OrganizationEvents } from '@waldur/customer/events';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
+import { InvoiceEvents } from '@waldur/invoices/events';
+import { IssueEvents } from '@waldur/issues/events';
+import { PaymentEvents } from '@waldur/paypal/events';
+import { RoleEvents } from '@waldur/permissions/events';
+import { ProjectEvents } from '@waldur/project/events';
+import { ResourceEvents } from '@waldur/resource/events';
+import { SshEvents, UserEvents } from '@waldur/user/events';
 
 import { EventGroup } from './types';
 
@@ -35,5 +44,16 @@ export class EventRegistry {
 }
 
 const registry = new EventRegistry();
+
+registry.registerGroup(AuthEvents);
+registry.registerGroup(IssueEvents);
+registry.registerGroup(OrganizationEvents);
+registry.registerGroup(RoleEvents);
+registry.registerGroup(InvoiceEvents);
+registry.registerGroup(ProjectEvents);
+registry.registerGroup(ResourceEvents);
+registry.registerGroup(UserEvents);
+registry.registerGroup(SshEvents);
+registry.registerGroup(PaymentEvents);
 
 export default registry;

@@ -1,6 +1,6 @@
 import { UISref } from '@uirouter/react';
 
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import {
   AffectedUserContext,
   getAffectedUserContext,
@@ -103,7 +103,7 @@ const formatRoleUpdatedEvent = (event: RoleEvent) => {
   );
 };
 
-eventsRegistry.registerGroup({
+export const RoleEvents: EventGroup = {
   title: gettext('Role management events'),
   events: [
     {
@@ -124,4 +124,4 @@ eventsRegistry.registerGroup({
       formatter: formatRoleRevokedEvent,
     },
   ],
-});
+};

@@ -1,10 +1,10 @@
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getAffectedUserContext, getUserContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
-import { UsersEnum, SshEnum } from '../EventsEnums';
+import { SshEnum, UsersEnum } from '../EventsEnums';
 
-eventsRegistry.registerGroup({
+export const UserEvents: EventGroup = {
   title: gettext('User management events'),
   context: getAffectedUserContext,
   events: [
@@ -35,9 +35,9 @@ eventsRegistry.registerGroup({
       title: gettext('User {affected_user_link} has been updated.'),
     },
   ],
-});
+};
 
-eventsRegistry.registerGroup({
+export const SshEvents: EventGroup = {
   title: gettext('SSH key management events'),
   context: getUserContext,
   events: [
@@ -54,4 +54,4 @@ eventsRegistry.registerGroup({
       ),
     },
   ],
-});
+};

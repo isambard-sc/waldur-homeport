@@ -1,10 +1,10 @@
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getProjectContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
 import { ProjectsEnum } from '../EventsEnums';
 
-eventsRegistry.registerGroup({
+export const ProjectEvents: EventGroup = {
   title: gettext('Project events'),
   context: getProjectContext,
   events: [
@@ -21,4 +21,4 @@ eventsRegistry.registerGroup({
       title: gettext('Project {project_link} has been updated.'),
     },
   ],
-});
+};

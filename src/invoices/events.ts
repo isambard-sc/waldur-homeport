@@ -1,4 +1,4 @@
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import { getCustomerContext } from '@waldur/events/utils';
 import { gettext } from '@waldur/i18n';
 
@@ -9,7 +9,7 @@ const getInvoiceContext = (event) => ({
   period: event.invoice_date,
 });
 
-eventsRegistry.registerGroup({
+export const InvoiceEvents: EventGroup = {
   title: gettext('Invoice events'),
   context: getInvoiceContext,
   events: [
@@ -32,4 +32,4 @@ eventsRegistry.registerGroup({
       ),
     },
   ],
-});
+};

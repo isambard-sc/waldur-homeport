@@ -1404,7 +1404,7 @@
     "message": "Billed yearly (20% discount)"
   },
   "Billing actions": {
-    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx",
+    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, slurm/SlurmAllocationActions.tsx",
     "message": "Billing actions"
   },
   "Billing component has been created successfully.": {
@@ -2636,7 +2636,7 @@
     "message": "Daily available booking time range"
   },
   "Dangerous actions": {
-    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx",
+    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, slurm/SlurmAllocationActions.tsx",
     "message": "Dangerous actions"
   },
   "Dark theme": {
@@ -6679,6 +6679,10 @@
     "description": "marketplace/orders/details/OrderDetails.tsx",
     "message": "Order details"
   },
+  "Order errors": {
+    "description": "marketplace/resources/resource-pending/ResourceOrderErrorDialog.tsx",
+    "message": "Order errors"
+  },
   "Order for: {resource_name} (view resource)": {
     "description": "marketplace/orders/details/OrderDetailsHeaderTitle.tsx",
     "message": "Order for: {resource_name} (view resource)"
@@ -6714,10 +6718,6 @@
   "Order": {
     "description": "administration/roles/PermissionOptions.tsx, events/ExpandableEventDetailsTable.tsx",
     "message": "Order"
-  },
-  "Orders errors": {
-    "description": "marketplace/resources/resource-pending/ResourceOrderErrorDialog.tsx",
-    "message": "Orders errors"
   },
   "Orders pending approval": {
     "description": "marketplace/service-providers/dashboard/ProviderWidgets.tsx",
@@ -8624,7 +8624,7 @@
     "message": "Resource UUID"
   },
   "Resource actions": {
-    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, resource/actions/ResourceActionComponent.tsx",
+    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, resource/actions/ResourceActionComponent.tsx, slurm/SlurmAllocationActions.tsx",
     "message": "Resource actions"
   },
   "Resource already has this plan.": {
@@ -10168,7 +10168,7 @@
     "message": "Sponsor number"
   },
   "Staff actions": {
-    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, resource/actions/ResourceActionComponent.tsx",
+    "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, resource/actions/ResourceActionComponent.tsx, slurm/SlurmAllocationActions.tsx",
     "message": "Staff actions"
   },
   "Staff and Support user": {
