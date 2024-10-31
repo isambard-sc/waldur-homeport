@@ -4,4 +4,5 @@
 
 .footer {
   background-color: get($footer-config, bg-color);
+  border-top: get($footer-config, border-top);
 }
