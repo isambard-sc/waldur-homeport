@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { MARKETPLACE_RANCHER } from './constants';
 
@@ -49,7 +49,7 @@ const serializer = ({
   tenant: tenant ? tenant.url : undefined,
 });
 
-registerOfferingType({
+export const RancherOffering: OfferingConfiguration = {
   type: MARKETPLACE_RANCHER,
   get label() {
     return translate('Rancher cluster');
@@ -60,4 +60,4 @@ registerOfferingType({
   providerType: 'Rancher',
   serializer,
   allowToUpdateService: true,
-});
+};

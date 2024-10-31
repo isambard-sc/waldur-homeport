@@ -3,7 +3,9 @@ import { DateTime } from 'luxon';
 import { parseDate } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
+
+import { OFFERING_TYPE_BOOKING } from './constants';
 
 const BookingDetails = lazyComponent(
   () => import('@waldur/booking/BookingDetails'),
@@ -21,8 +23,6 @@ const BookingOrderForm = lazyComponent(
   () => import('./deploy/BookingOrderForm'),
   'BookingOrderForm',
 );
-
-import { OFFERING_TYPE_BOOKING } from './constants';
 
 /* Since back-end doesn't allow slots in the past,
  * this function detects slots that are in the past and
@@ -63,7 +63,7 @@ export const handlePastSlotsForBookingOffering = (attributes) => {
 
 const serializer = (attrs) => handlePastSlotsForBookingOffering(attrs);
 
-registerOfferingType({
+export const BookingOffering: OfferingConfiguration = {
   type: OFFERING_TYPE_BOOKING,
   get label() {
     return translate('Booking');
@@ -75,4 +75,4 @@ registerOfferingType({
   showComponents: true,
   schedulable: true,
   serializer,
-});
+};

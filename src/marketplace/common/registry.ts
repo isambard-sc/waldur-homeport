@@ -1,66 +1,20 @@
-import {
-  Offering,
-  OrderDetailsProps,
-  OfferingComponent,
-} from '@waldur/marketplace/types';
+import { AzureSQLServerOffering } from '@waldur/azure/sql/marketplace';
+import { AzureVirtualMachineOffering } from '@waldur/azure/vm/marketplace';
+import { BookingOffering } from '@waldur/booking/marketplace';
+import { RemoteOffering } from '@waldur/marketplace-remote/marketplace';
+import { ScriptOffering } from '@waldur/marketplace-script/marketplace';
+import { Offering, OfferingComponent } from '@waldur/marketplace/types';
+import { OpenStackTenantOffering } from '@waldur/openstack/marketplace';
+import { OpenStackInstanceOffering } from '@waldur/openstack/openstack-instance/marketplace';
+import { OpenStackVolumeOffering } from '@waldur/openstack/openstack-volume/marketplace';
+import { RancherOffering } from '@waldur/rancher/cluster/create/marketplace';
+import { SlurmOffering, SlurmRemoteOffering } from '@waldur/slurm/marketplace';
+import { BasicOffering, SupportOffering } from '@waldur/support/marketplace';
+import { vmWareOffering } from '@waldur/vmware/marketplace';
 
-import { CheckoutSummaryProps } from '../deploy/types';
-import { OfferingEditPanelFormProps } from '../offerings/update/integration/types';
+import { OfferingConfiguration } from './types';
 
 const REGISTRY: { [key: string]: Omit<OfferingConfiguration, 'type'> } = {};
-
-export type Limits = Record<string, number>;
-
-export type LimitParser = (limits: Limits) => Limits;
-
-interface OfferingConfiguration<
-  AttributesType = any,
-  RequestPayloadType = any,
-> {
-  type: string;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  orderFormComponent?: React.ComponentType<any>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  pluginOptionsForm?: React.ComponentType<OfferingEditPanelFormProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  secretOptionsForm?: React.ComponentType<OfferingEditPanelFormProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  provisioningConfigForm?: React.ComponentType<OfferingEditPanelFormProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  detailsComponent?: React.ComponentType<OrderDetailsProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  checkoutSummaryComponent?: React.ComponentType<CheckoutSummaryProps>;
-  serializer?: (
-    attributes: AttributesType,
-    offering: Offering,
-  ) => RequestPayloadType;
-  limitSerializer?: LimitParser;
-  limitParser?: LimitParser;
-  label: string;
-  showComponents?: boolean;
-  onlyOnePlan?: boolean;
-  providerType?: string;
-  disableOfferingCreation?: boolean;
-  schedulable?: boolean;
-  showBackendId?: boolean;
-  allowToUpdateService?: boolean;
-  offeringComponentsFilter?: (
-    formData: any,
-    components: OfferingComponent[],
-  ) => OfferingComponent[];
-}
 
 export interface Option {
   value: string;
@@ -224,3 +178,18 @@ export const filterOfferingComponents = (
   }
   return offeringComponents;
 };
+
+registerOfferingType(AzureSQLServerOffering);
+registerOfferingType(AzureVirtualMachineOffering);
+registerOfferingType(RemoteOffering);
+registerOfferingType(BookingOffering);
+registerOfferingType(ScriptOffering);
+registerOfferingType(OpenStackTenantOffering);
+registerOfferingType(OpenStackInstanceOffering);
+registerOfferingType(OpenStackVolumeOffering);
+registerOfferingType(RancherOffering);
+registerOfferingType(SlurmOffering);
+registerOfferingType(SlurmRemoteOffering);
+registerOfferingType(SupportOffering);
+registerOfferingType(BasicOffering);
+registerOfferingType(vmWareOffering);

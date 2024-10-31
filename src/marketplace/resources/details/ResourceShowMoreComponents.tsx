@@ -2,7 +2,7 @@ import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 

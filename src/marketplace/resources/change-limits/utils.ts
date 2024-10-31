@@ -6,10 +6,9 @@ import {
 import {
   getFormLimitSerializer,
   getFormLimitParser,
-  LimitParser,
-  Limits,
   filterOfferingComponents,
 } from '@waldur/marketplace/common/registry';
+import { LimitParser, Limits } from '@waldur/marketplace/common/types';
 import { getBillingPeriods } from '@waldur/marketplace/common/utils';
 import { parseOfferingLimits } from '@waldur/marketplace/offerings/store/limits';
 import { OfferingLimits } from '@waldur/marketplace/offerings/store/types';

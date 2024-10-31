@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 
 import {
   getFormLimitParser,
-  Limits,
   filterOfferingComponents,
 } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { minAmount, maxAmount } from '@waldur/marketplace/common/utils';
 import { Offering, OfferingComponent } from '@waldur/marketplace/types';
 

@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 const AzureSQLServerDetails = lazyComponent(
   () => import('./AzureSQLServerDetails'),
@@ -11,7 +11,7 @@ const AzureSQLServerForm = lazyComponent(
   'AzureSQLServerForm',
 );
 
-registerOfferingType({
+export const AzureSQLServerOffering: OfferingConfiguration = {
   type: 'Azure.SQLServer',
   get label() {
     return translate('Azure PostgreSQL database server');
@@ -20,4 +20,4 @@ registerOfferingType({
   detailsComponent: AzureSQLServerDetails,
   providerType: 'Azure',
   allowToUpdateService: true,
-});
+};

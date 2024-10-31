@@ -3,7 +3,7 @@ import { InjectedFormProps } from 'redux-form';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 

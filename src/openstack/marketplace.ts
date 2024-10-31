@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { TENANT_TYPE } from './constants';
 
@@ -55,10 +55,10 @@ const offeringComponentsFilter = (formData, components) => {
   }
 };
 
-registerOfferingType({
+export const OpenStackTenantOffering: OfferingConfiguration = {
   type: TENANT_TYPE,
   get label() {
-    return translate('OpenStack admin');
+    return translate('OpenStack tenant');
   },
   orderFormComponent: OpenstackTenantOrder,
   detailsComponent: OpenStackPackageDetails,
@@ -70,4 +70,4 @@ registerOfferingType({
   showComponents: true,
   offeringComponentsFilter,
   allowToUpdateService: true,
-});
+};

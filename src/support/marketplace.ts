@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { BASIC_OFFERING_TYPE, SUPPORT_OFFERING_TYPE } from './constants';
 import { serializer } from './serializer';
@@ -34,7 +34,7 @@ export const COMMON_OPTIONS = {
   showComponents: true,
 };
 
-registerOfferingType({
+export const SupportOffering: OfferingConfiguration = {
   type: SUPPORT_OFFERING_TYPE,
   get label() {
     return translate('Request-based item');
@@ -42,9 +42,9 @@ registerOfferingType({
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
   provisioningConfigForm: ProvisioningConfigForm,
-});
+};
 
-registerOfferingType({
+export const BasicOffering: OfferingConfiguration = {
   type: BASIC_OFFERING_TYPE,
   get label() {
     return translate('Request-based item (without Service Desk)');
@@ -52,4 +52,4 @@ registerOfferingType({
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
   provisioningConfigForm: ProvisioningConfigForm,
-});
+};

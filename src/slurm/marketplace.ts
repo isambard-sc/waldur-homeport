@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 import { SLURM_PLUGIN, SLURM_REMOTE_PLUGIN } from '@waldur/slurm/constants';
 
 const UserPluginOptionsForm = lazyComponent(
@@ -18,7 +18,7 @@ const SlurmOrderForm = lazyComponent(
   'SlurmOrderForm',
 );
 
-registerOfferingType({
+export const SlurmOffering: OfferingConfiguration = {
   type: SLURM_PLUGIN,
   get label() {
     return translate('SLURM allocation');
@@ -26,9 +26,9 @@ registerOfferingType({
   orderFormComponent: SlurmOrderForm,
   providerType: 'SLURM',
   allowToUpdateService: true,
-});
+};
 
-registerOfferingType({
+export const SlurmRemoteOffering: OfferingConfiguration = {
   type: SLURM_REMOTE_PLUGIN,
   get label() {
     return translate('SLURM remote allocation');
@@ -38,4 +38,4 @@ registerOfferingType({
   secretOptionsForm: UserSecretOptionsForm,
   providerType: 'SLURM remote',
   allowToUpdateService: true,
-});
+};

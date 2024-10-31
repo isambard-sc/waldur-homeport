@@ -2,7 +2,7 @@ import { isEmpty } from 'lodash';
 import { Card } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { NoResult } from '@waldur/navigation/header/search/NoResult';
 

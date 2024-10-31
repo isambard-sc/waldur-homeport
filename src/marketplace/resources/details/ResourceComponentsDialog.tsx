@@ -2,7 +2,7 @@ import { Col, Row } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
 
 import { translate } from '@waldur/i18n';
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';

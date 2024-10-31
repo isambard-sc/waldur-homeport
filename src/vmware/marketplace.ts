@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { VMWARE_VM } from './constants';
 
@@ -39,7 +39,7 @@ const limitParser = (limits) =>
     disk: limits.disk && limits.disk / 1024,
   };
 
-registerOfferingType({
+export const vmWareOffering: OfferingConfiguration = {
   type: VMWARE_VM,
   get label() {
     return translate('vSphere Virtual Machine');
@@ -50,4 +50,4 @@ registerOfferingType({
   limitSerializer,
   limitParser,
   allowToUpdateService: true,
-});
+};

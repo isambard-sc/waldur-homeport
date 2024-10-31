@@ -1,5 +1,4 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import './marketplace';
 import * as ResourceSummary from '@waldur/resource/summary/registry';
 
 import './actions';

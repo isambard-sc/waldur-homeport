@@ -1,7 +1,7 @@
 import { Col, Row } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
 
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 
 import { QuotaCell } from './QuotaCell';
