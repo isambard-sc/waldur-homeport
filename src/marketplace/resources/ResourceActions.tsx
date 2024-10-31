@@ -3,15 +3,11 @@ import { useMemo } from 'react';
 import { translate } from '@waldur/i18n';
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
 import { ResourceActionsButton as BaseResourceActionsButton } from '@waldur/marketplace/resources/actions/ResourceActionsButton';
-import {
-  INSTANCE_TYPE,
-  TENANT_TYPE,
-  VOLUME_TYPE,
-} from '@waldur/openstack/constants';
 import { ActionRegistry } from '@waldur/resource/actions/registry';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 
 import { ActionsList } from './actions/ActionsList';
+import { ActionsLists } from './actions/ActionsLists';
 
 export const ResourceActions = ({
   resource,
@@ -39,9 +35,7 @@ export const ResourceActions = ({
     );
   }
 
-  if (
-    [INSTANCE_TYPE, VOLUME_TYPE, TENANT_TYPE].includes(resource.offering_type)
-  ) {
+  if (ActionsLists[resource.offering_type]) {
     return (
       <ModalActionsRouter
         offering_type={resource.offering_type}
