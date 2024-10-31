@@ -54,12 +54,12 @@ export const ProviderActionsList = [
   SubmitReportAction,
   CreateLexisLinkAction,
   CreateRobotAccountAction,
+  SetErredActionItem,
   EditResourceEndDateByProviderAction,
 ];
 
 export const StaffActions = [
   UnlinkActionItem,
-  SetErredActionItem,
   MoveResourceAction,
   SetSlugAction,
   EditResourceEndDateByStaffAction,
