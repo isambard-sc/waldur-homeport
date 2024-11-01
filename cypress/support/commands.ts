@@ -71,7 +71,7 @@ Cypress.Commands.add('waitForSpinner', () => {
 });
 
 Cypress.Commands.add('waitForPage', () => {
-  cy.get('#kt_content_container').should('exist').wait(600).waitForSpinner();
+  cy.get('#kt_content_container').should('exist').wait(1600).waitForSpinner();
 });
 
 Cypress.Commands.add('acceptCookies', () => {

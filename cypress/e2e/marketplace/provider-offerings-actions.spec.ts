@@ -1,4 +1,4 @@
-xdescribe('Offerings list actions in Provider dashboard page', () => {
+describe('Offerings list actions in Provider dashboard page', () => {
   beforeEach(() => {
     cy.mockUser()
       .setToken()
