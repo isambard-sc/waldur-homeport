@@ -33,3 +33,6 @@ declare module '*.md' {
   const ReactComponent: React.FC;
   export { ReactComponent };
 }
+
+declare module '*.woff';
+declare module '*.woff2';

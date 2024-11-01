@@ -1,4 +1,7 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+import italics from '@fontsource/open-sans/files/open-sans-all-400-italic.woff';
+import normal from '@fontsource/open-sans/files/open-sans-all-400-normal.woff';
+import bolditalics from '@fontsource/open-sans/files/open-sans-all-800-italic.woff';
+import bold from '@fontsource/open-sans/files/open-sans-all-800-normal.woff';
 import FileSaver from 'file-saver';
 
 function saveAsPdf(table, data) {
@@ -10,18 +13,10 @@ const getAbsolutePath = (path) => new URL(path, document.baseURI).href;
 
 const getFonts = () => ({
   OpenSans: {
-    normal: getAbsolutePath(
-      require('@fontsource/open-sans/files/open-sans-all-400-normal.woff'),
-    ),
-    bold: getAbsolutePath(
-      require('@fontsource/open-sans/files/open-sans-all-800-normal.woff'),
-    ),
-    italics: getAbsolutePath(
-      require('@fontsource/open-sans/files/open-sans-all-400-italic.woff'),
-    ),
-    bolditalics: getAbsolutePath(
-      require('@fontsource/open-sans/files/open-sans-all-800-italic.woff'),
-    ),
+    normal: getAbsolutePath(normal),
+    bold: getAbsolutePath(bold),
+    italics: getAbsolutePath(italics),
+    bolditalics: getAbsolutePath(bolditalics),
   },
 });
 
