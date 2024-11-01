@@ -10,6 +10,7 @@ import { FormattedJira } from '@waldur/core/FormattedJira';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
+import { injectReducer, injectSaga } from '@waldur/store/store';
 
 import { IssueAttachmentsContainer } from './attachments/IssueAttachmentsContainer';
 import { IssueCommentsContainer } from './comments/IssueCommentsContainer';
@@ -22,6 +23,24 @@ const linkify = (s) =>
   );
 
 const loadIssue = (id) => getById<any>('/support-issues/', id);
+
+const loadDependencies = async (issueId: string) => {
+  const [
+    issue,
+    issueAttachmentsSagaModule,
+    issueCommentsSagaModule,
+    reducerModule,
+  ] = await Promise.all([
+    loadIssue(issueId),
+    import('@waldur/issues/attachments/effects'),
+    import('@waldur/issues/comments/effects'),
+    import('@waldur/issues/reducers'),
+  ]);
+  injectSaga('issueAttachmentsSaga', issueAttachmentsSagaModule.default);
+  injectSaga('issueCommentsSaga', issueCommentsSagaModule.default);
+  injectReducer('issues', reducerModule.reducer);
+  return issue;
+};
 
 export const IssueDetails: FunctionComponent = () => {
   useTitle(translate('Request detail'));
@@ -39,7 +58,7 @@ export const IssueDetails: FunctionComponent = () => {
     loading,
     error,
     value: issue,
-  } = useAsync(() => loadIssue(issue_uuid));
+  } = useAsync(() => loadDependencies(issue_uuid));
 
   if (loading) {
     return <LoadingSpinner />;

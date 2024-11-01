@@ -3,6 +3,7 @@ import { Badge, Col, Container, Row } from 'react-bootstrap';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
+import { ENV } from '@waldur/configs/default';
 import { ExternalLink } from '@waldur/core/ExternalLink';
 import { translate } from '@waldur/i18n';
 import openstackIcon from '@waldur/images/appstore/icon-openstack.png';
@@ -15,7 +16,6 @@ import {
   ResourceSummaryProps,
 } from '@waldur/resource/summary';
 import { UserPassword } from '@waldur/resource/UserPassword';
-import { RootState } from '@waldur/store/reducers';
 
 import { OpenStackTenant } from './types';
 
@@ -158,9 +158,9 @@ export const PureOpenStackTenantSummary: FunctionComponent<
   );
 };
 
-const mapStateToProps = (state: RootState) => ({
+const mapStateToProps = () => ({
   tenantCredentialsVisible:
-    state.config.plugins.WALDUR_OPENSTACK.TENANT_CREDENTIALS_VISIBLE,
+    ENV.plugins.WALDUR_OPENSTACK.TENANT_CREDENTIALS_VISIBLE,
 });
 
 const enhance = compose(connect(mapStateToProps));
