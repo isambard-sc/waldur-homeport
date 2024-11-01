@@ -8,7 +8,7 @@ import {
   StaffActions,
 } from '@waldur/marketplace/resources/actions/ActionsList';
 
-import { ActionRegistry } from './registry';
+import { getActions } from './registry';
 import { ResourceActionComponent } from './ResourceActionComponent';
 
 interface ActionButtonResourceProps {
@@ -20,7 +20,7 @@ interface ActionButtonResourceProps {
 async function loadData(url: string) {
   const response = await Axios.get(url);
   const resource = response.data;
-  const resourceTypeActions = ActionRegistry.getActions(resource.resource_type);
+  const resourceTypeActions = getActions(resource.resource_type);
   let staffActions = [];
   let customerResourceActions = [];
   let marketplaceResource;

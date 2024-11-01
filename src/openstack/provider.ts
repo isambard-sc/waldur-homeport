@@ -1,15 +1,15 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
 const OpenStackForm = lazyComponent(
   () => import('./OpenStackForm'),
   'OpenStackForm',
 );
 
-ProvidersRegistry.register({
+export const OpenStackProviderConfig: ProviderConfig = {
   name: 'OpenStack',
   type: 'OpenStack',
   icon: 'icon-openstack.png',
   endpoint: 'openstack',
   component: OpenStackForm,
-});
+};

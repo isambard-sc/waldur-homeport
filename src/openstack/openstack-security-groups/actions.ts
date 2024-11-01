@@ -1,13 +1,16 @@
-import { ActionRegistry } from '@waldur/resource/actions/registry';
+import { ActionConfiguration } from '@waldur/resource/actions/types';
 
 import { DestroySecurityGroupAction } from './DestroySecurityGroupAction';
 import { EditAction } from './EditAction';
 import { PullSecurityGroupAction } from './PullSecurityGroupAction';
 import { SetRulesAction } from './SetRulesAction';
 
-ActionRegistry.register('OpenStack.SecurityGroup', [
-  EditAction,
-  SetRulesAction,
-  DestroySecurityGroupAction,
-  PullSecurityGroupAction,
-]);
+export const OpenStackSecurityGroupActions: ActionConfiguration = {
+  type: 'OpenStack.SecurityGroup',
+  actions: [
+    EditAction,
+    SetRulesAction,
+    DestroySecurityGroupAction,
+    PullSecurityGroupAction,
+  ],
+};

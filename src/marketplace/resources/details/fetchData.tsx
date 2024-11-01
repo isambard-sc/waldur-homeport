@@ -17,7 +17,7 @@ import {
 } from '@waldur/marketplace/common/api';
 import { PageBarTab } from '@waldur/navigation/types';
 import { INSTANCE_TYPE, TENANT_TYPE } from '@waldur/openstack/constants';
-import { NestedResourceTabsConfiguration } from '@waldur/resource/tabs/NestedResourceTabsConfiguration';
+import { getTabs } from '@waldur/resource/tabs/registry';
 import { getResourceAccessEndpoints } from '@waldur/resource/utils';
 import { SLURM_PLUGIN } from '@waldur/slurm/constants';
 import store from '@waldur/store/store';
@@ -153,7 +153,7 @@ export const getResourceTabs = ({
   }
 
   if (scope) {
-    tabs.push(...NestedResourceTabsConfiguration.get(scope.resource_type));
+    tabs.push(...getTabs(scope.resource_type));
   }
 
   if (lexisLinksCount) {
