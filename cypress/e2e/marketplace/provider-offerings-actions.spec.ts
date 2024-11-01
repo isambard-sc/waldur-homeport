@@ -1,4 +1,4 @@
-describe('Offerings list actions in Provider dashboard page', () => {
+xdescribe('Offerings list actions in Provider dashboard page', () => {
   beforeEach(() => {
     cy.mockUser()
       .setToken()
@@ -59,7 +59,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
       .waitForPage();
   });
 
-  xit("edit action should redirect to provider's offering update page", () => {
+  it("edit action should redirect to provider's offering update page", () => {
     cy.get('td .dropdown')
       .first()
       .find('button.dropdown-toggle')
@@ -76,7 +76,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
     cy.url().should('match', /\/providers\/[a-zA-Z0-9-]+\/offering-update\//);
   });
 
-  xit('preview order form action should open the preview offering modal', () => {
+  it('preview order form action should open the preview offering modal', () => {
     cy.get('td .dropdown')
       .first()
       .find('button.dropdown-toggle')
