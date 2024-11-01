@@ -15,7 +15,6 @@ export interface ProviderConfig {
   name: string;
   type: string;
   component: React.ComponentType<OfferingEditPanelFormProps>;
-  endpoint: string;
   icon: string;
 }
 

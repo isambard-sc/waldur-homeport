@@ -8,6 +8,5 @@ export const AzureProviderConfig: ProviderConfig = {
   name: 'Azure',
   type: 'Azure',
   icon,
-  endpoint: 'azure',
   component: AzureForm,
 };

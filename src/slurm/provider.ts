@@ -13,7 +13,6 @@ export const SlurmProviderConfig: ProviderConfig = {
   name: 'Batch processing',
   type: 'SLURM',
   icon,
-  endpoint: 'slurm',
   component: SlurmForm,
 };
 
@@ -21,6 +20,5 @@ export const SlurmRemoteProviderConfig: ProviderConfig = {
   name: 'Batch processing (agent)',
   type: 'SLURM remote',
   icon,
-  endpoint: 'slurm',
   component: SlurmRemoteForm,
 };

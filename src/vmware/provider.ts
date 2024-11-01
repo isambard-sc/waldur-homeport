@@ -8,6 +8,5 @@ export const VMwareProviderConfig: ProviderConfig = {
   name: 'VMware',
   type: 'VMware',
   icon,
-  endpoint: 'vmware',
   component: VMwareForm,
 };

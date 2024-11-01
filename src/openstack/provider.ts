@@ -11,6 +11,5 @@ export const OpenStackProviderConfig: ProviderConfig = {
   name: 'OpenStack',
   type: 'OpenStack',
   icon,
-  endpoint: 'openstack',
   component: OpenStackForm,
 };

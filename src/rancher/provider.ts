@@ -11,6 +11,5 @@ export const RancherProviderConfig: ProviderConfig = {
   name: 'Rancher',
   type: 'Rancher',
   icon,
-  endpoint: 'rancher',
   component: RancherProviderForm,
 };
