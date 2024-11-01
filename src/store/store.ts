@@ -1,9 +1,9 @@
-import { createStore, applyMiddleware, compose } from 'redux';
+import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import thunk from 'redux-thunk';
 
 import sagas from './effects';
-import { rootReducer } from './reducers';
+import { staticReducers } from './reducers';
 
 declare global {
   interface Window {
@@ -32,7 +32,29 @@ if (process.env.NODE_ENV !== 'production') {
   enhancedMiddlewares = applyMiddleware(...middlewares);
 }
 
-const store = createStore(rootReducer, enhancedMiddlewares);
+const store: any = createStore(
+  combineReducers(staticReducers),
+  enhancedMiddlewares,
+);
+
+const injectedReducers = {};
+export const injectReducer = (key, reducer) => {
+  injectedReducers[key] = reducer;
+  store.replaceReducer(
+    // @ts-ignore
+    combineReducers({
+      ...staticReducers,
+      ...injectedReducers,
+    }),
+  );
+};
+
+const injectedSagas = new Set();
+export const injectSaga = (key, saga) => {
+  if (injectedSagas.has(key)) return;
+  sagaMiddleware.run(saga);
+  injectedSagas.add(key);
+};
 
 sagas.forEach((saga) => sagaMiddleware.run(saga));
 

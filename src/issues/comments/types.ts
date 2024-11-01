@@ -21,7 +21,7 @@ export interface Comment {
   destroy_is_available: boolean;
 }
 
-export interface State {
+export interface IssueCommentState {
   loading: boolean;
   errors: any[];
   items: Comment[];

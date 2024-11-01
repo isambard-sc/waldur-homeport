@@ -9,7 +9,6 @@ import issueCommentsSaga from '@waldur/issues/comments/effects';
 import marketplaceSaga from '@waldur/marketplace/store/effects';
 import { effects as titleEffects } from '@waldur/navigation/title';
 import projectSaga from '@waldur/project/effects';
-import tableSaga from '@waldur/table/effects';
 import userSaga from '@waldur/user/support/effects';
 import workspaceSaga from '@waldur/workspace/effects';
 
@@ -20,7 +19,6 @@ export default [
   customerDetailsSaga,
   issueAttachmentsSaga,
   issueCommentsSaga,
-  tableSaga,
   marketplaceSaga,
   paymentProfilesSaga,
   organizationsSaga,

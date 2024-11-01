@@ -1,15 +1,17 @@
 import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Card, Col, ColProps, Row, Stack } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
 import { BaseFieldProps } from 'redux-form';
 
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
 import { ErrorView } from '@waldur/navigation/header/search/ErrorView';
+import { injectReducer, injectSaga } from '@waldur/store/store';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
 import { GridBody } from './GridBody';
@@ -34,6 +36,7 @@ import {
   TableDropdownItem,
   TableState,
 } from './types';
+
 import './Table.scss';
 
 export interface TableProps<RowType = any> extends TableState {
@@ -472,7 +475,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
   }
 }
 
-export default function Table<RowType = any>(props: TableProps<RowType>) {
+function Table<RowType = any>(props: TableProps<RowType>) {
   const {
     fetch,
     filterPosition: originalFilterPosition,
@@ -550,4 +553,22 @@ export default function Table<RowType = any>(props: TableProps<RowType>) {
   }, []);
 
   return <TableClass {...props} filterPosition={filterPosition} />;
+}
+
+export default function TableLoader<RowType = any>(props: TableProps<RowType>) {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    async function injectDependencies() {
+      const sagaModule = await import('@waldur/table/effects');
+      injectSaga('table', sagaModule.default);
+      const reducerModule = await import('@waldur/table/store');
+      injectReducer('tables', reducerModule.reducer);
+      setLoading(false);
+    }
+    injectDependencies();
+  }, []);
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+  return <Table {...props} />;
 }

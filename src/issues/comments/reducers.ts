@@ -6,9 +6,9 @@ import {
 } from '@waldur/issues/attachments/constants';
 
 import * as constants from './constants';
-import { Payload, State as CommentsState } from './types';
+import { Payload, IssueCommentState } from './types';
 
-const INITIAL_STATE: CommentsState = {
+const INITIAL_STATE: IssueCommentState = {
   loading: false,
   errors: [],
   items: [],
@@ -21,9 +21,9 @@ const INITIAL_STATE: CommentsState = {
 };
 
 export const reducer = (
-  state: CommentsState = INITIAL_STATE,
+  state: IssueCommentState = INITIAL_STATE,
   action: Action<Payload>,
-): CommentsState => {
+): IssueCommentState => {
   const { type, payload } = action;
   switch (type) {
     case constants.ISSUE_COMMENTS_GET:
