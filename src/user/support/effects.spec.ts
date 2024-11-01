@@ -26,6 +26,6 @@ describe('User side effects', () => {
     await fixture.updateUser({ payload: { user } });
     const createFailure = actions.updateUser.failure().type;
     expect(fixture.hasActionWithType(createFailure)).toBe(true);
-    expect(fixture.hasActionWithMessage('User could not been updated'));
+    expect(fixture.hasActionWithMessage('User could not be updated'));
   });
 });

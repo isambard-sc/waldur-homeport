@@ -12819,9 +12819,9 @@
     "description": "about.tsx, administration/routes.ts",
     "message": "User agreements"
   },
-  "User could not been updated": {
+  "User could not be updated": {
     "description": "user/support/effects.ts",
-    "message": "User could not been updated"
+    "message": "User could not be updated"
   },
   "User dashboard": {
     "description": "user/routes.ts",
