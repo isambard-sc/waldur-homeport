@@ -11,7 +11,7 @@ export interface Attachment {
   uuid: string;
 }
 
-export interface IssuesState {
+export interface IssueAttachmentState {
   loading: boolean;
   errors: any[];
   items: Attachment[];
