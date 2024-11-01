@@ -5,8 +5,7 @@ import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
 import { PlanRemainingColumn } from '@waldur/marketplace/common/PlanRemainingColumn';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { PlanUsageButton } from './PlanUsageButton';
 import { PlanUsageFilter } from './PlanUsageFilter';

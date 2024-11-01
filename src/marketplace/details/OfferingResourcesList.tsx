@@ -10,9 +10,8 @@ import {
 } from '@waldur/marketplace/details/constants';
 import { PublicResourceLink } from '@waldur/marketplace/resources/list/PublicResourceLink';
 import { Offering } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
 
 import { ProviderResourceActions } from '../resources/list/ProviderResourceActions';
 import { ResourceStateField } from '../resources/list/ResourceStateField';

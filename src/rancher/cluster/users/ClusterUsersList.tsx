@@ -1,9 +1,8 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { useTable } from '@waldur/table/utils';
 
 import { RolesRenderer } from './RolesRenderer';
 

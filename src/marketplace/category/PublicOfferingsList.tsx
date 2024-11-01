@@ -5,10 +5,10 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { getLabel } from '@waldur/marketplace/common/registry';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import { Column } from '@waldur/table/types';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { OfferingCard } from '../common/OfferingCard';

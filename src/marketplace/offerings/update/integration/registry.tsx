@@ -21,8 +21,7 @@ const findProvider = (type) => providers[type];
 export const getTypeDisplay = (type) =>
   providers[type] ? providers[type].name : type;
 
-export const getServiceIcon = (type) =>
-  `images/appstore/${providers[type].icon}`;
+export const getServiceIcon = (type) => providers[type].icon;
 
 export const getServiceSettingsForm = (type) => {
   const providerType = getProviderType(type);

@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 
-import { getNativeNameVisible, getConfig } from '@waldur/store/config';
+import { ENV } from '@waldur/configs/default';
+import { getNativeNameVisible } from '@waldur/store/config';
 import {
   fieldIsVisible,
   isRequired,
@@ -13,13 +14,6 @@ import { UserDetails } from '@waldur/workspace/types';
 
 import * as actions from './actions';
 
-const getProtectedMethods = (state: any): string[] => {
-  const plugins = getConfig(state).plugins;
-  return (
-    plugins.WALDUR_CORE.PROTECT_USER_DETAILS_FOR_REGISTRATION_METHODS || []
-  );
-};
-
 const mapStateToProps = (state, ownProps) => ({
   currentUser: getUser(state) as UserDetails,
   isVisibleForSupportOrStaff: isVisibleForSupportOrStaff(state),
@@ -27,10 +21,13 @@ const mapStateToProps = (state, ownProps) => ({
   userTokenIsVisible: userTokenIsVisible(state, ownProps),
   fieldIsVisible: fieldIsVisible(ownProps),
   isRequired,
-  nativeNameIsVisible: getNativeNameVisible(state),
+  nativeNameIsVisible: getNativeNameVisible(),
   fieldIsProtected: (field: string) =>
     ownProps.user.identity_provider_fields.includes(field) ||
-    getProtectedMethods(state).includes(ownProps.user.registration_method),
+    (
+      ENV.plugins.WALDUR_CORE.PROTECT_USER_DETAILS_FOR_REGISTRATION_METHODS ||
+      []
+    ).includes(ownProps.user.registration_method),
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => {

@@ -44,7 +44,7 @@ class TableFilterServiceClass {
         if (Array.isArray(jsonList)) {
           return jsonList;
         }
-      } catch (error) {
+      } catch {
         removeItem(key, STORAGE_FOR_SAVED_FILTERS);
       }
     }

@@ -3,8 +3,8 @@ import { Col, Modal, Row } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 
 import { INVITATION_CREATE_FORM_ID } from '../constants';
-import { useInvitationCreateDialog } from '../hooks';
 import { GroupInviteRow, InvitationContext } from '../types';
+import { useInvitationCreateDialog } from '../useInvitationCreateDialog';
 
 import { BulkUpload, EmailRolePairs } from './BulkUpload';
 import { CustomMessageInput } from './CustomMessageInput';

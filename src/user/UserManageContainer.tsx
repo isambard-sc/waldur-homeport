@@ -154,7 +154,7 @@ export const UserManageContainer = ({ isPersonal }) => {
   return (
     <UIView
       render={(Component, { key, ...props }) => (
-        <Component {...props} key={key} tabSpec={tabSpec} user={user} />
+        <Component key={key} {...props} tabSpec={tabSpec} user={user} />
       )}
     />
   );

@@ -5,7 +5,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { ReadOnlyFormControl } from '@waldur/form/ReadOnlyFormControl';
 import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
-import { Call as Call, Round } from '@waldur/proposals/types';
+import { Call, Round } from '@waldur/proposals/types';
 import {
   formatRoundAllocationStrategy,
   formatRoundAllocationTime,

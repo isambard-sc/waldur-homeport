@@ -4,7 +4,8 @@ import { change } from 'redux-form';
 
 import { Question } from '../types';
 
-import { FORM_ID, FIELD_MAP } from './constants';
+import { FORM_ID } from './constants';
+import { FIELD_MAP } from './fields';
 import { StringField } from './StringField';
 
 const parseDefaultValue = (question: Question) => {

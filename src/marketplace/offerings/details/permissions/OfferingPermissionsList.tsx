@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { OfferingPermissionActions } from './OfferingPermissionActions';
 import { OfferingPermissionCreateButton } from './OfferingPermissionCreateButton';

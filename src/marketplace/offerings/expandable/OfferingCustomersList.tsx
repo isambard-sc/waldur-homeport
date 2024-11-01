@@ -4,8 +4,8 @@ import { getFormValues } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import {
   OFFERING_CUSTOMERS_LIST_FILTER,

@@ -36,7 +36,7 @@ export const ImportYAMLDialog = reduxForm<
       onSubmit={handleSubmit(handler)}
       submitting={submitting}
     >
-      <MonacoField name="yaml" mode="yaml" height={200} />
+      <MonacoField name="yaml" language="yaml" height={200} />
     </ActionDialog>
   );
 });

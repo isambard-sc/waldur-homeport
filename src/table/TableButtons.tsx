@@ -11,13 +11,12 @@ import { useMediaQuery } from 'react-responsive';
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { translate } from '@waldur/i18n';
 
-import { TableProps } from './Table';
 import { TableColumnButton } from './TableColumnsButton';
 import { TableDisplayModeButton } from './TableDisplayModeButton';
 import { TableExportButton } from './TableExportButton';
 import { TableFilterButton } from './TableFilterButton';
 import { TableMoreActions } from './TableMoreActions';
-import { TableDropdownItem } from './types';
+import { TableProps, TableDropdownItem } from './types';
 
 interface TableButtonsProps extends TableProps {
   toggleFilterMenu?(): void;

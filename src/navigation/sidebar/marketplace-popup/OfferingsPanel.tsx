@@ -21,7 +21,7 @@ import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 
-import { RECENTLY_ADDED_OFFERINGS_UUID } from './MarketplacePopup';
+import { RECENTLY_ADDED_OFFERINGS_UUID } from './constants';
 import { fetchOfferingsByPage } from './utils';
 
 const PaginatedList = paginate(List);

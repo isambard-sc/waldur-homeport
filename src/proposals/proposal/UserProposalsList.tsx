@@ -10,9 +10,9 @@ import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { PROPOSALS_FILTER_FORM_ID } from '@waldur/proposals/constants';
 import { getProposalStateOptions } from '@waldur/proposals/utils';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher, Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { EndingField } from '../EndingField';
 

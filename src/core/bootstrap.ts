@@ -1,45 +1,60 @@
-import Axios from 'axios';
+import Axios, { AxiosResponse } from 'axios';
 
 import { getRoles } from '@waldur/administration/roles/api';
 import { afterBootstrap } from '@waldur/afterBootstrap';
 import { ENV } from '@waldur/configs/default';
 
-const CONFIG_FILE = 'scripts/configs/config.json';
+import { format } from './ErrorMessageFormatter';
+
+const getApiUrl = () =>
+  document.querySelector('meta[name="api-url"]').getAttribute('content');
+
+const parseLanguages = (inputValue) => {
+  const languageLabels = inputValue.reduce(
+    (result, [code, label]) => ({
+      ...result,
+      [code]: label,
+    }),
+    {},
+  );
+  return inputValue
+    .map((language) => language[0])
+    .map((code) => ({
+      code,
+      label: languageLabels[code],
+    }));
+};
+
+class BadResponseFormatError extends Error {
+  constructor(public response: AxiosResponse) {
+    super('Malformed response');
+  }
+}
+
+const fetchJSON = async (url) => {
+  const response = await Axios.get(url);
+  if (response.headers['content-type'] !== 'application/json') {
+    throw new BadResponseFormatError(response);
+  }
+  if (typeof response.data !== 'object') {
+    throw new BadResponseFormatError(response);
+  }
+  return response.data;
+};
 
 export async function loadConfig() {
-  let frontendSettings, backendSettings;
-  try {
-    const frontendResponse = await Axios.get(CONFIG_FILE);
-    frontendSettings = frontendResponse.data;
-  } catch (error) {
-    if (!error) {
-      throw new Error(`Unable to fetch client configuration file.`);
-    } else if (error.response?.status === 404) {
-      // fallback to default configuration
-      frontendSettings = {
-        apiEndpoint: 'http://localhost:8080/',
-      };
-    } else {
-      throw new Error(error);
-    }
-  }
-
-  // Axios swallows JSON parse error
-  if (typeof frontendSettings !== 'object') {
-    throw new Error(
-      `Unable to parse client configuration file ${CONFIG_FILE}.`,
-    );
+  let backendSettings;
+  const restApi = getApiUrl();
+  if (restApi != '__API_URL__') {
+    ENV.apiEndpoint = restApi;
   }
 
   try {
-    const backendResponse = await Axios.get(
-      `${frontendSettings.apiEndpoint}api/configuration/`,
-    );
-    backendSettings = backendResponse.data;
+    backendSettings = await fetchJSON(`${ENV.apiEndpoint}api/configuration/`);
   } catch (error) {
     if (!error) {
       throw new Error(
-        `Unfortunately, connection to server has failed. Please check if you can connect to ${frontendSettings.apiEndpoint} from your browser and contact support if the error continues.`,
+        `Unfortunately, connection to server has failed. Please check if you can connect to ${ENV.apiEndpoint} from your browser and contact support if the error continues.`,
       );
     } else if (error.response?.status >= 400) {
       throw new Error(
@@ -50,23 +65,9 @@ export async function loadConfig() {
     }
   }
 
-  const languageLabels = backendSettings.LANGUAGES.reduce(
-    (result, [code, label]) => ({
-      ...result,
-      [code]: label,
-    }),
-    {},
-  );
-
   const config = {
-    ...frontendSettings,
     plugins: backendSettings,
-    languageChoices: backendSettings.LANGUAGES.map(
-      (language) => language[0],
-    ).map((code) => ({
-      code,
-      label: languageLabels[code],
-    })),
+    languageChoices: parseLanguages(backendSettings.LANGUAGES),
     defaultLanguage: backendSettings.LANGUAGE_CODE,
     FEATURES: backendSettings.FEATURES,
   };
@@ -75,7 +76,7 @@ export async function loadConfig() {
     const roles = await getRoles();
     ENV.roles = roles;
   } catch (error) {
-    throw new Error(`Unable to fetch user roles.`);
+    throw new Error(`Unable to fetch user roles. ${format(error)}`);
   }
   afterBootstrap();
   return true;

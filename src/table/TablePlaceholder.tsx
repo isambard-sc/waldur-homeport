@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react';
 import { translate } from '@waldur/i18n';
 import { NoResult } from '@waldur/navigation/header/search/NoResult';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 import { getNoResultMessage, getNoResultTitle } from './utils';
 
 interface TablePlaceholderProps

@@ -1,5 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import React, { ReactNode } from 'react';
+import { ColProps } from 'react-bootstrap';
+import { BaseFieldProps } from 'redux-form';
 
 import { TableFiltersGroup } from './TableFilterService';
 
@@ -139,3 +141,70 @@ export type DropdownActionItemType<T = any> = React.ComponentType<{
   refetch?(): void;
   as?: React.ComponentType;
 }>;
+
+export interface TableProps<RowType = any> extends TableState {
+  table?: string;
+  rows: any[];
+  rowKey?: string;
+  fetch: (force?: boolean) => void;
+  gotoPage?: (page: number) => void;
+  hasQuery?: boolean;
+  setQuery?: (query: string) => void;
+  setFilter?: (item: FilterItem) => void;
+  applyFiltersFn?: (apply: boolean) => void;
+  setFilterPosition?: (filterPosition: FilterPosition) => void;
+  columns?: Array<Column<RowType>>;
+  setDisplayMode?: (mode: DisplayMode) => void;
+  gridItem?: React.ComponentType<{ row: RowType }>;
+  gridSize?: ColProps;
+  openExportDialog?: (format: ExportConfig['format'], props?) => void;
+  openFiltersDrawer?: (filters: React.ReactNode) => void;
+  renderFiltersDrawer?: (filters: React.ReactNode) => void;
+  dropdownActions?: TableDropdownItem[];
+  tableActions?: React.ReactNode;
+  verboseName?: string;
+  className?: string;
+  id?: string;
+  rowClass?: (({ row }) => string) | string;
+  hoverable?: boolean;
+  minHeight?: number;
+  cardBordered?: boolean;
+  showPageSizeSelector?: boolean;
+  updatePageSize?: (size: number) => void;
+  initialPageSize?: number;
+  resetPagination?: () => void;
+  hasPagination?: boolean;
+  sortList?(sorting: Sorting): void;
+  initialSorting?: Sorting;
+  expandableRow?: React.ComponentType<{ row: any }>;
+  expandableRowClassName?: string;
+  rowActions?: React.ComponentType<{ row; fetch }>;
+  toggleRow?(row: any): void;
+  toggled?: Record<string, boolean>;
+  enableExport?: boolean;
+  showExportInDropdown?: boolean;
+  placeholderComponent?: React.ReactNode;
+  filters?: JSX.Element;
+  title?: React.ReactNode;
+  alterTitle?: React.ReactNode;
+  hasActionBar?: boolean;
+  hasHeaders?: boolean;
+  enableMultiSelect?: boolean;
+  multiSelectActions?: React.ComponentType<{ rows: any[]; refetch }>;
+  selectRow?(row: any): void;
+  selectAllRows?(rows: any[]): void;
+  resetSelection?: () => void;
+  filter?: Record<string, any>;
+  fieldType?: 'checkbox' | 'radio';
+  fieldName?: string;
+  validate?: BaseFieldProps['validate'];
+  footer?: React.ReactNode;
+  /** If enabled, set `keys` and `id` for each column. Also pass the required keys separately. */
+  hasOptionalColumns?: boolean;
+  toggleColumn?(id, column, value?): void;
+  initColumnPositions?(ids: string[]): void;
+  swapColumns?(column1: string, column2: string): void;
+  initialMode?: 'grid' | 'table';
+  standalone?: boolean;
+  hideClearFilters?: boolean;
+}

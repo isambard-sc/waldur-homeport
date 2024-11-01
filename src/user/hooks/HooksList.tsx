@@ -4,8 +4,7 @@ import { createSelector } from 'reselect';
 
 import { titleCase } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { HOOK_LIST_ID } from './constants';

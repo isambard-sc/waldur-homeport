@@ -4,30 +4,14 @@ import {
   EventHandlerUtil,
 } from '../_utils/index';
 
-// Helpers
-import { CookieComponent } from './_CookieComponent';
-
-interface ToggleOptions {
-  saveState: boolean;
-  targetState?: string;
-  toggleState?: string;
-  targetToggleMode?: string;
-}
-
-const defaultToggleOptions: ToggleOptions = {
-  saveState: false,
-};
-
 class ToggleComponent {
   element: HTMLElement;
   instanceUid: string;
-  options: ToggleOptions;
   state = '';
   target: HTMLElement | null = null;
   attribute = '';
 
-  constructor(_element: HTMLElement, options: ToggleOptions) {
-    this.options = Object.assign(defaultToggleOptions, options);
+  constructor(_element: HTMLElement) {
     this.instanceUid = getUniqueIdWithPrefix('toggle');
     this.element = _element;
 
@@ -84,10 +68,6 @@ class ToggleComponent {
       this.element.classList.add(this.state);
     }
 
-    if (this.options.saveState) {
-      CookieComponent.set(this.attribute, 'on', {});
-    }
-
     EventHandlerUtil.trigger(this.element, 'kt.toggle.enabled');
     return this;
   };
@@ -102,10 +82,6 @@ class ToggleComponent {
 
     if (this.state.length > 0) {
       this.element.classList.remove(this.state);
-    }
-
-    if (this.options.saveState) {
-      CookieComponent.delete(this.attribute);
     }
 
     EventHandlerUtil.trigger(this.element, 'kt.toggle.disabled');
@@ -181,14 +157,13 @@ class ToggleComponent {
       const item = el as HTMLElement;
       let toggleElement = ToggleComponent.getInstance(item);
       if (!toggleElement) {
-        toggleElement = new ToggleComponent(item, defaultToggleOptions);
+        toggleElement = new ToggleComponent(item);
       }
     });
   };
 
   public static createInsance = (
     selector: string,
-    options: ToggleOptions = defaultToggleOptions,
   ): ToggleComponent | undefined => {
     const element = document.body.querySelector(selector);
     if (!element) {
@@ -197,7 +172,7 @@ class ToggleComponent {
     const item = element as HTMLElement;
     let toggle = ToggleComponent.getInstance(item);
     if (!toggle) {
-      toggle = new ToggleComponent(item, options);
+      toggle = new ToggleComponent(item);
     }
     return toggle;
   };
@@ -211,4 +186,4 @@ class ToggleComponent {
   };
 }
 
-export { ToggleComponent, defaultToggleOptions };
+export { ToggleComponent };

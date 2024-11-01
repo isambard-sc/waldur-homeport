@@ -19,15 +19,13 @@ const formatLimits = (props) => {
       .filter((c) => c.billing_type === 'limit')
       .map((c) => c.type);
     // Filter out disabled plan quotas
-    limits = {
-      ...Object.keys(planQuotas).reduce(
-        (acc, key) =>
-          limitedComponents.includes(key)
-            ? { ...acc, [key]: planQuotas[key] }
-            : acc,
-        {},
-      ),
-    };
+    limits = Object.keys(planQuotas).reduce(
+      (acc, key) =>
+        limitedComponents.includes(key)
+          ? { ...acc, [key]: planQuotas[key] }
+          : acc,
+      {},
+    );
   }
   const limitSerializer = getFormLimitSerializer(props.offering.type);
   limits = {

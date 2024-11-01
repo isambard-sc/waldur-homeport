@@ -3,8 +3,7 @@ import { FunctionComponent, useMemo } from 'react';
 import { translate } from '@waldur/i18n';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { SetRoutersButton } from './SetRoutersButton';
 

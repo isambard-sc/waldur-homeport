@@ -25,9 +25,9 @@ import {
   selectSelectedSavedFilter,
   selectTableSavedFilters,
 } from './selectors';
-import { TableProps } from './Table';
 import { TableFilterContext } from './TableFilterContainer';
 import { TableFilterService } from './TableFilterService';
+import { TableProps } from './types';
 import { getFiltersFormId, getSavedFiltersKey } from './utils';
 
 const SaveFilterDialog = lazyComponent(

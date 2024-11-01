@@ -1,5 +1,3 @@
-import { getConfig } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
+import { ENV } from '@waldur/configs/default';
 
-export const hasSupport = (state: RootState) =>
-  !!getConfig(state).plugins.WALDUR_SUPPORT?.ENABLED;
+export const hasSupport = () => !!ENV.plugins.WALDUR_SUPPORT?.ENABLED;

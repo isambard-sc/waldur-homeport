@@ -53,7 +53,7 @@ export const CustomerField: FC<{ organizationGroups }> = ({
                   customer: value.uuid,
                 });
                 dispatch(change(ORDER_FORM_ID, 'project', project));
-              } catch (error) {
+              } catch {
                 // Swallow
               }
             }}

@@ -3,8 +3,7 @@ import { FC } from 'react';
 import { translate } from '@waldur/i18n';
 import { RoundReviewersListExpandableRow } from '@waldur/proposals/round/reviewers/RoundReviewersListExpandableRow';
 import { Reviewer, Round } from '@waldur/proposals/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 interface RoundReviewersListProps {
   round: Round;

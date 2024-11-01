@@ -768,7 +768,7 @@
     "message": "Applications"
   },
   "Apply filters to table data": {
-    "description": "table/utils.tsx",
+    "description": "table/useTable.ts",
     "message": "Apply filters to table data"
   },
   "Apply table filters": {
@@ -1120,11 +1120,11 @@
     "message": "Are you sure you would like to delete project {projectName}?"
   },
   "Are you sure you would like to delete the hook?": {
-    "description": "user/hooks/HookRemoveDialog.tsx",
+    "description": "user/hooks/HookRemoveButton.tsx",
     "message": "Are you sure you would like to delete the hook?"
   },
   "Are you sure you would like to delete the key?": {
-    "description": "user/keys/KeyRemoveDialog.tsx",
+    "description": "user/keys/KeyRemoveButton.tsx",
     "message": "Are you sure you would like to delete the key?"
   },
   "Are you sure you would like to delete the user agreement?": {
@@ -2130,10 +2130,6 @@
   "Contact phone": {
     "description": "marketplace/offerings/import/SelectOrganizationTab.tsx",
     "message": "Contact phone"
-  },
-  "Contact support": {
-    "description": "navigation/header/search/ErrorView.tsx",
-    "message": "Contact support"
   },
   "Contact vendor": {
     "description": "marketplace/offerings/details/PublicOfferingGetHelp.tsx, marketplace/offerings/details/PublicOfferingPricing.tsx",
@@ -3944,7 +3940,7 @@
     "message": "Filters can be saved and reused on any pages"
   },
   "Filters": {
-    "description": "table/utils.tsx",
+    "description": "table/useTable.ts",
     "message": "Filters"
   },
   "Final configuration": {
@@ -4368,7 +4364,7 @@
     "message": "Hook has been removed."
   },
   "Hook removal": {
-    "description": "user/hooks/HookRemoveDialog.tsx",
+    "description": "user/hooks/HookRemoveButton.tsx",
     "message": "Hook removal"
   },
   "Horizontal pod autoscaler has been created.": {
@@ -5040,7 +5036,7 @@
     "message": "Key name"
   },
   "Key removal": {
-    "description": "user/keys/KeyRemoveDialog.tsx",
+    "description": "user/keys/KeyRemoveButton.tsx",
     "message": "Key removal"
   },
   "Key": {
@@ -7331,10 +7327,6 @@
     "description": "slurm/RequestLimitsChangeDialog.tsx",
     "message": "Please provide requested limits and a reason."
   },
-  "Please refresh the page or get in touch for support.": {
-    "description": "navigation/header/search/ErrorView.tsx",
-    "message": "Please refresh the page or get in touch for support."
-  },
   "Please review and activate offering {offeringName} ({offeringUuid}). \nRequestor: {userName} / {userUuid}. \nService provider: {customerName} / {customerUuid}": {
     "description": "marketplace/offerings/actions/RequestActionDialog.tsx",
     "message": "Please review and activate offering {offeringName} ({offeringUuid}). \nRequestor: {userName} / {userUuid}. \nService provider: {customerName} / {customerUuid}"
@@ -8194,10 +8186,6 @@
   "Referrals for {name}": {
     "description": "marketplace/referral/OfferingReferralsDialog.tsx",
     "message": "Referrals for {name}"
-  },
-  "Refresh page": {
-    "description": "navigation/header/search/ErrorView.tsx",
-    "message": "Refresh page"
   },
   "Refresh": {
     "description": "marketplace/common/RefreshButton.tsx, navigation/BackendHealthStatusDialog.tsx",
@@ -10144,7 +10132,7 @@
     "message": "Some functionality may not be accessible."
   },
   "Something went wrong": {
-    "description": "customer/list/ExportAsEmailDialog.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, navigation/header/search/ErrorView.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/proposal/create-review/ProposalReviewCreatePage.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx",
+    "description": "customer/list/ExportAsEmailDialog.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/proposal/create-review/ProposalReviewCreatePage.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx",
     "message": "Something went wrong"
   },
   "Source": {
@@ -10956,7 +10944,7 @@
     "message": "There are no plans"
   },
   "There are no projects.": {
-    "description": "invitations/actions/hooks.ts, project/ProjectBreadcrumbPopover.tsx",
+    "description": "invitations/actions/useInvitationCreateDialog.ts, project/ProjectBreadcrumbPopover.tsx",
     "message": "There are no projects."
   },
   "There are no resource issues.": {
@@ -13271,10 +13259,6 @@
     "description": "navigation/header/search/NoResult.tsx",
     "message": "We didn't get any results."
   },
-  "We had some trouble loading this page.": {
-    "description": "navigation/header/search/ErrorView.tsx",
-    "message": "We had some trouble loading this page."
-  },
   "Webhook": {
     "description": "user/hooks/HookTypeField.tsx",
     "message": "Webhook"
@@ -13340,7 +13324,7 @@
     "message": "Yes, use invitation email"
   },
   "Yes": {
-    "description": "administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, core/utils.ts, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsList.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/ExpandablePortRow.tsx, project/ProjectRemoveDialog.tsx, proposals/call-management/CallAllFilters.tsx, rancher/cluster/users/ClusterUsersList.tsx, resource/summary/ScheduleSummary.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/hooks/HookRemoveDialog.tsx, user/keys/KeyRemoveDialog.tsx, user/support/UserList.tsx",
+    "description": "administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, core/utils.ts, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsList.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/ExpandablePortRow.tsx, project/ProjectRemoveDialog.tsx, proposals/call-management/CallAllFilters.tsx, rancher/cluster/users/ClusterUsersList.tsx, resource/summary/ScheduleSummary.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/support/UserList.tsx",
     "message": "Yes"
   },
   "You agree to the <tos>Terms of Service</tos> and <pp>Privacy policy</pp>.": {

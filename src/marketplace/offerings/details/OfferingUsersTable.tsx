@@ -3,8 +3,7 @@ import { FunctionComponent, useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { OfferingUserRowActions } from '../actions/OfferingUserRowActions';
 

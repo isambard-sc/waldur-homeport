@@ -48,14 +48,16 @@ Run linters:
         - yarn.lock
         - tsconfig.json
         - typings.d.ts
-        - webpack.*
-        - .eslintrc.js
+        - vite.config.ts
+        - .eslintrc.cjs
         - .eslintignore
   script:
     - yarn format:check
     - yarn lint:check
+    - yarn oxlint
     - yarn style:check
-    - yarn deps:check
+    - yarn deps:unused
+    - yarn deps:circular
 
 Run code duplication detection:
   stage: test
@@ -93,9 +95,8 @@ Run jest tests:
         - yarn.lock
         - tsconfig.json
         - typings.d.ts
-        - webpack.*
+        - vite.config.ts
         - test/*
-        - jest.config.js
       allow_failure: true
   script:
     - yarn test
@@ -128,9 +129,9 @@ Run E2E tests:
         - yarn.lock
         - tsconfig.json
         - typings.d.ts
-        - webpack.*
+        - vite.config.ts
         - cypress/**/*
-        - cypress.config.ts
+        - cypress.config.js
       allow_failure: true
   script:
     - NO_COLOR=1 yarn ci:test
@@ -155,7 +156,7 @@ Build artifact:
     - yarn build
   artifacts:
     paths:
-      - build/
+      - dist/
     expire_in: 1 week
 
 Publish latest docker image:

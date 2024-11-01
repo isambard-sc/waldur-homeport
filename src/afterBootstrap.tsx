@@ -6,7 +6,6 @@ import { initAuthToken } from './auth/interceptor';
 import { ENV } from './configs/default';
 import { LanguageUtilsService } from './i18n/LanguageUtilsService';
 import { initTheme } from './navigation/theme/store';
-import { initConfig } from './store/config';
 import store from './store/store';
 import { attachTransitions } from './transitions';
 
@@ -52,7 +51,6 @@ export function afterBootstrap() {
     });
   initSentry();
   initAuthToken();
-  store.dispatch(initConfig(ENV));
   store.dispatch(initTheme(ENV));
   LanguageUtilsService.checkLanguage();
   attachTransitions();

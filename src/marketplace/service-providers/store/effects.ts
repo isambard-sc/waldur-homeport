@@ -3,7 +3,7 @@ import { put, takeEvery } from 'redux-saga/effects';
 import { translate } from '@waldur/i18n';
 import * as api from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { showSuccess, showError } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import * as actions from './actions';
 import * as constants from './constants';
@@ -26,7 +26,7 @@ function* generateServiceProviderSecretCode(action) {
   } catch (error) {
     yield put(actions.secretCodeRegenerateError());
     yield put(closeModalDialog());
-    yield put(showError(errorMessage));
+    yield put(showErrorResponse(error, errorMessage));
   }
 }
 
@@ -40,7 +40,7 @@ function* getServiceProviderSecretCode(action) {
     const secretCode = data.api_secret_code ? data.api_secret_code : '';
     yield put(actions.secretCodeFetchSuccess(secretCode));
   } catch (error) {
-    yield put(showError(errorMessage));
+    yield put(showErrorResponse(error, errorMessage));
   }
 }
 

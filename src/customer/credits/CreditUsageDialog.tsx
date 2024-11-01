@@ -4,9 +4,8 @@ import { parseDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
-import { createFetcher, Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
-
+import { createFetcher, Table, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 interface CreditUsageDialogProps {
   creditUuid: string;
   customerUuid?: string;

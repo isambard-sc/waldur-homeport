@@ -14,23 +14,8 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 const saveFeatures = (payload) => post('/feature-values/', payload);
 
-const processMap = (data) =>
-  Object.keys(data).reduce(
-    (acc, sKey) => ({
-      ...acc,
-      [sKey]: Object.keys(data[sKey]).reduce(
-        (acc, fKey) => ({
-          ...acc,
-          [fKey]: data[sKey][fKey],
-        }),
-        {},
-      ),
-    }),
-    {},
-  );
-
 export const FeaturesList = connect(() => ({
-  initialValues: processMap(ENV.FEATURES),
+  initialValues: ENV.FEATURES,
 }))(
   reduxForm({
     form: 'features',

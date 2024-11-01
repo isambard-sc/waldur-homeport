@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 
 export const TableDisplayModeButton = (
   props: Pick<TableProps, 'mode' | 'setDisplayMode'>,

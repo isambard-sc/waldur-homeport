@@ -1,7 +1,7 @@
 # Introduction
 
 Waldur HomePort is a web-based client for the [Waldur MasterMind][1].
-It uses yarn for dependency management and webpack as module bundler.
+It uses yarn for dependency management and Vite as module bundler.
 
 ## Minimal requirements
 
@@ -42,17 +42,15 @@ It uses yarn for dependency management and webpack as module bundler.
 
    PS. If you see errors related to fsevents on OS X, the workaround is: `yarn cache clean && yarn upgrade && yarn`.
 
-5. Create `/src/configs/config.json`:
-
-   ```bash
-   cp src/configs/config.json.example src/configs/config.json
-   ```
-
-6. Configure `config.json`.
-
-7. Run application: `yarn start`.
+5. Run application: `yarn start`.
 
    Server will listen on `//localhost:8001`
+
+   If your REST API runs on different host or port, specify API_URL environment variable.
+
+   ```bash
+   VITE_API_URL=http://127.0.0.1:8000/ yarn dev
+   ```
 
 ## Backend configuration
 

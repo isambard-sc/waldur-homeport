@@ -1,11 +1,11 @@
 import { UIView } from '@uirouter/react';
 
+import { ENV } from '@waldur/configs/default';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
-import { getConfig } from '@waldur/store/config';
 import { WorkspaceType } from '@waldur/workspace/types';
 
 import { UsersService } from './UsersService';
@@ -181,9 +181,7 @@ export const states: StateDeclaration[] = [
     parent: 'profile-credentials',
     data: {
       breadcrumb: () => translate('FreeIPA account'),
-      permissions: [
-        (state) => getConfig(state).plugins.WALDUR_FREEIPA?.ENABLED,
-      ],
+      permissions: [() => ENV.plugins.WALDUR_FREEIPA?.ENABLED],
     },
   },
   {

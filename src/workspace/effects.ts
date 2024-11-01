@@ -1,10 +1,9 @@
 import { takeEvery, put, call, select } from 'redux-saga/effects';
 
-import { format } from '@waldur/core/ErrorMessageFormatter';
 import { translate } from '@waldur/i18n';
 import { getCustomer, getProject } from '@waldur/project/api';
 import { router } from '@waldur/router';
-import { showError } from '@waldur/store/notify';
+import { showErrorResponse } from '@waldur/store/notify';
 import {
   clearImpersonationData,
   getCurrentUser,
@@ -35,10 +34,8 @@ function* refreshCurrentCustomer() {
     const newCustomer = yield call(getCustomer, customer.uuid);
     yield put(setCurrentCustomer(newCustomer));
   } catch (error) {
-    const errorMessage = `${translate(
-      'Organization could not be refreshed.',
-    )} ${format(error)}`;
-    yield put(showError(errorMessage));
+    const errorMessage = translate('Organization could not be refreshed.');
+    yield put(showErrorResponse(error, errorMessage));
   }
 }
 
@@ -91,7 +88,7 @@ function* initImpersonation(action) {
         setImpersonationData(storedImpersonatedUserUuid);
         const user = yield call(getCurrentUser);
         yield put(setCurrentUser(user, true));
-      } catch (error) {
+      } catch {
         clearImpersonationData();
       }
     }

@@ -3,10 +3,9 @@ import { Modal } from 'react-bootstrap';
 
 import { CancelButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
-
+import { renderFieldOrDash } from '@waldur/table/utils';
 const ProviderUsersList = (props) => {
   const filter = useMemo(
     () => ({

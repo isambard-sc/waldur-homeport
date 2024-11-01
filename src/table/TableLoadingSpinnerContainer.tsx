@@ -1,5 +1,5 @@
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { TableProps } from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
 
 export const TableLoadingSpinnerContainer = (props: TableProps) =>
   (props.loading && props.sorting && !props.sorting.loading) ||

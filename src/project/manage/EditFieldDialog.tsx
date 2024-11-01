@@ -16,7 +16,6 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { getConfig } from '@waldur/store/config';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { updateProject } from '../actions';
@@ -142,7 +141,7 @@ const mapStateToProps = (state, ownProps) => ({
   initialValues: pick(ownProps.resolve.project, ownProps.resolve.name),
   project_uuid: ownProps.resolve.project.uuid,
   project_type: ownProps.resolve.project.type_name,
-  enforceLatinName: getConfig(state).enforceLatinName,
+  enforceLatinName: ENV.enforceLatinName,
 });
 
 const mapDispatchToProps = (dispatch, ownProps) => ({

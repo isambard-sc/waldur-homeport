@@ -6,8 +6,7 @@ import { createSelector } from 'reselect';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { getProject } from '@waldur/workspace/selectors';
 
 import { ProjectUpdateRequestExpandable } from './ProjectUpdateRequestExpandable';

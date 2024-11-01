@@ -4,8 +4,7 @@ import { ButtonGroup } from 'react-bootstrap';
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { CreateSecurityGroupAction } from '../openstack-tenant/actions/CreateSecurityGroupAction';
 import { PullSecurityGroupsAction } from '../openstack-tenant/actions/PullSecurityGroupsAction';

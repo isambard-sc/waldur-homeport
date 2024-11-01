@@ -3,8 +3,7 @@ import { useMemo } from 'react';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { ProjectCostField } from '@waldur/project/ProjectCostField';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { ResourcesColumn } from './ResourcesColumn';
 

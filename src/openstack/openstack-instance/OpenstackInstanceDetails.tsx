@@ -15,7 +15,7 @@ import { formatFlavor, getData } from '@waldur/resource/utils';
 
 export const OpenstackInstanceDetails = (props: OrderDetailsProps) => {
   const {
-    order: { attributes: attributes },
+    order: { attributes },
   } = props;
 
   if (!attributes) return null;
@@ -77,7 +77,7 @@ export const OpenstackInstanceDetails = (props: OrderDetailsProps) => {
             };
           }),
         );
-      } catch (e) {
+      } catch {
         networks = null;
       }
     }
@@ -88,7 +88,7 @@ export const OpenstackInstanceDetails = (props: OrderDetailsProps) => {
             return await get(item.url).then((response) => response.data);
           }),
         );
-      } catch (e) {
+      } catch {
         securityGroups = null;
       }
     }

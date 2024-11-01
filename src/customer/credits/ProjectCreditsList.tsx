@@ -2,8 +2,8 @@ import { FC } from 'react';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { ProjectCreateCreditButton } from './ProjectCreateCreditButton';
 import { ProjectCreditActions } from './ProjectCreditActions';

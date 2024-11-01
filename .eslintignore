@@ -12,3 +12,5 @@ src/features/FeaturesDescription.ts
 src/core/testUtils.ts
 src/form/testUtils.tsx
 src/table/testUtils.tsx
+vite-plugin-react-displayname.ts
+vite.config.ts

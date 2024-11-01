@@ -11,8 +11,7 @@ import { CostPolicyEditButton } from '@waldur/customer/cost-policies/CostPolicyE
 import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { OrganizationCostPoliciesFilter } from './OrganizationCostPoliciesFilter';
 

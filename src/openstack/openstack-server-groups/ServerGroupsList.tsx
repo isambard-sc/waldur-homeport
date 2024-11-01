@@ -8,8 +8,7 @@ import { ServerGroupType } from '@waldur/openstack/types';
 import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { Resource } from '@waldur/resource/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 interface ResourceRules extends Resource {
   policy: ServerGroupType;

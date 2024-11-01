@@ -1,7 +1,7 @@
 import { FC, createElement } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 
 type GridBodyProps = Pick<TableProps, 'rows' | 'gridItem' | 'gridSize'>;
 

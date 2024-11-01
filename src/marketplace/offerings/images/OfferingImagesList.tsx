@@ -3,8 +3,7 @@ import { FunctionComponent, useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { IMAGES_TABLE_NAME } from '@waldur/marketplace/offerings/store/constants';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { CreateImageButton } from './CreateImageButton';
 import { DeleteImageButton } from './DeleteImageButton';

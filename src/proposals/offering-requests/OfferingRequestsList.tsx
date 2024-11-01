@@ -5,8 +5,7 @@ import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
 import { Round } from '@waldur/proposals/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { OFFERING_REQUESTS_FILTER_FORM_ID } from '../constants';

@@ -7,8 +7,8 @@ import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { ProposalReview } from '@waldur/proposals/types';
 import { formatReviewState } from '@waldur/proposals/utils';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { USER_REVIEWS_FILTER_FORM_ID } from '@waldur/user/constants';
 import { getUser } from '@waldur/workspace/selectors';
 

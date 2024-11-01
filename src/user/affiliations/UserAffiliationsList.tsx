@@ -4,9 +4,8 @@ import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { formatRoleType } from '@waldur/permissions/utils';
-import { Table } from '@waldur/table';
+import { Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { useTable } from '@waldur/table/utils';
 
 import { RolePopover } from './RolePopover';
 

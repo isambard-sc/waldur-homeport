@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
-import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { SubmitButton } from '@waldur/form';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { terminateResource } from '@waldur/marketplace/common/api';
@@ -9,8 +8,8 @@ import { orderCanBeApproved as orderCanBeApprovedSelector } from '@waldur/market
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import TenantSubtitle from '@waldur/openstack/openstack-tenant/actions/DestroyActionSubtitle.md';
-import ClusterSubtitle from '@waldur/rancher/cluster/actions/DestroyActionSubtitle.md';
+import { ReactComponent as TenantSubtitle } from '@waldur/openstack/openstack-tenant/actions/DestroyActionSubtitle.md';
+import { ReactComponent as ClusterSubtitle } from '@waldur/rancher/cluster/actions/DestroyActionSubtitle.md';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 export const TerminateDialog = reduxForm<
@@ -22,11 +21,11 @@ export const TerminateDialog = reduxForm<
   const orderCanBeApproved = useSelector(orderCanBeApprovedSelector);
   const resource = props.resolve.resource;
   const dialogSubtitle =
-    resource.resource_type === 'OpenStack.Tenant'
-      ? TenantSubtitle
-      : resource.resource_type === 'Rancher.Cluster'
-        ? ClusterSubtitle
-        : null;
+    resource.resource_type === 'OpenStack.Tenant' ? (
+      <TenantSubtitle />
+    ) : resource.resource_type === 'Rancher.Cluster' ? (
+      <ClusterSubtitle />
+    ) : null;
 
   const dispatch = useDispatch();
   const callback = async () => {
@@ -83,7 +82,7 @@ export const TerminateDialog = reduxForm<
           },
           formatJsxTemplate,
         )}
-        {dialogSubtitle && <FormattedHtml html={dialogSubtitle} />}
+        {dialogSubtitle}
       </ModalDialog>
     </form>
   );

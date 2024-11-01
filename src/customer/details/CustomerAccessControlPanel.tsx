@@ -2,8 +2,7 @@ import { FunctionComponent } from 'react';
 
 import { CustomerEditPanelProps } from '@waldur/customer/details/types';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { AccessSubnetCreateButton } from './AccessSubnetCreateButton';
 import { AccessSubnetDeleteButton } from './AccessSubnetDeleteButton';

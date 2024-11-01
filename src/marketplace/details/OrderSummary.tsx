@@ -2,10 +2,10 @@ import { createElement, FunctionComponent } from 'react';
 import { connect } from 'react-redux';
 import { isValid } from 'redux-form';
 
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { Offering } from '@waldur/marketplace/types';
-import { isVisible } from '@waldur/store/config';
 import { Customer } from '@waldur/workspace/types';
 
 import { formCustomerSelector, formErrorsSelector } from '../deploy/utils';
@@ -51,7 +51,7 @@ const mapStateToProps = (state, ownProps) => ({
   formData: orderFormDataSelector(state),
   formValid: isValid(ORDER_FORM_ID)(state),
   errors: formErrorsSelector(state),
-  shouldConcealPrices: isVisible(state, MarketplaceFeatures.conceal_prices),
+  shouldConcealPrices: isFeatureVisible(MarketplaceFeatures.conceal_prices),
 });
 
 export const OrderSummary = connect<

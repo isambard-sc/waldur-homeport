@@ -1,18 +1,12 @@
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
 
+import { ENV } from '@waldur/configs/default';
 import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { getConfig } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
 const PureInvoicesFilter = () => {
-  const accountingMode = useSelector(
-    (state: RootState) => getConfig(state).accountingMode,
-  );
-
   const choices = useMemo(() => {
     const result = [
       {
@@ -29,7 +23,7 @@ const PureInvoicesFilter = () => {
       },
     ];
 
-    if (accountingMode !== 'accounting') {
+    if (ENV.accountingMode !== 'accounting') {
       result.push({
         label: translate('Paid'),
         value: 'paid',
@@ -37,7 +31,7 @@ const PureInvoicesFilter = () => {
     }
 
     return result;
-  }, [accountingMode]);
+  }, [ENV.accountingMode]);
 
   return (
     <TableFilterItem name="state" title={translate('State')}>

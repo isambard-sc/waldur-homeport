@@ -6,14 +6,13 @@ import { useSelector } from 'react-redux';
 
 import { Panel } from '@waldur/core/Panel';
 import { TeamWidget } from '@waldur/dashboard/TeamWidget';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
-import { useCreateInvitation } from '@waldur/invitations/actions/hooks';
+import { useCreateInvitation } from '@waldur/invitations/actions/useCreateInvitation';
 import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/AggregateLimitWidget';
 import { getProjectStats } from '@waldur/marketplace/aggregate-limits/api';
 import { fetchSelectProjectUsers } from '@waldur/permissions/api';
-import { isVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 import { getProject, getUser } from '@waldur/workspace/selectors';
 
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
@@ -30,8 +29,8 @@ const shouldShowAggregateLimitWidget = (uuid) => {
 };
 
 export const ProjectDashboard: FunctionComponent<{}> = () => {
-  const shouldConcealPrices = useSelector((state: RootState) =>
-    isVisible(state, MarketplaceFeatures.conceal_prices),
+  const shouldConcealPrices = isFeatureVisible(
+    MarketplaceFeatures.conceal_prices,
   );
 
   const user = useSelector(getUser);
