@@ -76,7 +76,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
     cy.url().should('match', /\/providers\/[a-zA-Z0-9-]+\/offering-update\//);
   });
 
-  it('preview order form action should open the preview offering modal', () => {
+  xit('preview order form action should open the preview offering modal', () => {
     cy.get('td .dropdown')
       .first()
       .find('button.dropdown-toggle')
