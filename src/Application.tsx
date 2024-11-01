@@ -17,6 +17,7 @@ import { LayoutProvider } from './metronic/layout/core';
 import { MasterInit } from './metronic/layout/MasterInit';
 import { NotificationContainer } from './NotificationContainer';
 import { router } from './router';
+import { states } from './states';
 import { ThemeSelector } from './ThemeSelector';
 
 export const queryClient = new QueryClient({
@@ -30,6 +31,8 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
+states.forEach((state) => router.stateRegistry.register(state));
 
 export const Application: FunctionComponent = () => {
   const { loading, error, value } = useAsync(loadConfig);

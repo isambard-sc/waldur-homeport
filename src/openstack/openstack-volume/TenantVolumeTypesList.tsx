@@ -1,9 +1,8 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
-
+import { Table, createFetcher, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 export const TenantVolumeTypesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {

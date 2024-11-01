@@ -10,7 +10,7 @@ import { ResourceImportButton } from '@waldur/marketplace/resources/import/Resou
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { Table } from '@waldur/table';
 import { SLUG_COLUMN } from '@waldur/table/slug';
-import { TableProps } from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 import { Resource } from '../types';

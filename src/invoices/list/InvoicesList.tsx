@@ -9,9 +9,8 @@ import { translate } from '@waldur/i18n';
 import { INVOICES_TABLE } from '@waldur/invoices/constants';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 import { MarkAsPaidButton } from '@waldur/invoices/list/MarkAsPaidButton';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { InvoicePayButton } from '../details/InvoicePayButton';

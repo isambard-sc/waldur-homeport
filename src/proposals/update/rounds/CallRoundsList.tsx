@@ -5,8 +5,7 @@ import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { Call, Round } from '@waldur/proposals/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { RoundCreateButton } from './RoundCreateButton';
 import { RoundExpandableRow } from './RoundExpandableRow';

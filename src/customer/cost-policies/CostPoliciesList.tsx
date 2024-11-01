@@ -6,9 +6,8 @@ import { BooleanBadge } from '@waldur/core/BooleanBadge';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { ProjectLink } from '@waldur/project/ProjectLink';
-import { Table, createFetcher } from '@waldur/table';
-import { TableProps } from '@waldur/table/Table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
+import { TableProps } from '@waldur/table/types';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { CostPolicyCreateButton } from './CostPolicyCreateButton';

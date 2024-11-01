@@ -7,8 +7,8 @@ import { change, getFormValues } from 'redux-form';
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { translate } from '@waldur/i18n';
 
-import { TableProps } from './Table';
 import { TableFiltersMenu } from './TableFiltersMenu';
+import { TableProps } from './types';
 import { getFiltersFormId } from './utils';
 
 interface TableFiltersProps

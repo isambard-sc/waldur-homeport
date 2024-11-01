@@ -12,8 +12,7 @@ import {
 import { IssueField } from '@waldur/issues/feedback/IssueField';
 import { SupportFeedbackListExpandableRow } from '@waldur/issues/feedback/SupportFeedbackListExpandableRow';
 import { getStartAndEndDatesOfMonth } from '@waldur/issues/utils';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { SupportFeedbackListFilter } from './SupportFeedbackListFilter';
 

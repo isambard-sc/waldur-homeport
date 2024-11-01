@@ -2,8 +2,7 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,

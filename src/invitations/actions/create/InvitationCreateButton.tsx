@@ -2,8 +2,8 @@ import { FunctionComponent } from 'react';
 
 import { AddButton } from '@waldur/core/AddButton';
 
-import { useCreateInvitation } from '../hooks';
 import { InvitationContext } from '../types';
+import { useCreateInvitation } from '../useCreateInvitation';
 
 export const InvitationCreateButton: FunctionComponent<
   Omit<InvitationContext, 'customer' | 'user'>

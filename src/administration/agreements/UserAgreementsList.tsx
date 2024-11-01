@@ -2,8 +2,7 @@ import { FunctionComponent } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { UserAgreementCreateButton } from './UserAgreementCreateButton';
 import { UserAgreementDeleteButton } from './UserAgreementDeleteButton';

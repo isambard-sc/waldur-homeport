@@ -10,8 +10,6 @@ import {
   ElementStyleUtil,
 } from '../_utils/index';
 
-import { CookieComponent } from './_CookieComponent';
-
 interface ScrollOptions {
   saveState?: boolean;
 }
@@ -164,36 +162,6 @@ class ScrollComponent {
     }
   };
 
-  private setupState = () => {
-    if (this.getOption('save-state') === true && this.id) {
-      const cookie = CookieComponent.get(this.id + 'st');
-      if (cookie) {
-        const pos = parseInt(cookie);
-
-        if (pos > 0) {
-          this.element.scrollTop = pos;
-        }
-      }
-    }
-  };
-
-  private setupScrollHandler = () => {
-    if (this.getOption('save-state') === true && this.id) {
-      this.element.addEventListener('scroll', this.scrollHandler);
-    } else {
-      this.element.removeEventListener('scroll', this.scrollHandler);
-    }
-  };
-
-  private scrollHandler = () => {
-    const cookieId = this.id + 'st';
-    CookieComponent.set(cookieId, this.element.scrollTop, {});
-  };
-
-  private destroyScrollHandler = () => {
-    this.element.removeEventListener('scroll', this.scrollHandler);
-  };
-
   private resetHeight = () => {
     const heghtType = this.getHeightType();
     if (heghtType) {
@@ -211,11 +179,8 @@ class ScrollComponent {
       !this.element.hasAttribute('data-kt-scroll-activate')
     ) {
       this.setupHeight();
-      this.setupScrollHandler();
-      this.setupState();
     } else {
       this.resetHeight();
-      this.destroyScrollHandler();
     }
   };
 

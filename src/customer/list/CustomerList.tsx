@@ -7,9 +7,9 @@ import { formatDate } from '@waldur/core/dateUtils';
 import { FinancialReportSendButton } from '@waldur/customer/list/FinancialReportSendButton';
 import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { Column } from '@waldur/table/types';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { Customer } from '@waldur/workspace/types';
 
 import { CurrentCostField } from './CurrentCostField';

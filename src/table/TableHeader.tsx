@@ -6,9 +6,8 @@ import { translate } from '@waldur/i18n';
 
 import './TableHeader.scss';
 
-import { TableProps } from './Table';
 import { TableFiltersMenu } from './TableFiltersMenu';
-import { Column, Sorting } from './types';
+import { TableProps, Column, Sorting } from './types';
 
 interface TableHeaderProps {
   columns: Column[];

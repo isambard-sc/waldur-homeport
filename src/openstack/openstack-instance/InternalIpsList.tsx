@@ -3,8 +3,7 @@ import { FunctionComponent, useCallback } from 'react';
 import { getById } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { VirtualMachine, Port } from '@waldur/resource/types';
-import { Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, useTable } from '@waldur/table';
 
 import { UpdateInternalIpsAction } from './actions/update-internal-ips/UpdateInternalIpsSetAction';
 import { SetAllowedAddressPairsButton } from './SetAllowedAddressPairsButton';

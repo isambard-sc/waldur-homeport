@@ -1,4 +1,5 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import icon from '@waldur/images/appstore/icon-rancher.png';
 import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
 const RancherProviderForm = lazyComponent(
@@ -9,7 +10,7 @@ const RancherProviderForm = lazyComponent(
 export const RancherProviderConfig: ProviderConfig = {
   name: 'Rancher',
   type: 'Rancher',
-  icon: 'icon-rancher.png',
+  icon,
   endpoint: 'rancher',
   component: RancherProviderForm,
 };

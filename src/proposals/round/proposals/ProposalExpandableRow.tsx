@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { ProposalReviewsDetailButton } from './ProposalReviewsDetailButton';
 

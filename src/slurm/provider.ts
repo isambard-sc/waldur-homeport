@@ -1,4 +1,5 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import icon from '@waldur/images/appstore/icon-slurm.png';
 import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
 const SlurmForm = lazyComponent(() => import('./SlurmForm'), 'SlurmForm');
@@ -11,7 +12,7 @@ const SlurmRemoteForm = lazyComponent(
 export const SlurmProviderConfig: ProviderConfig = {
   name: 'Batch processing',
   type: 'SLURM',
-  icon: 'icon-slurm.png',
+  icon,
   endpoint: 'slurm',
   component: SlurmForm,
 };
@@ -19,7 +20,7 @@ export const SlurmProviderConfig: ProviderConfig = {
 export const SlurmRemoteProviderConfig: ProviderConfig = {
   name: 'Batch processing (agent)',
   type: 'SLURM remote',
-  icon: 'icon-slurm.png',
+  icon,
   endpoint: 'slurm',
   component: SlurmRemoteForm,
 };

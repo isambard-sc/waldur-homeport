@@ -25,7 +25,7 @@ export const isSshFormat = (url) => {
   try {
     const parsedUrl = new URL(url);
     return parsedUrl.protocol === 'ssh:';
-  } catch (error) {
+  } catch {
     return false;
   }
 };
@@ -95,7 +95,7 @@ export const formatRetentionTime = (props: ResourceSummaryProps<Schedule>) =>
 export const getData = async (url) => {
   try {
     return await get(url).then((response) => response.data);
-  } catch (e) {
+  } catch {
     return null;
   }
 };

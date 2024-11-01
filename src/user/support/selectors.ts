@@ -1,6 +1,6 @@
 import { ENV } from '@waldur/configs/default';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { UserFeatures } from '@waldur/FeaturesEnums';
-import { isVisible } from '@waldur/store/config';
 import { RootState } from '@waldur/store/reducers';
 import { getUser } from '@waldur/workspace/selectors';
 
@@ -34,5 +34,5 @@ export const isVisibleForSupportOrStaff = (state: RootState) => {
   return user && (user.is_support || user.is_staff);
 };
 
-export const userLanguageIsVisible = (state: RootState) =>
-  isVisible(state, UserFeatures.preferred_language);
+export const userLanguageIsVisible = () =>
+  isFeatureVisible(UserFeatures.preferred_language);

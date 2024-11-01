@@ -25,6 +25,7 @@ export const FormContainer: React.FC<PropsWithChildren<FormContainerProps>> = (
         {React.Children.map(props.children, (input: any) =>
           input && input.props && input.props.name ? (
             <Field
+              key={input.name}
               space={props.space}
               {...input.props}
               component={FormGroup}

@@ -3,8 +3,7 @@ import { createSelector } from 'reselect';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import {
   getCustomer,
   getProject,

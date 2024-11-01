@@ -3,8 +3,7 @@ import { FC, useMemo } from 'react';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { AvailableOfferingCard } from '@waldur/proposals/AvailableOfferingCard';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 export const CallsAvailableOfferingsList: FC = () => {
   const filter = useMemo(

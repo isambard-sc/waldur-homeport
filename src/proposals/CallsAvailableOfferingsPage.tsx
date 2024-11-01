@@ -12,8 +12,8 @@ import { OfferingStateCell } from '@waldur/marketplace/offerings/list/OfferingSt
 import { PUBLIC_OFFERINGS_FILTER_FORM_ID } from '@waldur/marketplace/offerings/store/constants';
 import { useFullPage } from '@waldur/navigation/context';
 import { AvailableOfferingCard } from '@waldur/proposals/AvailableOfferingCard';
-import { createFetcher, Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import background from './proposal-calls.png';
 

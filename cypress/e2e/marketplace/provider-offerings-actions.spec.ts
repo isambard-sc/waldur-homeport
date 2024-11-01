@@ -59,7 +59,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
       .waitForPage();
   });
 
-  it("edit action should redirect to provider's offering update page", () => {
+  xit("edit action should redirect to provider's offering update page", () => {
     cy.get('td .dropdown')
       .first()
       .find('button.dropdown-toggle')

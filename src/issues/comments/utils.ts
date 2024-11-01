@@ -28,7 +28,7 @@ export const createJiraComment = (
   }
 
   for (const attachment of attachments) {
-    const jiraMarkup = isImage(attachment.mime_type)
+    const jiraMarkup = attachment.mime_type.startsWith('image')
       ? `!${attachment.file_name}|thumbnail!`
       : `[^${attachment.file_name}]`;
 
@@ -37,8 +37,6 @@ export const createJiraComment = (
 
   return comment;
 };
-
-export const isImage = (mimeType: string) => /^image/.test(mimeType);
 
 export const commentExist = (
   comments: Comment[],

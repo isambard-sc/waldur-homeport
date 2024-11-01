@@ -19,9 +19,7 @@ import { Row } from './Row';
 import { userLanguageIsVisible, isVisibleForSupportOrStaff } from './selectors';
 
 interface StateProps {
-  userLanguageIsVisible: boolean;
   isVisibleForSupportOrStaff: boolean;
-  nativeNameVisible: boolean;
 }
 
 interface OwnProps {
@@ -38,7 +36,7 @@ const PureUserDetailsTable: FunctionComponent<UserDetailsTableProps> = (
   <Table responsive={true} bordered={true} className="text-gray-700 px-0">
     <tbody>
       <Row label={translate('Full name')} value={props.user.full_name} />
-      {props.nativeNameVisible && (
+      {getNativeNameVisible() && (
         <Row label={translate('Native name')} value={props.user.native_name} />
       )}
       <Row label={translate('ID code')} value={props.user.civil_number} />
@@ -51,7 +49,7 @@ const PureUserDetailsTable: FunctionComponent<UserDetailsTableProps> = (
       <Row
         label={translate('Preferred language')}
         value={props.user.preferred_language}
-        isVisible={props.userLanguageIsVisible}
+        isVisible={userLanguageIsVisible()}
       />
       <Row
         label={translate('Registration method')}
@@ -101,9 +99,7 @@ const UserDetailsTableContainer: FunctionComponent<UserDetailsTableProps> = (
   );
 
 const mapStateToProps = (state: RootState) => ({
-  userLanguageIsVisible: userLanguageIsVisible(state),
   isVisibleForSupportOrStaff: isVisibleForSupportOrStaff(state),
-  nativeNameVisible: getNativeNameVisible(state),
 });
 
 const enhance = connect<StateProps, {}, OwnProps>(mapStateToProps);

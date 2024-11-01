@@ -1,12 +1,9 @@
-import { useSelector } from 'react-redux';
-
 import { ENV } from '@waldur/configs/default';
 import { formatCurrency } from '@waldur/core/formatCurrency';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
-import { isVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 
 import { Component } from './types';
 
@@ -15,8 +12,8 @@ export const LimitlessComponentsTable = ({
 }: {
   components: Component[];
 }) => {
-  const shouldConcealPrices = useSelector((state: RootState) =>
-    isVisible(state, MarketplaceFeatures.conceal_prices),
+  const shouldConcealPrices = isFeatureVisible(
+    MarketplaceFeatures.conceal_prices,
   );
   return (
     <table className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">

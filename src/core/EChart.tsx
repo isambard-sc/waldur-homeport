@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import { Component } from 'react';
 import { connect } from 'react-redux';
-import ResizeObserver from 'resize-observer-polyfill';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { themeSelector } from '@waldur/navigation/theme/store';

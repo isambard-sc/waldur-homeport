@@ -69,7 +69,7 @@ class FavoritePageServiceClass {
         if (Array.isArray(jsonList)) {
           return jsonList;
         }
-      } catch (error) {
+      } catch {
         removeItem(FAVORITE_PAGES_KEY, STORAGE_FOR_FAVORITE_PAGES);
       }
     }

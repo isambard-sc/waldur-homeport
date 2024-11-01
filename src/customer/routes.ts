@@ -1,5 +1,6 @@
 import { UIView } from '@uirouter/react';
 
+import { ENV } from '@waldur/configs/default';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -7,8 +8,6 @@ import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
-import { getConfig } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
@@ -229,10 +228,7 @@ export const states: StateDeclaration[] = [
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Group invitations'),
-      permissions: [
-        (state: RootState) =>
-          !getConfig(state).plugins.WALDUR_CORE.INVITATION_USE_WEBHOOKS,
-      ],
+      permissions: [() => !ENV.plugins.WALDUR_CORE.INVITATION_USE_WEBHOOKS],
     },
   },
 

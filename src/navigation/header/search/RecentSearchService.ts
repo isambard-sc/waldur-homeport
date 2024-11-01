@@ -43,7 +43,7 @@ class RecentSearchServiceClass {
         if (Array.isArray(jsonList)) {
           return jsonList;
         }
-      } catch (error) {
+      } catch {
         removeItem(RECENT_SEARCH_KEY, STORAGE_FOR_RECENT_SEARCH);
       }
     }

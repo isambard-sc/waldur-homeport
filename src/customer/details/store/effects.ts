@@ -29,7 +29,7 @@ function* checkPendingReview(action) {
         }),
       );
     }
-  } catch (error) {
+  } catch {
     // Silently swallow error
   }
 }

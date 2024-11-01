@@ -2,11 +2,11 @@ import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import BaseSelect, {
-  components,
   ClearIndicatorProps,
+  components,
+  ControlProps,
   Props as SelectProps,
   ThemeConfig,
-  ControlProps,
 } from 'react-select';
 import { AsyncPaginate as BaseAsyncPaginate } from 'react-select-async-paginate';
 import BaseWindowedSelect from 'react-windowed-select';

@@ -4,7 +4,7 @@ import { FunctionComponent } from 'react';
 import { translate } from '@waldur/i18n';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
-import { TableProps } from './Table';
+import { TableProps } from './types';
 
 interface HiddenActionsMessageProps {
   toggleColumn: TableProps['toggleColumn'];

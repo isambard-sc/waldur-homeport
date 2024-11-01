@@ -4,8 +4,7 @@ import { getFormValues } from 'redux-form';
 
 import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { ProviderRobotAccountFilter } from './ProviderRobotAccountFilter';

@@ -9,7 +9,7 @@ import { getCategoryGroups } from '@waldur/marketplace/common/api';
 import { Category } from '@waldur/marketplace/types';
 
 import { CategoriesPanel } from './CategoriesPanel';
-import { RECENTLY_ADDED_OFFERINGS_UUID } from './MarketplacePopup';
+import { RECENTLY_ADDED_OFFERINGS_UUID } from './constants';
 import { OfferingsPanel } from './OfferingsPanel';
 import { fetchCategories, fetchLastNOfferings } from './utils';
 

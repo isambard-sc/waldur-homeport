@@ -4,8 +4,6 @@ import {
   MenuComponent,
   DrawerComponent,
   ScrollComponent,
-  ScrollTopComponent,
-  StickyComponent,
   ToggleComponent,
   SwapperComponent,
 } from '../components';
@@ -19,9 +17,7 @@ export function MasterInit() {
     isFirstRun.current = false;
     setTimeout(() => {
       ToggleComponent.bootstrap();
-      ScrollTopComponent.bootstrap();
       DrawerComponent.bootstrap();
-      StickyComponent.bootstrap();
       MenuComponent.bootstrap();
       ScrollComponent.bootstrap();
       SwapperComponent.bootstrap();

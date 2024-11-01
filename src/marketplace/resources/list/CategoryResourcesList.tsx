@@ -8,9 +8,8 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { CategoryColumn } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { SLUG_COLUMN } from '@waldur/table/slug';
-import { useTable } from '@waldur/table/utils';
 
 import { ResourceImportButton } from '../import/ResourceImportButton';
 

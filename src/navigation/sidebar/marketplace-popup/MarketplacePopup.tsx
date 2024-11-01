@@ -14,9 +14,6 @@ import { Customer, Project } from '@waldur/workspace/types';
 
 import { DataLoader } from './DataLoader';
 
-export const RECENTLY_ADDED_OFFERINGS_UUID =
-  'recently_added_offerings_category';
-
 const ADD_RESOURCE_DIALOG_FORM = 'AddResourceDialogForm';
 
 interface MarketplacePopupProps {

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { isValid } from 'redux-form';
 
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { SummaryTable } from '@waldur/marketplace/details/OrderSummary';
@@ -12,7 +13,6 @@ import {
 } from '@waldur/marketplace/details/types';
 import { Offering } from '@waldur/marketplace/types';
 import { orderFormDataSelector } from '@waldur/marketplace/utils';
-import { isVisible } from '@waldur/store/config';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 import { Customer, Project } from '@waldur/workspace/types';
 
@@ -34,7 +34,7 @@ const mapStateToProps = (state, ownProps) => ({
   total: pricesSelector(state, ownProps).total,
   formData: orderFormDataSelector(state),
   formValid: isValid(ORDER_FORM_ID)(state),
-  shouldConcealPrices: isVisible(state, MarketplaceFeatures.conceal_prices),
+  shouldConcealPrices: isFeatureVisible(MarketplaceFeatures.conceal_prices),
 });
 
 export const OrderDetailsSummary = connect<

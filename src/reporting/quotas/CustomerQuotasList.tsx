@@ -3,8 +3,7 @@ import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { CustomerQuotasFilter } from './CustomerQuotasFilter';
 import { CustomerQuota, QuotaChoice } from './types';

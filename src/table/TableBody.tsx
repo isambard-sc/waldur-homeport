@@ -7,7 +7,7 @@ import { Field } from 'redux-form';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { Tip } from '@waldur/core/Tooltip';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 import { getId } from './utils';
 
 type TableBodyProps = Pick<

@@ -238,8 +238,8 @@ export const OfferingDetailsUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           data={{
             ...offeringData,

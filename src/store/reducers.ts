@@ -12,12 +12,9 @@ import { reducer as title } from '@waldur/navigation/title';
 import { type TableState } from '@waldur/table/types';
 import { reducer as workspace } from '@waldur/workspace/reducers';
 
-import { reducer as config } from './config';
-
 export const staticReducers = {
   form: formReducer,
   notifications: notificationsReducer(),
-  config,
   modal,
   drawer,
   issues,

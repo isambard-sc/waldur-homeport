@@ -2,15 +2,13 @@ import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Card, Col, ColProps, Row, Stack } from 'react-bootstrap';
+import { Card, Col, Row, Stack } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
-import { BaseFieldProps } from 'redux-form';
 
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
-import { ErrorView } from '@waldur/navigation/header/search/ErrorView';
 import { injectReducer, injectSaga } from '@waldur/store/store';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
@@ -26,85 +24,9 @@ import { TablePagination } from './TablePagination';
 import { TablePlaceholder } from './TablePlaceholder';
 import { TableQuery } from './TableQuery';
 import { TableRefreshButton } from './TableRefreshButton';
-import {
-  Column,
-  DisplayMode,
-  ExportConfig,
-  FilterItem,
-  FilterPosition,
-  Sorting,
-  TableDropdownItem,
-  TableState,
-} from './types';
+import { TableProps } from './types';
 
 import './Table.scss';
-
-export interface TableProps<RowType = any> extends TableState {
-  table?: string;
-  rows: any[];
-  rowKey?: string;
-  fetch: (force?: boolean) => void;
-  gotoPage?: (page: number) => void;
-  hasQuery?: boolean;
-  setQuery?: (query: string) => void;
-  setFilter?: (item: FilterItem) => void;
-  applyFiltersFn?: (apply: boolean) => void;
-  setFilterPosition?: (filterPosition: FilterPosition) => void;
-  columns?: Array<Column<RowType>>;
-  setDisplayMode?: (mode: DisplayMode) => void;
-  gridItem?: React.ComponentType<{ row: RowType }>;
-  gridSize?: ColProps;
-  openExportDialog?: (format: ExportConfig['format'], props?) => void;
-  openFiltersDrawer?: (filters: React.ReactNode) => void;
-  renderFiltersDrawer?: (filters: React.ReactNode) => void;
-  dropdownActions?: TableDropdownItem[];
-  tableActions?: React.ReactNode;
-  verboseName?: string;
-  className?: string;
-  id?: string;
-  rowClass?: (({ row }) => string) | string;
-  hoverable?: boolean;
-  minHeight?: number;
-  cardBordered?: boolean;
-  showPageSizeSelector?: boolean;
-  updatePageSize?: (size: number) => void;
-  initialPageSize?: number;
-  resetPagination?: () => void;
-  hasPagination?: boolean;
-  sortList?(sorting: Sorting): void;
-  initialSorting?: Sorting;
-  expandableRow?: React.ComponentType<{ row: any }>;
-  expandableRowClassName?: string;
-  rowActions?: React.ComponentType<{ row; fetch }>;
-  toggleRow?(row: any): void;
-  toggled?: Record<string, boolean>;
-  enableExport?: boolean;
-  showExportInDropdown?: boolean;
-  placeholderComponent?: React.ReactNode;
-  filters?: JSX.Element;
-  title?: React.ReactNode;
-  alterTitle?: React.ReactNode;
-  hasActionBar?: boolean;
-  hasHeaders?: boolean;
-  enableMultiSelect?: boolean;
-  multiSelectActions?: React.ComponentType<{ rows: any[]; refetch }>;
-  selectRow?(row: any): void;
-  selectAllRows?(rows: any[]): void;
-  resetSelection?: () => void;
-  filter?: Record<string, any>;
-  fieldType?: 'checkbox' | 'radio';
-  fieldName?: string;
-  validate?: BaseFieldProps['validate'];
-  footer?: React.ReactNode;
-  /** If enabled, set `keys` and `id` for each column. Also pass the required keys separately. */
-  hasOptionalColumns?: boolean;
-  toggleColumn?(id, column, value?): void;
-  initColumnPositions?(ids: string[]): void;
-  swapColumns?(column1: string, column2: string): void;
-  initialMode?: 'grid' | 'table';
-  standalone?: boolean;
-  hideClearFilters?: boolean;
-}
 
 const TableComponent = (
   props: TableProps & { toggleFilterMenu?(show?): void },
@@ -361,7 +283,8 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     }
 
     if (this.props.error) {
-      return <ErrorView />;
+      // @ts-ignore
+      return <ErrorMessage error={this.props.error} />;
     }
 
     if (!this.props.loading && !this.hasRows()) {

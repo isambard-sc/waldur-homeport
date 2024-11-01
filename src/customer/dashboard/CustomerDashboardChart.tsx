@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { TeamWidget } from '@waldur/dashboard/TeamWidget';
 import { WidgetCard } from '@waldur/dashboard/WidgetCard';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { useCreateInvitation } from '@waldur/invitations/actions/hooks';
+import { useCreateInvitation } from '@waldur/invitations/actions/useCreateInvitation';
 import { ChangesAmountBadge } from '@waldur/marketplace/service-providers/dashboard/ChangesAmountBadge';
 import { fetchSelectCustomerUsers } from '@waldur/permissions/api';
 import { Customer, User } from '@waldur/workspace/types';

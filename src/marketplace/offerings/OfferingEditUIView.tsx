@@ -281,8 +281,8 @@ export const OfferingEditUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           data={{
             ...data,

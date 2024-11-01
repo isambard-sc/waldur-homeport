@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 
 interface TableExportButtonProps {
   openExportDialog?: TableProps['openExportDialog'];

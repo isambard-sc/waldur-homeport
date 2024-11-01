@@ -10,8 +10,7 @@ import { translate } from '@waldur/i18n';
 import { getCategoryGroups } from '@waldur/marketplace/common/api';
 import { CategoryLink } from '@waldur/marketplace/links/CategoryLink';
 import { Category } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { CategoryCreateButton } from './CategoryCreateButton';
 import { CategoryRowActions } from './CategoryRowActions';

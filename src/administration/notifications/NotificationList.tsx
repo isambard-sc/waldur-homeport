@@ -7,9 +7,8 @@ import { createSelector } from 'reselect';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher, Table, useTable } from '@waldur/table';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
 
 import { NotificationActions } from './NotificationActions';
 import { NotificationExpandableRow } from './NotificationExpandableRow';

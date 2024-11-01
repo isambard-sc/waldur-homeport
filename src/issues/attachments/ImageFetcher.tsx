@@ -21,7 +21,7 @@ export const ImageFetcher = ({ url, name }) => {
         const imageUrl = URL.createObjectURL(imageBlob);
 
         setImageUrl(imageUrl);
-      } catch (err) {
+      } catch {
         setError('Failed to load image');
       } finally {
         setLoading(false);

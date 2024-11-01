@@ -7,9 +7,8 @@ import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalA
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
 
 import { VOLUME_TYPE } from '../constants';
 

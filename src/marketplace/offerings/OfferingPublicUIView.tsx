@@ -205,8 +205,8 @@ export const OfferingPublicUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           data={data}
           isLoading={isLoading}

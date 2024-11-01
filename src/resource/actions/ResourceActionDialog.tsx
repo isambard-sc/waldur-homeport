@@ -26,7 +26,7 @@ interface ResourceActionDialogOwnProps {
 const validateJSON = (value: string) => {
   try {
     JSON.parse(value);
-  } catch (e) {
+  } catch {
     return translate('This value is invalid JSON.');
   }
 };
@@ -62,7 +62,7 @@ export const ResourceActionDialog = reduxForm<{}, ResourceActionDialogOwnProps>(
       return (
         <MonacoField
           {...props}
-          mode="json"
+          language="json"
           validate={validateJSON}
           height={300}
         />
@@ -123,6 +123,7 @@ export const ResourceActionDialog = reduxForm<{}, ResourceActionDialogOwnProps>(
           };
           return field.disabled && props.disabled_tooltip ? (
             <Tip
+              key={index}
               label={props.disabled_tooltip}
               id="resource-action-dialog-disabled-tooltip"
             >

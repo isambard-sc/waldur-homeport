@@ -18,8 +18,8 @@ import {
   selectSelectedSavedFilter,
   selectTableSavedFilters,
 } from './selectors';
-import { TableProps } from './Table';
 import { TableFilterService, TableFiltersGroup } from './TableFilterService';
+import { TableProps } from './types';
 import { getSavedFiltersKey } from './utils';
 
 import './SavedFilterSelect.scss';

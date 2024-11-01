@@ -3,9 +3,9 @@ import { FC, useMemo } from 'react';
 import { formatDate } from '@waldur/core/dateUtils';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher, Table, useTable } from '@waldur/table';
 import { Column } from '@waldur/table/types';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { Customer } from '@waldur/workspace/types';
 
 const AbbreviationField = ({ row }) => (

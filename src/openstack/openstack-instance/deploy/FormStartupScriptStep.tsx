@@ -26,10 +26,9 @@ export const FormStartupScriptStep = (props: FormStepProps) => {
       {scriptEnabled ? (
         <Field
           name="startup_script"
-          mode="shell"
+          language="shell"
           component={MonacoField}
           height={200}
-          options={{ scrollBeyondLastLine: false }}
         />
       ) : (
         <TextField

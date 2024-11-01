@@ -124,7 +124,7 @@ export const ConfigurationEditDialog = reduxForm<
           {item.type === 'html_field' ? (
             <MonacoField
               name="value"
-              mode="html"
+              language="html"
               height={100}
               label={item.description}
             />

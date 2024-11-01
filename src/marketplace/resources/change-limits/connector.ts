@@ -3,10 +3,10 @@ import { AsyncState } from 'react-use/lib/useAsync';
 import { compose } from 'redux';
 import { formValueSelector, reduxForm } from 'redux-form';
 
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { Limits } from '@waldur/marketplace/common/types';
 import { orderCanBeApproved as getOrderCanBeApproved } from '@waldur/marketplace/orders/actions/selectors';
-import { isVisible } from '@waldur/store/config';
 
 import { changeLimits } from '../store/constants';
 
@@ -63,8 +63,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
       orderCanBeApproved,
     );
   }
-  const shouldConcealPrices = isVisible(
-    state,
+  const shouldConcealPrices = isFeatureVisible(
     MarketplaceFeatures.conceal_prices,
   );
   return {

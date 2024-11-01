@@ -3,8 +3,7 @@ import { useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { PublicResourceLink } from '@waldur/marketplace/resources/list/PublicResourceLink';
-import { createFetcher, Table } from '@waldur/table/index';
-import { useTable } from '@waldur/table/utils';
+import { useTable, createFetcher, Table } from '@waldur/table';
 
 export const ProviderCampaignResourceExpandable = ({ campaign }) => {
   const tableOptions = useMemo(

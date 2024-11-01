@@ -3,9 +3,8 @@ import { useSelector } from 'react-redux';
 import Avatar from '@waldur/core/Avatar';
 import { renderRoleExpirationDate } from '@waldur/customer/team/CustomerUsersList';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher, Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { useTable } from '@waldur/table/utils';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { getProject } from '@waldur/workspace/selectors';
 

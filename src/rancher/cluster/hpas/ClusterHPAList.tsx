@@ -4,8 +4,7 @@ import { ButtonGroup } from 'react-bootstrap';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { HPA } from '@waldur/rancher/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { ViewYAMLButton } from '../ViewYAMLButton';
 

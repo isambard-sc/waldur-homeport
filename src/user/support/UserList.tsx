@@ -14,11 +14,10 @@ import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { formatRole } from '@waldur/permissions/utils';
+import { useTable, Table, createFetcher } from '@waldur/table';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { Table, createFetcher } from '@waldur/table/index';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
 import { User } from '@waldur/workspace/types';
 
 import { UserDetailsButton } from './UserDetailsButton';

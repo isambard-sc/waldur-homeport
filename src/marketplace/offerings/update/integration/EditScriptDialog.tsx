@@ -186,7 +186,7 @@ export const EditScriptDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
                 <Field
                   name="script"
                   required={true}
-                  mode={props.resolve.offering.secret_options.language}
+                  language={props.resolve.offering.secret_options.language}
                   component={MonacoField}
                 />
 

@@ -3,8 +3,7 @@ import { Card } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
 import { NoResult } from '@waldur/navigation/header/search/NoResult';
-import { Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, useTable } from '@waldur/table';
 
 import { RefreshButton } from '../components/RefreshButton';
 import { OfferingSectionProps } from '../types';

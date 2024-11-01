@@ -67,7 +67,7 @@ export const getComponentUsages = (
   params?: {},
 ) =>
   getAll<ComponentUsage>('/marketplace-component-usages/', {
-    params: { resource_uuid, date_after, ...(params || {}) },
+    params: { resource_uuid, date_after, ...params },
   });
 
 export const getComponentUserUsages = (
@@ -76,7 +76,7 @@ export const getComponentUserUsages = (
   params?: {},
 ) =>
   getAll<ComponentUserUsage>('/marketplace-component-user-usages/', {
-    params: { resource_uuid, date_after, ...(params || {}) },
+    params: { resource_uuid, date_after, ...params },
   });
 
 export const getCategory = (id: string, options?: AxiosRequestConfig) =>

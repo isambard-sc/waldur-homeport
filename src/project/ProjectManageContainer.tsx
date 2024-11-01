@@ -42,7 +42,7 @@ export const ProjectManageContainer = () => {
   return (
     <UIView
       render={(Component, { key, ...props }) => (
-        <Component {...props} key={key} tabSpec={tabSpec} />
+        <Component key={key} {...props} tabSpec={tabSpec} />
       )}
     />
   );

@@ -23,7 +23,7 @@ import { translate } from '@waldur/i18n';
 import CheckboxIcon from './Checkbox.svg';
 import CheckboxEmptyIcon from './CheckboxEmpty.svg';
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
-import { TableProps } from './Table';
+import { TableProps } from './types';
 
 const SortableItem = (props) => {
   const { attributes, listeners, setNodeRef, transform, transition } =

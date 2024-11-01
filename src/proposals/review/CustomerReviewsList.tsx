@@ -9,8 +9,7 @@ import { EndingField } from '@waldur/proposals/EndingField';
 import { ReviewsTableFilter } from '@waldur/proposals/review/ReviewsTableFilter';
 import { ProposalReview } from '@waldur/proposals/types';
 import { formatReviewState } from '@waldur/proposals/utils';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 import { USER_REVIEWS_FILTER_FORM_ID } from '@waldur/user/constants';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 

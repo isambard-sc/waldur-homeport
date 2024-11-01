@@ -95,8 +95,8 @@ export const PublicCallDetailsContainer: FunctionComponent = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refresh={refreshCall}
           call={value}
           tabSpec={tabSpec}

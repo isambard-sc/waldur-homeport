@@ -6,8 +6,8 @@ import { createSelector } from 'reselect';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { getNonCanceledProposalStates } from '@waldur/proposals/utils';
-import { createFetcher, Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { PROPOSALS_FILTER_FORM_ID } from '../constants';

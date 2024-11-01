@@ -24,7 +24,7 @@ export const ConnectionStatusIndicator = ({ status }) => {
         {translate('Status')}
       </FormLabel>
       <Col>
-        {Array.from(new Array(status.length)).map((_, i) => (
+        {Array.from({ length: status.length }).map((_, i) => (
           <Tip
             key={i}
             id="backend-id"

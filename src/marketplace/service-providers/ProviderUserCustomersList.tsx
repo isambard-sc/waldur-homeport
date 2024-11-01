@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 
 import { EstimatedCostField } from '@waldur/customer/list/EstimatedCostField';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { CustomerContactColumn } from './CustomerContactColumn';
 import { CustomerMembersColumn } from './CustomerMembersColumn';

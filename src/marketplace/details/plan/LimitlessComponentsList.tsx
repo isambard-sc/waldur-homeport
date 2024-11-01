@@ -1,10 +1,7 @@
-import { useSelector } from 'react-redux';
-
 import { ENV } from '@waldur/configs/default';
 import { formatCurrency } from '@waldur/core/formatCurrency';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
-import { isVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 
 import { Component } from './types';
 
@@ -13,8 +10,8 @@ export const LimitlessComponentsList = ({
 }: {
   components: Component[];
 }) => {
-  const shouldConcealPrices = useSelector((state: RootState) =>
-    isVisible(state, MarketplaceFeatures.conceal_prices),
+  const shouldConcealPrices = isFeatureVisible(
+    MarketplaceFeatures.conceal_prices,
   );
   return (
     <>

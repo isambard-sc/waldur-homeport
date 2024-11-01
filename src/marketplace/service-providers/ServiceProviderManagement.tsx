@@ -9,7 +9,7 @@ import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import * as api from '@waldur/marketplace/common/api';
 import { ServiceProvider } from '@waldur/marketplace/types';
-import { showError, showSuccess } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RootState } from '@waldur/store/reducers';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
@@ -28,7 +28,7 @@ import { getServiceProviderSecretCode } from './store/selectors';
 interface ServiceProviderWrapperProps {
   customer: Customer;
   canRegisterServiceProvider: boolean;
-  showError?(message: string): void;
+  showErrorResponse?(error, message: string): void;
   showSuccess?(message: string): void;
   updateCustomer(customer: Customer): void;
   secretCode: {
@@ -74,7 +74,7 @@ class ServiceProviderWrapper extends Component<
       this.props.updateCustomer(this.props.customer);
     } catch (error) {
       this.setState({ registering: false });
-      this.props.showError(errorMessage);
+      this.props.showErrorResponse(error, errorMessage);
     }
   };
 
@@ -109,7 +109,7 @@ class ServiceProviderWrapper extends Component<
       }
     } catch (error) {
       this.setState({ loading: false });
-      this.props.showError(errorMessage);
+      this.props.showErrorResponse(error, errorMessage);
     }
   }
 
@@ -201,7 +201,8 @@ const mapDispatchToProps = (dispatch) => ({
     dispatch(showSecretCodeRegenerateConfirm(serviceProvider)),
   getServiceProviderSecretCode: (serviceProvider) =>
     dispatch(secretCodeFetchStart(serviceProvider)),
-  showError: (message) => dispatch(showError(message)),
+  showErrorResponse: (error, message) =>
+    dispatch(showErrorResponse(error, message)),
   showSuccess: (message) => dispatch(showSuccess(message)),
   updateCustomer: (customer) => dispatch(updateCustomer(customer)),
 });

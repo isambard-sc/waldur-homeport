@@ -2,10 +2,6 @@
 .git
 .idea
 .vscode
-build
-build.dev
+dist
 coverage
-build.dll
 node_modules
-src/configs/config.json
-src/configs/test/config.json

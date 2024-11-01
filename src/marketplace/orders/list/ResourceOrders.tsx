@@ -6,8 +6,7 @@ import { translate } from '@waldur/i18n';
 import { OrderDetailsLink } from '@waldur/marketplace/orders/details/OrderDetailsLink';
 import { IssueLinkRenderer } from '@waldur/marketplace/orders/list/IssueLinkRenderer';
 import { Resource } from '@waldur/marketplace/resources/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 import { ResourceOrderRowActions } from '../actions/ResourceOrdersRowActions';
 

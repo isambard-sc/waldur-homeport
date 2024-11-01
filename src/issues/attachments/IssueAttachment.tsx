@@ -7,8 +7,6 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 
-import { isImage } from '../comments/utils';
-
 import * as actions from './actions';
 import './IssueAttachment.scss';
 import { FileDownloader } from './FileDownloader';
@@ -43,7 +41,7 @@ export const IssueAttachment: FunctionComponent<IssueAttachmentProps> = ({
       {attachment.file ? (
         <>
           <div className="attachment-item__thumb">
-            {isImage(attachment.mime_type) ? (
+            {attachment.mime_type.startsWith('image') ? (
               <button onClick={openModal}>
                 <ImageFetcher
                   url={attachment.file}

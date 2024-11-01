@@ -5,8 +5,7 @@ import { getFormValues } from 'redux-form';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 import { OfferingUserRowActions } from '../offerings/actions/OfferingUserRowActions';
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';

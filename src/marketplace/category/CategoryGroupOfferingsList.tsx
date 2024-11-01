@@ -20,7 +20,7 @@ export const CategoryGroupOfferingsList: FunctionComponent<{
   useExtraToolbar(filters.length ? <PageBarFilters /> : null, [filters]);
   const filter = useMemo(
     () => ({
-      ...(getContextFiltersForOfferings(filters) || {}),
+      ...getContextFiltersForOfferings(filters),
       category_group_uuid: categoryGroup.uuid,
     }),
     [categoryGroup],

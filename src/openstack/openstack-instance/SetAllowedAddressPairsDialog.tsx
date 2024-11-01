@@ -13,7 +13,7 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showError, showSuccess } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { validatePrivateCIDR } from '../utils';
 
@@ -128,7 +128,10 @@ export const SetAllowedAddressPairsDialog = enhance(
         dispatch(closeModalDialog());
       } catch (e) {
         dispatch(
-          showError(translate('Unable to update allowed address pairs.')),
+          showErrorResponse(
+            e,
+            translate('Unable to update allowed address pairs.'),
+          ),
         );
       }
     };

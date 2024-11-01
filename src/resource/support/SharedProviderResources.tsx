@@ -3,9 +3,8 @@ import { FC, useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
 
 import { ResourceRowActions } from '../actions/ResourceRowActions';
 import { ResourceName } from '../ResourceName';

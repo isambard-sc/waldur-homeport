@@ -6,8 +6,7 @@ import { createSelector } from 'reselect';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { titleCase } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { HookRemoveButton } from '@waldur/user/hooks/HookRemoveButton';
 import { formatEventTitle } from '@waldur/user/hooks/utils';
 

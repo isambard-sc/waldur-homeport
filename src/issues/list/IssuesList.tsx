@@ -9,10 +9,8 @@ import { IssueLinkField } from '@waldur/issues/list/IssueLinkField';
 import { IssuesListExpandableRow } from '@waldur/issues/list/IssuesListExpandableRow';
 import { StatusColumn } from '@waldur/issues/list/StatusColumn';
 import { TitleColumn } from '@waldur/issues/list/TitleColumn';
-import { Table, createFetcher } from '@waldur/table';
-import { TableProps } from '@waldur/table/Table';
-import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
+import { TableProps, Column } from '@waldur/table/types';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { IssueCreateButton } from './IssueCreateButton';

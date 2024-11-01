@@ -10,11 +10,10 @@ import { translate } from '@waldur/i18n';
 import { PROJECTS_LIST } from '@waldur/project/constants';
 import { GlobalProjectCreateButton } from '@waldur/project/GlobalProjectCreateButton';
 import { ProjectLink } from '@waldur/project/ProjectLink';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher, Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { OrganizationNameField } from './OrganizationNameField';

@@ -52,7 +52,7 @@ export const ViewYAMLDialog = reduxForm<
     >
       <MonacoField
         name="yaml"
-        mode="yaml"
+        language="yaml"
         original={value?.yaml}
         diff={showDiff}
         height={400}

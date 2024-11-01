@@ -2,8 +2,7 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { Table, createFetcher, useTable } from '@waldur/table';
 
 export const ClusterTemplatesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,

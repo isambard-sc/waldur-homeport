@@ -3,8 +3,7 @@ import { FC, useMemo } from 'react';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
-import { createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, useTable } from '@waldur/table';
 
 import { CostPolicyCreateButton } from './CostPolicyCreateButton';
 import { PoliciesTable } from './PoliciesTable';

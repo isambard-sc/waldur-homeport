@@ -2,8 +2,7 @@ import { FunctionComponent } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { OrganizationGroup } from '@waldur/marketplace/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, Table, useTable } from '@waldur/table';
 
 export const OrganizationGroupTypesList: FunctionComponent = () => {
   const tableProps = useTable({

@@ -1,4 +1,4 @@
-import { File, FileArrowUp } from '@phosphor-icons/react/dist/ssr';
+import { File, FileArrowUp } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { DropzoneOptions, useDropzone } from 'react-dropzone';
 

@@ -81,7 +81,7 @@ export const BookingResourcesCalendar: FunctionComponent<
               ))}
             </ul>
             <ul className="timeline-list-lines">
-              {Array.from(new Array(25)).map((_, i) => (
+              {Array.from({ length: 25 }).map((_, i) => (
                 <hr key={i} />
               ))}
             </ul>

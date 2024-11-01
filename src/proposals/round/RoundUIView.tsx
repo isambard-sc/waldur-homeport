@@ -155,8 +155,8 @@ export const RoundUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           round={round}
           call={call}

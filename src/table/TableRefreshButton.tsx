@@ -1,7 +1,7 @@
 import { ArrowsClockwise } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
-import { TableProps } from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
 
 export const LoadingSpinner: FunctionComponent = () => (
   <button type="button" className="btn btn-icon btn-flush">

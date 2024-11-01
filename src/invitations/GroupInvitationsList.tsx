@@ -11,9 +11,8 @@ import { GroupInvitationRowActions } from '@waldur/invitations/GroupInvitationRo
 import { GroupInvitationsFilter } from '@waldur/invitations/GroupInvitationsFilter';
 import { GroupInvitationsListExpandableRow } from '@waldur/invitations/GroupInvitationsListExpandableRow';
 import { RoleField } from '@waldur/invitations/RoleField';
-import { Table, createFetcher } from '@waldur/table';
+import { Table, createFetcher, useTable } from '@waldur/table';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
 import { exportRoleField } from '@waldur/user/affiliations/RolePopover';
 import { getCustomer } from '@waldur/workspace/selectors';
 
