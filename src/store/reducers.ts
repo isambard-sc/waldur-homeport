@@ -4,7 +4,8 @@ import { reducer as formReducer } from 'redux-form';
 
 import { reducer as bookings } from '@waldur/booking/store/reducer';
 import { reducer as drawer } from '@waldur/drawer/reducer';
-import { reducer as issues } from '@waldur/issues/reducers';
+import { type IssueAttachmentState } from '@waldur/issues/attachments/types';
+import { type IssueCommentState } from '@waldur/issues/comments/types';
 import { reducer as marketplace } from '@waldur/marketplace/store/reducers';
 import { reducer as modal } from '@waldur/modal/reducer';
 import { reducer as theme } from '@waldur/navigation/theme/store';
@@ -17,7 +18,6 @@ export const staticReducers = {
   notifications: notificationsReducer(),
   modal,
   drawer,
-  issues,
   workspace,
   marketplace,
   bookings,
@@ -29,4 +29,8 @@ const rootReducer = combineReducers(staticReducers);
 
 export type RootState = ReturnType<typeof rootReducer> & {
   tables: Record<string, TableState>;
+  issues: {
+    attachments: IssueAttachmentState;
+    comments: IssueCommentState;
+  };
 };
