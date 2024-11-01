@@ -5,6 +5,7 @@ import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { Panel } from '@waldur/core/Panel';
+import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
 import { TeamWidget } from '@waldur/dashboard/TeamWidget';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -55,13 +56,13 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   }
   return (
     <>
-      <Row style={{ height: '18rem' }}>
+      <Row>
         {!shouldConcealPrices && (
-          <Col md={6} sm={12} className="mb-6">
+          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardCostLimits project={project} />
           </Col>
         )}
-        <Col md={6} sm={12} className="mb-6">
+        <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
           <TeamWidget
             api={() => fetchSelectProjectUsers(project.uuid, { page_size: 5 })}
             scope={project}
@@ -78,8 +79,8 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
         </Col>
       </Row>
       {shouldShowAggregateLimitWidget(project.uuid) && (
-        <Row style={{ height: '18rem' }}>
-          <Col md={6} sm={12} className="mb-6">
+        <Row>
+          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
             <AggregateLimitWidget project={project} />
           </Col>
         </Row>
