@@ -25,18 +25,27 @@ const getConfirmationText = (resource) => {
   );
 };
 
-export const SetErredActionItem: FC<{ resource; refetch }> = ({
-  resource,
-  refetch,
-}) => {
+export const SetErredActionItem: FC<{
+  resource;
+  marketplaceResource;
+  refetch;
+}> = ({ resource, marketplaceResource, refetch }) => {
+  // if the parent is OpenStack resource actionslist then we use marketplaceResource here, otherwise resource param is already marketplace resource object
+  const resource_uuid = marketplaceResource
+    ? marketplaceResource.uuid
+    : resource.uuid;
+  const customer_uuid = marketplaceResource
+    ? marketplaceResource.offering_customer_uuid
+    : resource.offering_customer_uuid;
+
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   if (
     !hasPermission(user, {
       permission: PermissionEnum.SET_RESOURCE_STATE_ERRED,
-      customerId: resource.customer_uuid,
+      customerId: customer_uuid,
     }) ||
-    !resource.marketplace_resource_uuid
+    !resource_uuid
   ) {
     return null;
   }
@@ -53,7 +62,7 @@ export const SetErredActionItem: FC<{ resource; refetch }> = ({
 
     try {
       await post(
-        `/marketplace-provider-resources/${resource.marketplace_resource_uuid}/set_as_erred/`,
+        `/marketplace-provider-resources/${resource_uuid}/set_as_erred/`,
       );
       refetch();
       dispatch(showSuccess(translate('Resource has been set as erred.')));
@@ -71,7 +80,6 @@ export const SetErredActionItem: FC<{ resource; refetch }> = ({
       title={translate('Set as erred')}
       action={callback}
       className="text-danger"
-      staff
       iconNode={<CloudX />}
     />
   );
