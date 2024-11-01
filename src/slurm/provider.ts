@@ -1,5 +1,5 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
 const SlurmForm = lazyComponent(() => import('./SlurmForm'), 'SlurmForm');
 
@@ -8,18 +8,18 @@ const SlurmRemoteForm = lazyComponent(
   'SlurmRemoteForm',
 );
 
-ProvidersRegistry.register({
+export const SlurmProviderConfig: ProviderConfig = {
   name: 'Batch processing',
   type: 'SLURM',
   icon: 'icon-slurm.png',
   endpoint: 'slurm',
   component: SlurmForm,
-});
+};
 
-ProvidersRegistry.register({
+export const SlurmRemoteProviderConfig: ProviderConfig = {
   name: 'Batch processing (agent)',
   type: 'SLURM remote',
   icon: 'icon-slurm.png',
   endpoint: 'slurm',
   component: SlurmRemoteForm,
-});
+};

@@ -30,11 +30,11 @@ export const isSshFormat = (url) => {
   }
 };
 
-const RESOURCE_TYPE_LABELS = {};
-
-export function registerResourceTypeLabel(resourceType: string, label: string) {
-  RESOURCE_TYPE_LABELS[resourceType] = label;
-}
+const RESOURCE_TYPE_LABELS = {
+  'VMware.VirtualMachine': 'vSphere Virtual Machine',
+  'VMware.Disk': 'VM Disk',
+  'VMware.Port': 'VM Network Adapter',
+};
 
 export const formatResourceType = (resource) => {
   if (!resource.resource_type) return '';

@@ -1,15 +1,15 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
 const RancherProviderForm = lazyComponent(
   () => import('./RancherProviderForm'),
   'RancherProviderForm',
 );
 
-ProvidersRegistry.register({
+export const RancherProviderConfig: ProviderConfig = {
   name: 'Rancher',
   type: 'Rancher',
   icon: 'icon-rancher.png',
   endpoint: 'rancher',
   component: RancherProviderForm,
-});
+};

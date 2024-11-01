@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { NestedResourceTabsConfiguration } from '@waldur/resource/tabs/NestedResourceTabsConfiguration';
+import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
 const ClusterUsersList = lazyComponent(
   () => import('@waldur/rancher/cluster/users/ClusterUsersList'),
@@ -43,73 +43,76 @@ const ClusterHPAList = lazyComponent(
   'ClusterHPAList',
 );
 
-NestedResourceTabsConfiguration.register('Rancher.Cluster', () => [
-  {
-    title: translate('Cluster'),
-    key: 'cluster',
-    children: [
-      {
-        key: 'nodes',
-        title: translate('Nodes'),
-        component: ClusterNodesList,
-      },
-      {
-        key: 'projects',
-        title: translate('Projects'),
-        component: ClusterProjectList,
-      },
-      {
-        key: 'users',
-        title: translate('Users'),
-        component: ClusterUsersList,
-      },
-    ],
-  },
-  {
-    title: translate('Apps'),
-    key: 'apps',
-    children: [
-      {
-        key: 'templates',
-        title: translate('Application templates'),
-        component: ClusterTemplatesList,
-      },
-      {
-        key: 'applications',
-        title: translate('Applications'),
-        component: ClusterApplicationsList,
-      },
-      {
-        key: 'workloads',
-        title: translate('Workloads'),
-        component: ClusterWorkloadsList,
-      },
-      {
-        key: 'catalogs',
-        title: translate('Catalogues'),
-        component: ClusterCatalogList,
-      },
-    ],
-  },
-  {
-    title: translate('Service discovery'),
-    key: 'service-discovery',
-    children: [
-      {
-        key: 'hpas',
-        title: translate('HPA'),
-        component: ClusterHPAList,
-      },
-      {
-        key: 'ingresses',
-        title: translate('Ingress'),
-        component: ClusterIngressesList,
-      },
-      {
-        key: 'services',
-        title: translate('Services'),
-        component: ClusterServicesList,
-      },
-    ],
-  },
-]);
+export const RancherClusterTabConfiguration: ResourceTabsConfiguration = {
+  type: 'Rancher.Cluster',
+  tabs: [
+    {
+      title: translate('Cluster'),
+      key: 'cluster',
+      children: [
+        {
+          key: 'nodes',
+          title: translate('Nodes'),
+          component: ClusterNodesList,
+        },
+        {
+          key: 'projects',
+          title: translate('Projects'),
+          component: ClusterProjectList,
+        },
+        {
+          key: 'users',
+          title: translate('Users'),
+          component: ClusterUsersList,
+        },
+      ],
+    },
+    {
+      title: translate('Apps'),
+      key: 'apps',
+      children: [
+        {
+          key: 'templates',
+          title: translate('Application templates'),
+          component: ClusterTemplatesList,
+        },
+        {
+          key: 'applications',
+          title: translate('Applications'),
+          component: ClusterApplicationsList,
+        },
+        {
+          key: 'workloads',
+          title: translate('Workloads'),
+          component: ClusterWorkloadsList,
+        },
+        {
+          key: 'catalogs',
+          title: translate('Catalogues'),
+          component: ClusterCatalogList,
+        },
+      ],
+    },
+    {
+      title: translate('Service discovery'),
+      key: 'service-discovery',
+      children: [
+        {
+          key: 'hpas',
+          title: translate('HPA'),
+          component: ClusterHPAList,
+        },
+        {
+          key: 'ingresses',
+          title: translate('Ingress'),
+          component: ClusterIngressesList,
+        },
+        {
+          key: 'services',
+          title: translate('Services'),
+          component: ClusterServicesList,
+        },
+      ],
+    },
+  ],
+};

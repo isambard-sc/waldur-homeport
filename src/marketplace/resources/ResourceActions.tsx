@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { translate } from '@waldur/i18n';
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
 import { ResourceActionsButton as BaseResourceActionsButton } from '@waldur/marketplace/resources/actions/ResourceActionsButton';
-import { ActionRegistry } from '@waldur/resource/actions/registry';
+import { getActions } from '@waldur/resource/actions/registry';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 
 import { ActionsList } from './actions/ActionsList';
@@ -16,7 +16,7 @@ export const ResourceActions = ({
   labeled = false,
 }) => {
   const extraActions = useMemo(() => {
-    return ActionRegistry.getActions(resource.resource_type).filter(
+    return getActions(resource.resource_type).filter(
       (action) => !ActionsList.includes(action),
     );
   }, [resource]);

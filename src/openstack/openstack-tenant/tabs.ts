@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { NestedResourceTabsConfiguration } from '@waldur/resource/tabs/NestedResourceTabsConfiguration';
+import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
 const FloatingIpsList = lazyComponent(
   () => import('../openstack-floating-ips/FloatingIpsList'),
@@ -55,88 +55,91 @@ const TenantImagesList = lazyComponent(
   'TenantImagesList',
 );
 
-NestedResourceTabsConfiguration.register('OpenStack.Tenant', () => [
-  {
-    title: translate('Compute'),
-    key: 'compute',
-    children: [
-      {
-        key: 'instances',
-        title: translate('Instances'),
-        component: TenantInstancesList,
-      },
-      {
-        key: 'flavors',
-        title: translate('Flavors'),
-        component: TenantFlavorsList,
-      },
-      {
-        key: 'images',
-        title: translate('Images'),
-        component: TenantImagesList,
-      },
-      {
-        key: 'server_groups',
-        title: translate('Server groups'),
-        component: ServerGroupsList,
-      },
-    ],
-  },
-  {
-    title: translate('Networking'),
-    key: 'networking',
-    children: [
-      {
-        key: 'routers',
-        title: translate('Routers'),
-        component: TenantRoutersList,
-      },
-      {
-        key: 'networks',
-        title: translate('Networks'),
-        component: TenantNetworksList,
-      },
-      {
-        key: 'subnets',
-        title: translate('Subnets'),
-        component: TenantSubnetsList,
-      },
-      {
-        key: 'security_groups',
-        title: translate('Security groups'),
-        component: SecurityGroupsList,
-      },
-      {
-        key: 'floating_ips',
-        title: translate('Floating IPs'),
-        component: FloatingIpsList,
-      },
-      {
-        key: 'ports',
-        title: translate('Ports'),
-        component: TenantPortsList,
-      },
-    ],
-  },
-  {
-    title: translate('Storage'),
-    key: 'storage',
-    children: [
-      {
-        key: 'volumes',
-        title: translate('Volumes'),
-        component: TenantVolumesList,
-      },
-      {
-        key: 'volume-types',
-        title: translate('Volume types'),
-        component: TenantVolumeTypesList,
-      },
-      {
-        key: 'snapshots',
-        title: translate('Snapshots'),
-        component: TenantSnapshotsList,
-      },
-    ],
-  },
-]);
+export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
+  type: 'OpenStack.Tenant',
+  tabs: [
+    {
+      title: translate('Compute'),
+      key: 'compute',
+      children: [
+        {
+          key: 'instances',
+          title: translate('Instances'),
+          component: TenantInstancesList,
+        },
+        {
+          key: 'flavors',
+          title: translate('Flavors'),
+          component: TenantFlavorsList,
+        },
+        {
+          key: 'images',
+          title: translate('Images'),
+          component: TenantImagesList,
+        },
+        {
+          key: 'server_groups',
+          title: translate('Server groups'),
+          component: ServerGroupsList,
+        },
+      ],
+    },
+    {
+      title: translate('Networking'),
+      key: 'networking',
+      children: [
+        {
+          key: 'routers',
+          title: translate('Routers'),
+          component: TenantRoutersList,
+        },
+        {
+          key: 'networks',
+          title: translate('Networks'),
+          component: TenantNetworksList,
+        },
+        {
+          key: 'subnets',
+          title: translate('Subnets'),
+          component: TenantSubnetsList,
+        },
+        {
+          key: 'security_groups',
+          title: translate('Security groups'),
+          component: SecurityGroupsList,
+        },
+        {
+          key: 'floating_ips',
+          title: translate('Floating IPs'),
+          component: FloatingIpsList,
+        },
+        {
+          key: 'ports',
+          title: translate('Ports'),
+          component: TenantPortsList,
+        },
+      ],
+    },
+    {
+      title: translate('Storage'),
+      key: 'storage',
+      children: [
+        {
+          key: 'volumes',
+          title: translate('Volumes'),
+          component: TenantVolumesList,
+        },
+        {
+          key: 'volume-types',
+          title: translate('Volume types'),
+          component: TenantVolumeTypesList,
+        },
+        {
+          key: 'snapshots',
+          title: translate('Snapshots'),
+          component: TenantSnapshotsList,
+        },
+      ],
+    },
+  ],
+};

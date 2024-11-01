@@ -1,12 +1,12 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
 const VMwareForm = lazyComponent(() => import('./VMwareForm'), 'VMwareForm');
 
-ProvidersRegistry.register({
+export const VMwareProviderConfig: ProviderConfig = {
   name: 'VMware',
   type: 'VMware',
   icon: 'icon-vmware.png',
   endpoint: 'vmware',
   component: VMwareForm,
-});
+};

@@ -1,6 +1,6 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { NestedResourceTabsConfiguration } from '@waldur/resource/tabs/NestedResourceTabsConfiguration';
+import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
 import { VOLUME_TYPE } from '../constants';
 
@@ -13,21 +13,24 @@ const VolumeSnapshotsList = lazyComponent(
   'VolumeSnapshotsList',
 );
 
-NestedResourceTabsConfiguration.register(VOLUME_TYPE, () => [
-  {
-    title: translate('Snapshots'),
-    key: 'snapshots',
-    children: [
-      {
-        key: 'snapshots',
-        title: translate('Snapshots'),
-        component: VolumeSnapshotsList,
-      },
-      {
-        key: 'snapshot_schedules',
-        title: translate('Snapshot schedules'),
-        component: SnapshotSchedulesList,
-      },
-    ],
-  },
-]);
+export const OpenStackVolumeTabConfiguration: ResourceTabsConfiguration = {
+  type: VOLUME_TYPE,
+  tabs: [
+    {
+      title: translate('Snapshots'),
+      key: 'snapshots',
+      children: [
+        {
+          key: 'snapshots',
+          title: translate('Snapshots'),
+          component: VolumeSnapshotsList,
+        },
+        {
+          key: 'snapshot_schedules',
+          title: translate('Snapshot schedules'),
+          component: SnapshotSchedulesList,
+        },
+      ],
+    },
+  ],
+};

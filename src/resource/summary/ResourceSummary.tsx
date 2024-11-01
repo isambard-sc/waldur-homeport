@@ -13,20 +13,16 @@ interface ResourceSummaryProps {
 export const ResourceSummary: FunctionComponent<ResourceSummaryProps> = (
   props,
 ) => {
-  const CustomSummaryComponent = ResourceSummaryRegistry.getCustom(
-    props.resource.resource_type,
-  );
-  if (CustomSummaryComponent) {
-    return <CustomSummaryComponent resource={props.resource} />;
+  const conf = ResourceSummaryRegistry.get(props.resource.resource_type);
+  const SummaryComponent = conf?.component;
+  if (conf?.standalone) {
+    return <SummaryComponent resource={props.resource} />;
+  } else {
+    return (
+      <ExpandableContainer hasMultiSelect={props.hasMultiSelect} asTable>
+        <ResourceSummaryBase resource={props.resource} />
+        {SummaryComponent && <SummaryComponent resource={props.resource} />}
+      </ExpandableContainer>
+    );
   }
-
-  const SummaryComponent = ResourceSummaryRegistry.get(
-    props.resource.resource_type,
-  );
-  return (
-    <ExpandableContainer hasMultiSelect={props.hasMultiSelect} asTable>
-      <ResourceSummaryBase resource={props.resource} />
-      {SummaryComponent && <SummaryComponent resource={props.resource} />}
-    </ExpandableContainer>
-  );
 };
