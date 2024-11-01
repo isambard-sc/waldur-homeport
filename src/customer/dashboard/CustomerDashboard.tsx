@@ -3,6 +3,7 @@ import { FunctionComponent, useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
+import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
 import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/AggregateLimitWidget';
 import { getCustomerStats } from '@waldur/marketplace/aggregate-limits/api';
 import { ProjectsList } from '@waldur/project/ProjectsList';
@@ -49,12 +50,17 @@ export const CustomerDashboard: FunctionComponent = () => {
           )}
           {(shouldShowAggregateLimitWidget(customer.uuid) ||
             Boolean(customer.credit)) && (
-            <Row style={{ height: '18rem' }}>
-              <Col md={6} sm={12} className="mb-6">
+            <Row>
+              <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
                 <AggregateLimitWidget customer={customer} />
               </Col>
               {Boolean(customer.credit) && (
-                <Col md={6} sm={12} className="mb-6">
+                <Col
+                  md={6}
+                  sm={12}
+                  className="mb-6"
+                  style={COMMON_WIDGET_HEIGHT}
+                >
                   <CreditStatusWidget customer={customer} />
                 </Col>
               )}

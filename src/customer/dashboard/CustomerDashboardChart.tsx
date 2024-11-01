@@ -6,6 +6,7 @@ import { Col, Row } from 'react-bootstrap';
 import { EChart } from '@waldur/core/EChart';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
 import { TeamWidget } from '@waldur/dashboard/TeamWidget';
 import { WidgetCard } from '@waldur/dashboard/WidgetCard';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
@@ -45,9 +46,9 @@ export const CustomerDashboardChart: FunctionComponent<
   }
   if (data.costChart || data.teamChart) {
     return (
-      <Row style={{ height: '18rem' }}>
+      <Row>
         {Boolean(data.costChart) && (
-          <Col md={6} sm={12} className="mb-6">
+          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
             <WidgetCard
               cardTitle={data.costChart.chart.title}
               title={data.costChart.chart.current}
@@ -79,7 +80,7 @@ export const CustomerDashboardChart: FunctionComponent<
           </Col>
         )}
         {Boolean(data.teamChart) && (
-          <Col md={6} sm={12} className="mb-6">
+          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
             <TeamWidget
               api={() =>
                 fetchSelectCustomerUsers(customer.uuid, { page_size: 5 })
