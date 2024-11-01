@@ -1,7 +1,6 @@
-import { createFormAction } from 'redux-form-saga';
-
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
+import { createFormAction } from '@waldur/redux-form-saga';
 import { Project } from '@waldur/workspace/types';
 
 const ProjectRemoveDialog = lazyComponent(

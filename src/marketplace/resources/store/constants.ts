@@ -1,4 +1,4 @@
-import { createFormAction } from 'redux-form-saga';
+import { createFormAction } from '@waldur/redux-form-saga';
 
 export const submitUsage = createFormAction(
   'waldur/marketplace/resources/SUBMIT_USAGE',

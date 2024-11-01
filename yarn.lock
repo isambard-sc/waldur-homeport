@@ -9746,11 +9746,6 @@ reapop@^4.2.2:
   dependencies:
     react-transition-group "4.4.5"
 
-redux-form-saga@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.npmjs.org/redux-form-saga/-/redux-form-saga-0.2.2.tgz"
-  integrity sha512-DUKpmtZu3fYSTLtbzGeNEmBa6oOlzokAMZxbdM9UD7emEP5dN6KT2orKA853urtCBea2u2dzGh64e2dm0W4/3g==
-
 redux-form@^8.3.10:
   version "8.3.10"
   resolved "https://registry.npmjs.org/redux-form/-/redux-form-8.3.10.tgz"
