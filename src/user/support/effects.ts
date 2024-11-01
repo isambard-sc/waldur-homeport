@@ -21,7 +21,7 @@ const USERS_TABLE = 'userList';
 
 export function* handleUpdateUser(action) {
   const successMessage = translate('User has been updated');
-  const errorMessage = translate('User could not been updated');
+  const errorMessage = translate('User could not be updated');
 
   try {
     const { uuid, ...values } = action.payload;
