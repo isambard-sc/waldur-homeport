@@ -5,14 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import {
-  getCategory,
-  getPlugins,
-  getCategories,
-  getPublicOffering,
-} from '@waldur/marketplace/common/api';
-import * as actions from '@waldur/marketplace/offerings/store/actions';
-import { filterPluginsData } from '@waldur/marketplace/offerings/store/utils';
+import { getCategory, getPublicOffering } from '@waldur/marketplace/common/api';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/utils';
@@ -146,35 +139,10 @@ export const OfferingPublicUIView = () => {
   const { isLoading, error, data, refetch, isRefetching } = useQuery(
     [PUBLIC_OFFERING_DATA_QUERY_KEY, uuid, user?.uuid],
     async () => {
-      if (user) {
-        const offering = await getPublicOffering(uuid);
-        const category = await getCategory(offering.category_uuid);
-        const categories = await getCategories();
-        const pluginsData = await getPlugins();
-        const plugins = filterPluginsData(pluginsData);
-        dispatch(
-          actions.loadDataSuccess({
-            offering,
-            categories,
-            plugins,
-          }),
-        );
-        return { offering, category };
-      } else {
-        const offering = await getPublicOffering(uuid, ANONYMOUS_CONFIG);
-        const category = await getCategory(
-          offering.category_uuid,
-          ANONYMOUS_CONFIG,
-        );
-        const categories = await getCategories(ANONYMOUS_CONFIG);
-        dispatch(
-          actions.loadDataSuccess({
-            offering,
-            categories,
-          }),
-        );
-        return { offering, category };
-      }
+      const options = user ? undefined : ANONYMOUS_CONFIG;
+      const offering = await getPublicOffering(uuid, options);
+      const category = await getCategory(offering.category_uuid, options);
+      return { offering, category };
     },
     { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
   );

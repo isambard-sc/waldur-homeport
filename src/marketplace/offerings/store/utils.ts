@@ -62,9 +62,3 @@ export const formatSchedules = (schedules: any[]) =>
   schedules
     .filter((item) => Object.keys(item).length > 0)
     .map(pick(['start', 'end', 'title', 'allDay', 'extendedProps', 'id']));
-
-export const filterPluginsData = (pluginsData) =>
-  pluginsData.reduce(
-    (result, plugin) => ({ ...result, [plugin.offering_type]: plugin }),
-    {},
-  );

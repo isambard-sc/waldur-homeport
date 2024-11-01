@@ -1,6 +1,3 @@
-export const LOAD_DATA_SUCCESS =
-  'waldur/marketplace/offering/LOAD_DATA_SUCCESS';
-
 export const DRAFT = 'Draft';
 
 export const ACTIVE = 'Active';

@@ -1,12 +1,5 @@
 import * as constants from './constants';
 
-export const loadDataSuccess = (data) => ({
-  type: constants.LOAD_DATA_SUCCESS,
-  payload: {
-    ...data,
-  },
-});
-
 export const googleCalendarSync = (uuid: string) => ({
   type: constants.GOOGLE_CALENDAR_SYNC,
   payload: {
