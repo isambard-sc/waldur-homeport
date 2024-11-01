@@ -1,18 +1,16 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { getCustomer } from '@waldur/workspace/selectors';
 
 const ProviderProjectResourcesDialog = lazyComponent(
   () => import('./ProviderProjectResourcesDialog'),
   'ProviderProjectResourcesDialog',
 );
 
-export const ResourcesColumn = ({ row }) => {
+export const ResourcesColumn = ({ row, provider_uuid }) => {
   const dispatch = useDispatch();
-  const customer = useSelector(getCustomer);
 
   return (
     <button
@@ -22,7 +20,7 @@ export const ResourcesColumn = ({ row }) => {
           openModalDialog(ProviderProjectResourcesDialog, {
             resolve: {
               project_uuid: row.uuid,
-              provider_uuid: customer,
+              provider_uuid,
             },
             size: 'lg',
           }),
