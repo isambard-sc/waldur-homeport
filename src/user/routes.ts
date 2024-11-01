@@ -8,9 +8,12 @@ import { hasSupport } from '@waldur/issues/hooks';
 import { getConfig } from '@waldur/store/config';
 import { WorkspaceType } from '@waldur/workspace/types';
 
-import { PersonalManageContainer } from './PersonalManageContainer';
 import { UsersService } from './UsersService';
 
+const PersonalManageContainer = lazyComponent(
+  () => import('./PersonalManageContainer'),
+  'PersonalManageContainer',
+);
 const FreeIpaAccount = lazyComponent(
   () => import('@waldur/freeipa/FreeIPAAccount'),
   'FreeIpaAccount',

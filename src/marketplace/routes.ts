@@ -6,12 +6,15 @@ import { fetchCustomer } from '@waldur/customer/workspace/CustomerWorkspace';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
-import { OrganizationUIView } from '@waldur/organization/OrganizationUIView';
 import { isOwnerOrStaff } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
 import { fetchProvider, loadContext } from './resolve';
 
+const OrganizationUIView = lazyComponent(
+  () => import('@waldur/organization/OrganizationUIView'),
+  'OrganizationUIView',
+);
 const AdminOfferingsList = lazyComponent(
   () => import('@waldur/marketplace/offerings/admin/AdminOfferingsList'),
   'AdminOfferingsList',

@@ -6,10 +6,16 @@ import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
 import { WorkspaceType } from '@waldur/workspace/types';
 
-import { ProjectContainer } from './ProjectContainer';
-import { ProjectManageContainer } from './ProjectManageContainer';
 import { loadProject } from './resolve';
 
+const ProjectContainer = lazyComponent(
+  () => import('./ProjectContainer'),
+  'ProjectContainer',
+);
+const ProjectManageContainer = lazyComponent(
+  () => import('./ProjectManageContainer'),
+  'ProjectManageContainer',
+);
 const ProjectDashboard = lazyComponent(
   () => import('./ProjectDashboard'),
   'ProjectDashboard',

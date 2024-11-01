@@ -5,8 +5,12 @@ import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures, SupportFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
-import { UserManageContainer } from '@waldur/user/UserManageContainer';
 import { isStaff, isStaffOrSupport } from '@waldur/workspace/selectors';
+
+const UserManageContainer = lazyComponent(
+  () => import('@waldur/user/UserManageContainer'),
+  'UserManageContainer',
+);
 
 const AdministrationDashboard = lazyComponent(
   () => import('./dashboard/AdministrationDashboard'),

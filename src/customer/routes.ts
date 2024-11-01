@@ -7,15 +7,21 @@ import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
-import { OrganizationUIView } from '@waldur/organization/OrganizationUIView';
 import { getConfig } from '@waldur/store/config';
 import { RootState } from '@waldur/store/reducers';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
-import { CustomerManageContainer } from './details/CustomerManageContainer';
 import { fetchCustomer } from './workspace/CustomerWorkspace';
 
+const OrganizationUIView = lazyComponent(
+  () => import('@waldur/organization/OrganizationUIView'),
+  'OrganizationUIView',
+);
+const CustomerManageContainer = lazyComponent(
+  () => import('./details/CustomerManageContainer'),
+  'CustomerManageContainer',
+);
 const ProjectsList = lazyComponent(
   () => import('@waldur/project/ProjectsList'),
   'ProjectsList',

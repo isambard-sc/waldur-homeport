@@ -6,7 +6,11 @@ import { fetchCustomer } from '@waldur/customer/workspace/CustomerWorkspace';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
-import { OrganizationUIView } from '@waldur/organization/OrganizationUIView';
+
+const OrganizationUIView = lazyComponent(
+  () => import('@waldur/organization/OrganizationUIView'),
+  'OrganizationUIView',
+);
 
 const CallManagementDashboard = lazyComponent(
   () => import('./call-management/CallManagementDashboard'),
