@@ -52,9 +52,10 @@ Run linters:
         - .eslintrc.cjs
         - .eslintignore
   script:
-    - yarn format:check
-    - yarn lint:check
     - yarn oxlint
+    - yarn format:check
+    - yarn tsc -b
+    - yarn lint:check
     - yarn style:check
     - yarn deps:unused
     - yarn deps:circular
