@@ -13,14 +13,20 @@ const MoveProjectDialog = lazyComponent(
   'MoveProjectDialog',
 );
 
-export const MoveProjectAction = ({ project }: { project: Project }) => {
+export const MoveProjectAction = ({
+  project,
+  refetch,
+}: {
+  project: Project;
+  refetch;
+}) => {
   const dispatch = useDispatch();
   const isStaff = useSelector(isStaffSelector);
 
   const callback = () => {
     dispatch(
       openModalDialog(MoveProjectDialog, {
-        resolve: { project },
+        resolve: { project, refetch },
       }),
     );
   };

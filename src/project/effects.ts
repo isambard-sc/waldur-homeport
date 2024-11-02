@@ -7,19 +7,14 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { PROJECTS_LIST } from '@waldur/project/constants';
 import { router } from '@waldur/router';
 import { showSuccess, showError } from '@waldur/store/notify';
-import { deleteEntity, fetchListStart } from '@waldur/table/actions';
+import { fetchListStart } from '@waldur/table/actions';
 import {
   refreshCurrentCustomer,
   setCurrentProject,
 } from '@waldur/workspace/actions';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
-import {
-  createProject,
-  updateProject,
-  DELETE_PROJECT,
-  moveProject,
-} from './actions';
+import { createProject, updateProject, moveProject } from './actions';
 import * as api from './api';
 
 function* handleCreateProject(action) {
@@ -131,40 +126,8 @@ function* handleMoveProject(action) {
   }
 }
 
-function* handleProjectDelete(action) {
-  const successMessage = translate(
-    'Project {project} from {organization} was successfully removed',
-    {
-      project: action.payload.project.name,
-      organization: action.payload.project.customer_name,
-    },
-  );
-  const errorMessage = translate('An error occurred on project removal.');
-
-  const projectId = action.payload.project.uuid;
-
-  try {
-    const currentProject = yield select(getProject);
-    const isCurrentProject = projectId === currentProject.uuid;
-
-    yield call(api.deleteProject, projectId);
-    yield put(deleteEntity(PROJECTS_LIST, projectId));
-    yield put(showSuccess(successMessage));
-    yield put(fetchListStart(PROJECTS_LIST));
-    // Refresh the current customer to update ui for other modules
-    yield put(refreshCurrentCustomer());
-    if (isCurrentProject) {
-      yield call(router.stateService.go, 'projects');
-      yield put(setCurrentProject(undefined));
-    }
-  } catch (error) {
-    yield put(showError(`${errorMessage} ${format(error)}`));
-  }
-}
-
 export default function* projectSaga() {
   yield takeEvery(createProject.REQUEST, handleCreateProject);
   yield takeEvery(updateProject.REQUEST, handleUpdateProject);
   yield takeEvery(moveProject.REQUEST, handleMoveProject);
-  yield takeEvery(DELETE_PROJECT, handleProjectDelete);
 }

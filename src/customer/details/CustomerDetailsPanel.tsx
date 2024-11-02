@@ -21,7 +21,7 @@ import { FieldEditButton } from './FieldEditButton';
 import { CustomerEditPanelProps } from './types';
 
 export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
-  const nativeNameVisible = useSelector(getNativeNameVisible);
+  const nativeNameVisible = getNativeNameVisible();
   const user = useSelector(getUser);
 
   const dispatch = useDispatch();
