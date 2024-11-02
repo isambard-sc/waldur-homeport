@@ -1,3 +1,4 @@
+import { Warning } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Accordion } from 'react-bootstrap';
 
@@ -9,7 +10,9 @@ export const BackupScheduleWarning: FunctionComponent = () => (
   <Accordion id="backup-schedule-message">
     <Accordion.Item eventKey="0">
       <Accordion.Header>
-        <i className="fa fa-warning" />{' '}
+        <span className="svg-icon svg-icon-2">
+          <Warning />
+        </span>{' '}
         {translate('VM snapshot schedule caveats')}
       </Accordion.Header>
       <Accordion.Body>

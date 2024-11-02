@@ -1,7 +1,7 @@
-import { Component } from 'react';
+import { useRef, useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import Dropzone, { DropzoneRef } from 'react-dropzone';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
@@ -9,6 +9,8 @@ import { issueAttachmentsPut } from '@waldur/issues/attachments/actions';
 import { LoadingOverlay } from '@waldur/issues/comments/LoadingOverlay';
 import { IssueReload } from '@waldur/issues/IssueReload';
 import { RootState } from '@waldur/store/reducers';
+
+import { Issue } from '../list/types';
 
 import * as actions from './actions';
 import * as constants from './constants';
@@ -19,106 +21,68 @@ import {
   getIsLoading,
   getCommentsGetErred,
 } from './selectors';
-import { Comment, Issue } from './types';
+import { Comment } from './types';
 
-interface PureIssueCommentsContainerProps {
-  comments: Comment[];
+interface IssueCommentsContainerProps {
   issue: Issue;
-  loading: boolean;
-  erred: boolean;
-  fetchComments(): void;
-  putAttachments(files: File[]): void;
-  setIssue(issue: Issue): void;
-  renderHeader: boolean;
 }
 
-export class PureIssueCommentsContainer extends Component<PureIssueCommentsContainerProps> {
-  static defaultProps = {
-    renderHeader: true,
+export const IssueCommentsContainer = ({
+  issue,
+}: IssueCommentsContainerProps) => {
+  const dispatch = useDispatch();
+  const dropzoneRef = useRef<DropzoneRef>(null);
+
+  const comments = useSelector<RootState, Comment[]>(getCommentsSelector);
+  const loading = useSelector<RootState, boolean>(getIsLoading);
+  const erred = useSelector<RootState, boolean>(getCommentsGetErred);
+
+  useEffect(() => {
+    dispatch(actions.issueCommentsGet(issue.url));
+    dispatch(actions.issueCommentsIssueSet(issue));
+  }, [dispatch, issue]);
+
+  const onDrop = (files: File[]) => {
+    dispatch(issueAttachmentsPut(issue.url, files));
   };
 
-  dropzoneNode: DropzoneRef;
-
-  componentDidMount() {
-    const { fetchComments, setIssue, issue } = this.props;
-
-    fetchComments();
-    setIssue(issue);
-  }
-
-  onDrop = (files) => {
-    this.props.putAttachments(files);
-  };
-
-  openDownloadModal = () => this.dropzoneNode.open();
-
-  render() {
-    const { comments, loading, issue, erred } = this.props;
-    const body = loading ? (
-      <LoadingSpinner />
-    ) : (
-      <>
-        <IssueCommentsFormMainContainer
-          formId={constants.MAIN_FORM_ID}
-          erred={erred}
-        />
-        <IssueCommentsList comments={comments} />
-      </>
-    );
-
-    return (
-      <Dropzone
-        noClick
-        onDrop={this.onDrop}
-        ref={(node) => (this.dropzoneNode = node)}
-      >
-        {({ getRootProps, getInputProps, isDragActive }) => (
-          <div
-            {...getRootProps({ className: 'dropzone' })}
-            style={{ position: 'relative' }}
-          >
-            {isDragActive && (
-              <LoadingOverlay
-                className="loading-overlay_border_dashed"
-                message={translate('Drop files to attach them to the issue.')}
-              />
-            )}
-            <input {...getInputProps()} />
-            {this.props.renderHeader ? (
-              <Card>
-                <div className="card-header content-between-center">
-                  <h4>{translate('Comments')}</h4>
-                  <div>
-                    <IssueReload issueUrl={issue.url} />
-                  </div>
-                </div>
-                <Card.Body>{body}</Card.Body>
-              </Card>
-            ) : (
-              body
-            )}
-          </div>
-        )}
-      </Dropzone>
-    );
-  }
-}
-
-const mapStateToProps = (state: RootState) => ({
-  comments: getCommentsSelector(state),
-  loading: getIsLoading(state),
-  erred: getCommentsGetErred(state),
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  putAttachments: (files: File[]): void =>
-    dispatch(issueAttachmentsPut(ownProps.issue.url, files)),
-  fetchComments: (): void =>
-    dispatch(actions.issueCommentsGet(ownProps.issue.url)),
-  setIssue: (issue: Issue): void =>
-    dispatch(actions.issueCommentsIssueSet(issue)),
-});
-
-const enhance = connect(mapStateToProps, mapDispatchToProps);
-
-export const IssueCommentsContainer = enhance(PureIssueCommentsContainer);
+  return (
+    <Dropzone noClick onDrop={onDrop} ref={dropzoneRef}>
+      {({ getRootProps, getInputProps, isDragActive }) => (
+        <div
+          {...getRootProps({ className: 'dropzone' })}
+          style={{ position: 'relative' }}
+        >
+          {isDragActive && (
+            <LoadingOverlay
+              className="loading-overlay_border_dashed"
+              message={translate('Drop files to attach them to the issue.')}
+            />
+          )}
+          <input {...getInputProps()} />
+          <Card>
+            <div className="card-header content-between-center">
+              <h4>{translate('Comments')}</h4>
+              <div>
+                <IssueReload issueUrl={issue.url} />
+              </div>
+            </div>
+            <Card.Body>
+              {loading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <IssueCommentsFormMainContainer
+                    formId={constants.MAIN_FORM_ID}
+                    erred={erred}
+                  />
+                  <IssueCommentsList comments={comments} />
+                </>
+              )}
+            </Card.Body>
+          </Card>
+        </div>
+      )}
+    </Dropzone>
+  );
+};

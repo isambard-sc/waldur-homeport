@@ -1,3 +1,4 @@
+import { ArrowsClockwise } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
@@ -60,7 +61,11 @@ export const AdminCategoriesPage: FunctionComponent = () => {
           render: ({ row }) => {
             if (row.group) {
               if (loadingGroups) {
-                return <i className="fa fa-refresh fa-spin fs-4 me-2" />;
+                return (
+                  <span className="svg-icon svg-icon-4 fa-spin me-2">
+                    <ArrowsClockwise />
+                  </span>
+                );
               } else if (errorGroups) {
                 return (
                   <>
@@ -73,7 +78,9 @@ export const AdminCategoriesPage: FunctionComponent = () => {
                       className="btn-icon ms-1"
                       onClick={() => refetch()}
                     >
-                      <i className="fa fa-refresh fs-4 me-2" />
+                      <span className="svg-icon svg-icon-4 me-2">
+                        <ArrowsClockwise />
+                      </span>
                     </Button>
                   </>
                 );

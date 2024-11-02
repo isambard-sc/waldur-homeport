@@ -1028,7 +1028,7 @@
     "message": "Are you sure you want to remove the {name} resource request?"
   },
   "Are you sure you want to remove this column: {title}?": {
-    "description": "marketplace/category/admin/ColumnsList.tsx",
+    "description": "marketplace/category/admin/ColumnRow.tsx",
     "message": "Are you sure you want to remove this column: {title}?"
   },
   "Are you sure you want to remove {userName}?": {
@@ -1190,6 +1190,10 @@
   "Attach": {
     "description": "openstack/openstack-volume/actions/AttachAction.tsx",
     "message": "Attach"
+  },
+  "Attached instance": {
+    "description": "marketplace/category/admin/ColumnRow.tsx",
+    "message": "Attached instance"
   },
   "Attached to": {
     "description": "openstack/openstack-instance/OpenStackInstanceVolumeBadge.tsx, openstack/openstack-volume/InstanceVolumesList.tsx, openstack/openstack-volume/OpenStackVolumeSummary.tsx, openstack/openstack-volume/TenantVolumesList.tsx",
@@ -1944,7 +1948,7 @@
     "message": "Collation"
   },
   "Column has been removed successfully.": {
-    "description": "marketplace/category/admin/ColumnsList.tsx",
+    "description": "marketplace/category/admin/ColumnRow.tsx",
     "message": "Column has been removed successfully."
   },
   "Comma-separated list of columns for users table.": {
@@ -2088,7 +2092,7 @@
     "message": "Confirmation notification template"
   },
   "Confirmation": {
-    "description": "administration/TokenDeleteButton.tsx, administration/organizations/OrganizationGroupDeleteButton.tsx, administration/roles/RoleDeleteButton.tsx, broadcasts/BroadcastTemplateDeleteButton.tsx, customer/cost-policies/CostPolicyDeleteButton.tsx, customer/details/AccessSubnetDeleteButton.tsx, customer/details/CustomerCallManagerPanel.tsx, customer/details/CustomerDetailsPanel.tsx, customer/payment-profiles/PaymentProfileDeleteButton.tsx, customer/payments/DeletePaymentButton.tsx, customer/team/DeleteProjectUserButton.tsx, customer/team/UserRemoveButton.tsx, invitations/GroupInvitationCancelButton.tsx, invoices/details/InvoiceItemDelete.tsx, marketplace/category/admin/CategoryDeleteAction.tsx, marketplace/category/admin/ColumnsList.tsx, marketplace/category/admin/GroupDeleteButton.tsx, marketplace/details/CustomerField.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/details/policies/PolicyDeleteButton.tsx, marketplace/offerings/images/DeleteImageButton.tsx, marketplace/offerings/update/components/DeleteComponentButton.tsx, marketplace/offerings/update/endpoints/DeleteEndpointButton.tsx, marketplace/offerings/update/options/DeleteOptionButton.tsx, marketplace/offerings/update/plans/ArchivePlanButton.tsx, marketplace/offerings/update/roles/DeleteRoleButton.tsx, marketplace/orders/actions/OrderUnlinkButton.tsx, marketplace/resources/lexis/LexisLinkDeleteButton.tsx, marketplace/resources/resource-pending/OrderErredView.tsx, marketplace/resources/users/DeleteUserButton.tsx, marketplace/service-providers/OfferingPermissionRemoveButton.tsx, marketplace/service-providers/RestrictOfferingUser.tsx, openstack/openstack-tenant/DeleteMigrationAction.tsx, project/team/UserRemoveButton.tsx, proposals/details/CallOfferingDeleteButton.tsx, proposals/proposal/ProposalRowActions.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/team/UserRemoveButton.tsx, proposals/update/CallActions.tsx, rancher/cluster/create/FormNodesStep.tsx, resource/actions/AsyncActionItem.tsx, resource/actions/ResourceDeleteButton.tsx, user/support/UserTermination.tsx",
+    "description": "administration/TokenDeleteButton.tsx, administration/organizations/OrganizationGroupDeleteButton.tsx, administration/roles/RoleDeleteButton.tsx, broadcasts/BroadcastTemplateDeleteButton.tsx, customer/cost-policies/CostPolicyDeleteButton.tsx, customer/details/AccessSubnetDeleteButton.tsx, customer/details/CustomerCallManagerPanel.tsx, customer/details/CustomerDetailsPanel.tsx, customer/payment-profiles/PaymentProfileDeleteButton.tsx, customer/payments/DeletePaymentButton.tsx, customer/team/DeleteProjectUserButton.tsx, customer/team/UserRemoveButton.tsx, invitations/GroupInvitationCancelButton.tsx, invoices/details/InvoiceItemDelete.tsx, marketplace/category/admin/CategoryDeleteAction.tsx, marketplace/category/admin/ColumnRow.tsx, marketplace/category/admin/GroupDeleteButton.tsx, marketplace/details/CustomerField.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/details/policies/PolicyDeleteButton.tsx, marketplace/offerings/images/DeleteImageButton.tsx, marketplace/offerings/update/components/DeleteComponentButton.tsx, marketplace/offerings/update/endpoints/DeleteEndpointButton.tsx, marketplace/offerings/update/options/DeleteOptionButton.tsx, marketplace/offerings/update/plans/ArchivePlanButton.tsx, marketplace/offerings/update/roles/DeleteRoleButton.tsx, marketplace/orders/actions/OrderUnlinkButton.tsx, marketplace/resources/lexis/LexisLinkDeleteButton.tsx, marketplace/resources/resource-pending/OrderErredView.tsx, marketplace/resources/users/DeleteUserButton.tsx, marketplace/service-providers/OfferingPermissionRemoveButton.tsx, marketplace/service-providers/RestrictOfferingUser.tsx, openstack/openstack-tenant/DeleteMigrationAction.tsx, project/team/UserRemoveButton.tsx, proposals/details/CallOfferingDeleteButton.tsx, proposals/proposal/ProposalRowActions.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/team/UserRemoveButton.tsx, proposals/update/CallActions.tsx, rancher/cluster/create/FormNodesStep.tsx, resource/actions/AsyncActionItem.tsx, resource/actions/ResourceDeleteButton.tsx, user/support/UserTermination.tsx",
     "message": "Confirmation"
   },
   "Confirming that data is correct": {
@@ -3147,9 +3151,9 @@
     "description": "issues/attachments/IssueAttachmentsContainer.tsx, issues/comments/IssueCommentsContainer.tsx",
     "message": "Drop files to attach them to the issue."
   },
-  "Drop files to attach, or": {
+  "Drop files to attach, or <button>browse</button>.": {
     "description": "issues/attachments/IssueAttachmentsContainer.tsx",
-    "message": "Drop files to attach, or"
+    "message": "Drop files to attach, or <button>browse</button>."
   },
   "Dry run offering script": {
     "description": "administration/roles/PermissionOptions.tsx",
@@ -3910,6 +3914,10 @@
   "Files": {
     "description": "issues/attachments/utils.ts",
     "message": "Files"
+  },
+  "Filesize": {
+    "description": "marketplace/category/admin/ColumnRow.tsx",
+    "message": "Filesize"
   },
   "Filter by organization/project": {
     "description": "marketplace/landing/MarketplaceLandingFilter.tsx",
@@ -11968,7 +11976,7 @@
     "message": "Unable to remove category."
   },
   "Unable to remove column.": {
-    "description": "marketplace/category/admin/ColumnsList.tsx",
+    "description": "marketplace/category/admin/ColumnRow.tsx",
     "message": "Unable to remove column."
   },
   "Unable to remove component.": {
@@ -13542,10 +13550,6 @@
   "broadcasts": {
     "description": "broadcasts/BroadcastList.tsx",
     "message": "broadcasts"
-  },
-  "browse": {
-    "description": "issues/attachments/IssueAttachmentsContainer.tsx",
-    "message": "browse"
   },
   "campaigns": {
     "description": "marketplace/service-providers/ProviderCampaignsList.tsx",

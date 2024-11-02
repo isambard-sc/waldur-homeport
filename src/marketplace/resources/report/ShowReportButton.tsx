@@ -1,3 +1,4 @@
+import { BookOpen } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -31,8 +32,9 @@ export const ShowReportButton: React.FC<ShowReportButtonProps> = ({
   }
   return (
     <button className="btn btn-info pull-right btn-sm ms-2" onClick={callback}>
-      <i className="fa fa-book" />
-      &nbsp;
+      <span className="svg-icon svg-icon-2">
+        <BookOpen />
+      </span>{' '}
       {translate('Show report')}
     </button>
   );

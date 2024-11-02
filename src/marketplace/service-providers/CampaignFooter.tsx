@@ -1,3 +1,4 @@
+import { PaperPlaneTilt } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -89,7 +90,10 @@ export const CampaignFooter = ({
               className="ms-3"
               onClick={handleSubmit(saveAndSend)}
             >
-              <i className="fa fa-send" /> {translate('Create a campaign')}
+              <span className="svg-icon svg-icon-2">
+                <PaperPlaneTilt />
+              </span>{' '}
+              {translate('Create a campaign')}
             </Button>
           ) : (
             <Button
@@ -97,7 +101,10 @@ export const CampaignFooter = ({
               className="ms-3"
               onClick={handleSubmit(saveAndUpdate)}
             >
-              <i className="fa fa-send" /> {translate('Update a campaign')}
+              <span className="svg-icon svg-icon-2">
+                <PaperPlaneTilt />
+              </span>{' '}
+              {translate('Update a campaign')}
             </Button>
           )}
         </>

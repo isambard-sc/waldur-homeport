@@ -12,7 +12,6 @@ interface ParentProps {
   asyncState: AsyncState<{ columns: any[] }>;
   submitRequest: (formData: FormData) => Promise<void>;
   category: Category;
-  dispatch: any;
 }
 
 interface FormData {
@@ -28,7 +27,6 @@ const CategoryColumnsFormComponent: FC<Props> = ({
   asyncState,
   category,
   submitRequest,
-  dispatch,
 }) => {
   if (asyncState.loading) {
     return <p>{translate('Loading...')}</p>;
@@ -54,7 +52,7 @@ const CategoryColumnsFormComponent: FC<Props> = ({
             name="columns"
             component={ColumnsList}
             CategoryColumns={asyncState.value.columns}
-            dispatch={dispatch}
+            category={category}
           />
         ) : null}
       </AsyncActionDialog>

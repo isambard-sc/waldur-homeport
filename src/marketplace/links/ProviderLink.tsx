@@ -1,34 +1,33 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import { FC, PropsWithChildren } from 'react';
+import { useSelector } from 'react-redux';
 
 import { Link } from '@waldur/core/Link';
-import { RootState } from '@waldur/store/reducers';
 import { getWorkspace } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
 interface ProviderLinkProps {
-  workspace: WorkspaceType;
   customer_uuid: string;
   className?: string;
-  children?: React.ReactNode;
 }
 
-const PureProviderLink: React.FC<ProviderLinkProps> = (props) => (
-  <Link
-    state={
-      props.workspace === WorkspaceType.ORGANIZATION
-        ? 'marketplace-provider-details-customer'
-        : 'marketplace-provider-details'
-    }
-    params={{ customer_uuid: props.customer_uuid }}
-    className={props.className}
-  >
-    {props.children}
-  </Link>
-);
+export const ProviderLink: FC<PropsWithChildren<ProviderLinkProps>> = ({
+  customer_uuid,
+  className,
+  children,
+}) => {
+  const workspace = useSelector(getWorkspace);
 
-const mapStateToProps = (state: RootState) => ({
-  workspace: getWorkspace(state),
-});
-
-export const ProviderLink = connect(mapStateToProps)(PureProviderLink);
+  return (
+    <Link
+      state={
+        workspace === WorkspaceType.ORGANIZATION
+          ? 'marketplace-provider-details-customer'
+          : 'marketplace-provider-details'
+      }
+      params={{ customer_uuid }}
+      className={className}
+    >
+      {children}
+    </Link>
+  );
+};

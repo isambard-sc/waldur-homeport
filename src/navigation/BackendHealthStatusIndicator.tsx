@@ -1,6 +1,7 @@
+import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import Axios from 'axios';
-import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
+import { FC } from 'react';
+import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 
 import { ENV } from '@waldur/configs/default';
@@ -13,59 +14,44 @@ const BackendHealthStatusDialog = lazyComponent(
 );
 
 export const getBackendHealthStatus = async () => {
-  let response;
   try {
-    response = await Axios.get(`${ENV.apiEndpoint}health-check/`, {
+    const response = await Axios.get(`${ENV.apiEndpoint}health-check/`, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
+    return response.data;
   } catch (error) {
     return error.response.data;
   }
-  return response.data;
 };
 
-export const isWorking = (data): boolean => {
+export const isWorking = (data: Record<string, string>): boolean => {
   if (!data) return false;
-  for (const item of Object.values(data)) {
-    if (item !== 'working') {
-      return false;
-    }
-  }
-  return true;
+  return Object.values(data).every((item) => item === 'working');
 };
 
-const openBackendHealthStatusDialog = () =>
-  openModalDialog(BackendHealthStatusDialog, { size: 'lg' });
-
-export const PureBackendHealthStatusIndicator: FunctionComponent<any> = (
-  props,
-) => {
+export const BackendHealthStatusIndicator: FC = () => {
+  const dispatch = useDispatch();
   const { value } = useAsync(getBackendHealthStatus, []);
-  return value ? (
+
+  if (!value) return null;
+
+  return (
     <span className="me-2">
       <button
         type="button"
         className="text-btn"
-        onClick={() => props.openDialog()}
+        onClick={() =>
+          dispatch(openModalDialog(BackendHealthStatusDialog, { size: 'lg' }))
+        }
       >
         {isWorking(value) ? (
-          <i className="fa fa-check-circle text-success" />
+          <CheckCircle size={20} className="text-success" />
         ) : (
-          <i className="fa fa-times-circle text-danger" />
+          <XCircle size={20} className="text-danger" />
         )}
       </button>
     </span>
-  ) : null;
+  );
 };
-
-const mapDispatchToProps = (dispatch) => ({
-  openDialog: () => dispatch(openBackendHealthStatusDialog()),
-});
-
-const enhance = connect(null, mapDispatchToProps);
-
-export const BackendHealthStatusIndicator = enhance(
-  PureBackendHealthStatusIndicator,
-);
