@@ -16,7 +16,7 @@ export const LimitlessComponentsTable = ({
     MarketplaceFeatures.conceal_prices,
   );
   return (
-    <table className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+    <table className="table align-middle table-row-dashed fs-6 gy-5 no-footer">
       <thead>
         <tr className="text-start text-muted bg-light fw-bolder fs-7 text-uppercase gs-0">
           <th>{translate('Component name')}</th>

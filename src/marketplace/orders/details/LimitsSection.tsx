@@ -39,7 +39,7 @@ export const LimitsSection = ({
         </Card.Title>
       </Card.Header>
       <Card.Body>
-        <table className="table align-middle table-row-bordered fs-6 gy-4 dataTable no-footer">
+        <table className="table align-middle table-row-bordered fs-6 gy-4 no-footer">
           <thead>
             <tr className="text-start text-muted bg-light fw-bolder fs-7 text-uppercase gs-0">
               <th className="col-sm-1">{translate('Name')}</th>

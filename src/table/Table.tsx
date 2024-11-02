@@ -49,7 +49,7 @@ const TableComponent = (
   return (
     <table
       className={classNames(
-        'table align-middle table-row-bordered fs-6 gy-4 dataTable no-footer',
+        'table align-middle table-row-bordered fs-6 gy-4 no-footer',
         {
           'table-expandable': Boolean(props.expandableRow),
           'table-hover': props.hoverable,
@@ -154,7 +154,6 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           )}
           id={this.props.id}
         >
-          {this.props.blocked && <div className="table-block" />}
           {this.props.hasActionBar && (
             <Card.Header className="border-2 border-bottom">
               <Row className="card-toolbar g-0 gap-4 w-100">

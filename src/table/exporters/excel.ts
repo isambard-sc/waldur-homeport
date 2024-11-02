@@ -1,4 +1,6 @@
-import FileSaver from 'file-saver';
+import JSZip from 'jszip';
+
+import { saveFile } from './saveFile';
 
 const templates = {
   '[Content_Types].xml':
@@ -138,9 +140,8 @@ function getSheet(sharedStrings: SharedStrings, rows: any[][]) {
   );
 }
 
-export default async function exportExcel(table, data) {
-  const JSZip = await import('jszip');
-  const zip = new JSZip.default();
+export default function exportExcel(table, data) {
+  const zip = new JSZip();
   for (const path in templates) {
     if (templates.hasOwnProperty(path)) {
       addToZip(zip, path, templates[path]);
@@ -158,6 +159,6 @@ export default async function exportExcel(table, data) {
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     })
     .then((blob) => {
-      FileSaver.saveAs(blob, `${table}.xlsx`);
+      saveFile(blob, `${table}.xlsx`);
     });
 }

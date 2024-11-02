@@ -7,7 +7,7 @@ import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { Offering, PlanComponent } from '@waldur/marketplace/types';
 import { ANONYMOUS_CONFIG } from '@waldur/table/api';
-import exportExcel from '@waldur/table/excel';
+import exportExcel from '@waldur/table/exporters/excel';
 
 import './ExportFullPriceList.scss';
 

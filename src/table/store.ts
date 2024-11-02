@@ -136,18 +136,6 @@ const pagination = (state = INITIAL_STATE, action): TableState => {
         },
       };
 
-    case actions.BLOCK_START:
-      return {
-        ...state,
-        blocked: true,
-      };
-
-    case actions.BLOCK_STOP:
-      return {
-        ...state,
-        blocked: false,
-      };
-
     case actions.SORT_LIST_START:
       return {
         ...state,

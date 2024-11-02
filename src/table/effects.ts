@@ -4,7 +4,6 @@ import {
   call,
   put,
   select,
-  takeEvery,
   take,
   race,
   cancelled,
@@ -15,7 +14,6 @@ import { orderByFilter } from '@waldur/core/utils';
 import { transformRows } from '@waldur/table/utils';
 
 import * as actions from './actions';
-import { exportTable } from './export';
 import { getTableOptions } from './registry';
 import { getTableState } from './store';
 import { TableRequest } from './types';
@@ -102,5 +100,4 @@ export default function* watchFetchList() {
     fetchList,
     ({ payload: { table } }) => table,
   );
-  yield takeEvery(actions.EXPORT_TABLE_AS, exportTable);
 }
