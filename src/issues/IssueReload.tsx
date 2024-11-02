@@ -1,5 +1,6 @@
+import { ArrowsClockwise } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
@@ -7,40 +8,37 @@ import { issueAttachmentsGet } from '@waldur/issues/attachments/actions';
 import { getIsLoading as getAttachmentsIsLoading } from '@waldur/issues/attachments/selectors';
 import { issueCommentsGet } from '@waldur/issues/comments/actions';
 import { getIsLoading as getCommentsIsLoading } from '@waldur/issues/comments/selectors';
-import './IssueReload.scss';
 import { RootState } from '@waldur/store/reducers';
+import './IssueReload.scss';
 
-interface PureIssueReloadProps {
+interface IssueReloadProps {
   issueUrl: string;
-  loading: boolean;
-  fetchData(): void;
 }
 
-export const PureIssueReload: FunctionComponent<PureIssueReloadProps> = (
-  props,
-) => {
-  const { fetchData, loading } = props;
+export const IssueReload: FunctionComponent<IssueReloadProps> = ({
+  issueUrl,
+}) => {
+  const dispatch = useDispatch();
+
+  // Combine loading states using useSelector
+  const loading = useSelector(
+    (state: RootState) =>
+      getAttachmentsIsLoading(state) || getCommentsIsLoading(state),
+  );
+
+  // Combine fetch actions into a single callback
+  const fetchData = () => {
+    dispatch(issueAttachmentsGet(issueUrl));
+    dispatch(issueCommentsGet(issueUrl));
+  };
 
   return (
     <Tip label={translate('Reload issue data')} id="reload_issue_tooltip">
       <span className="issue-reload" onClick={fetchData} aria-hidden="true">
-        <i className={`fa fa-refresh ${loading ? 'fa-spin' : ''}`} />
+        <span className={`svg-icon svg-icon-2 ${loading ? 'fa-spin' : ''}`}>
+          <ArrowsClockwise />
+        </span>
       </span>
     </Tip>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  loading: getAttachmentsIsLoading(state) || getCommentsIsLoading(state),
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  fetchData: (): void => {
-    dispatch(issueAttachmentsGet(ownProps.issueUrl));
-    dispatch(issueCommentsGet(ownProps.issueUrl));
-  },
-});
-
-const enhance = connect(mapStateToProps, mapDispatchToProps);
-
-export const IssueReload = enhance(PureIssueReload);

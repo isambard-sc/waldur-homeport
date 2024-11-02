@@ -1,4 +1,4 @@
-import { X } from '@phosphor-icons/react';
+import { CaretDown, X } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { isEqual } from 'lodash';
 import React, {
@@ -81,7 +81,7 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
         }
       />
       <span className="svg-icon svg-icon-3 rotate-90 ms-2 lh-base">
-        <i className="fa fa-chevron-down" />
+        <CaretDown size={20} />
       </span>
     </button>
   );

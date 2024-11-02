@@ -1,17 +1,16 @@
 import { Plus } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Button, Table } from 'react-bootstrap';
-import { FormName, FormSection, WrappedFieldArrayProps } from 'redux-form';
+import { FormSection, WrappedFieldArrayProps } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { Category } from '@waldur/marketplace/types';
-import { waitForConfirmation } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { deleteCategoryColumn } from './api';
 import { ColumnRow } from './ColumnRow';
 
-const CategoryColumnsPlaceholder: FC = (category: Category) => (
+const CategoryColumnsPlaceholder: FC<{ category: Category }> = ({
+  category,
+}) => (
   <tr>
     <td className="text-center" colSpan={5}>
       {translate('Category {category} does not contain a column yet.', {
@@ -24,6 +23,7 @@ const CategoryColumnsPlaceholder: FC = (category: Category) => (
 interface ColumnsListProps extends WrappedFieldArrayProps {
   CategoryColumns: any[];
   dispatch: any;
+  category;
 }
 
 const ColumnsHeader: FC = () => (
@@ -45,37 +45,16 @@ const ColumnAddButton = ({ fields }) => (
   </Button>
 );
 
-const handleRemove = async (fields, index, column, dispatch) => {
-  try {
-    await waitForConfirmation(
-      dispatch,
-      translate('Confirmation'),
-      translate('Are you sure you want to remove this column: {title}?', {
-        title: column.title,
-      }),
-    );
-  } catch {
-    return;
-  }
-  try {
-    await deleteCategoryColumn(column.uuid);
-    fields.remove(index);
-    dispatch(showSuccess(translate('Column has been removed successfully.')));
-  } catch (e) {
-    dispatch(showErrorResponse(e, translate('Unable to remove column.')));
-  }
-};
-
 export const ColumnsList: FC<ColumnsListProps> = ({
   fields,
   CategoryColumns,
-  dispatch,
+  category,
 }) => (
   <>
     <Table bordered>
       {fields.length === 0 && CategoryColumns.length === 0 ? (
         <tbody>
-          <CategoryColumnsPlaceholder />
+          <CategoryColumnsPlaceholder category={category} />
         </tbody>
       ) : (
         <>
@@ -83,27 +62,11 @@ export const ColumnsList: FC<ColumnsListProps> = ({
             <ColumnsHeader />
           </thead>
           <tbody>
-            <FormName>
-              {({ form }) =>
-                fields.map((column, index) => (
-                  <FormSection name={column} key={index}>
-                    <ColumnRow
-                      formName={form}
-                      column={column}
-                      onRemove={() =>
-                        handleRemove(
-                          fields,
-                          index,
-                          CategoryColumns[index],
-                          dispatch,
-                        )
-                      }
-                      CategoryColumns={CategoryColumns}
-                    />
-                  </FormSection>
-                ))
-              }
-            </FormName>
+            {fields.map((column, index) => (
+              <FormSection name={column} key={index}>
+                <ColumnRow column={column} fields={fields} index={index} />
+              </FormSection>
+            ))}
           </tbody>
         </>
       )}

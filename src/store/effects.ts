@@ -1,5 +1,4 @@
 import customerDetailsSaga from '@waldur/customer/details/store/effects';
-import organizationsSaga from '@waldur/customer/list/store/effects';
 import paymentProfilesSaga from '@waldur/customer/payment-profiles/store/effects';
 import paymentsSaga from '@waldur/customer/payments/store/effects';
 import marketplaceSaga from '@waldur/marketplace/store/effects';
@@ -16,7 +15,6 @@ export default [
   customerDetailsSaga,
   marketplaceSaga,
   paymentProfilesSaga,
-  organizationsSaga,
   paymentsSaga,
   titleEffects,
   workspaceSaga,

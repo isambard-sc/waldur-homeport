@@ -1,8 +1,6 @@
 import { Attachment } from '@waldur/issues/attachments/types';
 
-export interface Issue {
-  [key: string]: string | boolean;
-}
+import { Issue } from '../list/types';
 
 export interface Comment {
   author_name: string;

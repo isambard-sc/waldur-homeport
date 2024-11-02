@@ -1,6 +1,6 @@
 import { Eye } from '@phosphor-icons/react';
-import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
+import { FC } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -18,27 +18,23 @@ export const openOfferingDetailsDialog = (offering: any) =>
     size: 'lg',
   });
 
-interface OfferingDetailsButton {
+interface OfferingDetailsButtonProps {
   offering: string;
-  openDialog(): void;
 }
 
-const PureOfferingDetailsButton: FunctionComponent<OfferingDetailsButton> = (
-  props,
-) => (
-  <ActionButton
-    title={translate('Offering details')}
-    iconNode={<Eye />}
-    action={props.openDialog}
-    className="me-3"
-  />
-);
+export const OfferingDetailsButton: FC<OfferingDetailsButtonProps> = ({
+  offering,
+}) => {
+  const dispatch = useDispatch();
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  openDialog: () => dispatch(openOfferingDetailsDialog(ownProps.offering)),
-});
-
-export const OfferingDetailsButton = connect(
-  null,
-  mapDispatchToProps,
-)(PureOfferingDetailsButton);
+  return (
+    <ActionButton
+      title={translate('Offering details')}
+      iconNode={<Eye />}
+      action={() => {
+        dispatch(openOfferingDetailsDialog(offering));
+      }}
+      className="me-3"
+    />
+  );
+};

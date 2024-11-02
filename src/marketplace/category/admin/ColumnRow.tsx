@@ -1,33 +1,43 @@
 import { Trash } from '@phosphor-icons/react';
-import { FC } from 'react';
 import { Button } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import { Field } from 'redux-form';
 
-import { translate } from '@waldur/i18n';
+import { formatJsxTemplate, translate } from '@waldur/i18n';
+import { waitForConfirmation } from '@waldur/modal/actions';
 import { FormField } from '@waldur/openstack/openstack-security-groups/rule-editor/FormField';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-interface ColumnRowProps {
-  formName: string;
-  column: any;
-  onRemove(): void;
-  CategoryColumns: any[];
-}
+import { deleteCategoryColumn } from './api';
 
-const WidgetField = () => (
-  <Field
-    name="widget"
-    component={FormField}
-    as="select"
-    tooltip={translate('Widget field allows to customise table cell rendering')}
-  >
-    <option value="">{translate('None')}</option>
-    <option value="csv">CSV</option>
-    <option value="filesize">Filesize</option>
-    <option value="attached_instance">Attached Instance</option>
-  </Field>
-);
+export const ColumnRow = ({ column, fields, index }) => {
+  const dispatch = useDispatch();
+  const onRemove = async () => {
+    try {
+      await waitForConfirmation(
+        dispatch,
+        translate('Confirmation'),
+        translate(
+          'Are you sure you want to remove this column: {title}?',
+          {
+            title: <strong>{column.title}</strong>,
+          },
+          formatJsxTemplate,
+        ),
+        true,
+      );
+    } catch {
+      return;
+    }
+    try {
+      await deleteCategoryColumn(column.uuid);
+      fields.remove(index);
+      dispatch(showSuccess(translate('Column has been removed successfully.')));
+    } catch (e) {
+      dispatch(showErrorResponse(e, translate('Unable to remove column.')));
+    }
+  };
 
-export const ColumnRow: FC<ColumnRowProps> = ({ onRemove }) => {
   return (
     <tr>
       <Field
@@ -40,7 +50,23 @@ export const ColumnRow: FC<ColumnRowProps> = ({ onRemove }) => {
         component={FormField}
         tooltip={translate('Resource attribute is rendered as table cell')}
       />
-      <td>{WidgetField()}</td>
+      <td>
+        <Field
+          name="widget"
+          component={FormField}
+          as="select"
+          tooltip={translate(
+            'Widget field allows to customise table cell rendering',
+          )}
+        >
+          <option value="">{translate('None')}</option>
+          <option value="csv">CSV</option>
+          <option value="filesize">{translate('Filesize')}</option>
+          <option value="attached_instance">
+            {translate('Attached instance')}
+          </option>
+        </Field>
+      </td>
       <Field
         name="index"
         component={FormField}

@@ -1,5 +1,7 @@
+import { Issue } from '../list/types';
+
 import * as constants from './constants';
-import { Issue, Comment } from './types';
+import { Comment } from './types';
 
 export const issueCommentsGet = (issueUrl: string) => ({
   type: constants.ISSUE_COMMENTS_GET,
