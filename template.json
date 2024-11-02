@@ -2160,7 +2160,7 @@
     "message": "Control plane"
   },
   "Copy to clipboard": {
-    "description": "core/CopyToClipboard.tsx, core/CopyToClipboardButton.tsx, marketplace/common/CopyToClipboard.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpRow.tsx, table/ExportDialog.tsx, table/TableButtons.tsx",
+    "description": "core/CopyToClipboard.tsx, core/CopyToClipboardButton.tsx, marketplace/common/CopyToClipboard.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpRow.tsx, table/exporters/constants.ts",
     "message": "Copy to clipboard"
   },
   "Copy": {
@@ -10476,7 +10476,7 @@
     "message": "TOTAL"
   },
   "Table has been exported to {format}.": {
-    "description": "table/export.ts",
+    "description": "table/useTableExport.ts",
     "message": "Table has been exported to {format}."
   },
   "Table mode": {
@@ -11626,6 +11626,10 @@
   "Unable to enable payment profile.": {
     "description": "customer/payment-profiles/store/effects.ts",
     "message": "Unable to enable payment profile."
+  },
+  "Unable to export table.": {
+    "description": "table/useTableExport.ts",
+    "message": "Unable to export table."
   },
   "Unable to extend disk.": {
     "description": "vmware/actions/ExtendDiskDialog.tsx",

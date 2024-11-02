@@ -2,11 +2,13 @@ import italics from '@fontsource/open-sans/files/open-sans-all-400-italic.woff';
 import normal from '@fontsource/open-sans/files/open-sans-all-400-normal.woff';
 import bolditalics from '@fontsource/open-sans/files/open-sans-all-800-italic.woff';
 import bold from '@fontsource/open-sans/files/open-sans-all-800-normal.woff';
-import FileSaver from 'file-saver';
+import pdfmake from 'pdfmake/build/pdfmake';
+
+import { saveFile } from './saveFile';
 
 function saveAsPdf(table, data) {
   const blob = new Blob([data], { type: 'application/pdf' });
-  FileSaver.saveAs(blob, `${table}.pdf`);
+  saveFile(blob, `${table}.pdf`);
 }
 
 const getAbsolutePath = (path) => new URL(path, document.baseURI).href;
@@ -20,8 +22,7 @@ const getFonts = () => ({
   },
 });
 
-export async function exportAsPdf(table, data) {
-  const pdfmake = (await import('pdfmake/build/pdfmake')).default;
+export default function exportAsPdf(table, data) {
   const header = data.fields.map((field) => ({
     text: field + '',
     style: 'tableHeader',

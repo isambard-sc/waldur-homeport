@@ -89,7 +89,6 @@ export interface TableState {
   entities?: Record<string, any>;
   order?: string[];
   loading?: boolean;
-  blocked?: boolean;
   error?: any;
   mode?: DisplayMode;
   pagination?: Pagination;
@@ -130,12 +129,6 @@ export interface TableDropdownItem {
   isMobileAction?: boolean;
 }
 
-export interface ExportConfig {
-  format: 'clipboard' | 'pdf' | 'excel' | 'csv';
-  withFilters?: boolean;
-  allPages?: boolean;
-}
-
 export type DropdownActionItemType<T = any> = React.ComponentType<{
   row?: T;
   refetch?(): void;
@@ -157,7 +150,6 @@ export interface TableProps<RowType = any> extends TableState {
   setDisplayMode?: (mode: DisplayMode) => void;
   gridItem?: React.ComponentType<{ row: RowType }>;
   gridSize?: ColProps;
-  openExportDialog?: (format: ExportConfig['format'], props?) => void;
   openFiltersDrawer?: (filters: React.ReactNode) => void;
   renderFiltersDrawer?: (filters: React.ReactNode) => void;
   dropdownActions?: TableDropdownItem[];

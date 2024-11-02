@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog, renderDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
 import { getTitle } from '@waldur/navigation/title';
 import { router } from '@waldur/router';
 import { RootState } from '@waldur/store/reducers';
@@ -16,17 +15,11 @@ import { getTableState } from './store';
 import { TableFilterActions } from './TableFilterActions';
 import {
   DisplayMode,
-  ExportConfig,
   FilterItem,
   FilterPosition,
   Sorting,
   TableOptionsType,
 } from './types';
-
-const ExportDialog = lazyComponent(
-  () => import('./ExportDialog'),
-  'ExportDialog',
-);
 
 const TableFilterContainer = lazyComponent(
   () => import('./TableFilterContainer'),
@@ -62,19 +55,6 @@ export const useTable = (options: TableOptionsType) => {
   );
   const gotoPage = useCallback(
     (page) => dispatch(actions.fetchListGotoPage(table, page)),
-    [dispatch, table],
-  );
-  const openExportDialog = useCallback(
-    (format: ExportConfig['format'], ownProps?) =>
-      dispatch(
-        openModalDialog(ExportDialog, {
-          resolve: {
-            table,
-            format,
-            ownProps,
-          },
-        }),
-      ),
     [dispatch, table],
   );
   const openFiltersDrawer = useCallback(
@@ -189,7 +169,6 @@ export const useTable = (options: TableOptionsType) => {
   return {
     fetch,
     gotoPage,
-    openExportDialog,
     openFiltersDrawer,
     renderFiltersDrawer,
     setDisplayMode,

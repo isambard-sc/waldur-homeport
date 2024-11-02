@@ -1,7 +1,5 @@
 import { Question } from '@phosphor-icons/react';
-import { useCallback } from 'react';
 import { connect } from 'react-redux';
-import { Dispatch } from 'redux';
 import { reduxForm } from 'redux-form';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -13,20 +11,15 @@ import { translate } from '@waldur/i18n';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RootState } from '@waldur/store/reducers';
 
-import { exportTableAs } from './actions';
-import { ExportConfig, TableState } from './types';
-
-const getFormatOptions = () => [
-  { value: 'clipboard', label: translate('Copy to clipboard') },
-  { value: 'csv', label: 'CSV' },
-  { value: 'pdf', label: 'PDF' },
-  { value: 'excel', label: 'Excel' },
-];
+import { EXPORT_OPTIONS } from './exporters/constants';
+import { ExportConfig, ExportFormat } from './exporters/types';
+import { TableState } from './types';
+import { useTableExport } from './useTableExport';
 
 interface ExportDialogProps {
   resolve: {
     table: string;
-    format: ExportConfig['format'];
+    format: ExportFormat;
     ownProps?: any;
   };
 }
@@ -44,13 +37,9 @@ export const ExportDialog = connect<{}, {}, ExportDialogProps>(
   reduxForm<ExportConfig, ExportDialogProps & { tableState: TableState }>({
     form: 'tableExportForm',
   })((props) => {
-    const callback = useCallback(
-      (formData: ExportConfig, dispatch: Dispatch<any>) => {
-        dispatch(
-          exportTableAs(props.resolve.table, formData, props.resolve.ownProps),
-        );
-      },
-      [props.resolve.table],
+    const callback = useTableExport(
+      props.resolve.table,
+      props.resolve.ownProps,
     );
     return (
       <form onSubmit={props.handleSubmit(callback)}>
@@ -60,11 +49,11 @@ export const ExportDialog = connect<{}, {}, ExportDialogProps>(
           footer={
             <SubmitButton
               disabled={props.invalid}
-              submitting={props.submitting || props.tableState.blocked}
+              submitting={props.submitting}
               label={
-                !props.tableState.blocked
-                  ? translate('Export')
-                  : translate('Exporting...')
+                props.submitting
+                  ? translate('Exporting...')
+                  : translate('Export')
               }
             />
           }
@@ -74,7 +63,7 @@ export const ExportDialog = connect<{}, {}, ExportDialogProps>(
               name="format"
               label={translate('Format')}
               simpleValue={true}
-              options={getFormatOptions()}
+              options={EXPORT_OPTIONS}
               required={true}
               isClearable={false}
               validate={required}

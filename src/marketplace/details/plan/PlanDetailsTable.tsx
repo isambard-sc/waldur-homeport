@@ -99,7 +99,7 @@ export const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (
     <div className={props.formGroupClassName}>
       <div className={props.columnClassName}>
         {hasExtraRows && (
-          <Table className="table align-middle table-row-bordered fs-6 gy-4 dataTable no-footer">
+          <Table className="table align-middle table-row-bordered fs-6 gy-4 no-footer">
             <thead>
               <HeaderRow
                 periods={!activeFixedPriceProfile ? props.periods : []}

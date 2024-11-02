@@ -11,12 +11,14 @@ import { useMediaQuery } from 'react-responsive';
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { translate } from '@waldur/i18n';
 
+import { EXPORT_OPTIONS } from './exporters/constants';
 import { TableColumnButton } from './TableColumnsButton';
 import { TableDisplayModeButton } from './TableDisplayModeButton';
 import { TableExportButton } from './TableExportButton';
 import { TableFilterButton } from './TableFilterButton';
 import { TableMoreActions } from './TableMoreActions';
 import { TableProps, TableDropdownItem } from './types';
+import { useExportDialog } from './useExportDialog';
 
 interface TableButtonsProps extends TableProps {
   toggleFilterMenu?(): void;
@@ -24,6 +26,8 @@ interface TableButtonsProps extends TableProps {
 }
 
 export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
+  const openExportDialog = useExportDialog();
+
   const [dropdownActions, setDropdownActions] = useState<TableDropdownItem[]>(
     [],
   );
@@ -45,35 +49,16 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
               {
                 label: translate('Export'),
                 iconNode: <Export />,
-                children: [
-                  {
-                    label: translate('Copy to clipboard'),
-                    action: () => props.openExportDialog('clipboard', props),
-                  },
-                  {
-                    label: 'CSV',
-                    action: () => props.openExportDialog('csv', props),
-                  },
-                  {
-                    label: 'PDF',
-                    action: () => props.openExportDialog('pdf', props),
-                  },
-                  {
-                    label: 'Excel',
-                    action: () => props.openExportDialog('excel', props),
-                  },
-                ],
+                children: EXPORT_OPTIONS.map(({ value, label }) => ({
+                  label: label,
+                  action: () => openExportDialog(props.table, value, props),
+                })),
               },
             ]
           : [],
       ),
     );
-  }, [
-    props.dropdownActions,
-    props.openExportDialog,
-    showExportInDropdown,
-    isSm,
-  ]);
+  }, [props.dropdownActions, showExportInDropdown, isSm]);
 
   const onClickFilterButton = useCallback(
     (event) => {

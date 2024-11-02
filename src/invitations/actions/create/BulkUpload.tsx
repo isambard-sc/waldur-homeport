@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { DropzoneFiles } from '@waldur/core/DropzoneFiles';
 import { translate } from '@waldur/i18n';
 import { showError } from '@waldur/store/notify';
-import { saveAsCsv } from '@waldur/table/export';
+import saveAsCsv from '@waldur/table/exporters/csv';
 
 import example_file from './example_file.json';
 
