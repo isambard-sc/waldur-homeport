@@ -43,7 +43,9 @@ export const OrganizationProjectsExpandable = ({ row, provider_uuid }) => {
         },
         {
           title: translate('Resources'),
-          render: ResourcesColumn,
+          render: ({ row }) => (
+            <ResourcesColumn row={row} provider_uuid={provider_uuid} />
+          ),
         },
         {
           title: translate('Estimated cost'),
