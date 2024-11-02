@@ -20,7 +20,6 @@ import { INSTANCE_TYPE, TENANT_TYPE } from '@waldur/openstack/constants';
 import { getTabs } from '@waldur/resource/tabs/registry';
 import { getResourceAccessEndpoints } from '@waldur/resource/utils';
 import { SLURM_PLUGIN } from '@waldur/slurm/constants';
-import store from '@waldur/store/store';
 
 const ResourceOrders = lazyComponent(
   () => import('@waldur/marketplace/orders/list/ResourceOrders'),
@@ -180,7 +179,7 @@ export const getResourceTabs = ({
     });
   }
 
-  const showIssues = hasSupport(store.getState());
+  const showIssues = hasSupport();
   if (showIssues) {
     tabs.push({
       key: 'tickets',
