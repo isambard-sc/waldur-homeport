@@ -31,7 +31,10 @@ export const UserAgreementsList: FunctionComponent<{}> = () => {
       rowActions={({ row }) => (
         <>
           <UserAgreementsEditButton row={row} refetch={props.fetch} />
-          <UserAgreementDeleteButton userAgreement={row} />
+          <UserAgreementDeleteButton
+            userAgreement={row}
+            refetch={props.fetch}
+          />
         </>
       )}
       expandableRow={UserAgreementsExpandableRow}

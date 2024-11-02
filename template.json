@@ -1128,7 +1128,7 @@
     "message": "Are you sure you would like to delete the key?"
   },
   "Are you sure you would like to delete the user agreement?": {
-    "description": "administration/agreements/UserAgreementDeleteDialog.tsx",
+    "description": "administration/agreements/UserAgreementDeleteButton.tsx",
     "message": "Are you sure you would like to delete the user agreement?"
   },
   "Are you sure you would like to terminate resource {resourceName} from project {projectName} ({customerName})?": {
@@ -2836,7 +2836,7 @@
     "message": "Delete robot account"
   },
   "Delete user agreement": {
-    "description": "administration/agreements/UserAgreementDeleteDialog.tsx",
+    "description": "administration/agreements/UserAgreementDeleteButton.tsx",
     "message": "Delete user agreement"
   },
   "Delete volumes": {
@@ -10304,7 +10304,7 @@
     "message": "Submit usage report"
   },
   "Submit": {
-    "description": "administration/agreements/UserAgreementDeleteDialog.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payments/PaymentCreateDialog.tsx, form/FloatingSubmitButton.tsx, form/WizardFormContainer.tsx, invitations/GroupinvitationButtons.tsx, invitations/PermissionRequestActionDialog.tsx, invitations/actions/GroupInvitationCreateDialog.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedback.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx, marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/import/WizardButtons.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx, marketplace/resources/lexis/CreateLexisLinkDialog.tsx, marketplace/resources/terminate/TerminateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx, marketplace-checklist/UserChecklist.tsx, marketplace-remote/ReviewDialog.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx, openstack/openstack-volume/actions/ExtendDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/catalog/CatalogDeleteDialog.tsx, rancher/cluster/ImportYAMLDialog.tsx, rancher/cluster/ViewYAMLDialog.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/support/EditFieldDialog.tsx",
+    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payments/PaymentCreateDialog.tsx, form/FloatingSubmitButton.tsx, form/WizardFormContainer.tsx, invitations/GroupinvitationButtons.tsx, invitations/PermissionRequestActionDialog.tsx, invitations/actions/GroupInvitationCreateDialog.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedback.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx, marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/import/WizardButtons.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx, marketplace/resources/lexis/CreateLexisLinkDialog.tsx, marketplace/resources/terminate/TerminateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx, marketplace-checklist/UserChecklist.tsx, marketplace-remote/ReviewDialog.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx, openstack/openstack-volume/actions/ExtendDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/catalog/CatalogDeleteDialog.tsx, rancher/cluster/ImportYAMLDialog.tsx, rancher/cluster/ViewYAMLDialog.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/support/EditFieldDialog.tsx",
     "message": "Submit"
   },
   "Submitted": {
@@ -11596,7 +11596,7 @@
     "message": "Unable to delete team member."
   },
   "Unable to delete the user agreement.": {
-    "description": "administration/agreements/UserAgreementDeleteDialog.tsx",
+    "description": "administration/agreements/UserAgreementDeleteButton.tsx",
     "message": "Unable to delete the user agreement."
   },
   "Unable to delete user.": {
@@ -12796,7 +12796,7 @@
     "message": "User agreement has been created"
   },
   "User agreement has been deleted.": {
-    "description": "administration/agreements/UserAgreementDeleteDialog.tsx",
+    "description": "administration/agreements/UserAgreementDeleteButton.tsx",
     "message": "User agreement has been deleted."
   },
   "User agreement was updated": {
