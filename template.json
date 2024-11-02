@@ -1112,7 +1112,7 @@
     "message": "Are you sure you would like to create a LEXIS link for the resource {resourceName}?"
   },
   "Are you sure you would like to delete Rancher catalog {catalog}?": {
-    "description": "rancher/catalog/CatalogDeleteDialog.tsx",
+    "description": "rancher/catalog/CatalogDeleteButton.tsx",
     "message": "Are you sure you would like to delete Rancher catalog {catalog}?"
   },
   "Are you sure you would like to delete project {projectName}?": {
@@ -1704,7 +1704,7 @@
     "message": "Catalog has been created."
   },
   "Catalog has been deleted.": {
-    "description": "rancher/catalog/CatalogDeleteDialog.tsx",
+    "description": "rancher/catalog/CatalogDeleteButton.tsx",
     "message": "Catalog has been deleted."
   },
   "Catalog": {
@@ -2784,7 +2784,7 @@
     "message": "Delete all selected invitations."
   },
   "Delete catalog": {
-    "description": "rancher/catalog/CatalogDeleteDialog.tsx",
+    "description": "rancher/catalog/CatalogDeleteButton.tsx",
     "message": "Delete catalog"
   },
   "Delete confirmation": {
@@ -10304,7 +10304,7 @@
     "message": "Submit usage report"
   },
   "Submit": {
-    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payments/PaymentCreateDialog.tsx, form/FloatingSubmitButton.tsx, form/WizardFormContainer.tsx, invitations/GroupinvitationButtons.tsx, invitations/PermissionRequestActionDialog.tsx, invitations/actions/GroupInvitationCreateDialog.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedback.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx, marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/import/WizardButtons.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx, marketplace/resources/lexis/CreateLexisLinkDialog.tsx, marketplace/resources/terminate/TerminateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx, marketplace-checklist/UserChecklist.tsx, marketplace-remote/ReviewDialog.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx, openstack/openstack-volume/actions/ExtendDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/catalog/CatalogDeleteDialog.tsx, rancher/cluster/ImportYAMLDialog.tsx, rancher/cluster/ViewYAMLDialog.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/support/EditFieldDialog.tsx",
+    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payments/PaymentCreateDialog.tsx, form/FloatingSubmitButton.tsx, form/WizardFormContainer.tsx, invitations/GroupinvitationButtons.tsx, invitations/PermissionRequestActionDialog.tsx, invitations/actions/GroupInvitationCreateDialog.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedback.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx, marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/import/WizardButtons.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx, marketplace/resources/lexis/CreateLexisLinkDialog.tsx, marketplace/resources/terminate/TerminateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx, marketplace-checklist/UserChecklist.tsx, marketplace-remote/ReviewDialog.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx, openstack/openstack-volume/actions/ExtendDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/cluster/ImportYAMLDialog.tsx, rancher/cluster/ViewYAMLDialog.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/support/EditFieldDialog.tsx",
     "message": "Submit"
   },
   "Submitted": {
@@ -11544,7 +11544,7 @@
     "message": "Unable to delete attachment."
   },
   "Unable to delete catalog.": {
-    "description": "rancher/catalog/CatalogDeleteDialog.tsx",
+    "description": "rancher/catalog/CatalogDeleteButton.tsx",
     "message": "Unable to delete catalog."
   },
   "Unable to delete comment.": {

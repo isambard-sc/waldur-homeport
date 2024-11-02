@@ -60,7 +60,7 @@ export const ClusterCatalogList: FunctionComponent<{ resourceScope }> = ({
       tableActions={<CatalogCreateButton cluster={resourceScope} />}
       rowActions={({ row }) =>
         row.scope_type === 'cluster' ? (
-          <CatalogDeleteButton catalog={row} />
+          <CatalogDeleteButton catalog={row} refetch={props.fetch} />
         ) : null
       }
     />
