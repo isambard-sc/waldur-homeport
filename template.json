@@ -688,7 +688,7 @@
     "message": "An error has occurred."
   },
   "An error occurred on project removal.": {
-    "description": "project/effects.ts",
+    "description": "project/useProjectDelete.tsx",
     "message": "An error occurred on project removal."
   },
   "An error occurred while attaching documents. Please try again.": {
@@ -1116,7 +1116,7 @@
     "message": "Are you sure you would like to delete Rancher catalog {catalog}?"
   },
   "Are you sure you would like to delete project {projectName}?": {
-    "description": "project/ProjectRemoveDialog.tsx",
+    "description": "project/useProjectDelete.tsx",
     "message": "Are you sure you would like to delete project {projectName}?"
   },
   "Are you sure you would like to delete the hook?": {
@@ -7712,7 +7712,7 @@
     "message": "Project price"
   },
   "Project removal": {
-    "description": "project/ProjectRemoveDialog.tsx",
+    "description": "project/useProjectDelete.tsx",
     "message": "Project removal"
   },
   "Project role": {
@@ -7752,7 +7752,7 @@
     "message": "Project workspace"
   },
   "Project {project} from {organization} was successfully removed": {
-    "description": "project/effects.ts",
+    "description": "project/useProjectDelete.tsx",
     "message": "Project {project} from {organization} was successfully removed"
   },
   "Project": {
@@ -13324,7 +13324,7 @@
     "message": "Yes, use invitation email"
   },
   "Yes": {
-    "description": "administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, core/utils.ts, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsList.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/ExpandablePortRow.tsx, project/ProjectRemoveDialog.tsx, proposals/call-management/CallAllFilters.tsx, rancher/cluster/users/ClusterUsersList.tsx, resource/summary/ScheduleSummary.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/support/UserList.tsx",
+    "description": "administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, core/utils.ts, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsList.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/ExpandablePortRow.tsx, proposals/call-management/CallAllFilters.tsx, rancher/cluster/users/ClusterUsersList.tsx, resource/summary/ScheduleSummary.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/support/UserList.tsx",
     "message": "Yes"
   },
   "You agree to the <tos>Terms of Service</tos> and <pp>Privacy policy</pp>.": {

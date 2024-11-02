@@ -113,7 +113,7 @@ export const ProjectsList: FunctionComponent<{}> = () => {
       tableActions={<ProjectCreateButton />}
       rowActions={({ row }) => (
         <>
-          <ProjectsListActions project={row} />
+          <ProjectsListActions project={row} refetch={props.fetch} />
           <ProjectDetailsButton project={row} />
         </>
       )}

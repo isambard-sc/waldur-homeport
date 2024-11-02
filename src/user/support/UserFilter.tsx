@@ -13,7 +13,6 @@ import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { getNativeNameVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
 import { getRoleFilterOptions, getUserStatusFilterOptions } from './utils';
@@ -84,8 +83,8 @@ const PureUserFilter: FunctionComponent<UserFilterProps> = ({ form }) => {
   );
 };
 
-const mapStateToProps = (state: RootState) => ({
-  nativeNameVisible: getNativeNameVisible(state),
+const mapStateToProps = () => ({
+  nativeNameVisible: getNativeNameVisible(),
 });
 
 const enhance = compose(

@@ -11,14 +11,16 @@ const ActionsList = [DeleteAction, MoveProjectAction];
 
 interface ProjectsListActionsProps {
   project: Project;
+  refetch;
 }
 
 export const ProjectsListActions: FC<ProjectsListActionsProps> = ({
   project,
+  refetch,
 }) => (
   <ActionsDropdownComponent title={translate('Actions')}>
     {ActionsList.map((ActionComponent, index) => (
-      <ActionComponent key={index} project={project} />
+      <ActionComponent key={index} project={project} refetch={refetch} />
     ))}
   </ActionsDropdownComponent>
 );
