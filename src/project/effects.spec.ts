@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { showSuccess } from '@waldur/store/notify';
 
 import * as actions from './actions';
@@ -6,13 +8,13 @@ import { setupFixture } from './effects.fixture';
 describe('Project side-effects', () => {
   const project = { uuid: 'uuid', name: 'name' };
 
-  let fixture;
+  let fixture: ReturnType<typeof setupFixture>;
   beforeEach(() => {
     fixture = setupFixture({ workspace: { customer: { projects: [] } } });
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('invalidates projects list cache if project has been updated', async () => {
@@ -21,7 +23,7 @@ describe('Project side-effects', () => {
     // TODO: Check that customer is updated
   });
 
-  xit('shows success message if project has been updated', async () => {
+  it('shows success message if project has been updated', async () => {
     fixture.mockUpdateProject.mockReturnValue({ data: project });
     await fixture.updateProject({ payload: { project } });
     expect(fixture.dispatched).toContainEqual(

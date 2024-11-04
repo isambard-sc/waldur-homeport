@@ -1,3 +1,5 @@
+import { describe, beforeEach, afterEach, vi, it, expect } from 'vitest';
+
 import * as actions from '@waldur/user/support/actions';
 import { setupFixture } from '@waldur/user/support/effects.fixture';
 
@@ -10,7 +12,7 @@ describe('User side effects', () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('shows success message if user has been updated', async () => {

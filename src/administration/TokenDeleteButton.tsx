@@ -22,6 +22,7 @@ export const TokenDeleteButton = ({ row, refetch }) => {
           },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;

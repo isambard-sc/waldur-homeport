@@ -16,7 +16,7 @@ interface AwesomeCheckboxFieldProps extends FormField {
 
 export const AwesomeCheckboxField: FunctionComponent<
   AwesomeCheckboxFieldProps
-> = ({ input, label, className, tooltip, help_text }) => (
+> = ({ input, label, className, tooltip, help_text, ...props }) => (
   <div
     className={classNames(
       'form-check form-switch form-check-custom form-check-solid',
@@ -26,6 +26,7 @@ export const AwesomeCheckboxField: FunctionComponent<
     <Form.Check
       checked={input.value}
       onChange={(e: React.ChangeEvent<any>) => input.onChange(e.target.checked)}
+      data-testid={props['data-testid']}
     />
     <label className="form-check-label">
       {tooltip && (

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import svgr from 'vite-plugin-svgr';
@@ -13,7 +13,9 @@ export default defineConfig({
       '~': path.resolve(__dirname),
       '~flatpickr': path.resolve('node_modules/flatpickr'),
       '~bootstrap': path.resolve('node_modules/bootstrap'),
-      'react-windowed-select': path.resolve('node_modules/react-windowed-select/dist/main.js'),
+      'react-windowed-select': path.resolve(
+        'node_modules/react-windowed-select/dist/main.js',
+      ),
     },
   },
   plugins: [
@@ -43,6 +45,11 @@ export default defineConfig({
         },
       },
     },
-
-  }
+  },
+  test: {
+    include: ['**/*.test.ts', '**/*.test.tsx'],
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./test/setupTests.js'],
+  },
 });

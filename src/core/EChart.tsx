@@ -1,118 +1,93 @@
 import classNames from 'classnames';
-import { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { themeSelector } from '@waldur/navigation/theme/store';
-import { RootState } from '@waldur/store/reducers';
+import { useTheme } from '@waldur/store/hooks';
 
 interface ChartProps {
   width?: string;
   height?: string;
-  theme?: any;
   options: any;
   className?: string;
 }
 
-class EChartComponent extends Component<ChartProps> {
-  container = undefined;
-  chart = undefined;
+export const EChart: React.FC<ChartProps> = ({
+  width = '100%',
+  height = '100%',
+  options,
+  className,
+}) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const chartRef = useRef<any>(null);
+  const [loading, setLoading] = useState(false);
+  const theme = useTheme();
 
-  state = {
-    loading: false,
-  };
+  useEffect(() => {
+    drawChart();
 
-  static defaultProps = {
-    width: '100%',
-    height: '100%',
-  };
+    return () => {
+      if (chartRef.current) {
+        chartRef.current.dispose();
+        containerRef.current = null;
+      }
+    };
+  }, []);
 
-  componentDidMount() {
-    this.drawChart();
-  }
-
-  componentWillUnmount() {
-    if (!this.chart) {
-      return;
+  useEffect(() => {
+    if (chartRef.current) {
+      renderChart();
+    } else if (!chartRef.current && !loading) {
+      drawChart();
     }
-    this.chart.dispose();
-    this.container = null;
-  }
+  }, [options, theme]);
 
-  componentDidUpdate(prevProps) {
-    const { options, theme } = this.props;
-    if (options === prevProps.options && theme === prevProps.theme) {
-      return;
-    } else if (theme !== prevProps.theme) {
-      this.chart.dispose();
-      this.drawChart();
-      return;
-    }
-    if (this.chart) {
-      this.renderChart();
-    } else if (!this.chart && !this.state.loading) {
-      this.drawChart();
-    }
-  }
-
-  drawChart() {
-    this.setState({
-      loading: true,
-    });
+  const drawChart = () => {
+    setLoading(true);
     import('@waldur/echarts').then((module) => {
-      this.setState({
-        loading: false,
-      });
-      if (!this.container) {
+      setLoading(false);
+      if (!containerRef.current) {
         return;
       }
       const echarts = module.default;
-      const chart = echarts.getInstanceByDom(this.container);
+      const chart = echarts.getInstanceByDom(containerRef.current);
       if (!chart) {
-        this.chart = echarts.init(
-          this.container,
-          this.props.theme + '-metronic',
+        chartRef.current = echarts.init(
+          containerRef.current,
+          `${theme}-metronic`,
         );
       }
-      this.renderChart();
+      renderChart();
       const resizeObserver = new ResizeObserver((entries) => {
-        entries.map(({ target }) => {
-          const instance = echarts.getInstanceByDom(target);
+        entries.forEach(({ target }) => {
+          const instance = echarts.getInstanceByDom(target as HTMLElement);
           if (instance) {
             instance.resize();
           }
         });
       });
-      resizeObserver.observe(this.container);
+      resizeObserver.observe(containerRef.current);
     });
-  }
+  };
 
-  renderChart() {
-    this.chart.setOption(this.props.options, this.props.theme + '-metronic');
-  }
+  const renderChart = () => {
+    if (chartRef.current) {
+      chartRef.current.setOption(options, `${theme}-metronic`);
+    }
+  };
 
-  render() {
-    const { width, height, className } = this.props;
-    const { loading } = this.state;
-    const style = { width, height };
-    return (
+  const style = { width, height };
+
+  return (
+    <div
+      className={classNames('content-center-center', className)}
+      style={style}
+    >
+      {loading && <LoadingSpinner />}
       <div
-        className={classNames('content-center-center', className)}
+        className={classNames({ hidden: loading })}
         style={style}
-      >
-        {loading && <LoadingSpinner />}
-        <div
-          className={classNames({ hidden: loading })}
-          style={style}
-          ref={(container) => (this.container = container)}
-        />
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = (state: RootState) => ({
-  theme: themeSelector(state),
-});
-
-export const EChart = connect(mapStateToProps)(EChartComponent);
+        ref={containerRef}
+      />
+    </div>
+  );
+};

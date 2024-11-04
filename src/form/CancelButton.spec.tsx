@@ -35,7 +35,7 @@ describe('CancelButton', () => {
   });
 
   it('handle click on button', () => {
-    const onClick = jest.fn();
+    const onClick = vi.fn();
     const wrapper: ShallowWrapper | ReactWrapper = renderCancelButton({
       onClick,
     });

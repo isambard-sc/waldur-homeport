@@ -22,6 +22,7 @@ export const ResourceDeleteButton: FunctionComponent<{
         translate('Are you sure you want to delete this {resourceType}?', {
           resourceType,
         }),
+        true,
       );
     } catch {
       return;

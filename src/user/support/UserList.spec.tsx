@@ -2,8 +2,8 @@ import { RoleEnum } from '@waldur/permissions/enums';
 
 import { formatRoleFilter, getOrganizationsWhereOwner } from './UserList';
 
-jest.mock('@waldur/core/filters', () => ({
-  getInitialValues: jest.fn().mockImplementation((arg) => arg),
+vi.mock('@waldur/core/filters', () => ({
+  getInitialValues: vi.fn().mockImplementation((arg) => arg),
 }));
 
 const filterMock = {

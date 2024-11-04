@@ -6,7 +6,7 @@ import { TableLoadingSpinnerContainer } from '@waldur/table/TableLoadingSpinnerC
 import Table from './Table';
 
 describe('Table', () => {
-  const fetch = jest.fn();
+  const fetch = vi.fn();
   const props = {
     loading: false,
     error: null,

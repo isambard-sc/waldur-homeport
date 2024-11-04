@@ -9,6 +9,7 @@ import {
   useEffect,
 } from 'react';
 import { Form } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import { clearFields, WrappedFieldMetaProps } from 'redux-form';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -26,6 +27,7 @@ export interface FormGroupProps extends FormField {
 
 export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
   const context = useContext(FormFieldsContext);
+  const dispatch = useDispatch();
 
   const {
     input,
@@ -49,7 +51,7 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
       if (clearOnUnmount === false) {
         return;
       }
-      meta.dispatch(clearFields(meta.form, false, false, input.name));
+      dispatch(clearFields(meta.form, false, false, input.name));
     };
   }, []);
 

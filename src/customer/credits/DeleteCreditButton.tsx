@@ -17,6 +17,7 @@ export const DeleteCreditButton = ({ row, refetch }) => {
         dispatch,
         translate('Delete confirmation'),
         translate('Are you sure you want to delete this credit?'),
+        true,
       );
     } catch {
       return;

@@ -21,7 +21,7 @@ export const UserAgreementCreateButton: FunctionComponent<{ refetch }> = ({
         resolve: {
           refetch,
         },
-        size: 'xl',
+        size: 'lg',
       }),
     );
   return <AddButton action={callback} />;

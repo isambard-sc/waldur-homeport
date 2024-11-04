@@ -55,6 +55,7 @@ export const DestroyActionItem: <T extends { uuid: string }>(
         dispatch,
         translate('Destroy resource'),
         getConfirmationText(resource) + (dialogSubtitle || ''),
+        true,
       );
     } catch {
       return;

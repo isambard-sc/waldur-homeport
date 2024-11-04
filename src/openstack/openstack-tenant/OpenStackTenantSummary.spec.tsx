@@ -9,7 +9,7 @@ import {
   resource,
 } from './OpenStackTenantSummary.fixture';
 
-jest.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/configs/default', () => ({
   ENV: {
     plugins: {
       WALDUR_MARKETPLACE: { ENABLE_RESOURCE_END_DATE: true },

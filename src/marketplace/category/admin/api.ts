@@ -28,7 +28,7 @@ export const updateCategory = (data, uuid) => {
     title: data.title,
     description: data.description,
     icon: data.icon,
-    group: data.group,
+    group: data.group?.url || null,
     default_vm_category: data.default_vm_category,
     default_volume_category: data.default_volume_category,
     default_tenant_category: data.default_tenant_category,

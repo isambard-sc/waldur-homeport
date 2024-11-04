@@ -1,9 +1,10 @@
+import React from 'react';
 import { Button } from 'react-bootstrap';
 import { ButtonVariant } from 'react-bootstrap/esm/types';
-import { connect } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
+
+import { useModal } from './hooks';
 
 interface OwnProps {
   label?: string;
@@ -11,30 +12,16 @@ interface OwnProps {
   className?: string;
 }
 
-interface DispatchProps {
-  dismiss(): void;
-}
-
-type Props = OwnProps & DispatchProps;
-
-const PureCloseDialogButton = ({
-  dismiss,
+export const CloseDialogButton: React.FC<OwnProps> = ({
   label,
   variant = 'outline btn-outline-default',
   className,
-}: Props) => (
-  <Button className={className} onClick={dismiss} variant={variant}>
-    {label || translate('Cancel')}
-  </Button>
-);
+}) => {
+  const { closeDialog } = useModal();
 
-const mapDispatchToProps = (dispatch) => ({
-  dismiss: () => dispatch(closeModalDialog()),
-});
-
-const enhance = connect<{}, DispatchProps, OwnProps>(
-  undefined,
-  mapDispatchToProps,
-);
-
-export const CloseDialogButton = enhance(PureCloseDialogButton);
+  return (
+    <Button className={className} onClick={closeDialog} variant={variant}>
+      {label || translate('Cancel')}
+    </Button>
+  );
+};

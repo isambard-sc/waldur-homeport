@@ -26,6 +26,7 @@ export interface FormField {
   noUpdateOnBlur?: boolean;
   spaceless?: boolean;
   space?: number;
+  'data-testid'?: string;
 }
 
 export interface CustomComponentInputProps<T> {

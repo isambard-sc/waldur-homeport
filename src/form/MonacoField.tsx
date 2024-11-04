@@ -1,8 +1,7 @@
 import { FC } from 'react';
-import { useSelector } from 'react-redux';
 import { Validator } from 'redux-form';
 
-import { RootState } from '@waldur/store/reducers';
+import { useTheme } from '@waldur/store/hooks';
 
 import { MonacoEditor } from './MonacoEditor';
 
@@ -22,7 +21,7 @@ interface MonacoFieldProps {
 }
 
 const getTheme = (): string => {
-  const theme = useSelector((state: RootState) => state.theme?.theme);
+  const theme = useTheme();
   return theme === 'dark' ? 'vs-dark' : 'vs-light';
 };
 

@@ -5,21 +5,21 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const OrganizationGroupEditDialog = lazyComponent(
-  () => import('./OrganizationGroupFromDialog'),
-  'OrganizationGroupFromDialog',
+const OrganizationGroupForm = lazyComponent(
+  () => import('./OrganizationGroupForm'),
+  'OrganizationGroupForm',
 );
-
-const organizationGroupEditDialog = (row, refetch) =>
-  openModalDialog(OrganizationGroupEditDialog, {
-    resolve: { organizationGroup: row, refetch },
-    size: 'md',
-  });
 
 export const OrganizationGroupEditButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
   const openFormDialog = useCallback(
-    () => dispatch(organizationGroupEditDialog(row, refetch)),
+    () =>
+      dispatch(
+        openModalDialog(OrganizationGroupForm, {
+          resolve: { organizationGroup: row, refetch },
+          size: 'md',
+        }),
+      ),
     [dispatch],
   );
 

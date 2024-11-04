@@ -29,19 +29,20 @@ export const CategoryDeleteAction = (props: CategoryDeleteActionProps) => {
           { title: <strong>{props.row.title}</strong> },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;
     }
     setRemoving(true);
-    removeCategory(props.row.uuid)
-      .then(() => {
-        props.refetch();
-      })
-      .catch((e) => {
-        dispatch(showErrorResponse(e, translate('Unable to remove category.')));
-        setRemoving(false);
-      });
+    try {
+      await removeCategory(props.row.uuid);
+      props.refetch();
+    } catch (e) {
+      dispatch(showErrorResponse(e, translate('Unable to remove category.')));
+    } finally {
+      setRemoving(false);
+    }
   }, [dispatch, setRemoving, props]);
 
   return (

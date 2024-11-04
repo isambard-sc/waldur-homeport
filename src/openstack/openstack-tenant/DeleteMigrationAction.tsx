@@ -15,6 +15,7 @@ export const DeleteMigrationAction = ({ resource, refetch }) => {
         dispatch,
         translate('Confirmation'),
         translate('Are you sure you want to delete the migration?'),
+        true,
       );
     } catch {
       return;
