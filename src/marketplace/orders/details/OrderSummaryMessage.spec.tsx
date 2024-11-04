@@ -1,8 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
+
 import { BillingType } from '@waldur/marketplace/types';
 
 import { getUpdateSummary } from './OrderSummaryMessage';
 
-jest.mock('@waldur/core/formatCurrency', () => ({
+vi.mock('@waldur/core/formatCurrency', () => ({
   defaultCurrency: (val) => val,
 }));
 

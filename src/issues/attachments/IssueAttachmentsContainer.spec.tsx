@@ -24,7 +24,7 @@ describe('IssueAttachmentsContainer', () => {
 
   describe('IssueAttachmentsContainer', () => {
     it('invokes getAttachments function', () => {
-      const getAttachments = jest.fn();
+      const getAttachments = vi.fn();
       renderWrapper({ getAttachments });
       expect(getAttachments).toBeCalled();
     });
@@ -50,7 +50,7 @@ describe('IssueAttachmentsContainer', () => {
       const mockDropzoneCallbackProps: DropzoneState = {
         isDragActive: false,
         acceptedFiles: [],
-        open: jest.fn(),
+        open: vi.fn(),
         fileRejections: [],
         inputRef: null,
         isDragAccept: true,

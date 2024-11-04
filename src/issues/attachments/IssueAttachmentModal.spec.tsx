@@ -32,7 +32,7 @@ describe('IssueAttachmentModal', () => {
   });
 
   it('click handler working correctly', () => {
-    const closeModal = jest.fn();
+    const closeModal = vi.fn();
     const wrapper = renderWrapper({ closeModal });
     const closeModalBtn = wrapper.find('.attachment-modal__close');
     closeModalBtn.simulate('click');

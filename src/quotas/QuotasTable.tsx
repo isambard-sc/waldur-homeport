@@ -1,15 +1,14 @@
 import { useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
 import { EChart } from '@waldur/core/EChart';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
 import { translate } from '@waldur/i18n';
-import { themeSelector } from '@waldur/navigation/theme/store';
+import { useTheme } from '@waldur/store/hooks';
 
 import { QUOTA_CATEGORIES } from './constants';
 import { Quota } from './types';
-import { formatQuotaValue, formatQuotaName, formatQuota } from './utils';
+import { formatQuota, formatQuotaName, formatQuotaValue } from './utils';
 
 interface Resource {
   quotas: Quota[];
@@ -23,7 +22,7 @@ const ResourceQuotaChart = ({ value, max }) => {
   if (percentage > 95) color = '#CC0808';
   else if (percentage > 60) color = '#FCCF5C';
 
-  const theme = useSelector(themeSelector);
+  const theme = useTheme();
 
   const chartOptions = {
     tooltip: {

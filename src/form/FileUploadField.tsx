@@ -11,15 +11,11 @@ export interface FileUploadFieldProps extends FormField {
   className?: string;
 }
 
-const defaultProps = {
-  className: 'btn btn-sm btn-primary',
-};
-
 export const FileUploadField = ({
   accept,
   showFileName,
   buttonLabel,
-  className = defaultProps.className,
+  className = 'btn btn-sm btn-primary',
   disabled,
   input,
 }: FileUploadFieldProps) => {
@@ -74,6 +70,7 @@ export const FileUploadField = ({
         accept={accept}
         onChange={handleFile}
         disabled={disabled}
+        data-testid="upload"
       />
     </>
   );

@@ -1,15 +1,13 @@
 import { FunctionComponent, useCallback } from 'react';
-import { useSelector } from 'react-redux';
 
 import { ENV } from '@waldur/configs/default';
 import { fixURL } from '@waldur/core/api';
 import { Link } from '@waldur/core/Link';
 import { useLayout } from '@waldur/metronic/layout/core';
-
-import { themeSelector } from '../theme/store';
+import { useTheme } from '@waldur/store/hooks';
 
 export const BrandName: FunctionComponent = () => {
-  const theme = useSelector(themeSelector);
+  const theme = useTheme();
   const sidebarTheme = ENV.plugins.WALDUR_CORE.SIDEBAR_STYLE || 'dark';
   const layout = useLayout();
   // switch aside.minimized to keep sidebar state between pages

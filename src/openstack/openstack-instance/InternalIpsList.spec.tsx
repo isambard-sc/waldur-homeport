@@ -1,3 +1,5 @@
+import { describe, it, expect } from 'vitest';
+
 import { Port } from '@waldur/resource/types';
 import { renderTable } from '@waldur/table/testUtils';
 
@@ -20,6 +22,6 @@ const renderList = () => {
 describe('InternalIpsList', () => {
   it('renders list', () => {
     const wrapper = renderList();
-    expect(wrapper.find('tbody').html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 });

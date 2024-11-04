@@ -7,12 +7,14 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { showHookUpdateDialog } from './actions';
 
-export const HookCreateButton: FunctionComponent = () => {
+export const HookCreateButton: FunctionComponent<{ refetch; hook? }> = (
+  props,
+) => {
   const dispatch = useDispatch();
   return (
     <ActionButton
       title={translate('Add notification')}
-      action={() => dispatch(showHookUpdateDialog())}
+      action={() => dispatch(showHookUpdateDialog(props))}
       iconNode={<PlusCircle />}
       variant="primary"
     />

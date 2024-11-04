@@ -8,10 +8,11 @@ interface FormGroupProps {
   label?: ReactNode;
   description?: ReactNode;
   required?: boolean;
+  controlId?: string;
 }
 
 export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => (
-  <Form.Group className="mb-7">
+  <Form.Group className="mb-7" controlId={props.controlId}>
     {props.label ? (
       <>
         <Form.Label className="fs-6 fw-semibold form-label mt-3">

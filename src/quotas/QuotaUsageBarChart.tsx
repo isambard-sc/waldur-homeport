@@ -60,7 +60,7 @@ export const QuotaUsageBarChartDescription = ({ quota }) => (
           label={translate('Quota usage exceeds available limit.')}
         >
           {' '}
-          <Warning />
+          <Warning data-testid="warning" />
         </Tip>
       )}
     </p>

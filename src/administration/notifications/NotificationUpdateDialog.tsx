@@ -1,6 +1,7 @@
+import arrayMutators from 'final-form-arrays';
 import { useCallback } from 'react';
-import { connect, useDispatch } from 'react-redux';
-import { reduxForm } from 'redux-form';
+import { Form } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -9,10 +10,6 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { overrideNotificationTemplate } from './api';
 import { NotificationForm } from './NotificationForm';
-
-const enhance = reduxForm<any, any>({
-  form: 'NotificationUpdateForm',
-});
 
 function findDifferentTemplates(formTemplate, initTemplate) {
   const formTemplates = formTemplate.templates;
@@ -26,45 +23,47 @@ function findDifferentTemplates(formTemplate, initTemplate) {
   });
 }
 
-export const NotificationUpdateDialog = connect<{}, {}, any>((_, ownProps) => ({
-  initialValues: { templates: ownProps.resolve.notification.templates },
-}))(
-  enhance(({ submitting, resolve, handleSubmit }) => {
-    const dispatch = useDispatch();
+export const NotificationUpdateDialog = ({ resolve }) => {
+  const dispatch = useDispatch();
 
-    const callback = useCallback(
-      async (formData) => {
-        const templatesToUpdate = findDifferentTemplates(formData, {
-          templates: resolve.notification.templates,
-        });
+  const onSubmit = useCallback(
+    async (formData) => {
+      const templatesToUpdate = findDifferentTemplates(formData, {
+        templates: resolve.notification.templates,
+      });
 
-        for (const template of templatesToUpdate) {
-          try {
-            await overrideNotificationTemplate(template.url, {
-              content: template.content,
-            });
-            await resolve.refetch();
-            dispatch(showSuccess(translate('Notification has been updated.')));
-            dispatch(closeModalDialog());
-          } catch (e) {
-            dispatch(
-              showErrorResponse(
-                e,
-                translate('Unable to update a notification.'),
-              ),
-            );
-          }
+      for (const template of templatesToUpdate) {
+        try {
+          await overrideNotificationTemplate(template.url, {
+            content: template.content,
+          });
+          await resolve.refetch();
+          dispatch(showSuccess(translate('Notification has been updated.')));
+          dispatch(closeModalDialog());
+        } catch (e) {
+          dispatch(
+            showErrorResponse(e, translate('Unable to update a notification.')),
+          );
         }
-      },
-      [dispatch, resolve],
-    );
+      }
+    },
+    [dispatch, resolve],
+  );
 
-    return (
-      <ModalDialog title={translate('Update a notification')}>
-        <form onSubmit={handleSubmit(callback)}>
-          <NotificationForm submitting={submitting} />
-        </form>
-      </ModalDialog>
-    );
-  }),
-);
+  return (
+    <ModalDialog title={translate('Update a notification')}>
+      <Form
+        onSubmit={onSubmit}
+        initialValues={{ templates: resolve.notification.templates }}
+        mutators={{
+          ...arrayMutators,
+        }}
+        render={({ handleSubmit, submitting }) => (
+          <form onSubmit={handleSubmit}>
+            <NotificationForm submitting={submitting} />
+          </form>
+        )}
+      />
+    </ModalDialog>
+  );
+};

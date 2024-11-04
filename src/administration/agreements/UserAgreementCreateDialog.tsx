@@ -1,64 +1,67 @@
-import { Modal } from 'react-bootstrap';
-import { connect, useDispatch } from 'react-redux';
-import { getFormValues, reduxForm } from 'redux-form';
+import { Form, Field } from 'react-final-form';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { post } from '@waldur/core/api';
-import { FormContainer, SelectField, TextField } from '@waldur/form';
+import { required } from '@waldur/core/validators';
+import { SelectField, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
+import { useModal } from '@waldur/modal/hooks';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { useNotify } from '@waldur/store/hooks';
 
-export const UserAgreementCreateDialog = connect((state: RootState) => ({
-  formValues: getFormValues('UserAgreementCreateForm')(state),
-}))(
-  reduxForm<any, { resolve: { refetch }; formValues: any }>({
-    form: 'UserAgreementCreateForm',
-  })(({ submitting, handleSubmit, resolve }) => {
-    const dispatch = useDispatch();
-    const callback = async (formValues) => {
-      try {
-        await post('/user-agreements/', {
-          agreement_type: formValues.agreement_type.value,
-          content: formValues.content,
-        });
+export const UserAgreementCreateDialog = ({ resolve }) => {
+  const { showErrorResponse, showSuccess } = useNotify();
+  const { closeDialog } = useModal();
 
-        dispatch(showSuccess(translate('User agreement has been created')));
-        dispatch(closeModalDialog());
-        await resolve.refetch();
-      } catch (error) {
-        dispatch(
-          showErrorResponse(
-            error,
-            translate('Unable to create a user agreement.'),
-          ),
-        );
-      }
-    };
+  const onSubmit = async (formValues) => {
+    try {
+      await post('/user-agreements/', {
+        agreement_type: formValues.agreement_type.value,
+        content: formValues.content,
+      });
+      showSuccess(translate('User agreement has been created'));
+      closeDialog();
+      await resolve.refetch();
+    } catch (error) {
+      showErrorResponse(error, translate('Unable to create a user agreement.'));
+    }
+  };
 
-    return (
-      <form onSubmit={handleSubmit(callback)}>
-        <Modal.Header closeButton className="without-border">
-          <h2 className="fw-bolder">{translate('Create a user agreements')}</h2>
-        </Modal.Header>
-        <FormContainer submitting={submitting}>
-          <SelectField
-            name="agreement_type"
-            label={translate('Agreement type')}
-            required={true}
-            options={[
-              { label: translate('Privacy policy'), value: 'PP' },
-              { label: translate('Terms of service'), value: 'TOS' },
-            ]}
-          />
-
-          <TextField name="content" label={translate('Content')} />
-          <div className="mb-5 text-end">
-            <SubmitButton submitting={submitting} label={translate('Save')} />
-          </div>
-        </FormContainer>
-      </form>
-    );
-  }),
-);
+  return (
+    <Form
+      onSubmit={onSubmit}
+      render={({ handleSubmit, submitting, invalid }) => (
+        <form onSubmit={handleSubmit}>
+          <ModalDialog
+            title={translate('Create a user agreements')}
+            footer={
+              <div className="mb-5 text-end">
+                <SubmitButton
+                  submitting={submitting}
+                  invalid={invalid}
+                  label={translate('Save')}
+                />
+              </div>
+            }
+          >
+            <FormGroup label={translate('Agreement type')} required>
+              <Field
+                name="agreement_type"
+                component={SelectField}
+                options={[
+                  { label: translate('Privacy policy'), value: 'PP' },
+                  { label: translate('Terms of service'), value: 'TOS' },
+                ]}
+                validate={required}
+              />
+            </FormGroup>
+            <FormGroup controlId="content" label={translate('Content')}>
+              <Field name="content" component={TextField as any} />
+            </FormGroup>
+          </ModalDialog>
+        </form>
+      )}
+    />
+  );
+};

@@ -39,6 +39,7 @@ export const ProviderOfferingUserDeleteButton: FC<{
         translate('Are you sure you want to delete offering user {username}?', {
           username: props.row.username,
         }),
+        true,
       );
       await deleteOfferingUser(props.row.uuid);
       dispatch(showSuccess(translate('Offering user has been deleted.')));

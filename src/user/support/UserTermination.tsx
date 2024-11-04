@@ -52,6 +52,7 @@ const PureUserTermination = (props: UserTerminationProps) => {
           { name: <strong>{props.user.full_name}</strong> },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;

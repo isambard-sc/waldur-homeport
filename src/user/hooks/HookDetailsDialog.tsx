@@ -1,84 +1,166 @@
-import { useMemo, FunctionComponent } from 'react';
-import { Modal } from 'react-bootstrap';
+import { FunctionComponent } from 'react';
+import { Field, Form } from 'react-final-form';
 import { useAsync } from 'react-use';
-import { AsyncState } from 'react-use/lib/useAsyncFn';
-import { reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { titleCase } from '@waldur/core/utils';
+import { required } from '@waldur/core/validators';
+import { StringField } from '@waldur/form';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
+import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { useNotify } from '@waldur/store/hooks';
 
-import { HookForm } from './HookForm';
-import { HookFormData, EventGroupOption, HookResponse } from './types';
-import { loadEventGroupsOptions, getInitialValue, useHookForm } from './utils';
+import { createHook, updateHook } from './api';
+import { HookTypeField } from './HookTypeField';
+import { MultiSelectField } from './MultiSelectField';
+import { HookFormData, HookResponse, HookType } from './types';
+import { loadEventGroupsOptions } from './utils';
 
-interface OwnProps {
-  hook: HookResponse;
-  listId: string;
-  eventGroupsState: AsyncState<EventGroupOption[]>;
-}
-
-const HookDetailsComponent = ({
-  hook,
-  listId,
-  eventGroupsState,
-  handleSubmit,
-  submitting,
-  invalid,
-}) => {
-  const saveHook = useHookForm(hook, listId);
-  return (
-    <form onSubmit={handleSubmit(saveHook)}>
-      <Modal.Header>
-        <Modal.Title>
-          {hook
-            ? translate('Update notification')
-            : translate('Create notification')}
-        </Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-        {eventGroupsState.loading ? (
-          <LoadingSpinner />
-        ) : eventGroupsState.error ? (
-          <>{translate('Unable to load data.')}</>
-        ) : (
-          <HookForm eventGroups={eventGroupsState.value} isNew={!hook} />
-        )}
-      </Modal.Body>
-
-      <Modal.Footer>
-        {!eventGroupsState.error && (
-          <SubmitButton
-            variant="primary"
-            submitting={submitting}
-            invalid={invalid}
-          >
-            {hook ? translate('Update') : translate('Create')}
-          </SubmitButton>
-        )}
-        <CloseDialogButton />
-      </Modal.Footer>
-    </form>
-  );
+const useHookForm = (hook, refetch) => {
+  const { showErrorResponse, showSuccess } = useNotify();
+  const saveHook = async (formData: HookFormData) => {
+    const hookType = hook ? hook.hook_type : formData.hook_type;
+    const payload: Partial<HookResponse> = {
+      hook_type: hookType,
+      is_active: formData.is_active,
+      event_groups: Object.keys(formData.event_groups),
+    };
+    if (hookType === 'email') {
+      payload.email = formData.email;
+    } else if (hookType === 'webhook') {
+      payload.destination_url = formData.destination_url;
+    }
+    if (hook) {
+      try {
+        await updateHook(hook.uuid, hook.hook_type, payload);
+        await refetch();
+        showSuccess(translate('Notification has been updated.'));
+        closeModalDialog();
+      } catch (e) {
+        showErrorResponse(e, translate('Unable to update notification.'));
+      }
+    } else {
+      try {
+        await createHook(hookType, payload);
+        await refetch();
+        showSuccess(translate('Notification has been created.'));
+        closeModalDialog();
+      } catch (e) {
+        showErrorResponse(e, translate('Unable to create notification.'));
+      }
+    }
+  };
+  const initialValues = hook
+    ? {
+        is_active: hook.is_active,
+        hook_type: hook.hook_type as HookType,
+        email: hook.email,
+        destination_url: hook.destination_url,
+        event_groups: hook.event_groups.reduce(
+          (result, group) => ({ ...result, [group]: true }),
+          {},
+        ),
+      }
+    : {
+        hook_type: 'webhook' as HookType,
+        event_groups: {},
+      };
+  const state = useAsync(loadEventGroupsOptions);
+  return { saveHook, initialValues, state };
 };
 
-const HookDetails = reduxForm<HookFormData, OwnProps>({ form: 'HookForm' })(
-  HookDetailsComponent,
-);
-
 export const HookDetailsDialog: FunctionComponent<{
-  resolve: { hook; listId };
-}> = ({ resolve: { hook, listId } }) => {
-  const state = useAsync(loadEventGroupsOptions);
-  const initialValues = useMemo(() => getInitialValue(hook), [hook]);
+  resolve: { hook?: HookResponse; refetch };
+}> = ({ resolve: { hook, refetch } }) => {
+  const {
+    saveHook,
+    initialValues,
+    state: { loading, error, value: eventGroups },
+  } = useHookForm(hook, refetch);
+
   return (
-    <HookDetails
-      hook={hook}
-      eventGroupsState={state}
+    <Form<HookFormData>
+      onSubmit={saveHook}
       initialValues={initialValues}
-      listId={listId}
+      render={({ handleSubmit, submitting, invalid, values }) => (
+        <form onSubmit={handleSubmit}>
+          <ModalDialog
+            title={
+              hook
+                ? translate('Update notification')
+                : translate('Create notification')
+            }
+            footer={
+              <SubmitButton
+                variant="primary"
+                submitting={submitting}
+                invalid={invalid}
+              >
+                {hook ? translate('Update') : translate('Create')}
+              </SubmitButton>
+            }
+          >
+            {loading ? (
+              <LoadingSpinner />
+            ) : error ? (
+              <>{translate('Unable to load data.')}</>
+            ) : (
+              <>
+                {!hook ? (
+                  <Field
+                    name="hook_type"
+                    component={HookTypeField as any}
+                    validate={required}
+                    hideLabel={true}
+                  />
+                ) : (
+                  <>
+                    <FormGroup label={translate('Notification method')}>
+                      {titleCase(values.hook_type)}
+                    </FormGroup>
+                    <Field
+                      name="is_active"
+                      component={AwesomeCheckboxField as any}
+                      label={translate('Enabled')}
+                    />
+                  </>
+                )}
+                {values.hook_type === 'email' ? (
+                  <FormGroup label={translate('Email address')} required>
+                    <Field
+                      name="email"
+                      component={StringField as any}
+                      type="email"
+                      validate={required}
+                      data-testid="email-address"
+                    />
+                  </FormGroup>
+                ) : values.hook_type === 'webhook' ? (
+                  <FormGroup label={translate('Destination URL')} required>
+                    <Field
+                      name="destination_url"
+                      component={StringField as any}
+                      type="url"
+                      validate={required}
+                      data-testid="destination-url"
+                    />
+                  </FormGroup>
+                ) : null}
+                <Field
+                  name="event_groups"
+                  component={MultiSelectField as any}
+                  options={eventGroups}
+                  hideLabel={true}
+                />
+              </>
+            )}
+          </ModalDialog>
+        </form>
+      )}
     />
   );
 };

@@ -31,6 +31,7 @@ export const AccessSubnetDeleteButton = (
           { inet: <strong>{props.row.inet}</strong> },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;

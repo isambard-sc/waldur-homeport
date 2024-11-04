@@ -8,7 +8,7 @@ describe('IssueCommentsForm', () => {
   const renderWrapper = (props?) => shallow(<IssueCommentsForm {...props} />);
 
   it('handles form submit', () => {
-    const handleSubmit = jest.fn();
+    const handleSubmit = vi.fn();
     const wrapper = renderWrapper({ handleSubmit });
     wrapper.find(SubmitButton).simulate('click');
     expect(handleSubmit).toBeCalled();
