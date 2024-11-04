@@ -38,4 +38,5 @@ export const SlurmRemoteOffering: OfferingConfiguration = {
   secretOptionsForm: UserSecretOptionsForm,
   providerType: 'SLURM remote',
   allowToUpdateService: true,
+  showComponents: true,
 };
