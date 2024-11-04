@@ -5260,7 +5260,7 @@
     "message": "Location has been removed."
   },
   "Location has been saved successfully.": {
-    "description": "customer/list/store/effects.ts, marketplace/offerings/update/overview/OfferingLocationButton.tsx",
+    "description": "customer/list/SetLocationButton.tsx, marketplace/offerings/update/overview/OfferingLocationButton.tsx",
     "message": "Location has been saved successfully."
   },
   "Location of {name} offering": {
@@ -10172,7 +10172,7 @@
     "message": "Staff and Support user"
   },
   "Staff": {
-    "description": "administration/dashboard/AdministrationProfile.tsx, user/support/UserList.tsx, user/support/utils.ts",
+    "description": "administration/dashboard/AdministrationProfile.tsx, navigation/header/UserDropdown.tsx, user/support/UserList.tsx, user/support/utils.ts",
     "message": "Staff"
   },
   "Start date": {
@@ -12060,7 +12060,7 @@
     "message": "Unable to save category columns. Please try again."
   },
   "Unable to save location.": {
-    "description": "customer/list/store/effects.ts, marketplace/offerings/update/overview/OfferingLocationButton.tsx",
+    "description": "customer/list/SetLocationButton.tsx, marketplace/offerings/update/overview/OfferingLocationButton.tsx",
     "message": "Unable to save location."
   },
   "Unable to schedule service synchronization.": {

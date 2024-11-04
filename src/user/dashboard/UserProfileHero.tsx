@@ -31,9 +31,10 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
 
   const isValidUser = useMemo(
     () =>
-      user &&
-      !UsersService.mandatoryFieldsMissing(user) &&
-      Boolean(user.agreement_date),
+      (user &&
+        !UsersService.mandatoryFieldsMissing(user) &&
+        Boolean(user.agreement_date)) ||
+      user?.is_staff,
     [user],
   );
 
