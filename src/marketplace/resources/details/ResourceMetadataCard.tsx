@@ -7,8 +7,8 @@ import * as ResourceSummaryRegistry from '@waldur/resource/summary/registry';
 import { ResourceSummary } from './ResourceSummary';
 
 export const ResourceMetadataCard = ({ resource, scope }) => {
-  const { component: SummaryComponent = ResourceSummaryBase } =
-    ResourceSummaryRegistry.get(resource.resource_type);
+  const configuration = ResourceSummaryRegistry.get(resource.resource_type);
+  const SummaryComponent = configuration?.component || ResourceSummaryBase;
 
   return (
     <Card className="card-bordered">
