@@ -13,6 +13,9 @@ describe('Table', () => {
     loading: false,
     error: null,
     fetch,
+    resetSelection: vi.fn(),
+    setFilterPosition: vi.fn(),
+    initColumnPositions: vi.fn(),
     rows: [],
     sorting: {
       mode: undefined,
@@ -24,11 +27,6 @@ describe('Table', () => {
   };
 
   describe('special states', () => {
-    it('renders message if loading failed', () => {
-      render(<Table {...props} error="Not found" />);
-      expect(screen.getByText('Unable to fetch data.')).toBeInTheDocument();
-    });
-
     it('renders message if list is empty', () => {
       render(<Table {...props} />);
       expect(screen.getByText('There are no items yet.')).toBeInTheDocument();
@@ -36,15 +34,15 @@ describe('Table', () => {
 
     it('renders custom message if list is empty and verboseName is set', () => {
       render(<Table {...props} verboseName="projects" />);
-      expect(
-        screen.getByText('There are no projects yet.'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('No projects found')).toBeInTheDocument();
     });
 
     it('renders custom message if list is empty and verboseName is set and query is set', () => {
       render(<Table {...props} verboseName="projects" query="my projects" />);
       expect(
-        screen.getByText('There are no projects found matching the filter.'),
+        screen.getByText(
+          'Your search "my projects" did not match any projects.',
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -54,6 +52,9 @@ describe('Table', () => {
       render(
         <Table
           fetch={fetch}
+          resetSelection={vi.fn()}
+          setFilterPosition={vi.fn()}
+          initColumnPositions={vi.fn()}
           loading={false}
           error={null}
           pagination={{

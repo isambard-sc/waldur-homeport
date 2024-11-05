@@ -247,7 +247,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
         )}
         {expandableRow && (
           <td
-            data-cy="row-expander"
+            data-testid="row-expander"
             className={toggled[getId(row, rowIndex)] ? 'active' : ''}
           >
             <CaretDown size={20} weight="bold" className="rotate-180" />
