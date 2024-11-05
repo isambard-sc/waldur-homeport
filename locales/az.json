@@ -1719,7 +1719,6 @@
   "Set rules": "Qaydaları seçin",
   "Set static routes": "Statik marşrutları təyin edin",
   "Set termination date": "Xitam tarixini təyin edin",
-  "Set to \"true\" if this category is for OpenStack VM. Only one category can have \"true\" value.": "Bu kateqoriya OpenStack VM üçündürsə “doğru” vəziyyətinə təyin edin. Yalnız bir kateqoriya “həqiqi” dəyərə sahib ola bilər.",
   "Set to draft": "Layihəyə təyin edin",
   "Set to true if this category is for OpenStack Tenant. Only one category can have \"true\" value.": "Bu kateqoriya OpenStack Tenant üçündürsə, doğru vəziyyətinə təyin edin. Yalnız bir kateqoriya “həqiqi” dəyərə sahib ola bilər.",
   "Set to true if this category is for OpenStack Volume. Only one category can have \"true\" value.": "Bu kateqoriya OpenStack Volume üçündürsə, doğru vəziyyətinə təyin edin. Yalnız bir kateqoriya “həqiqi” dəyərə sahib ola bilər.",
