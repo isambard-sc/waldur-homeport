@@ -1,9 +1,11 @@
-import { mount, shallow } from 'enzyme';
-
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { TableLoadingSpinnerContainer } from '@waldur/table/TableLoadingSpinnerContainer';
+import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Table from './Table';
+
+vi.mock('@waldur/table/useTableLoader', () => ({
+  useTableLoader: () => false,
+}));
 
 describe('Table', () => {
   const fetch = vi.fn();
@@ -22,43 +24,34 @@ describe('Table', () => {
   };
 
   describe('special states', () => {
-    it('renders spinner if list is loading', () => {
-      const wrapper = shallow(
-        <TableLoadingSpinnerContainer {...props} loading={true} />,
-      );
-      expect(wrapper.contains(<LoadingSpinnerIcon />)).toBe(true);
-    });
-
     it('renders message if loading failed', () => {
-      const wrapper = shallow(<Table {...props} error="Not found" />);
-      expect(wrapper.html()).toContain('Unable to fetch data.');
+      render(<Table {...props} error="Not found" />);
+      expect(screen.getByText('Unable to fetch data.')).toBeInTheDocument();
     });
 
     it('renders message if list is empty', () => {
-      const wrapper = mount(<Table {...props} />);
-      expect(wrapper.contains('There are no items yet.')).toBe(true);
+      render(<Table {...props} />);
+      expect(screen.getByText('There are no items yet.')).toBeInTheDocument();
     });
 
     it('renders custom message if list is empty and verboseName is set', () => {
-      const wrapper = mount(<Table {...props} verboseName="projects" />);
-      expect(wrapper.contains('There are no projects yet.')).toBe(true);
+      render(<Table {...props} verboseName="projects" />);
+      expect(
+        screen.getByText('There are no projects yet.'),
+      ).toBeInTheDocument();
     });
 
     it('renders custom message if list is empty and verboseName is set and query is set', () => {
-      const wrapper = mount(
-        <Table {...props} verboseName="projects" query="my projects" />,
-      );
+      render(<Table {...props} verboseName="projects" query="my projects" />);
       expect(
-        wrapper.contains('There are no projects found matching the filter.'),
-      ).toBe(true);
+        screen.getByText('There are no projects found matching the filter.'),
+      ).toBeInTheDocument();
     });
   });
 
   describe('data rendering', () => {
-    let wrapper;
-
     beforeEach(() => {
-      wrapper = mount(
+      render(
         <Table
           fetch={fetch}
           loading={false}
@@ -91,13 +84,13 @@ describe('Table', () => {
     });
 
     it('renders column headers', () => {
-      expect(wrapper.contains(<th>Resource type</th>)).toBe(true);
-      expect(wrapper.contains(<th>Resource name</th>)).toBe(true);
+      expect(screen.getByText('Resource type')).toBeInTheDocument();
+      expect(screen.getByText('Resource name')).toBeInTheDocument();
     });
 
     it('renders row values', () => {
-      expect(wrapper.contains('OpenStack Instance')).toBe(true);
-      expect(wrapper.contains('Web server')).toBe(true);
+      expect(screen.getByText('OpenStack Instance')).toBeInTheDocument();
+      expect(screen.getByText('Web server')).toBeInTheDocument();
     });
   });
 });

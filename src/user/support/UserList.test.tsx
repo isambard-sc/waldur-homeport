@@ -1,9 +1,12 @@
+import { vi, describe, it, expect } from 'vitest';
+
 import { RoleEnum } from '@waldur/permissions/enums';
 
 import { formatRoleFilter, getOrganizationsWhereOwner } from './UserList';
 
 vi.mock('@waldur/core/filters', () => ({
   getInitialValues: vi.fn().mockImplementation((arg) => arg),
+  syncFiltersToURL: vi.fn(),
 }));
 
 const filterMock = {

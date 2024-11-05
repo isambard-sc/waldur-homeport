@@ -1,4 +1,5 @@
-import { render } from 'enzyme';
+import { render } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
 
 import { Customer } from '@waldur/workspace/types';
 
@@ -22,6 +23,6 @@ const Customer = {
 describe('CustomerDetails', () => {
   it('renders all rows', () => {
     const wrapper = render(<CustomerDetails customer={Customer} />);
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 });

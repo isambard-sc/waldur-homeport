@@ -1,6 +1,7 @@
-import { render } from 'enzyme';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import { describe, it, expect } from 'vitest';
 
 import { RootState } from '@waldur/store/reducers';
 
@@ -23,7 +24,7 @@ const renderComponent = (resource) => {
     </Provider>
   );
   const wrapper = render(component);
-  return wrapper.html();
+  return wrapper.container;
 };
 
 describe('QuotasTable', () => {

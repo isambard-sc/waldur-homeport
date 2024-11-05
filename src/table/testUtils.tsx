@@ -4,7 +4,7 @@ import configureStore from 'redux-mock-store';
 
 import { TableState } from '@waldur/table/types';
 
-const fakeInstance = { state: 'OK' };
+const fakeInstance = { uuid: 'test-uuid', state: 'OK' };
 
 export const renderTable = (Component, tableId, rowId, row) => {
   const mockStore = configureStore();
@@ -37,7 +37,7 @@ export const renderTable = (Component, tableId, rowId, row) => {
   });
   return render(
     <Provider store={store}>
-      <Component resource={fakeInstance} />
+      <Component resourceScope={fakeInstance} />
     </Provider>,
   );
 };
