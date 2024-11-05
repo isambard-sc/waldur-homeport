@@ -1,4 +1,5 @@
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
 
 import { AttributeCell } from './AttributeCell';
 import {
@@ -10,44 +11,44 @@ import {
 
 describe('AttributeCell', () => {
   it('renders list attribute', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <AttributeCell attr={ListAttribute} value={['E5-2650v3', 'E5-2680v3']} />,
     );
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 
   it('renders choice attribute', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <AttributeCell attr={ChoiceAttribute} value="gpu_NVidia_K80" />,
     );
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 
   it('renders invalid choice attribute', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <AttributeCell attr={ChoiceAttribute} value="invalid" />,
     );
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 
   it('renders boolean value', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <AttributeCell attr={BooleanAttribute} value={true} />,
     );
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 
   it('renders negative boolean value', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <AttributeCell attr={BooleanAttribute} value={false} />,
     );
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 
   it('renders string attribute', () => {
-    const wrapper = shallow(
+    const wrapper = render(
       <AttributeCell attr={StringAttribute} value="/opt/" />,
     );
-    expect(wrapper.html()).toMatchSnapshot();
+    expect(wrapper.container).toMatchSnapshot();
   });
 });

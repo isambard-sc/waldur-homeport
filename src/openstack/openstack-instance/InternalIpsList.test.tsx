@@ -1,9 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import { Port } from '@waldur/resource/types';
 import { renderTable } from '@waldur/table/testUtils';
 
 import { InternalIpsList } from './InternalIpsList';
+
+vi.mock('@waldur/table/useTableLoader', () => ({
+  useTableLoader: () => false,
+}));
 
 const renderList = () => {
   const item: Port = {
