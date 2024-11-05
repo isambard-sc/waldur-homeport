@@ -18,16 +18,6 @@ import { CreditStatusWidget } from './CreditStatusWidget';
 import { CustomerDashboardChart } from './CustomerDashboardChart';
 import { CustomerProfile } from './CustomerProfile';
 
-const shouldShowAggregateLimitWidget = (uuid) => {
-  const { data } = useQuery(
-    ['customer-stats', uuid],
-    () => getCustomerStats(uuid),
-    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
-  );
-
-  return data?.data.components?.length > 0;
-};
-
 export const CustomerDashboard: FunctionComponent = () => {
   const user = useSelector(getUser);
   const customer = useSelector(getCustomer);
@@ -36,6 +26,19 @@ export const CustomerDashboard: FunctionComponent = () => {
     [customer, user],
   );
   const canSeeCharts = useSelector(isOwnerOrStaff);
+
+  const {
+    data: aggregateLimitData,
+    isLoading: isAggregateLimitLoading,
+    error: aggregateLimitError,
+  } = useQuery(
+    ['customer-stats', customer?.uuid],
+    () => getCustomerStats(customer?.uuid),
+    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
+  );
+
+  const shouldShowAggregateLimitWidget =
+    aggregateLimitData?.data.components?.length > 0;
 
   if (!customer) return null;
 
@@ -48,11 +51,15 @@ export const CustomerDashboard: FunctionComponent = () => {
           {canSeeCharts && (
             <CustomerDashboardChart customer={customer} user={user} />
           )}
-          {(shouldShowAggregateLimitWidget(customer.uuid) ||
-            Boolean(customer.credit)) && (
+          {(shouldShowAggregateLimitWidget || Boolean(customer.credit)) && (
             <Row>
               <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
-                <AggregateLimitWidget customer={customer} />
+                <AggregateLimitWidget
+                  customer={customer}
+                  data={aggregateLimitData}
+                  isLoading={isAggregateLimitLoading}
+                  error={aggregateLimitError}
+                />
               </Col>
               {Boolean(customer.credit) && (
                 <Col
