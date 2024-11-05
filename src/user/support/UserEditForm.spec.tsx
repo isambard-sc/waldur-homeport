@@ -5,7 +5,7 @@ import { TermsOfService } from '@waldur/user/support/TermsOfService';
 import { UserEditForm } from '@waldur/user/support/UserEditForm';
 
 const renderForm = (props) =>
-  shallow(<UserEditForm handleSubmit={jest.fn()} {...props} />);
+  shallow(<UserEditForm handleSubmit={vi.fn()} {...props} />);
 
 describe('UserEditForm', () => {
   it('should render form with all possible fields for STAFF user', () => {

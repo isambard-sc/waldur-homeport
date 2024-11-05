@@ -8,11 +8,11 @@ import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import * as api from './api';
 import { ProjectCreateForm } from './ProjectCreateForm';
 
-jest.mock('./api');
+vi.mock('./api');
 
-const apiMock = api as jest.Mocked<typeof api>;
+const apiMock = vi.mocked(api);
 
-jest.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/configs/default', () => ({
   ENV: {
     plugins: {
       WALDUR_CORE: {
@@ -22,8 +22,8 @@ jest.mock('@waldur/configs/default', () => ({
   },
 }));
 
-jest.mock('@waldur/i18n', () => ({
-  translate: jest.fn().mockImplementation((arg) => arg),
+vi.mock('@waldur/i18n', () => ({
+  translate: (arg) => arg,
 }));
 
 const renderForm = async () => {
@@ -36,7 +36,7 @@ const renderForm = async () => {
   });
   const wrapper = mount(
     <Provider store={store}>
-      <ProjectCreateForm onSubmit={jest.fn()} />
+      <ProjectCreateForm onSubmit={vi.fn()} />
     </Provider>,
   );
   await actWait();

@@ -11,7 +11,7 @@ describe('IssueReload', () => {
   });
 
   it('fetch issue data on click', () => {
-    const fetchData = jest.fn();
+    const fetchData = vi.fn();
     const wrapper = renderWrapper({ fetchData });
     wrapper.find('.issue-reload').simulate('click');
     expect(fetchData).toBeCalled();

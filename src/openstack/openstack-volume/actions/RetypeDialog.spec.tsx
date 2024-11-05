@@ -10,9 +10,9 @@ import { Volume } from '@waldur/resource/types';
 
 import { RetypeDialog } from './RetypeDialog';
 
-jest.mock('@waldur/openstack/api');
+vi.mock('@waldur/openstack/api');
 
-const apiMock = api as jest.Mocked<typeof api>;
+const apiMock = vi.mocked(api);
 
 const resource = {
   uuid: 'volume_uuid',
@@ -42,7 +42,7 @@ const mountDialog = () => {
   const store = createActionStore();
   return mount(
     <Provider store={store}>
-      <RetypeDialog resolve={{ resource, refetch: jest.fn() }} />
+      <RetypeDialog resolve={{ resource, refetch: vi.fn() }} />
     </Provider>,
   );
 };

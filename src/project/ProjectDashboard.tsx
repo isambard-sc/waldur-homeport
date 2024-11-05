@@ -19,16 +19,6 @@ import { getProject, getUser } from '@waldur/workspace/selectors';
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { getProjectTeamChart } from './utils';
 
-const shouldShowAggregateLimitWidget = (uuid) => {
-  const { data } = useQuery(
-    ['project-stats', uuid],
-    () => getProjectStats(uuid),
-    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
-  );
-
-  return data?.data.components?.length > 0;
-};
-
 export const ProjectDashboard: FunctionComponent<{}> = () => {
   const shouldConcealPrices = isFeatureVisible(
     MarketplaceFeatures.conceal_prices,
@@ -50,6 +40,19 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     project: project,
     roleTypes: ['project'],
   });
+
+  const {
+    data: aggregateLimitData,
+    isLoading: isAggregateLimitLoading,
+    error: aggregateLimitError,
+  } = useQuery(
+    ['project-stats', project?.uuid],
+    () => getProjectStats(project?.uuid),
+    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
+  );
+
+  const shouldShowAggregateLimitWidget =
+    aggregateLimitData?.data.components?.length > 0;
 
   if (!project || !user) {
     return null;
@@ -78,10 +81,15 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
           />
         </Col>
       </Row>
-      {shouldShowAggregateLimitWidget(project.uuid) && (
+      {shouldShowAggregateLimitWidget && (
         <Row>
           <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
-            <AggregateLimitWidget project={project} />
+            <AggregateLimitWidget
+              project={project}
+              data={aggregateLimitData}
+              isLoading={isAggregateLimitLoading}
+              error={aggregateLimitError}
+            />
           </Col>
         </Row>
       )}

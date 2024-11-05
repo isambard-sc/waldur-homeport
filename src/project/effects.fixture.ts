@@ -1,11 +1,12 @@
 import { runSaga } from 'redux-saga';
+import { vi } from 'vitest';
 
 import * as api from './api';
 import * as effects from './effects';
 
 export const setupFixture = (state = {}) => {
-  const mockUpdateProject = jest.spyOn(api, 'updateProjectPartially');
-  jest.spyOn(api, 'dangerouslyUpdateProject').mockReturnValue(null);
+  const mockUpdateProject = vi.spyOn(api, 'updateProjectPartially');
+  vi.spyOn(api, 'dangerouslyUpdateProject').mockReturnValue(null);
   const updateProject = (action) =>
     runSaga(store, effects.handleUpdateProject, action).toPromise();
   const hasActionWithType = (type) =>

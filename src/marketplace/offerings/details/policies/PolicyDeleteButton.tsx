@@ -32,6 +32,7 @@ export const PolicyDeleteButton = ({
           { name: <strong>{row.scope_name}</strong> },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;

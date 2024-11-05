@@ -73,10 +73,10 @@ export const HooksList: FunctionComponent = () => {
       ]}
       showPageSizeSelector={true}
       verboseName={translate('Notifications')}
-      tableActions={<HookCreateButton />}
+      tableActions={<HookCreateButton refetch={props.fetch} />}
       rowActions={({ row }) => (
         <>
-          <HookUpdateButton row={row} />
+          <HookUpdateButton hook={row} refetch={props.fetch} />
           <HookRemoveButton url={row.url} refetch={props.fetch} />
         </>
       )}

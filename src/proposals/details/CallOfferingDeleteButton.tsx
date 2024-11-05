@@ -21,6 +21,7 @@ export const CallOfferingDeleteButton = ({ row, refetch }) => {
           },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;

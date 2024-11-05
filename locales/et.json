@@ -2288,7 +2288,6 @@
   "Set static routes": "Määrake staatilised marsruudid",
   "Set termination date": "Määra lõpetamise kuupäev",
   "Set termination date of {resourceName}": "Määrake lõpetamise kuupäev ressursile {resourceName}",
-  "Set to \"true\" if this category is for OpenStack VM. Only one category can have \"true\" value.": "Määrake väärtuseks „tõene”, kui see kategooria on mõeldud OpenStack VM-ile. Ainult ühel kategoorial võib olla „tõene” väärtus.",
   "Set to draft": "Määrake mustandiks",
   "Set to true if this category is for OpenStack Tenant. Only one category can have \"true\" value.": "Määrake väärtuseks \"tõene\", kui see kategooria on mõeldud OpenStack Tenanti jaoks. Ainult ühel kategoorial võib olla „tõene” väärtus.",
   "Set to true if this category is for OpenStack Volume. Only one category can have \"true\" value.": "Määrake väärtuseks \"tõene,\" kui see kategooria on mõeldud OpenStack Volume jaoks. Ainult ühel kategoorial võib olla „tõene” väärtus.",

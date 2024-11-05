@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { AddButton } from '@waldur/core/AddButton';
@@ -10,15 +9,18 @@ const CategoryCreateDialog = lazyComponent(
   'CategoryEditDialog',
 );
 
-const categoryCreateDialog = (refetch) =>
-  openModalDialog(CategoryCreateDialog, { resolve: { refetch }, size: 'md' });
-
 export const CategoryCreateButton = ({ refetch }) => {
   const dispatch = useDispatch();
-  const openFormDialog = useCallback(
-    () => dispatch(categoryCreateDialog(refetch)),
-    [dispatch],
+  return (
+    <AddButton
+      action={() =>
+        dispatch(
+          openModalDialog(CategoryCreateDialog, {
+            resolve: { refetch },
+            size: 'md',
+          }),
+        )
+      }
+    />
   );
-
-  return <AddButton action={openFormDialog} />;
 };

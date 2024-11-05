@@ -10,9 +10,9 @@ import {
   fakeSubnet,
 } from './UpdateInternalIpsDialog.fixture';
 
-jest.mock('@waldur/openstack/api');
+vi.mock('@waldur/openstack/api');
 
-const apiMock = api as jest.Mocked<typeof api>;
+const apiMock = vi.mocked(api);
 
 describe('UpdateInternalIpsDialog', () => {
   let store: Store;

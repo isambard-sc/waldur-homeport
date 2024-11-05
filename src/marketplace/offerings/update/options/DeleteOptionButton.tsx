@@ -32,6 +32,7 @@ export const DeleteOptionButton: FC<
           },
           formatJsxTemplate,
         ),
+        true,
       );
     } catch {
       return;

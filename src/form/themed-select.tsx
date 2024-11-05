@@ -1,6 +1,5 @@
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useSelector } from 'react-redux';
 import BaseSelect, {
   ClearIndicatorProps,
   components,
@@ -12,7 +11,7 @@ import { AsyncPaginate as BaseAsyncPaginate } from 'react-select-async-paginate'
 import BaseWindowedSelect from 'react-windowed-select';
 
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { useTheme } from '@waldur/store/hooks';
 
 const REACT_SELECT_MENU_PORTALING: Partial<SelectProps> = {
   menuPortalTarget: document.body,
@@ -74,8 +73,8 @@ const DARK_COLORS = {
   primary50: '#4C6351',
 };
 
-const useTheme = (): ThemeConfig => {
-  const theme = useSelector((state: RootState) => state.theme?.theme);
+const useSelectTheme = (): ThemeConfig => {
+  const theme = useTheme();
   return (boxTheme) => {
     if (theme === 'dark') {
       return {
@@ -91,7 +90,7 @@ const useTheme = (): ThemeConfig => {
 };
 
 export const Select = (props) => {
-  const theme = useTheme();
+  const theme = useSelectTheme();
   return (
     <BaseSelect
       theme={theme}
@@ -103,7 +102,7 @@ export const Select = (props) => {
 };
 
 export const AsyncPaginate: FC<any> = (props) => {
-  const theme = useTheme();
+  const theme = useSelectTheme();
   return (
     <BaseAsyncPaginate
       theme={theme}
@@ -117,7 +116,7 @@ export const AsyncPaginate: FC<any> = (props) => {
 };
 
 export const WindowedSelect = (props) => {
-  const theme = useTheme();
+  const theme = useSelectTheme();
   return (
     <BaseWindowedSelect
       theme={theme}

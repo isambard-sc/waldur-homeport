@@ -1,23 +1,14 @@
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
 import { Marker, Popup } from 'react-leaflet';
+import { describe, expect, it } from 'vitest';
 
 import { CustomerMap } from './CustomerMap';
 import { initCustomer } from './fixtures';
 
-jest.mock('@waldur/images/marker-icon-red.png', () => 'marker-icon-red.png');
-jest.mock(
-  '@waldur/images/marker-icon-yellow.png',
-  () => 'marker-icon-yellow.png',
-);
-jest.mock(
-  '@waldur/images/marker-icon-green.png',
-  () => 'marker-icon-green.png',
-);
-
 const getSrcFromCustomerMap = (props = {}) => {
   const customers = [initCustomer(props)];
 
-  const component = shallow(<CustomerMap customers={customers} />);
+  const component = render(<CustomerMap customers={customers} />);
   const icon = component.find(Marker);
   const src = icon.prop('icon');
 
@@ -47,7 +38,7 @@ describe('CustomerMap', () => {
     it("should't render any markers", () => {
       const customers = [initCustomer({ latitude: null, longitude: null })];
 
-      const component = shallow(<CustomerMap customers={customers} />);
+      const component = render(<CustomerMap customers={customers} />);
       const icon = component.find(Marker);
 
       expect(icon).toHaveLength(0);
@@ -58,7 +49,7 @@ describe('CustomerMap', () => {
     it('should render a popup with name and score', () => {
       const customers = [initCustomer()];
 
-      const component = shallow(<CustomerMap customers={customers} />);
+      const component = render(<CustomerMap customers={customers} />);
       const popup = component.find(Popup);
       const icon = component.find(Marker);
       const text = popup.text();
@@ -70,7 +61,7 @@ describe('CustomerMap', () => {
     it("shouldn't render any popups", () => {
       const customers = [initCustomer({ latitude: null, longitude: null })];
 
-      const component = shallow(<CustomerMap customers={customers} />);
+      const component = render(<CustomerMap customers={customers} />);
       const popup = component.find(Popup);
 
       expect(popup).toHaveLength(0);

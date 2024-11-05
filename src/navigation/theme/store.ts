@@ -1,7 +1,6 @@
 import { AnyAction } from 'redux';
 
 import { ApplicationConfigurationOptions } from '@waldur/core/types';
-import { RootState } from '@waldur/store/reducers';
 
 import { getTheme, setTheme } from './ThemeStorage';
 import { ThemeName } from './types';
@@ -61,5 +60,3 @@ export const reducer = (state = INITIAL_STATE, action: AnyAction) => {
       return state;
   }
 };
-
-export const themeSelector = (state: RootState): ThemeName => state.theme.theme;

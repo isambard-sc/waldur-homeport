@@ -1,0 +1,25 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`formatJsx > allows to use angular braces syntax to interpolate JSX component 1`] = `
+<div>
+  By submitting the form you are agreeing to the 
+  <a
+    href="example.com"
+  >
+    Terms of Service
+  </a>
+  .
+</div>
+`;
+
+exports[`formatJsxTemplate > allows to use curly braces syntax to interpolate JSX component 1`] = `
+<div>
+  Please send an email to 
+  <a
+    href="mailto:admin@example.com"
+  >
+    admin@example.com
+  </a>
+  . Thank you!
+</div>
+`;

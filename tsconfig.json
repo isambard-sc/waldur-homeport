@@ -29,6 +29,9 @@
     "lib": [
       "es2021",
       "dom"
+    ],
+    "types": [
+      "@testing-library/jest-dom"
     ]
   },
   "include": [
@@ -41,14 +44,14 @@
     "./cypress/**/*",
     "./cypress.config.js",
     "**/*.spec.tsx",
+    "**/*.spec.ts",
     "**/*.fixture.tsx",
     "./src/core/testUtils.ts",
     "./src/form/testUtils.tsx",
-    "./src/table/testUtils.tsx"
   ],
   "typeRoots": [
     "./node_modules/@types",
     "./typings.d.ts",
-    "vite/client"
-  ],
+    "vite/client",
+  ]
 }

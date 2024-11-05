@@ -29,7 +29,7 @@ describe('IssueCommentsContainer', () => {
     const mockDropzoneCallbackProps: DropzoneState = {
       isDragActive: false,
       acceptedFiles: [],
-      open: jest.fn(),
+      open: vi.fn(),
       fileRejections: [],
       inputRef: null,
       isDragAccept: true,

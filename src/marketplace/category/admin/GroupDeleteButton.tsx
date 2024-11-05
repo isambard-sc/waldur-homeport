@@ -29,6 +29,7 @@ export const GroupDeleteButton = (props: GroupDeleteButtonProps) => {
           { title: <strong>{props.row.title}</strong> },
           formatJsxTemplate,
         ),
+        true,
       );
 
       if (!confirmed) return;

@@ -6,17 +6,13 @@ import { translate } from '@waldur/i18n';
 
 import { showHookUpdateDialog } from './actions';
 
-interface HookUpdateButtonProps {
-  row: any;
-}
-
-export const HookUpdateButton: FC<HookUpdateButtonProps> = ({ row }) => {
+export const HookUpdateButton: FC<{ refetch; hook }> = (props) => {
   const dispatch = useDispatch();
   return (
     <EditButton
       title={translate('Update')}
       onClick={() => {
-        dispatch(showHookUpdateDialog(row));
+        dispatch(showHookUpdateDialog(props));
       }}
       size="sm"
     />

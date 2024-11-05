@@ -1,19 +1,29 @@
-import { useQuery } from '@tanstack/react-query';
+import { Eye } from '@phosphor-icons/react';
+import { useCallback } from 'react';
 import { Col, Row } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { WidgetCard } from '@waldur/dashboard/WidgetCard';
 import { translate } from '@waldur/i18n';
 import { AggregateLimitsShowMoreButton } from '@waldur/marketplace/aggregate-limits/AggregateLimitsShowMoreButton';
 import { QuotaCell } from '@waldur/marketplace/resources/details/QuotaCell';
+import { openModalDialog } from '@waldur/modal/actions';
 import { Customer, Project } from '@waldur/workspace/types';
-
-import { getProjectStats, getCustomerStats } from './api';
 
 interface AggregateLimitWidgetProps {
   project?: Project;
   customer?: Customer;
+  data: any;
+  isLoading: boolean;
+  error: any;
 }
+
+const AggregateLimitDetailsDialog = lazyComponent(
+  () => import('./AggregateLimitDetailsDialog'),
+  'AggregateLimitDetailsDialog',
+);
 
 export const ComponentItem = ({ component }) => {
   return (
@@ -29,14 +39,27 @@ export const ComponentItem = ({ component }) => {
 export const AggregateLimitWidget = ({
   project,
   customer,
+  data,
+  isLoading,
+  error,
 }: AggregateLimitWidgetProps) => {
+  const dispatch = useDispatch();
   const isProject = !!project;
-  const uuid = isProject ? project.uuid : customer?.uuid;
 
-  const { data, isLoading, error } = useQuery(
-    [isProject ? 'project-stats' : 'customer-stats', uuid],
-    () => (isProject ? getProjectStats(uuid) : getCustomerStats(uuid)),
-    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
+  const viewDetails = useCallback(
+    () =>
+      dispatch(
+        openModalDialog(AggregateLimitDetailsDialog, {
+          resolve: {
+            [isProject ? 'project' : 'customer']: isProject
+              ? project
+              : customer,
+            components: data?.data.components,
+          },
+          size: 'lg',
+        }),
+      ),
+    [dispatch, project, customer, data, isProject],
   );
 
   if (isLoading) {
@@ -57,6 +80,13 @@ export const AggregateLimitWidget = ({
     <WidgetCard
       cardTitle={translate('Aggregate usage and limits')}
       className="h-100"
+      actions={[
+        {
+          label: translate('Details'),
+          icon: <Eye />,
+          callback: viewDetails,
+        },
+      ]}
     >
       <Row className="field-row mb-1">
         {components.slice(0, 4).map((component) => (

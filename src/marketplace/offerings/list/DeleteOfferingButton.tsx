@@ -31,6 +31,7 @@ export const DeleteOfferingButton = ({ row, refetch }) => {
         dispatch,
         translate('Delete confirmation'),
         translate('Are you sure you want to delete this offering?'),
+        true,
       );
     } catch {
       return;

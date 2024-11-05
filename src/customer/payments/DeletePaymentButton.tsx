@@ -19,6 +19,7 @@ export const DeletePaymentButton = ({ payment }) => {
             dispatch,
             translate('Confirmation'),
             translate('Are you sure you want to delete the payment?'),
+            true,
           );
         } catch {
           return;
