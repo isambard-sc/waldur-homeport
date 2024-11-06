@@ -348,7 +348,8 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Credit management'),
       permissions: [
         isOwnerOrStaff,
-        (state) => Boolean(state.workspace.customer?.credit),
+        (state) =>
+          !state.workspace.customer || Boolean(state.workspace.customer.credit),
       ],
       priority: 137,
     },
