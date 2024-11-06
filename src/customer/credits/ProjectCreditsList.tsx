@@ -1,18 +1,23 @@
 import { FC } from 'react';
+import { useSelector } from 'react-redux';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { createFetcher, Table, useTable } from '@waldur/table';
 import { renderFieldOrDash } from '@waldur/table/utils';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 import { ProjectCreateCreditButton } from './ProjectCreateCreditButton';
 import { ProjectCreditActions } from './ProjectCreditActions';
 import { ProjectCredit } from './types';
 
 export const ProjectCreditsList: FC = () => {
+  const customer = useSelector(getCustomer);
   const tableProps = useTable({
     table: 'ProjectCreditsList',
-    fetchData: createFetcher('project-credits'),
+    fetchData: createFetcher('project-credits', {
+      params: { customer_uuid: customer.uuid },
+    }),
     queryField: 'query',
   });
 
@@ -35,10 +40,16 @@ export const ProjectCreditsList: FC = () => {
         {
           title: translate('Eligible offerings'),
           render: ({ row }) => (
-            <>{row.offerings.map((offering) => offering.name).join(', ')}</>
+            <>
+              {renderFieldOrDash(
+                row.offerings.map((offering) => offering.name).join(', '),
+              )}
+            </>
           ),
           export: (row) =>
-            row.offerings.map((offering) => offering.name).join(', '),
+            renderFieldOrDash(
+              row.offerings.map((offering) => offering.name).join(', '),
+            ),
         },
       ]}
       title={translate('Credit management')}
