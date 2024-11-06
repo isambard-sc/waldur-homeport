@@ -24,17 +24,12 @@ export const ConsumerRejectAll = ({ orders, refetch }) => {
     }
   });
   return (
-    <Button
-      variant="danger"
-      className="me-4"
-      onClick={() => mutate()}
-      disabled={isLoading}
-    >
+    <Button variant="danger" onClick={() => mutate()} disabled={isLoading}>
       {isLoading ? (
         <LoadingSpinnerIcon />
       ) : (
         <span className="svg-icon svg-icon-2">
-          <Prohibit />
+          <Prohibit weight="bold" />
         </span>
       )}
       {translate('Reject all')}

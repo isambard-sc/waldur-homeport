@@ -24,17 +24,12 @@ export const ConsumerApproveAll = ({ orders, refetch }) => {
     }
   });
   return (
-    <Button
-      variant="primary"
-      className="me-4"
-      onClick={() => mutate()}
-      disabled={isLoading}
-    >
+    <Button variant="primary" onClick={() => mutate()} disabled={isLoading}>
       {isLoading ? (
         <LoadingSpinnerIcon />
       ) : (
         <span className="svg-icon svg-icon-2">
-          <Check />
+          <Check weight="bold" />
         </span>
       )}
       {translate('Approve all')}

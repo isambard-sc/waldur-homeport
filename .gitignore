@@ -1,5 +1,6 @@
 build.dev/
 .DS_Store
+.idea/
 node_modules
 coverage
 cypress/videos
