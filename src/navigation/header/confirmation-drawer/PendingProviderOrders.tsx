@@ -49,21 +49,19 @@ export const PendingProviderOrders: React.FC<{}> = () => {
   ];
 
   return (
-    <div>
-      <Table
-        {...tableProps}
-        placeholderComponent={<OrderTablePlaceholder />}
-        columns={columns}
-        title={translate('Orders')}
-        verboseName={translate('Orders')}
-        initialSorting={{ field: 'created', mode: 'desc' }}
-        initialPageSize={5}
-        expandableRow={OrderExpandableRow}
-        rowActions={({ row }) => (
-          <OrderProviderActions row={row} refetch={tableProps.fetch} />
-        )}
-      />
-      <BulkProviderActions orders={tableProps.rows} />
-    </div>
+    <Table
+      {...tableProps}
+      placeholderComponent={<OrderTablePlaceholder />}
+      columns={columns}
+      title={translate('Orders')}
+      verboseName={translate('Orders')}
+      initialSorting={{ field: 'created', mode: 'desc' }}
+      initialPageSize={5}
+      expandableRow={OrderExpandableRow}
+      tableActions={<BulkProviderActions orders={tableProps.rows} />}
+      rowActions={({ row }) => (
+        <OrderProviderActions row={row} refetch={tableProps.fetch} />
+      )}
+    />
   );
 };
