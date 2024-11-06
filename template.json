@@ -108,7 +108,7 @@
     "message": "Accept invitation"
   },
   "Accept": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx, proposals/offering-requests/OfferingRequestItemActions.tsx",
+    "description": "booking/components/AcceptBookingButton.tsx, proposals/offering-requests/OfferingRequestItemActions.tsx",
     "message": "Accept"
   },
   "Accepted proposals": {
@@ -1464,15 +1464,15 @@
     "message": "Blocked users cannot login into the system"
   },
   "Booked by": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "booking/components/BookingResourceDetailsDialog.tsx",
     "message": "Booked by"
   },
   "Booking has been accepted.": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "booking/components/AcceptBookingButton.tsx",
     "message": "Booking has been accepted."
   },
   "Booking has been cancelled.": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "booking/components/RejectBookingButton.tsx",
     "message": "Booking has been cancelled."
   },
   "Booking": {
@@ -1672,7 +1672,7 @@
     "message": "Cancel invitation"
   },
   "Cancel order": {
-    "description": "administration/roles/PermissionOptions.tsx, booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "administration/roles/PermissionOptions.tsx, booking/components/RejectBookingButton.tsx",
     "message": "Cancel order"
   },
   "Cancel payment": {
@@ -1884,7 +1884,7 @@
     "message": "Clone"
   },
   "Close": {
-    "description": "administration/TelemetryExampleDialog.tsx, booking/components/modal/BookingResourceDetailsDialog.tsx, broadcasts/RecipientsListDialog.tsx, invitations/actions/create/FormButtons.tsx, marketplace/aggregate-limits/AllComponentsDialog.tsx, marketplace/details/plan/EstimateUsageComponentDialog.tsx, marketplace/offerings/images/ImageDetailsDialog.tsx, marketplace/referral/OfferingReferralsDialog.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/ProviderProjectResourcesDialog.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, resource/summary/ResourceMetadataDialog.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserPopover.tsx, user/support/UserDetailsDialog.tsx, user/support/UserRemovalMessageDialog.tsx",
+    "description": "administration/TelemetryExampleDialog.tsx, booking/components/BookingResourceDetailsDialog.tsx, broadcasts/RecipientsListDialog.tsx, invitations/actions/create/FormButtons.tsx, marketplace/aggregate-limits/AllComponentsDialog.tsx, marketplace/details/plan/EstimateUsageComponentDialog.tsx, marketplace/offerings/images/ImageDetailsDialog.tsx, marketplace/referral/OfferingReferralsDialog.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/ProviderProjectResourcesDialog.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, resource/summary/ResourceMetadataDialog.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserPopover.tsx, user/support/UserDetailsDialog.tsx, user/support/UserRemovalMessageDialog.tsx",
     "message": "Close"
   },
   "Closed issues (this month)": {
@@ -2856,7 +2856,7 @@
     "message": "Deleting PostgreSQL server will cause deletion of all databases created within server."
   },
   "Deny": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "booking/components/RejectBookingButton.tsx",
     "message": "Deny"
   },
   "Deploy Longhorn block storage after cluster is deployed": {
@@ -11256,7 +11256,7 @@
     "message": "UUID"
   },
   "Unable to accept booking.": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "booking/components/AcceptBookingButton.tsx",
     "message": "Unable to accept booking."
   },
   "Unable to accept offering request.": {
@@ -11344,7 +11344,7 @@
     "message": "Unable to bootstrap application."
   },
   "Unable to cancel booking.": {
-    "description": "booking/components/modal/BookingResourceDetailsDialog.tsx",
+    "description": "booking/components/RejectBookingButton.tsx",
     "message": "Unable to cancel booking."
   },
   "Unable to cancel group invitation.": {
