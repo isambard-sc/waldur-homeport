@@ -4,7 +4,7 @@ import { Field } from 'redux-form';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
-const Select = ({ input, loadOptions, ...rest }) => (
+export const Select = ({ input, loadOptions, ...rest }) => (
   <AsyncPaginate
     value={input.value}
     onChange={input.onChange}

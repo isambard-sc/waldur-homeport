@@ -5,7 +5,7 @@ import { Field } from 'redux-form';
 import { required } from '@waldur/core/validators';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { ProjectCreateButton } from '@waldur/project/ProjectCreateButton';
+import { ProjectCreateButton } from '@waldur/project/create/ProjectCreateButton';
 import { setCurrentProject } from '@waldur/workspace/actions';
 
 import { projectAutocomplete } from '../common/autocompletes';

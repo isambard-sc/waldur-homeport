@@ -1,67 +1,94 @@
-import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { reduxForm } from 'redux-form';
+import { FunctionComponent, useCallback } from 'react';
+import { Field, Form } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
-import { FormContainer, SubmitButton } from '@waldur/form';
+import { format } from '@waldur/core/ErrorMessageFormatter';
+import { required } from '@waldur/core/validators';
+import { SubmitButton } from '@waldur/form';
+import { Select } from '@waldur/form/AsyncSelectField';
 import { translate } from '@waldur/i18n';
+import { organizationAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import * as actions from '@waldur/project/actions';
-import { MOVE_PROJECT_FORM_ID } from '@waldur/project/constants';
-import { MoveToOrganizationAutocomplete } from '@waldur/project/MoveToOrganizationAutocomplete';
-import { Project } from '@waldur/workspace/types';
+import { showError, showSuccess } from '@waldur/store/notify';
 
-interface MoveProjectDialogOwnProps {
-  project: Project;
-}
+import * as api from './api';
 
-interface FormData {
-  organization: { name: string; url: string };
-}
-
-const PureMoveProjectDialog: FunctionComponent<any> = (props) => (
-  <form onSubmit={props.handleSubmit(props.submitRequest)}>
-    <ModalDialog
-      title={translate('Move project {projectName}', {
-        projectName: props.resolve.project.name,
-      })}
-      footer={
-        <>
-          <CloseDialogButton />
-          <SubmitButton
-            submitting={props.submitting}
-            label={translate('Save')}
-            disabled={props.invalid}
-          />
-        </>
+export const MoveProjectDialog: FunctionComponent<{
+  resolve: { project; refetch };
+}> = ({ resolve: { project, refetch } }) => {
+  const dispatch = useDispatch();
+  const onSubmit = useCallback(
+    async (formData) => {
+      try {
+        await api.moveProject({
+          organization: formData.organization,
+          project: project,
+        });
+        dispatch(
+          showSuccess(
+            translate(
+              '{projectName} project has been moved to {organizationName} organization.',
+              {
+                projectName: project.name,
+                organizationName: formData.organization.name,
+              },
+            ),
+          ),
+        );
+        await refetch();
+        dispatch(closeModalDialog());
+      } catch (error) {
+        const errorMessage = `${translate('Project could not be moved.')} ${format(error)}`;
+        dispatch(showError(errorMessage));
       }
-    >
-      <FormContainer submitting={props.submitting}>
-        <MoveToOrganizationAutocomplete isDisabled={props.submitting} />
-      </FormContainer>
-    </ModalDialog>
-  </form>
-);
+    },
+    [dispatch, project],
+  );
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  submitRequest: (formData) =>
-    actions.moveProject(
-      {
-        organization: formData.organization,
-        project: ownProps.resolve.project,
-      },
-      dispatch,
-    ),
-});
-
-const connector = connect(null, mapDispatchToProps);
-
-const enhance = compose(
-  connector,
-  reduxForm<FormData, MoveProjectDialogOwnProps>({
-    form: MOVE_PROJECT_FORM_ID,
-  }),
-);
-
-export const MoveProjectDialog = enhance(PureMoveProjectDialog);
+  return (
+    <Form
+      onSubmit={onSubmit}
+      render={({ handleSubmit, submitting, invalid }) => (
+        <form onSubmit={handleSubmit}>
+          <ModalDialog
+            title={translate('Move project {projectName}', {
+              projectName: project.name,
+            })}
+            footer={
+              <>
+                <CloseDialogButton />
+                <SubmitButton
+                  submitting={submitting}
+                  label={translate('Save')}
+                  disabled={invalid}
+                />
+              </>
+            }
+          >
+            <FormGroup label={translate('Move to organization')} required>
+              <Field
+                component={Select as any}
+                name="organization"
+                validate={required}
+                placeholder={translate('Select organization...')}
+                loadOptions={(query, prevOptions, page) =>
+                  organizationAutocomplete(query, prevOptions, page, {
+                    field: ['name', 'url'],
+                    o: 'name',
+                  })
+                }
+                getOptionLabel={(option) => option.name}
+                getOptionValue={(option) => option.url}
+                noOptionsMessage={() => translate('No organizations')}
+                isDisabled={submitting}
+              />
+            </FormGroup>
+          </ModalDialog>
+        </form>
+      )}
+    />
+  );
+};

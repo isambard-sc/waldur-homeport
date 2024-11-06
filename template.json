@@ -428,7 +428,7 @@
     "message": "Add {category}"
   },
   "Add": {
-    "description": "administration/providers/CreateProviderDialog.tsx, core/AddButton.tsx, customer/list/OrganizationCreateButton.tsx, customer/team/AddProjectUserButton.tsx, customer/team/UserAddButton.tsx, issues/comments/IssueCommentsForm.tsx, marketplace/deploy/DeployPage.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-backup/actions/NetworksList.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpsList.tsx, openstack/openstack-instance/deploy/FormNetworkStep.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/GlobalProjectCreateButton.tsx, project/ProjectCreateButton.tsx, rancher/cluster/create/FormNodesStep.tsx",
+    "description": "administration/providers/CreateProviderDialog.tsx, core/AddButton.tsx, customer/list/OrganizationCreateButton.tsx, customer/team/AddProjectUserButton.tsx, customer/team/UserAddButton.tsx, issues/comments/IssueCommentsForm.tsx, marketplace/deploy/DeployPage.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-backup/actions/NetworksList.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpsList.tsx, openstack/openstack-instance/deploy/FormNetworkStep.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/create/GlobalProjectCreateButton.tsx, project/create/ProjectCreateButton.tsx, rancher/cluster/create/FormNodesStep.tsx",
     "message": "Add"
   },
   "Additional account description invisible to user": {
@@ -1828,7 +1828,7 @@
     "message": "Choices as comma-separated list"
   },
   "Choose a science code identifying project activities.": {
-    "description": "project/ProjectCreateForm.tsx",
+    "description": "project/create/OecdCodeGroup.tsx",
     "message": "Choose a science code identifying project activities."
   },
   "Civil engineering": {
@@ -2356,7 +2356,7 @@
     "message": "Create project permission"
   },
   "Create project": {
-    "description": "administration/roles/PermissionOptions.tsx, project/ProjectCreateDialog.tsx",
+    "description": "administration/roles/PermissionOptions.tsx, project/create/ProjectCreateDialog.tsx",
     "message": "Create project"
   },
   "Create proposal": {
@@ -2400,7 +2400,7 @@
     "message": "Create subnet"
   },
   "Create": {
-    "description": "administration/organizations/OrganizationGroupForm.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateDialog.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
+    "description": "administration/organizations/OrganizationGroupForm.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateDialog.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
     "message": "Create"
   },
   "Created at": {
@@ -3299,10 +3299,6 @@
     "description": "proposals/update/general/CallGeneralSection.tsx",
     "message": "Edit reference code"
   },
-  "Edit request": {
-    "description": "project/ProjectCreateDialog.tsx",
-    "message": "Edit request"
-  },
   "Edit resource request": {
     "description": "proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx",
     "message": "Edit resource request"
@@ -3476,7 +3472,7 @@
     "message": "End date of the agreement is {date}."
   },
   "End date": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, booking/deploy/CustomRangeDatePicker.tsx, customer/credits/CreditFormDialog.tsx, customer/dashboard/CreditStatusWidget.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, marketplace/service-providers/OrganizationProjectsExpandable.tsx, marketplace/service-providers/ProviderCampaignsList.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, project/ProjectCreateForm.tsx, project/ProjectsList.tsx, project/manage/EditFieldDialog.tsx, project/manage/ProjectGeneral.tsx, user/affiliations/ProjectsList.tsx",
+    "description": "administration/organizations/OrganizationCreditsList.tsx, booking/deploy/CustomRangeDatePicker.tsx, customer/credits/CreditFormDialog.tsx, customer/dashboard/CreditStatusWidget.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, marketplace/service-providers/OrganizationProjectsExpandable.tsx, marketplace/service-providers/ProviderCampaignsList.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, project/ProjectsList.tsx, project/create/EndDateGroup.tsx, project/manage/ProjectGeneral.tsx, user/affiliations/ProjectsList.tsx",
     "message": "End date"
   },
   "End date:": {
@@ -3528,7 +3524,7 @@
     "message": "Enter a contact number for the user"
   },
   "Enter a description": {
-    "description": "marketplace/resources/usage/ResourceUsageForm.tsx, project/ProjectCreateForm.tsx",
+    "description": "marketplace/resources/usage/ResourceUsageForm.tsx, project/create/DescriptionGroup.tsx",
     "message": "Enter a description"
   },
   "Enter a single port (22) or a port range (5000-6000) or just leave blank for all ports.": {
@@ -3904,7 +3900,7 @@
     "message": "File download failed"
   },
   "File too large. Please select a smaller file.": {
-    "description": "project/effects.ts",
+    "description": "core/ErrorMessageFormatter.ts",
     "message": "File too large. Please select a smaller file."
   },
   "File": {
@@ -5696,7 +5692,7 @@
     "message": "Move resource {resourceName} from {projectName} ({customerName})"
   },
   "Move to organization": {
-    "description": "project/MoveToOrganizationAutocomplete.tsx",
+    "description": "project/MoveProjectDialog.tsx",
     "message": "Move to organization"
   },
   "Move to project": {
@@ -6076,7 +6072,7 @@
     "message": "No organizations found"
   },
   "No organizations": {
-    "description": "customer/cost-policies/CostPolicyForm.tsx, customer/credits/CreditFormDialog.tsx, marketplace/orders/OrganizationAutocomplete.tsx, marketplace/robot-accounts/ProviderCustomerFilter.tsx, project/MoveToOrganizationAutocomplete.tsx, project/ProjectCreateForm.tsx",
+    "description": "customer/cost-policies/CostPolicyForm.tsx, customer/credits/CreditFormDialog.tsx, marketplace/orders/OrganizationAutocomplete.tsx, marketplace/robot-accounts/ProviderCustomerFilter.tsx, project/MoveProjectDialog.tsx, project/create/OrganizationGroup.tsx",
     "message": "No organizations"
   },
   "No outputs found for this order": {
@@ -6292,7 +6288,7 @@
     "message": "Number of worker nodes"
   },
   "OECD FoS code": {
-    "description": "marketplace-remote/ProjectUpdateRequestExpandable.tsx, project/ProjectCreateForm.tsx, project/manage/EditFieldDialog.tsx, project/manage/ProjectMetadata.tsx, proposals/proposal/UserProposalsList.tsx, user/affiliations/ProjectsList.tsx",
+    "description": "marketplace-remote/ProjectUpdateRequestExpandable.tsx, project/create/OecdCodeGroup.tsx, project/manage/ProjectMetadata.tsx, proposals/proposal/UserProposalsList.tsx, user/affiliations/ProjectsList.tsx",
     "message": "OECD FoS code"
   },
   "OK": {
@@ -6508,7 +6504,7 @@
     "message": "On that date all credit will be set to 0"
   },
   "Once start date is reached, invitations and orders are processed.": {
-    "description": "project/ProjectCreateForm.tsx, project/manage/EditFieldDialog.tsx",
+    "description": "project/create/StartDateGroup.tsx",
     "message": "Once start date is reached, invitations and orders are processed."
   },
   "One project": {
@@ -6832,7 +6828,7 @@
     "message": "Organization workspace"
   },
   "Organization": {
-    "description": "administration/InvitationsFilter.tsx, administration/organizations/OrganizationCostPoliciesFilter.tsx, administration/organizations/OrganizationCostPoliciesList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/credits/CreditFormDialog.tsx, customer/details/CustomerRemoveDialog.tsx, customer/list/CustomerList.tsx, customer/routes.ts, events/ExpandableEventDetailsTable.tsx, invitations/actions/UserDetailsGroup.tsx, issues/IssueSummary.tsx, issues/create/IssueHeader.tsx, issues/list/IssuesList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/deploy/steps/FormCustomerStep.tsx, marketplace/details/CustomerField.tsx, marketplace/landing/MarketplaceLandingFilter.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/expandable/OfferingCustomersList.tsx, marketplace/offerings/import/tabs.ts, marketplace/offerings/list/OfferingsList.tsx, marketplace/orders/details/OrderDetailsHeaderBody.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ResourcesAllListTable.tsx, marketplace/robot-accounts/ProviderRobotAccountFilter.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, marketplace/service-providers/ProviderOfferingUsersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace-checklist/ChecklistOverview.tsx, marketplace-remote/BaseProjectUpdateRequestsList.tsx, marketplace-remote/OrganizationProjectUpdateRequestListFilter.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx, permissions/constants.tsx, project/ProjectCreateForm.tsx, proposals/PublicCallsList.tsx, proposals/offering-requests/OfferingRequestsTableFilter.tsx, reporting/resource-usage/ResourceUsageFilter.tsx, resource/support/SharedProviderCustomers.tsx, resource/support/SharedProviderResources.tsx, user/UserPermissionRequestsList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/affiliations/UserAffiliationsList.tsx, user/support/UserDetailsTable.tsx, user/support/UserFilter.tsx, user/support/UserList.tsx",
+    "description": "administration/InvitationsFilter.tsx, administration/organizations/OrganizationCostPoliciesFilter.tsx, administration/organizations/OrganizationCostPoliciesList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/credits/CreditFormDialog.tsx, customer/details/CustomerRemoveDialog.tsx, customer/list/CustomerList.tsx, customer/routes.ts, events/ExpandableEventDetailsTable.tsx, invitations/actions/UserDetailsGroup.tsx, issues/IssueSummary.tsx, issues/create/IssueHeader.tsx, issues/list/IssuesList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/deploy/steps/FormCustomerStep.tsx, marketplace/details/CustomerField.tsx, marketplace/landing/MarketplaceLandingFilter.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/expandable/OfferingCustomersList.tsx, marketplace/offerings/import/tabs.ts, marketplace/offerings/list/OfferingsList.tsx, marketplace/orders/details/OrderDetailsHeaderBody.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ResourcesAllListTable.tsx, marketplace/robot-accounts/ProviderRobotAccountFilter.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, marketplace/service-providers/ProviderOfferingUsersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace-checklist/ChecklistOverview.tsx, marketplace-remote/BaseProjectUpdateRequestsList.tsx, marketplace-remote/OrganizationProjectUpdateRequestListFilter.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx, permissions/constants.tsx, project/create/OrganizationGroup.tsx, proposals/PublicCallsList.tsx, proposals/offering-requests/OfferingRequestsTableFilter.tsx, reporting/resource-usage/ResourceUsageFilter.tsx, resource/support/SharedProviderCustomers.tsx, resource/support/SharedProviderResources.tsx, user/UserPermissionRequestsList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/affiliations/UserAffiliationsList.tsx, user/support/UserDetailsTable.tsx, user/support/UserFilter.tsx, user/support/UserList.tsx",
     "message": "Organization"
   },
   "Organizations owner": {
@@ -7304,7 +7300,7 @@
     "message": "Please make sure you know what you are doing and set to 10 minutes if unsure."
   },
   "Please mark if project is aimed at industrial use": {
-    "description": "project/ProjectCreateForm.tsx, project/manage/EditFieldDialog.tsx",
+    "description": "project/create/IndustryGroup.tsx",
     "message": "Please mark if project is aimed at industrial use"
   },
   "Please note that request should specify allocation name and provide a reason for change.": {
@@ -7350,10 +7346,6 @@
   "Please search for your organization": {
     "description": "auth/saml2/AuthSaml2Dialog.tsx",
     "message": "Please search for your organization"
-  },
-  "Please select OECD code corresponding to field of science and technology": {
-    "description": "project/manage/EditFieldDialog.tsx",
-    "message": "Please select OECD code corresponding to field of science and technology"
   },
   "Please select a script language to use dry-run": {
     "description": "marketplace/offerings/update/integration/EditScriptDialog.tsx",
@@ -7631,16 +7623,12 @@
     "description": "project/ProjectDashboardCostLimits.tsx",
     "message": "Project cost"
   },
-  "Project could not be created.": {
-    "description": "project/effects.ts",
-    "message": "Project could not be created."
-  },
   "Project could not be moved.": {
-    "description": "project/effects.ts",
+    "description": "project/MoveProjectDialog.tsx",
     "message": "Project could not be moved."
   },
   "Project could not be updated.": {
-    "description": "project/effects.ts",
+    "description": "project/manage/EditFieldDialog.tsx, project/manage/ProjectAvatar.tsx",
     "message": "Project could not be updated."
   },
   "Project dashboard": {
@@ -7648,7 +7636,7 @@
     "message": "Project dashboard"
   },
   "Project description": {
-    "description": "marketplace/orders/list/OrdersListExpandableRow.tsx, project/ProjectCreateForm.tsx, project/manage/EditFieldDialog.tsx",
+    "description": "marketplace/orders/list/OrdersListExpandableRow.tsx, project/create/DescriptionGroup.tsx",
     "message": "Project description"
   },
   "Project details": {
@@ -7688,11 +7676,11 @@
     "message": "Project for civilian purpose?"
   },
   "Project has been created.": {
-    "description": "project/GlobalProjectCreateButton.tsx, project/effects.ts",
+    "description": "project/create/ProjectCreateDialog.tsx",
     "message": "Project has been created."
   },
   "Project has been updated.": {
-    "description": "project/effects.ts",
+    "description": "project/manage/EditFieldDialog.tsx, project/manage/ProjectAvatar.tsx",
     "message": "Project has been updated."
   },
   "Project has reached its end date {date}": {
@@ -7704,11 +7692,11 @@
     "message": "Project has reached its end date."
   },
   "Project image": {
-    "description": "project/ProjectCreateForm.tsx",
+    "description": "project/create/ImageGroup.tsx",
     "message": "Project image"
   },
   "Project name": {
-    "description": "customer/team/CustomerUsersListExpandableRow.tsx, events/ExpandableEventDetailsTable.tsx, project/ProjectNameField.tsx",
+    "description": "customer/team/CustomerUsersListExpandableRow.tsx, events/ExpandableEventDetailsTable.tsx, project/ProjectNameField.tsx, project/create/NameGroup.tsx",
     "message": "Project name"
   },
   "Project owner": {
@@ -7744,7 +7732,7 @@
     "message": "Project title"
   },
   "Project type": {
-    "description": "project/ProjectCreateForm.tsx",
+    "description": "project/create/TypeGroup.tsx",
     "message": "Project type"
   },
   "Project update requests": {
@@ -7920,7 +7908,7 @@
     "message": "Provide an email address for the user's communication and recovery"
   },
   "Provide the required information to set up a new project.": {
-    "description": "project/ProjectCreateDialog.tsx",
+    "description": "project/create/ProjectCreateDialog.tsx",
     "message": "Provide the required information to set up a new project."
   },
   "Provider UUID": {
@@ -9468,7 +9456,7 @@
     "message": "Select organization(s)"
   },
   "Select organization...": {
-    "description": "auth/saml2/ProviderField.tsx, marketplace/details/CustomerField.tsx, marketplace/orders/OrganizationAutocomplete.tsx, marketplace/robot-accounts/ProviderCustomerFilter.tsx, project/MoveToOrganizationAutocomplete.tsx",
+    "description": "auth/saml2/ProviderField.tsx, marketplace/details/CustomerField.tsx, marketplace/orders/OrganizationAutocomplete.tsx, marketplace/robot-accounts/ProviderCustomerFilter.tsx, project/MoveProjectDialog.tsx",
     "message": "Select organization..."
   },
   "Select organizations...": {
@@ -9612,7 +9600,7 @@
     "message": "Select"
   },
   "Select...": {
-    "description": "project/ProjectCreateForm.tsx",
+    "description": "project/create/OrganizationGroup.tsx",
     "message": "Select..."
   },
   "Selected": {
@@ -10176,7 +10164,7 @@
     "message": "Staff"
   },
   "Start date": {
-    "description": "marketplace/service-providers/ProviderCampaignsList.tsx, project/ProjectCreateForm.tsx, project/ProjectsList.tsx, project/manage/EditFieldDialog.tsx, project/manage/ProjectGeneral.tsx, proposals/details/CallRoundsList.tsx, proposals/round/submission/RoundSubmissionSection.tsx, proposals/update/rounds/CallRoundsList.tsx, proposals/update/rounds/WizardFormFirstPage.tsx, user/affiliations/ProjectsList.tsx",
+    "description": "marketplace/service-providers/ProviderCampaignsList.tsx, project/ProjectsList.tsx, project/create/StartDateGroup.tsx, project/manage/ProjectGeneral.tsx, proposals/details/CallRoundsList.tsx, proposals/round/submission/RoundSubmissionSection.tsx, proposals/update/rounds/CallRoundsList.tsx, proposals/update/rounds/WizardFormFirstPage.tsx, user/affiliations/ProjectsList.tsx",
     "message": "Start date"
   },
   "Start date:": {
@@ -10712,7 +10700,7 @@
     "message": "The category has been updated."
   },
   "The date is inclusive. Once reached, all project resource will be scheduled for termination.": {
-    "description": "project/ProjectCreateForm.tsx, project/manage/EditFieldDialog.tsx",
+    "description": "project/create/EndDateGroup.tsx",
     "message": "The date is inclusive. Once reached, all project resource will be scheduled for termination."
   },
   "The date is inclusive. Once reached, resource will be scheduled for termination.": {
@@ -11004,7 +10992,7 @@
     "message": "This field is required."
   },
   "This name will be visible in accounting data.": {
-    "description": "azure/sql/AzureSQLServerForm.tsx, azure/vm/AzureVirtualMachineForm.tsx, marketplace/deploy/steps/ResourceNameGroup.tsx, project/ProjectNameField.tsx",
+    "description": "azure/sql/AzureSQLServerForm.tsx, azure/vm/AzureVirtualMachineForm.tsx, marketplace/deploy/steps/ResourceNameGroup.tsx, project/ProjectNameField.tsx, project/create/NameGroup.tsx",
     "message": "This name will be visible in accounting data."
   },
   "This offering has been archived.": {
@@ -11512,7 +11500,7 @@
     "message": "Unable to create port."
   },
   "Unable to create project.": {
-    "description": "project/GlobalProjectCreateButton.tsx",
+    "description": "project/create/ProjectCreateDialog.tsx",
     "message": "Unable to create project."
   },
   "Unable to create request.": {
@@ -11840,7 +11828,7 @@
     "message": "Unable to load plan details."
   },
   "Unable to load project types.": {
-    "description": "project/ProjectCreateForm.tsx",
+    "description": "project/create/TypeGroup.tsx",
     "message": "Unable to load project types."
   },
   "Unable to load questions and answers.": {
@@ -13420,7 +13408,7 @@
     "message": "You do not have the permissions for accessing this page."
   },
   "You don't have enough privileges to perform this operation.": {
-    "description": "project/ProjectCreateButton.tsx",
+    "description": "project/create/ProjectCreateButton.tsx",
     "message": "You don't have enough privileges to perform this operation."
   },
   "You don't have permission to cancel these invitations.": {
@@ -13596,7 +13584,7 @@
     "message": "disks"
   },
   "e.g. Community Health Outreach": {
-    "description": "project/ProjectNameField.tsx",
+    "description": "project/ProjectNameField.tsx, project/create/NameGroup.tsx",
     "message": "e.g. Community Health Outreach"
   },
   "e.g. MyApp": {
@@ -14052,7 +14040,7 @@
     "message": "{price} per {unit}"
   },
   "{projectName} project has been moved to {organizationName} organization.": {
-    "description": "project/effects.ts",
+    "description": "project/MoveProjectDialog.tsx",
     "message": "{projectName} project has been moved to {organizationName} organization."
   },
   "{pronoun} email is required for account notifications and password recovery": {

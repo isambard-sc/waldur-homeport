@@ -23,7 +23,7 @@ const checkDuplicate = (value, props) =>
     ? translate('Name is duplicated. Choose other name.')
     : undefined;
 
-const validateProjectName = (value, _, props) =>
+export const validateProjectName = (value, _, props) =>
   checkDuplicate(value, props) || checkPattern(value);
 
 interface ProjectNameFieldProps {

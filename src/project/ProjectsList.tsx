@@ -13,8 +13,8 @@ import { Column } from '@waldur/table/types';
 import { formatLongText } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
+import { ProjectCreateButton } from './create/ProjectCreateButton';
 import { ProjectCostField } from './ProjectCostField';
-import { ProjectCreateButton } from './ProjectCreateButton';
 import { ProjectDetailsButton } from './ProjectDetailsButton';
 import { ProjectExpandableRowContainer } from './ProjectExpandableRowContainer';
 import { ProjectLink } from './ProjectLink';
@@ -110,7 +110,7 @@ export const ProjectsList: FunctionComponent<{}> = () => {
       initialSorting={{ field: 'created', mode: 'desc' }}
       hasQuery={true}
       showPageSizeSelector={true}
-      tableActions={<ProjectCreateButton />}
+      tableActions={<ProjectCreateButton refetch={props.fetch} />}
       rowActions={({ row }) => (
         <>
           <ProjectsListActions project={row} refetch={props.fetch} />
