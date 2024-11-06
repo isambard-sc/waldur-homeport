@@ -264,6 +264,7 @@ const pagination = (state = INITIAL_STATE, action): TableState => {
       return {
         ...state,
         selectedRows: [],
+        firstFetch: true,
       };
     }
 

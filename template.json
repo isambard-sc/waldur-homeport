@@ -404,7 +404,7 @@
     "message": "Add rule"
   },
   "Add time period": {
-    "description": "booking/deploy/FormPeriodsStep.tsx, marketplace/offerings/update/integration/OfferingScheduler.tsx",
+    "description": "booking/OfferingScheduler.tsx, booking/deploy/FormPeriodsStep.tsx",
     "message": "Add time period"
   },
   "Add to a new namespace": {
@@ -1296,7 +1296,7 @@
     "message": "Availability zone"
   },
   "Availability": {
-    "description": "marketplace/offerings/update/integration/OfferingScheduler.tsx",
+    "description": "booking/OfferingScheduler.tsx",
     "message": "Availability"
   },
   "Availability:": {
@@ -3320,7 +3320,7 @@
     "message": "Edit round submission"
   },
   "Edit schedules": {
-    "description": "marketplace/offerings/update/integration/EditSchedulesButton.tsx",
+    "description": "booking/EditSchedulesButton.tsx",
     "message": "Edit schedules"
   },
   "Edit user agreement": {
@@ -7112,7 +7112,7 @@
     "message": "Performed"
   },
   "Period {i}": {
-    "description": "booking/deploy/FormPeriodsStep.tsx, marketplace/offerings/update/integration/OfferingScheduler.tsx",
+    "description": "booking/OfferingScheduler.tsx, booking/deploy/FormPeriodsStep.tsx",
     "message": "Period {i}"
   },
   "Period": {
@@ -9192,7 +9192,7 @@
     "message": "Scheduled"
   },
   "Schedules have been updated successfully.": {
-    "description": "marketplace/offerings/update/integration/EditSchedulesDialog.tsx",
+    "description": "booking/EditSchedulesDialog.tsx",
     "message": "Schedules have been updated successfully."
   },
   "Scope name": {
@@ -11084,7 +11084,7 @@
     "message": "To team verification"
   },
   "To": {
-    "description": "booking/deploy/FormPeriodsStep.tsx, marketplace/offerings/update/integration/OfferingScheduler.tsx",
+    "description": "booking/OfferingScheduler.tsx, booking/deploy/FormPeriodsStep.tsx",
     "message": "To"
   },
   "Toggler for SSL verification": {
@@ -12360,7 +12360,7 @@
     "message": "Unable to update review."
   },
   "Unable to update schedules.": {
-    "description": "marketplace/offerings/update/integration/EditSchedulesDialog.tsx",
+    "description": "booking/EditSchedulesDialog.tsx",
     "message": "Unable to update schedules."
   },
   "Unable to update script.": {
@@ -12644,7 +12644,7 @@
     "message": "Update robot account"
   },
   "Update schedule": {
-    "description": "marketplace/offerings/update/integration/EditSchedulesDialog.tsx",
+    "description": "booking/EditSchedulesDialog.tsx",
     "message": "Update schedule"
   },
   "Update security groups for OpenStack instance {name}": {
@@ -12672,7 +12672,7 @@
     "message": "Update {resourceType}"
   },
   "Update": {
-    "description": "administration/hooks/HookUpdateButton.tsx, administration/service-desk/AdministrationServiceDeskUpdateDialog.tsx, broadcasts/BroadcastUpdateButton.tsx, customer/details/AccessSubnetEditDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, marketplace/offerings/update/integration/EditSchedulesDialog.tsx, marketplace/offerings/update/overview/EditGettingStartedDialog.tsx, marketplace/offerings/update/overview/EditOverviewDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/options/UpdateResourceOptionDialog.tsx, marketplace/service-providers/UpdateOfferingPermissionExpirationTimeDialog.tsx, openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx, openstack/openstack-tenant/SetRoutesDialog.tsx, table/SaveFilterDialog.tsx, table/TableFiltersMenu.tsx, user/hooks/HookDetailsDialog.tsx, user/hooks/HookUpdateButton.tsx",
+    "description": "administration/hooks/HookUpdateButton.tsx, administration/service-desk/AdministrationServiceDeskUpdateDialog.tsx, booking/EditSchedulesDialog.tsx, broadcasts/BroadcastUpdateButton.tsx, customer/details/AccessSubnetEditDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, marketplace/offerings/update/overview/EditGettingStartedDialog.tsx, marketplace/offerings/update/overview/EditOverviewDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/options/UpdateResourceOptionDialog.tsx, marketplace/service-providers/UpdateOfferingPermissionExpirationTimeDialog.tsx, openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx, openstack/openstack-tenant/SetRoutesDialog.tsx, table/SaveFilterDialog.tsx, table/TableFiltersMenu.tsx, user/hooks/HookDetailsDialog.tsx, user/hooks/HookUpdateButton.tsx",
     "message": "Update"
   },
   "Updates": {

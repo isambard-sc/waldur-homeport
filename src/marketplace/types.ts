@@ -259,7 +259,6 @@ export interface OfferingConfigurationFormProps extends InjectedFormProps {
   offering: Offering;
   project?: Project;
   plan?: Plan;
-  initialAttributes?: AttributesType;
   initialLimits?: AttributesType;
   customer?: Customer;
   limits: string[];

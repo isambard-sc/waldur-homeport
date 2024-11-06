@@ -11,7 +11,6 @@ import { useSelector } from 'react-redux';
 import { useEffectOnce } from 'react-use';
 import { reduxForm } from 'redux-form';
 
-import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { parseDate } from '@waldur/core/dateUtils';
 import { SidebarLayout } from '@waldur/form/SidebarLayout';
 import { translate } from '@waldur/i18n';
@@ -43,7 +42,6 @@ interface DeployPageProps {
   cartItem?: OrderResponse;
   plan?: Plan;
   initialLimits?: AttributesType;
-  initialAttributes?: AttributesType;
 }
 
 interface DeployFormData {
@@ -133,33 +131,6 @@ export const BaseDeployPage = ({
       initialValues.offering = selectedOffering;
     }
 
-    // initial attributes
-    const attributes: AttributesType = {};
-    if (props.initialAttributes) {
-      Object.assign(attributes, props.initialAttributes);
-      if (props.offering.options.order) {
-        props.offering.options.order.forEach((key) => {
-          const options = props.offering.options.options[key];
-          if (options && options.default !== undefined) {
-            attributes[key] = options.default;
-          }
-        });
-      }
-    }
-    if (props.offering.type === OFFERING_TYPE_BOOKING) {
-      // initial attributes.schedules
-      if (attributes.schedules) {
-        attributes.schedules = attributes.schedules.map((schedule) => ({
-          ...schedule,
-          start: new Date(schedule.start),
-          end: new Date(schedule.end),
-        }));
-      } else {
-        attributes.schedules = [];
-      }
-    }
-    initialValues.attributes = attributes;
-
     if (props.initialLimits || props.limits) {
       initialValues.limits = props.initialLimits || props.limits;
     }
@@ -167,9 +138,9 @@ export const BaseDeployPage = ({
       initialValues.plan = props.plan;
     }
 
-    if (Object.keys(initialValues).length > 0) {
-      props.initialize(initialValues);
-    }
+    Object.entries(initialValues).forEach(([key, value]) => {
+      props.change(key, value);
+    });
   });
 
   // Initialize limits and plan when the offering changes
