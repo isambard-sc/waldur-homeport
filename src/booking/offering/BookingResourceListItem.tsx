@@ -17,7 +17,7 @@ const ONE_HOUR_HEIGHT = 40; // 40px
 const ONE_MINUTE_HEIGHT = ONE_HOUR_HEIGHT / 60;
 
 const BookingResourceDetailsDialog = lazyComponent(
-  () => import('@waldur/booking/components/modal/BookingResourceDetailsDialog'),
+  () => import('@waldur/booking/components/BookingResourceDetailsDialog'),
   'BookingResourceDetailsDialog',
 );
 

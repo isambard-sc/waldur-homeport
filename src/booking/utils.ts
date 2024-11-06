@@ -6,7 +6,7 @@ import { translate } from '@waldur/i18n';
 
 import { BookedItem, BookingProps, EventInput } from './types';
 
-export interface BookingFilterStateOption {
+interface BookingFilterStateOption {
   value: string;
   label: string;
 }

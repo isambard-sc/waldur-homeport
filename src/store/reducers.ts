@@ -2,7 +2,6 @@ import { reducer as notificationsReducer } from 'reapop';
 import { combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
 
-import { reducer as bookings } from '@waldur/booking/store/reducer';
 import { reducer as drawer } from '@waldur/drawer/reducer';
 import { type IssueAttachmentState } from '@waldur/issues/attachments/types';
 import { type IssueCommentState } from '@waldur/issues/comments/types';
@@ -20,7 +19,6 @@ export const staticReducers = {
   drawer,
   workspace,
   marketplace,
-  bookings,
   title,
   theme,
 };
