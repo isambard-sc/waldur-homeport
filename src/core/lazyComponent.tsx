@@ -3,15 +3,6 @@ import React from 'react';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { ErrorMessage } from '@waldur/ErrorMessage';
-import { translate } from '@waldur/i18n';
-
-const ErrorRetryView = ({ retry, componentName }) => (
-  <button className="btn btn-primary" onClick={retry}>
-    {translate('Module {componentName} loading error. Try again.', {
-      componentName,
-    })}
-  </button>
-);
 
 // Based on https://github.com/facebook/react/issues/14254#issuecomment-538710039
 export function lazyComponent<T = any>(
@@ -20,18 +11,18 @@ export function lazyComponent<T = any>(
 ) {
   function LazyLoader(props: T) {
     const [loading, setLoading] = React.useState<boolean>(true);
-    const retry = React.useCallback(() => setLoading(true), []);
     const Lazy = React.useMemo(
       () =>
         React.lazy(() =>
           promise()
             .then((module) => ({ default: module[componentName] }))
-            .catch(() => {
+            .catch((error) => {
               setLoading(false);
               return {
-                default: () => (
-                  <ErrorRetryView retry={retry} componentName={componentName} />
-                ),
+                default: () => {
+                  /* @ts-ignore */
+                  return <ErrorMessage error={error} />;
+                },
               };
             }),
         ),
