@@ -8,7 +8,7 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { PROJECTS_LIST } from '@waldur/project/constants';
-import { GlobalProjectCreateButton } from '@waldur/project/GlobalProjectCreateButton';
+import { GlobalProjectCreateButton } from '@waldur/project/create/GlobalProjectCreateButton';
 import { ProjectLink } from '@waldur/project/ProjectLink';
 import { createFetcher, Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';

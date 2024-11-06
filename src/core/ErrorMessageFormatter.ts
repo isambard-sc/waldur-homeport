@@ -36,6 +36,10 @@ export const format = (error, parseResponse?) => {
     return error;
   }
 
+  if (error.response && error.response.status === 413) {
+    return translate('File too large. Please select a smaller file.');
+  }
+
   let message = `${error.status}: ${error.statusText}.`;
 
   if (error.data) {

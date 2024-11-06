@@ -4,20 +4,18 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n/translate';
-import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
+import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
-
-import { createProject } from './actions';
 
 const ProjectCreateDialog = lazyComponent(
   () => import('./ProjectCreateDialog'),
   'ProjectCreateDialog',
 );
 
-export const ProjectCreateButton: FC = () => {
+export const ProjectCreateButton: FC<{ refetch? }> = ({ refetch }) => {
   const customer = useSelector(getCustomer);
   const user = useSelector(getUser);
   const disabled =
@@ -35,12 +33,8 @@ export const ProjectCreateButton: FC = () => {
           openModalDialog(ProjectCreateDialog, {
             size: 'lg',
             formId: 'projectCreate',
-            onSubmit: (formData) => {
-              createProject(formData, dispatch).then(() => {
-                dispatch(closeModalDialog());
-              });
-            },
-            initialValues: { customer },
+            customer,
+            refetch,
           }),
         )
       }

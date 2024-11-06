@@ -11,13 +11,25 @@ import { formatDate } from '@waldur/core/dateUtils';
 import { InvoiceSummary } from '@waldur/dashboard/types';
 import { Customer, Project } from '@waldur/workspace/types';
 
+export interface ProjectInput {
+  name: string;
+  description: string;
+  end_date?: Date;
+  start_date?: Date;
+  customer: { url: string };
+  type?: { url: string };
+  oecd_fos_2007_code?: { value: string };
+  is_industry: boolean;
+  image?: File | string;
+}
+
 export const getProject = (projectId: string) =>
   getById<Project>('/projects/', projectId);
 
 export const getCustomer = (customerId: string) =>
   getById<Customer>('/customers/', customerId);
 
-export const createProject = (project) => {
+export const createProject = (project: ProjectInput) => {
   const data = {
     name: project.name,
     description: project.description,
@@ -39,7 +51,7 @@ export const createProject = (project) => {
   return sendForm<{ uuid }>('POST', `${ENV.apiEndpoint}api/projects/`, data);
 };
 
-export const updateProjectPartially = (
+export const updateProject = (
   projectUuid: string,
   values: Record<string, any>,
 ) => {
@@ -78,11 +90,6 @@ export const deleteProject = (projectId: string) =>
 
 export const loadProjectTypes = () =>
   get<{ url; name }[]>(`/project-types/`).then((response) => response.data);
-
-export const dangerouslyUpdateProject = (cache, project) => {
-  cache.name = project.name;
-  cache.description = project.description;
-};
 
 export const fetchLast12MonthProjectCosts = (projectId: string) =>
   getList<InvoiceSummary>('/invoice-items/costs/', {
