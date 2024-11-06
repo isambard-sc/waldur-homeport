@@ -3,6 +3,7 @@ import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { FieldArray, reduxForm } from 'redux-form';
 
+import { pick } from '@waldur/core/utils';
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { updateOfferingAttributes } from '@waldur/marketplace/common/api';
@@ -10,10 +11,13 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { formatSchedules } from '../../store/utils';
-
 import { EDIT_SCHEDULES_FORM_ID } from './constants';
 import { OfferingScheduler } from './OfferingScheduler';
+
+export const formatSchedules = (schedules: any[]) =>
+  schedules
+    .filter((item) => Object.keys(item).length > 0)
+    .map(pick(['start', 'end', 'title', 'allDay', 'extendedProps', 'id']));
 
 export const EditSchedulesDialog = connect(
   (_, ownProps: { resolve: { offering } }) => ({

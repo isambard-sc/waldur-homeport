@@ -1,4 +1,3 @@
-import { pick } from '@waldur/core/utils';
 import { OptionField } from '@waldur/marketplace/types';
 
 import { FieldType } from '../update/options/types';
@@ -57,8 +56,3 @@ export const formatComponent = (component) => ({
   limit_period: component.limit_period ? component.limit_period.value : null,
   uuid: component.uuid,
 });
-
-export const formatSchedules = (schedules: any[]) =>
-  schedules
-    .filter((item) => Object.keys(item).length > 0)
-    .map(pick(['start', 'end', 'title', 'allDay', 'extendedProps', 'id']));

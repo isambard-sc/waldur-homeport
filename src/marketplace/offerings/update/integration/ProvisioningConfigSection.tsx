@@ -8,8 +8,9 @@ import { translate } from '@waldur/i18n';
 import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constants';
 import { getProvisioningConfigForm } from '@waldur/marketplace/common/registry';
 
+import { EditSchedulesButton } from '../../../../booking/EditSchedulesButton';
+
 import { EditLexisLinkIntegrationButton } from './EditLexisLinkIntegrationButton';
-import { EditSchedulesButton } from './EditSchedulesButton';
 import { GoogleCalendarActions } from './GoogleCalendarActions';
 import { RemoteActions } from './RemoteActions';
 import { ScriptIntegrationSummary } from './ScriptIntegrationSummary';

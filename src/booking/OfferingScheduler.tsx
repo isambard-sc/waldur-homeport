@@ -1,59 +1,105 @@
 import { PlusCircle, X } from '@phosphor-icons/react';
-import { Duration } from 'luxon';
-import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
+import { DateTime, Duration } from 'luxon';
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { DateTimePickerProps } from 'react-flatpickr';
-import { connect } from 'react-redux';
-import { Field, formValueSelector, WrappedFieldArrayProps } from 'redux-form';
+import { usePrevious } from 'react-use';
+import { Field, WrappedFieldArrayProps } from 'redux-form';
 
-import { CalendarSettings } from '@waldur/booking/components/CalendarSettings';
 import { CustomRangeDatePicker } from '@waldur/booking/deploy/CustomRangeDatePicker';
-import { getConfig } from '@waldur/booking/store/selectors';
 import { BookingProps } from '@waldur/booking/types';
 import { createBooking, getDurationOptions } from '@waldur/booking/utils';
 import { parseDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+
+import { BusinessHoursGroup } from './components/BusinessHoursGroup';
+import { SlotDurationGroup } from './components/SlotDurationGroup';
+import { TimeZoneGroup } from './components/TimeZoneGroup';
+import { WeekdaysGroup } from './components/WeekdaysGroup';
+import { WeekendsGroup } from './components/WeekendsGroup';
 
 import './OfferingScheduler.scss';
 
-const getSchedules = (state: RootState) =>
-  formValueSelector('EditSchedulesDialog')(
-    state,
-    'schedules',
-  ) as BookingProps[];
-
-type StateProps = ReturnType<typeof mapStateToProps>;
-
-type OfferingSchedulerProps = WrappedFieldArrayProps<BookingProps> & StateProps;
-
-const getDurationSlot = (config: StateProps['config']) => {
-  return config?.slotDuration || getDurationOptions()[0].value;
+const INITIAL_CONFIG = {
+  weekends: true,
+  minTime: '00:00',
+  maxTime: '24:00',
+  slotDuration: '01:00:00',
+  businessHours: {
+    startTime: '00:00',
+    endTime: '24:00',
+    daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+  },
 };
 
-const getDisabledRangeOfDates = (config: StateProps['config']) => {
+type OfferingSchedulerProps = WrappedFieldArrayProps<BookingProps>;
+
+const getDisabledRangeOfDates = (weekends, daysOfWeek) => {
   const disabledRanges: DateTimePickerProps['options']['disable'] = [];
   disabledRanges.push(function (date) {
-    if (!config.weekends) {
+    if (!weekends) {
       if (date.getDay() === 0 || date.getDay() === 6) {
         return true;
       }
     }
-    return !config.businessHours.daysOfWeek.includes(date.getDay());
+    return !daysOfWeek.includes(date.getDay());
   });
   return disabledRanges;
 };
 
-const PureOfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
+export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
   props,
 ) => {
+  const [weekends, setWeekends] = useState<boolean>(INITIAL_CONFIG.weekends);
+  const [slotDuration, setSlotDuration] = useState<any>(
+    INITIAL_CONFIG.slotDuration,
+  );
+  const [startTime, setStartTime] = useState<any>(
+    INITIAL_CONFIG.businessHours.startTime,
+  );
+  const [endTime, setEndTime] = useState<any>(
+    INITIAL_CONFIG.businessHours.endTime,
+  );
+  const [daysOfWeek, setDaysOfWeek] = useState<number[]>(
+    INITIAL_CONFIG.businessHours.daysOfWeek,
+  );
+  const [timeZone, setTimeZone] = useState<any>(DateTime.local().zoneName);
+
+  const prevWeekends = usePrevious(weekends);
+
+  const updateWeekends = useCallback(() => {
+    if (prevWeekends === weekends) {
+      return;
+    }
+    if (weekends) {
+      if (!daysOfWeek.includes(0) || !daysOfWeek.includes(6)) {
+        setDaysOfWeek(daysOfWeek.concat([0, 6]));
+      }
+    } else {
+      if (daysOfWeek.includes(0) || daysOfWeek.includes(6)) {
+        setDaysOfWeek(daysOfWeek.filter((day) => !(day === 0 || day === 6)));
+      }
+    }
+  }, [weekends, daysOfWeek, setDaysOfWeek, prevWeekends]);
+
+  useEffect(() => {
+    updateWeekends();
+  }, [updateWeekends, weekends]);
+
   const addRow = useCallback(() => {
     props.fields.push({} as any);
   }, [props.fields]);
 
   const durationSlot = useMemo(
-    () => Duration.fromISOTime(getDurationSlot(props.config), {}),
-    [props.config],
+    () =>
+      Duration.fromISOTime(slotDuration || getDurationOptions()[0].value, {}),
+    [slotDuration],
   );
 
   useEffect(() => {
@@ -65,21 +111,24 @@ const PureOfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
   const parseField = useCallback(
     (v: [Date, Date]) => {
       if (!v) return {};
-      const { weekends, slotDuration, businessHours } = props.config;
       return createBooking(
         {
           start: v[0],
           end: v[1],
           allDay: true,
           extendedProps: {
-            config: { weekends, slotDuration, businessHours },
+            config: {
+              weekends,
+              slotDuration,
+              businessHours: { startTime, endTime, daysOfWeek },
+            },
             type: 'Availability',
           },
         },
         new Date().getTime().toString(),
       );
     },
-    [props.config],
+    [weekends, slotDuration, startTime, endTime, daysOfWeek],
   );
 
   return (
@@ -91,7 +140,22 @@ const PureOfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
           </Card.Title>
         </Card.Header>
         <Card.Body>
-          <CalendarSettings />
+          <BusinessHoursGroup
+            startTime={startTime}
+            endTime={endTime}
+            setStartTime={setStartTime}
+            setEndTime={setEndTime}
+          />
+          <WeekdaysGroup
+            daysOfWeek={daysOfWeek}
+            setDaysOfWeek={setDaysOfWeek}
+          />
+          <WeekendsGroup weekends={weekends} setWeekends={setWeekends} />
+          <SlotDurationGroup
+            slotDuration={slotDuration}
+            setSlotDuration={setSlotDuration}
+          />
+          <TimeZoneGroup timeZone={timeZone} setTimeZone={setTimeZone} />
         </Card.Body>
       </Card>
       <>
@@ -128,7 +192,7 @@ const PureOfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
               component={CustomRangeDatePicker}
               options={{
                 minDate: 'today',
-                disable: getDisabledRangeOfDates(props.config),
+                disable: getDisabledRangeOfDates(weekends, daysOfWeek),
                 timeStep: durationSlot ? durationSlot.as('minutes') : 60,
               }}
               parse={parseField}
@@ -148,14 +212,3 @@ const PureOfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
     </>
   );
 };
-
-const mapStateToProps = (state: RootState) => ({
-  schedules: getSchedules(state),
-  config: getConfig(state),
-});
-
-const enhance = connect(mapStateToProps);
-
-export const OfferingScheduler = enhance(
-  PureOfferingScheduler,
-) as React.ComponentType<any>;
