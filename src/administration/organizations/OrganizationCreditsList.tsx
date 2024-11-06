@@ -45,7 +45,9 @@ export const OrganizationCreditsList: FC<{}> = () => {
             </>
           ),
           export: (row) =>
-            row.offerings.map((offering) => offering.name).join(', '),
+            renderFieldOrDash(
+              row.offerings.map((offering) => offering.name).join(', '),
+            ),
         },
         {
           title: translate('Minimal consumption logic'),
