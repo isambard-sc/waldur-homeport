@@ -88,7 +88,7 @@
     "message": "API secret code:"
   },
   "API token": {
-    "description": "navigation/header/UserToken.tsx, user/api-key/UserEditTokenContainer.tsx, user/routes.ts",
+    "description": "navigation/header/UserToken.tsx, user/api-key/UserTokenLifetime.tsx, user/routes.ts",
     "message": "API token"
   },
   "Abbreviation": {
@@ -1556,7 +1556,7 @@
     "message": "By ordering, you agree to the platform <tos>terms of service</tos> and <pp>privacy policy</pp>."
   },
   "By setting token lifetime to indefinite you are allowing anyone who has the token to impersonate your actions till the token has been changed.": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "By setting token lifetime to indefinite you are allowing anyone who has the token to impersonate your actions till the token has been changed."
   },
   "By submitting the form you are agreeing to the <tos>Terms of Service</tos> and <pp>Privacy policy</pp>.": {
@@ -5136,7 +5136,7 @@
     "message": "Lifecycle policy"
   },
   "Lifetime will be updated and reset upon saving the form.": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "Lifetime will be updated and reset upon saving the form."
   },
   "Light": {
@@ -7292,7 +7292,7 @@
     "message": "Please make sure that project proposal details and resource requests are finalised. During team verification they will not be editable."
   },
   "Please make sure you know what you are doing and set to 10 minutes if unsure.": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "Please make sure you know what you are doing and set to 10 minutes if unsure."
   },
   "Please mark if project is aimed at industrial use": {
@@ -9152,7 +9152,7 @@
     "message": "Save as"
   },
   "Save changes": {
-    "description": "customer/details/CustomerBillingPanel.tsx, user/api-key/UserEditTokenContainer.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, user/api-key/UserTokenLifetime.tsx",
     "message": "Save changes"
   },
   "Save draft": {
@@ -11136,7 +11136,7 @@
     "message": "Token lifetime (s)"
   },
   "Token lifetime": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "Token lifetime"
   },
   "Token": {
@@ -12812,7 +12812,7 @@
     "message": "User agreements"
   },
   "User could not be updated": {
-    "description": "user/support/effects.ts",
+    "description": "user/api-key/UserTokenLifetime.tsx, user/support/effects.ts",
     "message": "User could not be updated"
   },
   "User dashboard": {
@@ -12860,7 +12860,7 @@
     "message": "User has been successfully added."
   },
   "User has been updated": {
-    "description": "user/support/effects.ts",
+    "description": "user/api-key/UserTokenLifetime.tsx, user/support/effects.ts",
     "message": "User has been updated"
   },
   "User input": {
@@ -13884,7 +13884,7 @@
     "message": "till"
   },
   "token will not timeout": {
-    "description": "user/api-key/TokenLifetimeField.tsx, user/support/utils.ts",
+    "description": "user/api-key/UserTokenLifetime.tsx, user/support/utils.ts",
     "message": "token will not timeout"
   },
   "tokens": {
@@ -13972,11 +13972,11 @@
     "message": "{changes} vs last month"
   },
   "{count} hour": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "{count} hour"
   },
   "{count} hours": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "{count} hours"
   },
   "{count} members": {
@@ -13984,7 +13984,7 @@
     "message": "{count} members"
   },
   "{count} minutes": {
-    "description": "user/api-key/TokenLifetimeField.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "{count} minutes"
   },
   "{count} month": {
