@@ -29,6 +29,7 @@ export interface User {
 }
 
 export interface UserDetails extends User {
+  token_lifetime?: number;
   native_name?: string;
   civil_number: string;
   phone_number: string;

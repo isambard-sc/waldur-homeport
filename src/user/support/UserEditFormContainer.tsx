@@ -6,7 +6,6 @@ import {
   fieldIsVisible,
   isRequired,
   isVisibleForSupportOrStaff,
-  userTokenIsVisible,
 } from '@waldur/user/support/selectors';
 import { UserEditForm } from '@waldur/user/support/UserEditForm';
 import { getUser } from '@waldur/workspace/selectors';
@@ -18,7 +17,6 @@ const mapStateToProps = (state, ownProps) => ({
   currentUser: getUser(state) as UserDetails,
   isVisibleForSupportOrStaff: isVisibleForSupportOrStaff(state),
   initialValues: ownProps.user,
-  userTokenIsVisible: userTokenIsVisible(state, ownProps),
   fieldIsVisible: fieldIsVisible(ownProps),
   isRequired,
   nativeNameIsVisible: getNativeNameVisible(),
