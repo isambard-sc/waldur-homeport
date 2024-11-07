@@ -68,6 +68,13 @@ export const getInitialValues = (initialValues?) => {
   return queryParamValues;
 };
 
+/** When switching between pages, existing filters are removed from the URL, we need to restore them. */
+export const useSyncInitialFiltersToURL = (initialValues) => {
+  useEffect(() => {
+    syncFiltersToURL(initialValues);
+  }, []);
+};
+
 export const useReinitializeFilterFromUrl = (
   form: string,
   initialValues?: any,

@@ -3,7 +3,11 @@ import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
-import { PROJECT_RESOURCES_ALL_FILTER_FORM_ID } from '@waldur/marketplace/resources/list/constants';
+import {
+  ALL_RESOURCES_TABLE_ID,
+  PROJECT_RESOURCES_ALL_FILTER_FORM_ID,
+} from '@waldur/marketplace/resources/list/constants';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { createFetcher, useTable } from '@waldur/table';
 import { TableProps } from '@waldur/table/types';
 import { Project } from '@waldur/workspace/types';
@@ -53,12 +57,24 @@ interface AllResourcesListProps extends Partial<TableProps> {
 }
 
 export const AllResourcesList: FC<AllResourcesListProps> = (props) => {
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources('all-resources');
   const filter = useSelector(mapStateToFilter);
+
   const tableProps = useTable({
-    table: `AllResourcesList`,
+    table: ALL_RESOURCES_TABLE_ID,
     fetchData: createFetcher('marketplace-resources'),
     queryField: 'query',
     filter,
+    onApplyFilter: (filters) => {
+      const organization = filters.find((item) => item.name === 'organization');
+      const project = filters.find((item) => item.name === 'project');
+      const formValues = {
+        organization: organization?.value,
+        project: project?.value,
+      };
+      syncResourceFilters(formValues);
+    },
     mandatoryFields: resourcesListRequiredFields(),
   });
 

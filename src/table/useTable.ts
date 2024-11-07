@@ -59,7 +59,7 @@ export const useTable = (options: TableOptionsType) => {
   );
   const openFiltersDrawer = useCallback(
     (filters: React.ReactNode) => {
-      dispatch(actions.applyFilters(table, false));
+      applyFiltersFn(false);
       return dispatch(
         openDrawerDialog(TableFilterContainer, {
           title: translate('Filters'),
@@ -70,7 +70,7 @@ export const useTable = (options: TableOptionsType) => {
             filters,
             setFilter: (item: FilterItem) =>
               dispatch(actions.setFilter(table, item)),
-            apply: () => dispatch(actions.applyFilters(table, true)),
+            apply: () => applyFiltersFn(true),
           },
           footer: TableFilterActions,
         }),
@@ -90,7 +90,7 @@ export const useTable = (options: TableOptionsType) => {
           },
         }),
       );
-      dispatch(actions.applyFilters(table, true));
+      applyFiltersFn(true);
       dispatch(actions.selectSavedFilter(table, null));
     },
     [dispatch, table],

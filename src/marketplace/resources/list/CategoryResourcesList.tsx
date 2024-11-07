@@ -8,6 +8,7 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { CategoryColumn } from '@waldur/marketplace/types';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { Table, createFetcher, useTable } from '@waldur/table';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 
@@ -15,6 +16,10 @@ import { ResourceImportButton } from '../import/ResourceImportButton';
 
 import { AllResourcesFilter } from './AllResourcesFilter';
 import { CategoryColumnField } from './CategoryColumnField';
+import {
+  CATEGORY_RESOURCES_ALL_FILTER_FORM_ID,
+  CATEGORY_RESOURCES_TABLE_ID,
+} from './constants';
 import { CreateResourceButton } from './CreateResourceButton';
 import { ExpandableResourceSummary } from './ExpandableResourceSummary';
 import { ResourceActionsButton } from './ResourceActionsButton';
@@ -33,7 +38,9 @@ interface OwnProps {
 export const CategoryResourcesList: FunctionComponent<OwnProps> = (
   ownProps,
 ) => {
-  const filterValues: any = useSelector(getFormValues('AllResourcesFilter'));
+  const filterValues: any = useSelector(
+    getFormValues(CATEGORY_RESOURCES_ALL_FILTER_FORM_ID),
+  );
 
   const filter = useMemo(() => {
     const filter: Record<string, any> = {};
@@ -65,11 +72,23 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
     return filter;
   }, [filterValues, ownProps.category_uuid]);
 
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources('category-resources');
+
   const props = useTable({
-    table: `UserResourcesList-${ownProps.category_uuid}`,
+    table: `${CATEGORY_RESOURCES_TABLE_ID}-${ownProps.category_uuid}`,
     fetchData: createFetcher('marketplace-resources'),
     filter,
     queryField: 'query',
+    onApplyFilter: (filters) => {
+      const organization = filters.find((item) => item.name === 'organization');
+      const project = filters.find((item) => item.name === 'project');
+      const formValues = {
+        organization: organization?.value,
+        project: project?.value,
+      };
+      syncResourceFilters(formValues);
+    },
     mandatoryFields: resourcesListRequiredFields(),
   });
   const columns: any[] = [

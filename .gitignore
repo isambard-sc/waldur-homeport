@@ -9,3 +9,4 @@ cypress/results/
 junit.xml
 dist/
 yarn-error.log
+.env
