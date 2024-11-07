@@ -67,7 +67,7 @@ Cypress.Commands.add('fillAndSubmitLoginForm', (username, password) => {
 });
 
 Cypress.Commands.add('waitForSpinner', () => {
-  cy.get('.fa-spinner.fa-spin').should('not.exist');
+  cy.get('.animation-spin').should('not.exist');
 });
 
 Cypress.Commands.add('waitForPage', () => {
@@ -163,7 +163,7 @@ Cypress.Commands.add(
         .then(($el) => {
           //@ts-ignore
           const className = $el[0].parentNode.className;
-          if (className.indexOf('fa-spin') < 0) {
+          if (className.indexOf('animation-spin') < 0) {
             cy.get('[data-cy=loading-spinner]').first().click();
           }
         });

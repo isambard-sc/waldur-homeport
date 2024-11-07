@@ -1,4 +1,3 @@
-import 'font-awesome/css/font-awesome.css';
 import '@fontsource/inter/index.css';
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';

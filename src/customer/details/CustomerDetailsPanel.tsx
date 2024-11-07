@@ -166,7 +166,7 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
                     !isRemovingLocation ? (
                       <Trash weight="bold" className="text-danger" />
                     ) : (
-                      <Spinner className="fa-spin" />
+                      <Spinner className="animation-spin" />
                     )
                   }
                   action={removeLocation}

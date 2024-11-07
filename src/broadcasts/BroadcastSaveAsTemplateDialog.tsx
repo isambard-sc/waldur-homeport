@@ -1,3 +1,4 @@
+import { ArrowLeft } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
@@ -77,7 +78,10 @@ export const BroadcastSaveAsTemplateDialog = connect()(
                 onClick={() => backToBroadcast(resolve.broadcastData)}
                 variant="secondary"
               >
-                <i className="fa fa-long-arrow-left" /> {translate('Back')}
+                <span className="svg-icon svg-icon-2">
+                  <ArrowLeft />
+                </span>{' '}
+                {translate('Back')}
               </Button>
               <SubmitButton submitting={submitting} label={translate('Save')} />
             </div>

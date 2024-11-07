@@ -158,7 +158,7 @@ export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
               <span className="svg-icon svg-icon-4">
                 <ArrowsClockwise
                   weight="bold"
-                  className={isLoading ? ' fa-spin' : ''}
+                  className={isLoading ? ' animation-spin' : ''}
                 />
               </span>
               {translate('Retry')}

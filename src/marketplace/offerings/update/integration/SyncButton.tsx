@@ -49,7 +49,7 @@ export const SyncButton = ({ offering, refetch }) => {
         {enabled ? (
           <ArrowsClockwise weight="bold" />
         ) : (
-          <Spinner className="fa-spin" />
+          <Spinner className="animation-spin" />
         )}
       </span>{' '}
       {translate('Synchronize')}

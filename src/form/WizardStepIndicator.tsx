@@ -1,3 +1,4 @@
+import { Check } from '@phosphor-icons/react';
 import './WizardStepIndicator.scss';
 
 export const WizardStepIndicator = ({ steps, activeStep, onSelect }) => (
@@ -9,12 +10,8 @@ export const WizardStepIndicator = ({ steps, activeStep, onSelect }) => (
         onClick={() => onSelect(stepIndex)}
         aria-hidden="true"
       >
-        <div className="step">
-          {stepIndex < activeStep ? (
-            <i className="fa fa-check" />
-          ) : (
-            stepIndex + 1
-          )}
+        <div className="step svg-icon">
+          {stepIndex < activeStep ? <Check /> : stepIndex + 1}
         </div>{' '}
         <div className="caption hidden-xs hidden-sm">{step}</div>
       </li>

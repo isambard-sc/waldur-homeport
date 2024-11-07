@@ -1,3 +1,4 @@
+import { CheckCircle } from '@phosphor-icons/react';
 import { useEffect, useState } from 'react';
 
 import { translate } from '@waldur/i18n';
@@ -14,11 +15,7 @@ export const FinishStepWrapper = () => {
     <>
       <h2 className="mb-10">{translate('Success')}</h2>
       <div className="success-step d-flex h-75">
-        <i
-          className={
-            'fa fa-check-circle text-success m-auto ' + (show && 'show')
-          }
-        />
+        <CheckCircle className={'text-success m-auto ' + (show && 'show')} />
       </div>
     </>
   );

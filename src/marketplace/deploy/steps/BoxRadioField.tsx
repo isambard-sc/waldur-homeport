@@ -1,3 +1,4 @@
+import { CaretDown, Check } from '@phosphor-icons/react';
 import { isEqual } from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -78,7 +79,9 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = (props) => {
                 ) : typeof choice.label === 'string' ? (
                   choice.label.toUpperCase().substring(0, 4)
                 ) : (
-                  <i className="fa fa-check display-6" />
+                  <span className="display-6">
+                    <Check />
+                  </span>
                 )}
               </div>
               <input
@@ -113,7 +116,9 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = (props) => {
                         {selectedVersions[index].label}
                       </div>
                     </div>
-                    <i className="fa fa-angle-down fs-1 fw-light" />
+                    <span className="fs-1 fw-light">
+                      <CaretDown />
+                    </span>
                   </div>
 
                   {/* Options menu */}

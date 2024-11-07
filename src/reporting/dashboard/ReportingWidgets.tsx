@@ -1,3 +1,4 @@
+import { CaretRight } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 
@@ -5,6 +6,7 @@ import { Link } from '@waldur/core/Link';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { FeaturesEnum, SupportFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
+
 import './ReportingWidgets.scss';
 
 interface ReportingWidget {
@@ -91,7 +93,7 @@ const WidgetItem = ({ item }: { item: ReportingWidget }) => (
           )}
         </div>
         <div>
-          <i className="icon-arrow fa fa-angle-right display-5 fw-light text-dark" />
+          <CaretRight className="icon-arrow display-5 fw-light text-dark" />
         </div>
       </div>
     </Card.Body>

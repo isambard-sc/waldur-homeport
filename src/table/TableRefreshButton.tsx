@@ -5,7 +5,7 @@ import { TableProps } from '@waldur/table/types';
 
 export const LoadingSpinner: FunctionComponent = () => (
   <button type="button" className="btn btn-icon btn-flush">
-    <span className="fa-spin">
+    <span className="animation-spin">
       <ArrowsClockwise size={20} data-cy="loading-spinner" />
     </span>
   </button>

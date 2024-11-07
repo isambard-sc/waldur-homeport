@@ -134,7 +134,7 @@ export const CategoriesPanel: FunctionComponent<{
           {translate('Categories')}
         </h6>
         {loading && (
-          <span className="fa-spin text-gray-700 lh-1">
+          <span className="animation-spin text-gray-700 lh-1">
             <ArrowsClockwise size={16} />
           </span>
         )}

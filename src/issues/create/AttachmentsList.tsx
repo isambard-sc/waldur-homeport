@@ -1,3 +1,4 @@
+import { CloudArrowDown } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
 export const AttachmentsList: FunctionComponent<{ attachments }> = ({
@@ -7,7 +8,10 @@ export const AttachmentsList: FunctionComponent<{ attachments }> = ({
     {attachments.map((attachment, index) => (
       <li key={index}>
         <a href={attachment.file} target="_blank" rel="noopener noreferrer">
-          <i className="fa fa-cloud-download" /> {attachment.name}
+          <span className="svg-icon svg-icon-2">
+            <CloudArrowDown />
+          </span>{' '}
+          {attachment.name}
         </a>
       </li>
     ))}
