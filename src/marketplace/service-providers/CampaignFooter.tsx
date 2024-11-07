@@ -1,4 +1,4 @@
-import { PaperPlaneTilt } from '@phosphor-icons/react';
+import { CaretRight, PaperPlaneTilt } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -80,7 +80,10 @@ export const CampaignFooter = ({
     <Modal.Footer>
       {step === 0 ? (
         <Button onClick={() => setStep(1)} className="ms-3">
-          <i className="fa fa-long-arrow-right" /> {translate('Continue')}
+          <span className="svg-icon svg-icon-2">
+            <CaretRight />
+          </span>{' '}
+          {translate('Continue')}
         </Button>
       ) : (
         <>

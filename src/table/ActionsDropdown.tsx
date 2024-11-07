@@ -107,7 +107,7 @@ export const ActionsDropdown: FunctionComponent<
     {open ? (
       loading ? (
         <Dropdown.Item eventKey="1">
-          <Spinner size={20} className="fa-spin me-2" />
+          <Spinner size={20} className="animation-spin me-2" />
           {translate('Loading actions')}
         </Dropdown.Item>
       ) : error ? (

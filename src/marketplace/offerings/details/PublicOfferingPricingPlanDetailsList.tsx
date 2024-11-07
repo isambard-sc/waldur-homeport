@@ -1,3 +1,4 @@
+import { Circle } from '@phosphor-icons/react';
 import { FC } from 'react';
 
 interface PricingPlanDetailsListProps {
@@ -16,7 +17,7 @@ export const PricingPlanDetailsList: FC<PricingPlanDetailsListProps> = ({
     <ul className={`pricing-plan-details-list ${className}`}>
       {items.map((item, i) => (
         <li key={i}>
-          <i className="dot fa fa-circle text-dark me-2" />
+          <Circle className="dot text-dark me-2" />
           <span>
             {item.title}
             {': '}

@@ -1,3 +1,4 @@
+import { Key, Prohibit } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { OptionProps, components } from 'react-select';
 
@@ -34,7 +35,7 @@ export const UserListOptionInline: FC<UserListOptionInlineProps> = (props) => (
       >
         {props.data.is_active === false && (
           <Tip label={translate('Inactive')} id="inactive-user-tooltip">
-            <i className="fa fa-ban" />
+            <Prohibit />
           </Tip>
         )}
       </span>
@@ -49,7 +50,7 @@ export const UserListOptionInline: FC<UserListOptionInlineProps> = (props) => (
             label={props.data.registration_method}
             id="registration-method-tooltip"
           >
-            <i className="fa fa-key" />
+            <Key />
           </Tip>
         </small>
       </span>

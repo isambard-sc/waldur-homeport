@@ -62,7 +62,7 @@ export const AdminCategoriesPage: FunctionComponent = () => {
             if (row.group) {
               if (loadingGroups) {
                 return (
-                  <span className="svg-icon svg-icon-4 fa-spin me-2">
+                  <span className="svg-icon svg-icon-4 animation-spin me-2">
                     <ArrowsClockwise />
                   </span>
                 );

@@ -35,7 +35,9 @@ export const IssueReload: FunctionComponent<IssueReloadProps> = ({
   return (
     <Tip label={translate('Reload issue data')} id="reload_issue_tooltip">
       <span className="issue-reload" onClick={fetchData} aria-hidden="true">
-        <span className={`svg-icon svg-icon-2 ${loading ? 'fa-spin' : ''}`}>
+        <span
+          className={`svg-icon svg-icon-2 ${loading ? 'animation-spin' : ''}`}
+        >
           <ArrowsClockwise />
         </span>
       </span>

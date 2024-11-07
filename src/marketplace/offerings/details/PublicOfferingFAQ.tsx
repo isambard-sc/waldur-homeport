@@ -1,3 +1,4 @@
+import { Minus, Plus } from '@phosphor-icons/react';
 import { FunctionComponent, useContext } from 'react';
 import {
   Accordion,
@@ -26,11 +27,9 @@ function CustomToggle({ children, eventKey }) {
       onClick={decoratedOnClick}
     >
       {children}
-      <i
-        className={`fa fa-${
-          isCurrentEventKey ? 'minus' : 'plus'
-        } fs-4 ms-2 text-dark`}
-      />
+      <span className="fs-4 ms-2 text-dark">
+        {isCurrentEventKey ? <Minus /> : <Plus />}
+      </span>
     </Button>
   );
 }

@@ -1,3 +1,4 @@
+import { FileText } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 
@@ -26,7 +27,10 @@ export const InvoicesDropdown: FunctionComponent<
   <DropdownButton
     title={
       <>
-        <i className="fa fa-file-text-o" /> {translate('Link invoice')}
+        <span className="svg-icon svg-icon-2">
+          <FileText />
+        </span>{' '}
+        {translate('Link invoice')}
       </>
     }
     id="link-invoice-dropdown-btn"

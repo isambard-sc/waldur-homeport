@@ -1,3 +1,4 @@
+import { ChatCircleText } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -31,7 +32,9 @@ export const PureIssueCommentsFormMainContainer: FunctionComponent<
             disabled={uiDisabled}
             onClick={toggle}
           >
-            <i className="fa fa-comment-o" />
+            <span className="svg-icon svg-icon-2">
+              <ChatCircleText />
+            </span>{' '}
             <span className="p-w-xs">{translate('Add comment')}</span>
           </button>
         )}

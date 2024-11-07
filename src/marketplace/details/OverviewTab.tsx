@@ -1,3 +1,4 @@
+import { ChatCircleText } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
@@ -8,7 +9,10 @@ import { Offering } from '@waldur/marketplace/types';
 
 const DemoButton: FunctionComponent = () => (
   <button className="btn btn-outline btn-success btn-sm">
-    <i className="fa fa-comment" /> {translate('Request demo')}
+    <span className="svg-icon svg-icon-2">
+      <ChatCircleText />
+    </span>{' '}
+    {translate('Request demo')}
   </button>
 );
 
