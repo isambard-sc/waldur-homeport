@@ -59,6 +59,25 @@
         }
       }
     }
+
+    .resources-filter {
+      height: 42px;
+      display: flex;
+      align-items: center;
+
+      .filter-item {
+        width: 100%;
+        padding: 0.55rem get($aside-config, padding-x);
+
+        .badge {
+          display: inline-flex;
+          align-items: center;
+          height: 28px;
+          padding-left: 6px;
+          padding-right: 8px;
+        }
+      }
+    }
   }
 
   &:not(:hover) .aside-logo #kt_aside_toggle {
@@ -109,6 +128,10 @@ $dark-add-resource-color: $grey-600;
 $dark-add-resource-state-color: $gray-700;
 $dark-show-more-color: $grey-600;
 $dark-show-more-active-icon: $gray-800;
+// Resources filter
+$dark-badge-color: $gray-800;
+$dark-badge-bg: $grey-100;
+$dark-badge-border: $grey-400;
 
 $custom-aside: (
   dark: (
@@ -120,6 +143,11 @@ $custom-aside: (
     show-more-color: if(isDarkMode(), $dark-show-more-color, $primary-300),
     show-more-active-icon:
       if(isDarkMode(), $dark-show-more-active-icon, $primary-100),
+    // Resources filter
+    filter-label: if(isDarkMode(), $dark-show-more-color, $primary-200),
+    filter-badge-color: if(isDarkMode(), $dark-badge-color, $primary-100),
+    filter-badge-bg: if(isDarkMode(), $dark-badge-bg, $primary-700),
+    filter-badge-border: if(isDarkMode(), $dark-badge-border, $primary-600),
   ),
   light: (
     add-resource-border: if(isDarkMode(), $dark-add-resource-border, $grey-300),
@@ -129,6 +157,10 @@ $custom-aside: (
     show-more-color: if(isDarkMode(), $dark-show-more-color, $grey-500),
     show-more-active-icon:
       if(isDarkMode(), $dark-show-more-active-icon, $grey-600),
+    filter-label: if(isDarkMode(), $dark-show-more-color, $grey-500),
+    filter-badge-color: if(isDarkMode(), $dark-badge-color, $gray-700),
+    filter-badge-bg: if(isDarkMode(), $dark-badge-bg, transparent),
+    filter-badge-border: if(isDarkMode(), $dark-badge-border, $grey-300),
   ),
   accent: (
     add-resource-border:
@@ -144,41 +176,64 @@ $custom-aside: (
     show-more-color: if(isDarkMode(), $dark-show-more-color, $primary-400),
     show-more-active-icon:
       if(isDarkMode(), $dark-show-more-active-icon, $primary-600),
+    filter-label: if(isDarkMode(), $dark-show-more-color, $primary-300),
+    filter-badge-color: if(isDarkMode(), $dark-badge-color, $primary-800),
+    filter-badge-bg: if(isDarkMode(), $dark-badge-bg, transparent),
+    filter-badge-border: if(isDarkMode(), $dark-badge-border, $primary-200),
   ),
 );
 
 .aside {
   @each $name, $value in $custom-aside {
-    &.aside-#{$name} .menu-item {
-      &.add-resource-toggle {
-        .menu-link {
-          border-color: get($value, add-resource-border);
-          &:not(:hover) {
-            .menu-title,
-            .menu-icon .svg-icon svg {
-              color: get($value, add-resource-color);
+    &.aside-#{$name} {
+      .menu-item {
+        &.add-resource-toggle {
+          .menu-link {
+            border-color: get($value, add-resource-border);
+            &:not(:hover) {
+              .menu-title,
+              .menu-icon .svg-icon svg {
+                color: get($value, add-resource-color);
+              }
+            }
+            &:hover {
+              .menu-title,
+              .menu-icon .svg-icon svg {
+                color: get($value, add-resource-state-color);
+              }
             }
           }
-          &:hover {
-            .menu-title,
-            .menu-icon .svg-icon svg {
-              color: get($value, add-resource-state-color);
+        }
+        &.menu-show-more {
+          .menu-link {
+            .menu-title .btn {
+              color: get($value, show-more-color);
+            }
+            .menu-badge .svg-icon {
+              @include svg-icon-color(get($value, show-more-color));
+            }
+          }
+          &.active .menu-link {
+            .menu-badge .svg-icon {
+              @include svg-icon-color(get($value, show-more-active-icon));
             }
           }
         }
       }
-      &.menu-show-more {
-        .menu-link {
-          .menu-title .btn {
-            color: get($value, show-more-color);
+
+      .resources-filter {
+        .filter-item {
+          > label {
+            color: get($value, filter-label);
           }
-          .menu-badge .svg-icon {
-            @include svg-icon-color(get($value, show-more-color));
-          }
-        }
-        &.active .menu-link {
-          .menu-badge .svg-icon {
-            @include svg-icon-color(get($value, show-more-active-icon));
+          .badge {
+            color: get($value, filter-badge-color) !important;
+            background-color: get($value, filter-badge-bg) !important;
+            border: 1px solid get($value, filter-badge-border) !important;
+
+            button {
+              color: get($value, filter-badge-color);
+            }
           }
         }
       }

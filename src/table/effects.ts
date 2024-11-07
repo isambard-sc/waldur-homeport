@@ -7,6 +7,7 @@ import {
   take,
   race,
   cancelled,
+  takeEvery,
 } from 'redux-saga/effects';
 
 import { takeLatestPerKey } from '@waldur/core/effects';
@@ -94,10 +95,20 @@ function* fetchList(action) {
   }
 }
 
+function* fireOnApplyFilters(action) {
+  const { table, apply } = action.payload;
+  const state = yield select(getTableState(table));
+  const { onApplyFilter } = getTableOptions(table);
+  if (apply && onApplyFilter) {
+    onApplyFilter(state.filtersStorage);
+  }
+}
+
 export default function* watchFetchList() {
   yield takeLatestPerKey(
     actions.FETCH_LIST_START,
     fetchList,
     ({ payload: { table } }) => table,
   );
+  yield takeEvery(actions.APPLY_FILTERS, fireOnApplyFilters);
 }

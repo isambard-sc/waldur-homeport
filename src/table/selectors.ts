@@ -42,3 +42,10 @@ export const selectSelectedSavedFilter = (state: RootState, table: string) => {
   }
   return null;
 };
+
+export const selectFiltersStorage = (state: RootState, table: string) => {
+  if (state.tables && state.tables[table]) {
+    return state.tables[table].filtersStorage;
+  }
+  return null;
+};

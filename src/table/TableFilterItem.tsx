@@ -26,6 +26,7 @@ interface TableFilterItem {
   ellipsis?: boolean;
   showValueBadge?: boolean;
   hideRemoveButton?: boolean;
+  onApply?({ title, name, value }): void;
 }
 
 const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
@@ -87,13 +88,13 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   );
 };
 
-export const RemoveFilterBadgeButton = ({ onClick }) => (
+export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
   <button
     type="button"
     className="text-btn ps-2 text-hover-danger"
     onClick={onClick}
   >
-    <X weight="bold" size={20} />
+    <X weight="bold" size={size} />
   </button>
 );
 
@@ -206,6 +207,8 @@ const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   );
   useEffect(() => {
     _setFilter(itemValue);
+    props.onApply &&
+      props.onApply({ title: props.title, name: props.name, value: itemValue });
   }, [itemValue, _setFilter]);
 
   return (
@@ -284,9 +287,10 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
       } else {
         newValue = null;
       }
+      apply(false);
       dispatch(change(form, props.name, newValue, true));
       _setFilter(newValue);
-      apply(false);
+      apply(true);
     },
     [dispatch, form, props.name, _setFilter],
   );
@@ -317,6 +321,8 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 
   const onApply = () => {
     _setFilter(itemValue);
+    props.onApply &&
+      props.onApply({ title: props.title, name: props.name, value: itemValue });
     apply();
   };
 

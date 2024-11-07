@@ -47,6 +47,7 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
     if (props.filterPosition === 'sidebar') {
       props.renderFiltersDrawer(props.filters);
     }
+    props.applyFiltersFn(true);
   }, [dispatch, props, formValues]);
 
   const isMd = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.md });

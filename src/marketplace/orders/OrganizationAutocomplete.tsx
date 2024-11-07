@@ -25,7 +25,7 @@ export const OrganizationAutocomplete: FunctionComponent<
         placeholder={props.placeholder || translate('Select organization...')}
         loadOptions={(query, prevOptions, { page }) =>
           organizationAutocomplete(query, prevOptions, page, {
-            field: ['name', 'uuid'],
+            field: ['name', 'uuid', 'abbreviation'],
             o: 'name',
           })
         }

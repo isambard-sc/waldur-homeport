@@ -36,6 +36,11 @@
       justify-content: flex-start;
     }
   }
+
+  .menu-separator {
+    height: 1px;
+    margin: 0 get($aside-config, margin-x);
+  }
 }
 
 .aside {
@@ -197,6 +202,20 @@ $asides: (
     }
     .aside-footer.has-divider::before {
       background: get($value, footer-separator);
+    }
+
+    .menu-text {
+      color: get($value, title);
+    }
+    .menu-separator {
+      background: get($value, footer-separator);
+    }
+    .menu-btn {
+      color: get($value, arrow);
+
+      &:hover {
+        color: get($value, arrow-state);
+      }
     }
   }
 }

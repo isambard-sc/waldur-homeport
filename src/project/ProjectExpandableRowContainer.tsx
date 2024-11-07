@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { translate } from '@waldur/i18n';
-import { useOfferingCategories } from '@waldur/navigation/sidebar/ResourcesMenu';
+import { useOfferingCategories } from '@waldur/navigation/sidebar/utils';
 import { Field } from '@waldur/resource/summary';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { Project } from '@waldur/workspace/types';

@@ -7,7 +7,7 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { useExtraTabs } from '@waldur/navigation/context';
-import { useOfferingCategories } from '@waldur/navigation/sidebar/ResourcesMenu';
+import { useOfferingCategories } from '@waldur/navigation/sidebar/utils';
 import { Tab } from '@waldur/navigation/Tab';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { RootState } from '@waldur/store/reducers';

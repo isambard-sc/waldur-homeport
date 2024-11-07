@@ -1,8 +1,10 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
 import path from 'path';
-import svgr from 'vite-plugin-svgr';
+
+import react from '@vitejs/plugin-react';
 import markdownPlugin from 'vite-plugin-markdown';
+import svgr from 'vite-plugin-svgr';
+import { defineConfig } from 'vitest/config';
+
 import reactDisplayNamePlugin from './vite-plugin-react-displayname';
 
 export default defineConfig({
