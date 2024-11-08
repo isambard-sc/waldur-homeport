@@ -74,7 +74,12 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
           render: ({ row }) => <BooleanBadge value={row.has_fired} />,
         },
         {
-          title: translate('Credit'),
+          title: translate('Organization credit'),
+          render: ({ row }) =>
+            row.customer_credit ? defaultCurrency(row.customer_credit) : 'N/A',
+        },
+        {
+          title: translate('Project credit'),
           render: ({ row }) =>
             row.project_credit ? defaultCurrency(row.project_credit) : 'N/A',
         },
