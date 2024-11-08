@@ -78,7 +78,7 @@ export interface Port extends Partial<SubnetReference> {
 export interface VirtualMachine extends Resource {
   ports?: Port[];
   floating_ips?: any[];
-  offering_external_ips?: any[];
+  external_address?: any[];
   cores: number;
   disk: number;
   ram: number;
