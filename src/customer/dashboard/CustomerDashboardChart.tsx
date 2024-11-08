@@ -48,7 +48,7 @@ export const CustomerDashboardChart: FunctionComponent<
     return (
       <Row>
         {Boolean(data.costChart) && (
-          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <WidgetCard
               cardTitle={data.costChart.chart.title}
               title={data.costChart.chart.current}
@@ -80,7 +80,7 @@ export const CustomerDashboardChart: FunctionComponent<
           </Col>
         )}
         {Boolean(data.teamChart) && (
-          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <TeamWidget
               api={() =>
                 fetchSelectCustomerUsers(customer.uuid, { page_size: 5 })

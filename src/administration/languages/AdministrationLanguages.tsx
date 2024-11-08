@@ -10,7 +10,7 @@ export const AdministrationLanguages: FunctionComponent = () => {
   const languageChoices = ENV.languageChoices;
 
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>{translate('Language options')}</Card.Title>
       </Card.Header>

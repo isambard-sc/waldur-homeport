@@ -65,7 +65,7 @@ export const MonthOverview: FunctionComponent<MonthOverviewProps> = ({
   }
 
   return (
-    <Card className="h-100">
+    <Card className="card-bordered h-100">
       <Card.Body>
         <Row className="h-100">
           <Col xs={6}>

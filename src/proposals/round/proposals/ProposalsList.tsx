@@ -29,7 +29,6 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
     <Table
       {...tableProps}
       id="proposals"
-      className="mb-7"
       columns={[
         {
           title: translate('Name'),

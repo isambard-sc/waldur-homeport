@@ -27,7 +27,7 @@ interface HealthChecksProps {
 
 export const HealthChecks = ({ healthInfoItems }: HealthChecksProps) => {
   return (
-    <Card className="mb-6">
+    <Card className="card-bordered mb-5">
       <Card.Body>
         <h3 className="mb-8">{translate('Health checks')}:</h3>
         <div className="d-flex justify-content-start justify-content-lg-between flex-wrap">

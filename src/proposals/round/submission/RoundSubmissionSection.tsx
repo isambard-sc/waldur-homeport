@@ -34,7 +34,7 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
   }, [round]);
 
   return (
-    <Card id="submission" className="mb-7">
+    <Card id="submission" className="card-bordered">
       <Card.Header>
         <Card.Title>
           {translate('Submission strategy')}

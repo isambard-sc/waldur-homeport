@@ -12,7 +12,7 @@ interface CallDescriptionCardProps {
 }
 
 export const CallDescriptionCard = ({ call }: CallDescriptionCardProps) => (
-  <Card>
+  <Card className="card-bordered">
     <Card.Header>
       <Card.Title>
         <h3>{translate('Description')}</h3>

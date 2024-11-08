@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { PropsWithChildren } from 'react';
 import { Card } from 'react-bootstrap';
 
@@ -6,6 +7,7 @@ interface PanelProps {
   id?: string;
   className?: string;
   actions?: React.ReactNode;
+  cardBordered?: boolean;
 }
 
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({
@@ -13,9 +15,13 @@ export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({
   id,
   children,
   className,
+  cardBordered,
   actions,
 }) => (
-  <Card className={className} id={id}>
+  <Card
+    className={classNames(cardBordered && 'card-bordered', className)}
+    id={id}
+  >
     {title && (
       <Card.Header>
         <Card.Title>

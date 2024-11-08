@@ -86,7 +86,7 @@ interface OrderDetailsProps {
 
 const PageHero = ({ data, isRefetching }) => (
   <PublicDashboardHero2
-    className="container-fluid mb-8 mt-6"
+    className="container-fluid my-5"
     cardBordered
     logo={data.offering.thumbnail}
     logoAlt={data.offering.name}

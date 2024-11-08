@@ -60,8 +60,9 @@ const ProviderDetailsHero: FunctionComponent<ProviderDetailsProps> = (data) => {
   return (
     <PublicDashboardHero2
       hideQuickSection
+      cardBordered
       logo={data.provider.customer_image}
-      className="container-fluid mb-8 mt-6"
+      className="container-fluid my-5"
       logoAlt={data.provider.customer_name}
       logoTooltip={data.provider.customer_name}
       title={

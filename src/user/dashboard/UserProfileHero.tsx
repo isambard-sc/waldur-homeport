@@ -45,7 +45,7 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
   ) : error ? (
     <LoadingErred loadData={refetch} />
   ) : (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       <Tabs
         defaultActiveKey={
           state.name === 'profile-manage' || !showViewTab

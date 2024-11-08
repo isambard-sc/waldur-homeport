@@ -24,7 +24,7 @@ import { CallOfferingsSection } from './offerings/CallOfferingsSection';
 import { CallRoundsList } from './rounds/CallRoundsList';
 
 const PageHero = ({ call, refetch }) => (
-  <div className="container-fluid mb-8 mt-6">
+  <div className="container-fluid my-5">
     <CallTabs call={call} />
     <CallUpdateHero call={call} refetch={refetch} />
   </div>

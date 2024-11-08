@@ -1,5 +1,3 @@
-import { Card } from 'react-bootstrap';
-
 import { Link } from '@waldur/core/Link';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -64,31 +62,19 @@ export const ProviderOfferingsList = (props) => {
 
 export const ProviderDashboardTab = (props) => {
   return (
-    <div className="mb-10">
-      <Card>
-        <Card.Body>
-          <ProviderOfferingsList
-            items={props.data.offerings}
-            initialMode="grid"
-          />
-        </Card.Body>
-      </Card>
+    <>
+      <ProviderOfferingsList items={props.data.offerings} initialMode="grid" />
       {isFeatureVisible(
         MarketplaceFeatures.show_call_management_functionality,
       ) && (
-        <>
-          <hr />
-          <Card>
-            <Card.Body>
-              <PublicCallsList
-                provider_uuid={props.data.provider.customer_uuid}
-                offering_uuid={null}
-                initialMode="grid"
-              />
-            </Card.Body>
-          </Card>
-        </>
+        <div className="mt-5">
+          <PublicCallsList
+            provider_uuid={props.data.provider.customer_uuid}
+            offering_uuid={null}
+            initialMode="grid"
+          />
+        </div>
       )}
-    </div>
+    </>
   );
 };

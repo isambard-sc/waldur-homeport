@@ -41,7 +41,7 @@ export const ProjectAvatar = ({ project }: ProjectAvatarProps) => {
       onSubmit={processRequest}
       initialValues={{ image: project.image }}
       render={({ handleSubmit, submitting }) => (
-        <Card as="form" onSubmit={handleSubmit} className="card-bordered mb-7">
+        <Card as="form" onSubmit={handleSubmit} className="card-bordered mb-5">
           <Card.Header>
             <Card.Title>
               <h3>{translate('Avatar')}</h3>

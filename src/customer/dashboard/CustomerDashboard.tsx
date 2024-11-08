@@ -53,7 +53,7 @@ export const CustomerDashboard: FunctionComponent = () => {
           )}
           {(shouldShowAggregateLimitWidget || Boolean(customer.credit)) && (
             <Row>
-              <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
+              <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
                 <AggregateLimitWidget
                   customer={customer}
                   data={aggregateLimitData}
@@ -65,7 +65,7 @@ export const CustomerDashboard: FunctionComponent = () => {
                 <Col
                   md={6}
                   sm={12}
-                  className="mb-6"
+                  className="mb-5"
                   style={COMMON_WIDGET_HEIGHT}
                 >
                   <CreditStatusWidget customer={customer} />
@@ -73,9 +73,7 @@ export const CustomerDashboard: FunctionComponent = () => {
               )}
             </Row>
           )}
-          <div className="mb-6">
-            <ProjectsList />
-          </div>
+          <ProjectsList />
         </>
       )}
     </>
