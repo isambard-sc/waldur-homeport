@@ -99,7 +99,7 @@ export const formatCostChartLabel = (
 
 export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
   let items: DateValuePair[] = invoices.map((invoice) => ({
-    value: invoice.price,
+    value: Number(invoice.price),
     date: DateTime.fromObject({ year: invoice.year, month: invoice.month }),
   }));
 
@@ -124,7 +124,8 @@ export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
   const lastMonthCost = Number(lastMonths[0].value);
   const currentMonthCost = Number(lastMonths[1].value);
   if (lastMonthCost || lastMonthCost === 0) {
-    changesPercent = ((currentMonthCost - lastMonthCost) / lastMonthCost) * 100;
+    changesPercent =
+      ((currentMonthCost - lastMonthCost) / Math.abs(lastMonthCost)) * 100;
   }
 
   return {
