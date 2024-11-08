@@ -1,3 +1,4 @@
+import { EChartsOption } from 'echarts';
 import { DateTime } from 'luxon';
 
 import { EChart } from '@waldur/core/EChart';
@@ -7,7 +8,7 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { PlanUsageRowProps } from './types';
 
-const getChartData = (props: PlanUsageRowProps) => ({
+const getChartData = (props: PlanUsageRowProps): EChartsOption => ({
   toolbox: {
     show: true,
     showTitle: false,

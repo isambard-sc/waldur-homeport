@@ -1,3 +1,4 @@
+import { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
@@ -24,14 +25,14 @@ const ResourceQuotaChart = ({ value, max }) => {
 
   const theme = useTheme();
 
-  const chartOptions = {
+  const chartOptions: EChartsOption = {
     tooltip: {
       trigger: 'item',
     },
     series: [
       {
         type: 'pie',
-        radius: '100%',
+        radius: '95%',
         center: ['50%', '50%'],
         label: { show: false },
         data: [
@@ -40,6 +41,9 @@ const ResourceQuotaChart = ({ value, max }) => {
             value: empty,
             name: translate('Free'),
             itemStyle: { color: theme === 'light' ? '#f5f8fa' : '#1a261d' },
+            emphasis: {
+              itemStyle: { color: theme === 'light' ? '#f5f8fa' : '#1a261d' },
+            },
           },
         ],
         animation: false,
@@ -47,6 +51,7 @@ const ResourceQuotaChart = ({ value, max }) => {
           itemStyle: {
             shadowColor: 'rgba(0, 0, 0, 0.5)',
           },
+          scaleSize: 2,
         },
       },
     ],

@@ -1,9 +1,12 @@
+import { EChartsOption } from 'echarts';
 import { DateTime } from 'luxon';
 
 import { ENV } from '@waldur/configs/default';
 import { translate } from '@waldur/i18n';
 
-export const formatOfferingCostsChart = (offeringCostsChartData) => {
+export const formatOfferingCostsChart = (
+  offeringCostsChartData,
+): EChartsOption => {
   const name = translate('Cost');
   return {
     toolbox: {
@@ -43,6 +46,8 @@ export const formatOfferingCostsChart = (offeringCostsChartData) => {
         axisLabel: {
           formatter: `${ENV.plugins.WALDUR_CORE.CURRENCY_NAME}{value}`,
         },
+        axisLine: { show: true },
+        axisTick: { show: true },
       },
     ],
     legend: {

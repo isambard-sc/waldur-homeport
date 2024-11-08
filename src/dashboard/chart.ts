@@ -1,3 +1,5 @@
+import { EChartsOption } from 'echarts';
+
 import { translate } from '@waldur/i18n';
 import { ThemeName } from '@waldur/navigation/theme/types';
 
@@ -15,7 +17,7 @@ export const getScopeChartOptions = (
   values: Value[],
   hLines?: HLine[],
   color?: string,
-) => ({
+): EChartsOption => ({
   tooltip: {
     trigger: 'axis',
     formatter: '{b}',
@@ -45,14 +47,12 @@ export const getScopeChartOptions = (
             data: hLines.map((line) => [
               {
                 label: {
-                  normal: {
-                    show: false,
-                    position: 'middle',
-                    formatter: line.label,
-                  },
-                  emphasis: { show: true },
+                  show: false,
+                  position: 'middle',
+                  formatter: line.label,
                 },
-                lineStyle: { normal: { type: 'solid', color: '#0072ff' } },
+                emphasis: { label: { show: true } },
+                lineStyle: { type: 'solid', color: '#0072ff' },
                 yAxis: line.value,
                 x: '0%',
                 symbol: 'none',
@@ -222,7 +222,7 @@ export const getLineChartOptionsWithAxis = (chart: Chart) =>
 export const getRingChartOptions = (
   props: RingChartOption,
   theme: ThemeName,
-) => {
+): EChartsOption => {
   const emptySpace = (props.max || 100) - props.value;
   return {
     title: {
@@ -232,7 +232,7 @@ export const getRingChartOptions = (
       textStyle: {
         color: theme === 'light' ? '#667085' : '#98a2b3',
         fontSize: 15,
-        fontWeight: '500',
+        fontWeight: 500,
       },
     },
     grid: {
@@ -245,17 +245,15 @@ export const getRingChartOptions = (
     series: [
       {
         type: 'pie',
-        startAngle: '90',
+        startAngle: 90,
         avoidLabelOverlap: false,
         label: {
           show: true,
           position: 'center',
-          padding: [30, 0, 0, 0],
-          textStyle: {
-            color: theme === 'light' ? '#101828' : '#f9fafb',
-            fontSize: 16,
-            fontWeight: '600',
-          },
+          offset: [0, 15, 0, 0],
+          color: theme === 'light' ? '#101828' : '#f9fafb',
+          fontSize: 16,
+          fontWeight: 600,
         },
         labelLine: {
           show: false,
@@ -264,8 +262,8 @@ export const getRingChartOptions = (
           label: {
             fontSize: 17,
           },
+          scaleSize: 2,
         },
-        hoverOffset: 2,
         data: [
           {
             value: props.value,
@@ -273,6 +271,7 @@ export const getRingChartOptions = (
           },
           {
             value: emptySpace,
+            label: { show: false },
             itemStyle: {
               color: theme === 'light' ? '#e6f0e3' : '#2b3d2f',
             },
