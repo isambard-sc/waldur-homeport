@@ -40,9 +40,9 @@ export const OverviewLastMonths: FunctionComponent = () => {
   }
 
   return (
-    <Row className="mb-6">
+    <Row className="mb-5">
       {value[0] && (
-        <Col sm={12} md={6} className="mb-sm-6 mb-md-0">
+        <Col sm={12} md={6} className="mb-sm-5 mb-md-0">
           <MonthOverview
             invoice={value[0]}
             customer={customer}

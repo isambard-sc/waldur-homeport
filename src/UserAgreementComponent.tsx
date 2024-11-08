@@ -53,7 +53,7 @@ export const UserAgreementComponent: FunctionComponent<
 
   return (
     <div>
-      <div className="mb-6 card">
+      <div className="mb-6 card card-bordered">
         <div className="card-body">
           <Markdown>{option.content}</Markdown>
         </div>

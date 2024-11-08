@@ -36,7 +36,7 @@ export const FreeIpaAccount = () => {
   if (error) return <>{translate('Unable to load data.')}</>;
 
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>{translate('FreeIPA account')}</Card.Header>
       <Card.Body>
         {profile ? (

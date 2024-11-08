@@ -94,7 +94,7 @@ export const AdministrationServiceDesk = () => {
       <FormTable.Card
         title={INTEGRATION_SETTINGS.description}
         key={INTEGRATION_SETTINGS.description}
-        className="card-bordered mb-3"
+        className="card-bordered mb-5"
       >
         <Table bordered={true} responsive={true} className="form-table">
           {INTEGRATION_SETTINGS.items.map((item) => (
@@ -102,7 +102,7 @@ export const AdministrationServiceDesk = () => {
           ))}
         </Table>
       </FormTable.Card>
-      <Card>
+      <Card className="card-bordered">
         <Card.Body>
           <Row>
             {serviceDeskProviders.map((serviceDeskProvider, index) => (

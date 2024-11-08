@@ -73,7 +73,7 @@ export const AdministrationLanguages: FunctionComponent = () => {
   };
 
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>{translate('Language options')}</Card.Title>
       </Card.Header>

@@ -84,7 +84,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
   }
 
   return (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       {canManageAndEditOfferings && (
         <Tab.Container defaultActiveKey={state.name} onSelect={goTo}>
           <Nav variant="tabs" className="nav-line-tabs mb-4">

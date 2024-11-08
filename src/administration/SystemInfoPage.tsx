@@ -10,7 +10,7 @@ const getDatabaseStats = () =>
   get('/database-stats/').then((response) => response.data);
 
 const DatabaseStats = ({ data }) => (
-  <Card>
+  <Card className="card-bordered">
     <Card.Header>
       <Card.Title>{translate('Top 10 largest database tables')}</Card.Title>
     </Card.Header>

@@ -30,7 +30,7 @@ export const ResourceDetailsHero = ({
         <OrderErredView resource={resource} />
       ) : null}
       <PublicDashboardHero2
-        containerClassName="container-fluid mb-8 mt-6"
+        containerClassName="container-fluid my-5"
         cardBordered
         logo={getMarketplaceResourceLogo(resource)}
         logoAlt={resource.category_title}

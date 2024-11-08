@@ -38,7 +38,7 @@ export const IdentityProvidersList = () => {
       loadData={refetch}
     />
   ) : data ? (
-    <Card>
+    <Card className="card-bordered">
       <Card.Body>
         <Row>
           <Col xs={12} md={6} xl={4} className="mb-6">

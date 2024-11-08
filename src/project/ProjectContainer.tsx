@@ -33,7 +33,7 @@ const PageHero = ({ project }) => {
     router.stateService.go(stateName, { uuid: project.uuid });
 
   return (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       {canEdit && (
         <Tab.Container defaultActiveKey={state.name} onSelect={goTo}>
           <Nav variant="tabs" className="nav-line-tabs mb-4">

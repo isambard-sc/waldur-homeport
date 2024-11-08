@@ -61,11 +61,11 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     <>
       <Row>
         {!shouldConcealPrices && (
-          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardCostLimits project={project} />
           </Col>
         )}
-        <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
+        <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
           <TeamWidget
             api={() => fetchSelectProjectUsers(project.uuid, { page_size: 5 })}
             scope={project}
@@ -83,7 +83,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       </Row>
       {shouldShowAggregateLimitWidget && (
         <Row>
-          <Col md={6} sm={12} className="mb-6" style={COMMON_WIDGET_HEIGHT}>
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <AggregateLimitWidget
               project={project}
               data={aggregateLimitData}
@@ -94,7 +94,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
         </Row>
       )}
       {project.description ? (
-        <Panel title={translate('Description')}>
+        <Panel title={translate('Description')} cardBordered>
           <p>{project.description}</p>
         </Panel>
       ) : null}

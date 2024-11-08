@@ -80,7 +80,7 @@ export const TeamSection: FC<
   );
 
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>
           <h3>{props.title}</h3>

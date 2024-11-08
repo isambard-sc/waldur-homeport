@@ -26,6 +26,7 @@ export const CallUpdateHero: FC<CallUpdateHeroProps> = ({ call, refetch }) => {
     <PublicDashboardHero2
       logo={customer?.image}
       logoAlt={call.name}
+      cardBordered
       title={
         <>
           <div className="d-flex flex-wrap gap-2 mb-2 align-items-center">

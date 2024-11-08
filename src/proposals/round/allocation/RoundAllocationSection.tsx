@@ -27,7 +27,7 @@ export const RoundAllocationSection: FC<RoundAllocationSectionProps> = ({
   loading,
 }) => {
   return (
-    <Card id="allocation" className="mb-7">
+    <Card id="allocation" className="card-bordered">
       <Card.Header>
         <Card.Title>
           {translate('Allocation strategy')}

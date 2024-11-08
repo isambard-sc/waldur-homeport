@@ -133,7 +133,7 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
 
       <FormTable.Card
         title={translate('Details')}
-        className="card-bordered mb-7"
+        className="card-bordered mb-5"
       >
         <FormTable>
           {detailsRows.map((row) => (

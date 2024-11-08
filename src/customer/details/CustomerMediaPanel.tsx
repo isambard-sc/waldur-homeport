@@ -31,7 +31,7 @@ export const CustomerMediaPanel = connect<{}, {}, CustomerEditPanelProps>(
     }, [dispatch, props.customer]);
 
     return (
-      <Card className="card-bordered mb-7">
+      <Card className="card-bordered mb-5">
         <Card.Header>
           <Card.Title>
             <h3>{translate('Logo')}</h3>

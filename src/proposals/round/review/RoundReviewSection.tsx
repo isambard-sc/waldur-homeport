@@ -33,7 +33,7 @@ export const RoundReviewSection: FC<RoundReviewSectionProps> = ({
   }, [round]);
 
   return (
-    <Card id="review" className="mb-7">
+    <Card id="review" className="card-bordered">
       <Card.Header>
         <Card.Title>
           {translate('Review strategy')}

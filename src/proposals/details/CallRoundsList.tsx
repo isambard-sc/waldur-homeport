@@ -27,7 +27,6 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
     <Table
       {...tableProps}
       id="rounds"
-      className="mb-7"
       columns={[
         {
           title: translate('Round name'),

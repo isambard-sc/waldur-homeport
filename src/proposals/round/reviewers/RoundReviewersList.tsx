@@ -19,7 +19,6 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
     <Table<Reviewer>
       {...tableProps}
       id="reviewers"
-      className="mb-7"
       columns={[
         {
           title: translate('Full name'),

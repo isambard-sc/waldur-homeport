@@ -14,7 +14,7 @@ import { useNotify } from '@waldur/store/hooks';
 const saveFeatures = (payload) => post('/feature-values/', payload);
 
 const FeatureSection = ({ section }) => (
-  <FormTable.Card title={section.description} className="card-bordered mb-7">
+  <FormTable.Card title={section.description} className="card-bordered mb-5">
     <FormTable>
       {section.items.map((item) => (
         <tr key={item.key}>

@@ -45,7 +45,7 @@ export const SupportDashboard: FC = () => {
       {data && <HealthChecks healthInfoItems={data} />}
       {isSupportEnabled ? (
         <IssuesList
-          className="mb-6"
+          className="mb-5"
           title={translate('Open issues')}
           filter={{ status: 'Open' }}
           initialPageSize={5}
