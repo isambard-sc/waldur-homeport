@@ -1,9 +1,10 @@
+import { EChartsOption } from 'echarts';
 import { DateTime } from 'luxon';
 
 import { ENV } from '@waldur/configs/default';
 import { translate } from '@waldur/i18n';
 
-export const formatGrowthChart = (growthChartData) => {
+export const formatGrowthChart = (growthChartData): EChartsOption => {
   return {
     toolbox: {
       feature: {
@@ -49,6 +50,8 @@ export const formatGrowthChart = (growthChartData) => {
         axisLabel: {
           formatter: `${ENV.plugins.WALDUR_CORE.CURRENCY_NAME}{value}`,
         },
+        axisLine: { show: true },
+        axisTick: { show: true },
       },
       {
         type: 'value',
@@ -59,6 +62,8 @@ export const formatGrowthChart = (growthChartData) => {
         axisLabel: {
           formatter: `${ENV.plugins.WALDUR_CORE.CURRENCY_NAME}{value}`,
         },
+        axisLine: { show: true },
+        axisTick: { show: true },
       },
     ],
     legend: {

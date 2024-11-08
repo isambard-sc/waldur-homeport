@@ -72,6 +72,8 @@ const formatChart = (
       axisLabel: {
         formatter: '{value}',
       },
+      axisLine: { show: true },
+      axisTick: { show: true },
     },
   ],
   series: [

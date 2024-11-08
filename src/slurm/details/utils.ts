@@ -1,3 +1,4 @@
+import { EChartsOption } from 'echarts';
 import { DateTime } from 'luxon';
 
 import { translate } from '@waldur/i18n';
@@ -7,7 +8,7 @@ import { getChartSpec, palette } from '@waldur/slurm/details/constants';
 import { getAllocationUserUsages } from './api';
 import { Period, Usage, UserUsage } from './types';
 
-const eChartInitialOption = () => ({
+const eChartInitialOption = (): EChartsOption => ({
   color: palette,
   tooltip: {
     trigger: 'axis',
@@ -37,6 +38,8 @@ const eChartInitialOption = () => ({
       axisLabel: {
         formatter: '{value} h',
       },
+      axisLine: { show: true },
+      axisTick: { show: true },
     },
     {
       type: 'value',
@@ -44,6 +47,8 @@ const eChartInitialOption = () => ({
       axisLabel: {
         formatter: '{value} h',
       },
+      axisLine: { show: true },
+      axisTick: { show: true },
     },
   ],
   series: [
