@@ -88,7 +88,7 @@ export const AggregateLimitWidget = ({
         },
       ]}
     >
-      <Row className="field-row mb-1">
+      <Row className="field-row">
         {components.slice(0, 4).map((component) => (
           <Col key={component.type} xs={6}>
             <ComponentItem component={component} />
@@ -96,7 +96,7 @@ export const AggregateLimitWidget = ({
         ))}
       </Row>
       {components?.length > 4 && (
-        <div className="flex-grow-1 d-flex align-items-end mt-5">
+        <div className="flex-grow-1 d-flex align-items-end">
           <AggregateLimitsShowMoreButton components={components} />
         </div>
       )}
