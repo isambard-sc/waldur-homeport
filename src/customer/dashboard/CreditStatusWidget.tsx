@@ -56,7 +56,9 @@ export const CreditStatusWidget: FC<CreditStatusWidgetProps> = (props) => {
             value: credit?.allocated_to_projects,
             max: Number(credit?.value),
           }}
-          className="me-8"
+          className="me-3"
+          height="116px"
+          width="116px"
         />
       }
       right={

@@ -231,7 +231,7 @@ export const getRingChartOptions = (
       top: '26%',
       textStyle: {
         color: theme === 'light' ? '#667085' : '#98a2b3',
-        fontSize: 15,
+        fontSize: 12,
         fontWeight: 500,
       },
     },
@@ -252,7 +252,7 @@ export const getRingChartOptions = (
           position: 'center',
           offset: [0, 15, 0, 0],
           color: theme === 'light' ? '#101828' : '#f9fafb',
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: 600,
         },
         labelLine: {
@@ -260,7 +260,7 @@ export const getRingChartOptions = (
         },
         emphasis: {
           label: {
-            fontSize: 17,
+            fontSize: 15,
           },
           scaleSize: 2,
         },

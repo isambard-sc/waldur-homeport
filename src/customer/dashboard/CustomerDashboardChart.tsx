@@ -73,7 +73,7 @@ export const CustomerDashboardChart: FunctionComponent<
               }
               right={
                 <Col xs={7}>
-                  <EChart options={data.costChart.options} height="100px" />
+                  <EChart options={data.costChart.options} height="64px" />
                 </Col>
               }
             />

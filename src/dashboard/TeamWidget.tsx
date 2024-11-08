@@ -116,7 +116,7 @@ export const TeamWidget: FC<TeamWidgetProps> = ({
       }
     >
       {showChart && Boolean(chartData) && (
-        <EChart options={chartData.options} height="68px" />
+        <EChart options={chartData.options} height="64px" />
       )}
     </WidgetCard>
   );
