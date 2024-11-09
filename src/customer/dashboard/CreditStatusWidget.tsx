@@ -1,8 +1,9 @@
-import { Circle } from '@phosphor-icons/react';
+import { Circle, WarningOctagon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Col, Stack } from 'react-bootstrap';
 
 import { ENV } from '@waldur/configs/default';
+import { Badge } from '@waldur/core/Badge';
 import { formatDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { RingChart } from '@waldur/dashboard/RingChart';
@@ -21,7 +22,16 @@ export const CreditStatusWidget: FC<CreditStatusWidgetProps> = (props) => {
   return (
     <WidgetCard
       cardTitle={translate('Credits')}
-      title={defaultCurrency(credit?.value)}
+      title={
+        <div className="d-flex flex-wrap gap-3">
+          {defaultCurrency(credit?.value)}
+          {credit.allocated_to_projects > Number(credit.value) && (
+            <Badge leftIcon={<WarningOctagon />} variant="warning" outline pill>
+              {translate('Credit is overallocated')}
+            </Badge>
+          )}
+        </div>
+      }
       className="h-100"
       meta={
         <>

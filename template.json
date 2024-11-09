@@ -2463,6 +2463,10 @@
     "description": "customer/credits/DeleteCreditButton.tsx, customer/credits/ProjectDeleteCreditButton.tsx",
     "message": "Credit deleted successfully."
   },
+  "Credit is overallocated": {
+    "description": "customer/dashboard/CreditStatusWidget.tsx",
+    "message": "Credit is overallocated"
+  },
   "Credit management": {
     "description": "administration/organizations/OrganizationCreditsList.tsx, administration/routes.ts, customer/credits/ProjectCreditsList.tsx, customer/routes.ts",
     "message": "Credit management"
