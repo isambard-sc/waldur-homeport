@@ -5,13 +5,16 @@ import { reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { updateOfferingAccessPolicy } from '@waldur/marketplace/common/api';
+import {
+  updateOfferingAccessPolicy,
+  updatePlanAccessPolicy,
+} from '@waldur/marketplace/common/api';
 import { SET_ACCESS_POLICY_FORM_ID } from '@waldur/marketplace/offerings/actions/constants';
 import {
   formatRequestBodyForSetAccessPolicyForm,
   getInitialValuesForSetAccessPolicyForm,
 } from '@waldur/marketplace/offerings/actions/utils';
-import { Offering, OrganizationGroup } from '@waldur/marketplace/types';
+import { Offering, OrganizationGroup, Plan } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -20,16 +23,23 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { SetAccessPolicyFormContainer } from './SetAccessPolicyFormContainer';
 
 interface SetAccessPolicyDialogFormOwnProps {
-  offering: Offering;
+  offering?: Offering;
+  plan?: Plan;
   organizationGroups: OrganizationGroup[];
+  refetch: any;
 }
 
 const PureSetAccessPolicyDialogForm: FunctionComponent<any> = (props) => {
   const dispatch = useDispatch();
   const submitRequest = async (formData) => {
     try {
-      await updateOfferingAccessPolicy(
-        props.offering.uuid,
+      const updateAccessPolicy = props.plan
+        ? updatePlanAccessPolicy
+        : updateOfferingAccessPolicy;
+      const uuid = props.plan ? props.plan.uuid : props.offering.uuid;
+
+      await updateAccessPolicy(
+        uuid,
         formatRequestBodyForSetAccessPolicyForm(
           formData,
           props.organizationGroups,
@@ -38,6 +48,7 @@ const PureSetAccessPolicyDialogForm: FunctionComponent<any> = (props) => {
       dispatch(
         showSuccess(translate('Access policy has been updated successfully.')),
       );
+      props.refetch();
       dispatch(closeModalDialog());
     } catch (error) {
       dispatch(
@@ -48,9 +59,15 @@ const PureSetAccessPolicyDialogForm: FunctionComponent<any> = (props) => {
   return (
     <form onSubmit={props.handleSubmit(submitRequest)}>
       <ModalDialog
-        title={translate('Set access policy for {offeringName}', {
-          offeringName: props.offering.name,
-        })}
+        title={translate(
+          props.plan
+            ? 'Set access policy for {planName}'
+            : 'Set access policy for {offeringName}',
+          {
+            planName: props.plan?.name,
+            offeringName: props.offering?.name,
+          },
+        )}
         footer={
           <>
             <CloseDialogButton />
@@ -75,7 +92,8 @@ const mapStateToProps = (
   ownProps: SetAccessPolicyDialogFormOwnProps,
 ) => ({
   initialValues: getInitialValuesForSetAccessPolicyForm(
-    ownProps.offering.organization_groups,
+    ownProps.offering?.organization_groups ||
+      ownProps.plan?.organization_groups,
   ),
 });
 
