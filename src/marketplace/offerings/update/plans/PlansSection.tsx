@@ -1,83 +1,96 @@
-import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
-import { Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
+import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
-import { getOfferingPlans } from '@waldur/marketplace/common/api';
 import { hidePlanAddButton } from '@waldur/marketplace/common/registry';
-import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { Plan } from '@waldur/marketplace/types';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import { createFetcher, Table, useTable } from '@waldur/table';
+import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { getUser } from '@waldur/workspace/selectors';
 
-import { RefreshButton } from '../components/RefreshButton';
 import { OfferingSectionProps } from '../types';
 
 import { AddPlanButton } from './AddPlanButton';
-import { PlansTable } from './PlansTable';
+import { PlanActions } from './PlanActions';
 
 export const PlansSection: FC<OfferingSectionProps> = (props) => {
   const user = useSelector(getUser);
-  const {
-    data: plans,
-    refetch: refetchPlans,
-    isRefetching,
-  } = useQuery<{}, {}, Plan[]>(
-    ['OfferingPlans', props.offering.uuid],
-    () => (props.offering ? getOfferingPlans(props.offering.uuid) : []),
+
+  const columns = [
     {
-      initialData: props.offering.plans,
-      enabled: false,
+      title: translate('Name'),
+      render: ({ row }) => row.name,
+      copyField: (row) => row.name,
     },
-  );
+    {
+      title: translate('Status'),
+      render: ({ row }) => (
+        <StateIndicator
+          label={row.archived ? translate('Archived') : translate('Active')}
+          variant={row.archived ? 'warning' : 'success'}
+          outline
+          pill
+        />
+      ),
+    },
+    {
+      title: translate('Resources'),
+      render: ({ row }) =>
+        row.resources_count === 0
+          ? translate('Not used')
+          : row.resources_count === 1
+            ? translate('Used by one resource')
+            : translate('Used by {count} resources', {
+                count: row.resources_count,
+              }),
+    },
+    {
+      title: translate('Organization groups'),
+      render: ({ row }) =>
+        row.organization_groups.map((group) => group.name).join(', ') ||
+        DASH_ESCAPE_CODE,
+    },
+    {
+      title: translate('UUID'),
+      render: ({ row }) => row.uuid,
+    },
+  ];
 
-  const refresh = () => {
-    props.refetch();
-    refetchPlans();
-  };
+  const tableProps = useTable({
+    table: 'OfferingPlans',
+    fetchData: createFetcher('marketplace-plans', {
+      params: { offering_uuid: props.offering.uuid },
+    }),
+  });
 
-  if (!plans) {
-    return null;
-  }
+  const canCreatePlan =
+    !hidePlanAddButton(props.offering.type, props.offering.plans) &&
+    hasPermission(user, {
+      permission: PermissionEnum.CREATE_OFFERING_PLAN,
+      customerId: props.offering.customer_uuid,
+    });
 
   return (
-    <Card id="plans">
-      <Card.Header className="border-2 border-bottom">
-        <Card.Title className="h5">
-          <ValidationIcon value={plans.length > 0} />
-          <span className="me-2">{translate('Accounting plans')}</span>
-          <RefreshButton refetch={refresh} loading={isRefetching} />
-        </Card.Title>
-        {!hidePlanAddButton(props.offering.type, plans) &&
-          hasPermission(user, {
-            permission: PermissionEnum.CREATE_OFFERING_PLAN,
-            customerId: props.offering.customer_uuid,
-          }) && (
-            <div className="card-toolbar">
-              <AddPlanButton refetch={refresh} offering={props.offering} />
-            </div>
-          )}
-      </Card.Header>
-      <Card.Body>
-        {plans.length === 0 ? (
-          <div className="justify-content-center row">
-            <div className="col-sm-4">
-              <p className="text-center">
-                {translate("Offering doesn't have plans.")}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <PlansTable
-            plans={plans}
-            offering={props.offering}
-            refetch={refresh}
-            user={user}
-          />
-        )}
-      </Card.Body>
-    </Card>
+    <Table<Plan>
+      {...tableProps}
+      columns={columns}
+      verboseName={translate('plans')}
+      tableActions={
+        canCreatePlan && (
+          <AddPlanButton refetch={tableProps.fetch} offering={props.offering} />
+        )
+      }
+      rowActions={({ row }) => (
+        <PlanActions
+          offering={props.offering}
+          plan={row}
+          refetch={tableProps.fetch}
+          user={user}
+        />
+      )}
+    />
   );
 };

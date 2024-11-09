@@ -466,6 +466,14 @@ export const updateOfferingAccessPolicy = (
     },
   );
 
+export const updatePlanAccessPolicy = (
+  planUuid: string,
+  organizationGroups: string[],
+) =>
+  post(`/marketplace-plans/${planUuid}/update_organization_groups/`, {
+    organization_groups: organizationGroups,
+  });
+
 export const updateOfferingLogo = (offeringUuid: string, formData) =>
   sendForm(
     'POST',

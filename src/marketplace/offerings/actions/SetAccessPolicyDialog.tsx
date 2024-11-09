@@ -5,10 +5,10 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { getAllOrganizationGroups } from '@waldur/marketplace/common/api';
 import { SetAccessPolicyDialogForm } from '@waldur/marketplace/offerings/actions/SetAccessPolicyDialogForm';
-import { Offering } from '@waldur/marketplace/types';
+import { Offering, Plan } from '@waldur/marketplace/types';
 
 interface SetAccessPolicyDialogProps {
-  resolve: { offering: Offering };
+  resolve: { offering?: Offering; plan?: Plan; refetch: any };
 }
 
 export const SetAccessPolicyDialog: FunctionComponent<
@@ -27,6 +27,8 @@ export const SetAccessPolicyDialog: FunctionComponent<
     <SetAccessPolicyDialogForm
       organizationGroups={organizationGroups}
       offering={resolve.offering}
+      plan={resolve.plan}
+      refetch={resolve.refetch}
     />
   );
 };

@@ -48,6 +48,7 @@ export interface Plan {
   archived: boolean;
   price: number;
   plan_type: string;
+  organization_groups: OrganizationGroup[];
 }
 
 export interface OptionField {
