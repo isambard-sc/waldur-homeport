@@ -56,7 +56,7 @@
     "message": "A custom favicon .png image file"
   },
   "A list of languages available for selection has been updated": {
-    "description": "administration/languages/LanguageOptionsForm.tsx",
+    "description": "administration/languages/AdministrationLanguages.tsx",
     "message": "A list of languages available for selection has been updated"
   },
   "A minimal expected configuration of worker is 4 vCPU and 4 GB RAM.": {
@@ -2480,7 +2480,7 @@
     "message": "Credit usage"
   },
   "Credit": {
-    "description": "administration/organizations/OrganizationCostPoliciesList.tsx, customer/cost-policies/CostPoliciesList.tsx",
+    "description": "administration/organizations/OrganizationCostPoliciesList.tsx",
     "message": "Credit"
   },
   "Credits available for this organization: {currency} {credits}": {
@@ -4040,7 +4040,7 @@
     "message": "Floating IP count"
   },
   "Floating IP": {
-    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-floating-ips/FloatingIpsList.tsx",
+    "description": "openstack/OpenStackExternalIpsField.tsx, openstack/openstack-floating-ips/FloatingIpsList.tsx",
     "message": "Floating IP"
   },
   "Floating IPs update has been scheduled.": {
@@ -4048,7 +4048,7 @@
     "message": "Floating IPs update has been scheduled."
   },
   "Floating IPs": {
-    "description": "openstack/openstack-instance/tabs.ts, openstack/openstack-tenant/tabs.ts",
+    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-instance/tabs.ts, openstack/openstack-tenant/tabs.ts",
     "message": "Floating IPs"
   },
   "Folder": {
@@ -6759,6 +6759,10 @@
     "description": "workspace/effects.ts",
     "message": "Organization could not be refreshed."
   },
+  "Organization credit": {
+    "description": "customer/cost-policies/CostPoliciesList.tsx",
+    "message": "Organization credit"
+  },
   "Organization dashboard": {
     "description": "customer/routes.ts",
     "message": "Organization dashboard"
@@ -7360,7 +7364,7 @@
     "message": "Please select a username that you will use for login into the Linux systems."
   },
   "Please select at least one language to save changes": {
-    "description": "administration/languages/LanguageOptionsForm.tsx",
+    "description": "administration/languages/AdministrationLanguages.tsx",
     "message": "Please select at least one language to save changes"
   },
   "Please select organization first.": {
@@ -7630,6 +7634,10 @@
   "Project could not be updated.": {
     "description": "project/manage/EditFieldDialog.tsx, project/manage/ProjectAvatar.tsx",
     "message": "Project could not be updated."
+  },
+  "Project credit": {
+    "description": "customer/cost-policies/CostPoliciesList.tsx",
+    "message": "Project credit"
   },
   "Project dashboard": {
     "description": "project/routes.ts",
@@ -9172,7 +9180,7 @@
     "message": "Save summary"
   },
   "Save": {
-    "description": "administration/FeaturesList.tsx, administration/agreements/UserAgreementCreateDialog.tsx, administration/agreements/UserAgreementsEditDialog.tsx, administration/languages/LanguageOptionsForm.tsx, administration/notifications/NotificationForm.tsx, administration/providers/UpdateProviderDialog.tsx, administration/roles/RoleDescriptionForm.tsx, administration/roles/RoleForm.tsx, broadcasts/BroadcastSaveAsTemplateDialog.tsx, broadcasts/BroadcastTemplateForm.tsx, customer/details/CustomerMediaPanel.tsx, customer/team/AddProjectUserDialog.tsx, customer/team/EditProjectUserDialog.tsx, customer/team/EditUserDialog.tsx, map/SetLocationDialog.tsx, marketplace/offerings/actions/SetAccessPolicyDialogForm.tsx, marketplace/offerings/actions/UpdateOfferingLogoDialog.tsx, marketplace/offerings/expandable/utils.ts, marketplace/offerings/update/attributes/EditAttributeDialog.tsx, marketplace/offerings/update/attributes/EditCategoryDialog.tsx, marketplace/offerings/update/components/EditComponentDialog.tsx, marketplace/offerings/update/integration/EditLexisLinkIntegrationDialog.tsx, marketplace/offerings/update/integration/EditScriptDialog.tsx, marketplace/offerings/update/integration/EditVarsDialog.tsx, marketplace/offerings/update/options/EditOptionDialog.tsx, marketplace/offerings/update/plans/EditPlanDescriptionDialog.tsx, marketplace/offerings/update/plans/EditPlanPricesDialog.tsx, marketplace/offerings/update/plans/EditPlanQuotasDialog.tsx, marketplace/resources/actions/EditResourceEndDateDialog.tsx, marketplace/resources/actions/MoveResourceDialog.tsx, marketplace/resources/mass-actions/MultiMoveDialog.tsx, marketplace/resources/usage/utils.ts, marketplace-checklist/ChecklistCustomer.tsx, project/MoveProjectDialog.tsx, project/manage/ProjectAvatar.tsx, project/team/EditUserDialog.tsx, proposals/proposal/create-review/CommentFormDialog.tsx, proposals/team/AddUserDialog.tsx, proposals/update/documents/AttachDocumentsDialog.tsx, proposals/update/general/EditGeneralInfoDialog.tsx, reporting/invoices/utils.ts, table/SaveFilterDialog.tsx, user/support/UserEditAvatarFormItem.tsx",
+    "description": "administration/FeaturesList.tsx, administration/agreements/UserAgreementCreateDialog.tsx, administration/agreements/UserAgreementsEditDialog.tsx, administration/languages/AdministrationLanguages.tsx, administration/notifications/NotificationForm.tsx, administration/providers/UpdateProviderDialog.tsx, administration/roles/RoleDescriptionForm.tsx, administration/roles/RoleForm.tsx, broadcasts/BroadcastSaveAsTemplateDialog.tsx, broadcasts/BroadcastTemplateForm.tsx, customer/details/CustomerMediaPanel.tsx, customer/team/AddProjectUserDialog.tsx, customer/team/EditProjectUserDialog.tsx, customer/team/EditUserDialog.tsx, map/SetLocationDialog.tsx, marketplace/offerings/actions/SetAccessPolicyDialogForm.tsx, marketplace/offerings/actions/UpdateOfferingLogoDialog.tsx, marketplace/offerings/expandable/utils.ts, marketplace/offerings/update/attributes/EditAttributeDialog.tsx, marketplace/offerings/update/attributes/EditCategoryDialog.tsx, marketplace/offerings/update/components/EditComponentDialog.tsx, marketplace/offerings/update/integration/EditLexisLinkIntegrationDialog.tsx, marketplace/offerings/update/integration/EditScriptDialog.tsx, marketplace/offerings/update/integration/EditVarsDialog.tsx, marketplace/offerings/update/options/EditOptionDialog.tsx, marketplace/offerings/update/plans/EditPlanDescriptionDialog.tsx, marketplace/offerings/update/plans/EditPlanPricesDialog.tsx, marketplace/offerings/update/plans/EditPlanQuotasDialog.tsx, marketplace/resources/actions/EditResourceEndDateDialog.tsx, marketplace/resources/actions/MoveResourceDialog.tsx, marketplace/resources/mass-actions/MultiMoveDialog.tsx, marketplace/resources/usage/utils.ts, marketplace-checklist/ChecklistCustomer.tsx, project/MoveProjectDialog.tsx, project/manage/ProjectAvatar.tsx, project/team/EditUserDialog.tsx, proposals/proposal/create-review/CommentFormDialog.tsx, proposals/team/AddUserDialog.tsx, proposals/update/documents/AttachDocumentsDialog.tsx, proposals/update/general/EditGeneralInfoDialog.tsx, reporting/invoices/utils.ts, table/SaveFilterDialog.tsx, user/support/UserEditAvatarFormItem.tsx",
     "message": "Save"
   },
   "Saved filters": {
@@ -12296,7 +12304,7 @@
     "message": "Unable to update invoice item."
   },
   "Unable to update languages available for selection": {
-    "description": "administration/languages/LanguageOptionsForm.tsx",
+    "description": "administration/languages/AdministrationLanguages.tsx",
     "message": "Unable to update languages available for selection"
   },
   "Unable to update logo.": {
@@ -13376,11 +13384,11 @@
     "message": "You can start filling this table by creating your first offering."
   },
   "You cannot unselect the current UI language": {
-    "description": "administration/languages/LanguageOptionsForm.tsx",
+    "description": "administration/languages/AdministrationLanguages.tsx",
     "message": "You cannot unselect the current UI language"
   },
   "You cannot unselect the default language": {
-    "description": "administration/languages/LanguageOptionsForm.tsx",
+    "description": "administration/languages/AdministrationLanguages.tsx",
     "message": "You cannot unselect the default language"
   },
   "You do not have an active payment profile, visit {link} to create a payment profile.": {

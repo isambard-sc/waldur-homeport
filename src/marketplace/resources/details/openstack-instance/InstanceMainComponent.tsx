@@ -39,8 +39,8 @@ export const InstanceMainComponent = ({ resourceScope }) => {
           hasCopy
         />
         <Field
-          label={translate('External IP')}
-          value={resourceScope.external_ips.join(', ')}
+          label={translate('External IPs')}
+          value={resourceScope.external_address.join(', ')}
           hasCopy
         />
       </Card.Body>
