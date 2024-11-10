@@ -5139,9 +5139,9 @@
     "description": "marketplace/offerings/OfferingEditUIView.tsx, marketplace/offerings/update/integration/LifecyclePolicySection.tsx",
     "message": "Lifecycle policy"
   },
-  "Lifetime will be updated and reset upon saving the form.": {
+  "Lifetime will be updated and reset upon saving the form. Token lifetime is prolonged each time a successful API call with the token is done.": {
     "description": "user/api-key/UserTokenLifetime.tsx",
-    "message": "Lifetime will be updated and reset upon saving the form."
+    "message": "Lifetime will be updated and reset upon saving the form. Token lifetime is prolonged each time a successful API call with the token is done."
   },
   "Light": {
     "description": "administration/settings/ConfigurationEditDialog.tsx",
