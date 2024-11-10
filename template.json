@@ -432,7 +432,7 @@
     "message": "Add"
   },
   "Additional account description invisible to user": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Additional account description invisible to user"
   },
   "Additional configuration": {
@@ -480,7 +480,7 @@
     "message": "Affected resource"
   },
   "Affiliations": {
-    "description": "marketplace/service-providers/ProviderUsersList.tsx, user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx, user/support/UserList.tsx",
+    "description": "marketplace/service-providers/ProviderUsersList.tsx, user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx, user/support/UserList.tsx",
     "message": "Affiliations"
   },
   "Affinity": {
@@ -2696,7 +2696,7 @@
     "message": "Date and time when item usage has started"
   },
   "Date joined": {
-    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx, user/support/UserList.tsx",
+    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx, user/support/UserList.tsx",
     "message": "Date joined"
   },
   "Date of reporting": {
@@ -2880,19 +2880,19 @@
     "message": "Deployment type"
   },
   "Describe the user's role or position within the organization": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Describe the user's role or position within the organization"
   },
   "Describe user's account type": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Describe user's account type"
   },
   "Describe your role or position within the organization": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Describe your role or position within the organization"
   },
   "Describe your user account type": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Describe your user account type"
   },
   "Description ({language})": {
@@ -2904,7 +2904,7 @@
     "message": "Description of the Waldur deployment."
   },
   "Description": {
-    "description": "administration/roles/RolesList.tsx, azure/vm/AzureVirtualMachineForm.tsx, customer/details/AccessSubnetCreateForm.tsx, customer/details/AccessSubnetEditDialog.tsx, customer/details/CustomerAccessControlPanel.tsx, customer/details/EditFieldDialog.tsx, issues/list/IssuesListExpandableRow.tsx, marketplace/category/admin/AdminCategoriesPage.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/CategoryGroupsList.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/deploy/steps/FormFinalConfigurationStep.tsx, marketplace/details/OfferingTabs.tsx, marketplace/details/plan/PlanSection.tsx, marketplace/offerings/OfferingPublicUIView.tsx, marketplace/offerings/actions/RequestActionDialog.tsx, marketplace/offerings/details/PublicOfferingComponentsTable.tsx, marketplace/offerings/details/PublicOfferingInfo.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/images/OfferingImagesList.tsx, marketplace/offerings/update/options/OptionForm.tsx, marketplace/offerings/update/overview/OverviewSection.tsx, marketplace/offerings/update/plans/PlanForm.tsx, marketplace/orders/details/OrderDetailsApprovalsTab.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/usage/utils.ts, marketplace/service-providers/OrganizationProjectsExpandable.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, openstack/openstack-backup/BackupsList.tsx, openstack/openstack-instance/deploy/FormSecurityGroupsStep.tsx, openstack/openstack-security-groups/SecurityGroupRuleHeader.tsx, openstack/openstack-security-groups/SecurityGroupsList.tsx, openstack/openstack-security-groups/rule-editor/RulesHeader.tsx, openstack/openstack-snapshot/TenantSnapshotsList.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupForm.tsx, openstack/openstack-tenant/actions/RequestDirectAccessDialog.tsx, openstack/openstack-volume/TenantVolumeTypesList.tsx, openstack/openstack-volume/VolumeSnapshotsList.tsx, project/ProjectDashboard.tsx, project/ProjectsList.tsx, project/manage/ProjectGeneral.tsx, proposals/CallsAvailableOfferingsPage.tsx, proposals/call-management/CallFormDialog.tsx, proposals/details/CallDescriptionCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/proposal/create/ProjectDetailsSummary.tsx, proposals/update/general/CallGeneralSection.tsx, proposals/update/general/EditGeneralInfoDialog.tsx, rancher/ClusterProjectList.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/catalog/ClusterCatalogList.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, rancher/template/ApplicationConfiguration.tsx, rancher/template/CatalogTemplateList.tsx, rancher/template/ClusterTemplateList.tsx, resource/actions/base.ts, resource/summary/ResourceSummaryBase.tsx, slurm/RequestLimitsChangeDialog.tsx, user/affiliations/ProjectExpandableRow.tsx, user/support/EditFieldDialog.tsx, user/support/UserEditForm.tsx, user/support/UserList.tsx",
+    "description": "administration/roles/RolesList.tsx, azure/vm/AzureVirtualMachineForm.tsx, customer/details/AccessSubnetCreateForm.tsx, customer/details/AccessSubnetEditDialog.tsx, customer/details/CustomerAccessControlPanel.tsx, customer/details/EditFieldDialog.tsx, issues/list/IssuesListExpandableRow.tsx, marketplace/category/admin/AdminCategoriesPage.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/CategoryGroupsList.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/deploy/steps/FormFinalConfigurationStep.tsx, marketplace/details/OfferingTabs.tsx, marketplace/details/plan/PlanSection.tsx, marketplace/offerings/OfferingPublicUIView.tsx, marketplace/offerings/actions/RequestActionDialog.tsx, marketplace/offerings/details/PublicOfferingComponentsTable.tsx, marketplace/offerings/details/PublicOfferingInfo.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/images/OfferingImagesList.tsx, marketplace/offerings/update/options/OptionForm.tsx, marketplace/offerings/update/overview/OverviewSection.tsx, marketplace/offerings/update/plans/PlanForm.tsx, marketplace/orders/details/OrderDetailsApprovalsTab.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/usage/utils.ts, marketplace/service-providers/OrganizationProjectsExpandable.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, openstack/openstack-backup/BackupsList.tsx, openstack/openstack-instance/deploy/FormSecurityGroupsStep.tsx, openstack/openstack-security-groups/SecurityGroupRuleHeader.tsx, openstack/openstack-security-groups/SecurityGroupsList.tsx, openstack/openstack-security-groups/rule-editor/RulesHeader.tsx, openstack/openstack-snapshot/TenantSnapshotsList.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupForm.tsx, openstack/openstack-tenant/actions/RequestDirectAccessDialog.tsx, openstack/openstack-volume/TenantVolumeTypesList.tsx, openstack/openstack-volume/VolumeSnapshotsList.tsx, project/ProjectDashboard.tsx, project/ProjectsList.tsx, project/manage/ProjectGeneral.tsx, proposals/CallsAvailableOfferingsPage.tsx, proposals/call-management/CallFormDialog.tsx, proposals/details/CallDescriptionCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/proposal/create/ProjectDetailsSummary.tsx, proposals/update/general/CallGeneralSection.tsx, proposals/update/general/EditGeneralInfoDialog.tsx, rancher/ClusterProjectList.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/catalog/ClusterCatalogList.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, rancher/template/ApplicationConfiguration.tsx, rancher/template/CatalogTemplateList.tsx, rancher/template/ClusterTemplateList.tsx, resource/actions/base.ts, resource/summary/ResourceSummaryBase.tsx, slurm/RequestLimitsChangeDialog.tsx, user/affiliations/ProjectExpandableRow.tsx, user/support/EditFieldDialog.tsx, user/support/UserEditRows.tsx, user/support/UserList.tsx",
     "message": "Description"
   },
   "Desired replicas": {
@@ -3056,19 +3056,19 @@
     "message": "Display name"
   },
   "Display the user's first name on their profile": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Display the user's first name on their profile"
   },
   "Display the user's last name on their profile": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Display the user's last name on their profile"
   },
   "Display your first name on your profile": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Display your first name on your profile"
   },
   "Display your last name on your profile": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Display your last name on your profile"
   },
   "Do not configure a gateway for this subnet": {
@@ -3384,7 +3384,7 @@
     "message": "Email verification has been sent. Please check your inbox."
   },
   "Email": {
-    "description": "administration/InvitationList.tsx, administration/hooks/HooksList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, administration/providers/ProviderUsersDialog.tsx, broadcasts/RecipientsList.tsx, customer/details/CustomerContactPanel.tsx, customer/details/EditFieldDialog.tsx, customer/list/ExportAsEmailDialog.tsx, customer/team/CustomerUsersList.tsx, customer/team/UserGroup.tsx, invitations/InvitationsList.tsx, invitations/actions/create/EmailsListGroup.tsx, project/team/InvitationsList.tsx, project/team/ProjectUsersList.tsx, project/team/UserGroup.tsx, proposals/round/reviewers/RoundReviewersList.tsx, proposals/team/InvitationsList.tsx, proposals/team/UsersList.tsx, user/affiliations/OrganizationsList.tsx, user/hooks/HookTypeField.tsx, user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx, user/support/UserEmailChangeDialog.tsx, user/support/UserList.tsx",
+    "description": "administration/InvitationList.tsx, administration/hooks/HooksList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, administration/providers/ProviderUsersDialog.tsx, broadcasts/RecipientsList.tsx, customer/details/CustomerContactPanel.tsx, customer/details/EditFieldDialog.tsx, customer/list/ExportAsEmailDialog.tsx, customer/team/CustomerUsersList.tsx, customer/team/UserGroup.tsx, invitations/InvitationsList.tsx, invitations/actions/create/EmailsListGroup.tsx, project/team/InvitationsList.tsx, project/team/ProjectUsersList.tsx, project/team/UserGroup.tsx, proposals/round/reviewers/RoundReviewersList.tsx, proposals/team/InvitationsList.tsx, proposals/team/UsersList.tsx, user/affiliations/OrganizationsList.tsx, user/hooks/HookTypeField.tsx, user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx, user/support/UserEmailChangeDialog.tsx, user/support/UserList.tsx",
     "message": "Email"
   },
   "Email: {email}": {
@@ -3524,7 +3524,7 @@
     "message": "Enter a comma separated list of fields of the user profile that would be protected from editing in Waldur."
   },
   "Enter a contact number for the user": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Enter a contact number for the user"
   },
   "Enter a description": {
@@ -3552,7 +3552,7 @@
     "message": "Enter the minimum credit reduction per month"
   },
   "Enter your contact number": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Enter your contact number"
   },
   "Enter your custom message": {
@@ -3972,7 +3972,7 @@
     "message": "Fingerprint (SHA512)"
   },
   "First name": {
-    "description": "administration/TokensList.tsx, user/support/UserEditForm.tsx",
+    "description": "administration/TokensList.tsx, user/support/UserEditRows.tsx",
     "message": "First name"
   },
   "First": {
@@ -4420,7 +4420,7 @@
     "message": "I confirm that I understand the impact and want to delete my account"
   },
   "ID code": {
-    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx",
+    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx",
     "message": "ID code"
   },
   "ID of application used for OAuth authentication.": {
@@ -4460,7 +4460,7 @@
     "message": "Identity provided has been selected via SAML2 discovery service. You will be redirected to the login page soon."
   },
   "Identity provider data": {
-    "description": "user/support/IdentityProviderContainer.tsx",
+    "description": "user/support/IdentityProviderCard.tsx",
     "message": "Identity provider data"
   },
   "Identity provider fields": {
@@ -4480,11 +4480,11 @@
     "message": "Identity provider name"
   },
   "Identity provider of the user": {
-    "description": "user/support/IdentityProviderContainer.tsx",
+    "description": "user/support/IdentityProviderCard.tsx",
     "message": "Identity provider of the user"
   },
   "Identity provider": {
-    "description": "user/support/IdentityProviderContainer.tsx, user/support/IdentityProviderIndicator.tsx",
+    "description": "user/support/IdentityProviderCard.tsx, user/support/IdentityProviderIndicator.tsx",
     "message": "Identity provider"
   },
   "Identity providers": {
@@ -4644,11 +4644,11 @@
     "message": "Industry project"
   },
   "Information is coming from identity provider": {
-    "description": "user/support/FieldEditButton.tsx",
+    "description": "user/support/UserEditRow.tsx",
     "message": "Information is coming from identity provider"
   },
   "Information is coming from {identityProvider}": {
-    "description": "user/support/FieldEditButton.tsx",
+    "description": "user/support/UserEditRow.tsx",
     "message": "Information is coming from {identityProvider}"
   },
   "Informational - client’s request to get or provide additional information related to a service.": {
@@ -5012,7 +5012,7 @@
     "message": "Job has been submitted."
   },
   "Job position": {
-    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx",
+    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx",
     "message": "Job position"
   },
   "Job title": {
@@ -5112,7 +5112,7 @@
     "message": "Languages"
   },
   "Last name": {
-    "description": "administration/TokensList.tsx, user/support/UserEditForm.tsx",
+    "description": "administration/TokensList.tsx, user/support/UserEditRows.tsx",
     "message": "Last name"
   },
   "Latest date for resource termination": {
@@ -5820,7 +5820,7 @@
     "message": "Nano technology"
   },
   "Native name": {
-    "description": "customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, invitations/actions/UserDetailsGroup.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx",
+    "description": "customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, invitations/actions/UserDetailsGroup.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx",
     "message": "Native name"
   },
   "Negative": {
@@ -6800,7 +6800,7 @@
     "message": "Organization invoice history"
   },
   "Organization name": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, user/support/UserEditForm.tsx",
+    "description": "administration/organizations/OrganizationCreditsList.tsx, user/support/UserEditRows.tsx",
     "message": "Organization name"
   },
   "Organization quotas": {
@@ -7184,7 +7184,7 @@
     "message": "Philosophy, ethics and religion"
   },
   "Phone number": {
-    "description": "customer/details/CustomerContactPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx, user/support/UserEditForm.tsx, user/support/UserList.tsx",
+    "description": "customer/details/CustomerContactPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx, user/support/UserEditRows.tsx, user/support/UserList.tsx",
     "message": "Phone number"
   },
   "Phone numbers": {
@@ -7604,12 +7604,8 @@
     "message": "Profile management URL"
   },
   "Profile settings": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditTab.tsx",
     "message": "Profile settings"
-  },
-  "Profile updated successfully": {
-    "description": "user/support/UserEditForm.tsx",
-    "message": "Profile updated successfully"
   },
   "Progress": {
     "description": "marketplace/deploy/DeployPageSidebar.tsx",
@@ -7904,11 +7900,11 @@
     "message": "Protected fields"
   },
   "Provide an email address for communication and recovery": {
-    "description": "user/support/UserEditForm.tsx, user/support/UserEmailChangeDialog.tsx",
+    "description": "user/support/UserEditRows.tsx, user/support/UserEmailChangeDialog.tsx",
     "message": "Provide an email address for communication and recovery"
   },
   "Provide an email address for the user's communication and recovery": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Provide an email address for the user's communication and recovery"
   },
   "Provide the required information to set up a new project.": {
@@ -8112,7 +8108,7 @@
     "message": "Rating"
   },
   "Read-only field": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Read-only field"
   },
   "Reason unknown, please contact support.": {
@@ -9880,7 +9876,7 @@
     "message": "Short title for the project, which explains the project goal as much as possible."
   },
   "Shortname": {
-    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx, user/support/UserList.tsx",
+    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx, user/support/UserList.tsx",
     "message": "Shortname"
   },
   "Should extra issue field mappings be applied": {
@@ -10144,11 +10140,11 @@
     "message": "Special price"
   },
   "Specify the name of the organization the user is affiliated with": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Specify the name of the organization the user is affiliated with"
   },
   "Specify the name of the organization you are affiliated with": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Specify the name of the organization you are affiliated with"
   },
   "Sponsor number": {
@@ -10712,7 +10708,7 @@
     "message": "The date is inclusive. Once reached, resource will be scheduled for termination."
   },
   "The date the user has joined": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "The date the user has joined"
   },
   "The endpoint for endpoint discovery.": {
@@ -10832,7 +10828,7 @@
     "message": "The round will be open on: "
   },
   "The user's {field} is required": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "The user's {field} is required"
   },
   "The value is not valid IP v4 CIDR": {
@@ -12820,7 +12816,7 @@
     "message": "User agreements"
   },
   "User could not be updated": {
-    "description": "user/api-key/UserTokenLifetime.tsx, user/support/effects.ts",
+    "description": "user/api-key/UserTokenLifetime.tsx, user/support/useUpdateUser.ts",
     "message": "User could not be updated"
   },
   "User dashboard": {
@@ -12868,7 +12864,7 @@
     "message": "User has been successfully added."
   },
   "User has been updated": {
-    "description": "user/api-key/UserTokenLifetime.tsx, user/support/effects.ts",
+    "description": "user/api-key/UserTokenLifetime.tsx, user/support/useUpdateUser.ts",
     "message": "User has been updated"
   },
   "User input": {
@@ -12916,7 +12912,7 @@
     "message": "User tenant ID."
   },
   "User type": {
-    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditForm.tsx",
+    "description": "user/support/UserDetailsTable.tsx, user/support/UserEditRows.tsx",
     "message": "User type"
   },
   "User username": {
@@ -12948,7 +12944,7 @@
     "message": "User {user_link} role has been updated."
   },
   "User's": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "User's"
   },
   "User": {
@@ -13500,11 +13496,11 @@
     "message": "Your session has expired, please enter credentials to continue."
   },
   "Your {field} is required": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Your {field} is required"
   },
   "Your": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "Your"
   },
   "Zammad API server URL. For example <http://localhost:8080/>": {
@@ -13559,10 +13555,6 @@
     "description": "rancher/catalog/ClusterCatalogList.tsx",
     "message": "catalogues"
   },
-  "civil_number": {
-    "description": "user/support/UserEditForm.tsx",
-    "message": "civil_number"
-  },
   "components": {
     "description": "marketplace/offerings/PriceList.tsx",
     "message": "components"
@@ -13580,7 +13572,7 @@
     "message": "day"
   },
   "description": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "description"
   },
   "disks": {
@@ -13620,7 +13612,7 @@
     "message": "events"
   },
   "first name": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "first name"
   },
   "flavors": {
@@ -13680,7 +13672,7 @@
     "message": "jobs"
   },
   "last name": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "last name"
   },
   "migrations": {
@@ -13700,7 +13692,7 @@
     "message": "month"
   },
   "native name": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "native name"
   },
   "network": {
@@ -14048,11 +14040,11 @@
     "message": "{projectName} project has been moved to {organizationName} organization."
   },
   "{pronoun} email is required for account notifications and password recovery": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "{pronoun} email is required for account notifications and password recovery"
   },
   "{pronoun} phone number": {
-    "description": "user/support/UserEditForm.tsx",
+    "description": "user/support/UserEditRows.tsx",
     "message": "{pronoun} phone number"
   },
   "{relative} ago, {date}": {

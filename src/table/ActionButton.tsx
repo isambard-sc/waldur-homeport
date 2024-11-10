@@ -49,6 +49,7 @@ const ActionButtonPure: FC<ActionButtonProps> = ({
       size={props.size}
       onClick={props.action}
       variant={variant}
+      data-testid={props['data-testid']}
     >
       {props.iconRight && props.title}
       {props.pending ? (

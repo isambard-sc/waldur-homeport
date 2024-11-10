@@ -1,86 +1,97 @@
 import { pick } from 'lodash';
 import { useCallback } from 'react';
-import { connect } from 'react-redux';
-import { SubmissionError, reduxForm } from 'redux-form';
+import { Field, Form } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
 import { required } from '@waldur/core/validators';
 import { SubmitButton, TextField } from '@waldur/form';
-import { FormContainer } from '@waldur/form/FormContainer';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 
 import { EditUserProps } from '../types';
 
-type FormData = Record<string, any>;
+import { useUpdateUser } from './useUpdateUser';
 
-export const EditFieldDialog = connect<{}, {}, { resolve: EditUserProps }>(
-  (_, ownProps) => ({
-    initialValues: pick(ownProps.resolve.user, ownProps.resolve.name),
-  }),
-)(
-  reduxForm<FormData, { resolve: EditUserProps }>({
-    form: 'UserInfoForm',
-  })((props) => {
-    const processRequest = useCallback(
-      (values: FormData, dispatch) => {
-        return props.resolve
-          .callback(values, dispatch)
-          .then(() => {
-            dispatch(closeModalDialog());
-          })
-          .catch((e) => {
-            if (e.response && e.response.status === 400) {
-              throw new SubmissionError(e.response.data);
+interface EditFieldDialogProps {
+  resolve: EditUserProps;
+}
+
+export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
+  resolve,
+}) => {
+  const dispatch = useDispatch();
+  const { callback } = useUpdateUser(resolve.user);
+
+  const processRequest = useCallback(
+    async (values) => {
+      try {
+        await callback(values);
+        dispatch(closeModalDialog());
+      } catch (e) {
+        if (e.response && e.response.status === 400) {
+          return e.response.data;
+        }
+      }
+    },
+    [resolve, dispatch],
+  );
+
+  return (
+    <Form
+      onSubmit={processRequest}
+      initialValues={pick(resolve.user, resolve.name)}
+      render={({ handleSubmit, submitting, invalid, dirty }) => (
+        <form onSubmit={handleSubmit}>
+          <MetronicModalDialog
+            headerLess
+            footer={
+              <>
+                <CloseDialogButton
+                  variant="outline btn-outline-default"
+                  className="flex-equal"
+                />
+                <SubmitButton
+                  disabled={invalid || !dirty}
+                  submitting={submitting}
+                  label={translate('Submit')}
+                  className="btn btn-primary flex-equal"
+                />
+              </>
             }
-          });
-      },
-      [props.resolve.callback],
-    );
-
-    return (
-      <form onSubmit={props.handleSubmit(processRequest)}>
-        <MetronicModalDialog
-          headerLess
-          footer={
-            <>
-              <CloseDialogButton
-                variant="outline btn-outline-default"
-                className="flex-equal"
-              />
-              <SubmitButton
-                disabled={props.invalid || !props.dirty}
-                submitting={props.submitting}
-                label={translate('Submit')}
-                className="btn btn-primary flex-equal"
-              />
-            </>
-          }
-        >
-          <FormContainer submitting={props.submitting}>
-            {props.resolve.name === 'description' ? (
-              <TextField
-                name="description"
+          >
+            {resolve.name === 'description' ? (
+              <FormGroup
                 label={translate('Description')}
-                required={Boolean(props.resolve.requiredMsg)}
-                validate={props.resolve.requiredMsg ? required : null}
-                maxLength={500}
-                spaceless
-              />
-            ) : props.resolve.name ? (
-              <StringField
-                name={props.resolve.name}
-                label={props.resolve.label}
-                required={Boolean(props.resolve.requiredMsg)}
-                validate={props.resolve.requiredMsg ? required : null}
-                spaceless
-              />
+                required={Boolean(resolve.requiredMsg)}
+              >
+                <Field
+                  name="description"
+                  component={TextField as any}
+                  validate={resolve.requiredMsg ? required : undefined}
+                  maxLength={500}
+                  spaceless
+                />
+              </FormGroup>
+            ) : resolve.name ? (
+              <FormGroup
+                label={resolve.label}
+                required={Boolean(resolve.requiredMsg)}
+              >
+                <Field
+                  name={resolve.name}
+                  component={StringField as any}
+                  validate={resolve.requiredMsg ? required : undefined}
+                  spaceless
+                />
+              </FormGroup>
             ) : null}
-          </FormContainer>
-        </MetronicModalDialog>
-      </form>
-    );
-  }),
-);
+          </MetronicModalDialog>
+        </form>
+      )}
+    />
+  );
+};

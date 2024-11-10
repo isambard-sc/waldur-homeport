@@ -24,5 +24,4 @@ export interface EditUserProps {
   disabled?: boolean;
   protected?: boolean;
   protectedMsg?: string;
-  callback(formData, dispatch): Promise<any>;
 }
