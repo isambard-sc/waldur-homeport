@@ -90,12 +90,6 @@
     "SHORT_PAGE_TITLE": "Waldur",
     "FULL_PAGE_TITLE": "Waldur | Cloud Service Management",
     "USER_MANDATORY_FIELDS": ["full_name", "email"],
-    "USER_REGISTRATION_HIDDEN_FIELDS": [
-      "registration_method",
-      "job_title",
-      "phone_number",
-      "organization"
-    ],
     "INVITATION_CIVIL_NUMBER_LABEL": "",
     "INVITATION_TAX_NUMBER_LABEL": "",
     "HOMEPORT_SENTRY_DSN": null,

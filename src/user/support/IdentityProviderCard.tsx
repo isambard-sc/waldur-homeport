@@ -3,7 +3,7 @@ import { translate } from '@waldur/i18n';
 
 import { IdentityProviderIndicator } from './IdentityProviderIndicator';
 
-export const IdentityProviderContainer = ({ user }) => (
+export const IdentityProviderCard = ({ user }) => (
   <FormTable.Card
     title={translate('Identity provider data')}
     className="card-bordered mb-7"

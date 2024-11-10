@@ -13,10 +13,10 @@ import {
   formatUserIsActive,
   formatUserStatus,
 } from '@waldur/user/support/utils';
+import { isStaffOrSupport } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
 
 import { Row } from './Row';
-import { userLanguageIsVisible, isVisibleForSupportOrStaff } from './selectors';
 
 interface StateProps {
   isVisibleForSupportOrStaff: boolean;
@@ -49,7 +49,7 @@ const PureUserDetailsTable: FunctionComponent<UserDetailsTableProps> = (
       <Row
         label={translate('Preferred language')}
         value={props.user.preferred_language}
-        isVisible={userLanguageIsVisible()}
+        isVisible={isFeatureVisible(UserFeatures.preferred_language)}
       />
       <Row
         label={translate('Registration method')}
@@ -99,7 +99,7 @@ const UserDetailsTableContainer: FunctionComponent<UserDetailsTableProps> = (
   );
 
 const mapStateToProps = (state: RootState) => ({
-  isVisibleForSupportOrStaff: isVisibleForSupportOrStaff(state),
+  isVisibleForSupportOrStaff: isStaffOrSupport(state),
 });
 
 const enhance = connect<StateProps, {}, OwnProps>(mapStateToProps);

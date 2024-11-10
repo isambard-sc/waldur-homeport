@@ -11,12 +11,6 @@
       "Government owned company"
     ],
     "ONLY_STAFF_MANAGES_SERVICES": false,
-    "USER_REGISTRATION_HIDDEN_FIELDS": [
-      "registration_method",
-      "job_title",
-      "phone_number",
-      "organization"
-    ],
     "USER_MANDATORY_FIELDS": ["full_name", "email"],
     "LANGUAGE_CHOICES": "en,it,de,es,et,fr,ar"
   },

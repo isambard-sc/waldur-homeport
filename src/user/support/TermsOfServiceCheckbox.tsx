@@ -1,7 +1,5 @@
-import { useMutation } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Form } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
@@ -9,26 +7,25 @@ import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { formatJsx, translate } from '@waldur/i18n';
 import { UserDetails } from '@waldur/workspace/types';
 
+import { useUpdateUser } from './useUpdateUser';
+
 interface TermsOfServiceCheckboxProps {
   user: UserDetails;
-  update: (formData: any, dispatch: any) => Promise<void>;
 }
 
 export const TermsOfServiceCheckbox: FunctionComponent<
   TermsOfServiceCheckboxProps
-> = ({ user, update }) => {
-  const dispatch = useDispatch();
-  const { mutate: agree, isLoading } = useMutation(() =>
-    update({ agree_with_policy: true }, dispatch),
-  );
-
+> = ({ user }) => {
+  const { callback, isLoading } = useUpdateUser(user);
   return (
     <div className="d-flex align-items-center">
       <Form.Check type="checkbox">
         <Form.Check.Input
           type="checkbox"
           checked={Boolean(user.agreement_date)}
-          onChange={() => !user.agreement_date && agree()}
+          onChange={() => {
+            !user.agreement_date && callback({ agree_with_policy: true });
+          }}
           disabled={isLoading || Boolean(user.agreement_date)}
         />
         <Form.Check.Label className="opacity-100">

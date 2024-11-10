@@ -33,7 +33,11 @@ const FormTableItem: FC<FormTableItemProps> = ({ actions, ...props }) => {
             {Boolean(props.warnTooltip) &&
               wrapTooltip(
                 props.warnTooltip,
-                <WarningCircle size={20} className="ms-2 text-warning mb-1" />,
+                <WarningCircle
+                  size={20}
+                  className="ms-2 text-warning mb-1"
+                  data-testid="warning"
+                />,
               )}
           </div>
           <div className="fw-normal">{props.description}</div>

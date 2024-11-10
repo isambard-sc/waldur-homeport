@@ -25,9 +25,9 @@ const UserDetailsTable = lazyComponent(
   () => import('@waldur/user/support/UserDetailsTable'),
   'UserDetailsTable',
 );
-const UserEditFormContainer = lazyComponent(
-  () => import('@waldur/user/support/UserEditFormContainer'),
-  'UserEditFormContainer',
+const UserEditTab = lazyComponent(
+  () => import('@waldur/user/support/UserEditTab'),
+  'UserEditTab',
 );
 const UserTermination = lazyComponent(
   () => import('@waldur/user/support/UserTermination'),
@@ -103,9 +103,7 @@ export const UserManageContainer = ({ isPersonal }) => {
         (currentUser.is_staff || currentUser.is_support || isPersonal) && {
           key: 'user-details',
           component:
-            currentUser.is_staff || isPersonal
-              ? UserEditFormContainer
-              : UserDetailsTable,
+            currentUser.is_staff || isPersonal ? UserEditTab : UserDetailsTable,
           title: translate('User profile'),
         },
         (!isFeatureVisible(UserFeatures.disable_user_termination) ||
