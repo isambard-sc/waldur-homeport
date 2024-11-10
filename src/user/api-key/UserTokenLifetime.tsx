@@ -82,7 +82,7 @@ export const UserTokenLifetime: React.FC<UserEditTokenComponentProps> = (
             <Tip
               id="token"
               label={translate(
-                'Lifetime will be updated and reset upon saving the form.',
+                'Lifetime will be updated and reset upon saving the form. Token lifetime is prolonged each time a successful API call with the token is done.',
               )}
             >
               {translate('Token lifetime')} <Question />

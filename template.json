@@ -3824,11 +3824,11 @@
     "message": "Extending"
   },
   "External IP": {
-    "description": "azure/vm/AzureVirtualMachineSummary.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/OpenStackExternalIpsField.tsx, resource/summary/VirtualMachineSummary.tsx",
+    "description": "azure/vm/AzureVirtualMachineSummary.tsx, openstack/OpenStackExternalIpsField.tsx, resource/summary/VirtualMachineSummary.tsx",
     "message": "External IP"
   },
   "External IPs": {
-    "description": "openstack/openstack-tenant/OpenStackRouterSummary.tsx, openstack/openstack-tenant/TenantInstancesList.tsx",
+    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-tenant/OpenStackRouterSummary.tsx, openstack/openstack-tenant/TenantInstancesList.tsx",
     "message": "External IPs"
   },
   "External links": {
