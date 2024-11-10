@@ -36,29 +36,6 @@ function* handleSubmitUsage(action) {
   }
 }
 
-function* handleSwitchPlan(action) {
-  const { resource, plan_url, refetch } = action.payload;
-  try {
-    yield call(api.switchPlan, resource.uuid, plan_url);
-    yield put(
-      showSuccess(
-        translate('Resource plan change request has been submitted.'),
-      ),
-    );
-    yield put(constants.switchPlan.success());
-    yield put(closeModalDialog());
-    if (refetch) {
-      yield call(refetch);
-    }
-  } catch (error) {
-    const errorMessage = `${translate(
-      'Unable to submit plan change request.',
-    )} ${format(error)}`;
-    yield put(showError(errorMessage));
-    yield put(constants.switchPlan.success());
-  }
-}
-
 function* handleChangeLimits(action) {
   const { resource, limits, refetch } = action.payload;
   try {
@@ -104,7 +81,6 @@ function* handlePeriodChange(action) {
 
 export default function* () {
   yield takeEvery(constants.submitUsage.REQUEST, handleSubmitUsage);
-  yield takeEvery(constants.switchPlan.REQUEST, handleSwitchPlan);
   yield takeEvery(constants.changeLimits.REQUEST, handleChangeLimits);
   yield takeEvery(constants.PERIOD_CHANGED, handlePeriodChange);
 }

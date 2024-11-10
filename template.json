@@ -1788,7 +1788,7 @@
     "message": "Change resource limits"
   },
   "Change resource plan": {
-    "description": "marketplace/resources/change-plan/ChangePlanBody.tsx",
+    "description": "marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "Change resource plan"
   },
   "Change": {
@@ -2560,7 +2560,7 @@
     "message": "Current native name: {value}."
   },
   "Current plan": {
-    "description": "marketplace/resources/change-limits/ChangeLimitsComponent.tsx, marketplace/resources/change-plan/ChangePlanComponent.tsx",
+    "description": "marketplace/resources/change-limits/ChangeLimitsComponent.tsx, marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "Current plan"
   },
   "Current postal code: {value}.": {
@@ -5888,7 +5888,7 @@
     "message": "New offering"
   },
   "New plan": {
-    "description": "marketplace/resources/change-plan/ChangePlanComponent.tsx, navigation/header/confirmation-drawer/OrderExpandableRow.tsx",
+    "description": "marketplace/resources/change-plan/ChangePlanDialog.tsx, navigation/header/confirmation-drawer/OrderExpandableRow.tsx",
     "message": "New plan"
   },
   "New policy": {
@@ -6784,7 +6784,7 @@
     "message": "Organization group"
   },
   "Organization groups": {
-    "description": "administration/organizations/OrganizationGroupsList.tsx, administration/routes.ts, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/details/policies/PolicyCreateForm.tsx",
+    "description": "administration/organizations/OrganizationGroupsList.tsx, administration/routes.ts, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/details/policies/PolicyCreateForm.tsx, marketplace/offerings/update/plans/PlansSection.tsx",
     "message": "Organization groups"
   },
   "Organization has been created.": {
@@ -8456,7 +8456,7 @@
     "message": "Request feedback field name"
   },
   "Request for a change": {
-    "description": "marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx",
+    "description": "marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "Request for a change"
   },
   "Request for a termination": {
@@ -8640,7 +8640,7 @@
     "message": "Resource details"
   },
   "Resource does not have any plan.": {
-    "description": "marketplace/resources/change-limits/ChangeLimitsComponent.tsx, marketplace/resources/change-plan/ChangePlanComponent.tsx",
+    "description": "marketplace/resources/change-limits/ChangeLimitsComponent.tsx, marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "Resource does not have any plan."
   },
   "Resource does not have backend ID.": {
@@ -8704,7 +8704,7 @@
     "message": "Resource orders"
   },
   "Resource plan change request has been submitted.": {
-    "description": "marketplace/resources/store/effects.ts",
+    "description": "marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "Resource plan change request has been submitted."
   },
   "Resource request has been deleted.": {
@@ -10304,7 +10304,7 @@
     "message": "Submit usage report"
   },
   "Submit": {
-    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payments/PaymentCreateDialog.tsx, form/FloatingSubmitButton.tsx, form/WizardFormContainer.tsx, invitations/GroupinvitationButtons.tsx, invitations/PermissionRequestActionDialog.tsx, invitations/actions/GroupInvitationCreateDialog.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedback.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx, marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/import/WizardButtons.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx, marketplace/resources/lexis/CreateLexisLinkDialog.tsx, marketplace/resources/terminate/TerminateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx, marketplace-checklist/UserChecklist.tsx, marketplace-remote/ReviewDialog.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx, openstack/openstack-volume/actions/ExtendDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/cluster/ImportYAMLDialog.tsx, rancher/cluster/ViewYAMLDialog.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/support/EditFieldDialog.tsx",
+    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payments/PaymentCreateDialog.tsx, form/FloatingSubmitButton.tsx, form/WizardFormContainer.tsx, invitations/GroupinvitationButtons.tsx, invitations/PermissionRequestActionDialog.tsx, invitations/actions/GroupInvitationCreateDialog.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedback.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx, marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/offerings/images/CreateImageDialog.tsx, marketplace/offerings/import/WizardButtons.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanDialog.tsx, marketplace/resources/lexis/CreateLexisLinkDialog.tsx, marketplace/resources/terminate/TerminateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx, marketplace-checklist/UserChecklist.tsx, marketplace-remote/ReviewDialog.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx, openstack/openstack-volume/actions/ExtendDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, rancher/catalog/CatalogCreateDialog.tsx, rancher/cluster/ImportYAMLDialog.tsx, rancher/cluster/ViewYAMLDialog.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/support/EditFieldDialog.tsx",
     "message": "Submit"
   },
   "Submitted": {
@@ -10932,7 +10932,7 @@
     "message": "There are no organizations yet."
   },
   "There are no other plans available.": {
-    "description": "marketplace/resources/change-plan/ChangePlanComponent.tsx",
+    "description": "marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "There are no other plans available."
   },
   "There are no other volume types available.": {
@@ -11744,7 +11744,7 @@
     "message": "Unable to load data"
   },
   "Unable to load data.": {
-    "description": "core/LoadingErred.tsx, customer/list/TotalCostComponent.tsx, freeipa/FreeIPAAccount.tsx, invoices/details/BillingDetails.tsx, issues/IssueDetails.tsx, issues/create/IssueCreateForm.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanBody.tsx, project/ProjectDashboardCostLimits.tsx, rancher/cluster/actions/RancherClusterKubeconfigDialog.tsx, rancher/cluster/create/CreateNodeDialog.tsx, rancher/template/CatalogTemplateContainer.tsx, rancher/template/SecretField.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/dashboard/UserDashboard.tsx, user/hooks/HookDetailsDialog.tsx",
+    "description": "core/LoadingErred.tsx, customer/list/TotalCostComponent.tsx, freeipa/FreeIPAAccount.tsx, invoices/details/BillingDetails.tsx, issues/IssueDetails.tsx, issues/create/IssueCreateForm.tsx, marketplace/resources/change-limits/ChangeLimitsBody.tsx, marketplace/resources/change-plan/ChangePlanDialog.tsx, project/ProjectDashboardCostLimits.tsx, rancher/cluster/actions/RancherClusterKubeconfigDialog.tsx, rancher/cluster/create/CreateNodeDialog.tsx, rancher/template/CatalogTemplateContainer.tsx, rancher/template/SecretField.tsx, resource/actions/AsyncActionDialog.tsx, resource/actions/ResourceActionDialog.tsx, user/dashboard/UserDashboard.tsx, user/hooks/HookDetailsDialog.tsx",
     "message": "Unable to load data."
   },
   "Unable to load detail.": {
@@ -12112,7 +12112,7 @@
     "message": "Unable to submit order."
   },
   "Unable to submit plan change request.": {
-    "description": "marketplace/resources/store/effects.ts",
+    "description": "marketplace/resources/change-plan/ChangePlanDialog.tsx",
     "message": "Unable to submit plan change request."
   },
   "Unable to submit report.": {

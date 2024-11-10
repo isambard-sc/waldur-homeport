@@ -3,9 +3,6 @@ import { createFormAction } from '@waldur/redux-form-saga';
 export const submitUsage: any = createFormAction(
   'waldur/marketplace/resources/SUBMIT_USAGE',
 );
-export const switchPlan: any = createFormAction(
-  'waldur/marketplace/resources/SWITCH_PLAN',
-);
 export const changeLimits: any = createFormAction(
   'waldur/marketplace/resources/CHANGE_LIMITS',
 );
