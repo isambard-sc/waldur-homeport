@@ -9,6 +9,7 @@ import { translate } from '@waldur/i18n';
 import { ResourceImportButton } from '@waldur/marketplace/resources/import/ResourceImportButton';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { Table } from '@waldur/table';
+import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import { TableProps } from '@waldur/table/types';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
@@ -157,6 +158,30 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
             row.backend_metadata?.state ||
             row.state,
         },
+        {
+          title: translate('Paused'),
+          render: ({ row }) => <BooleanField value={row.paused} />,
+          id: 'paused',
+          keys: ['paused'],
+          optional: true,
+        },
+        {
+          title: translate('Downscaled'),
+          render: ({ row }) => <BooleanField value={row.downscaled} />,
+          id: 'downscaled',
+          keys: ['downscaled'],
+          optional: true,
+        },
+        {
+          title: translate('Restrict member access'),
+          render: ({ row }) => (
+            <BooleanField value={row.restrict_member_access} />
+          ),
+          id: 'restrict_member_access',
+          keys: ['restrict_member_access'],
+          optional: true,
+        },
+
         SLUG_COLUMN,
       ]}
       hasOptionalColumns
