@@ -144,6 +144,11 @@ export const deleteResourceUser = (userId) =>
 export const getProviderOffering = (id: string, options?: AxiosRequestConfig) =>
   getById<Offering>('/marketplace-provider-offerings/', id, options);
 
+export const getProviderOfferingGLAuthConfig = (uuid: string) =>
+  get(`/marketplace-provider-offerings/${uuid}/glauth_users_config/`).then(
+    (response) => response.data,
+  );
+
 export const getPublicOffering = (id: string, options?: AxiosRequestConfig) =>
   getById<Offering>('/marketplace-public-offerings/', id, options);
 

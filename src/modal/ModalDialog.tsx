@@ -16,6 +16,7 @@ export interface ModalDialogProps {
   footerClassName?: string;
   children?: ReactNode;
   headerLess?: boolean;
+  actions?: ReactNode;
 }
 
 export const ModalDialog: FC<ModalDialogProps> = ({
@@ -30,6 +31,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
   headerClassName,
   footerClassName,
   headerLess,
+  actions,
 }) => (
   <div>
     {!headerLess && (
@@ -61,6 +63,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
             <h6 className="text-grey-500 fw-normal mt-2">{subtitle}</h6>
           )}
         </div>
+        {actions}
       </Modal.Header>
     )}
     <Modal.Body className={bodyClassName}>{children}</Modal.Body>

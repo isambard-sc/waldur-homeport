@@ -60,7 +60,7 @@ export const ViewYAMLDialog = reduxForm<
       />
       {value?.yaml && (
         <>
-          <CopyToClipboard value={value.yaml} />{' '}
+          <CopyToClipboard value={value.yaml} textButton className="my-2" />{' '}
           <Button onClick={toggleShowDiff}>
             {showDiff ? translate('Hide diff') : translate('Show diff')}
           </Button>

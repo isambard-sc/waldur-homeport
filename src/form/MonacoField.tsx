@@ -18,6 +18,7 @@ interface MonacoFieldProps {
   width?: number;
   original?: string;
   options?: any;
+  readOnly?: boolean;
 }
 
 const getTheme = (): string => {
@@ -33,6 +34,7 @@ export const MonacoField: FC<MonacoFieldProps> = ({
     language={props.language}
     value={props.input.value}
     onChange={props.input.onChange}
+    readOnly={props.readOnly}
     theme={getTheme()}
     height={height}
   />
