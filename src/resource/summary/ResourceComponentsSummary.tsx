@@ -5,7 +5,7 @@ import { Col, Row } from 'react-bootstrap';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { getResourceOffering } from '@waldur/marketplace/common/api';
-import { ResourceComponentItem } from '@waldur/marketplace/resources/details/ResourceComponents';
+import { ResourceComponentItem } from '@waldur/marketplace/resources/details/ResourceComponentItem';
 import { Resource } from '@waldur/marketplace/resources/types';
 
 interface ResourceComponentsSummaryProps {

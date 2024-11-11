@@ -4,30 +4,8 @@ import { useMediaQuery } from 'react-responsive';
 import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 
-import { QuotaCell } from './QuotaCell';
+import { ResourceComponentItem } from './ResourceComponentItem';
 import { ResourceShowMoreComponents } from './ResourceShowMoreComponents';
-
-const normalize = (value: number, factor: number) =>
-  ((value || 0) / (factor || 1)).toFixed();
-
-export const ResourceComponentItem = ({ component, resource }) => {
-  return (
-    <QuotaCell
-      usage={
-        component.billing_type === 'limit' && resource.limit_usage
-          ? normalize(resource.limit_usage[component.type], component.factor)
-          : normalize(resource.current_usages[component.type], component.factor)
-      }
-      limit={
-        component.billing_type !== 'usage'
-          ? normalize(resource.limits[component.type], component.factor)
-          : null
-      }
-      title={component.name}
-      description={component.description}
-    />
-  );
-};
 
 export const ResourceComponents = ({
   resource,

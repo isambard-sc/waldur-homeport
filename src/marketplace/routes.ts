@@ -10,6 +10,7 @@ import { isOwnerOrStaff } from '@waldur/workspace/selectors';
 import { WorkspaceType } from '@waldur/workspace/types';
 
 import { fetchProvider, loadContext } from './resolve';
+import { ResourceDetailsContainer } from './resources/details/ResourceDetailsContainer';
 
 const OrganizationUIView = lazyComponent(
   () => import('@waldur/organization/OrganizationUIView'),
@@ -536,9 +537,16 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-resource-container',
+    url: '',
+    abstract: true,
+    parent: 'layout',
+    component: ResourceDetailsContainer,
+  },
+  {
     name: 'marketplace-resource-details',
     url: '/resource-details/:resource_uuid?tab',
-    parent: 'layout',
+    parent: 'marketplace-resource-container',
     component: ResourceDetailsPage,
     data: {
       useExtraTabs: true,
