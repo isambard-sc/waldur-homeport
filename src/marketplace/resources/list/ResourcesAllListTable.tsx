@@ -11,6 +11,7 @@ import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-ac
 import { Table } from '@waldur/table';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import { TableProps } from '@waldur/table/types';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 import { Resource } from '../types';
@@ -72,6 +73,13 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
           render: ({ row }) => <>{row.uuid}</>,
           id: 'uuid',
           keys: ['uuid'],
+          optional: true,
+        },
+        {
+          title: translate('Backend ID'),
+          render: ({ row }) => renderFieldOrDash(row.backend_id),
+          id: 'backend_id',
+          keys: ['backend_id'],
           optional: true,
         },
         {
