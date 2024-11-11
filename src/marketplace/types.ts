@@ -252,6 +252,7 @@ export interface ServiceProvider {
   customer_abbreviation?: string;
   customer_country?: string;
   country?: string;
+  country_name?: string;
   organizationGroup?: string;
   url?: string;
 }

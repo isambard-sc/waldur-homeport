@@ -2212,7 +2212,7 @@
     "message": "Could not create organization"
   },
   "Country": {
-    "description": "customer/list/SelectCountryField.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "customer/details/CustomerDetailsPanel.tsx, customer/list/SelectCountryField.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Country"
   },
   "Coupon": {
