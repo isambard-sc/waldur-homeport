@@ -17,11 +17,6 @@ interface ValimoAuthConfiguration {
   MOBILE_PREFIX: string;
 }
 
-export interface ExternalLink {
-  label: string;
-  url: string;
-}
-
 interface CoreConfiguration {
   INVITATION_USE_WEBHOOKS: boolean;
   DEFAULT_IDP: { provider: string; auth_url: string; client_id: string };
@@ -49,7 +44,6 @@ interface CoreConfiguration {
   SHORT_PAGE_TITLE: string;
   FULL_PAGE_TITLE: string;
   USER_MANDATORY_FIELDS: string[];
-  EXTERNAL_LINKS: ExternalLink[];
   DOCS_URL: string;
   SUPPORT_PORTAL_URL: string;
   AUTHENTICATION_METHODS: string[];

@@ -1,25 +1,34 @@
 import { ChatCircleText } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
+import { RootState } from '@waldur/store/reducers';
 
 import * as actions from './actions';
 import { IssueCommentsFormContainer } from './IssueCommentsFormContainer';
 import { getCommentFormIsOpen, getIsUiDisabled } from './selectors';
 
-interface PureIssueCommentsFomrMainContainerProps {
+interface IssueCommentsFormMainContainerProps {
   formId: string;
-  opened: boolean;
-  uiDisabled: boolean;
-  toggle(): void;
 }
 
-export const PureIssueCommentsFormMainContainer: FunctionComponent<
-  PureIssueCommentsFomrMainContainerProps
-> = (props) => {
-  const { opened, toggle, formId, uiDisabled } = props;
+export const IssueCommentsFormMainContainer: FunctionComponent<
+  IssueCommentsFormMainContainerProps
+> = ({ formId }) => {
+  const dispatch = useDispatch();
+  const opened = useSelector((state: RootState) =>
+    getCommentFormIsOpen(state, { formId }),
+  );
+  const uiDisabled = useSelector(
+    (state: RootState) =>
+      getIsUiDisabled(state) ||
+      !state.issues.comments.issue?.add_comment_is_available,
+  );
+
+  const toggle = () => {
+    dispatch(actions.issueCommentsFormToggle(formId));
+  };
 
   return (
     <div>
@@ -43,21 +52,3 @@ export const PureIssueCommentsFormMainContainer: FunctionComponent<
     </div>
   );
 };
-
-const mapStateToProps = (state, ownProps) => ({
-  opened: getCommentFormIsOpen(state, ownProps),
-  uiDisabled:
-    getIsUiDisabled(state) ||
-    !state.issues.comments.issue?.add_comment_is_available,
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  toggle: (): void =>
-    dispatch(actions.issueCommentsFormToggle(ownProps.formId)),
-});
-
-const enhance = compose(connect(mapStateToProps, mapDispatchToProps));
-
-export const IssueCommentsFormMainContainer = enhance(
-  PureIssueCommentsFormMainContainer,
-);

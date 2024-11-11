@@ -1,8 +1,7 @@
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
-import { FunctionComponent, useState, useLayoutEffect, useRef } from 'react';
+import { FunctionComponent, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
 
-import { ExternalLinks } from './header/ExternalLinks';
 import { TabsList } from './TabsList';
 
 interface OwnProps {
@@ -62,7 +61,6 @@ export const Toolbar: FunctionComponent<OwnProps> = ({ actions }) => {
               data-kt-menu="true"
             >
               <TabsList />
-              <ExternalLinks />
             </div>
           </div>
         </div>

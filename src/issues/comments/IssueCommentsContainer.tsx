@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Card } from 'react-bootstrap';
 import Dropzone, { DropzoneRef } from 'react-dropzone';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,11 +16,7 @@ import * as actions from './actions';
 import * as constants from './constants';
 import { IssueCommentsFormMainContainer } from './IssueCommentsFormMainContainer';
 import { IssueCommentsList } from './IssueCommentsList';
-import {
-  getCommentsSelector,
-  getIsLoading,
-  getCommentsGetErred,
-} from './selectors';
+import { getCommentsSelector, getIsLoading } from './selectors';
 import { Comment } from './types';
 
 interface IssueCommentsContainerProps {
@@ -35,7 +31,6 @@ export const IssueCommentsContainer = ({
 
   const comments = useSelector<RootState, Comment[]>(getCommentsSelector);
   const loading = useSelector<RootState, boolean>(getIsLoading);
-  const erred = useSelector<RootState, boolean>(getCommentsGetErred);
 
   useEffect(() => {
     dispatch(actions.issueCommentsGet(issue.url));
@@ -74,7 +69,6 @@ export const IssueCommentsContainer = ({
                 <>
                   <IssueCommentsFormMainContainer
                     formId={constants.MAIN_FORM_ID}
-                    erred={erred}
                   />
                   <IssueCommentsList comments={comments} />
                 </>

@@ -1,40 +1,34 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useSelector } from 'react-redux';
 
-import { customerCreateDialog } from '@waldur/customer/create/actions';
-import { canCreateOrganization } from '@waldur/customer/create/selectors';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n/translate';
-import { RootState } from '@waldur/store/reducers';
+import { useModal } from '@waldur/modal/hooks';
 import { ActionButton } from '@waldur/table/ActionButton';
+import { getUser } from '@waldur/workspace/selectors';
 
-type StateProps = ReturnType<typeof mapStateToProps>;
+const CustomerCreateDialog = lazyComponent(
+  () => import('@waldur/customer/create/CustomerCreateDialog'),
+  'CustomerCreateDialog',
+);
 
-type DispatchProps = typeof mapDispatchToProps;
+export const OrganizationCreateButton: FunctionComponent = () => {
+  const user = useSelector(getUser);
+  const { openDialog } = useModal();
 
-type OrganizationCreateButtonProps = StateProps & DispatchProps;
+  const handleClick = () => {
+    openDialog(CustomerCreateDialog, {
+      resolve: { role: 'CUSTOMER' },
+    });
+  };
 
-const OrganizationCreateButtonPure: FunctionComponent<
-  OrganizationCreateButtonProps
-> = ({ isVisible, onClick }) =>
-  isVisible ? (
+  return user.is_staff ? (
     <ActionButton
       title={translate('Add')}
-      action={onClick}
+      action={handleClick}
       iconNode={<PlusCircle />}
       variant="primary"
     />
   ) : null;
-
-const mapDispatchToProps = {
-  onClick: customerCreateDialog,
 };
-
-const mapStateToProps = (state: RootState) => ({
-  isVisible: canCreateOrganization(state),
-});
-
-const enhance = compose(connect(mapStateToProps, mapDispatchToProps));
-
-export const OrganizationCreateButton = enhance(OrganizationCreateButtonPure);

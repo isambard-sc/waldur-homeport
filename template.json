@@ -3831,10 +3831,6 @@
     "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-tenant/OpenStackRouterSummary.tsx, openstack/openstack-tenant/TenantInstancesList.tsx",
     "message": "External IPs"
   },
-  "External links": {
-    "description": "navigation/header/ExternalLinks.tsx",
-    "message": "External links"
-  },
   "External network ID": {
     "description": "openstack/OpenStackForm.tsx, resource/summary/ResourceMetadataDialog.tsx",
     "message": "External network ID"

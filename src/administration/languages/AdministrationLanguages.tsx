@@ -15,7 +15,7 @@ export const AdministrationLanguages: FunctionComponent = () => {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     ENV.plugins.WALDUR_CORE.LANGUAGE_CHOICES,
   );
-  const { showError, showSuccess } = useNotify();
+  const { showError, showErrorResponse, showSuccess } = useNotify();
   const { currentLanguage } = useLanguageSelector();
 
   const handleLanguageChange = (code: string) => {
@@ -65,7 +65,8 @@ export const AdministrationLanguages: FunctionComponent = () => {
         );
         location.reload();
       } catch (e) {
-        showError(
+        showErrorResponse(
+          e,
           translate('Unable to update languages available for selection'),
         );
       }
