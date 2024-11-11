@@ -7,7 +7,7 @@ import { OfferingComponent } from '@waldur/marketplace/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
-import { ResourceComponentItem } from './ResourceComponents';
+import { ResourceComponentItem } from './ResourceComponentItem';
 
 interface ResourceComponentsDialogProps {
   resolve: {
