@@ -20,7 +20,6 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
     fetchData: createFetcher(
       `proposal-protected-calls/${props.call.uuid}/rounds`,
     ),
-    queryField: 'name',
   });
 
   return (
@@ -72,7 +71,6 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
         </>
       }
       verboseName={translate('Rounds')}
-      hasQuery={true}
       tableActions={
         <RoundCreateButton call={props.call} refetch={tableProps.fetch} />
       }
