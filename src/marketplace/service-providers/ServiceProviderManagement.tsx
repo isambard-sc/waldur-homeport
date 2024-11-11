@@ -1,5 +1,5 @@
-import { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { SubmissionError } from 'redux-form';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -10,11 +10,9 @@ import { translate } from '@waldur/i18n';
 import * as api from '@waldur/marketplace/common/api';
 import { ServiceProvider } from '@waldur/marketplace/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
-import { Customer } from '@waldur/workspace/types';
 
 import { SecretValueField } from '../SecretValueField';
 
@@ -25,188 +23,151 @@ import {
 } from './store/actions';
 import { getServiceProviderSecretCode } from './store/selectors';
 
-interface ServiceProviderWrapperProps {
-  customer: Customer;
-  canRegisterServiceProvider: boolean;
-  showErrorResponse?(error, message: string): void;
-  showSuccess?(message: string): void;
-  updateCustomer(customer: Customer): void;
-  secretCode: {
-    code: string;
-    generating: boolean;
-  };
-  getServiceProviderSecretCode(provider): void;
-  showSecretCodeRegenerateConfirm(provider): void;
-}
+export const ServiceProviderManagement: React.FC = () => {
+  const dispatch = useDispatch();
+  const customer = useSelector(getCustomer);
+  const canRegisterServiceProvider = useSelector(
+    canRegisterServiceProviderForCustomer,
+  );
+  const secretCode = useSelector(getServiceProviderSecretCode);
 
-interface ServiceProviderWrapperState {
-  registering: boolean;
-  loading: boolean;
-  serviceProvider: ServiceProvider;
-}
+  const [registering, setRegistering] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [serviceProvider, setServiceProvider] =
+    useState<ServiceProvider | null>(null);
 
-const updateCustomer = (customer: Customer) =>
-  setCurrentCustomer({
-    ...customer,
-    is_service_provider: true,
-  });
-
-class ServiceProviderWrapper extends Component<
-  ServiceProviderWrapperProps,
-  ServiceProviderWrapperState
-> {
-  state = {
-    registering: false,
-    loading: false,
-    serviceProvider: null as ServiceProvider,
-  };
-
-  registerServiceProvider = async () => {
+  const registerServiceProvider = async () => {
     const successMessage = translate('Service provider has been registered.');
     const errorMessage = translate('Unable to register service provider.');
     try {
-      this.setState({ registering: true });
+      setRegistering(true);
       const serviceProvider = await api.createServiceProvider({
-        customer: this.props.customer.url,
+        customer: customer.url,
       });
-      this.setState({ registering: false, serviceProvider });
-      this.props.showSuccess(successMessage);
-      this.props.updateCustomer(this.props.customer);
+      setRegistering(false);
+      setServiceProvider(serviceProvider);
+      dispatch(showSuccess(successMessage));
+      dispatch(
+        setCurrentCustomer({
+          ...customer,
+          is_service_provider: true,
+        }),
+      );
     } catch (error) {
-      this.setState({ registering: false });
-      this.props.showErrorResponse(error, errorMessage);
+      setRegistering(false);
+      dispatch(showErrorResponse(error, errorMessage));
     }
   };
 
-  update = (formData) => {
-    return api
-      .updateServiceProvider(this.state.serviceProvider.uuid, formData)
-      .then((res) => {
-        this.setState({ loading: false, serviceProvider: res.data });
-        return res;
-      })
-      .catch((error) => {
-        const errorMessage =
-          error?.response?.message || translate('Something went wrong');
-        const errorData = error?.response?.data;
-        throw new SubmissionError({
-          _error: errorMessage,
-          ...errorData,
-        });
+  const update = async (formData) => {
+    try {
+      setLoading(true);
+      const res = await api.updateServiceProvider(
+        serviceProvider.uuid,
+        formData,
+      );
+      setLoading(false);
+      setServiceProvider(res.data);
+      return res;
+    } catch (error) {
+      setLoading(false);
+      const errorMessage =
+        error?.response?.message || translate('Something went wrong');
+      const errorData = error?.response?.data;
+      throw new SubmissionError({
+        _error: errorMessage,
+        ...errorData,
       });
+    }
   };
 
-  async getServiceProvider() {
+  const getServiceProvider = async () => {
     const errorMessage = translate('Unable to load service provider.');
     try {
-      this.setState({ loading: true });
+      setLoading(true);
       const serviceProvider = await api.getServiceProviderByCustomer({
-        customer_uuid: this.props.customer.uuid,
+        customer_uuid: customer.uuid,
       });
-      this.setState({ loading: false, serviceProvider });
+      setLoading(false);
+      setServiceProvider(serviceProvider);
       if (serviceProvider) {
-        this.props.getServiceProviderSecretCode(serviceProvider);
+        dispatch(secretCodeFetchStart(serviceProvider));
       }
     } catch (error) {
-      this.setState({ loading: false });
-      this.props.showErrorResponse(error, errorMessage);
+      setLoading(false);
+      dispatch(showErrorResponse(error, errorMessage));
     }
-  }
+  };
 
-  componentDidMount() {
-    this.getServiceProvider();
-  }
+  useEffect(() => {
+    getServiceProvider();
+  }, [customer]);
 
-  render() {
-    if (!this.props.customer) {
-      return null;
-    } else if (this.state.loading) {
-      return <LoadingSpinner />;
-    } else if (this.state.serviceProvider) {
-      return (
-        <>
-          <div className="d-flex justify-content-between">
-            <div>
-              <p>
-                {`${translate('Registered at:')} ${formatDateTime(
-                  this.state.serviceProvider.created,
-                )}`}
-              </p>
-              <p>
-                {translate('API secret code:')}
-                <SecretValueField value={this.props.secretCode.code} />
-              </p>
-            </div>
-            <div>
-              <ActionButton
-                title={translate('Regenerate')}
-                action={() =>
-                  this.props.showSecretCodeRegenerateConfirm(
-                    this.state.serviceProvider,
-                  )
-                }
-                pending={this.props.secretCode.generating}
-                className="btn btn-primary"
-              />
-            </div>
-          </div>
-
-          <FormTable>
-            <FormTable.Item
-              label={translate('Description')}
-              value={this.state.serviceProvider?.description}
-              actions={
-                <FieldEditButton
-                  customer={this.state.serviceProvider}
-                  name="description"
-                  callback={this.update}
-                />
-              }
-            />
-          </FormTable>
-        </>
-      );
-    } else if (this.props.canRegisterServiceProvider) {
-      return (
+  if (!customer) {
+    return null;
+  } else if (loading) {
+    return <LoadingSpinner />;
+  } else if (serviceProvider) {
+    return (
+      <>
         <div className="d-flex justify-content-between">
-          <p>
-            {translate(
-              'You can register organization as a service provider by pressing the button',
-            )}
-          </p>
+          <div>
+            <p>
+              {`${translate('Registered at:')} ${formatDateTime(
+                serviceProvider.created,
+              )}`}
+            </p>
+            <p>
+              {translate('API secret code:')}
+              <SecretValueField value={secretCode.code} />
+            </p>
+          </div>
           <div>
             <ActionButton
-              title={translate('Register as service provider')}
-              action={this.registerServiceProvider}
+              title={translate('Regenerate')}
+              action={() =>
+                dispatch(showSecretCodeRegenerateConfirm(serviceProvider))
+              }
+              pending={secretCode.generating}
               className="btn btn-primary"
-              pending={this.state.registering}
             />
           </div>
         </div>
-      );
-    } else {
-      return null;
-    }
+
+        <FormTable>
+          <FormTable.Item
+            label={translate('Description')}
+            value={serviceProvider?.description}
+            actions={
+              <FieldEditButton
+                customer={serviceProvider}
+                name="description"
+                callback={update}
+              />
+            }
+          />
+        </FormTable>
+      </>
+    );
+  } else if (canRegisterServiceProvider) {
+    return (
+      <div className="d-flex justify-content-between">
+        <p>
+          {translate(
+            'You can register organization as a service provider by pressing the button',
+          )}
+        </p>
+        <div>
+          <ActionButton
+            title={translate('Register as service provider')}
+            action={registerServiceProvider}
+            className="btn btn-primary"
+            pending={registering}
+          />
+        </div>
+      </div>
+    );
+  } else {
+    return null;
   }
-}
-
-const mapStateToProps = (state: RootState) => ({
-  customer: getCustomer(state),
-  canRegisterServiceProvider: canRegisterServiceProviderForCustomer(state),
-  secretCode: getServiceProviderSecretCode(state),
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  showSecretCodeRegenerateConfirm: (serviceProvider) =>
-    dispatch(showSecretCodeRegenerateConfirm(serviceProvider)),
-  getServiceProviderSecretCode: (serviceProvider) =>
-    dispatch(secretCodeFetchStart(serviceProvider)),
-  showErrorResponse: (error, message) =>
-    dispatch(showErrorResponse(error, message)),
-  showSuccess: (message) => dispatch(showSuccess(message)),
-  updateCustomer: (customer) => dispatch(updateCustomer(customer)),
-});
-
-const enhance = connect(mapStateToProps, mapDispatchToProps);
-
-export const ServiceProviderManagement = enhance(ServiceProviderWrapper);
+};

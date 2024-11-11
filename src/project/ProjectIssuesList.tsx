@@ -1,17 +1,23 @@
-import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
+import { FunctionComponent, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 
 import { IssuesList } from '@waldur/issues/list/IssuesList';
 import { getProject } from '@waldur/workspace/selectors';
 
-const mapStateToProps = createSelector(getProject, (project) => ({
-  scope: { project },
-  filter: { project: project && project.url },
-}));
+export const ProjectIssuesList: FunctionComponent = () => {
+  const project = useSelector(getProject);
 
-const ProjectIssuesListComponent = connect(mapStateToProps)(IssuesList);
+  const scope = useMemo(() => ({ project }), [project]);
+  const filter = useMemo(
+    () => ({ project: project && project.url }),
+    [project],
+  );
 
-export const ProjectIssuesList: FunctionComponent = () => (
-  <ProjectIssuesListComponent hiddenColumns={['customer', 'project']} />
-);
+  return (
+    <IssuesList
+      hiddenColumns={['customer', 'project']}
+      scope={scope}
+      filter={filter}
+    />
+  );
+};

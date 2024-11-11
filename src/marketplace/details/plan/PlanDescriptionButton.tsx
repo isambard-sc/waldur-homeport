@@ -1,30 +1,27 @@
 import { Eye } from '@phosphor-icons/react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { showOfferingPlanDescription } from '@waldur/marketplace/details/plan/actions';
-import { RootState } from '@waldur/store/reducers';
 import { ActionButton } from '@waldur/table/ActionButton';
 
 interface PlanDescriptionButtonProps {
-  showOfferingPlanDescription(planDescription: string): void;
   planDescription?: string;
   className?: string;
-  formData: any;
+  formId?: string;
 }
 
-export const PurePlanDescriptionButton = (
-  props: PlanDescriptionButtonProps,
-) => {
+export const PlanDescriptionButton = (props: PlanDescriptionButtonProps) => {
+  const dispatch = useDispatch();
+  const formData = useSelector(
+    getFormValues(props.formId || ORDER_FORM_ID),
+  ) as { plan: { description } };
+
   let planDescription = '';
-  if (
-    props.formData &&
-    props.formData.plan &&
-    props.formData.plan.description
-  ) {
-    planDescription = (props.formData.plan.description as string).trim();
+  if (formData && formData.plan && formData.plan.description) {
+    planDescription = (formData.plan.description as string).trim();
   }
   if (props.planDescription) {
     planDescription = props.planDescription.trim();
@@ -32,26 +29,17 @@ export const PurePlanDescriptionButton = (
   if (!planDescription) {
     return null;
   }
+
+  const handleClick = () => {
+    dispatch(showOfferingPlanDescription(planDescription));
+  };
+
   return (
     <ActionButton
       title={translate('Details')}
-      action={() => props.showOfferingPlanDescription(planDescription)}
+      action={handleClick}
       iconNode={<Eye />}
       className={props.className}
     />
   );
 };
-
-const mapStateToProps = (state: RootState, ownProps) => ({
-  formData: getFormValues(ownProps.formId || ORDER_FORM_ID)(state),
-});
-
-const mapDispatchToProps = (dispatch) => ({
-  showOfferingPlanDescription: (planDescription) =>
-    dispatch(showOfferingPlanDescription(planDescription)),
-});
-
-export const PlanDescriptionButton = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(PurePlanDescriptionButton);

@@ -1,9 +1,8 @@
 import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { useModal } from '@waldur/modal/hooks';
 
 import { Resource } from '../types';
 
@@ -14,21 +13,20 @@ const ResourceMetadataDialog = lazyComponent(
   'ResourceMetadataDialog',
 );
 
-const openDetailsDialog = (props) =>
-  openModalDialog(ResourceMetadataDialog, {
-    resolve: props,
-    size: 'lg',
-  });
-
 export const ResourceMetadataLink = <T extends Resource = any>(
   props: ResourceSummaryProps<T>,
 ) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   return (
     <Button
       variant="link"
       className="btn-flush"
-      onClick={() => dispatch(openDetailsDialog(props))}
+      onClick={() =>
+        openDialog(ResourceMetadataDialog, {
+          resolve: props,
+          size: 'lg',
+        })
+      }
     >
       {translate('Show')}
     </Button>

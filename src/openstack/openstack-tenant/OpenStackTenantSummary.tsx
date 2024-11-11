@@ -1,7 +1,5 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 import { Badge, Col, Container, Row } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
 
 import { ENV } from '@waldur/configs/default';
 import { ExternalLink } from '@waldur/core/ExternalLink';
@@ -19,14 +17,10 @@ import { UserPassword } from '@waldur/resource/UserPassword';
 
 import { OpenStackTenant } from './types';
 
-interface OpenStackTenantSummaryProps
-  extends ResourceSummaryProps<OpenStackTenant> {
-  tenantCredentialsVisible: boolean;
-  volumeTypeVisible: boolean;
-}
+type OpenStackTenantSummaryProps = ResourceSummaryProps<OpenStackTenant>;
 
 const formatAccess = (props: OpenStackTenantSummaryProps) => {
-  if (!props.tenantCredentialsVisible) {
+  if (!ENV.plugins.WALDUR_OPENSTACK.TENANT_CREDENTIALS_VISIBLE) {
     return null;
   }
   if (!props.resource.access_url) {
@@ -38,10 +32,13 @@ const formatAccess = (props: OpenStackTenantSummaryProps) => {
 };
 
 const formatUsername = (props: OpenStackTenantSummaryProps) =>
-  props.tenantCredentialsVisible ? props.resource.user_username : null;
+  ENV.plugins.WALDUR_OPENSTACK.TENANT_CREDENTIALS_VISIBLE
+    ? props.resource.user_username
+    : null;
 
 const formatPassword = (props: OpenStackTenantSummaryProps) =>
-  props.tenantCredentialsVisible && props.resource.user_password ? (
+  ENV.plugins.WALDUR_OPENSTACK.TENANT_CREDENTIALS_VISIBLE &&
+  props.resource.user_password ? (
     <UserPassword password={props.resource.user_password} />
   ) : null;
 
@@ -112,7 +109,7 @@ const QuotaBadges = ({
   );
 };
 
-export const PureOpenStackTenantSummary: FunctionComponent<
+export const OpenStackTenantSummary: FunctionComponent<
   OpenStackTenantSummaryProps
 > = (props) => {
   const { resource } = props;
@@ -157,12 +154,3 @@ export const PureOpenStackTenantSummary: FunctionComponent<
     </Container>
   );
 };
-
-const mapStateToProps = () => ({
-  tenantCredentialsVisible:
-    ENV.plugins.WALDUR_OPENSTACK.TENANT_CREDENTIALS_VISIBLE,
-});
-
-const enhance = compose(connect(mapStateToProps));
-
-export const OpenStackTenantSummary = enhance(PureOpenStackTenantSummary);
