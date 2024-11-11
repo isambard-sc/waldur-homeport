@@ -9,8 +9,6 @@ import { FormSectionContainer } from '@waldur/form/FormSectionContainer';
 import { translate } from '@waldur/i18n';
 import { RootState } from '@waldur/store/reducers';
 
-import { SelectCountryField } from '../list/SelectCountryField';
-
 import { CustomerEditPanelProps } from './types';
 
 const enhance = compose(
@@ -22,12 +20,6 @@ const enhance = compose(
       bank_account: customer.bank_account,
       vat_code: customer.vat_code,
       default_tax_percent: customer.default_tax_percent,
-      country: customer.country
-        ? {
-            value: customer.country,
-            label: customer.country_name,
-          }
-        : null,
     };
     return { initialValues };
   }),
@@ -74,7 +66,6 @@ export const CustomerBillingPanel = enhance((props: OwnProps) => {
               min={0}
               max={200}
             />
-            <SelectCountryField />
           </FormSectionContainer>
 
           {props.dirty && (

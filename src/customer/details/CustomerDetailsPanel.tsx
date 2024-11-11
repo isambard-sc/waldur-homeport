@@ -102,6 +102,11 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
           key: 'postal',
           value: props.customer.postal,
         },
+        {
+          label: translate('Country'),
+          key: 'country',
+          value: props.customer.country_name,
+        },
       ].filter(Boolean),
     [props.customer, nativeNameVisible],
   );
