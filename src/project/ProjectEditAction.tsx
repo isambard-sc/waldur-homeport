@@ -1,18 +1,19 @@
+import { Pen } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
 
 import { translate } from '@waldur/i18n/translate';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { Project } from '@waldur/workspace/types';
 
-export const ProjectDetailsButton = ({ project }: { project: Project }) => {
+export const ProjectEditAction = ({ project }: { project: Project }) => {
   const router = useRouter();
   return (
-    <RowActionButton
-      title={translate('Details')}
+    <ActionItem
+      title={translate('Edit')}
       action={() =>
         router.stateService.go('project-manage', { uuid: project.uuid })
       }
-      size="sm"
+      iconNode={<Pen />}
     />
   );
 };
