@@ -12,6 +12,7 @@ import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
 import { createFetcher, Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { SLUG_COLUMN } from '@waldur/table/slug';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { CUSTOMERS_FILTER_FORM_ID } from '../constants';
 
@@ -62,6 +63,13 @@ export const OrganizationsList: FunctionComponent = () => {
       keys: ['uuid'],
       optional: true,
       id: 'uuid',
+    },
+    {
+      title: translate('Backend ID'),
+      render: ({ row }) => renderFieldOrDash(row.backend_id),
+      keys: ['backend_id'],
+      optional: true,
+      id: 'backend_id',
     },
     {
       title: translate('Abbreviation'),

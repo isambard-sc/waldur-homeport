@@ -11,6 +11,7 @@ import { CategoryColumn } from '@waldur/marketplace/types';
 import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { Table, createFetcher, useTable } from '@waldur/table';
 import { SLUG_COLUMN } from '@waldur/table/slug';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { ResourceImportButton } from '../import/ResourceImportButton';
 
@@ -99,6 +100,13 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       id: 'name',
       keys: ['name'],
       export: (row) => row.name || row.offering_name, // render as ResourceNameField label
+    },
+    {
+      title: translate('Backend ID'),
+      render: ({ row }) => renderFieldOrDash(row.backend_id),
+      id: 'backend_id',
+      keys: ['backend_id'],
+      optional: true,
     },
     {
       title: translate('Offering'),
