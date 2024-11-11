@@ -7708,7 +7708,7 @@
     "message": "Project removal"
   },
   "Project role": {
-    "description": "customer/team/CustomerUsersListFilter.tsx",
+    "description": "customer/team/CustomerUsersListFilter.tsx, project/team/ProjectUsersListFilter.tsx",
     "message": "Project role"
   },
   "Project roles": {

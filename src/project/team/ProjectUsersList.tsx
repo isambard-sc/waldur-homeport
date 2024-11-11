@@ -1,4 +1,6 @@
 import { useSelector } from 'react-redux';
+import { getFormValues } from 'redux-form';
+import { createSelector } from 'reselect';
 
 import Avatar from '@waldur/core/Avatar';
 import { renderRoleExpirationDate } from '@waldur/customer/team/CustomerUsersList';
@@ -8,8 +10,11 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { getProject } from '@waldur/workspace/selectors';
 
+import { PROJECT_USERS_LIST_FILTER_FORM_ID } from '../constants';
+
 import { AddUserButton } from './AddUserButton';
 import { ProjectPermisionActions } from './ProjectPermisionActions';
+import { ProjectUsersListFilter } from './ProjectUsersListFilter';
 
 const mandatoryFields = [
   // Required for actions
@@ -21,12 +26,27 @@ const mandatoryFields = [
   'user_username',
 ];
 
+const mapStateToFilter = createSelector(
+  getFormValues(PROJECT_USERS_LIST_FILTER_FORM_ID),
+  (filterValues: any) => {
+    const filter: Record<string, string | boolean> = {};
+    if (filterValues) {
+      if (filterValues.project_role) {
+        filter.role = filterValues.project_role.map(({ name }) => name);
+      }
+    }
+    return filter;
+  },
+);
+
 export const ProjectUsersList = () => {
+  const filter = useSelector(mapStateToFilter);
   const project = useSelector(getProject);
   const tableProps = useTable({
     table: 'project-users',
     fetchData: createFetcher(`projects/${project.uuid}/list_users`),
     queryField: 'search_string',
+    filter,
     mandatoryFields,
   });
 
@@ -76,6 +96,7 @@ export const ProjectUsersList = () => {
           render: RoleField,
           id: 'role_name',
           keys: ['role_name'],
+          filter: 'project_role',
         },
         {
           title: translate('Role expiration'),
@@ -89,6 +110,7 @@ export const ProjectUsersList = () => {
       title={translate('Team members')}
       verboseName={translate('Team members')}
       rowActions={ProjectPermisionActions}
+      filters={<ProjectUsersListFilter />}
       hasOptionalColumns
     />
   );
