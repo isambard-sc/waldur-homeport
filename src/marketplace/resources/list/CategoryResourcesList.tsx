@@ -10,6 +10,7 @@ import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-ac
 import { CategoryColumn } from '@waldur/marketplace/types';
 import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { Table, createFetcher, useTable } from '@waldur/table';
+import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
@@ -115,6 +116,27 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       id: 'offering',
       keys: ['offering_name'],
       export: (row) => row.offering_name,
+    },
+    {
+      title: translate('Paused'),
+      render: ({ row }) => <BooleanField value={row.paused} />,
+      id: 'paused',
+      keys: ['paused'],
+      optional: true,
+    },
+    {
+      title: translate('Downscaled'),
+      render: ({ row }) => <BooleanField value={row.downscaled} />,
+      id: 'downscaled',
+      keys: ['downscaled'],
+      optional: true,
+    },
+    {
+      title: translate('Restrict member access'),
+      render: ({ row }) => <BooleanField value={row.restrict_member_access} />,
+      id: 'restrict_member_access',
+      keys: ['restrict_member_access'],
+      optional: true,
     },
   ];
 

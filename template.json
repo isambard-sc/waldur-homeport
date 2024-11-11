@@ -2976,7 +2976,7 @@
     "message": "Details for {provider}"
   },
   "Details": {
-    "description": "administration/organizations/OrganizationGroupDetailsButton.tsx, administration/providers/ProviderCard.tsx, customer/details/CustomerBillingPanel.tsx, customer/details/CustomerDetailsPanel.tsx, invoices/list/MonthOverview.tsx, marketplace/aggregate-limits/AggregateLimitWidget.tsx, marketplace/details/plan/PlanDescriptionButton.tsx, marketplace/referral/ReferralDetailsButton.tsx, marketplace/resources/details/fetchData.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, marketplace/resources/details/popup/ResourceDetailsDialog.tsx, project/ProjectDetailsButton.tsx, project/manage/ProjectGeneral.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, rancher/cluster/apps/ApplicationDetailsButton.tsx, resource/summary/ResourceSummaryButton.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserDetailsButton.tsx, user/UserPopover.tsx, user/support/UserDetailsButton.tsx, user/support/UserDetailsDialog.tsx, user/support/UserDetailsTable.tsx, vmware/tabs.ts",
+    "description": "administration/organizations/OrganizationGroupDetailsButton.tsx, administration/providers/ProviderCard.tsx, customer/details/CustomerBillingPanel.tsx, customer/details/CustomerDetailsPanel.tsx, invoices/list/MonthOverview.tsx, marketplace/aggregate-limits/AggregateLimitWidget.tsx, marketplace/details/plan/PlanDescriptionButton.tsx, marketplace/referral/ReferralDetailsButton.tsx, marketplace/resources/details/fetchData.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, marketplace/resources/details/popup/ResourceDetailsDialog.tsx, project/ProjectDetailsButton.tsx, project/manage/ProjectGeneral.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, rancher/cluster/apps/ApplicationDetailsButton.tsx, resource/summary/ResourceSummaryButton.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserDetailsButton.tsx, user/UserPopover.tsx, user/support/UserDetailsButton.tsx, user/support/UserDetailsDialog.tsx, vmware/tabs.ts",
     "message": "Details"
   },
   "Device ID": {
@@ -3136,7 +3136,7 @@
     "message": "Download"
   },
   "Downscaled": {
-    "description": "marketplace/resources/details/ResourceFlags.tsx, marketplace/resources/details/utils.tsx",
+    "description": "marketplace/resources/details/ResourceFlags.tsx, marketplace/resources/details/utils.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ResourcesAllListTable.tsx",
     "message": "Downscaled"
   },
   "Draft": {
@@ -6948,7 +6948,7 @@
     "message": "Pause"
   },
   "Paused": {
-    "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/resources/details/ResourceFlags.tsx, marketplace/resources/details/utils.tsx",
+    "description": "marketplace/offerings/details/PublicOfferingDetails.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/resources/details/ResourceFlags.tsx, marketplace/resources/details/utils.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ResourcesAllListTable.tsx",
     "message": "Paused"
   },
   "Pay": {
@@ -8816,7 +8816,7 @@
     "message": "Restore"
   },
   "Restrict member access": {
-    "description": "marketplace/resources/details/utils.tsx, marketplace/resources/list/ProviderResourcesList.tsx",
+    "description": "marketplace/resources/details/utils.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/list/ResourcesAllListTable.tsx",
     "message": "Restrict member access"
   },
   "Restrict": {
