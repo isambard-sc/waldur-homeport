@@ -6,8 +6,9 @@ import { Project } from '@waldur/workspace/types';
 
 import { DeleteAction } from './DeleteAction';
 import { MoveProjectAction } from './MoveProjectAction';
+import { ProjectEditAction } from './ProjectEditAction';
 
-const ActionsList = [DeleteAction, MoveProjectAction];
+const ActionsList = [DeleteAction, MoveProjectAction, ProjectEditAction];
 
 interface ProjectsListActionsProps {
   project: Project;

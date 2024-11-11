@@ -15,7 +15,6 @@ import { getCustomer } from '@waldur/workspace/selectors';
 
 import { ProjectCreateButton } from './create/ProjectCreateButton';
 import { ProjectCostField } from './ProjectCostField';
-import { ProjectDetailsButton } from './ProjectDetailsButton';
 import { ProjectExpandableRowContainer } from './ProjectExpandableRowContainer';
 import { ProjectLink } from './ProjectLink';
 
@@ -112,10 +111,7 @@ export const ProjectsList: FunctionComponent<{}> = () => {
       showPageSizeSelector={true}
       tableActions={<ProjectCreateButton refetch={props.fetch} />}
       rowActions={({ row }) => (
-        <>
-          <ProjectsListActions project={row} refetch={props.fetch} />
-          <ProjectDetailsButton project={row} />
-        </>
+        <ProjectsListActions project={row} refetch={props.fetch} />
       )}
       expandableRow={ProjectExpandableRowContainer}
       enableExport={true}
