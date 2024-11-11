@@ -6,7 +6,14 @@ const MONACO_LANGUAGE_PATH_MAP = {
   shell: () => import('monaco-editor/esm/vs/basic-languages/shell/shell.js'),
 };
 
-export const MonacoEditor = ({ value, onChange, language, theme, height }) => {
+export const MonacoEditor = ({
+  value,
+  onChange,
+  language,
+  theme,
+  height,
+  readOnly = false,
+}) => {
   const editorRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -40,6 +47,7 @@ export const MonacoEditor = ({ value, onChange, language, theme, height }) => {
           lineNumbers: 'on',
           scrollBeyondLastLine: false,
           wordWrap: 'on',
+          readOnly,
         });
 
         // Add change event listener

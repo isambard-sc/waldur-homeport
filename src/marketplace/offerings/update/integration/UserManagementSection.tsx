@@ -7,6 +7,7 @@ import {
   getSecretOptionsForm,
 } from '@waldur/marketplace/common/registry';
 
+import { GLAuthConfigButton } from './GLAuthConfigButton';
 import { OfferingEditPanelProps } from './types';
 import { useUpdateOfferingIntegration } from './utils';
 
@@ -21,7 +22,11 @@ export const UserManagementSection: FC<OfferingEditPanelProps> = (props) => {
   const PluginOptionsForm = getPluginOptionsForm(props.offering.type);
 
   return (
-    <FormTable.Card title={TITLE} className="card-bordered mb-7">
+    <FormTable.Card
+      title={TITLE}
+      className="card-bordered mb-7"
+      actions={<GLAuthConfigButton offering={props.offering} />}
+    >
       <FormTable>
         {SecretOptionsForm && (
           <SecretOptionsForm
