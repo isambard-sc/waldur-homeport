@@ -1,6 +1,7 @@
 import { Prohibit } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
+import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
@@ -23,6 +24,7 @@ import { OrderResponse } from '../types';
 interface RejectByProviderButtonProps {
   row: OrderResponse;
   refetch?: () => void;
+  as?: React.ComponentType;
 }
 
 export const RejectByProviderButton: FunctionComponent<
@@ -61,7 +63,10 @@ export const RejectByProviderButton: FunctionComponent<
   });
   return (
     <ActionItem
-      className="text-danger"
+      as={props.as}
+      className={
+        props.as === Button ? 'btn-light-danger btn-sm w-100' : 'text-danger'
+      }
       title={translate('Reject')}
       action={mutate}
       disabled={isLoading}

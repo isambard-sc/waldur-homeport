@@ -1559,6 +1559,10 @@
     "description": "form/TosNotification.tsx",
     "message": "By ordering, you agree to the platform <tos>terms of service</tos> and <pp>privacy policy</pp>."
   },
+  "By provider": {
+    "description": "marketplace/resources/resource-pending/OrderInProgressView.tsx",
+    "message": "By provider"
+  },
   "By setting token lifetime to indefinite you are allowing anyone who has the token to impersonate your actions till the token has been changed.": {
     "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "By setting token lifetime to indefinite you are allowing anyone who has the token to impersonate your actions till the token has been changed."
@@ -7056,7 +7060,7 @@
     "message": "Pending proposals"
   },
   "Pending provider approval": {
-    "description": "marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/orders/list/OrderStateCell.tsx, marketplace/orders/list/OrderStateFilter.tsx",
+    "description": "marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/orders/list/OrderStateCell.tsx, marketplace/orders/list/OrderStateFilter.tsx, marketplace/resources/resource-pending/OrderInProgressView.tsx",
     "message": "Pending provider approval"
   },
   "Pending provider orders": {

@@ -60,7 +60,7 @@ export const PendingProviderOrders: React.FC<{}> = () => {
       expandableRow={OrderExpandableRow}
       tableActions={<BulkProviderActions orders={tableProps.rows} />}
       rowActions={({ row }) => (
-        <OrderProviderActions row={row} refetch={tableProps.fetch} />
+        <OrderProviderActions order={row} refetch={tableProps.fetch} />
       )}
     />
   );

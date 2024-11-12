@@ -6,6 +6,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { ProgressSteps } from '@waldur/core/ProgressSteps';
 import { translate } from '@waldur/i18n';
 import { OrderConsumerActions } from '@waldur/marketplace/orders/actions/OrderConsumerActions';
+import { OrderProviderActions } from '@waldur/marketplace/orders/actions/OrderProviderActions';
 import { OrderDetailsLink } from '@waldur/marketplace/orders/details/OrderDetailsLink';
 
 import { Resource } from '../types';
@@ -37,10 +38,9 @@ const getSteps = (resource: Resource) => {
   });
   const isStep2Completed = order.state !== 'pending-consumer';
   steps.push({
-    label:
-      order.state === 'pending-consumer'
-        ? translate('Pending approval')
-        : translate('Approved'),
+    label: isStep2Completed
+      ? translate('Approved')
+      : translate('Pending approval'),
     description: isStep2Completed
       ? [
           [
@@ -51,6 +51,23 @@ const getSteps = (resource: Resource) => {
       : [translate('Pending organization approval')],
     completed: isStep2Completed,
   });
+  const isStep3Completed = !['pending-consumer', 'pending-provider'].includes(
+    order.state,
+  );
+  steps.push({
+    label: isStep3Completed
+      ? translate('Approved')
+      : translate('Pending approval'),
+    description: isStep3Completed
+      ? [
+          [
+            order.provider_reviewed_by_full_name || translate('By provider'),
+            formatDateTime(order.provider_reviewed_at),
+          ].join(', '),
+        ]
+      : [translate('Pending provider approval')],
+    completed: isStep3Completed,
+  });
   steps.push({
     label: getTranslatedOrderType(order.type),
     description: [
@@ -60,10 +77,7 @@ const getSteps = (resource: Resource) => {
         ).toLowerCase(),
       }),
     ],
-    completed:
-      steps[steps.length - 1].completed &&
-      order.state !== 'pending-provider' &&
-      order.state !== 'executing',
+    completed: steps[steps.length - 1].completed && order.state !== 'executing',
   });
 
   const isStep4Completed =
@@ -112,13 +126,19 @@ export const OrderInProgressView: FC<OrderInProgressViewProps> = ({
             className="flex-grow-1"
           />
           <div className="d-flex flex-sm-column gap-3 text-nowrap">
-            {resource.order_in_progress.state === 'pending-consumer' && (
+            {resource.order_in_progress.state === 'pending-consumer' ? (
               <OrderConsumerActions
                 order={resource.order_in_progress}
                 refetch={refetch}
                 as={Button}
               />
-            )}
+            ) : resource.order_in_progress.state === 'pending-provider' ? (
+              <OrderProviderActions
+                order={resource.order_in_progress}
+                refetch={refetch}
+                as={Button}
+              />
+            ) : null}
             <OrderDetailsLink
               order_uuid={resource.order_in_progress.uuid}
               project_uuid={resource.order_in_progress.project_uuid}

@@ -37,7 +37,7 @@ export const OrdersListExpandableRow: FunctionComponent<{
     />
     <Field
       label={translate('Actions')}
-      value={<OrderProviderActions row={order} />}
+      value={<OrderProviderActions order={order} />}
     />
   </ExpandableContainer>
 );
