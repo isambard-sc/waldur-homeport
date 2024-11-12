@@ -1,23 +1,15 @@
-import { useDispatch } from 'react-redux';
-import { useAsync } from 'react-use';
-import { formValueSelector, reduxForm } from 'redux-form';
-
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
 import {
-  loadFlavors,
-  loadSecurityGroups,
-  loadFloatingIps,
-  loadSubnets,
-  restoreBackup,
   BackupRestoreRequestBody,
+  loadFlavors,
+  loadFloatingIps,
+  loadSecurityGroups,
+  loadSubnets,
 } from '@waldur/openstack/api';
 import {
   formatFlavorTitle,
   formatSubnet,
 } from '@waldur/openstack/openstack-instance/utils';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
 
 import { OpenStackBackup } from '../types';
 
@@ -42,13 +34,13 @@ interface BackupNetworkType {
   floating_ip: string;
 }
 
-interface BackupRestoreFormData {
+export interface BackupRestoreFormData {
   flavor: Option;
   security_groups: Option[];
   networks: BackupNetworkType[];
 }
 
-const loadData = async (
+export const loadData = async (
   resource: OpenStackBackup,
 ): Promise<BackupFormChoices> => {
   const [flavors, securityGroups, floatingIps, subnets] = await Promise.all([
@@ -107,7 +99,7 @@ const loadData = async (
   };
 };
 
-const getInitialValues = (
+export const getInitialValues = (
   resource: OpenStackBackup,
 ): Partial<BackupRestoreFormData> => ({
   security_groups: resource.instance_security_groups.map((choice) => ({
@@ -122,7 +114,7 @@ const getInitialValues = (
     : [],
 });
 
-const serializeBackupRestoreFormData = (
+export const serializeBackupRestoreFormData = (
   form: BackupRestoreFormData,
 ): BackupRestoreRequestBody => ({
   flavor: form.flavor.value,
@@ -152,54 +144,6 @@ const serializeBackupRestoreFormData = (
     url: value,
   })),
 });
-
-export const useBackupRestoreForm = (resource: OpenStackBackup, refetch?) => {
-  const asyncState = useAsync(() => loadData(resource), [resource]);
-  const dispatch = useDispatch();
-
-  const submitRequest = async (formData: BackupRestoreFormData) => {
-    try {
-      await restoreBackup(
-        resource.uuid,
-        serializeBackupRestoreFormData(formData),
-      );
-      dispatch(
-        showSuccess(translate('VM snapshot restoration has been scheduled.')),
-      );
-      dispatch(closeModalDialog());
-      if (refetch) {
-        await refetch();
-      }
-    } catch (e) {
-      dispatch(
-        showErrorResponse(e, translate('Unable to restore VM snapshot.')),
-      );
-    }
-  };
-  return {
-    resource: resource,
-    asyncState: asyncState,
-    submitRequest: submitRequest,
-    initialValues: getInitialValues(resource),
-  };
-};
-
-const FORM_NAME = 'BackupRestoreForm';
-
-type BackupRestoreOwnProps = ReturnType<typeof useBackupRestoreForm>;
-
-export const connectBackupRestoreForm = reduxForm<
-  BackupRestoreFormData,
-  BackupRestoreOwnProps
->({
-  form: FORM_NAME,
-});
-
-export const getNetworkSelector = (name: string) => (state: RootState) =>
-  formValueSelector(FORM_NAME)(state, name) as BackupNetworkType;
-
-export const getAllNetworksSelector = (state: RootState) =>
-  formValueSelector(FORM_NAME)(state, 'networks') as BackupNetworkType[];
 
 export function hasFreeSubnets(
   subnets: Option[],

@@ -1,20 +1,15 @@
 import { Plus, Trash } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import { FormSection, WrappedFieldArrayProps } from 'redux-form';
+import { Field } from 'react-final-form';
 
 import { translate } from '@waldur/i18n';
-import { SelectField } from '@waldur/openstack/openstack-instance/actions/update-floating-ips/SelectField';
-import { RootState } from '@waldur/store/reducers';
 
 import {
   BackupFormChoices,
-  hasFreeSubnets,
-  getFreeSubnets,
   getFreeFloatingIps,
-  getAllNetworksSelector,
-  getNetworkSelector,
+  getFreeSubnets,
+  hasFreeSubnets,
   SKIP_FLOATING_IP_ASSIGNMENT,
 } from './utils';
 
@@ -37,49 +32,51 @@ const DeleteButton = ({ onClick }) => (
   </Button>
 );
 
-const NetworkRow: FC<NetworkChoices & { name: string; onDelete(): void }> = ({
-  name,
-  subnets,
-  floatingIps,
-  onDelete,
-}) => {
-  const network = useSelector((state: RootState) =>
-    getNetworkSelector(name)(state),
-  );
-  const networks = useSelector(getAllNetworksSelector);
+const SubnetField = ({ name, subnets, networks, network }) => {
   const freeSubnets = useMemo(
     () => getFreeSubnets(subnets, networks, network),
     [subnets, networks, network],
   );
+
+  return (
+    <Field name={`${name}.subnet`} component="select" className="form-control">
+      {freeSubnets.map((option, index) => (
+        <option value={option.value} key={index}>
+          {option.label}
+        </option>
+      ))}
+    </Field>
+  );
+};
+
+const FloatingIpField = ({ name, floatingIps, networks, network }) => {
   const freeFloatingIps = useMemo(
     () => getFreeFloatingIps(floatingIps, networks, network),
     [floatingIps, networks, network],
   );
+
   return (
-    <tr>
-      <td className="ps-0 col-md-6">
-        <SelectField name="subnet" options={freeSubnets} />
-      </td>
-      <td className="col-md-5">
-        <SelectField
-          options={freeFloatingIps}
-          name="floating_ip"
-          disabled={!network.subnet}
-        />
-      </td>
-      <td className="pe-0">
-        <DeleteButton onClick={onDelete} />
-      </td>
-    </tr>
+    <Field
+      name={`${name}.floating_ip`}
+      component="select"
+      className="form-control"
+    >
+      {freeFloatingIps.map((option, index) => (
+        <option value={option.value} key={index}>
+          {option.label}
+        </option>
+      ))}
+    </Field>
   );
 };
 
-export const NetworksList: FC<WrappedFieldArrayProps & NetworkChoices> = ({
+export const NetworksList: FC<NetworkChoices & { fields; values }> = ({
   fields,
   subnets,
   floatingIps,
+  values,
 }) => {
-  const networks = useSelector(getAllNetworksSelector);
+  const networks = values.networks;
   const addDisabled = useMemo(
     () => !hasFreeSubnets(subnets, networks),
     [subnets, networks],
@@ -88,15 +85,28 @@ export const NetworksList: FC<WrappedFieldArrayProps & NetworkChoices> = ({
     <>
       <table className="table table-borderless mb-1">
         <tbody>
-          {fields.map((field, index) => (
-            <FormSection key={index} name={field}>
-              <NetworkRow
-                name={field}
-                subnets={subnets}
-                floatingIps={floatingIps}
-                onDelete={() => fields.remove(index)}
-              />
-            </FormSection>
+          {fields.map((name, index) => (
+            <tr key={name}>
+              <td className="ps-0 col-md-6">
+                <SubnetField
+                  name={name}
+                  subnets={subnets}
+                  networks={networks}
+                  network={networks[index]}
+                />
+              </td>
+              <td className="col-md-5">
+                <FloatingIpField
+                  name={name}
+                  floatingIps={floatingIps}
+                  networks={networks}
+                  network={networks[index]}
+                />
+              </td>
+              <td className="pe-0">
+                <DeleteButton onClick={() => fields.remove(index)} />
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
