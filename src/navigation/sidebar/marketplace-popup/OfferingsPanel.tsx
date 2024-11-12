@@ -1,15 +1,8 @@
 import { CaretLeft } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
 import classNames from 'classnames';
-import {
-  useState,
-  useCallback,
-  FunctionComponent,
-  useMemo,
-  forwardRef,
-} from 'react';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { ListGroupItem, Stack } from 'react-bootstrap';
-import { Scrollbars } from 'react-custom-scrollbars';
 import { FixedSizeList as List } from 'react-window';
 import paginate from 'react-window-paginated';
 
@@ -25,38 +18,6 @@ import { RECENTLY_ADDED_OFFERINGS_UUID } from './constants';
 import { fetchOfferingsByPage } from './utils';
 
 const PaginatedList = paginate(List);
-
-const CustomScrollbars = ({ onScroll, forwardedRef, style, children }) => {
-  const refSetter = useCallback(
-    (scrollbarsRef) => {
-      if (scrollbarsRef) {
-        forwardedRef(scrollbarsRef.view);
-      } else {
-        forwardedRef(null);
-      }
-    },
-    [forwardedRef],
-  );
-
-  return (
-    <Scrollbars
-      ref={refSetter}
-      style={{ ...style, overflow: 'hidden' }}
-      onScroll={onScroll}
-      className="scrollbar-view"
-    >
-      {children}
-    </Scrollbars>
-  );
-};
-
-const CustomScrollbarsVirtualList = forwardRef((props: any, ref) => (
-  <CustomScrollbars {...props} forwardedRef={ref} />
-));
-
-const VirtualPaginatedList: FunctionComponent<any> = (props) => (
-  <PaginatedList {...props} outerElementType={CustomScrollbarsVirtualList} />
-);
 
 const VIRTUALIZED_SELECTOR_PAGE_SIZE = 20;
 
@@ -215,13 +176,14 @@ export const OfferingsPanel: FunctionComponent<{
       <h6 className="text-gray-700 fw-bold mt-4 mb-2 ms-7">
         {translate('Offerings')}
       </h6>
-      <VirtualPaginatedList
+      <PaginatedList
         height={500}
         itemSize={68}
         getPage={getPage}
         key={`${filter}-${customer?.uuid}-${project?.uuid}-${category?.uuid}`}
         elementsPerPage={VIRTUALIZED_SELECTOR_PAGE_SIZE}
         noResultsRenderer={EmptyOfferingListPlaceholder}
+        className="scrollbar-view"
       >
         {(listItemProps) => {
           const item = listItemProps.data[listItemProps.index];
@@ -234,7 +196,7 @@ export const OfferingsPanel: FunctionComponent<{
             />
           );
         }}
-      </VirtualPaginatedList>
+      </PaginatedList>
     </div>
   );
 };
