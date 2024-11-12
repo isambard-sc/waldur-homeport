@@ -1,12 +1,14 @@
 import { BaseEventsList } from '@waldur/events/BaseEventsList';
+import { InvoicesEnum } from '@waldur/EventsEnums';
 import { translate } from '@waldur/i18n';
 import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 
 const eventsFilter = {
   event_type: [
-    'update_of_credit_by_staff',
-    'create_of_credit_by_staff',
-    'set_to_zero_overdue_credit',
+    InvoicesEnum.update_of_credit_by_staff,
+    InvoicesEnum.create_of_credit_by_staff,
+    InvoicesEnum.set_to_zero_overdue_credit,
+    InvoicesEnum.allowed_offerings_have_been_updated,
   ],
 };
 
