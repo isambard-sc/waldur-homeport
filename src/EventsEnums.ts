@@ -21,6 +21,7 @@ export const CallEnum = {
 };
 
 export const CustomersEnum = {
+  allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
   create_of_credit_by_staff: 'create_of_credit_by_staff',
   customer_creation_succeeded: 'customer_creation_succeeded',
   customer_deletion_succeeded: 'customer_deletion_succeeded',
@@ -43,6 +44,7 @@ export const CustomersEnum = {
 };
 
 export const InvoicesEnum = {
+  allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
   create_of_credit_by_staff: 'create_of_credit_by_staff',
   invoice_canceled: 'invoice_canceled',
   invoice_created: 'invoice_created',
