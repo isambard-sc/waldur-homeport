@@ -1,6 +1,7 @@
 import { Check } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
+import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
@@ -23,6 +24,7 @@ import { OrderResponse } from '../types';
 interface SupportOrderApproveButtonProps {
   row: OrderResponse;
   refetch?: () => void;
+  as?: React.ComponentType;
 }
 
 export const ApproveByProviderButton: FunctionComponent<
@@ -59,7 +61,10 @@ export const ApproveByProviderButton: FunctionComponent<
   });
   return (
     <ActionItem
-      className="text-success"
+      as={props.as}
+      className={
+        props.as === Button ? 'btn-light-success btn-sm w-100' : 'text-success'
+      }
       title={translate('Approve')}
       action={mutate}
       disabled={isLoading}
