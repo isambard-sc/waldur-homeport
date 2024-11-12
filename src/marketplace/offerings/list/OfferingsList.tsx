@@ -9,9 +9,9 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { useOfferingDropdownActions } from '../hooks';
 
+import { CreateOfferingButton } from './CreateOfferingButton';
 import { OfferingActions } from './OfferingActions';
 import { OfferingNameColumn } from './OfferingNameColumn';
-import { OfferingsListTablePlaceholder } from './OfferingsListTablePlaceholder';
 import { OfferingStateCell } from './OfferingStateCell';
 
 export const BaseOfferingsList: FunctionComponent<{
@@ -93,8 +93,8 @@ export const BaseOfferingsList: FunctionComponent<{
   return (
     <Table
       {...props}
-      placeholderComponent={
-        <OfferingsListTablePlaceholder showActions={showActions} />
+      placeholderActions={
+        showActions && <CreateOfferingButton className="w-175px mw-350px" />
       }
       columns={columns}
       verboseName={translate('Offerings')}

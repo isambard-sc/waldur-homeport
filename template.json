@@ -4208,7 +4208,7 @@
     "message": "Go to detail view"
   },
   "Go to marketplace": {
-    "description": "marketplace/orders/list/OrderTablePlaceholder.tsx",
+    "description": "marketplace/orders/list/OrderTablePlaceholderActions.tsx",
     "message": "Go to marketplace"
   },
   "Go to profile": {
@@ -6210,10 +6210,6 @@
   "Notes (not visible to user)": {
     "description": "proposals/proposal/create-review/steps/FormSummaryStep.tsx",
     "message": "Notes (not visible to user)"
-  },
-  "Nothing to see here": {
-    "description": "marketplace/offerings/list/OfferingsListTablePlaceholder.tsx",
-    "message": "Nothing to see here"
   },
   "Nothing to show here": {
     "description": "marketplace/resources/list/CustomerResourcesListPlaceholder.tsx",
@@ -9342,10 +9338,6 @@
   "See our {guide}.": {
     "description": "dashboard/hero/NewbiesGuideNotification.tsx",
     "message": "See our {guide}."
-  },
-  "Seems there's nothing here": {
-    "description": "marketplace/orders/list/OrderTablePlaceholder.tsx",
-    "message": "Seems there's nothing here"
   },
   "Seems you don't have any resources yet": {
     "description": "marketplace/resources/list/CustomerResourcesListPlaceholder.tsx",
@@ -13390,10 +13382,6 @@
   "You can remove this project by pressing the button above.": {
     "description": "project/manage/ProjectDelete.tsx",
     "message": "You can remove this project by pressing the button above."
-  },
-  "You can start filling this table by creating your first offering.": {
-    "description": "marketplace/offerings/list/OfferingsListTablePlaceholder.tsx",
-    "message": "You can start filling this table by creating your first offering."
   },
   "You cannot unselect the current UI language": {
     "description": "administration/languages/AdministrationLanguages.tsx",

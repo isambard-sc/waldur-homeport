@@ -10,7 +10,7 @@ import { TableProps } from '@waldur/table/types';
 import { OrderProviderActions } from '../actions/OrderProviderActions';
 
 import { OrdersListExpandableRow } from './OrdersListExpandableRow';
-import { OrderTablePlaceholder } from './OrderTablePlaceholder';
+import { OrderTablePlaceholderActions } from './OrderTablePlaceholderActions';
 import { OrderTypeCell } from './OrderTypeCell';
 
 interface OrdersTableComponentProps extends Partial<TableProps> {
@@ -138,7 +138,7 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
     <Table
       {...props}
       columns={columns}
-      placeholderComponent={<OrderTablePlaceholder />}
+      placeholderActions={<OrderTablePlaceholderActions />}
       verboseName={translate('Orders')}
       hasQuery={true}
       showPageSizeSelector={true}
