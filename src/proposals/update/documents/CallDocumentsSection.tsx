@@ -23,7 +23,7 @@ export const CallDocumentsSection = ({ call, refetch }) => {
                 <tr key={i}>
                   <td className="col-md-3">
                     {decodeURIComponent(
-                      document.file
+                      document.file_name
                         .split('/')
                         .pop()
                         .replace(/_[^_]+\./, '.'),

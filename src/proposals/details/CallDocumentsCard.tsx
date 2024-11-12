@@ -18,7 +18,7 @@ export const CallDocumentsCard = ({ call }) => {
               <ExternalLink
                 url={document.file}
                 label={decodeURIComponent(
-                  document.file
+                  document.file_name
                     .split('/')
                     .pop()
                     .replace(/_[^_]+\./, '.'),
