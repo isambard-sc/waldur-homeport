@@ -12032,7 +12032,7 @@
     "message": "Unable to resend invitations."
   },
   "Unable to restore VM snapshot.": {
-    "description": "openstack/openstack-backup/actions/utils.tsx",
+    "description": "openstack/openstack-backup/actions/BackupRestoreDialog.tsx",
     "message": "Unable to restore VM snapshot."
   },
   "Unable to restore volume snapshot.": {
@@ -13044,7 +13044,7 @@
     "message": "VM snapshot has been created."
   },
   "VM snapshot restoration has been scheduled.": {
-    "description": "openstack/openstack-backup/actions/utils.tsx",
+    "description": "openstack/openstack-backup/actions/BackupRestoreDialog.tsx",
     "message": "VM snapshot restoration has been scheduled."
   },
   "VM snapshot schedule caveats": {
