@@ -14,7 +14,7 @@ const VolumeTypeRow = ({ volumeType, onRemove, options }) => (
         component={SelectField}
         options={options.sourceVolumeTypes}
         getOptionLabel={({ name }) => name}
-        getOptionKey={({ uuid }) => uuid}
+        getOptionValue={({ uuid }) => uuid}
       />
     </td>
     <td>
@@ -23,7 +23,7 @@ const VolumeTypeRow = ({ volumeType, onRemove, options }) => (
         component={SelectField}
         options={options.destinationVolumeTypes}
         getOptionLabel={({ name }) => name}
-        getOptionKey={({ uuid }) => uuid}
+        getOptionValue={({ uuid }) => uuid}
       />
     </td>
     <td>
