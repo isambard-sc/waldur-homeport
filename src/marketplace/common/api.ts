@@ -100,7 +100,11 @@ export const getAllOfferingPermissions = (options?: AxiosRequestConfig) =>
 export const getProviderOfferings = (customerUuid: string) =>
   getAllProviderOfferings({ params: { customer_uuid: customerUuid } });
 
-export const getPlan = (id: string) => getById<any>('/marketplace-plans/', id);
+export const getPublicPlan = (id: string, offeringUuid: string) =>
+  getById<any>(`/marketplace-public-offerings/${offeringUuid}/plans/`, id);
+
+export const getProviderPlan = (id: string) =>
+  getById<any>('/marketplace-plans/', id);
 
 export const createPlan = (payload) => post(`/marketplace-plans/`, payload);
 
