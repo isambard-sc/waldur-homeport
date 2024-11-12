@@ -1,43 +1,35 @@
 import { FunctionComponent } from 'react';
 
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+
 import { IssueAttachment } from './IssueAttachment';
-import { IssueAttachmentLoading } from './IssueAttachmentLoading';
-import './IssueAttachmentsList.scss';
 import { Attachment } from './types';
+import './IssueAttachmentsList.scss';
 
 interface IssueAttachmentsListProps {
   attachments: Attachment[];
   uploading: number;
 }
 
-const getAttachmentsLoading = (count: number) => {
-  const attachmentsLoadingList = [];
-
-  for (let i = 0; i < count; i++) {
-    const blankAttachment = (
-      <li key={`attachment-loading-${i}`}>
-        <IssueAttachmentLoading />
-      </li>
-    );
-    attachmentsLoadingList.push(blankAttachment);
-  }
-
-  return attachmentsLoadingList;
-};
-
 export const IssueAttachmentsList: FunctionComponent<
   IssueAttachmentsListProps
-> = (props) => {
-  const { attachments, uploading } = props;
-  const attachmentsList = attachments.length
-    ? attachments.map((attachment: Attachment) => (
+> = ({ attachments, uploading }) => {
+  return attachments.length > 0 || uploading > 0 ? (
+    <ul className="attachment-list">
+      {attachments.map((attachment) => (
         <li key={attachment.uuid}>
           <IssueAttachment attachment={attachment} />
         </li>
-      ))
-    : [];
-  const attachmentsLoadingList = getAttachmentsLoading(uploading);
-  const body = [...attachmentsList, ...attachmentsLoadingList];
-
-  return body.length ? <ul className="attachment-list">{body}</ul> : null;
+      ))}
+      {Array.from({ length: uploading }, (_, i) => (
+        <li key={`attachment-loading-${i}`}>
+          <div className="attachment-item-loading">
+            <div className="attachment-item__overlay">
+              <LoadingSpinner />
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  ) : null;
 };

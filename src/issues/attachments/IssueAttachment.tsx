@@ -3,9 +3,11 @@ import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
 
 import * as actions from './actions';
 import './IssueAttachment.scss';
@@ -13,7 +15,11 @@ import { FileDownloader } from './FileDownloader';
 import { ImageFetcher } from './ImageFetcher';
 import { getIsDeleting } from './selectors';
 import { Attachment } from './types';
-import * as utils from './utils';
+
+const IssueAttachmentModal = lazyComponent(
+  () => import('./IssueAttachmentModal'),
+  'IssueAttachmentModal',
+);
 
 interface IssueAttachmentProps {
   attachment: Attachment;
@@ -28,8 +34,13 @@ export const IssueAttachment: FunctionComponent<IssueAttachmentProps> = ({
   const dispatch = useDispatch();
   const deleteAttachment = () =>
     dispatch(actions.issueAttachmentsDelete(attachment.uuid));
+
   const openModal = () =>
-    dispatch(utils.openAttachmentModal(attachment.file, attachment.file_name));
+    dispatch(
+      openModalDialog(IssueAttachmentModal, {
+        resolve: { url: attachment.file, name: attachment.file_name },
+      }),
+    );
 
   return (
     <div className="attachment-item">
