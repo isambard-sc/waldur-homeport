@@ -11,7 +11,7 @@ export const OrganizationNameField = ({ row }) => {
       user.permissions.find(
         (permission) =>
           permission.scope_type === 'customer' &&
-          permission.customer_uuid === row.uuid,
+          permission.scope_uuid === row.uuid,
       ),
     [user, row],
   );
