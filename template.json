@@ -116,11 +116,11 @@
     "message": "Accept"
   },
   "Accepted proposals": {
-    "description": "proposals/call-management/CallManagementStatistics.tsx",
+    "description": "proposals/call-management/CallManagementStatistics.tsx, proposals/round/reviewers/RoundReviewersList.tsx",
     "message": "Accepted proposals"
   },
   "Accepted": {
-    "description": "booking/BookingStateField.tsx, booking/utils.ts, invitations/InvitationStateFilter.tsx, proposals/proposal/create/ProgressSteps.tsx, proposals/round/reviewers/RoundReviewersListExpandableRow.tsx, proposals/utils.ts",
+    "description": "booking/BookingStateField.tsx, booking/utils.ts, invitations/InvitationStateFilter.tsx, proposals/proposal/create/ProgressSteps.tsx, proposals/utils.ts",
     "message": "Accepted"
   },
   "Accepting offering request": {
@@ -4595,10 +4595,6 @@
     "description": "resource/state/constants.ts",
     "message": "Importing resources"
   },
-  "In progress": {
-    "description": "proposals/round/reviewers/RoundReviewersListExpandableRow.tsx",
-    "message": "In progress"
-  },
   "In review": {
     "description": "proposals/utils.ts",
     "message": "In review"
@@ -7720,7 +7716,7 @@
     "message": "Project removal"
   },
   "Project role": {
-    "description": "customer/team/CustomerUsersListFilter.tsx, project/team/ProjectUsersListFilter.tsx",
+    "description": "customer/team/CustomerUsersListFilter.tsx",
     "message": "Project role"
   },
   "Project roles": {
@@ -7826,6 +7822,10 @@
   "Proposal": {
     "description": "permissions/constants.tsx, proposals/proposal/CustomerProposalsList.tsx, proposals/proposal/ProposalDetails.tsx, proposals/proposal/UserProposalsList.tsx, proposals/proposal/create/ProposalHeader.tsx, proposals/proposal/create/ProposalRejectionStep.tsx, proposals/review/CustomerReviewsList.tsx, proposals/review/UserReviewsList.tsx",
     "message": "Proposal"
+  },
+  "Proposals in progress": {
+    "description": "proposals/round/reviewers/RoundReviewersList.tsx",
+    "message": "Proposals in progress"
   },
   "Proposals": {
     "description": "navigation/sidebar/CallPublicMenu.tsx, proposals/proposal/CustomerProposalsList.tsx, proposals/round/RoundUIView.tsx, proposals/round/proposals/ProposalsList.tsx, proposals/routes.ts, proposals/update/rounds/CallRoundsList.tsx",
@@ -8247,8 +8247,12 @@
     "description": "invitations/UserPermissionRequestRejectButton.tsx, marketplace/orders/actions/RejectByConsumerButton.tsx, marketplace/orders/actions/RejectByProviderButton.tsx, marketplace-remote/ReviewRejectAction.tsx, proposals/offering-requests/OfferingRequestItemActions.tsx, proposals/proposal/ProposalRowActions.tsx",
     "message": "Reject"
   },
+  "Rejected proposals": {
+    "description": "proposals/round/reviewers/RoundReviewersList.tsx",
+    "message": "Rejected proposals"
+  },
   "Rejected": {
-    "description": "booking/BookingStateField.tsx, booking/utils.ts, invitations/InvitationStateFilter.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/orders/list/OrderStateCell.tsx, marketplace/resources/resource-pending/OrderInProgressView.tsx, marketplace-remote/RequestStateFilter.tsx, proposals/proposal/create/ProgressSteps.tsx, proposals/proposal/create/ProposalRejectionStep.tsx, proposals/round/reviewers/RoundReviewersListExpandableRow.tsx, proposals/utils.ts, user/UserPermissionRequestsStateFilter.tsx",
+    "description": "booking/BookingStateField.tsx, booking/utils.ts, invitations/InvitationStateFilter.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/orders/list/OrderStateCell.tsx, marketplace/resources/resource-pending/OrderInProgressView.tsx, marketplace-remote/RequestStateFilter.tsx, proposals/proposal/create/ProgressSteps.tsx, proposals/proposal/create/ProposalRejectionStep.tsx, proposals/utils.ts, user/UserPermissionRequestsStateFilter.tsx",
     "message": "Rejected"
   },
   "Rejecting offering request": {
@@ -9040,7 +9044,7 @@
     "message": "Role name"
   },
   "Role": {
-    "description": "administration/InvitationList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/team/CustomerUsersListExpandableRow.tsx, invitations/GroupInvitationsList.tsx, invitations/InvitationRoleFilter.tsx, invitations/InvitationsList.tsx, invitations/actions/RoleGroup.tsx, invitations/actions/create/EmailsListGroup.tsx, marketplace/offerings/update/roles/RolesSection.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/resources/users/ResourceUsersList.tsx, project/team/InvitationsList.tsx, project/team/RoleGroup.tsx, proposals/team/InvitationsList.tsx, proposals/team/UsersList.tsx, rancher/cluster/create/NodeRoleGroup.tsx, user/UserPermissionRequestsList.tsx, user/affiliations/PermissionDetails.tsx, user/support/UserFilter.tsx",
+    "description": "administration/InvitationList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/team/CustomerUsersListExpandableRow.tsx, invitations/GroupInvitationsList.tsx, invitations/InvitationRoleFilter.tsx, invitations/InvitationsList.tsx, invitations/actions/RoleGroup.tsx, invitations/actions/create/EmailsListGroup.tsx, marketplace/offerings/update/roles/RolesSection.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/resources/users/ResourceUsersList.tsx, project/team/InvitationsList.tsx, project/team/ProjectUsersListFilter.tsx, project/team/RoleGroup.tsx, proposals/team/InvitationsList.tsx, proposals/team/UsersList.tsx, rancher/cluster/create/NodeRoleGroup.tsx, user/UserPermissionRequestsList.tsx, user/affiliations/PermissionDetails.tsx, user/support/UserFilter.tsx",
     "message": "Role"
   },
   "Roles and permissions": {
