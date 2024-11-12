@@ -1,14 +1,13 @@
 import { FileArrowDown } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { get } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { showErrorResponse } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 
 export const FileDownloader = ({ url, name }) => {
-  const dispatch = useDispatch();
+  const { showErrorResponse } = useNotify();
   const [loading, setLoading] = useState(false);
 
   const handleDownload = () => {
@@ -31,7 +30,7 @@ export const FileDownloader = ({ url, name }) => {
         link.parentNode.removeChild(link);
       })
       .catch((error) => {
-        dispatch(showErrorResponse(error, translate('File download failed')));
+        showErrorResponse(error, translate('File download failed'));
       })
       .finally(() => {
         setLoading(false);
