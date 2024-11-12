@@ -1,7 +1,6 @@
 import { FC } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { RoundReviewersListExpandableRow } from '@waldur/proposals/round/reviewers/RoundReviewersListExpandableRow';
 import { Reviewer, Round } from '@waldur/proposals/types';
 import { createFetcher, Table, useTable } from '@waldur/table';
 
@@ -28,10 +27,21 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
           title: translate('Email'),
           render: ({ row }) => <>{row.email || '-'} </>,
         },
+        {
+          title: translate('Proposals in progress'),
+          render: ({ row }) => <>{row.in_review_proposals}</>,
+        },
+        {
+          title: translate('Accepted proposals'),
+          render: ({ row }) => <>{row.accepted_proposals}</>,
+        },
+        {
+          title: translate('Rejected proposals'),
+          render: ({ row }) => <>{row.rejected_proposals}</>,
+        },
       ]}
       title={translate('Reviewers')}
       verboseName={translate('Reviewers')}
-      expandableRow={RoundReviewersListExpandableRow}
     />
   );
 };
