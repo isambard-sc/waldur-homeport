@@ -1067,6 +1067,10 @@
     "description": "proposals/proposal/create/ProposalSubmissionStep.tsx",
     "message": "Are you sure you want to send the proposal to team verification step?"
   },
+  "Are you sure you want to set {count} resources to erred?": {
+    "description": "marketplace/resources/mass-actions/MultiSetErredAction.tsx",
+    "message": "Are you sure you want to set {count} resources to erred?"
+  },
   "Are you sure you want to set {name} {resourceType} to erred state? ": {
     "description": "resource/actions/SetErredActionItem.tsx",
     "message": "Are you sure you want to set {name} {resourceType} to erred state? "
@@ -1090,6 +1094,10 @@
   "Are you sure you want to unlink the order?": {
     "description": "marketplace/orders/actions/OrderUnlinkButton.tsx",
     "message": "Are you sure you want to unlink the order?"
+  },
+  "Are you sure you want to unlink {count} resources?": {
+    "description": "marketplace/resources/mass-actions/MultiUnlinkAction.tsx",
+    "message": "Are you sure you want to unlink {count} resources?"
   },
   "Are you sure you want to unlink {resourceName} {resourceType} from {projectName} ({customerName})? ": {
     "description": "resource/actions/UnlinkActionItem.tsx",
@@ -7100,7 +7108,7 @@
     "message": "Perform local logout"
   },
   "Perform mass action": {
-    "description": "marketplace/resources/mass-actions/MultiDestroyAction.tsx, marketplace/resources/mass-actions/MultiPullAction.tsx, marketplace/resources/mass-actions/VirtualMachineMultiAction.tsx",
+    "description": "marketplace/resources/mass-actions/MultiDestroyAction.tsx, marketplace/resources/mass-actions/MultiPullAction.tsx, marketplace/resources/mass-actions/MultiSetErredAction.tsx, marketplace/resources/mass-actions/MultiUnlinkAction.tsx, marketplace/resources/mass-actions/VirtualMachineMultiAction.tsx",
     "message": "Perform mass action"
   },
   "Perform review": {
@@ -9787,6 +9795,10 @@
     "description": "marketplace/category/admin/CategoryColumnsForm.tsx",
     "message": "Set columns in {name} category"
   },
+  "Set erred": {
+    "description": "marketplace/resources/mass-actions/MultiSetErredAction.tsx",
+    "message": "Set erred"
+  },
   "Set external username": {
     "description": "marketplace/service-providers/ProviderOfferingUserUpdateDialog.tsx",
     "message": "Set external username"
@@ -10162,6 +10174,10 @@
   "Sponsor number": {
     "description": "customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx",
     "message": "Sponsor number"
+  },
+  "Staff action": {
+    "description": "resource/actions/ActionItem.tsx",
+    "message": "Staff action"
   },
   "Staff actions": {
     "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, resource/actions/ResourceActionComponent.tsx, slurm/SlurmAllocationActions.tsx",
@@ -12476,7 +12492,7 @@
     "message": "Unlink resource"
   },
   "Unlink": {
-    "description": "marketplace/orders/actions/OrderUnlinkButton.tsx, resource/actions/UnlinkActionItem.tsx",
+    "description": "marketplace/orders/actions/OrderUnlinkButton.tsx, marketplace/resources/mass-actions/MultiUnlinkAction.tsx, resource/actions/UnlinkActionItem.tsx",
     "message": "Unlink"
   },
   "Unpause offering": {
