@@ -297,6 +297,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
             verboseName={verboseName}
             clearSearch={() => setQuery('')}
             fetch={this.props.fetch}
+            actions={this.props.placeholderActions}
           />
         );
       }

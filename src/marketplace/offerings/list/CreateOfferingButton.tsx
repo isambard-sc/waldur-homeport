@@ -12,7 +12,13 @@ const OfferingCreateDialog = lazyComponent(
   'OfferingCreateDialog',
 );
 
-export const CreateOfferingButton = ({ fetch }: { fetch? }) => {
+export const CreateOfferingButton = ({
+  fetch,
+  className,
+}: {
+  fetch?;
+  className?;
+}) => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
   const user = useSelector(getUser);
@@ -28,7 +34,7 @@ export const CreateOfferingButton = ({ fetch }: { fetch? }) => {
       customerId: customer.uuid,
     })
   ) {
-    return <AddButton action={callback} />;
+    return <AddButton action={callback} className={className} />;
   } else {
     return null;
   }

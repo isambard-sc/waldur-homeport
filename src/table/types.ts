@@ -177,6 +177,7 @@ export interface TableProps<RowType = any> extends TableState {
   enableExport?: boolean;
   showExportInDropdown?: boolean;
   placeholderComponent?: React.ReactNode;
+  placeholderActions?: React.ReactNode;
   filters?: JSX.Element;
   title?: React.ReactNode;
   alterTitle?: React.ReactNode;

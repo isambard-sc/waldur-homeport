@@ -5,7 +5,7 @@ import { OrderProviderActions } from '@waldur/marketplace/orders/actions/OrderPr
 import { TABLE_PENDING_PROVIDER_PUBLIC_ORDERS } from '@waldur/marketplace/orders/list/constants';
 import { OrderNameField } from '@waldur/marketplace/orders/list/OrderNameField';
 import { OrderStateCell } from '@waldur/marketplace/orders/list/OrderStateCell';
-import { OrderTablePlaceholder } from '@waldur/marketplace/orders/list/OrderTablePlaceholder';
+import { OrderTablePlaceholderActions } from '@waldur/marketplace/orders/list/OrderTablePlaceholderActions';
 import { OrderTypeCell } from '@waldur/marketplace/orders/list/OrderTypeCell';
 import { ResourceNameField } from '@waldur/marketplace/orders/list/ResourceNameField';
 import { createFetcher, Table, useTable } from '@waldur/table';
@@ -51,7 +51,7 @@ export const PendingProviderOrders: React.FC<{}> = () => {
   return (
     <Table
       {...tableProps}
-      placeholderComponent={<OrderTablePlaceholder />}
+      placeholderActions={<OrderTablePlaceholderActions />}
       columns={columns}
       title={translate('Orders')}
       verboseName={translate('Orders')}
