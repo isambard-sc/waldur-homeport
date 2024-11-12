@@ -406,6 +406,16 @@ export const terminateResource = (resource_uuid: string, data?) =>
     (response) => response.data,
   );
 
+export const unlinkResource = (resource_uuid: string) =>
+  post(`/marketplace-resources/${resource_uuid}/unlink/`).then(
+    (response) => response.data,
+  );
+
+export const setErredResource = (resource_uuid: string) =>
+  post(`/marketplace-provider-resources/${resource_uuid}/set_as_erred/`).then(
+    (response) => response.data,
+  );
+
 export const moveResource = (resourceUuid: string, projectUrl: string) =>
   post(`/marketplace-resources/${resourceUuid}/move_resource/`, {
     project: {

@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { IdentificationBadge, Question } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { uniqueId } from 'lodash';
 import { FC, ReactNode, useContext } from 'react';
@@ -6,6 +6,7 @@ import { Button, Dropdown } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';
 
 import { Tip } from '@waldur/core/Tooltip';
+import { translate } from '@waldur/i18n';
 import { ResourceActionMenuContext } from '@waldur/marketplace/resources/actions/ResourceActionMenuContext';
 
 export interface ActionItemProps {
@@ -75,6 +76,15 @@ export const ActionItem: FC<ActionItemProps> = (props) => {
           className="ms-1 me-3"
         >
           <Question size={20} />
+        </Tip>
+      )}
+      {props.staff && (
+        <Tip
+          label={translate('Staff action')}
+          id={`staff-action-${uniqueId()}`}
+          className="text-dark ms-auto ps-2"
+        >
+          <IdentificationBadge size={25} />
         </Tip>
       )}
     </div>

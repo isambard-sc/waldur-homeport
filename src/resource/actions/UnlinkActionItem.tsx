@@ -2,8 +2,8 @@ import { LinkBreak } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { post } from '@waldur/core/api';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
+import { unlinkResource } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getUser } from '@waldur/workspace/selectors';
@@ -44,9 +44,7 @@ export const UnlinkActionItem: FC<{ resource }> = ({ resource }) => {
     }
 
     try {
-      await post(
-        `/marketplace-resources/${resource.marketplace_resource_uuid}/unlink/`,
-      );
+      await unlinkResource(resource.marketplace_resource_uuid);
       dispatch(showSuccess(translate('Resource has been unlinked.')));
     } catch (e) {
       dispatch(showErrorResponse(e, translate('Unable to unlink resource.')));
