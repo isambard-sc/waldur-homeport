@@ -47,6 +47,7 @@ function renderSortingIcon(
       <span className="sorting-buttons">
         <button
           type="button"
+          data-testid="sort-asc"
           onClick={() => onClickSort('asc')}
           className={classNames(
             'text-btn',
@@ -61,6 +62,7 @@ function renderSortingIcon(
         </button>
         <button
           type="button"
+          data-testid="sort-desc"
           onClick={() => onClickSort('desc')}
           className={classNames(
             'text-btn',
@@ -162,6 +164,7 @@ export const TableHeader: FC<TableHeaderProps> = ({
           <th style={{ width: '10px' }}>
             <FormCheck
               ref={refCheck}
+              data-testid="select-all"
               className="form-check form-check-custom form-check-sm"
               checked={isAllSelected}
               onChange={() => onSelectAllRows(rows)}
