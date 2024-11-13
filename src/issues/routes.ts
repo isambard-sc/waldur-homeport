@@ -36,9 +36,9 @@ const BroadcastTemplateList = lazyComponent(
   () => import('../broadcasts/BroadcastTemplateList'),
   'BroadcastTemplateList',
 );
-const BaseEventsList = lazyComponent(
-  () => import('@waldur/events/BaseEventsList'),
-  'BaseEventsList',
+const SupportEventsList = lazyComponent(
+  () => import('@waldur/support/SupportEventsList'),
+  'SupportEventsList',
 );
 
 export const states: StateDeclaration[] = [
@@ -130,7 +130,7 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.audit-logs',
     url: 'audit-logs/',
-    component: BaseEventsList,
+    component: SupportEventsList,
     data: {
       breadcrumb: () => translate('Audit logs'),
       priority: 105,
