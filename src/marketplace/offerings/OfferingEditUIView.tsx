@@ -31,57 +31,70 @@ import { getServiceSettingsForm } from './update/integration/registry';
 import { SCRIPT_ROWS } from './update/integration/utils';
 import { getOfferingBreadcrumbItems } from './utils';
 
-const OverviewSection = lazyComponent(
-  () => import('./update/overview/OverviewSection'),
-  'OverviewSection',
+const OverviewSection = lazyComponent(() =>
+  import('./update/overview/OverviewSection').then((module) => ({
+    default: module.OverviewSection,
+  })),
 );
-const CredentialsSection = lazyComponent(
-  () => import('./update/integration/CredentialsSection'),
-  'CredentialsSection',
+const CredentialsSection = lazyComponent(() =>
+  import('./update/integration/CredentialsSection').then((module) => ({
+    default: module.CredentialsSection,
+  })),
 );
-const LifecyclePolicySection = lazyComponent(
-  () => import('./update/integration/LifecyclePolicySection'),
-  'LifecyclePolicySection',
+const LifecyclePolicySection = lazyComponent(() =>
+  import('./update/integration/LifecyclePolicySection').then((module) => ({
+    default: module.LifecyclePolicySection,
+  })),
 );
-const UserManagementSection = lazyComponent(
-  () => import('./update/integration/UserManagementSection'),
-  'UserManagementSection',
+const UserManagementSection = lazyComponent(() =>
+  import('./update/integration/UserManagementSection').then((module) => ({
+    default: module.UserManagementSection,
+  })),
 );
-const ProvisioningConfigSection = lazyComponent(
-  () => import('./update/integration/ProvisioningConfigSection'),
-  'ProvisioningConfigSection',
+const ProvisioningConfigSection = lazyComponent(() =>
+  import('./update/integration/ProvisioningConfigSection').then((module) => ({
+    default: module.ProvisioningConfigSection,
+  })),
 );
-const OfferingEndpointsSection = lazyComponent(
-  () => import('./update/endpoints/OfferingEndpointsSection'),
-  'OfferingEndpointsSection',
+const OfferingEndpointsSection = lazyComponent(() =>
+  import('./update/endpoints/OfferingEndpointsSection').then((module) => ({
+    default: module.OfferingEndpointsSection,
+  })),
 );
-const OfferingOptionsSection = lazyComponent(
-  () => import('./update/options/OfferingOptionsSection'),
-  'OfferingOptionsSection',
+const OfferingOptionsSection = lazyComponent(() =>
+  import('./update/options/OfferingOptionsSection').then((module) => ({
+    default: module.OfferingOptionsSection,
+  })),
 );
-const OfferingResourceOptionsSection = lazyComponent(
-  () => import('./update/options/OfferingResourceOptionsSection'),
-  'OfferingResourceOptionsSection',
+const OfferingResourceOptionsSection = lazyComponent(() =>
+  import('./update/options/OfferingResourceOptionsSection').then((module) => ({
+    default: module.OfferingResourceOptionsSection,
+  })),
 );
-const AttributesSection = lazyComponent(
-  () => import('./update/attributes/AttributesSection'),
-  'AttributesSection',
+const AttributesSection = lazyComponent(() =>
+  import('./update/attributes/AttributesSection').then((module) => ({
+    default: module.AttributesSection,
+  })),
 );
-const ComponentsSection = lazyComponent(
-  () => import('./update/components/ComponentsSection'),
-  'ComponentsSection',
+const ComponentsSection = lazyComponent(() =>
+  import('./update/components/ComponentsSection').then((module) => ({
+    default: module.ComponentsSection,
+  })),
 );
-const PlansSection = lazyComponent(
-  () => import('./update/plans/PlansSection'),
-  'PlansSection',
+const PlansSection = lazyComponent(() =>
+  import('./update/plans/PlansSection').then((module) => ({
+    default: module.PlansSection,
+  })),
 );
-const OfferingImagesList = lazyComponent(
-  () => import('./images/OfferingImagesList'),
-  'OfferingImagesList',
+const OfferingImagesList = lazyComponent(() =>
+  import('./images/OfferingImagesList').then((module) => ({
+    default: module.OfferingImagesList,
+  })),
 );
-const RolesSection = lazyComponent(
-  () => import('./update/roles/RolesSection'),
-  'RolesSection',
+const RolesSection = lazyComponent(() =>
+  import('./update/roles/RolesSection').then((module) => ({
+    default: module.RolesSection,
+  })),
 );
 
 const getOfferingData = async (offering_uuid) => {

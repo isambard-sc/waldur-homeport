@@ -9,9 +9,10 @@ import { Customer, Project } from '@waldur/workspace/types';
 import { createOrganizationCostPolicy, createProjectCostPolicy } from './api';
 import { CostPolicyFormData, CostPolicyType } from './types';
 
-const CostPolicyFormDialog = lazyComponent(
-  () => import('./CostPolicyFormDialog'),
-  'CostPolicyFormDialog',
+const CostPolicyFormDialog = lazyComponent(() =>
+  import('./CostPolicyFormDialog').then((module) => ({
+    default: module.CostPolicyFormDialog,
+  })),
 );
 
 interface SubmitedFormData {

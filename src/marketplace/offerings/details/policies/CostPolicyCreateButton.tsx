@@ -14,9 +14,10 @@ import { showErrorResponse } from '@waldur/store/notify';
 import { OFFERING_POLICY_FORM } from './PolicyCreateDialog';
 import { OfferingCostPolicyFormData } from './types';
 
-const PolicyCreateDialog = lazyComponent(
-  () => import('./PolicyCreateDialog'),
-  'PolicyCreateDialog',
+const PolicyCreateDialog = lazyComponent(() =>
+  import('./PolicyCreateDialog').then((module) => ({
+    default: module.PolicyCreateDialog,
+  })),
 );
 
 interface CostPolicyCreateButtonProps {

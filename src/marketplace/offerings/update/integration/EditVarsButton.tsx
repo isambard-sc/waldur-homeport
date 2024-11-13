@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { ENVIRON_FORM_ID } from './constants';
 
-const EditVarsDialog = lazyComponent(
-  () => import('./EditVarsDialog'),
-  'EditVarsDialog',
+const EditVarsDialog = lazyComponent(() =>
+  import('./EditVarsDialog').then((module) => ({
+    default: module.EditVarsDialog,
+  })),
 );
 
 export const EditVarsButton: FunctionComponent<{

@@ -5,7 +5,7 @@ import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { Option } from '@waldur/marketplace/common/registry';
 
-export const getOrderStateFilterOption = (): Option[] => [
+const getOrderStateFilterOption = (): Option[] => [
   { value: 'pending-consumer', label: translate('Pending consumer approval') },
   { value: 'pending-provider', label: translate('Pending provider approval') },
   { value: 'executing', label: translate('Executing') },

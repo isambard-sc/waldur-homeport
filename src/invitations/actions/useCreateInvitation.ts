@@ -9,9 +9,10 @@ import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 import { InvitationContext } from './types';
 
-const InvitationCreateDialog = lazyComponent(
-  () => import('./create/InvitationCreateDialog'),
-  'InvitationCreateDialog',
+const InvitationCreateDialog = lazyComponent(() =>
+  import('./create/InvitationCreateDialog').then((module) => ({
+    default: module.InvitationCreateDialog,
+  })),
 );
 
 export const useCreateInvitation = (

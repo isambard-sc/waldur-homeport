@@ -9,9 +9,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { GenericPermission } from '@waldur/permissions/types';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
-const EditUserDialog = lazyComponent(
-  () => import('./EditUserDialog'),
-  'EditUserDialog',
+const EditUserDialog = lazyComponent(() =>
+  import('./EditUserDialog').then((module) => ({
+    default: module.EditUserDialog,
+  })),
 );
 
 interface EditUserButtonProps {

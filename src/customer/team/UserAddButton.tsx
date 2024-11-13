@@ -14,9 +14,10 @@ interface UserAddButtonProps {
   refetch;
 }
 
-const AddUserDialog = lazyComponent(
-  () => import('@waldur/project/team/AddUserDialog'),
-  'AddUserDialog',
+const AddUserDialog = lazyComponent(() =>
+  import('@waldur/project/team/AddUserDialog').then((module) => ({
+    default: module.AddUserDialog,
+  })),
 );
 
 export const UserAddButton: FunctionComponent<UserAddButtonProps> = ({

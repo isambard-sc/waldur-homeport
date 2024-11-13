@@ -11,9 +11,10 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { ARCHIVED } from '../../store/constants';
 
-const SetLocationDialog = lazyComponent(
-  () => import('@waldur/map/SetLocationDialog'),
-  'SetLocationDialog',
+const SetLocationDialog = lazyComponent(() =>
+  import('@waldur/map/SetLocationDialog').then((module) => ({
+    default: module.SetLocationDialog,
+  })),
 );
 
 export const OfferingLocationButton = ({ offering, refetch }) => {

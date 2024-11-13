@@ -10,14 +10,16 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { ACTIVE, ARCHIVED, DRAFT, PAUSED } from '../store/constants';
 
-const RequestActionDialog = lazyComponent(
-  () => import('@waldur/marketplace/offerings/actions/RequestActionDialog'),
-  'RequestActionDialog',
+const RequestActionDialog = lazyComponent(() =>
+  import('@waldur/marketplace/offerings/actions/RequestActionDialog').then(
+    (module) => ({ default: module.RequestActionDialog }),
+  ),
 );
 
-const PauseOfferingDialog = lazyComponent(
-  () => import('./PauseOfferingDialog'),
-  'PauseOfferingDialog',
+const PauseOfferingDialog = lazyComponent(() =>
+  import('./PauseOfferingDialog').then((module) => ({
+    default: module.PauseOfferingDialog,
+  })),
 );
 
 export const OfferingStateActions = ({

@@ -10,9 +10,10 @@ import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { ACTIVE, DRAFT, PAUSED } from '../../store/constants';
 
-const UpdateOfferingLogoDialog = lazyComponent(
-  () => import('../../actions/UpdateOfferingLogoDialog'),
-  'UpdateOfferingLogoDialog',
+const UpdateOfferingLogoDialog = lazyComponent(() =>
+  import('../../actions/UpdateOfferingLogoDialog').then((module) => ({
+    default: module.UpdateOfferingLogoDialog,
+  })),
 );
 
 export const OfferingLogoButton: FC<{ offering; refetch }> = (props) => {

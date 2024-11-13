@@ -15,9 +15,10 @@ import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-const BroadcastCreateDialog = lazyComponent(
-  () => import('./BroadcastCreateDialog'),
-  'BroadcastCreateDialog',
+const BroadcastCreateDialog = lazyComponent(() =>
+  import('./BroadcastCreateDialog').then((module) => ({
+    default: module.BroadcastCreateDialog,
+  })),
 );
 
 export const BroadcastSaveAsTemplateDialog = connect()(

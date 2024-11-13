@@ -12,9 +12,10 @@ import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
 
-const GroupInvitationCreateDialog = lazyComponent(
-  () => import('./GroupInvitationCreateDialog'),
-  'GroupInvitationCreateDialog',
+const GroupInvitationCreateDialog = lazyComponent(() =>
+  import('./GroupInvitationCreateDialog').then((module) => ({
+    default: module.GroupInvitationCreateDialog,
+  })),
 );
 
 export const GroupInvitationCreateButton: FC<{

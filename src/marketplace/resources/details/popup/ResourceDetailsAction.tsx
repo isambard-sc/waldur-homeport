@@ -5,9 +5,10 @@ import { translate } from '@waldur/i18n';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const ResourceDetailsDialog = lazyComponent(
-  () => import('./ResourceDetailsDialog'),
-  'ResourceDetailsDialog',
+const ResourceDetailsDialog = lazyComponent(() =>
+  import('./ResourceDetailsDialog').then((module) => ({
+    default: module.ResourceDetailsDialog,
+  })),
 );
 
 export const ResourceDetailsAction: ActionItemType = ({ resource }) => (

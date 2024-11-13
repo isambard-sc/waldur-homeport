@@ -7,9 +7,10 @@ import { lazyComponent } from '../../core/lazyComponent';
 
 import { Component } from './types';
 
-const AllComponentsDialog = lazyComponent(
-  () => import('./AllComponentsDialog'),
-  'AllComponentsDialog',
+const AllComponentsDialog = lazyComponent(() =>
+  import('./AllComponentsDialog').then((module) => ({
+    default: module.AllComponentsDialog,
+  })),
 );
 
 const showAllComponentsDialog = (components) =>

@@ -9,9 +9,10 @@ import { OfferingSectionProps } from '../types';
 
 import { OPTION_FORM_ID } from './constants';
 
-const EditOptionDialog = lazyComponent(
-  () => import('./EditOptionDialog'),
-  'EditOptionDialog',
+const EditOptionDialog = lazyComponent(() =>
+  import('./EditOptionDialog').then((module) => ({
+    default: module.EditOptionDialog,
+  })),
 );
 
 export const EditOptionButton: FunctionComponent<

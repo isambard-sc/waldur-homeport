@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { EditCallProps } from '@waldur/proposals/types';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const EditGeneralInfoDialog = lazyComponent(
-  () => import('./EditGeneralInfoDialog'),
-  'EditGeneralInfoDialog',
+const EditGeneralInfoDialog = lazyComponent(() =>
+  import('./EditGeneralInfoDialog').then((module) => ({
+    default: module.EditGeneralInfoDialog,
+  })),
 );
 
 export const EditGeneralInfoButton = (props: EditCallProps) => {

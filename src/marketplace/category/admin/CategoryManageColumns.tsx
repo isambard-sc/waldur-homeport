@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-const CategoryManageColumnsDialog = lazyComponent(
-  () => import('./CategoryManageColumnsDialog'),
-  'CategoryManageColumnsDialog',
+const CategoryManageColumnsDialog = lazyComponent(() =>
+  import('./CategoryManageColumnsDialog').then((module) => ({
+    default: module.CategoryManageColumnsDialog,
+  })),
 );
 
 export const CategoryManageColumns = ({ row, refetch }) => {

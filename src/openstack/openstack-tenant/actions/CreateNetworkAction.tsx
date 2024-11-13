@@ -8,9 +8,10 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { TenantActionProps } from './types';
 
-const CreateNetworkDialog = lazyComponent(
-  () => import('./CreateNetworkDialog'),
-  'CreateNetworkDialog',
+const CreateNetworkDialog = lazyComponent(() =>
+  import('./CreateNetworkDialog').then((module) => ({
+    default: module.CreateNetworkDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

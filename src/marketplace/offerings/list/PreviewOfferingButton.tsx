@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { ACTIVE, PAUSED } from '../store/constants';
 
-const PreviewOfferingDialog = lazyComponent(
-  () => import('./PreviewOfferingDialog'),
-  'PreviewOfferingDialog',
+const PreviewOfferingDialog = lazyComponent(() =>
+  import('./PreviewOfferingDialog').then((module) => ({
+    default: module.PreviewOfferingDialog,
+  })),
 );
 export const PreviewOfferingButton = ({ row }) => {
   const dispatch = useDispatch();

@@ -19,7 +19,7 @@ interface PageBarTabProps {
   subTabs?: Omit<PageBarTabProps, 'children'>[];
 }
 
-export const PageBarTabItem = (props: PageBarTabProps) =>
+const PageBarTabItem = (props: PageBarTabProps) =>
   props.subTabs?.length > 0 ? (
     <div>
       <Button

@@ -1,27 +1,26 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 
-const Layout = lazyComponent(
-  () => import('@waldur/navigation/Layout'),
-  'Layout',
-);
-
-const LandingPage = lazyComponent(() => import('./LandingPage'), 'LandingPage');
-
-const LogoutPage = lazyComponent(() => import('./LogoutPage'), 'LogoutPage');
-
 export const states: StateDeclaration[] = [
   {
     name: 'home',
     url: '',
     abstract: true,
-    component: Layout,
+    component: lazyComponent(() =>
+      import('@waldur/navigation/Layout').then((module) => ({
+        default: module.Layout,
+      })),
+    ),
   },
 
   {
     name: 'login',
     url: '/login/?disableAutoLogin',
-    component: LandingPage,
+    component: lazyComponent(() =>
+      import('./LandingPage').then((module) => ({
+        default: module.LandingPage,
+      })),
+    ),
     params: {
       toState: '',
       toParams: {},
@@ -35,7 +34,11 @@ export const states: StateDeclaration[] = [
     name: 'layout',
     url: '',
     abstract: true,
-    component: Layout,
+    component: lazyComponent(() =>
+      import('@waldur/navigation/Layout').then((module) => ({
+        default: module.Layout,
+      })),
+    ),
     data: {
       auth: true,
     },
@@ -44,6 +47,8 @@ export const states: StateDeclaration[] = [
   {
     name: 'logout',
     url: '/logout/',
-    component: LogoutPage,
+    component: lazyComponent(() =>
+      import('./LogoutPage').then((module) => ({ default: module.LogoutPage })),
+    ),
   },
 ];

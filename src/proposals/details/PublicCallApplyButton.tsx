@@ -17,9 +17,10 @@ interface PublicCallApplyButtonProps {
   className?: string;
 }
 
-const ProposalCreateDialog = lazyComponent(
-  () => import('@waldur/proposals/proposal/create/AddProposalDialog'),
-  'AddProposalDialog',
+const ProposalCreateDialog = lazyComponent(() =>
+  import('@waldur/proposals/proposal/create/AddProposalDialog').then(
+    (module) => ({ default: module.AddProposalDialog }),
+  ),
 );
 
 export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({

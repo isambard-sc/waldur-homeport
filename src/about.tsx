@@ -9,9 +9,10 @@ import { lazyComponent } from './core/lazyComponent';
 import { loadContext } from './marketplace/resolve';
 import { useTitle } from './navigation/title';
 
-const Layout = lazyComponent(
-  () => import('@waldur/navigation/Layout'),
-  'Layout',
+const Layout = lazyComponent(() =>
+  import('@waldur/navigation/Layout').then((module) => ({
+    default: module.Layout,
+  })),
 );
 
 const TosPage = () => {

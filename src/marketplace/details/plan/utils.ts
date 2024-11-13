@@ -237,10 +237,3 @@ export const pricesSelector = (state, props): PricesData => {
   const limits: Limits = getLimits(state, props) || props.limits;
   return combinePrices(plan, limits, {}, props.offering);
 };
-
-export const getStartingPrice = (offering: Offering) => {
-  const prices = offering.plans.map((plan) => {
-    return combinePrices(plan, null, null, offering).total;
-  });
-  return Math.min(...prices);
-};

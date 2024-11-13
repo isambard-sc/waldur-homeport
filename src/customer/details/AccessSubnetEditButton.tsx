@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const AccessSubnetEditDialog = lazyComponent(
-  () => import('./AccessSubnetEditDialog'),
-  'AccessSubnetEditDialog',
+const AccessSubnetEditDialog = lazyComponent(() =>
+  import('./AccessSubnetEditDialog').then((module) => ({
+    default: module.AccessSubnetEditDialog,
+  })),
 );
 
 export const AccessSubnetEditButton = ({ row, refetch }) => {

@@ -8,9 +8,10 @@ import { ENV } from '@waldur/configs/default';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const BackendHealthStatusDialog = lazyComponent(
-  () => import('./BackendHealthStatusDialog'),
-  'BackendHealthStatusDialog',
+const BackendHealthStatusDialog = lazyComponent(() =>
+  import('./BackendHealthStatusDialog').then((module) => ({
+    default: module.BackendHealthStatusDialog,
+  })),
 );
 
 export const getBackendHealthStatus = async () => {

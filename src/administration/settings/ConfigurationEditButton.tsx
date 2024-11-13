@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ConfigurationEditDialog = lazyComponent(
-  () => import('./ConfigurationEditDialog'),
-  'ConfigurationEditDialog',
+const ConfigurationEditDialog = lazyComponent(() =>
+  import('./ConfigurationEditDialog').then((module) => ({
+    default: module.ConfigurationEditDialog,
+  })),
 );
 
 export const ConfigurationEditButton = ({ item, value }) => {

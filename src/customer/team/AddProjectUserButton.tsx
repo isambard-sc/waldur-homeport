@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { NestedCustomerPermission } from './types';
 
-const AddProjectUserDialog = lazyComponent(
-  () => import('./AddProjectUserDialog'),
-  'AddProjectUserDialog',
+const AddProjectUserDialog = lazyComponent(() =>
+  import('./AddProjectUserDialog').then((module) => ({
+    default: module.AddProjectUserDialog,
+  })),
 );
 
 interface AddProjectUserButtonProps {

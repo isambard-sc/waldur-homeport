@@ -6,9 +6,8 @@ import { validateRuntimeState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const AttachDialog = lazyComponent(
-  () => import('./AttachDialog'),
-  'AttachDialog',
+const AttachDialog = lazyComponent(() =>
+  import('./AttachDialog').then((module) => ({ default: module.AttachDialog })),
 );
 
 const validators = [validateRuntimeState('available')];

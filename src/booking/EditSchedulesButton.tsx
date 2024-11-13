@@ -10,9 +10,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { EDIT_SCHEDULES_FORM_ID } from './constants';
 
-const EditSchedulesDialog = lazyComponent(
-  () => import('./EditSchedulesDialog'),
-  'EditSchedulesDialog',
+const EditSchedulesDialog = lazyComponent(() =>
+  import('./EditSchedulesDialog').then((module) => ({
+    default: module.EditSchedulesDialog,
+  })),
 );
 
 export const EditSchedulesButton: FunctionComponent<{

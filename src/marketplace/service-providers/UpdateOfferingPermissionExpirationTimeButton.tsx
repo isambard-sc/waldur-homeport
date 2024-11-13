@@ -8,9 +8,10 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const UpdateOfferingPermissionExpirationTimeDialog = lazyComponent(
-  () => import('./UpdateOfferingPermissionExpirationTimeDialog'),
-  'UpdateOfferingPermissionExpirationTimeDialog',
+const UpdateOfferingPermissionExpirationTimeDialog = lazyComponent(() =>
+  import('./UpdateOfferingPermissionExpirationTimeDialog').then((module) => ({
+    default: module.UpdateOfferingPermissionExpirationTimeDialog,
+  })),
 );
 
 export const UpdateOfferingPermissionExpirationTimeButton: FunctionComponent<{

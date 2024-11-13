@@ -8,9 +8,10 @@ import { RootState } from '@waldur/store/reducers';
 import { issueCommentsFormToggle } from './actions';
 import { getIsFormToggleDisabled, getIsUiDisabled, getUser } from './selectors';
 
-const IssueCommentDeleteDialog = lazyComponent(
-  () => import('./IssueCommentDeleteDialog'),
-  'IssueCommentDeleteDialog',
+const IssueCommentDeleteDialog = lazyComponent(() =>
+  import('./IssueCommentDeleteDialog').then((module) => ({
+    default: module.IssueCommentDeleteDialog,
+  })),
 );
 
 export const CommentActions = ({ comment }) => {

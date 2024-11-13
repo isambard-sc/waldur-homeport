@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const ImportYAMLDialog = lazyComponent(
-  () => import('./ImportYAMLDialog'),
-  'ImportYAMLDialog',
+const ImportYAMLDialog = lazyComponent(() =>
+  import('./ImportYAMLDialog').then((module) => ({
+    default: module.ImportYAMLDialog,
+  })),
 );
 
 export const ImportYAMLButton: FunctionComponent<{ cluster_id }> = ({

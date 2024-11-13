@@ -31,7 +31,7 @@ const providerAutocomplete = async (
   );
 };
 
-export const SharedProviderFilter: FunctionComponent = () => (
+const SharedProviderFilter: FunctionComponent = () => (
   <Card>
     <Card.Body>
       <div className="row">

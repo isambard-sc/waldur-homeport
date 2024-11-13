@@ -10,9 +10,10 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 import { editRole, getRoles } from './api';
 
-const RoleEditDialog = lazyComponent(
-  () => import('./RoleEditDialog'),
-  'RoleEditDialog',
+const RoleEditDialog = lazyComponent(() =>
+  import('./RoleEditDialog').then((module) => ({
+    default: module.RoleEditDialog,
+  })),
 );
 
 export const RoleEditButton = ({ row, refetch }) => {

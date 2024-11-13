@@ -9,9 +9,10 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { getUser } from '@waldur/workspace/selectors';
 
-const CreateRobotAccountDialog = lazyComponent(
-  () => import('./CreateRobotAccountDialog'),
-  'CreateRobotAccountDialog',
+const CreateRobotAccountDialog = lazyComponent(() =>
+  import('./CreateRobotAccountDialog').then((module) => ({
+    default: module.CreateRobotAccountDialog,
+  })),
 );
 
 export const CreateRobotAccountAction: ActionItemType = ({ resource }) => {

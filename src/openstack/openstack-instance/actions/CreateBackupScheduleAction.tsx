@@ -9,9 +9,10 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { OpenStackInstance } from '../types';
 
-const CreateBackupScheduleDialog = lazyComponent(
-  () => import('./CreateBackupScheduleDialog'),
-  'CreateBackupScheduleDialog',
+const CreateBackupScheduleDialog = lazyComponent(() =>
+  import('./CreateBackupScheduleDialog').then((module) => ({
+    default: module.CreateBackupScheduleDialog,
+  })),
 );
 
 interface CreateBackupScheduleActionProps {

@@ -8,24 +8,28 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const CreateProviderDialog = lazyComponent(
-  () => import('./CreateProviderDialog'),
-  'CreateProviderDialog',
+const CreateProviderDialog = lazyComponent(() =>
+  import('./CreateProviderDialog').then((module) => ({
+    default: module.CreateProviderDialog,
+  })),
 );
 
-const UpdateProviderDialog = lazyComponent(
-  () => import('./UpdateProviderDialog'),
-  'UpdateProviderDialog',
+const UpdateProviderDialog = lazyComponent(() =>
+  import('./UpdateProviderDialog').then((module) => ({
+    default: module.UpdateProviderDialog,
+  })),
 );
 
-const ProviderUsersDialog = lazyComponent(
-  () => import('./ProviderUsersDialog'),
-  'ProviderUsersDialog',
+const ProviderUsersDialog = lazyComponent(() =>
+  import('./ProviderUsersDialog').then((module) => ({
+    default: module.ProviderUsersDialog,
+  })),
 );
 
-const ProviderDetailsDialog = lazyComponent(
-  () => import('./ProviderDetailsDialog'),
-  'ProviderDetailsDialog',
+const ProviderDetailsDialog = lazyComponent(() =>
+  import('./ProviderDetailsDialog').then((module) => ({
+    default: module.ProviderDetailsDialog,
+  })),
 );
 
 interface ProviderCardProps {

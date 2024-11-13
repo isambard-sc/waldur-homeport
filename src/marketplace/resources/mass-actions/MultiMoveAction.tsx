@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
-const MultiMoveDialog = lazyComponent(
-  () => import('./MultiMoveDialog'),
-  'MultiMoveDialog',
+const MultiMoveDialog = lazyComponent(() =>
+  import('./MultiMoveDialog').then((module) => ({
+    default: module.MultiMoveDialog,
+  })),
 );
 
 export const MultiMoveAction = ({ rows, refetch }) => {

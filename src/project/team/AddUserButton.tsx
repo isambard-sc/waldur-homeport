@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const AddUserDialog = lazyComponent(
-  () => import('./AddUserDialog'),
-  'AddUserDialog',
+const AddUserDialog = lazyComponent(() =>
+  import('./AddUserDialog').then((module) => ({
+    default: module.AddUserDialog,
+  })),
 );
 
 export const AddUserButton: React.FC<{ refetch }> = ({ refetch }) => {

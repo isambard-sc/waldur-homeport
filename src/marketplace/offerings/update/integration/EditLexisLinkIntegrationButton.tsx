@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { EDIT_LEXIS_LINK_INTEGRATION_FORM_ID } from './constants';
 
-const EditLexisLinkIntegrationDialog = lazyComponent(
-  () => import('./EditLexisLinkIntegrationDialog'),
-  'EditLexisLinkIntegrationDialog',
+const EditLexisLinkIntegrationDialog = lazyComponent(() =>
+  import('./EditLexisLinkIntegrationDialog').then((module) => ({
+    default: module.EditLexisLinkIntegrationDialog,
+  })),
 );
 
 export const EditLexisLinkIntegrationButton: FunctionComponent<{

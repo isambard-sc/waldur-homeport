@@ -34,9 +34,10 @@ import { getUser } from '@waldur/workspace/selectors';
 import { CreatePageSidebar } from './CreatePageSidebar';
 import { createReviewSteps } from './steps/steps';
 
-const CommentFormDialog = lazyComponent(
-  () => import('./CommentFormDialog'),
-  'CommentFormDialog',
+const CommentFormDialog = lazyComponent(() =>
+  import('./CommentFormDialog').then((module) => ({
+    default: module.CommentFormDialog,
+  })),
 );
 
 const loadData = async (reviewUuid) => {

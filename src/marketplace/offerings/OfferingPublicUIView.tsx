@@ -18,41 +18,50 @@ import { PUBLIC_OFFERING_DATA_QUERY_KEY } from './constants';
 import { OfferingViewHero } from './OfferingViewHero';
 import { getPublicOfferingBreadcrumbItems } from './utils';
 
-const PublicOfferingInfo = lazyComponent(
-  () => import('./details/PublicOfferingInfo'),
-  'PublicOfferingInfo',
+const PublicOfferingInfo = lazyComponent(() =>
+  import('./details/PublicOfferingInfo').then((module) => ({
+    default: module.PublicOfferingInfo,
+  })),
 );
-const PublicOfferingComponents = lazyComponent(
-  () => import('./details/PublicOfferingComponents'),
-  'PublicOfferingComponents',
+const PublicOfferingComponents = lazyComponent(() =>
+  import('./details/PublicOfferingComponents').then((module) => ({
+    default: module.PublicOfferingComponents,
+  })),
 );
-const PublicOfferingImages = lazyComponent(
-  () => import('./details/PublicOfferingImages'),
-  'PublicOfferingImages',
+const PublicOfferingImages = lazyComponent(() =>
+  import('./details/PublicOfferingImages').then((module) => ({
+    default: module.PublicOfferingImages,
+  })),
 );
-const PublicOfferingGettingStarted = lazyComponent(
-  () => import('./details/PublicOfferingGettingStarted'),
-  'PublicOfferingGettingStarted',
+const PublicOfferingGettingStarted = lazyComponent(() =>
+  import('./details/PublicOfferingGettingStarted').then((module) => ({
+    default: module.PublicOfferingGettingStarted,
+  })),
 );
-const PublicOfferingFAQ = lazyComponent(
-  () => import('./details/PublicOfferingFAQ'),
-  'PublicOfferingFAQ',
+const PublicOfferingFAQ = lazyComponent(() =>
+  import('./details/PublicOfferingFAQ').then((module) => ({
+    default: module.PublicOfferingFAQ,
+  })),
 );
-const PublicOfferingReviews = lazyComponent(
-  () => import('./details/PublicOfferingReviews'),
-  'PublicOfferingReviews',
+const PublicOfferingReviews = lazyComponent(() =>
+  import('./details/PublicOfferingReviews').then((module) => ({
+    default: module.PublicOfferingReviews,
+  })),
 );
-const PublicOfferingPricing = lazyComponent(
-  () => import('./details/PublicOfferingPricing'),
-  'PublicOfferingPricing',
+const PublicOfferingPricing = lazyComponent(() =>
+  import('./details/PublicOfferingPricing').then((module) => ({
+    default: module.PublicOfferingPricing,
+  })),
 );
-const PublicOfferingLocation = lazyComponent(
-  () => import('./details/PublicOfferingLocation'),
-  'PublicOfferingLocation',
+const PublicOfferingLocation = lazyComponent(() =>
+  import('./details/PublicOfferingLocation').then((module) => ({
+    default: module.PublicOfferingLocation,
+  })),
 );
-const PublicOfferingGetHelp = lazyComponent(
-  () => import('./details/PublicOfferingGetHelp'),
-  'PublicOfferingGetHelp',
+const PublicOfferingGetHelp = lazyComponent(() =>
+  import('./details/PublicOfferingGetHelp').then((module) => ({
+    default: module.PublicOfferingGetHelp,
+  })),
 );
 
 const getTabs = (offering?): PageBarTab[] => {

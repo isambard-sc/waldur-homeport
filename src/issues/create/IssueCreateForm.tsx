@@ -42,7 +42,7 @@ interface OwnProps {
   hideProjectAndResourceFields?: boolean;
 }
 
-export const issueCreateProjectSelector = (state: RootState) =>
+const issueCreateProjectSelector = (state: RootState) =>
   formValueSelector(ISSUE_CREATION_FORM_ID)(state, 'project');
 
 const mapStateToProps = (_, ownProps: OwnProps) => {

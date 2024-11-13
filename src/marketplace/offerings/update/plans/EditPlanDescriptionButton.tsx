@@ -9,9 +9,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { EDIT_PLAN_FORM_ID } from './constants';
 
-const EditPlanDescriptionDialog = lazyComponent(
-  () => import('./EditPlanDescriptionDialog'),
-  'EditPlanDescriptionDialog',
+const EditPlanDescriptionDialog = lazyComponent(() =>
+  import('./EditPlanDescriptionDialog').then((module) => ({
+    default: module.EditPlanDescriptionDialog,
+  })),
 );
 
 export const EditPlanDescriptionButton: FunctionComponent<{

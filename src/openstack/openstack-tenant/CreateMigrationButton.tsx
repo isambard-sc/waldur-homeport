@@ -7,9 +7,10 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { TenantActionProps } from './actions/types';
 
-const MigrateTenantDialog = lazyComponent(
-  () => import('./actions/MigrateTenantDialog'),
-  'MigrateTenantDialog',
+const MigrateTenantDialog = lazyComponent(() =>
+  import('./actions/MigrateTenantDialog').then((module) => ({
+    default: module.MigrateTenantDialog,
+  })),
 );
 
 export const CreateMigrationButton: FC<TenantActionProps> = ({

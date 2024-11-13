@@ -4,29 +4,35 @@ import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
 import { INSTANCE_TYPE } from '../constants';
 
-const BackupsSchedulesList = lazyComponent(
-  () => import('../openstack-backup-schedule/BackupSchedulesList'),
-  'BackupsSchedulesList',
+const BackupsSchedulesList = lazyComponent(() =>
+  import('../openstack-backup-schedule/BackupSchedulesList').then((module) => ({
+    default: module.BackupsSchedulesList,
+  })),
 );
-const BackupsList = lazyComponent(
-  () => import('../openstack-backup/BackupsList'),
-  'BackupsList',
+const BackupsList = lazyComponent(() =>
+  import('../openstack-backup/BackupsList').then((module) => ({
+    default: module.BackupsList,
+  })),
 );
-const InstanceVolumesList = lazyComponent(
-  () => import('../openstack-volume/InstanceVolumesList'),
-  'InstanceVolumesList',
+const InstanceVolumesList = lazyComponent(() =>
+  import('../openstack-volume/InstanceVolumesList').then((module) => ({
+    default: module.InstanceVolumesList,
+  })),
 );
-const InternalIpsList = lazyComponent(
-  () => import('./InternalIpsList'),
-  'InternalIpsList',
+const InternalIpsList = lazyComponent(() =>
+  import('./InternalIpsList').then((module) => ({
+    default: module.InternalIpsList,
+  })),
 );
-const FloatingIpsList = lazyComponent(
-  () => import('./FloatingIpsList'),
-  'FloatingIpsList',
+const FloatingIpsList = lazyComponent(() =>
+  import('./FloatingIpsList').then((module) => ({
+    default: module.FloatingIpsList,
+  })),
 );
-const OpenStackSecurityGroupsList = lazyComponent(
-  () => import('./OpenStackSecurityGroupsList'),
-  'OpenStackSecurityGroupsList',
+const OpenStackSecurityGroupsList = lazyComponent(() =>
+  import('./OpenStackSecurityGroupsList').then((module) => ({
+    default: module.OpenStackSecurityGroupsList,
+  })),
 );
 
 export const OpenStackInstanceTabConfiguration: ResourceTabsConfiguration = {

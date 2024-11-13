@@ -87,7 +87,7 @@ const LayoutProvider: FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-export { LayoutContext, LayoutProvider };
+export { LayoutProvider };
 
 export function useLayout() {
   return useContext(LayoutContext);

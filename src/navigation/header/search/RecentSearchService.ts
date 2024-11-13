@@ -61,7 +61,7 @@ class RecentSearchServiceClass {
   };
 }
 
-export const RecentSearchService = new RecentSearchServiceClass();
+const RecentSearchService = new RecentSearchServiceClass();
 
 export const useRecentSearch = () => {
   const getRecentSearchList = () => RecentSearchService.list().reverse();

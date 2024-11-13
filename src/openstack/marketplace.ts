@@ -4,17 +4,20 @@ import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { TENANT_TYPE } from './constants';
 
-const OpenStackPackageDetails = lazyComponent(
-  () => import('./OpenStackPackageDetails'),
-  'OpenStackPackageDetails',
+const OpenStackPackageDetails = lazyComponent(() =>
+  import('./OpenStackPackageDetails').then((module) => ({
+    default: module.OpenStackPackageDetails,
+  })),
 );
-const OpenStackProvisioningConfigForm = lazyComponent(
-  () => import('./OpenStackProvisioningConfigForm'),
-  'OpenStackProvisioningConfigForm',
+const OpenStackProvisioningConfigForm = lazyComponent(() =>
+  import('./OpenStackProvisioningConfigForm').then((module) => ({
+    default: module.OpenStackProvisioningConfigForm,
+  })),
 );
-const OpenstackTenantOrder = lazyComponent(
-  () => import('./deploy/OpenstackTenantOrder'),
-  'OpenstackTenantOrder',
+const OpenstackTenantOrder = lazyComponent(() =>
+  import('./deploy/OpenstackTenantOrder').then((module) => ({
+    default: module.OpenstackTenantOrder,
+  })),
 );
 
 const serializeVolumeTypeLimits = (limits) =>

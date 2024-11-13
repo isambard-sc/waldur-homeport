@@ -32,18 +32,6 @@ export const formatRole = (name: string) => {
   return role?.description || role?.name;
 };
 
-export const getCustomerPermission = (user, customer) => {
-  if (!user || !user.permissions || !customer) {
-    return null;
-  }
-  return user.permissions?.find(
-    (permission) =>
-      customer &&
-      permission.scope_uuid === customer.uuid &&
-      permission.scope_type === 'customer',
-  );
-};
-
 export const getProjectPermission = (user) =>
   user.permissions?.find(({ scope_type }) => scope_type === 'project');
 

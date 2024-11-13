@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const BackupRestoreDialog = lazyComponent(
-  () => import('./BackupRestoreDialog'),
-  'BackupRestoreDialog',
+const BackupRestoreDialog = lazyComponent(() =>
+  import('./BackupRestoreDialog').then((module) => ({
+    default: module.BackupRestoreDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

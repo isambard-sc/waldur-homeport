@@ -8,9 +8,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { useModalDialogCallback } from '@waldur/resource/actions/useModalDialogCallback';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 
-const TerminateDialog = lazyComponent(
-  () => import('./TerminateDialog'),
-  'TerminateDialog',
+const TerminateDialog = lazyComponent(() =>
+  import('./TerminateDialog').then((module) => ({
+    default: module.TerminateDialog,
+  })),
 );
 
 const validators = [validateState('OK', 'Erred')];

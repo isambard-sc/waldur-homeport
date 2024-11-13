@@ -11,9 +11,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { useModalDialogCallback } from '@waldur/resource/actions/useModalDialogCallback';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 
-const CreateLexisLinkDialog = lazyComponent(
-  () => import('./CreateLexisLinkDialog'),
-  'CreateLexisLinkDialog',
+const CreateLexisLinkDialog = lazyComponent(() =>
+  import('./CreateLexisLinkDialog').then((module) => ({
+    default: module.CreateLexisLinkDialog,
+  })),
 );
 
 const validators = [validateState('OK', 'Erred')];

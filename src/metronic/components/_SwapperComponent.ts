@@ -6,7 +6,7 @@ import {
   throttle,
 } from '../_utils/index';
 
-export class SwapperStore {
+class SwapperStore {
   static store: Map<string, SwapperComponent> = new Map();
 
   public static set(
@@ -217,4 +217,4 @@ window.addEventListener('resize', function () {
   );
 });
 
-export { SwapperComponent, defaultSwapperOptions, defaultSwapperQueires };
+export { SwapperComponent };

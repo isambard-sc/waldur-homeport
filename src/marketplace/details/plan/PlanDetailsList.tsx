@@ -36,9 +36,7 @@ const FixedRows = (props: { components: Component[] }) => (
   </>
 );
 
-export const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (
-  props,
-) => {
+const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (props) => {
   if (props.components.length === 0) {
     return null;
   }

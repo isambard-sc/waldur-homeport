@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const SecurityGroupEditorDialog = lazyComponent(
-  () => import('./SecurityGroupEditorDialog'),
-  'SecurityGroupEditorDialog',
+const SecurityGroupEditorDialog = lazyComponent(() =>
+  import('./SecurityGroupEditorDialog').then((module) => ({
+    default: module.SecurityGroupEditorDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

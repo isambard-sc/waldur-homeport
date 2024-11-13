@@ -4,13 +4,15 @@ import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
 import { VOLUME_TYPE } from '../constants';
 
-const SnapshotSchedulesList = lazyComponent(
-  () => import('../openstack-snapshot-schedule/SnapshotSchedulesList'),
-  'SnapshotSchedulesList',
+const SnapshotSchedulesList = lazyComponent(() =>
+  import('../openstack-snapshot-schedule/SnapshotSchedulesList').then(
+    (module) => ({ default: module.SnapshotSchedulesList }),
+  ),
 );
-const VolumeSnapshotsList = lazyComponent(
-  () => import('./VolumeSnapshotsList'),
-  'VolumeSnapshotsList',
+const VolumeSnapshotsList = lazyComponent(() =>
+  import('./VolumeSnapshotsList').then((module) => ({
+    default: module.VolumeSnapshotsList,
+  })),
 );
 
 export const OpenStackVolumeTabConfiguration: ResourceTabsConfiguration = {

@@ -7,21 +7,25 @@ import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { OFFERING_TYPE_BOOKING } from './constants';
 
-const BookingDetails = lazyComponent(
-  () => import('@waldur/booking/BookingDetails'),
-  'BookingDetails',
+const BookingDetails = lazyComponent(() =>
+  import('@waldur/booking/BookingDetails').then((module) => ({
+    default: module.BookingDetails,
+  })),
 );
-const BookingCheckoutSummary = lazyComponent(
-  () => import('@waldur/booking/BookingCheckoutSummary'),
-  'BookingCheckoutSummary',
+const BookingCheckoutSummary = lazyComponent(() =>
+  import('@waldur/booking/BookingCheckoutSummary').then((module) => ({
+    default: module.BookingCheckoutSummary,
+  })),
 );
-const UserPluginOptionsForm = lazyComponent(
-  () => import('@waldur/marketplace/UserPluginOptionsForm'),
-  'UserPluginOptionsForm',
+const UserPluginOptionsForm = lazyComponent(() =>
+  import('@waldur/marketplace/UserPluginOptionsForm').then((module) => ({
+    default: module.UserPluginOptionsForm,
+  })),
 );
-const BookingOrderForm = lazyComponent(
-  () => import('./deploy/BookingOrderForm'),
-  'BookingOrderForm',
+const BookingOrderForm = lazyComponent(() =>
+  import('./deploy/BookingOrderForm').then((module) => ({
+    default: module.BookingOrderForm,
+  })),
 );
 
 /* Since back-end doesn't allow slots in the past,

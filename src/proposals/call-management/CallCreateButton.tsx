@@ -4,9 +4,10 @@ import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const CallCreateDialog = lazyComponent(
-  () => import('./CallFormDialog'),
-  'CallFormDialog',
+const CallCreateDialog = lazyComponent(() =>
+  import('./CallFormDialog').then((module) => ({
+    default: module.CallFormDialog,
+  })),
 );
 
 const callCreateDialog = (refetch) =>

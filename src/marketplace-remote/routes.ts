@@ -2,21 +2,15 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 
-const OrganizationProjectUpdateRequestsList = lazyComponent(
-  () => import('./OrganizationProjectUpdateRequestsList'),
-  'OrganizationProjectUpdateRequestsList',
-);
-
-const ProjectUpdateRequestsList = lazyComponent(
-  () => import('./ProjectUpdateRequestsList'),
-  'ProjectUpdateRequestsList',
-);
-
 export const states: StateDeclaration[] = [
   {
     name: 'marketplace-organization-project-update-requests',
     url: 'marketplace-project-update-requests/',
-    component: OrganizationProjectUpdateRequestsList,
+    component: lazyComponent(() =>
+      import('./OrganizationProjectUpdateRequestsList').then((module) => ({
+        default: module.OrganizationProjectUpdateRequestsList,
+      })),
+    ),
     parent: 'organization',
     data: {
       breadcrumb: () => translate('Project updates'),
@@ -26,7 +20,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-project-update-requests',
     url: 'marketplace-project-update-requests/',
-    component: ProjectUpdateRequestsList,
+    component: lazyComponent(() =>
+      import('./ProjectUpdateRequestsList').then((module) => ({
+        default: module.ProjectUpdateRequestsList,
+      })),
+    ),
     parent: 'project',
     data: {
       breadcrumb: () => translate('Project updates'),

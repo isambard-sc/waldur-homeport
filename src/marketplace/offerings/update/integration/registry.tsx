@@ -12,7 +12,7 @@ import { ProviderConfig } from './types';
 
 const providers: { [key: string]: ProviderConfig } = {};
 
-export const register = (provider: ProviderConfig) => {
+const register = (provider: ProviderConfig) => {
   providers[provider.type] = provider;
 };
 

@@ -13,9 +13,10 @@ import { Customer } from '@waldur/workspace/types';
 
 import { updateOrganization } from './api';
 
-const SetLocationDialog = lazyComponent(
-  () => import('@waldur/map/SetLocationDialog'),
-  'SetLocationDialog',
+const SetLocationDialog = lazyComponent(() =>
+  import('@waldur/map/SetLocationDialog').then((module) => ({
+    default: module.SetLocationDialog,
+  })),
 );
 
 interface SetLocationButtonProps {

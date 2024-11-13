@@ -1,17 +1,20 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { ResourceSummaryConfiguration } from '@waldur/resource/summary/types';
 
-const VMwareDiskSummary = lazyComponent(
-  () => import('./VMwareDiskSummary'),
-  'VMwareDiskSummary',
+const VMwareDiskSummary = lazyComponent(() =>
+  import('./VMwareDiskSummary').then((module) => ({
+    default: module.VMwareDiskSummary,
+  })),
 );
-const VMwarePortSummary = lazyComponent(
-  () => import('./VMwarePortSummary'),
-  'VMwarePortSummary',
+const VMwarePortSummary = lazyComponent(() =>
+  import('./VMwarePortSummary').then((module) => ({
+    default: module.VMwarePortSummary,
+  })),
 );
-const VMwareVirtualMachineSummary = lazyComponent(
-  () => import('./VMwareVirtualMachineSummary'),
-  'VMwareVirtualMachineSummary',
+const VMwareVirtualMachineSummary = lazyComponent(() =>
+  import('./VMwareVirtualMachineSummary').then((module) => ({
+    default: module.VMwareVirtualMachineSummary,
+  })),
 );
 
 export const VMwareVirtualMachineSummaryConfiguration: ResourceSummaryConfiguration =

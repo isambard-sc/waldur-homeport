@@ -8,9 +8,10 @@ import { useModal } from '@waldur/modal/hooks';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const CustomerCreateDialog = lazyComponent(
-  () => import('@waldur/customer/create/CustomerCreateDialog'),
-  'CustomerCreateDialog',
+const CustomerCreateDialog = lazyComponent(() =>
+  import('@waldur/customer/create/CustomerCreateDialog').then((module) => ({
+    default: module.CustomerCreateDialog,
+  })),
 );
 
 export const OrganizationCreateButton: FunctionComponent = () => {

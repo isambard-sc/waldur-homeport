@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ATTRIBUTE_FORM_ID } from './constants';
 import { EditAttributeDialogProps } from './types';
 
-const EditAttributeDialog = lazyComponent(
-  () => import('./EditAttributeDialog'),
-  'EditAttributeDialog',
+const EditAttributeDialog = lazyComponent(() =>
+  import('./EditAttributeDialog').then((module) => ({
+    default: module.EditAttributeDialog,
+  })),
 );
 
 export const EditAttributeButton: FunctionComponent<

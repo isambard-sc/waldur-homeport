@@ -21,9 +21,10 @@ import {
   TableOptionsType,
 } from './types';
 
-const TableFilterContainer = lazyComponent(
-  () => import('./TableFilterContainer'),
-  'TableFilterContainer',
+const TableFilterContainer = lazyComponent(() =>
+  import('./TableFilterContainer').then((module) => ({
+    default: module.TableFilterContainer,
+  })),
 );
 
 const getDefaultTitle = (state: RootState) => {

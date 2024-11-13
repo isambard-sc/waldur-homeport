@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { ATTRIBUTE_FORM_ID } from './constants';
 
-const EditCategoryDialog = lazyComponent(
-  () => import('./EditCategoryDialog'),
-  'EditCategoryDialog',
+const EditCategoryDialog = lazyComponent(() =>
+  import('./EditCategoryDialog').then((module) => ({
+    default: module.EditCategoryDialog,
+  })),
 );
 
 export const EditCategoryButton: FunctionComponent<{

@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const CampaignCreateDialog = lazyComponent(
-  () => import('./CampaignCreateDialog'),
-  'CampaignCreateDialog',
+const CampaignCreateDialog = lazyComponent(() =>
+  import('./CampaignCreateDialog').then((module) => ({
+    default: module.CampaignCreateDialog,
+  })),
 );
 
 export const CampaignCreateButton: FunctionComponent<{ refetch }> = ({

@@ -9,7 +9,7 @@ import { TableFilterItem } from '@waldur/table/TableFilterItem';
 import { getQuotas } from './constants';
 import { QuotaChoice } from './types';
 
-export const PureCustomerQuotasFilter: FunctionComponent<{}> = () => (
+const PureCustomerQuotasFilter: FunctionComponent<{}> = () => (
   <TableFilterItem
     title={translate('Quota')}
     name="quota"

@@ -27,7 +27,7 @@ import { ResourceSummaryConfiguration } from './types';
 
 const registry: Record<string, ResourceSummaryConfiguration> = {};
 
-export const register = (configuration: ResourceSummaryConfiguration) => {
+const register = (configuration: ResourceSummaryConfiguration) => {
   registry[configuration.type] = configuration;
 };
 

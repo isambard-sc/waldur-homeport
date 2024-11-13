@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { GETTING_STARTED_FORM_ID } from './constants';
 
-const EditGettingStartedDialog = lazyComponent(
-  () => import('./EditGettingStartedDialog'),
-  'EditGettingStartedDialog',
+const EditGettingStartedDialog = lazyComponent(() =>
+  import('./EditGettingStartedDialog').then((module) => ({
+    default: module.EditGettingStartedDialog,
+  })),
 );
 
 export const EditGettingStartedButton: FC<{ offering; refetch }> = (props) => {

@@ -8,7 +8,7 @@ import { PeriodFilterField } from '@waldur/issues/feedback/PeriodFilterField';
 import { UserAutocomplete } from '@waldur/issues/feedback/UserAutocomplete';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
-export const PureSupportFeedbackListFilter = () => (
+const PureSupportFeedbackListFilter = () => (
   <>
     <TableFilterItem
       title={translate('Date')}

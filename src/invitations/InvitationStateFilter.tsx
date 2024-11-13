@@ -4,7 +4,7 @@ import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
-export const choices = [
+const choices = [
   {
     label: translate('Requested'),
     value: 'requested',

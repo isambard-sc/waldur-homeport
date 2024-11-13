@@ -4,9 +4,10 @@ import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const PaymentProfileCreateDialog = lazyComponent(
-  () => import('./PaymentProfileCreateDialog'),
-  'PaymentProfileCreateDialog',
+const PaymentProfileCreateDialog = lazyComponent(() =>
+  import('./PaymentProfileCreateDialog').then((module) => ({
+    default: module.PaymentProfileCreateDialog,
+  })),
 );
 
 export const PaymentProfileCreateButton = (props) => {

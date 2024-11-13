@@ -11,9 +11,10 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { OpenStackInstance } from '../types';
 
-const AttachVolumeDialog = lazyComponent(
-  () => import('./AttachVolumeDialog'),
-  'AttachVolumeDialog',
+const AttachVolumeDialog = lazyComponent(() =>
+  import('./AttachVolumeDialog').then((module) => ({
+    default: module.AttachVolumeDialog,
+  })),
 );
 
 interface AttachVolumeActionProps {

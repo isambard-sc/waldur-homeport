@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const HPAUpdateDialog = lazyComponent(
-  () => import('./HPAUpdateDialog'),
-  'HPAUpdateDialog',
+const HPAUpdateDialog = lazyComponent(() =>
+  import('./HPAUpdateDialog').then((module) => ({
+    default: module.HPAUpdateDialog,
+  })),
 );
 
 const editHPADialog = (hpa) =>

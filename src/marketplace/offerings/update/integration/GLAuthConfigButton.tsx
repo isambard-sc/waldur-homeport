@@ -10,9 +10,10 @@ import { getProviderOfferingGLAuthConfig } from '@waldur/marketplace/common/api'
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const GLAuthConfigDialog = lazyComponent(
-  () => import('./GLAuthConfigDialog'),
-  'GLAuthConfigDialog',
+const GLAuthConfigDialog = lazyComponent(() =>
+  import('./GLAuthConfigDialog').then((module) => ({
+    default: module.GLAuthConfigDialog,
+  })),
 );
 
 export const GLAuthConfigButton: FC<{

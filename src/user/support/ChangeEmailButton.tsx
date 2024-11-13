@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { UserDetails } from '@waldur/workspace/types';
 
-const UserEmailChangeDialog = lazyComponent(
-  () => import('./UserEmailChangeDialog'),
-  'UserEmailChangeDialog',
+const UserEmailChangeDialog = lazyComponent(() =>
+  import('./UserEmailChangeDialog').then((module) => ({
+    default: module.UserEmailChangeDialog,
+  })),
 );
 
 interface ChangeEmailButtonProps {

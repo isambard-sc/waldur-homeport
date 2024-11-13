@@ -118,9 +118,7 @@ const ComponentRowTotal = (props: {
   );
 };
 
-export const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (
-  props,
-) => {
+const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (props) => {
   if (props.components.length === 0) {
     return null;
   }

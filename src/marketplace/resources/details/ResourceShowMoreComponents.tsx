@@ -6,9 +6,10 @@ import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ResourceComponentsDialog = lazyComponent(
-  () => import('./ResourceComponentsDialog'),
-  'ResourceComponentsDialog',
+const ResourceComponentsDialog = lazyComponent(() =>
+  import('./ResourceComponentsDialog').then((module) => ({
+    default: module.ResourceComponentsDialog,
+  })),
 );
 
 const showResourceComponentsDialog = (resource, components) =>

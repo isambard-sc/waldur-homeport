@@ -13,9 +13,10 @@ import { ServiceProvider } from '../types';
 
 import { OfferingUser } from './types';
 
-const ProviderOfferingUserUpdateDialog = lazyComponent(
-  () => import('./ProviderOfferingUserUpdateDialog'),
-  'ProviderOfferingUserUpdateDialog',
+const ProviderOfferingUserUpdateDialog = lazyComponent(() =>
+  import('./ProviderOfferingUserUpdateDialog').then((module) => ({
+    default: module.ProviderOfferingUserUpdateDialog,
+  })),
 );
 
 export const ProviderOfferingUserUpdateButton: FC<{

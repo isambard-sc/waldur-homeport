@@ -6,9 +6,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { EditProjectProps } from '../types';
 
-const EditFieldDialog = lazyComponent(
-  () => import('./EditFieldDialog'),
-  'EditFieldDialog',
+const EditFieldDialog = lazyComponent(() =>
+  import('./EditFieldDialog').then((module) => ({
+    default: module.EditFieldDialog,
+  })),
 );
 
 export const FieldEditButton = (props: EditProjectProps) => {

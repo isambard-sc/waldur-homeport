@@ -8,9 +8,10 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
-const MoveResourceDialog = lazyComponent(
-  () => import('./MoveResourceDialog'),
-  'MoveResourceDialog',
+const MoveResourceDialog = lazyComponent(() =>
+  import('./MoveResourceDialog').then((module) => ({
+    default: module.MoveResourceDialog,
+  })),
 );
 
 export const MoveResourceAction: ActionItemType = ({ resource, refetch }) => {

@@ -11,9 +11,10 @@ import { Proposal, ProposalResource } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const ResourceRequestFormDialog = lazyComponent(
-  () => import('./ResourceRequestFormDialog'),
-  'ResourceRequestFormDialog',
+const ResourceRequestFormDialog = lazyComponent(() =>
+  import('./ResourceRequestFormDialog').then((module) => ({
+    default: module.ResourceRequestFormDialog,
+  })),
 );
 
 interface ResourceRequestItemActionsProps {

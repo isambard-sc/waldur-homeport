@@ -18,9 +18,10 @@ import { createBroadcast, sendBroadcast, updateBroadcast } from './api';
 import { BroadcastFormData } from './types';
 import { serializeBroadcast } from './utils';
 
-const BroadcastSaveAsTemplateDialog = lazyComponent(
-  () => import('./BroadcastSaveAsTemplateDialog'),
-  'BroadcastSaveAsTemplateDialog',
+const BroadcastSaveAsTemplateDialog = lazyComponent(() =>
+  import('./BroadcastSaveAsTemplateDialog').then((module) => ({
+    default: module.BroadcastSaveAsTemplateDialog,
+  })),
 );
 
 export const BroadcastFooter = ({

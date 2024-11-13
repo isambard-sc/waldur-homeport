@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { OVERVIEW_FORM_ID } from './constants';
 import { EditOfferingProps } from './types';
 
-const EditOverviewDialog = lazyComponent(
-  () => import('./EditOverviewDialog'),
-  'EditOverviewDialog',
+const EditOverviewDialog = lazyComponent(() =>
+  import('./EditOverviewDialog').then((module) => ({
+    default: module.EditOverviewDialog,
+  })),
 );
 
 export const EditOverviewButton: FC<EditOfferingProps> = (props) => {

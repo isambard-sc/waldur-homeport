@@ -6,9 +6,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 import { Call } from '@waldur/proposals/types';
 
-const CallRoundCreateDialog = lazyComponent(
-  () => import('./CallRoundCreateDialog'),
-  'CallRoundCreateDialog',
+const CallRoundCreateDialog = lazyComponent(() =>
+  import('./CallRoundCreateDialog').then((module) => ({
+    default: module.CallRoundCreateDialog,
+  })),
 );
 
 interface RoundCreateButtonProps {

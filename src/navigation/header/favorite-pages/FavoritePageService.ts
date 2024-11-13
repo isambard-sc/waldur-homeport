@@ -87,7 +87,7 @@ class FavoritePageServiceClass {
   };
 }
 
-export const FavoritePageService = new FavoritePageServiceClass();
+const FavoritePageService = new FavoritePageServiceClass();
 
 const getDataForFavoritePage = async (
   state: StateDeclaration,

@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const CampaignUpdateDialog = lazyComponent(
-  () => import('./CampaignUpdateDialog'),
-  'CampaignUpdateDialog',
+const CampaignUpdateDialog = lazyComponent(() =>
+  import('./CampaignUpdateDialog').then((module) => ({
+    default: module.CampaignUpdateDialog,
+  })),
 );
 
 export const ProviderCampaignUpdateButton: FunctionComponent<{

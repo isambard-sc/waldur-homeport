@@ -6,9 +6,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 import { Customer, Project } from '@waldur/workspace/types';
 
-const MarketplacePopup = lazyComponent(
-  () => import('@waldur/navigation/sidebar/marketplace-popup/MarketplacePopup'),
-  'MarketplacePopup',
+const MarketplacePopup = lazyComponent(() =>
+  import('@waldur/navigation/sidebar/marketplace-popup/MarketplacePopup').then(
+    (module) => ({ default: module.MarketplacePopup }),
+  ),
 );
 
 interface CreateResourceButtonProps {

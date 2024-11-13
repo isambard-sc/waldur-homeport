@@ -4,9 +4,10 @@ import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { VMWARE_VM } from './constants';
 
-const VmwareOrderForm = lazyComponent(
-  () => import('./deploy/VmwareOrderForm'),
-  'VmwareOrderForm',
+const VmwareOrderForm = lazyComponent(() =>
+  import('./deploy/VmwareOrderForm').then((module) => ({
+    default: module.VmwareOrderForm,
+  })),
 );
 
 const serializer = ({

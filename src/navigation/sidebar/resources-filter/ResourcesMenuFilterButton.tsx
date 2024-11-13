@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { HeaderButtonBullet } from '@waldur/navigation/header/HeaderButtonBullet';
 import { selectFiltersStorage } from '@waldur/table/selectors';
 
-const FilterByOrgAndProjectDialog = lazyComponent(
-  () => import('./FilterByOrgAndProjectDialog'),
-  'FilterByOrgAndProjectDialog',
+const FilterByOrgAndProjectDialog = lazyComponent(() =>
+  import('./FilterByOrgAndProjectDialog').then((module) => ({
+    default: module.FilterByOrgAndProjectDialog,
+  })),
 );
 
 export const ResourcesMenuFilterButton = () => {

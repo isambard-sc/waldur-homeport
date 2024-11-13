@@ -12,9 +12,10 @@ import { showErrorResponse } from '@waldur/store/notify';
 import { updateProjectCredit } from './api';
 import { ProjectCreditFormData } from './types';
 
-const ProjectCreditFormDialog = lazyComponent(
-  () => import('./ProjectCreditFormDialog'),
-  'ProjectCreditFormDialog',
+const ProjectCreditFormDialog = lazyComponent(() =>
+  import('./ProjectCreditFormDialog').then((module) => ({
+    default: module.ProjectCreditFormDialog,
+  })),
 );
 
 export const ProjectEditCreditButton = ({ row, refetch }) => {

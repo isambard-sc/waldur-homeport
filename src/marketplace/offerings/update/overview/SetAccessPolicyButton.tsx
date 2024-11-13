@@ -7,9 +7,10 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { isVisible } from '../../actions/utils';
 
-const SetAccessPolicyDialog = lazyComponent(
-  () => import('../../actions/SetAccessPolicyDialog'),
-  'SetAccessPolicyDialog',
+const SetAccessPolicyDialog = lazyComponent(() =>
+  import('../../actions/SetAccessPolicyDialog').then((module) => ({
+    default: module.SetAccessPolicyDialog,
+  })),
 );
 
 export const SetAccessPolicyButton = ({ offering, refetch }) => {

@@ -4,9 +4,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 
-const InvoiceItemCompensationDialog = lazyComponent(
-  () => import('./InvoiceItemCompensationDialog'),
-  'InvoiceItemCompensationDialog',
+const InvoiceItemCompensationDialog = lazyComponent(() =>
+  import('./InvoiceItemCompensationDialog').then((module) => ({
+    default: module.InvoiceItemCompensationDialog,
+  })),
 );
 
 export const InvoiceItemCompensation = ({ item, refreshInvoiceItems }) => (

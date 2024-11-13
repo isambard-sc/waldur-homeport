@@ -7,9 +7,10 @@ import { Resource } from '@waldur/marketplace/resources/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-const ResourceShowUsageDialog = lazyComponent(
-  () => import('@waldur/marketplace/resources/usage/ResourceShowUsageDialog'),
-  'ResourceShowUsageDialog',
+const ResourceShowUsageDialog = lazyComponent(() =>
+  import('@waldur/marketplace/resources/usage/ResourceShowUsageDialog').then(
+    (module) => ({ default: module.ResourceShowUsageDialog }),
+  ),
 );
 
 export const ShowUsageAction = ({ resource }: { resource: Resource }) => {

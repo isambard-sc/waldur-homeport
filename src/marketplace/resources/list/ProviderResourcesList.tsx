@@ -43,9 +43,10 @@ interface ResourceFilter {
   include_terminated?: boolean;
 }
 
-const ResourceDetailsDialog = lazyComponent(
-  () => import('../details/popup/ResourceDetailsDialog'),
-  'ResourceDetailsDialog',
+const ResourceDetailsDialog = lazyComponent(() =>
+  import('../details/popup/ResourceDetailsDialog').then((module) => ({
+    default: module.ResourceDetailsDialog,
+  })),
 );
 
 const ResourceField = ({ row }) => {
@@ -257,13 +258,13 @@ const TableComponent: FunctionComponent<any> = (props) => {
   );
 };
 
-export const TableOptions = {
+const TableOptions = {
   table: TABLE_PUBLIC_RESOURCE,
   fetchData: createFetcher('marketplace-provider-resources'),
   queryField: 'query',
 };
 
-export const mapStateToFilter = createSelector(
+const mapStateToFilter = createSelector(
   getCustomer,
   getUser,
   isServiceManagerSelector,

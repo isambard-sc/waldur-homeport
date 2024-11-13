@@ -6,9 +6,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { LoginButton } from './LoginButton';
 
-const AuthSaml2Dialog = lazyComponent(
-  () => import('./saml2/AuthSaml2Dialog'),
-  'AuthSaml2Dialog',
+const AuthSaml2Dialog = lazyComponent(() =>
+  import('./saml2/AuthSaml2Dialog').then((module) => ({
+    default: module.AuthSaml2Dialog,
+  })),
 );
 
 export const Saml2ProvidersButton = () => {

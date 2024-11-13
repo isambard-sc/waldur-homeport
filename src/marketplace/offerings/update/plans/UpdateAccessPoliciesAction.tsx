@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-const SetAccessPolicyDialog = lazyComponent(
-  () => import('../../actions/SetAccessPolicyDialog'),
-  'SetAccessPolicyDialog',
+const SetAccessPolicyDialog = lazyComponent(() =>
+  import('../../actions/SetAccessPolicyDialog').then((module) => ({
+    default: module.SetAccessPolicyDialog,
+  })),
 );
 
 export const UpdateAccessPoliciesAction = ({ plan, refetch }) => {

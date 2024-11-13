@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const NotificationUpdateDialog = lazyComponent(
-  () => import('./NotificationUpdateDialog'),
-  'NotificationUpdateDialog',
+const NotificationUpdateDialog = lazyComponent(() =>
+  import('./NotificationUpdateDialog').then((module) => ({
+    default: module.NotificationUpdateDialog,
+  })),
 );
 
 export const NotificationUpdateButton: FunctionComponent<{

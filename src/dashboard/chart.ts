@@ -1,6 +1,5 @@
 import { EChartsOption } from 'echarts';
 
-import { translate } from '@waldur/i18n';
 import { ThemeName } from '@waldur/navigation/theme/types';
 
 import { LINE_CHART_COLOR } from './constants';
@@ -68,7 +67,7 @@ export const getScopeChartOptions = (
   ],
 });
 
-export const getScopeChartOptionsWithAxis = ({
+const getScopeChartOptionsWithAxis = ({
   dates,
   values,
   color,
@@ -145,62 +144,6 @@ export const getScopeChartOptionsWithAxis = ({
     },
   ],
 });
-
-export const getResourceChartOptions = (
-  dates,
-  usages,
-  limits,
-  units: string,
-) => {
-  const series = limits
-    ? [
-        {
-          name: translate('Usage'),
-          type: 'line',
-          stack: 'Quota',
-          data: usages,
-        },
-        {
-          name: translate('Limit'),
-          type: 'line',
-          stack: 'Quota',
-          data: limits,
-        },
-      ]
-    : [
-        {
-          type: 'bar',
-          data: usages,
-          barMinHeight: 5,
-        },
-      ];
-  return {
-    tooltip: {
-      trigger: 'axis',
-    },
-    grid: {
-      left: 30,
-      right: 50,
-      bottom: 50,
-      top: 50,
-    },
-    xAxis: [
-      {
-        type: 'category',
-        data: dates,
-        name: translate('Date'),
-      },
-    ],
-    yAxis: [
-      {
-        name: units,
-        type: 'value',
-        minInterval: 1,
-      },
-    ],
-    series,
-  };
-};
 
 export const getLineChartOptions = (chart: Chart, hLines?: HLine[]) =>
   getScopeChartOptions(

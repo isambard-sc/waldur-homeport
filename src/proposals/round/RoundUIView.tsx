@@ -13,25 +13,30 @@ import { getProtectedCall, getProtectedCallRound } from '../api';
 
 import { RoundPageHero } from './RoundPageHero';
 
-const ProposalsList = lazyComponent(
-  () => import('./proposals/ProposalsList'),
-  'ProposalsList',
+const ProposalsList = lazyComponent(() =>
+  import('./proposals/ProposalsList').then((module) => ({
+    default: module.ProposalsList,
+  })),
 );
-const RoundReviewersList = lazyComponent(
-  () => import('@waldur/proposals/round/reviewers/RoundReviewersList'),
-  'RoundReviewersList',
+const RoundReviewersList = lazyComponent(() =>
+  import('@waldur/proposals/round/reviewers/RoundReviewersList').then(
+    (module) => ({ default: module.RoundReviewersList }),
+  ),
 );
-const RoundSubmissionSection = lazyComponent(
-  () => import('./submission/RoundSubmissionSection'),
-  'RoundSubmissionSection',
+const RoundSubmissionSection = lazyComponent(() =>
+  import('./submission/RoundSubmissionSection').then((module) => ({
+    default: module.RoundSubmissionSection,
+  })),
 );
-const RoundReviewSection = lazyComponent(
-  () => import('./review/RoundReviewSection'),
-  'RoundReviewSection',
+const RoundReviewSection = lazyComponent(() =>
+  import('./review/RoundReviewSection').then((module) => ({
+    default: module.RoundReviewSection,
+  })),
 );
-const RoundAllocationSection = lazyComponent(
-  () => import('./allocation/RoundAllocationSection'),
-  'RoundAllocationSection',
+const RoundAllocationSection = lazyComponent(() =>
+  import('./allocation/RoundAllocationSection').then((module) => ({
+    default: module.RoundAllocationSection,
+  })),
 );
 
 const tabs: PageBarTab[] = [

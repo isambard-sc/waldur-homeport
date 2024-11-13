@@ -1,4 +1,4 @@
-import { formValueSelector, isDirty } from 'redux-form';
+import { formValueSelector } from 'redux-form';
 
 import {
   getFormLimitSerializer,
@@ -63,9 +63,7 @@ export const formatOrderForCreate = (props: OrderSummaryProps) => ({
   accepting_terms_of_service: true,
 });
 
-export const orderFormValues = formValueSelector(ORDER_FORM_ID);
-
-export const orderFormIsDirty = isDirty(ORDER_FORM_ID);
+const orderFormValues = formValueSelector(ORDER_FORM_ID);
 
 export const orderCustomerSelector = (state) =>
   orderFormValues(state, 'customer');

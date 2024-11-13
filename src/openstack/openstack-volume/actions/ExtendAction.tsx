@@ -8,9 +8,10 @@ import { ActionItemType } from '@waldur/resource/actions/types';
 
 import { isBootable } from './utils';
 
-const VolumeExtendDialog = lazyComponent(
-  () => import('./ExtendDialog'),
-  'VolumeExtendDialog',
+const VolumeExtendDialog = lazyComponent(() =>
+  import('./ExtendDialog').then((module) => ({
+    default: module.VolumeExtendDialog,
+  })),
 );
 
 const validators = [isBootable, validateState('OK')];

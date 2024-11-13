@@ -20,7 +20,7 @@ const REACT_SELECT_MENU_PORTALING: Partial<SelectProps> = {
   menuPlacement: 'bottom',
 };
 
-export const REACT_SELECT_MENU_NO_PORTALING: Partial<SelectProps> = {
+const REACT_SELECT_MENU_NO_PORTALING: Partial<SelectProps> = {
   menuPortalTarget: undefined,
   styles: undefined,
   menuPosition: undefined,

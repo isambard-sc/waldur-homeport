@@ -69,20 +69,6 @@ function getElementActualHeight(el: HTMLElement) {
   return getElementActualCss(el, 'height', false);
 }
 
-function getElementActualWidth(el: HTMLElement) {
-  return getElementActualCss(el, 'width', false);
-}
-
-function getElementIndex(element: HTMLElement) {
-  if (element.parentNode) {
-    const c = element.parentNode.children;
-    for (let i = 0; i < c.length; i++) {
-      if (c[i] === element) return i;
-    }
-  }
-  return -1;
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/API/Element/matches
 function getElementMatches(element: HTMLElement, selector: string) {
   const p = Element.prototype;
@@ -178,10 +164,6 @@ function getHighestZindex(el: HTMLElement) {
   return null;
 }
 
-function getScrollTop(): number {
-  return (document.scrollingElement || document.documentElement).scrollTop;
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth
 function getViewPort(): ViewPortModel {
   return {
@@ -192,20 +174,6 @@ function getViewPort(): ViewPortModel {
 
 function insertAfterElement(el: HTMLElement, referenceNode: HTMLElement) {
   return referenceNode.parentNode?.insertBefore(el, referenceNode.nextSibling);
-}
-
-function isElementHasClasses(
-  element: HTMLElement,
-  classesStr: string,
-): boolean {
-  const classes = classesStr.split(' ');
-  for (let i = 0; i < classes.length; i++) {
-    if (!element.classList.contains(classes[i])) {
-      return false;
-    }
-  }
-
-  return true;
 }
 
 function isVisibleElement(element: HTMLElement): boolean {
@@ -258,17 +226,6 @@ function getElementChild(
 ): HTMLElement | null {
   const children = getElementChildren(element, selector);
   return children ? children[0] : null;
-}
-
-function isMobileDevice(): boolean {
-  let test = getViewPort().width < +getBreakpoint('lg') ? true : false;
-
-  if (test === false) {
-    // For use within normal web clients
-    test = navigator.userAgent.match(/iPad/i) != null;
-  }
-
-  return test;
 }
 
 function slide(el: HTMLElement, dir: string, speed: number, callback: any) {
@@ -454,74 +411,17 @@ function getAttributeValueByBreakpoint(incomingAttr: string): string | JSON {
   return resultKey ? getObjectPropertyValueByKey(value, resultKey) : value;
 }
 
-function colorLighten(color: string, amount: number) {
-  const addLight = (_color: string, _amount: number) => {
-    const cc = parseInt(_color, 16) + _amount;
-    const cNum = cc > 255 ? 255 : cc;
-    const c =
-      cNum.toString(16).length > 1
-        ? cNum.toString(16)
-        : `0${cNum.toString(16)}`;
-    return c;
-  };
-
-  color = color.indexOf('#') >= 0 ? color.substring(1, color.length) : color;
-  amount = parseInt(((255 * amount) / 100).toString());
-  return (color = `#${addLight(color.substring(0, 2), amount)}${addLight(
-    color.substring(2, 4),
-    amount,
-  )}${addLight(color.substring(4, 6), amount)}`);
-}
-
-function colorDarken(color: string, amount: number) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const subtractLight = (_color: string, _amount: number) => {
-    const cc = parseInt(color, 16) - amount;
-    const cNum = cc < 0 ? 0 : cc;
-    const c =
-      cNum.toString(16).length > 1
-        ? cNum.toString(16)
-        : `0${cNum.toString(16)}`;
-    return c;
-  };
-
-  color = color.indexOf('#') >= 0 ? color.substring(1, color.length) : color;
-  amount = parseInt(((255 * amount) / 100).toString());
-
-  return (color = `#${subtractLight(
-    color.substring(0, 2),
-    amount,
-  )}${subtractLight(color.substring(2, 4), amount)}${subtractLight(
-    color.substring(4, 6),
-    amount,
-  )}`);
-}
-
 export {
-  getBreakpoint,
   getCSS,
-  getCSSVariableValue,
-  getElementActualCss,
-  getElementActualHeight,
-  getElementActualWidth,
-  getElementIndex,
-  getElementMatches,
   getElementOffset,
   getElementParents,
   getHighestZindex,
-  getScrollTop,
   getViewPort,
   insertAfterElement,
-  isElementHasClasses,
   isVisibleElement,
   throttle,
-  getElementChildren,
   getElementChild,
-  isMobileDevice,
-  slide,
   slideUp,
   slideDown,
   getAttributeValueByBreakpoint,
-  colorLighten,
-  colorDarken,
 };

@@ -3,9 +3,10 @@ import { ResourceSummaryConfiguration } from '@waldur/resource/summary/types';
 
 import { INSTANCE_TYPE } from '../constants';
 
-const OpenStackInstanceSummary = lazyComponent(
-  () => import('./OpenStackInstanceSummary'),
-  'OpenStackInstanceSummary',
+const OpenStackInstanceSummary = lazyComponent(() =>
+  import('./OpenStackInstanceSummary').then((module) => ({
+    default: module.OpenStackInstanceSummary,
+  })),
 );
 
 export const OpenStackInstanceSummaryConfiguration: ResourceSummaryConfiguration =

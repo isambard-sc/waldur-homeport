@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { Report } from '@waldur/marketplace/resources/types';
 import { useModal } from '@waldur/modal/hooks';
 
-const ShowReportDialog = lazyComponent(
-  () => import('./ShowReportDialog'),
-  'ShowReportDialog',
+const ShowReportDialog = lazyComponent(() =>
+  import('./ShowReportDialog').then((module) => ({
+    default: module.ShowReportDialog,
+  })),
 );
 
 interface ShowReportButtonProps {

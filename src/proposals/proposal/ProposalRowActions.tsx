@@ -13,9 +13,10 @@ import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
 import { forceApproveProposal, rejectProposal } from '../api';
 
-const CreateReviewDialog = lazyComponent(
-  () => import('./create-review/CreateReviewDialog'),
-  'CreateReviewDialog',
+const CreateReviewDialog = lazyComponent(() =>
+  import('./create-review/CreateReviewDialog').then((module) => ({
+    default: module.CreateReviewDialog,
+  })),
 );
 
 const linkToProposalDetails = (proposalUuid) =>

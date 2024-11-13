@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const OfferingPermissionCreateDialog = lazyComponent(
-  () => import('./OfferingPermissionCreateDialog'),
-  'OfferingPermissionCreateDialog',
+const OfferingPermissionCreateDialog = lazyComponent(() =>
+  import('./OfferingPermissionCreateDialog').then((module) => ({
+    default: module.OfferingPermissionCreateDialog,
+  })),
 );
 
 export const OfferingPermissionCreateButton: React.FC<{

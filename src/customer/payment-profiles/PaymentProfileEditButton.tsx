@@ -4,9 +4,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const PaymentProfileUpdateDialogContainer = lazyComponent(
-  () => import('./PaymentProfileUpdateDialog'),
-  'PaymentProfileUpdateDialogContainer',
+const PaymentProfileUpdateDialogContainer = lazyComponent(() =>
+  import('./PaymentProfileUpdateDialog').then((module) => ({
+    default: module.PaymentProfileUpdateDialogContainer,
+  })),
 );
 
 export const PaymentProfileEditButton = (props) => {

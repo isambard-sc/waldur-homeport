@@ -21,7 +21,7 @@ export interface Option {
   label: string;
 }
 
-export function registerOfferingType(config: OfferingConfiguration) {
+function registerOfferingType(config: OfferingConfiguration) {
   const { type, ...rest } = config;
   REGISTRY[type] = rest;
 }

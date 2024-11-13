@@ -10,7 +10,7 @@ import {
   ElementStyleUtil,
 } from '../_utils/index';
 
-export class DrawerStore {
+class DrawerStore {
   static store: Map<string, DrawerComponent> = new Map();
 
   public static set(
@@ -383,4 +383,4 @@ class DrawerComponent {
   };
 }
 
-export { DrawerComponent, defaultDrawerOptions };
+export { DrawerComponent };
