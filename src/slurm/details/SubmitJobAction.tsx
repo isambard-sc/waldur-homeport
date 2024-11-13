@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton';
 
-const SubmitJobDialog = lazyComponent(
-  () => import('./SubmitJobDialog'),
-  'SubmitJobDialog',
+const SubmitJobDialog = lazyComponent(() =>
+  import('./SubmitJobDialog').then((module) => ({
+    default: module.SubmitJobDialog,
+  })),
 );
 
 interface SubmitJobActionProps {

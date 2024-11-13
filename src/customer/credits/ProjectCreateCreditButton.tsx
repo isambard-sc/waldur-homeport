@@ -11,9 +11,10 @@ import { showErrorResponse } from '@waldur/store/notify';
 import { createProjectCredit } from './api';
 import { ProjectCreditFormData } from './types';
 
-const ProjectCreditFormDialog = lazyComponent(
-  () => import('./ProjectCreditFormDialog'),
-  'ProjectCreditFormDialog',
+const ProjectCreditFormDialog = lazyComponent(() =>
+  import('./ProjectCreditFormDialog').then((module) => ({
+    default: module.ProjectCreditFormDialog,
+  })),
 );
 
 export const ProjectCreateCreditButton = ({ refetch }) => {

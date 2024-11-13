@@ -14,9 +14,10 @@ import {
 } from './confirmation-drawer/constants';
 import { HeaderButtonBullet } from './HeaderButtonBullet';
 
-const PendingConfirmationContainer = lazyComponent(
-  () => import('./confirmation-drawer/PendingConfirmationContainer'),
-  'PendingConfirmationContainer',
+const PendingConfirmationContainer = lazyComponent(() =>
+  import('./confirmation-drawer/PendingConfirmationContainer').then(
+    (module) => ({ default: module.PendingConfirmationContainer }),
+  ),
 );
 
 export const ConfirmationDrawerToggle: React.FC = () => {

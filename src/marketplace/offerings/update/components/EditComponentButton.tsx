@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { EDIT_COMPONENT_FORM_ID } from './constants';
 
-const EditComponentDialog = lazyComponent(
-  () => import('./EditComponentDialog'),
-  'EditComponentDialog',
+const EditComponentDialog = lazyComponent(() =>
+  import('./EditComponentDialog').then((module) => ({
+    default: module.EditComponentDialog,
+  })),
 );
 
 export const EditComponentButton: FunctionComponent<{

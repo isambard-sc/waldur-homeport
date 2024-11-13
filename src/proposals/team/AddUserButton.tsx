@@ -10,9 +10,10 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { AddUserDialogProps } from './types';
 
-const AddUserDialog = lazyComponent(
-  () => import('./AddUserDialog'),
-  'AddUserDialog',
+const AddUserDialog = lazyComponent(() =>
+  import('./AddUserDialog').then((module) => ({
+    default: module.AddUserDialog,
+  })),
 );
 
 export const AddUserButton: React.FC<AddUserDialogProps> = (props) => {

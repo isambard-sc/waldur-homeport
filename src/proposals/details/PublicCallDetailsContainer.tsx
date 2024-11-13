@@ -16,21 +16,25 @@ import { getCallBreadcrumbItems } from '../utils';
 import { CallTabs } from './CallTabs';
 import { PublicCallDetailsHero } from './PublicCallDetailsHero';
 
-const CallDescriptionCard = lazyComponent(
-  () => import('./CallDescriptionCard'),
-  'CallDescriptionCard',
+const CallDescriptionCard = lazyComponent(() =>
+  import('./CallDescriptionCard').then((module) => ({
+    default: module.CallDescriptionCard,
+  })),
 );
-const CallDocumentsCard = lazyComponent(
-  () => import('./CallDocumentsCard'),
-  'CallDocumentsCard',
+const CallDocumentsCard = lazyComponent(() =>
+  import('./CallDocumentsCard').then((module) => ({
+    default: module.CallDocumentsCard,
+  })),
 );
-const CallOfferingsCard = lazyComponent(
-  () => import('./CallOfferingsCard'),
-  'CallOfferingsCard',
+const CallOfferingsCard = lazyComponent(() =>
+  import('./CallOfferingsCard').then((module) => ({
+    default: module.CallOfferingsCard,
+  })),
 );
-const CallRoundsList = lazyComponent(
-  () => import('./CallRoundsList'),
-  'CallRoundsList',
+const CallRoundsList = lazyComponent(() =>
+  import('./CallRoundsList').then((module) => ({
+    default: module.CallRoundsList,
+  })),
 );
 
 const tabs: PageBarTab[] = [

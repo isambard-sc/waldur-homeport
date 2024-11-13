@@ -3,16 +3,15 @@ import { StateDeclaration } from '@waldur/core/types';
 import { SupportFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 
-const SharedProviderContainer = lazyComponent(
-  () => import('./SharedProviderContainer'),
-  'SharedProviderContainer',
-);
-
 export const states: StateDeclaration[] = [
   {
     name: 'support.shared-providers',
     url: 'shared-providers/',
-    component: SharedProviderContainer,
+    component: lazyComponent(() =>
+      import('./SharedProviderContainer').then((module) => ({
+        default: module.SharedProviderContainer,
+      })),
+    ),
     data: {
       feature: SupportFeatures.shared_providers,
       breadcrumb: () => translate('Shared providers'),

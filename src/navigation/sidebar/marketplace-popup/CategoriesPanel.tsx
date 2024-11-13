@@ -29,7 +29,7 @@ interface CategoryListItemProps {
   className?: string;
 }
 
-export const CategoryListItem: FunctionComponent<
+const CategoryListItem: FunctionComponent<
   PropsWithChildren<CategoryListItemProps>
 > = ({ item, onClick, selectedItem, active, className, children }) => {
   return (
@@ -89,7 +89,7 @@ function CustomToggle({ item, eventKey }) {
   );
 }
 
-export const CategoryGroupListItem: FunctionComponent<{
+const CategoryGroupListItem: FunctionComponent<{
   item: CategoryGroup;
   onClick;
   selectedItem: Category;

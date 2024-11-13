@@ -7,9 +7,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const CreditUsageDialog = lazyComponent(
-  () => import('./CreditUsageDialog'),
-  'CreditUsageDialog',
+const CreditUsageDialog = lazyComponent(() =>
+  import('./CreditUsageDialog').then((module) => ({
+    default: module.CreditUsageDialog,
+  })),
 );
 
 export const CreditUsageButton = ({ row }) => {

@@ -9,9 +9,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { TableDropdownItem } from '@waldur/table/types';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const OfferingImportDialog = lazyComponent(
-  () => import('./import/OfferingImportDialog'),
-  'OfferingImportDialog',
+const OfferingImportDialog = lazyComponent(() =>
+  import('./import/OfferingImportDialog').then((module) => ({
+    default: module.OfferingImportDialog,
+  })),
 );
 
 export const useOfferingDropdownActions = (): TableDropdownItem[] => {

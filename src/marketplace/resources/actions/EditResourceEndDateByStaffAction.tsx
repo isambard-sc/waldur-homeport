@@ -10,9 +10,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
-const EditResourceEndDateDialog = lazyComponent(
-  () => import('./EditResourceEndDateDialog'),
-  'EditResourceEndDateDialog',
+const EditResourceEndDateDialog = lazyComponent(() =>
+  import('./EditResourceEndDateDialog').then((module) => ({
+    default: module.EditResourceEndDateDialog,
+  })),
 );
 
 interface EditResourceEndDateByProviderActionProps {

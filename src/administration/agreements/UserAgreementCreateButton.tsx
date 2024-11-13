@@ -5,9 +5,10 @@ import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const UserAgreementCreateDialog = lazyComponent(
-  () => import('./UserAgreementCreateDialog'),
-  'UserAgreementCreateDialog',
+const UserAgreementCreateDialog = lazyComponent(() =>
+  import('./UserAgreementCreateDialog').then((module) => ({
+    default: module.UserAgreementCreateDialog,
+  })),
 );
 
 export const UserAgreementCreateButton: FunctionComponent<{ refetch }> = ({

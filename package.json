@@ -15,7 +15,7 @@
     "style:check": "stylelint \"src/**/*.css\" \"src/**/*.scss\"",
     "lint:check": "eslint --ext ts,tsx src",
     "lint:fix": "eslint --fix --ext ts,tsx src",
-    "deps:unused": "knip --include files,types,enumMembers",
+    "deps:unused": "knip --include files,types,enumMembers,exports",
     "deps:circular": "madge --exclude broadcasts/BroadcastFooter.tsx --circular src/**/*",
     "test": "vitest",
     "ci:start": "VITE_API_URL=http://localhost:8001/ yarn build && yarn serve dist --single --listen 8001",
@@ -140,7 +140,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^9.0.1",
     "jsdom": "^25.0.1",
-    "knip": "^5.2.2",
+    "knip": "^5.36.7",
     "lint-staged": "^10.0.8",
     "madge": "^8.0.0",
     "mock-match-media": "^0.4.3",
@@ -198,7 +198,13 @@
     },
     "ignore": [
       "extractLiteralsFromFiles.cjs",
-      "extractLiteralsFromFiles.ts"
+      "extractLiteralsFromFiles.ts",
+      "*.spec.ts",
+      "*.spec.tsx",
+      "*.fixture.ts",
+      "*.fixture.tsx",
+      "src/EventsEnums.ts",
+      "src/core/draftjs-module.tsx"
     ]
   },
   "stylelint": {

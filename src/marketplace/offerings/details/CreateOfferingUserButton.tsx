@@ -9,9 +9,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const CreateOfferingUserDialog = lazyComponent(
-  () => import('./CreateOfferingUserDialog'),
-  'CreateOfferingUserDialog',
+const CreateOfferingUserDialog = lazyComponent(() =>
+  import('./CreateOfferingUserDialog').then((module) => ({
+    default: module.CreateOfferingUserDialog,
+  })),
 );
 
 export const CreateOfferingUserButton = ({ offering, onSuccess }) => {

@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
 
-const QuickIssueContainer = lazyComponent(
-  () => import('./quick-issue-drawer/QuickIssueContainer'),
-  'QuickIssueContainer',
+const QuickIssueContainer = lazyComponent(() =>
+  import('./quick-issue-drawer/QuickIssueContainer').then((module) => ({
+    default: module.QuickIssueContainer,
+  })),
 );
 
 export const QuickIssueDrawerToggle: React.FC = () => {

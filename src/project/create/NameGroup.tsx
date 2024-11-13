@@ -4,7 +4,7 @@ import { StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 
-import { validateProjectName } from '../ProjectNameField';
+import { validateProjectName } from '../validators';
 
 export const NameGroup = ({ customer }) => (
   <FormGroup label={translate('Project name')} required controlId="name">

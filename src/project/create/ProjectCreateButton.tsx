@@ -10,9 +10,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const ProjectCreateDialog = lazyComponent(
-  () => import('./ProjectCreateDialog'),
-  'ProjectCreateDialog',
+const ProjectCreateDialog = lazyComponent(() =>
+  import('./ProjectCreateDialog').then((module) => ({
+    default: module.ProjectCreateDialog,
+  })),
 );
 
 export const ProjectCreateButton: FC<{ refetch? }> = ({ refetch }) => {

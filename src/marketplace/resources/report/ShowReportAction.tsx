@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const ShowReportDialog = lazyComponent(
-  () => import('./ShowReportDialog'),
-  'ShowReportDialog',
+const ShowReportDialog = lazyComponent(() =>
+  import('./ShowReportDialog').then((module) => ({
+    default: module.ShowReportDialog,
+  })),
 );
 
 const openReport = (report) =>

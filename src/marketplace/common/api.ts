@@ -19,12 +19,10 @@ import { GeolocationPoint } from '@waldur/map/types';
 import { OrderDetailsType } from '@waldur/marketplace/orders/types';
 import {
   Category,
-  CategoryComponentUsage,
   CategoryGroup,
   Offering,
   OfferingPermission,
   OrganizationGroup,
-  Plan,
   PluginMetadata,
   ServiceProvider,
 } from '@waldur/marketplace/types';
@@ -54,12 +52,6 @@ export const getCategories = (options?: AxiosRequestConfig) =>
 
 export const getCategoryOptions = (options?: {}) =>
   getSelectData<Category>('/marketplace-categories/', options);
-
-export const getCategoryUsages = (options?: {}) =>
-  getAll<CategoryComponentUsage>(
-    '/marketplace-category-component-usages/',
-    options,
-  );
 
 export const getComponentUsages = (
   resource_uuid: string,
@@ -91,7 +83,7 @@ export const getProviderOfferingsOptions = (params?: {}) =>
 export const getPublicOfferingsOptions = (params?: {}) =>
   getSelectData<Offering>('/marketplace-public-offerings/', params);
 
-export const getAllProviderOfferings = (options?: {}) =>
+const getAllProviderOfferings = (options?: {}) =>
   getAll<Offering>('/marketplace-provider-offerings/', options);
 
 export const getAllOfferingPermissions = (options?: AxiosRequestConfig) =>
@@ -102,9 +94,6 @@ export const getProviderOfferings = (customerUuid: string) =>
 
 export const getPublicPlan = (id: string, offeringUuid: string) =>
   getById<any>(`/marketplace-public-offerings/${offeringUuid}/plans/`, id);
-
-export const getProviderPlan = (id: string) =>
-  getById<any>('/marketplace-plans/', id);
 
 export const createPlan = (payload) => post(`/marketplace-plans/`, payload);
 
@@ -119,11 +108,6 @@ export const updatePlanQuotas = (planId, data) =>
 
 export const updatePlanPrices = (planId, data) =>
   post(`/marketplace-plans/${planId}/update_prices/`, data);
-
-export const getOfferingPlans = (offeringUuid: string) =>
-  getAll<Plan>('/marketplace-plans/', {
-    params: { offering_uuid: offeringUuid },
-  });
 
 export const getOfferingPlansUsage = (offeringUuid: string) =>
   getAll<PlanUsageRow>('/marketplace-plans/usage_stats/', {
@@ -202,11 +186,6 @@ export const getResourceDetails = (resourceId: string) =>
 
 export const getResourceTeam = (resourceId: string) =>
   getAll<any>(`/marketplace-resources/${resourceId}/team/`);
-
-export const getResourcePlanPeriods = (resourceId: string) =>
-  getAll<ResourcePlanPeriod>(
-    `/marketplace-resources/${resourceId}/plan_periods/`,
-  );
 
 export const getProviderResourcePlanPeriods = (resourceId: string) =>
   getAll<ResourcePlanPeriod>(
@@ -393,9 +372,6 @@ export const submitUsageReport = (payload) =>
 export const getResource = (id: string, options?: AxiosRequestConfig) =>
   getById<Resource>('/marketplace-resources/', id, options);
 
-export const getProviderResource = (id: string, options?: AxiosRequestConfig) =>
-  getById<Resource>('/marketplace-provider-resources/', id, options);
-
 export const switchPlan = (resource_uuid: string, plan_url: string) =>
   post(`/marketplace-resources/${resource_uuid}/switch_plan/`, {
     plan: plan_url,
@@ -567,16 +543,6 @@ export const deleteRobotAccount = (id) =>
 
 export const updateRobotAccount = (id, payload) =>
   patch(`/marketplace-robot-accounts/${id}/`, payload);
-
-export const updateProviderOfferingsUser = (
-  provider_uuid,
-  user_uuid,
-  username,
-) =>
-  post(
-    `/marketplace-service-providers/${provider_uuid}/set_offerings_username/`,
-    { user_uuid, username },
-  );
 
 export const createOfferingEndpoint = (offeringId, endpoint) =>
   post(`/marketplace-provider-offerings/${offeringId}/add_endpoint/`, endpoint);

@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const UpdateFloatingIpsDialog = lazyComponent(
-  () => import('./UpdateFloatingIpsDialog'),
-  'UpdateFloatingIpsDialog',
+const UpdateFloatingIpsDialog = lazyComponent(() =>
+  import('./UpdateFloatingIpsDialog').then((module) => ({
+    default: module.UpdateFloatingIpsDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { getUser } from '@waldur/workspace/selectors';
 
-const PaymentCreateDialogContainer = lazyComponent(
-  () => import('@waldur/customer/payments/PaymentCreateDialog'),
-  'PaymentCreateDialogContainer',
+const PaymentCreateDialogContainer = lazyComponent(() =>
+  import('@waldur/customer/payments/PaymentCreateDialog').then((module) => ({
+    default: module.PaymentCreateDialogContainer,
+  })),
 );
 
 export const CreatePaymentButton = ({ activePaymentProfile }) => {

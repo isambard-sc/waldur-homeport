@@ -10,7 +10,7 @@ interface Theme {
   themes: Record<ThemeName, string> | {};
 }
 
-export const ThemeAction = {
+const ThemeAction = {
   INIT_THEME: 'INIT_THEME',
   UPDATE_THEME: 'UPDATE_THEME',
   ADD_THEME: 'ADD_THEME',

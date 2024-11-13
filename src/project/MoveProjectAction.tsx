@@ -8,9 +8,10 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 import { Project } from '@waldur/workspace/types';
 
-const MoveProjectDialog = lazyComponent(
-  () => import('./MoveProjectDialog'),
-  'MoveProjectDialog',
+const MoveProjectDialog = lazyComponent(() =>
+  import('./MoveProjectDialog').then((module) => ({
+    default: module.MoveProjectDialog,
+  })),
 );
 
 export const MoveProjectAction = ({

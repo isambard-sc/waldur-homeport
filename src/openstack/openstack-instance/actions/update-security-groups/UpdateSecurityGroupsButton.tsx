@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const UpdateSecurityGroupsDialog = lazyComponent(
-  () => import('./UpdateSecurityGroupsDialog'),
-  'UpdateSecurityGroupsDialog',
+const UpdateSecurityGroupsDialog = lazyComponent(() =>
+  import('./UpdateSecurityGroupsDialog').then((module) => ({
+    default: module.UpdateSecurityGroupsDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

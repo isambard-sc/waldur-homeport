@@ -8,7 +8,9 @@ import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { getUser } from '@waldur/workspace/selectors';
 
-const LinkDialog = lazyComponent(() => import('./LinkDialog'), 'LinkDialog');
+const LinkDialog = lazyComponent(() =>
+  import('./LinkDialog').then((module) => ({ default: module.LinkDialog })),
+);
 
 export const LinkAction: ActionItemType = ({ resource, refetch }) => {
   const user = useSelector(getUser);

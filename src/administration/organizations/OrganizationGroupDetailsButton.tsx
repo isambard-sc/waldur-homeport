@@ -8,9 +8,10 @@ import { OrganizationGroup } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const OrganizationGroupDetailsDialog = lazyComponent(
-  () => import('./OrganizationGroupDetailsDialog'),
-  'OrganizationGroupDetailsDialog',
+const OrganizationGroupDetailsDialog = lazyComponent(() =>
+  import('./OrganizationGroupDetailsDialog').then((module) => ({
+    default: module.OrganizationGroupDetailsDialog,
+  })),
 );
 
 interface OrganizationGroupDetailsButtonProps {

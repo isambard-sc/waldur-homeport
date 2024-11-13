@@ -10,9 +10,10 @@ import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { NestedCustomerPermission } from './types';
 
-const EditUserDialog = lazyComponent(
-  () => import('./EditUserDialog'),
-  'EditUserDialog',
+const EditUserDialog = lazyComponent(() =>
+  import('./EditUserDialog').then((module) => ({
+    default: module.EditUserDialog,
+  })),
 );
 
 interface UserEditButtonProps {

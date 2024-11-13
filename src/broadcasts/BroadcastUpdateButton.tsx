@@ -9,9 +9,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { BroadcastResponseData } from './types';
 import { parseBroadcast } from './utils';
 
-const BroadcastUpdateDialog = lazyComponent(
-  () => import('./BroadcastUpdateDialog'),
-  'BroadcastUpdateDialog',
+const BroadcastUpdateDialog = lazyComponent(() =>
+  import('./BroadcastUpdateDialog').then((module) => ({
+    default: module.BroadcastUpdateDialog,
+  })),
 );
 
 export const BroadcastUpdateButton: FunctionComponent<{

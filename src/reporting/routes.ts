@@ -6,39 +6,6 @@ import { SupportFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
 
-const ReportingDashboard = lazyComponent(
-  () => import('./dashboard/ReportingDashboard'),
-  'ReportingDashboard',
-);
-const CustomerListContainer = lazyComponent(
-  () => import('@waldur/customer/list/CustomerListContainer'),
-  'CustomerListContainer',
-);
-const PriceList = lazyComponent(
-  () => import('@waldur/marketplace/offerings/PriceList'),
-  'PriceList',
-);
-const GrowthContainer = lazyComponent(
-  () => import('./invoices/GrowthContainer'),
-  'GrowthContainer',
-);
-const CustomerQuotasList = lazyComponent(
-  () => import('./quotas/CustomerQuotasList'),
-  'CustomerQuotasList',
-);
-const VmTypeOverviewContainer = lazyComponent(
-  () => import('./openstack/VmTypeOverviewContainer'),
-  'VmTypeOverviewContainer',
-);
-const PlanUsageList = lazyComponent(
-  () => import('./plan-usage/PlanUsageList'),
-  'PlanUsageList',
-);
-const ResourceUsageList = lazyComponent(
-  () => import('./resource-usage/ResourceUsageList'),
-  'ResourceUsageList',
-);
-
 export const states: StateDeclaration[] = [
   {
     name: 'reporting',
@@ -55,7 +22,11 @@ export const states: StateDeclaration[] = [
     name: 'reporting-dashboard',
     url: '',
     parent: 'reporting',
-    component: ReportingDashboard,
+    component: lazyComponent(() =>
+      import('./dashboard/ReportingDashboard').then((module) => ({
+        default: module.ReportingDashboard,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Dashboard'),
       priority: 100,
@@ -64,7 +35,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'reporting.organizations',
     url: 'organizations/',
-    component: CustomerListContainer,
+    component: lazyComponent(() =>
+      import('@waldur/customer/list/CustomerListContainer').then((module) => ({
+        default: module.CustomerListContainer,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Monthly revenue'),
     },
@@ -72,7 +47,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'reporting.pricelist',
     url: 'pricelist/',
-    component: PriceList,
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/offerings/PriceList').then((module) => ({
+        default: module.PriceList,
+      })),
+    ),
     data: {
       feature: SupportFeatures.pricelist,
       breadcrumb: () => translate('Pricelist'),
@@ -82,7 +61,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'invoicesGrowth',
     url: 'growth/',
-    component: GrowthContainer,
+    component: lazyComponent(() =>
+      import('./invoices/GrowthContainer').then((module) => ({
+        default: module.GrowthContainer,
+      })),
+    ),
     parent: 'reporting',
     data: {
       breadcrumb: () => translate('Growth'),
@@ -92,7 +75,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'reporting.quotas',
     url: 'quotas/',
-    component: CustomerQuotasList,
+    component: lazyComponent(() =>
+      import('./quotas/CustomerQuotasList').then((module) => ({
+        default: module.CustomerQuotasList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Organization quotas'),
     },
@@ -100,7 +87,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'reporting.vm-type-overview',
     url: 'vm-type-overview/',
-    component: VmTypeOverviewContainer,
+    component: lazyComponent(() =>
+      import('./openstack/VmTypeOverviewContainer').then((module) => ({
+        default: module.VmTypeOverviewContainer,
+      })),
+    ),
     data: {
       feature: SupportFeatures.vm_type_overview,
       breadcrumb: () => translate('VM type overview'),
@@ -109,7 +100,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-support-plan-usages',
     url: 'plan-usages/',
-    component: PlanUsageList,
+    component: lazyComponent(() =>
+      import('./plan-usage/PlanUsageList').then((module) => ({
+        default: module.PlanUsageList,
+      })),
+    ),
     parent: 'reporting',
     data: {
       breadcrumb: () => translate('Capacity'),
@@ -118,7 +113,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-support-usage-reports',
     url: 'usage/',
-    component: ResourceUsageList,
+    component: lazyComponent(() =>
+      import('./resource-usage/ResourceUsageList').then((module) => ({
+        default: module.ResourceUsageList,
+      })),
+    ),
     parent: 'reporting',
     data: {
       breadcrumb: () => translate('Usage reports'),

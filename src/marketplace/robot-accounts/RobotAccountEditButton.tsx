@@ -7,9 +7,10 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { getUser } from '@waldur/workspace/selectors';
 
-const RobotAccountEditDialog = lazyComponent(
-  () => import('./RobotAccountEditDialog'),
-  'RobotAccountEditDialog',
+const RobotAccountEditDialog = lazyComponent(() =>
+  import('./RobotAccountEditDialog').then((module) => ({
+    default: module.RobotAccountEditDialog,
+  })),
 );
 
 export const RobotAccountEditButton = (props) => {

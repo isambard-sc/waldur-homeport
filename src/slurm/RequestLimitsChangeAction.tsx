@@ -5,9 +5,10 @@ import { translate } from '@waldur/i18n';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const RequestLimitsChangeDialog = lazyComponent(
-  () => import('./RequestLimitsChangeDialog'),
-  'RequestLimitsChangeDialog',
+const RequestLimitsChangeDialog = lazyComponent(() =>
+  import('./RequestLimitsChangeDialog').then((module) => ({
+    default: module.RequestLimitsChangeDialog,
+  })),
 );
 
 export const RequestLimitsChangeAction: ActionItemType = ({ resource }) => (

@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton';
 
-const CreateDiskDialog = lazyComponent(
-  () => import('./CreateDiskDialog'),
-  'CreateDiskDialog',
+const CreateDiskDialog = lazyComponent(() =>
+  import('./CreateDiskDialog').then((module) => ({
+    default: module.CreateDiskDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

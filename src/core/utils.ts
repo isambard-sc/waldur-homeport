@@ -6,7 +6,7 @@ export function wait(amount = 0) {
   return new Promise((resolve) => setTimeout(resolve, amount));
 }
 
-export const FILESIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+const FILESIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
 export const formatFilesize = (
   input,

@@ -12,9 +12,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getUser } from '@waldur/workspace/selectors';
 
-const EditResourceEndDateDialog = lazyComponent(
-  () => import('./EditResourceEndDateDialog'),
-  'EditResourceEndDateDialog',
+const EditResourceEndDateDialog = lazyComponent(() =>
+  import('./EditResourceEndDateDialog').then((module) => ({
+    default: module.EditResourceEndDateDialog,
+  })),
 );
 
 interface EditResourceEndDateByProviderActionProps {

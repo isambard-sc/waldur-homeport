@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { EDIT_SCRIPT_FORM_ID } from './constants';
 import { ScriptEditorProps } from './types';
 
-const EditScriptDialog = lazyComponent(
-  () => import('./EditScriptDialog'),
-  'EditScriptDialog',
+const EditScriptDialog = lazyComponent(() =>
+  import('./EditScriptDialog').then((module) => ({
+    default: module.EditScriptDialog,
+  })),
 );
 
 export const EditScriptButton: FunctionComponent<ScriptEditorProps> = (

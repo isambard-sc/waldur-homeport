@@ -30,9 +30,10 @@ import { TableFilterService } from './TableFilterService';
 import { TableProps } from './types';
 import { getFiltersFormId, getSavedFiltersKey } from './utils';
 
-const SaveFilterDialog = lazyComponent(
-  () => import('./SaveFilterDialog'),
-  'SaveFilterDialog',
+const SaveFilterDialog = lazyComponent(() =>
+  import('./SaveFilterDialog').then((module) => ({
+    default: module.SaveFilterDialog,
+  })),
 );
 
 const SaveFilterItems = ({ table, formId, apply }) => {

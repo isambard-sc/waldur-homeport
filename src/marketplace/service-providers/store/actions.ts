@@ -1,9 +1,10 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ServiceProviderSecretCodeGenerateConfirm = lazyComponent(
-  () => import('../ServiceProviderSecretCodeGenerateConfirm'),
-  'ServiceProviderSecretCodeGenerateConfirm',
+const ServiceProviderSecretCodeGenerateConfirm = lazyComponent(() =>
+  import('../ServiceProviderSecretCodeGenerateConfirm').then((module) => ({
+    default: module.ServiceProviderSecretCodeGenerateConfirm,
+  })),
 );
 
 import * as constants from './constants';

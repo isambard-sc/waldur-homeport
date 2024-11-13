@@ -14,9 +14,10 @@ import { showError } from '@waldur/store/notify';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const CustomerRemoveDialog = lazyComponent(
-  () => import('@waldur/customer/details/CustomerRemoveDialog'),
-  'CustomerRemoveDialog',
+const CustomerRemoveDialog = lazyComponent(() =>
+  import('@waldur/customer/details/CustomerRemoveDialog').then((module) => ({
+    default: module.CustomerRemoveDialog,
+  })),
 );
 
 export const CustomerRemovePanel: FunctionComponent = () => {

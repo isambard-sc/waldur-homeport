@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { ADD_PLAN_FORM_ID } from './constants';
 
-const AddPlanDialog = lazyComponent(
-  () => import('./AddPlanDialog'),
-  'AddPlanDialog',
+const AddPlanDialog = lazyComponent(() =>
+  import('./AddPlanDialog').then((module) => ({
+    default: module.AddPlanDialog,
+  })),
 );
 
 export const AddPlanButton: FunctionComponent<{

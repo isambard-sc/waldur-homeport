@@ -8,9 +8,10 @@ import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 
 import { createRole, getRoles } from './api';
 
-const RoleCreateDialog = lazyComponent(
-  () => import('./RoleCreateDialog'),
-  'RoleCreateDialog',
+const RoleCreateDialog = lazyComponent(() =>
+  import('./RoleCreateDialog').then((module) => ({
+    default: module.RoleCreateDialog,
+  })),
 );
 
 export const RoleCreateButton = ({ refetch }) => {

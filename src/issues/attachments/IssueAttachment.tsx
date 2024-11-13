@@ -16,9 +16,10 @@ import { ImageFetcher } from './ImageFetcher';
 import { getIsDeleting } from './selectors';
 import { Attachment } from './types';
 
-const IssueAttachmentModal = lazyComponent(
-  () => import('./IssueAttachmentModal'),
-  'IssueAttachmentModal',
+const IssueAttachmentModal = lazyComponent(() =>
+  import('./IssueAttachmentModal').then((module) => ({
+    default: module.IssueAttachmentModal,
+  })),
 );
 
 interface IssueAttachmentProps {

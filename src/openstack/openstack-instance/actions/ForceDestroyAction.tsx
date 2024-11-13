@@ -6,9 +6,10 @@ import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
-const ForceDestroyDialog = lazyComponent(
-  () => import('./ForceDestroyDialog'),
-  'ForceDestroyDialog',
+const ForceDestroyDialog = lazyComponent(() =>
+  import('./ForceDestroyDialog').then((module) => ({
+    default: module.ForceDestroyDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {

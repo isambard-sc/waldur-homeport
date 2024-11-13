@@ -15,9 +15,10 @@ import { SettingsDescription } from '@waldur/SettingsDescription';
 import { getDBSettings } from '../settings/api';
 import { FieldRow } from '../settings/FieldRow';
 
-const AdministrationServiceDeskUpdateDialog = lazyComponent(
-  () => import('./AdministrationServiceDeskUpdateDialog'),
-  'AdministrationServiceDeskUpdateDialog',
+const AdministrationServiceDeskUpdateDialog = lazyComponent(() =>
+  import('./AdministrationServiceDeskUpdateDialog').then((module) => ({
+    default: module.AdministrationServiceDeskUpdateDialog,
+  })),
 );
 
 const INTEGRATION_SETTINGS = SettingsDescription.find(

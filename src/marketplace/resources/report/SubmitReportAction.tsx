@@ -12,9 +12,10 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { validateStaffAction } from '../actions/utils';
 
-const SubmitReportDialog = lazyComponent(
-  () => import('./SubmitReportDialog'),
-  'SubmitReportDialog',
+const SubmitReportDialog = lazyComponent(() =>
+  import('./SubmitReportDialog').then((module) => ({
+    default: module.SubmitReportDialog,
+  })),
 );
 
 const validators = [validateState('OK', 'Erred'), validateStaffAction];

@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const CreateSubnetDialog = lazyComponent(
-  () => import('./CreateSubnetDialog'),
-  'CreateSubnetDialog',
+const CreateSubnetDialog = lazyComponent(() =>
+  import('./CreateSubnetDialog').then((module) => ({
+    default: module.CreateSubnetDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

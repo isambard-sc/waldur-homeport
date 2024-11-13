@@ -8,9 +8,10 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { TenantActionProps } from './types';
 
-const CreateSecurityGroupDialog = lazyComponent(
-  () => import('./CreateSecurityGroupDialog'),
-  'CreateSecurityGroupDialog',
+const CreateSecurityGroupDialog = lazyComponent(() =>
+  import('./CreateSecurityGroupDialog').then((module) => ({
+    default: module.CreateSecurityGroupDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

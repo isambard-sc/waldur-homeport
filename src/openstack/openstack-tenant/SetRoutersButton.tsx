@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const SetRoutesDialog = lazyComponent(
-  () => import('./SetRoutesDialog'),
-  'SetRoutesDialog',
+const SetRoutesDialog = lazyComponent(() =>
+  import('./SetRoutesDialog').then((module) => ({
+    default: module.SetRoutesDialog,
+  })),
 );
 
 export const SetRoutersButton: FunctionComponent<{ router }> = ({ router }) => {

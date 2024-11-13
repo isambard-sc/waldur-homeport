@@ -12,9 +12,10 @@ import { ISSUE_IDS } from '@waldur/issues/types/constants';
 import { openModalDialog } from '@waldur/modal/actions';
 import { UserDetails } from '@waldur/workspace/types';
 
-const UserRemovalMessageDialog = lazyComponent(
-  () => import('./UserRemovalMessageDialog'),
-  'UserRemovalMessageDialog',
+const UserRemovalMessageDialog = lazyComponent(() =>
+  import('./UserRemovalMessageDialog').then((module) => ({
+    default: module.UserRemovalMessageDialog,
+  })),
 );
 
 export const UserDeleteAccount: FC<{ user: UserDetails }> = ({ user }) => {

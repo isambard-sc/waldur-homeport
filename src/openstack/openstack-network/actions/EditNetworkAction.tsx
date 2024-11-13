@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const EditNetworkDialog = lazyComponent(
-  () => import('./EditNetworkDialog'),
-  'EditNetworkDialog',
+const EditNetworkDialog = lazyComponent(() =>
+  import('./EditNetworkDialog').then((module) => ({
+    default: module.EditNetworkDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const SetAllowedAddressPairsDialog = lazyComponent(
-  () => import('./SetAllowedAddressPairsDialog'),
-  'SetAllowedAddressPairsDialog',
+const SetAllowedAddressPairsDialog = lazyComponent(() =>
+  import('./SetAllowedAddressPairsDialog').then((module) => ({
+    default: module.SetAllowedAddressPairsDialog,
+  })),
 );
 
 export const SetAllowedAddressPairsButton: FunctionComponent<{

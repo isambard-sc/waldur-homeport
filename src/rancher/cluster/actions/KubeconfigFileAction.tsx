@@ -8,9 +8,10 @@ import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 import { getUser } from '@waldur/workspace/selectors';
 
-const RancherClusterKubeconfigDialog = lazyComponent(
-  () => import('./RancherClusterKubeconfigDialog'),
-  'RancherClusterKubeconfigDialog',
+const RancherClusterKubeconfigDialog = lazyComponent(() =>
+  import('./RancherClusterKubeconfigDialog').then((module) => ({
+    default: module.RancherClusterKubeconfigDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {

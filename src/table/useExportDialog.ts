@@ -5,9 +5,8 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { ExportFormat } from './exporters/types';
 
-const ExportDialog = lazyComponent(
-  () => import('./ExportDialog'),
-  'ExportDialog',
+const ExportDialog = lazyComponent(() =>
+  import('./ExportDialog').then((module) => ({ default: module.ExportDialog })),
 );
 
 export const useExportDialog = () => {

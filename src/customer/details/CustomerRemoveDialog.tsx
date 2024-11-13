@@ -19,7 +19,7 @@ interface CustomerRemoveDialogProps {
   dismiss: () => void;
 }
 
-export const PureCustomerRemoveDialog = reduxForm<
+const PureCustomerRemoveDialog = reduxForm<
   { reason },
   CustomerRemoveDialogProps
 >({

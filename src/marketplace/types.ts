@@ -222,17 +222,6 @@ export interface Category {
   group?: string;
 }
 
-export interface CategoryComponentUsage {
-  date: string;
-  reported_usage: number;
-  fixed_usage: number;
-  category_uuid: string;
-  category_title: string;
-  name: string;
-  type: string;
-  measured_unit: string;
-}
-
 export interface OfferingsListType {
   items: Offering[];
   loaded: boolean;

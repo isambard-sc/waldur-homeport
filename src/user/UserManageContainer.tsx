@@ -21,21 +21,25 @@ import { UserDetails } from '@waldur/workspace/types';
 import { CompleteYourProfileBanner } from './CompleteYourProfileBanner';
 import { UsersService } from './UsersService';
 
-const UserDetailsTable = lazyComponent(
-  () => import('@waldur/user/support/UserDetailsTable'),
-  'UserDetailsTable',
+const UserDetailsTable = lazyComponent(() =>
+  import('@waldur/user/support/UserDetailsTable').then((module) => ({
+    default: module.UserDetailsTable,
+  })),
 );
-const UserEditTab = lazyComponent(
-  () => import('@waldur/user/support/UserEditTab'),
-  'UserEditTab',
+const UserEditTab = lazyComponent(() =>
+  import('@waldur/user/support/UserEditTab').then((module) => ({
+    default: module.UserEditTab,
+  })),
 );
-const UserTermination = lazyComponent(
-  () => import('@waldur/user/support/UserTermination'),
-  'UserTermination',
+const UserTermination = lazyComponent(() =>
+  import('@waldur/user/support/UserTermination').then((module) => ({
+    default: module.UserTermination,
+  })),
 );
-const UserDeleteAccount = lazyComponent(
-  () => import('@waldur/user/support/UserDeleteAccount'),
-  'UserDeleteAccount',
+const UserDeleteAccount = lazyComponent(() =>
+  import('@waldur/user/support/UserDeleteAccount').then((module) => ({
+    default: module.UserDeleteAccount,
+  })),
 );
 
 const NotAllowedTab = () => (

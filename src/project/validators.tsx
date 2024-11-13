@@ -1,6 +1,3 @@
-import { FunctionComponent } from 'react';
-
-import { StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 
 const checkPattern = (value: string) => {
@@ -25,22 +22,3 @@ const checkDuplicate = (value, props) =>
 
 export const validateProjectName = (value, _, props) =>
   checkDuplicate(value, props) || checkPattern(value);
-
-interface ProjectNameFieldProps {
-  isDisabled?: boolean;
-  customer?;
-}
-
-export const ProjectNameField: FunctionComponent<ProjectNameFieldProps> = ({
-  isDisabled = false,
-}) => (
-  <StringField
-    label={translate('Project name')}
-    name="name"
-    placeholder={translate('e.g. Community Health Outreach')}
-    description={translate('This name will be visible in accounting data.')}
-    required={true}
-    validate={validateProjectName}
-    disabled={isDisabled}
-  />
-);

@@ -2,45 +2,55 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
-const ClusterUsersList = lazyComponent(
-  () => import('@waldur/rancher/cluster/users/ClusterUsersList'),
-  'ClusterUsersList',
+const ClusterUsersList = lazyComponent(() =>
+  import('@waldur/rancher/cluster/users/ClusterUsersList').then((module) => ({
+    default: module.ClusterUsersList,
+  })),
 );
-const ClusterCatalogList = lazyComponent(
-  () => import('../catalog/ClusterCatalogList'),
-  'ClusterCatalogList',
+const ClusterCatalogList = lazyComponent(() =>
+  import('../catalog/ClusterCatalogList').then((module) => ({
+    default: module.ClusterCatalogList,
+  })),
 );
-const ClusterProjectList = lazyComponent(
-  () => import('../ClusterProjectList'),
-  'ClusterProjectList',
+const ClusterProjectList = lazyComponent(() =>
+  import('../ClusterProjectList').then((module) => ({
+    default: module.ClusterProjectList,
+  })),
 );
-const ClusterNodesList = lazyComponent(
-  () => import('../node/ClusterNodesList'),
-  'ClusterNodesList',
+const ClusterNodesList = lazyComponent(() =>
+  import('../node/ClusterNodesList').then((module) => ({
+    default: module.ClusterNodesList,
+  })),
 );
-const ClusterTemplatesList = lazyComponent(
-  () => import('../template/ClusterTemplateList'),
-  'ClusterTemplatesList',
+const ClusterTemplatesList = lazyComponent(() =>
+  import('../template/ClusterTemplateList').then((module) => ({
+    default: module.ClusterTemplatesList,
+  })),
 );
-const ClusterApplicationsList = lazyComponent(
-  () => import('./apps/ClusterApplicationsList'),
-  'ClusterApplicationsList',
+const ClusterApplicationsList = lazyComponent(() =>
+  import('./apps/ClusterApplicationsList').then((module) => ({
+    default: module.ClusterApplicationsList,
+  })),
 );
-const ClusterIngressesList = lazyComponent(
-  () => import('./ClusterIngressesList'),
-  'ClusterIngressesList',
+const ClusterIngressesList = lazyComponent(() =>
+  import('./ClusterIngressesList').then((module) => ({
+    default: module.ClusterIngressesList,
+  })),
 );
-const ClusterServicesList = lazyComponent(
-  () => import('./ClusterServicesList'),
-  'ClusterServicesList',
+const ClusterServicesList = lazyComponent(() =>
+  import('./ClusterServicesList').then((module) => ({
+    default: module.ClusterServicesList,
+  })),
 );
-const ClusterWorkloadsList = lazyComponent(
-  () => import('./ClusterWorkloadsList'),
-  'ClusterWorkloadsList',
+const ClusterWorkloadsList = lazyComponent(() =>
+  import('./ClusterWorkloadsList').then((module) => ({
+    default: module.ClusterWorkloadsList,
+  })),
 );
-const ClusterHPAList = lazyComponent(
-  () => import('./hpas/ClusterHPAList'),
-  'ClusterHPAList',
+const ClusterHPAList = lazyComponent(() =>
+  import('./hpas/ClusterHPAList').then((module) => ({
+    default: module.ClusterHPAList,
+  })),
 );
 
 export const RancherClusterTabConfiguration: ResourceTabsConfiguration = {

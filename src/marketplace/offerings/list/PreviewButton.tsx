@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const PreviewOfferingDialog = lazyComponent(
-  () => import('./PreviewOfferingDialog'),
-  'PreviewOfferingDialog',
+const PreviewOfferingDialog = lazyComponent(() =>
+  import('./PreviewOfferingDialog').then((module) => ({
+    default: module.PreviewOfferingDialog,
+  })),
 );
 
 export const PreviewButton = ({ offering }) => {

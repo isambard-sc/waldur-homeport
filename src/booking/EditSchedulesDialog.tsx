@@ -14,7 +14,7 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { EDIT_SCHEDULES_FORM_ID } from './constants';
 import { OfferingScheduler } from './OfferingScheduler';
 
-export const formatSchedules = (schedules: any[]) =>
+const formatSchedules = (schedules: any[]) =>
   schedules
     .filter((item) => Object.keys(item).length > 0)
     .map(pick(['start', 'end', 'title', 'allDay', 'extendedProps', 'id']));

@@ -5,9 +5,10 @@ import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const BroadcastTemplateCreateDialog = lazyComponent(
-  () => import('./BroadcastTemplateCreateDialog'),
-  'BroadcastTemplateCreateDialog',
+const BroadcastTemplateCreateDialog = lazyComponent(() =>
+  import('./BroadcastTemplateCreateDialog').then((module) => ({
+    default: module.BroadcastTemplateCreateDialog,
+  })),
 );
 
 export const BroadcastTemplateCreateButton: FunctionComponent<{ refetch }> = ({

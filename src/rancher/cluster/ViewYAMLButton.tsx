@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const ViewYAMLDialog = lazyComponent(
-  () => import('./ViewYAMLDialog'),
-  'ViewYAMLDialog',
+const ViewYAMLDialog = lazyComponent(() =>
+  import('./ViewYAMLDialog').then((module) => ({
+    default: module.ViewYAMLDialog,
+  })),
 );
 
 export const ViewYAMLButton = ({

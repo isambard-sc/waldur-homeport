@@ -10,9 +10,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const CreateImageDialog = lazyComponent(
-  () => import('./CreateImageDialog'),
-  'CreateImageDialog',
+const CreateImageDialog = lazyComponent(() =>
+  import('./CreateImageDialog').then((module) => ({
+    default: module.CreateImageDialog,
+  })),
 );
 
 interface CreateImageButtonProps {

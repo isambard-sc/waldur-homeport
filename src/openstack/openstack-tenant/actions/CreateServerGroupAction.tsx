@@ -8,9 +8,10 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { TenantActionProps } from './types';
 
-const CreateServerGroupDialog = lazyComponent(
-  () => import('./CreateServerGroupDialog'),
-  'CreateServerGroupDialog',
+const CreateServerGroupDialog = lazyComponent(() =>
+  import('./CreateServerGroupDialog').then((module) => ({
+    default: module.CreateServerGroupDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

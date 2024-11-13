@@ -25,7 +25,7 @@ interface ChoicesTableProps extends PureChoicesTableProps {
   filterOptions?: FilterOptions;
 }
 
-export const PureChoicesTable: FC<ChoicesTableProps> = ({
+const PureChoicesTable: FC<ChoicesTableProps> = ({
   enableSelect = true,
   ...props
 }) => (

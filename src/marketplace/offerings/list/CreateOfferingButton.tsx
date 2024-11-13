@@ -7,9 +7,10 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const OfferingCreateDialog = lazyComponent(
-  () => import('../actions/OfferingCreateDialog'),
-  'OfferingCreateDialog',
+const OfferingCreateDialog = lazyComponent(() =>
+  import('../actions/OfferingCreateDialog').then((module) => ({
+    default: module.OfferingCreateDialog,
+  })),
 );
 
 export const CreateOfferingButton = ({

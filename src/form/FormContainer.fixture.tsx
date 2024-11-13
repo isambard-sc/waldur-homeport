@@ -3,7 +3,6 @@ import { formValues } from 'redux-form';
 
 import { FormContainer } from './FormContainer';
 import { StringField } from './StringField';
-import { mountTestForm } from './testUtils';
 import { TextField } from './TextField';
 
 const Component = (options) => (props) => {

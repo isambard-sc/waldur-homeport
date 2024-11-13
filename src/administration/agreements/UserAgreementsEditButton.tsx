@@ -4,9 +4,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const UserAgreementsEditDialog = lazyComponent(
-  () => import('./UserAgreementsEditDialog'),
-  'UserAgreementsEditDialog',
+const UserAgreementsEditDialog = lazyComponent(() =>
+  import('./UserAgreementsEditDialog').then((module) => ({
+    default: module.UserAgreementsEditDialog,
+  })),
 );
 
 export const UserAgreementsEditButton = ({ row, refetch }) => {

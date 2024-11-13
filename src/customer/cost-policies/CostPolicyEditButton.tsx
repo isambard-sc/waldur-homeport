@@ -12,9 +12,10 @@ import { updateOrganizationCostPolicy, updateProjectCostPolicy } from './api';
 import { CostPolicyFormData, CostPolicyType } from './types';
 import { getCostPolicyActionOptions } from './utils';
 
-const CostPolicyFormDialog = lazyComponent(
-  () => import('./CostPolicyFormDialog'),
-  'CostPolicyFormDialog',
+const CostPolicyFormDialog = lazyComponent(() =>
+  import('./CostPolicyFormDialog').then((module) => ({
+    default: module.CostPolicyFormDialog,
+  })),
 );
 
 interface SubmitedFormData {

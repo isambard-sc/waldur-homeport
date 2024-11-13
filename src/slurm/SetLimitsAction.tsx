@@ -9,9 +9,10 @@ import { ActionItemType } from '@waldur/resource/actions/types';
 import { useModalDialogCallback } from '@waldur/resource/actions/useModalDialogCallback';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 
-const SetLimitsDialog = lazyComponent(
-  () => import('./SetLimitsDialog'),
-  'SetLimitsDialog',
+const SetLimitsDialog = lazyComponent(() =>
+  import('./SetLimitsDialog').then((module) => ({
+    default: module.SetLimitsDialog,
+  })),
 );
 
 const validators = [validateState('OK'), validateStaffAction];

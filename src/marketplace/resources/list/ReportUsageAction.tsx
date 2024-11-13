@@ -13,9 +13,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 import { getUser } from '@waldur/workspace/selectors';
 
-const ResourceCreateUsageDialog = lazyComponent(
-  () => import('@waldur/marketplace/resources/usage/ResourceCreateUsageDialog'),
-  'ResourceCreateUsageDialog',
+const ResourceCreateUsageDialog = lazyComponent(() =>
+  import('@waldur/marketplace/resources/usage/ResourceCreateUsageDialog').then(
+    (module) => ({ default: module.ResourceCreateUsageDialog }),
+  ),
 );
 
 const validators = [validateState('OK')];

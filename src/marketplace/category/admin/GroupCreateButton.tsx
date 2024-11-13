@@ -5,9 +5,10 @@ import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const GroupCreateDialog = lazyComponent(
-  () => import('./GroupFromDialog'),
-  'GroupFromDialog',
+const GroupCreateDialog = lazyComponent(() =>
+  import('./GroupFromDialog').then((module) => ({
+    default: module.GroupFromDialog,
+  })),
 );
 
 const groupCreateDialog = (refetch) =>

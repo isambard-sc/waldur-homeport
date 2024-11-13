@@ -25,20 +25,20 @@ const linkify = (s) =>
 const loadIssue = (id) => getById<any>('/support-issues/', id);
 
 const loadDependencies = async (issueId: string) => {
-  const [
-    issue,
-    issueAttachmentsSagaModule,
-    issueCommentsSagaModule,
-    reducerModule,
-  ] = await Promise.all([
-    loadIssue(issueId),
-    import('@waldur/issues/attachments/effects'),
-    import('@waldur/issues/comments/effects'),
-    import('@waldur/issues/reducers'),
-  ]);
-  injectSaga('issueAttachmentsSaga', issueAttachmentsSagaModule.default);
-  injectSaga('issueCommentsSaga', issueCommentsSagaModule.default);
-  injectReducer('issues', reducerModule.reducer);
+  const [issue, issueAttachmentsSaga, issueCommentsSaga, reducer] =
+    await Promise.all([
+      loadIssue(issueId),
+      import('@waldur/issues/attachments/effects').then(
+        (module) => module.default,
+      ),
+      import('@waldur/issues/comments/effects').then(
+        (module) => module.default,
+      ),
+      import('@waldur/issues/reducers').then((module) => module.reducer),
+    ]);
+  injectSaga('issueAttachmentsSaga', issueAttachmentsSaga);
+  injectSaga('issueCommentsSaga', issueCommentsSaga);
+  injectReducer('issues', reducer);
   return issue;
 };
 

@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const CategoryEditDialog = lazyComponent(
-  () => import('./CategoryEditDialog'),
-  'CategoryEditDialog',
+const CategoryEditDialog = lazyComponent(() =>
+  import('./CategoryEditDialog').then((module) => ({
+    default: module.CategoryEditDialog,
+  })),
 );
 
 export const CategoryEditAction = ({ row, refetch }) => {

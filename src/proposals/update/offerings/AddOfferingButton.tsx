@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { Call } from '@waldur/proposals/types';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const CallOfferingCreateDialog = lazyComponent(
-  () => import('./CallOfferingCreateDialog'),
-  'CallOfferingCreateDialog',
+const CallOfferingCreateDialog = lazyComponent(() =>
+  import('./CallOfferingCreateDialog').then((module) => ({
+    default: module.CallOfferingCreateDialog,
+  })),
 );
 
 interface AddOfferingButtonProps {

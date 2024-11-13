@@ -12,9 +12,10 @@ import { showErrorResponse } from '@waldur/store/notify';
 import { updateCustomerCredit } from './api';
 import { CustomerCreditFormData } from './types';
 
-const CreditFormDialog = lazyComponent(
-  () => import('./CreditFormDialog'),
-  'CreditFormDialog',
+const CreditFormDialog = lazyComponent(() =>
+  import('./CreditFormDialog').then((module) => ({
+    default: module.CreditFormDialog,
+  })),
 );
 
 export const EditCreditButton = ({ row, refetch }) => {

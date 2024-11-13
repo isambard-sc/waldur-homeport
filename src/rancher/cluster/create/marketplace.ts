@@ -4,17 +4,20 @@ import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { MARKETPLACE_RANCHER } from './constants';
 
-const RancherClusterCheckoutSummary = lazyComponent(
-  () => import('./RancherClusterCheckoutSummary'),
-  'RancherClusterCheckoutSummary',
+const RancherClusterCheckoutSummary = lazyComponent(() =>
+  import('./RancherClusterCheckoutSummary').then((module) => ({
+    default: module.RancherClusterCheckoutSummary,
+  })),
 );
-const RancherPluginOptionsForm = lazyComponent(
-  () => import('./RancherPluginOptionsForm'),
-  'RancherPluginOptionsForm',
+const RancherPluginOptionsForm = lazyComponent(() =>
+  import('./RancherPluginOptionsForm').then((module) => ({
+    default: module.RancherPluginOptionsForm,
+  })),
 );
-const RancherOrderForm = lazyComponent(
-  () => import('./RancherOrderForm'),
-  'RancherOrderForm',
+const RancherOrderForm = lazyComponent(() =>
+  import('./RancherOrderForm').then((module) => ({
+    default: module.RancherOrderForm,
+  })),
 );
 
 const serializeDataVolume = ({ size, ...volumeRest }) => ({

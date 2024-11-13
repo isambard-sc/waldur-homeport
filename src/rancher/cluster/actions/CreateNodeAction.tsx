@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { Cluster } from '@waldur/rancher/types';
 import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton';
 
-const CreateNodeDialog = lazyComponent(
-  () => import('../create/CreateNodeDialog'),
-  'CreateNodeDialog',
+const CreateNodeDialog = lazyComponent(() =>
+  import('../create/CreateNodeDialog').then((module) => ({
+    default: module.CreateNodeDialog,
+  })),
 );
 
 export const CreateNodeAction: FC<{ resource: Cluster }> = ({ resource }) =>

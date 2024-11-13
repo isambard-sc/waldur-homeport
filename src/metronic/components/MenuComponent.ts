@@ -1088,4 +1088,4 @@ class MenuComponent {
   };
 }
 
-export { MenuComponent, defaultMenuOptions };
+export { MenuComponent };

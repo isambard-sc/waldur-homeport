@@ -17,12 +17,10 @@ import { SecurityGroup } from '@waldur/openstack/openstack-security-groups/types
 import { Table, createFetcher, useTable } from '@waldur/table';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const OpenStackSecurityGroupsDialog = lazyComponent(
-  () =>
-    import(
-      '@waldur/openstack/openstack-security-groups/OpenStackSecurityGroupsDialog'
-    ),
-  'OpenStackSecurityGroupsDialog',
+const OpenStackSecurityGroupsDialog = lazyComponent(() =>
+  import(
+    '@waldur/openstack/openstack-security-groups/OpenStackSecurityGroupsDialog'
+  ).then((module) => ({ default: module.OpenStackSecurityGroupsDialog })),
 );
 
 interface ShowSecurityGroupsButtonProps {

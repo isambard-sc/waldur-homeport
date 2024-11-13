@@ -6,9 +6,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const ChangePlanDialog = lazyComponent(
-  () => import('./ChangePlanDialog'),
-  'ChangePlanDialog',
+const ChangePlanDialog = lazyComponent(() =>
+  import('./ChangePlanDialog').then((module) => ({
+    default: module.ChangePlanDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

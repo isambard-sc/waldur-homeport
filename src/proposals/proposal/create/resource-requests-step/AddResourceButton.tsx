@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { Proposal } from '@waldur/proposals/types';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const ResourceRequestFormDialog = lazyComponent(
-  () => import('./ResourceRequestFormDialog'),
-  'ResourceRequestFormDialog',
+const ResourceRequestFormDialog = lazyComponent(() =>
+  import('./ResourceRequestFormDialog').then((module) => ({
+    default: module.ResourceRequestFormDialog,
+  })),
 );
 
 interface AddResourceButtonProps {

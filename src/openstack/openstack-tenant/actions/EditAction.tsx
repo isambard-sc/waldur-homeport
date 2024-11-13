@@ -6,7 +6,9 @@ import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 
 import { userCanModifyTenant } from './utils';
 
-const EditDialog = lazyComponent(() => import('./EditDialog'), 'EditDialog');
+const EditDialog = lazyComponent(() =>
+  import('./EditDialog').then((module) => ({ default: module.EditDialog })),
+);
 
 const validators = [userCanModifyTenant];
 

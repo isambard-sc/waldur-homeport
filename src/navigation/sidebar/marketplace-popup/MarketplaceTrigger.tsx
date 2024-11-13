@@ -10,9 +10,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import './MarketplaceTrigger.scss';
 
-const MarketplacePopup = lazyComponent(
-  () => import('./MarketplacePopup'),
-  'MarketplacePopup',
+const MarketplacePopup = lazyComponent(() =>
+  import('./MarketplacePopup').then((module) => ({
+    default: module.MarketplacePopup,
+  })),
 );
 
 export const MarketplaceTrigger: FunctionComponent = () => {

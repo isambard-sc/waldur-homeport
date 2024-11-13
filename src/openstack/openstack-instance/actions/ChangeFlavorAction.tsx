@@ -10,9 +10,10 @@ import {
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
-const ChangeFlavorDialog = lazyComponent(
-  () => import('./ChangeFlavorDialog'),
-  'ChangeFlavorDialog',
+const ChangeFlavorDialog = lazyComponent(() =>
+  import('./ChangeFlavorDialog').then((module) => ({
+    default: module.ChangeFlavorDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {

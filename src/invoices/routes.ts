@@ -4,20 +4,15 @@ import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 import { isOwnerOrStaff } from '@waldur/workspace/selectors';
 
-const BillingDetails = lazyComponent(
-  () => import('./details/BillingDetails'),
-  'BillingDetails',
-);
-const BillingTabs = lazyComponent(
-  () => import('./list/BillingTabs'),
-  'BillingTabs',
-);
-
 export const states: StateDeclaration[] = [
   {
     name: 'organization-billing.billing',
     url: 'billing/',
-    component: BillingTabs,
+    component: lazyComponent(() =>
+      import('./list/BillingTabs').then((module) => ({
+        default: module.BillingTabs,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Invoices'),
       permissions: [isOwnerOrStaff],
@@ -28,7 +23,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'billingDetails',
     url: 'billing/:invoice_uuid/?status',
-    component: BillingDetails,
+    component: lazyComponent(() =>
+      import('./details/BillingDetails').then((module) => ({
+        default: module.BillingDetails,
+      })),
+    ),
     parent: 'organization',
     data: {
       breadcrumb: () =>

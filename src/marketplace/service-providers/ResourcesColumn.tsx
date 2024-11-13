@@ -4,9 +4,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ProviderProjectResourcesDialog = lazyComponent(
-  () => import('./ProviderProjectResourcesDialog'),
-  'ProviderProjectResourcesDialog',
+const ProviderProjectResourcesDialog = lazyComponent(() =>
+  import('./ProviderProjectResourcesDialog').then((module) => ({
+    default: module.ProviderProjectResourcesDialog,
+  })),
 );
 
 export const ResourcesColumn = ({ row, provider_uuid }) => {

@@ -5,9 +5,10 @@ import { COMMON_OPTIONS } from '@waldur/support/marketplace';
 
 import { REMOTE_OFFERING_TYPE } from './constants';
 
-const RemoteOfferingSecretOptions = lazyComponent(
-  () => import('./RemoteOfferingSecretOptions'),
-  'RemoteOfferingSecretOptions',
+const RemoteOfferingSecretOptions = lazyComponent(() =>
+  import('./RemoteOfferingSecretOptions').then((module) => ({
+    default: module.RemoteOfferingSecretOptions,
+  })),
 );
 
 export const RemoteOffering: OfferingConfiguration = {

@@ -8,9 +8,10 @@ import { Resource } from '../types';
 
 import { ResourceSummaryProps } from './types';
 
-const ResourceMetadataDialog = lazyComponent(
-  () => import('./ResourceMetadataDialog'),
-  'ResourceMetadataDialog',
+const ResourceMetadataDialog = lazyComponent(() =>
+  import('./ResourceMetadataDialog').then((module) => ({
+    default: module.ResourceMetadataDialog,
+  })),
 );
 
 export const ResourceMetadataLink = <T extends Resource = any>(

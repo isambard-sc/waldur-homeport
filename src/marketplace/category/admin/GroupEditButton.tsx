@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const GroupEditDialog = lazyComponent(
-  () => import('./GroupFromDialog'),
-  'GroupFromDialog',
+const GroupEditDialog = lazyComponent(() =>
+  import('./GroupFromDialog').then((module) => ({
+    default: module.GroupFromDialog,
+  })),
 );
 
 const groupEditDialog = (row, refetch) =>

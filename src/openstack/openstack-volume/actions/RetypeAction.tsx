@@ -9,9 +9,8 @@ import {
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const RetypeDialog = lazyComponent(
-  () => import('./RetypeDialog'),
-  'RetypeDialog',
+const RetypeDialog = lazyComponent(() =>
+  import('./RetypeDialog').then((module) => ({ default: module.RetypeDialog })),
 );
 
 const validators = [validateRuntimeState('available'), validateState('OK')];

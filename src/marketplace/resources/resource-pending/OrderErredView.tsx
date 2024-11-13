@@ -18,9 +18,10 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { Resource } from '../types';
 
-const ResourceOrderErrorDialog = lazyComponent(
-  () => import('./ResourceOrderErrorDialog'),
-  'ResourceOrderErrorDialog',
+const ResourceOrderErrorDialog = lazyComponent(() =>
+  import('./ResourceOrderErrorDialog').then((module) => ({
+    default: module.ResourceOrderErrorDialog,
+  })),
 );
 
 interface OrderErredViewProps {

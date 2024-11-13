@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const UserDetailsDialog = lazyComponent(
-  () => import('./UserDetailsDialog'),
-  'UserDetailsDialog',
+const UserDetailsDialog = lazyComponent(() =>
+  import('./UserDetailsDialog').then((module) => ({
+    default: module.UserDetailsDialog,
+  })),
 );
 
 export const UserDetailsButton: FunctionComponent<{ row }> = ({ row }) => {

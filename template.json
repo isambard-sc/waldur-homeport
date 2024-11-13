@@ -2720,7 +2720,7 @@
     "message": "Date of reporting"
   },
   "Date": {
-    "description": "customer/payments/PaymentCreateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, customer/payments/PaymentsList.tsx, dashboard/chart.ts, invitations/actions/create/SendingStatus.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedbackListFilter.tsx, marketplace/resources/usage/ResourceUsageTable.tsx, marketplace/resources/usage/utils.ts",
+    "description": "customer/payments/PaymentCreateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, customer/payments/PaymentsList.tsx, invitations/actions/create/SendingStatus.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedbackListFilter.tsx, marketplace/resources/usage/ResourceUsageTable.tsx, marketplace/resources/usage/utils.ts",
     "message": "Date"
   },
   "Days": {
@@ -5168,7 +5168,7 @@
     "message": "Limit period"
   },
   "Limit": {
-    "description": "dashboard/chart.ts, marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/offerings/details/PlanUsageList.tsx, marketplace/offerings/details/policies/ComponentLimitsField.tsx, marketplace/orders/details/LimitsSection.tsx, reporting/plan-usage/PlanUsageList.tsx",
+    "description": "marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/offerings/details/PlanUsageList.tsx, marketplace/offerings/details/policies/ComponentLimitsField.tsx, marketplace/orders/details/LimitsSection.tsx, reporting/plan-usage/PlanUsageList.tsx",
     "message": "Limit"
   },
   "Limit-based": {
@@ -5720,7 +5720,7 @@
     "message": "Must be 2000 characters or less."
   },
   "Must be 500 characters or less.": {
-    "description": "project/ProjectNameField.tsx",
+    "description": "project/validators.tsx",
     "message": "Must be 500 characters or less."
   },
   "Must be a number.": {
@@ -5780,11 +5780,11 @@
     "message": "Name '{label}' must not start or end with a hyphen"
   },
   "Name is duplicated. Choose other name.": {
-    "description": "project/ProjectNameField.tsx",
+    "description": "project/validators.tsx",
     "message": "Name is duplicated. Choose other name."
   },
   "Name is required field.": {
-    "description": "project/ProjectNameField.tsx",
+    "description": "project/validators.tsx",
     "message": "Name is required field."
   },
   "Name is too short, names should be at least two alphanumeric characters.": {
@@ -5812,7 +5812,7 @@
     "message": "Name should consist of latin symbols, numbers and dashes."
   },
   "Name should contain at least 3 symbols.": {
-    "description": "project/ProjectNameField.tsx",
+    "description": "project/validators.tsx",
     "message": "Name should contain at least 3 symbols."
   },
   "Name": {
@@ -6344,7 +6344,7 @@
     "message": "Offering details synchronization has been scheduled."
   },
   "Offering details": {
-    "description": "marketplace/details/OverviewTab.tsx, marketplace/offerings/details/OfferingDetailsButton.tsx, marketplace/offerings/details/OfferingDetailsDialog.tsx",
+    "description": "marketplace/details/OverviewTab.tsx, marketplace/offerings/details/OfferingDetailsDialog.tsx",
     "message": "Offering details"
   },
   "Offering does not have any usage-based components.": {
@@ -6788,7 +6788,7 @@
     "message": "Organization group types"
   },
   "Organization group": {
-    "description": "administration/organizations/OrganizationGroupOrganizationsList.tsx, administration/organizations/OrganizationsFilter.tsx, customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, customer/list/SelectOrganizationGroupField.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "administration/organizations/OrganizationGroupOrganizationsList.tsx, administration/organizations/OrganizationsFilter.tsx, customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Organization group"
   },
   "Organization groups": {
@@ -7704,7 +7704,7 @@
     "message": "Project image"
   },
   "Project name": {
-    "description": "customer/team/CustomerUsersListExpandableRow.tsx, events/ExpandableEventDetailsTable.tsx, project/ProjectNameField.tsx, project/create/NameGroup.tsx",
+    "description": "customer/team/CustomerUsersListExpandableRow.tsx, events/ExpandableEventDetailsTable.tsx, project/create/NameGroup.tsx",
     "message": "Project name"
   },
   "Project owner": {
@@ -11012,7 +11012,7 @@
     "message": "This field is required."
   },
   "This name will be visible in accounting data.": {
-    "description": "azure/sql/AzureSQLServerForm.tsx, azure/vm/AzureVirtualMachineForm.tsx, marketplace/deploy/steps/ResourceNameGroup.tsx, project/ProjectNameField.tsx, project/create/NameGroup.tsx",
+    "description": "azure/sql/AzureSQLServerForm.tsx, azure/vm/AzureVirtualMachineForm.tsx, marketplace/deploy/steps/ResourceNameGroup.tsx, project/create/NameGroup.tsx",
     "message": "This name will be visible in accounting data."
   },
   "This offering has been archived.": {
@@ -12788,7 +12788,7 @@
     "message": "Usage reports"
   },
   "Usage": {
-    "description": "dashboard/chart.ts, marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/resources/change-limits/ChangeLimitsComponent.tsx, marketplace/resources/details/fetchData.tsx, reporting/plan-usage/PlanUsageDialog.tsx, slurm/details/utils.ts",
+    "description": "marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/resources/change-limits/ChangeLimitsComponent.tsx, marketplace/resources/details/fetchData.tsx, reporting/plan-usage/PlanUsageDialog.tsx, slurm/details/utils.ts",
     "message": "Usage"
   },
   "Usage-based": {
@@ -13604,7 +13604,7 @@
     "message": "disks"
   },
   "e.g. Community Health Outreach": {
-    "description": "project/ProjectNameField.tsx, project/create/NameGroup.tsx",
+    "description": "project/create/NameGroup.tsx",
     "message": "e.g. Community Health Outreach"
   },
   "e.g. MyApp": {

@@ -9,9 +9,10 @@ import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { getUser } from '@waldur/workspace/selectors';
 
-const SetBackendIdDialog = lazyComponent(
-  () => import('./SetBackendIdDialog'),
-  'SetBackendIdDialog',
+const SetBackendIdDialog = lazyComponent(() =>
+  import('./SetBackendIdDialog').then((module) => ({
+    default: module.SetBackendIdDialog,
+  })),
 );
 
 export const SetBackendIdAction: ActionItemType = ({ resource, refetch }) => {

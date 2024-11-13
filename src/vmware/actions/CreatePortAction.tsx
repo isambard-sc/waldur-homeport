@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton';
 
-const CreatePortDialog = lazyComponent(
-  () => import('./CreatePortDialog'),
-  'CreatePortDialog',
+const CreatePortDialog = lazyComponent(() =>
+  import('./CreatePortDialog').then((module) => ({
+    default: module.CreatePortDialog,
+  })),
 );
 
 const validators = [validateState('OK')];

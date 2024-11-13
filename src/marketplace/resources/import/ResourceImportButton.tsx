@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const ResourceImportDialog = lazyComponent(
-  () => import('./ResourceImportDialog'),
-  'ResourceImportDialog',
+const ResourceImportDialog = lazyComponent(() =>
+  import('./ResourceImportDialog').then((module) => ({
+    default: module.ResourceImportDialog,
+  })),
 );
 
 interface ResourceImportButtonProps {

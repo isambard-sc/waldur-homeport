@@ -20,9 +20,10 @@ interface RowProps {
   actions?: React.ReactNode;
 }
 
-const EditFieldDialog = lazyComponent(
-  () => import('./EditFieldDialog'),
-  'EditFieldDialog',
+const EditFieldDialog = lazyComponent(() =>
+  import('./EditFieldDialog').then((module) => ({
+    default: module.EditFieldDialog,
+  })),
 );
 
 export const UserEditRow = (props: RowProps) => {

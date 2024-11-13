@@ -21,82 +21,97 @@ import { getTabs } from '@waldur/resource/tabs/registry';
 import { getResourceAccessEndpoints } from '@waldur/resource/utils';
 import { SLURM_PLUGIN } from '@waldur/slurm/constants';
 
-const ResourceOrders = lazyComponent(
-  () => import('@waldur/marketplace/orders/list/ResourceOrders'),
-  'ResourceOrders',
+const ResourceOrders = lazyComponent(() =>
+  import('@waldur/marketplace/orders/list/ResourceOrders').then((module) => ({
+    default: module.ResourceOrders,
+  })),
 );
 
-const RobotAccountCard = lazyComponent(
-  () => import('@waldur/marketplace/robot-accounts/RobotAccountCard'),
-  'RobotAccountCard',
+const RobotAccountCard = lazyComponent(() =>
+  import('@waldur/marketplace/robot-accounts/RobotAccountCard').then(
+    (module) => ({ default: module.RobotAccountCard }),
+  ),
 );
 
-const AllocationJobsTable = lazyComponent(
-  () => import('@waldur/slurm/details/AllocationJobsTable'),
-  'AllocationJobsTable',
+const AllocationJobsTable = lazyComponent(() =>
+  import('@waldur/slurm/details/AllocationJobsTable').then((module) => ({
+    default: module.AllocationJobsTable,
+  })),
 );
 
-const AllocationUsersTable = lazyComponent(
-  () => import('@waldur/slurm/details/AllocationUsersTable'),
-  'AllocationUsersTable',
+const AllocationUsersTable = lazyComponent(() =>
+  import('@waldur/slurm/details/AllocationUsersTable').then((module) => ({
+    default: module.AllocationUsersTable,
+  })),
 );
 
-const LexisLinkCard = lazyComponent(
-  () => import('../lexis/LexisLinkCard'),
-  'LexisLinkCard',
+const LexisLinkCard = lazyComponent(() =>
+  import('../lexis/LexisLinkCard').then((module) => ({
+    default: module.LexisLinkCard,
+  })),
 );
 
-const ResourceOptionsCard = lazyComponent(
-  () => import('../options/ResourceOptionsCard'),
-  'ResourceOptionsCard',
+const ResourceOptionsCard = lazyComponent(() =>
+  import('../options/ResourceOptionsCard').then((module) => ({
+    default: module.ResourceOptionsCard,
+  })),
 );
 
-const ResourceUsersList = lazyComponent(
-  () => import('../users/ResourceUsersList'),
-  'ResourceUsersList',
+const ResourceUsersList = lazyComponent(() =>
+  import('../users/ResourceUsersList').then((module) => ({
+    default: module.ResourceUsersList,
+  })),
 );
 
-const ActivityCard = lazyComponent(
-  () => import('./ActivityCard'),
-  'ActivityCard',
+const ActivityCard = lazyComponent(() =>
+  import('./ActivityCard').then((module) => ({ default: module.ActivityCard })),
 );
 
-const BookingMainComponent = lazyComponent(
-  () => import('./BookingMainComponent'),
-  'BookingMainComponent',
+const BookingMainComponent = lazyComponent(() =>
+  import('./BookingMainComponent').then((module) => ({
+    default: module.BookingMainComponent,
+  })),
 );
 
-const GettingStartedCard = lazyComponent(
-  () => import('./GettingStartedCard'),
-  'GettingStartedCard',
+const GettingStartedCard = lazyComponent(() =>
+  import('./GettingStartedCard').then((module) => ({
+    default: module.GettingStartedCard,
+  })),
 );
 
-const InstanceMainComponent = lazyComponent(
-  () => import('./openstack-instance/InstanceMainComponent'),
-  'InstanceMainComponent',
+const InstanceMainComponent = lazyComponent(() =>
+  import('./openstack-instance/InstanceMainComponent').then((module) => ({
+    default: module.InstanceMainComponent,
+  })),
 );
 
-const ResourceIssuesCard = lazyComponent(
-  () => import('./ResourceIssuesCard'),
-  'ResourceIssuesCard',
+const ResourceIssuesCard = lazyComponent(() =>
+  import('./ResourceIssuesCard').then((module) => ({
+    default: module.ResourceIssuesCard,
+  })),
 );
 
-const ResourceMetadataCard = lazyComponent(
-  () => import('./ResourceMetadataCard'),
-  'ResourceMetadataCard',
+const ResourceMetadataCard = lazyComponent(() =>
+  import('./ResourceMetadataCard').then((module) => ({
+    default: module.ResourceMetadataCard,
+  })),
 );
 
-const TenantMainComponent = lazyComponent(
-  () => import('./TenantMainComponent'),
-  'TenantMainComponent',
+const TenantMainComponent = lazyComponent(() =>
+  import('./TenantMainComponent').then((module) => ({
+    default: module.TenantMainComponent,
+  })),
 );
 
-const TenantMigrationsList = lazyComponent(
-  () => import('@waldur/openstack/openstack-tenant/TenantMigrationsList'),
-  'TenantMigrationsList',
+const TenantMigrationsList = lazyComponent(() =>
+  import('@waldur/openstack/openstack-tenant/TenantMigrationsList').then(
+    (module) => ({ default: module.TenantMigrationsList }),
+  ),
 );
 
-const UsageCard = lazyComponent(() => import('./UsageCard'), 'UsageCard');
+const UsageCard = lazyComponent(() =>
+  import('./UsageCard').then((module) => ({ default: module.UsageCard })),
+);
 
 export const getResourceTabs = ({
   resource,

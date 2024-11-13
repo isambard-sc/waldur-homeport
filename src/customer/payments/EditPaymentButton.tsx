@@ -7,9 +7,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const PaymentUpdateDialogContainer = lazyComponent(
-  () => import('@waldur/customer/payments/PaymentUpdateDialog'),
-  'PaymentUpdateDialogContainer',
+const PaymentUpdateDialogContainer = lazyComponent(() =>
+  import('@waldur/customer/payments/PaymentUpdateDialog').then((module) => ({
+    default: module.PaymentUpdateDialogContainer,
+  })),
 );
 
 export const EditPaymentButton = ({ payment }) => {

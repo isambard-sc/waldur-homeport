@@ -273,4 +273,4 @@ class ScrollComponent {
   }
 }
 
-export { ScrollComponent, defaultScrollOptions };
+export { ScrollComponent };

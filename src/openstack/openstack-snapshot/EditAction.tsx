@@ -6,7 +6,9 @@ import { validateState } from '@waldur/resource/actions/base';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const EditDialog = lazyComponent(() => import('./EditDialog'), 'EditDialog');
+const EditDialog = lazyComponent(() =>
+  import('./EditDialog').then((module) => ({ default: module.EditDialog })),
+);
 
 const validators = [validateState('OK')];
 

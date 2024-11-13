@@ -84,7 +84,7 @@ function redirectOnSuccess() {
   }
 }
 
-export function clearTokenHeader() {
+function clearTokenHeader() {
   delete Axios.defaults.headers.Authorization;
 }
 

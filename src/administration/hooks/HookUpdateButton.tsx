@@ -8,12 +8,13 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { ADMIN_HOOK_LIST_ID } from './constants';
 
-const HookDetailsDialog = lazyComponent(
-  () => import('@waldur/user/hooks/HookDetailsDialog'),
-  'HookDetailsDialog',
+const HookDetailsDialog = lazyComponent(() =>
+  import('@waldur/user/hooks/HookDetailsDialog').then((module) => ({
+    default: module.HookDetailsDialog,
+  })),
 );
 
-export const showHookUpdateDialog = (row?) =>
+const showHookUpdateDialog = (row?) =>
   openModalDialog(HookDetailsDialog, {
     resolve: { hook: row, listId: ADMIN_HOOK_LIST_ID },
     size: 'md',

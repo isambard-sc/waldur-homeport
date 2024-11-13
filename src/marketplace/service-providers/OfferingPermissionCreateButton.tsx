@@ -10,9 +10,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const OfferingPermissionCreateDialog = lazyComponent(
-  () => import('./OfferingPermissionCreateDialog'),
-  'OfferingPermissionCreateDialog',
+const OfferingPermissionCreateDialog = lazyComponent(() =>
+  import('./OfferingPermissionCreateDialog').then((module) => ({
+    default: module.OfferingPermissionCreateDialog,
+  })),
 );
 
 export const OfferingPermissionCreateButton: React.FC<{ fetch }> = ({

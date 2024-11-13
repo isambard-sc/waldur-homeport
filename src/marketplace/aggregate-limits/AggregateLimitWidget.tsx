@@ -20,9 +20,10 @@ interface AggregateLimitWidgetProps {
   error: any;
 }
 
-const AggregateLimitDetailsDialog = lazyComponent(
-  () => import('./AggregateLimitDetailsDialog'),
-  'AggregateLimitDetailsDialog',
+const AggregateLimitDetailsDialog = lazyComponent(() =>
+  import('./AggregateLimitDetailsDialog').then((module) => ({
+    default: module.AggregateLimitDetailsDialog,
+  })),
 );
 
 export const ComponentItem = ({ component }) => {

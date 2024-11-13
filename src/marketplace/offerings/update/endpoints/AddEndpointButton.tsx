@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { ENDPOINT_FORM_ID } from './constants';
 
-const AddEndpointDialog = lazyComponent(
-  () => import('./AddEndpointDialog'),
-  'AddEndpointDialog',
+const AddEndpointDialog = lazyComponent(() =>
+  import('./AddEndpointDialog').then((module) => ({
+    default: module.AddEndpointDialog,
+  })),
 );
 
 export const AddEndpointButton: FunctionComponent<{

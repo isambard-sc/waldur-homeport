@@ -3,9 +3,10 @@ import { Question } from '@phosphor-icons/react';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { useModal } from '@waldur/modal/hooks';
 
-const OpenStackSecurityGroupsDialog = lazyComponent(
-  () => import('./OpenStackSecurityGroupsDialog'),
-  'OpenStackSecurityGroupsDialog',
+const OpenStackSecurityGroupsDialog = lazyComponent(() =>
+  import('./OpenStackSecurityGroupsDialog').then((module) => ({
+    default: module.OpenStackSecurityGroupsDialog,
+  })),
 );
 
 export const OpenStackSecurityGroupsLink = ({ items }) => {
