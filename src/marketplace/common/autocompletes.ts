@@ -146,7 +146,7 @@ export const userAutocomplete = async (
 ) => {
   const params = {
     full_name: query,
-    field: ['full_name', 'url', 'username', 'email'],
+    field: ['full_name', 'url', 'username', 'email', 'uuid'],
     o: ['full_name'],
     page: page,
     page_size: ENV.pageSize,
