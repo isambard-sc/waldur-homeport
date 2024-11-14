@@ -25,21 +25,16 @@ export function loadTheme(newTheme: ThemeName) {
   styleTag.href = hrefs[newTheme];
 }
 
-function getPreference(): ThemeName {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
-}
-
 /** Get initial theme from local storage or user preference */
 export const getInitialTheme = () => {
-  let currentTheme = ThemeStorage.getTheme();
-  if (!currentTheme) {
-    currentTheme = getPreference();
-  }
   if (ENV.plugins.WALDUR_CORE.DISABLE_DARK_THEME) {
-    currentTheme = 'light';
+    return 'light';
   }
-  ThemeStorage.setTheme(currentTheme);
-  return currentTheme;
+  if (hrefs[ThemeStorage.getTheme()]) {
+    return ThemeStorage.getTheme();
+  }
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
+  }
+  return 'light';
 };

@@ -35,18 +35,6 @@ export default defineConfig({
   ],
   build: {
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('metronic/sass/style.dark')) {
-            return 'dark-bundle';
-          }
-          if (id.includes('metronic/sass/style')) {
-            return 'light-bundle';
-          }
-        },
-      },
-    },
   },
   test: {
     include: ['**/*.test.ts', '**/*.test.tsx'],
