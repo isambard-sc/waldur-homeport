@@ -7,7 +7,6 @@ import { type IssueAttachmentState } from '@waldur/issues/attachments/types';
 import { type IssueCommentState } from '@waldur/issues/comments/types';
 import { reducer as marketplace } from '@waldur/marketplace/store/reducers';
 import { reducer as modal } from '@waldur/modal/reducer';
-import { reducer as theme } from '@waldur/navigation/theme/store';
 import { reducer as title } from '@waldur/navigation/title';
 import { type TableState } from '@waldur/table/types';
 import { reducer as workspace } from '@waldur/workspace/reducers';
@@ -20,7 +19,6 @@ export const staticReducers = {
   workspace,
   marketplace,
   title,
-  theme,
 };
 
 const rootReducer = combineReducers(staticReducers);

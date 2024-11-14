@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 
 import { EChart } from '@waldur/core/EChart';
-import { useTheme } from '@waldur/store/hooks';
+import { useTheme } from '@waldur/theme/useTheme';
 
 import { getRingChartOptions } from './chart';
 import { RingChartOption } from './types';
@@ -19,7 +19,7 @@ export const RingChart: FC<RingChartProps> = ({
   width = '150px',
   className,
 }) => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const options = useMemo(
     () => getRingChartOptions(option, theme),
     [option, theme],

@@ -2660,7 +2660,7 @@
     "message": "Dangerous actions"
   },
   "Dark theme": {
-    "description": "navigation/theme/ThemeSwitcher.tsx",
+    "description": "theme/ThemeSwitcher.tsx",
     "message": "Dark theme"
   },
   "Dark": {

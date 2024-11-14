@@ -9,7 +9,7 @@ import { translate } from '@waldur/i18n';
 import { getUser } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
 
-import { ThemeSwitcher } from '../theme/ThemeSwitcher';
+import { ThemeSwitcher } from '../../theme/ThemeSwitcher';
 
 import { LanguageSelectorDropdown } from './LanguageSelectorDropdown';
 import { UserDropdownMenuItems } from './UserDropdownMenuItems';

@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { useTheme } from '@waldur/store/hooks';
+import { useTheme } from '@waldur/theme/useTheme';
 
 interface ChartProps {
   width?: string;
@@ -20,7 +20,7 @@ export const EChart: React.FC<ChartProps> = ({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<any>(null);
   const [loading, setLoading] = useState(false);
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   useEffect(() => {
     drawChart();

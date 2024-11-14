@@ -18,7 +18,7 @@ import { MasterInit } from './metronic/layout/MasterInit';
 import { NotificationContainer } from './NotificationContainer';
 import { router } from './router';
 import { states } from './states';
-import { ThemeSelector } from './ThemeSelector';
+import { ThemeProvider } from './theme/ThemeProvider';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,12 +46,13 @@ export const Application: FunctionComponent = () => {
         <QueryClientProvider client={queryClient}>
           <Provider store={store}>
             <LayoutProvider>
-              <ThemeSelector />
-              <NotificationContainer />
-              <ModalRoot />
-              <DrawerRoot />
-              <UIView />
-              <MasterInit />
+              <ThemeProvider>
+                <NotificationContainer />
+                <ModalRoot />
+                <DrawerRoot />
+                <UIView />
+                <MasterInit />
+              </ThemeProvider>
             </LayoutProvider>
           </Provider>
         </QueryClientProvider>
