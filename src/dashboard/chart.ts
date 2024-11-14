@@ -47,7 +47,10 @@ export const getScopeChartOptions = (
               {
                 label: {
                   show: false,
-                  position: 'middle',
+                  position:
+                    line.value > Math.max(...values.map((v) => Number(v)))
+                      ? 'insideMiddleBottom'
+                      : 'insideMiddleTop',
                   formatter: line.label,
                 },
                 emphasis: { label: { show: true } },
