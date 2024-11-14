@@ -48,32 +48,22 @@ export interface LanguageOption {
 export interface ApplicationConfigurationOptions {
   apiEndpoint: string;
   plugins?: PluginConfiguration;
-  /** Language choices and default language are fetched from MasterMind */
+  // Language choices and default language are fetched from MasterMind
   languageChoices?: LanguageOption[];
   defaultLanguage?: string;
   FEATURES?: Record<string, boolean>;
   marketplaceLandingPageTitle: string;
+  pageSizes: number[];
   pageSize: number;
+  defaultErrorMessage: string;
   buildId: string;
   accountingMode: 'billing' | 'accounting';
+  defaultPullInterval: number;
+  countersTimerInterval: number;
   roles: Role[];
-  /**
-    Provide exclude file types for issue attachments uploading
-    Based on https://github.com/okonet/attr-accept
-    Reffered to https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input#Attributes
-    Available value format:
-    A file extension starting with the STOP character (U+002E). (e.g. .jpg, .png, .doc).
-    A valid MIME type with no extensions.
-    audio/* representing sound files.
-    video/* representing video files.
-    image/* representing image files.
-  */
+  invitationRedirectTime: number;
   excludedAttachmentTypes: string[];
-
-  /** Ensure that customer, project and resource name contains only ASCII chars. */
   enforceLatinName: boolean;
-
-  /** It can be either 'localStorage' or 'sessionStorage'. */
   authStorage: string;
 }
 

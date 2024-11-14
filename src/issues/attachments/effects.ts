@@ -1,14 +1,13 @@
 import {
   call,
   put,
-  race,
-  select,
-  spawn,
   take,
   takeEvery,
+  select,
+  spawn,
+  race,
 } from 'redux-saga/effects';
 
-import { ENV } from '@waldur/configs/default';
 import { format } from '@waldur/core/ErrorMessageFormatter';
 import { translate } from '@waldur/i18n';
 import { ISSUE_COMMENTS_FORM_SUBMIT_CANCEL } from '@waldur/issues/comments/constants';
@@ -17,7 +16,7 @@ import { showError } from '@waldur/store/notify';
 import * as actions from './actions';
 import * as api from './api';
 import * as constants from './constants';
-import { getDeleting } from './selectors';
+import { getDeleting, getExludedTypes } from './selectors';
 import * as utils from './utils';
 
 function* issueAttachmentsGet(action) {
@@ -58,10 +57,11 @@ function* issueAttachmentUpload(action) {
 
 function* issueAttachmentsPut(action) {
   const { issueUrl, files } = action.payload;
+  const excludedTypes = yield select(getExludedTypes);
   const { accepted, rejected } = yield call(
     utils.validateFiles,
     files,
-    ENV.excludedAttachmentTypes,
+    excludedTypes,
   );
 
   if (rejected.length) {
