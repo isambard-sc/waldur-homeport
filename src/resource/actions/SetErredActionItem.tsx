@@ -42,7 +42,7 @@ export const SetErredActionItem: FC<{
   const user = useSelector(getUser);
   if (
     !hasPermission(user, {
-      permission: PermissionEnum.SET_RESOURCE_STATE_ERRED,
+      permission: PermissionEnum.SET_RESOURCE_STATE,
       customerId: customer_uuid,
     }) ||
     !resource_uuid
