@@ -1,6 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
 
-import { ENV } from '@waldur/configs/default';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import eventsRegistry from '@waldur/events/registry';
 import { translate } from '@waldur/i18n';
@@ -38,7 +37,7 @@ export const BaseEventsList: FunctionComponent<{
       filter,
       fetchData: createFetcher('events'),
       queryField: 'message',
-      pullInterval: ENV.countersTimerInterval * 1000,
+      pullInterval: 30 * 1000,
     }),
     [table, filter],
   );
