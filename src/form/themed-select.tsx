@@ -11,7 +11,7 @@ import { AsyncPaginate as BaseAsyncPaginate } from 'react-select-async-paginate'
 import BaseWindowedSelect from 'react-windowed-select';
 
 import { translate } from '@waldur/i18n';
-import { useTheme } from '@waldur/store/hooks';
+import { useTheme } from '@waldur/theme/useTheme';
 
 const REACT_SELECT_MENU_PORTALING: Partial<SelectProps> = {
   menuPortalTarget: document.body,
@@ -74,7 +74,7 @@ const DARK_COLORS = {
 };
 
 const useSelectTheme = (): ThemeConfig => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return (boxTheme) => {
     if (theme === 'dark') {
       return {

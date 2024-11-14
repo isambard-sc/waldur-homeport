@@ -4,10 +4,10 @@ import { ENV } from '@waldur/configs/default';
 import { fixURL } from '@waldur/core/api';
 import { Link } from '@waldur/core/Link';
 import { useLayout } from '@waldur/metronic/layout/core';
-import { useTheme } from '@waldur/store/hooks';
+import { useTheme } from '@waldur/theme/useTheme';
 
 export const BrandName: FunctionComponent = () => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   const sidebarTheme = ENV.plugins.WALDUR_CORE.SIDEBAR_STYLE || 'dark';
   const layout = useLayout();
   // switch aside.minimized to keep sidebar state between pages

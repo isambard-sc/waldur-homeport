@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Validator } from 'redux-form';
 
-import { useTheme } from '@waldur/store/hooks';
+import { useTheme } from '@waldur/theme/useTheme';
 
 import { MonacoEditor } from './MonacoEditor';
 
@@ -22,7 +22,7 @@ interface MonacoFieldProps {
 }
 
 const getTheme = (): string => {
-  const theme = useTheme();
+  const { theme } = useTheme();
   return theme === 'dark' ? 'vs-dark' : 'vs-light';
 };
 

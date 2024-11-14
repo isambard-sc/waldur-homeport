@@ -1,6 +1,6 @@
 import { EChartsOption } from 'echarts';
 
-import { ThemeName } from '@waldur/navigation/theme/types';
+import { ThemeName } from '@waldur/theme/types';
 
 import { LINE_CHART_COLOR } from './constants';
 import { Chart, RingChartOption } from './types';

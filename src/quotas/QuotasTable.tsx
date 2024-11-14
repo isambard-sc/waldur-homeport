@@ -5,7 +5,7 @@ import { Col, Row } from 'react-bootstrap';
 import { EChart } from '@waldur/core/EChart';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
 import { translate } from '@waldur/i18n';
-import { useTheme } from '@waldur/store/hooks';
+import { useTheme } from '@waldur/theme/useTheme';
 
 import { QUOTA_CATEGORIES } from './constants';
 import { Quota } from './types';
@@ -23,7 +23,7 @@ const ResourceQuotaChart = ({ value, max }) => {
   if (percentage > 95) color = '#CC0808';
   else if (percentage > 60) color = '#FCCF5C';
 
-  const theme = useTheme();
+  const { theme } = useTheme();
 
   const chartOptions: EChartsOption = {
     tooltip: {
