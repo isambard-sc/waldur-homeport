@@ -500,7 +500,7 @@
     "message": "After round is closed"
   },
   "After secret API code has been regenerated, it will not be possible to submit usage with the old key.": {
-    "description": "marketplace/service-providers/ServiceProviderSecretCodeGenerateConfirm.tsx",
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "After secret API code has been regenerated, it will not be possible to submit usage with the old key."
   },
   "Aggregate usage and limits": {
@@ -526,10 +526,6 @@
   "Agriculture, forestry, and fisheries": {
     "description": "project/OECD_FOS_2007_CODES.ts",
     "message": "Agriculture, forestry, and fisheries"
-  },
-  "Alert": {
-    "description": "marketplace/service-providers/ServiceProviderSecretCodeGenerateConfirm.tsx",
-    "message": "Alert"
   },
   "All actions": {
     "description": "invitations/InvitationsMultiSelectActions.tsx, marketplace/resources/mass-actions/ResourceMultiSelectAction.tsx",
@@ -4244,15 +4240,15 @@
     "message": "Go to service catalog"
   },
   "Google Calendar has been published successfully.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Google Calendar has been published successfully."
   },
   "Google Calendar has been synced successfully.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Google Calendar has been synced successfully."
   },
   "Google Calendar has been unpublished successfully.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Google Calendar has been unpublished successfully."
   },
   "Grant permission": {
@@ -4936,11 +4932,11 @@
     "message": "Invoice from"
   },
   "Invoice has been successfully linked to payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/LinkInvoiceAction.tsx",
     "message": "Invoice has been successfully linked to payment."
   },
   "Invoice has been successfully unlinked from payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/UnlinkInvoiceButton.tsx",
     "message": "Invoice has been successfully unlinked from payment."
   },
   "Invoice item has been removed.": {
@@ -6372,7 +6368,7 @@
     "message": "Offering description"
   },
   "Offering details synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering details synchronization has been scheduled."
   },
   "Offering details": {
@@ -6416,7 +6412,7 @@
     "message": "Offering has been updated successfully."
   },
   "Offering invoices synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering invoices synchronization has been scheduled."
   },
   "Offering is restricted to {organization}": {
@@ -6440,7 +6436,7 @@
     "message": "Offering name"
   },
   "Offering orders synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering orders synchronization has been scheduled."
   },
   "Offering permissions": {
@@ -6448,7 +6444,7 @@
     "message": "Offering permissions"
   },
   "Offering project data synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering project data synchronization has been scheduled."
   },
   "Offering request has been accepted.": {
@@ -6464,7 +6460,7 @@
     "message": "Offering request has been submitted."
   },
   "Offering resources synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering resources synchronization has been scheduled."
   },
   "Offering shared?": {
@@ -6484,7 +6480,7 @@
     "message": "Offering type"
   },
   "Offering usage synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering usage synchronization has been scheduled."
   },
   "Offering user has been created.": {
@@ -6496,7 +6492,7 @@
     "message": "Offering user has been deleted."
   },
   "Offering users synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Offering users synchronization has been scheduled."
   },
   "Offering users": {
@@ -7036,11 +7032,11 @@
     "message": "Payment has already been done."
   },
   "Payment has been created.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/PaymentCreateDialog.tsx",
     "message": "Payment has been created."
   },
   "Payment has been deleted.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/DeletePaymentButton.tsx",
     "message": "Payment has been deleted."
   },
   "Payment has been processed successfully.": {
@@ -7048,7 +7044,7 @@
     "message": "Payment has been processed successfully."
   },
   "Payment has been updated.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/PaymentUpdateDialog.tsx",
     "message": "Payment has been updated."
   },
   "Payment is being processed, please wait.": {
@@ -7056,23 +7052,23 @@
     "message": "Payment is being processed, please wait."
   },
   "Payment profile has been created and enabled.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx",
     "message": "Payment profile has been created and enabled."
   },
   "Payment profile has been created.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx",
     "message": "Payment profile has been created."
   },
   "Payment profile has been enabled.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileEnableButton.tsx",
     "message": "Payment profile has been enabled."
   },
   "Payment profile has been removed.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileDeleteButton.tsx",
     "message": "Payment profile has been removed."
   },
   "Payment profile has been updated.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileUpdateDialog.tsx",
     "message": "Payment profile has been updated."
   },
   "Payment profiles": {
@@ -8271,8 +8267,12 @@
     "description": "marketplace/common/RefreshButton.tsx, navigation/BackendHealthStatusDialog.tsx",
     "message": "Refresh"
   },
+  "Regenerate secret API code": {
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "message": "Regenerate secret API code"
+  },
   "Regenerate": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx, marketplace/service-providers/ServiceProviderSecretCodeGenerateConfirm.tsx",
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "Regenerate"
   },
   "Register as a customer of our portal and provide your cloud services through the service catalog.": {
@@ -8796,7 +8796,7 @@
     "message": "Resource is not connected to the service catalog yet."
   },
   "Resource limits change request has been submitted.": {
-    "description": "marketplace/resources/store/effects.ts",
+    "description": "marketplace/resources/change-limits/ChangeLimitsBody.tsx",
     "message": "Resource limits change request has been submitted."
   },
   "Resource metadata": {
@@ -9108,7 +9108,7 @@
     "message": "Robot account"
   },
   "Robot accounts synchronization has been scheduled.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Robot accounts synchronization has been scheduled."
   },
   "Robot accounts": {
@@ -9836,7 +9836,7 @@
     "message": "Service discovery"
   },
   "Service provider API secret code has been generated.": {
-    "description": "marketplace/service-providers/store/effects.ts",
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "Service provider API secret code has been generated."
   },
   "Service provider can charge for usage of the following components": {
@@ -11636,11 +11636,11 @@
     "message": "Unable to create organization group."
   },
   "Unable to create payment profile.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx",
     "message": "Unable to create payment profile."
   },
   "Unable to create payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/PaymentCreateDialog.tsx",
     "message": "Unable to create payment."
   },
   "Unable to create plan.": {
@@ -11720,7 +11720,7 @@
     "message": "Unable to delete offering user."
   },
   "Unable to delete payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/DeletePaymentButton.tsx",
     "message": "Unable to delete payment."
   },
   "Unable to delete policy.": {
@@ -11772,7 +11772,7 @@
     "message": "Unable to edit the credit"
   },
   "Unable to enable payment profile.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileEnableButton.tsx",
     "message": "Unable to enable payment profile."
   },
   "Unable to export table.": {
@@ -11804,11 +11804,11 @@
     "message": "Unable to find:"
   },
   "Unable to generate service provider API secret code.": {
-    "description": "marketplace/service-providers/store/effects.ts",
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "Unable to generate service provider API secret code."
   },
   "Unable to get service provider API secret code.": {
-    "description": "marketplace/service-providers/store/effects.ts",
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "Unable to get service provider API secret code."
   },
   "Unable to grant permission.": {
@@ -11832,7 +11832,7 @@
     "message": "Unable to link instance."
   },
   "Unable to link invoice to the payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/LinkInvoiceAction.tsx",
     "message": "Unable to link invoice to the payment."
   },
   "Unable to load actions": {
@@ -12068,7 +12068,7 @@
     "message": "Unable to process payment."
   },
   "Unable to publish Google Calendar.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Unable to publish Google Calendar."
   },
   "Unable to register service provider.": {
@@ -12148,7 +12148,7 @@
     "message": "Unable to remove organization group."
   },
   "Unable to remove payment profile.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileDeleteButton.tsx",
     "message": "Unable to remove payment profile."
   },
   "Unable to remove role.": {
@@ -12264,7 +12264,7 @@
     "message": "Unable to submit job."
   },
   "Unable to submit limits change request.": {
-    "description": "marketplace/resources/store/effects.ts",
+    "description": "marketplace/resources/change-limits/ChangeLimitsBody.tsx",
     "message": "Unable to submit limits change request."
   },
   "Unable to submit order.": {
@@ -12288,7 +12288,7 @@
     "message": "Unable to submit review."
   },
   "Unable to submit usage report.": {
-    "description": "marketplace/resources/store/effects.ts",
+    "description": "marketplace/resources/usage/ResourceUsageForm.tsx",
     "message": "Unable to submit usage report."
   },
   "Unable to sync FreeIPA profile.": {
@@ -12296,7 +12296,7 @@
     "message": "Unable to sync FreeIPA profile."
   },
   "Unable to sync Google Calendar.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Unable to sync Google Calendar."
   },
   "Unable to synchronise resource.": {
@@ -12308,35 +12308,35 @@
     "message": "Unable to synchronise."
   },
   "Unable to synchronize offering details.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering details."
   },
   "Unable to synchronize offering invoices.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering invoices."
   },
   "Unable to synchronize offering orders.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering orders."
   },
   "Unable to synchronize offering project data.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering project data."
   },
   "Unable to synchronize offering resources.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering resources."
   },
   "Unable to synchronize offering usage.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering usage."
   },
   "Unable to synchronize offering users.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize offering users."
   },
   "Unable to synchronize robot accounts.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/RemoteActions.tsx",
     "message": "Unable to synchronize robot accounts."
   },
   "Unable to toggle user status.": {
@@ -12348,7 +12348,7 @@
     "message": "Unable to unlink instance from node."
   },
   "Unable to unlink invoice from the payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/UnlinkInvoiceButton.tsx",
     "message": "Unable to unlink invoice from the payment."
   },
   "Unable to unlink resource.": {
@@ -12356,7 +12356,7 @@
     "message": "Unable to unlink resource."
   },
   "Unable to unpublish Google Calendar.": {
-    "description": "marketplace/offerings/store/effects.ts",
+    "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Unable to unpublish Google Calendar."
   },
   "Unable to update YAML.": {
@@ -12492,11 +12492,11 @@
     "message": "Unable to update organization group."
   },
   "Unable to update payment profile.": {
-    "description": "customer/payment-profiles/store/effects.ts",
+    "description": "customer/payment-profiles/PaymentProfileUpdateDialog.tsx",
     "message": "Unable to update payment profile."
   },
   "Unable to update payment.": {
-    "description": "customer/payments/store/effects.ts",
+    "description": "customer/payments/PaymentUpdateDialog.tsx",
     "message": "Unable to update payment."
   },
   "Unable to update permission.": {
@@ -12924,7 +12924,7 @@
     "message": "Usage policy"
   },
   "Usage report has been submitted.": {
-    "description": "marketplace/resources/store/effects.ts",
+    "description": "marketplace/resources/usage/ResourceUsageForm.tsx",
     "message": "Usage report has been submitted."
   },
   "Usage reports": {
