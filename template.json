@@ -1408,7 +1408,7 @@
     "message": "Batch script file"
   },
   "Become a customer of our portal. Provision IT services from the catalog and manage your team from one place.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Become a customer of our portal. Provision IT services from the catalog and manage your team from one place."
   },
   "Before removing organization, please make sure that all projects are removed.": {
@@ -3824,7 +3824,7 @@
     "message": "Explore marketplace"
   },
   "Explore {deployment} service catalog": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Explore {deployment} service catalog"
   },
   "Export as": {
@@ -4240,7 +4240,7 @@
     "message": "Go to profile"
   },
   "Go to service catalog": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Go to service catalog"
   },
   "Google Calendar has been published successfully.": {
@@ -5140,7 +5140,7 @@
     "message": "Label that is visible to users in Marketplace."
   },
   "Label that is visible to users in service catalog.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Label that is visible to users in service catalog."
   },
   "Label": {
@@ -7480,7 +7480,7 @@
     "message": "Policies"
   },
   "Policy": {
-    "description": "marketplace/offerings/OfferingDetailsUIView.tsx, openstack/openstack-server-groups/ServerGroupsList.tsx, openstack/openstack-tenant/actions/CreateServerGroupForm.tsx, project/utils.ts",
+    "description": "marketplace/offerings/OfferingDetailsUIView.tsx, openstack/openstack-server-groups/ServerGroupsList.tsx, openstack/openstack-tenant/actions/CreateServerGroupForm.tsx",
     "message": "Policy"
   },
   "Political science": {
@@ -8276,7 +8276,7 @@
     "message": "Regenerate"
   },
   "Register as a customer of our portal and provide your cloud services through the service catalog.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Register as a customer of our portal and provide your cloud services through the service catalog."
   },
   "Register as service provider": {
@@ -8616,7 +8616,7 @@
     "message": "Request {requestId} has been created."
   },
   "Request": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Request"
   },
   "Request-based item (without Service Desk)": {
@@ -8792,7 +8792,7 @@
     "message": "Resource is in sync"
   },
   "Resource is not connected to the service catalog yet.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Resource is not connected to the service catalog yet."
   },
   "Resource limits change request has been submitted.": {
@@ -9812,11 +9812,11 @@
     "message": "Service Request"
   },
   "Service catalog offerings": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Service catalog offerings"
   },
   "Service catalog": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Service catalog"
   },
   "Service desk ID or key": {
@@ -9884,7 +9884,7 @@
     "message": "Service type"
   },
   "Services can only be provisioned for a certain affiliation. You currently do not have any organizations or projects connected with your account.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Services can only be provisioned for a certain affiliation. You currently do not have any organizations or projects connected with your account."
   },
   "Services": {
@@ -10504,7 +10504,7 @@
     "message": "Sum of all project credits must not exceed the organization's total available credit."
   },
   "Sum": {
-    "description": "customer/payments/PaymentCreateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, customer/payments/PaymentsList.tsx",
+    "description": "customer/payments/PaymentCreateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, customer/payments/PaymentsList.tsx, project/utils.ts",
     "message": "Sum"
   },
   "Summary": {
@@ -11016,7 +11016,7 @@
     "message": "There are no actions."
   },
   "There are no categories in catalog yet.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "There are no categories in catalog yet."
   },
   "There are no categories in marketplace yet.": {
@@ -11056,7 +11056,7 @@
     "message": "There are no matching checklists."
   },
   "There are no offerings in catalog yet.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "There are no offerings in catalog yet."
   },
   "There are no offerings in marketplace yet.": {
@@ -12576,7 +12576,7 @@
     "message": "Unique ID of a resource created via Marketplace"
   },
   "Unique ID of a resource created via service catalog": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Unique ID of a resource created via service catalog"
   },
   "Unique ID of a resource in a backend system": {
@@ -13488,7 +13488,7 @@
     "message": "Webhook"
   },
   "Welcome to service catalog": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "Welcome to service catalog"
   },
   "Welcome to": {
@@ -13576,7 +13576,7 @@
     "message": "You can add a message to be attached to the invitation email the users receives."
   },
   "You can find offerings to order in the service catalog": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "You can find offerings to order in the service catalog"
   },
   "You can not create group invitations.": {
@@ -13656,7 +13656,7 @@
     "message": "You have no quotas yet."
   },
   "You have the right to request service without additional approval.": {
-    "description": "i18n/constants.ts",
+    "description": "i18n/translate.tsx",
     "message": "You have the right to request service without additional approval."
   },
   "You must be staff to modify payment profiles": {
