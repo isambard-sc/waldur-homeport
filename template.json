@@ -923,10 +923,6 @@
     "description": "marketplace/offerings/images/DeleteImageButton.tsx",
     "message": "Are you sure you want to delete the image?"
   },
-  "Are you sure you want to delete the migration?": {
-    "description": "openstack/openstack-tenant/DeleteMigrationAction.tsx",
-    "message": "Are you sure you want to delete the migration?"
-  },
   "Are you sure you want to delete the offering {offering_name} ?": {
     "description": "proposals/details/CallOfferingDeleteButton.tsx",
     "message": "Are you sure you want to delete the offering {offering_name} ?"
@@ -942,6 +938,10 @@
   "Are you sure you want to delete the policy for offering {name}?": {
     "description": "marketplace/offerings/details/policies/PolicyDeleteButton.tsx",
     "message": "Are you sure you want to delete the policy for offering {name}?"
+  },
+  "Are you sure you want to delete the replication?": {
+    "description": "openstack/openstack-tenant/DeleteMigrationAction.tsx",
+    "message": "Are you sure you want to delete the replication?"
   },
   "Are you sure you want to delete the role {name}?": {
     "description": "administration/roles/RoleDeleteButton.tsx",
@@ -5567,18 +5567,6 @@
     "description": "rancher/cluster/hpas/utils.ts",
     "message": "MiB"
   },
-  "Migrate tenant to another OpenStack deployment": {
-    "description": "openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
-    "message": "Migrate tenant to another OpenStack deployment"
-  },
-  "Migrate": {
-    "description": "openstack/openstack-tenant/actions/MigrateTenantAction.tsx",
-    "message": "Migrate"
-  },
-  "Migrations": {
-    "description": "marketplace/resources/details/fetchData.tsx",
-    "message": "Migrations"
-  },
   "Min replicas": {
     "description": "rancher/cluster/hpas/ClusterHPAList.tsx, rancher/cluster/hpas/HPACreateDialog.tsx, rancher/cluster/hpas/HPAUpdateDialog.tsx",
     "message": "Min replicas"
@@ -6627,13 +6615,13 @@
     "description": "openstack/openstack-instance/actions/EditDialog.tsx, openstack/openstack-instance/marketplace.ts, rancher/node/RancherNodeSummary.tsx, rancher/node/actions/LinkDialog.tsx",
     "message": "OpenStack instance"
   },
-  "OpenStack migration has been initiated.": {
-    "description": "openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
-    "message": "OpenStack migration has been initiated."
-  },
   "OpenStack networks has been created.": {
     "description": "openstack/openstack-tenant/actions/CreateNetworkDialog.tsx",
     "message": "OpenStack networks has been created."
+  },
+  "OpenStack replication has been initiated.": {
+    "description": "openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
+    "message": "OpenStack replication has been initiated."
   },
   "OpenStack resources provisioning": {
     "description": "features/FeaturesDescription.ts",
@@ -8374,6 +8362,18 @@
   "Renders link to docs in header": {
     "description": "SettingsDescription.ts",
     "message": "Renders link to docs in header"
+  },
+  "Replicate tenant to another OpenStack deployment": {
+    "description": "openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
+    "message": "Replicate tenant to another OpenStack deployment"
+  },
+  "Replicate": {
+    "description": "openstack/openstack-tenant/actions/MigrateTenantAction.tsx",
+    "message": "Replicate"
+  },
+  "Replications": {
+    "description": "marketplace/resources/details/fetchData.tsx",
+    "message": "Replications"
   },
   "Report details": {
     "description": "marketplace/resources/report/ShowReportDialog.tsx",
@@ -11887,10 +11887,6 @@
     "description": "invoices/list/MarkAsPaidDialog.tsx",
     "message": "Unable to mark the invoice as paid."
   },
-  "Unable to migrate OpenStack tenant.": {
-    "description": "openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
-    "message": "Unable to migrate OpenStack tenant."
-  },
   "Unable to move item {item} from invoice {origin} to {target}.": {
     "description": "invoices/details/InvoiceItemMoveDialog.tsx",
     "message": "Unable to move item {item} from invoice {origin} to {target}."
@@ -12030,6 +12026,10 @@
   "Unable to remove user.": {
     "description": "marketplace/resources/users/DeleteUserButton.tsx",
     "message": "Unable to remove user."
+  },
+  "Unable to replicate OpenStack tenant.": {
+    "description": "openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
+    "message": "Unable to replicate OpenStack tenant."
   },
   "Unable to resend invitation.": {
     "description": "invitations/actions/InvitationSendButton.tsx",
@@ -13699,10 +13699,6 @@
     "description": "user/support/UserEditRows.tsx",
     "message": "last name"
   },
-  "migrations": {
-    "description": "openstack/openstack-tenant/TenantMigrationsList.tsx",
-    "message": "migrations"
-  },
   "milli CPUs": {
     "description": "rancher/cluster/hpas/utils.ts",
     "message": "milli CPUs"
@@ -13814,6 +13810,10 @@
   "remote accounts": {
     "description": "user/UserOfferingList.tsx",
     "message": "remote accounts"
+  },
+  "replications": {
+    "description": "openstack/openstack-tenant/TenantMigrationsList.tsx",
+    "message": "replications"
   },
   "requests": {
     "description": "marketplace-remote/BaseProjectUpdateRequestsList.tsx, marketplace-remote/ProjectUpdateRequestsList.tsx",

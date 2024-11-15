@@ -64,7 +64,7 @@ export const MigrateTenantDialog = connect<
             },
           });
           dispatch(
-            showSuccess(translate('OpenStack migration has been initiated.')),
+            showSuccess(translate('OpenStack replication has been initiated.')),
           );
           dispatch(closeModalDialog());
           if (refetch) {
@@ -74,7 +74,7 @@ export const MigrateTenantDialog = connect<
           dispatch(
             showErrorResponse(
               e,
-              translate('Unable to migrate OpenStack tenant.'),
+              translate('Unable to replicate OpenStack tenant.'),
             ),
           );
         }
@@ -104,7 +104,9 @@ export const MigrateTenantDialog = connect<
       return (
         <form onSubmit={handleSubmit(submitForm)}>
           <ModalDialog
-            title={translate('Migrate tenant to another OpenStack deployment')}
+            title={translate(
+              'Replicate tenant to another OpenStack deployment',
+            )}
             footer={
               <div>
                 <CloseDialogButton className="me-3" />

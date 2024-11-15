@@ -50,7 +50,7 @@ export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => row.state,
         },
       ]}
-      verboseName={translate('migrations')}
+      verboseName={translate('replications')}
       rowActions={({ row }) => (
         <>
           <ExecuteMigrationAction resource={row} refetch={props.fetch} />

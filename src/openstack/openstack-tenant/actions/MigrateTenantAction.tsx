@@ -21,7 +21,7 @@ export const MigrateTenantAction: FC<TenantActionProps> = ({
 }) =>
   isFeatureVisible(OpenstackFeatures.show_migrations) ? (
     <DialogActionItem
-      title={translate('Migrate')}
+      title={translate('Replicate')}
       iconNode={<ArrowsLeftRight />}
       modalComponent={MigrateTenantDialog}
       resource={resource}

@@ -247,8 +247,8 @@ export const getResourceTabs = ({
     isFeatureVisible(OpenstackFeatures.show_migrations)
   ) {
     tabs.push({
-      key: 'Migrations',
-      title: translate('Migrations'),
+      key: 'replications',
+      title: translate('Replications'),
       component: TenantMigrationsList,
     });
   }
