@@ -5,6 +5,7 @@ export interface OfferingCostPolicyFormData {
   actions: string;
   organization_groups: string[];
   limit_cost: number;
+  project_credit?: number;
   period: PolicyPeriod;
 }
 

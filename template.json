@@ -2496,7 +2496,7 @@
     "message": "Credit usage"
   },
   "Credit": {
-    "description": "administration/organizations/OrganizationCostPoliciesList.tsx",
+    "description": "administration/organizations/OrganizationCostPoliciesList.tsx, project/utils.ts",
     "message": "Credit"
   },
   "Credits available for this organization: {currency} {credits}": {
@@ -5172,7 +5172,7 @@
     "message": "Limit period"
   },
   "Limit": {
-    "description": "marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/offerings/details/PlanUsageList.tsx, marketplace/offerings/details/policies/ComponentLimitsField.tsx, marketplace/orders/details/LimitsSection.tsx, reporting/plan-usage/PlanUsageList.tsx",
+    "description": "marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/offerings/details/PlanUsageList.tsx, marketplace/offerings/details/policies/ComponentLimitsField.tsx, marketplace/orders/details/LimitsSection.tsx, project/utils.ts, reporting/plan-usage/PlanUsageList.tsx",
     "message": "Limit"
   },
   "Limit-based": {

@@ -1,5 +1,6 @@
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { getProjectCostPolicies } from '@waldur/customer/cost-policies/api';
+import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
 import { formatCostChart, getTeamSizeChart } from '@waldur/dashboard/api';
 import {
   getLineChartOptions,
@@ -27,12 +28,27 @@ export async function loadChart(project: Project, withAxis = false) {
     options: !withAxis
       ? getLineChartOptions(
           chart,
-          (costPolicies || []).map((item, i) => ({
-            label: `${translate('Policy')}  #${i + 1} (${defaultCurrency(
-              item.limit_cost,
-            )})`,
-            value: item.limit_cost,
-          })),
+          (costPolicies || []).map((item) => {
+            const limitCost = defaultCurrency(item.limit_cost);
+            const projectCredit = item.project_credit
+              ? defaultCurrency(item.project_credit)
+              : null;
+
+            const totalCost = item.limit_cost + (item.project_credit || 0);
+            const totalCostFormatted = defaultCurrency(totalCost);
+            const action = getCostPolicyActionOptions().find(
+              (option) => option.value === item.actions,
+            )?.label;
+
+            const label = projectCredit
+              ? `Policy: ${action}\n${translate('Sum')}: ${totalCostFormatted}, ${translate('Limit')}: ${limitCost}, ${translate('Credit')}: ${projectCredit}`
+              : `Policy: ${action}\n${translate('Limit')}: ${limitCost}`;
+
+            return {
+              label,
+              value: totalCost,
+            };
+          }),
         )
       : getLineChartOptionsWithAxis(chart),
   };

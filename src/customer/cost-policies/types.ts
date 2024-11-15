@@ -18,6 +18,7 @@ interface BasePolicy {
 
 export interface CostPolicyFormData {
   limit_cost: number;
+  project_credit?: number;
   scope: string;
   actions: string;
 }
