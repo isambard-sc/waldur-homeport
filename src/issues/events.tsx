@@ -2,7 +2,7 @@ import { UISref } from '@uirouter/react';
 
 import { EventGroup } from '@waldur/events/types';
 import { getCallerContext } from '@waldur/events/utils';
-import { gettext } from '@waldur/i18n';
+import { translate } from '@waldur/i18n';
 
 import { SupportEnum } from '../EventsEnums';
 
@@ -17,12 +17,12 @@ const getIssueContext = (event) => ({
 });
 
 export const IssueEvents: EventGroup = {
-  title: gettext('Support request events'),
+  title: translate('Support request events'),
   context: getIssueContext,
   events: [
     {
       key: SupportEnum.issue_creation_succeeded,
-      title: gettext('Issue {issue_link} has been created by {caller_link}.'),
+      title: translate('Issue {issue_link} has been created by {caller_link}.'),
     },
   ],
 };

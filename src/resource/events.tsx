@@ -1,7 +1,7 @@
 import { UISref } from '@uirouter/react';
 
 import { getUserContext } from '@waldur/events/utils';
-import { gettext } from '@waldur/i18n';
+import { translate } from '@waldur/i18n';
 
 import { ResourcesEnum } from '../EventsEnums';
 
@@ -23,86 +23,86 @@ const getResourceContext = (event) => ({
 });
 
 export const ResourceEvents = {
-  title: gettext('Resource events'),
+  title: translate('Resource events'),
   context: getResourceContext,
   events: [
     {
       key: ResourcesEnum.resource_creation_failed,
-      title: gettext('{resource_link} creation has failed.'),
+      title: translate('{resource_link} creation has failed.'),
     },
     {
       key: ResourcesEnum.resource_creation_scheduled,
-      title: gettext(
+      title: translate(
         '{resource_link} creation has been scheduled by {user_link}.',
       ),
     },
     {
       key: ResourcesEnum.resource_creation_succeeded,
-      title: gettext('{resource_link} has been created.'),
+      title: translate('{resource_link} has been created.'),
     },
     {
       key: ResourcesEnum.resource_deletion_failed,
-      title: gettext('{resource_link} deletion has failed.'),
+      title: translate('{resource_link} deletion has failed.'),
     },
     {
       key: ResourcesEnum.resource_deletion_scheduled,
-      title: gettext(
+      title: translate(
         '{resource_link} has been scheduled to deletion by {user_link}.',
       ),
     },
     {
       key: ResourcesEnum.resource_deletion_succeeded,
-      title: gettext('{resource_name} has been deleted.'),
+      title: translate('{resource_name} has been deleted.'),
     },
     {
       key: ResourcesEnum.resource_import_succeeded,
-      title: gettext('{resource_link} has been imported by {user_link}.'),
+      title: translate('{resource_link} has been imported by {user_link}.'),
     },
     {
       key: ResourcesEnum.resource_restart_failed,
-      title: gettext('{resource_link} restart has failed.'),
+      title: translate('{resource_link} restart has failed.'),
     },
     {
       key: ResourcesEnum.resource_restart_scheduled,
-      title: gettext(
+      title: translate(
         '{resource_link} has been scheduled to restart by {user_link}.',
       ),
     },
     {
       key: ResourcesEnum.resource_restart_succeeded,
-      title: gettext('{resource_link} has been restarted.'),
+      title: translate('{resource_link} has been restarted.'),
     },
     {
       key: ResourcesEnum.resource_start_failed,
-      title: gettext('{resource_link} start has failed.'),
+      title: translate('{resource_link} start has failed.'),
     },
     {
       key: ResourcesEnum.resource_start_scheduled,
-      title: gettext(
+      title: translate(
         '{resource_link} has been scheduled to start by {user_link}.',
       ),
     },
     {
       key: ResourcesEnum.resource_start_succeeded,
-      title: gettext('{resource_link} has been started.'),
+      title: translate('{resource_link} has been started.'),
     },
     {
       key: ResourcesEnum.resource_stop_failed,
-      title: gettext('{resource_link} stop has failed.'),
+      title: translate('{resource_link} stop has failed.'),
     },
     {
       key: ResourcesEnum.resource_stop_scheduled,
-      title: gettext(
+      title: translate(
         '{resource_link} has been scheduled to stop by {user_link}.',
       ),
     },
     {
       key: ResourcesEnum.resource_stop_succeeded,
-      title: gettext('{resource_link} has been stopped.'),
+      title: translate('{resource_link} has been stopped.'),
     },
     {
       key: ResourcesEnum.resource_update_succeeded,
-      title: gettext('{resource_link} has been updated by {user_link}.'),
+      title: translate('{resource_link} has been updated by {user_link}.'),
     },
   ],
 };

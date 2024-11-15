@@ -1,6 +1,6 @@
 import { EventGroup } from '@waldur/events/types';
 import { getCustomerContext } from '@waldur/events/utils';
-import { gettext } from '@waldur/i18n';
+import { translate } from '@waldur/i18n';
 
 import { InvoicesEnum } from '../EventsEnums';
 
@@ -10,24 +10,24 @@ const getInvoiceContext = (event) => ({
 });
 
 export const InvoiceEvents: EventGroup = {
-  title: gettext('Invoice events'),
+  title: translate('Invoice events'),
   context: getInvoiceContext,
   events: [
     {
       key: InvoicesEnum.invoice_creation_succeeded,
-      title: gettext(
+      title: translate(
         'Invoice for organization {customer_link} for the period of {period} has been created.',
       ),
     },
     {
       key: InvoicesEnum.invoice_deletion_succeeded,
-      title: gettext(
+      title: translate(
         'Invoice for organization {customer_name} for the period of {period} has been deleted.',
       ),
     },
     {
       key: InvoicesEnum.invoice_update_succeeded,
-      title: gettext(
+      title: translate(
         'Invoice for organization {customer_link} for the period of {period} has been updated.',
       ),
     },

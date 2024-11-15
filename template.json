@@ -1252,7 +1252,7 @@
     "message": "Authenticate using Mobile ID"
   },
   "Authentication events": {
-    "description": "user/api-key/AuthenticationEvents.tsx",
+    "description": "auth/AuthEvents.ts, user/api-key/AuthenticationEvents.tsx",
     "message": "Authentication events"
   },
   "Authentication required.": {
@@ -1406,6 +1406,10 @@
   "Batch script file": {
     "description": "slurm/details/SubmitJobDialog.tsx",
     "message": "Batch script file"
+  },
+  "Become a customer of our portal. Provision IT services from the catalog and manage your team from one place.": {
+    "description": "i18n/constants.ts",
+    "message": "Become a customer of our portal. Provision IT services from the catalog and manage your team from one place."
   },
   "Before removing organization, please make sure that all projects are removed.": {
     "description": "customer/details/CustomerRemovePanel.tsx",
@@ -2418,6 +2422,10 @@
   "Create": {
     "description": "administration/organizations/OrganizationGroupForm.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateDialog.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
     "message": "Create"
+  },
+  "Created a new payment for {customer_link}.": {
+    "description": "paypal/events.ts",
+    "message": "Created a new payment for {customer_link}."
   },
   "Created at": {
     "description": "administration/InvitationList.tsx, administration/agreements/UserAgreementsList.tsx, administration/notifications/NotificationList.tsx, broadcasts/BroadcastList.tsx, invitations/GroupInvitationsList.tsx, invitations/InvitationsList.tsx, invitations/UserPermissionRequestsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/details/OfferingResourcesList.tsx, marketplace/offerings/details/OfferingUsersTable.tsx, marketplace/offerings/details/permissions/OfferingPermissionsList.tsx, marketplace/orders/details/OrderDetailsApprovalsTab.tsx, marketplace/orders/list/OrdersTableComponent.tsx, marketplace/orders/list/ResourceOrders.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/list/ResourcesAllListTable.tsx, marketplace/service-providers/OfferingPermissionsList.tsx, marketplace/service-providers/ProviderCampaignResourceExpandable.tsx, marketplace/service-providers/ProviderProjectResourcesList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, navigation/header/confirmation-drawer/OrderExpandableRow.tsx, project/team/InvitationsList.tsx, proposals/team/InvitationsList.tsx, resource/support/SharedProviderResources.tsx, user/UserOfferingList.tsx, user/UserPermissionRequestsList.tsx",
@@ -3815,6 +3823,10 @@
     "description": "navigation/FooterLinks.tsx",
     "message": "Explore marketplace"
   },
+  "Explore {deployment} service catalog": {
+    "description": "i18n/constants.ts",
+    "message": "Explore {deployment} service catalog"
+  },
   "Export as": {
     "description": "table/ExportDialog.tsx",
     "message": "Export as"
@@ -4226,6 +4238,10 @@
   "Go to profile": {
     "description": "auth/PermissionLayout.tsx, invitations/GroupInvitationErrorMessage.tsx, invitations/InvitationErrorMessage.tsx",
     "message": "Go to profile"
+  },
+  "Go to service catalog": {
+    "description": "i18n/constants.ts",
+    "message": "Go to service catalog"
   },
   "Google Calendar has been published successfully.": {
     "description": "marketplace/offerings/store/effects.ts",
@@ -4899,6 +4915,22 @@
     "description": "invoices/details/InvoiceDetails.tsx, invoices/list/InvoicesList.tsx",
     "message": "Invoice date"
   },
+  "Invoice events": {
+    "description": "invoices/events.ts",
+    "message": "Invoice events"
+  },
+  "Invoice for organization {customer_link} for the period of {period} has been created.": {
+    "description": "invoices/events.ts",
+    "message": "Invoice for organization {customer_link} for the period of {period} has been created."
+  },
+  "Invoice for organization {customer_link} for the period of {period} has been updated.": {
+    "description": "invoices/events.ts",
+    "message": "Invoice for organization {customer_link} for the period of {period} has been updated."
+  },
+  "Invoice for organization {customer_name} for the period of {period} has been deleted.": {
+    "description": "invoices/events.ts",
+    "message": "Invoice for organization {customer_name} for the period of {period} has been deleted."
+  },
   "Invoice from": {
     "description": "invoices/details/InvoiceDetails.tsx",
     "message": "Invoice from"
@@ -4974,6 +5006,10 @@
   "Issue type used for request-based item processing.": {
     "description": "SettingsDescription.ts",
     "message": "Issue type used for request-based item processing."
+  },
+  "Issue {issue_link} has been created by {caller_link}.": {
+    "description": "issues/events.tsx",
+    "message": "Issue {issue_link} has been created by {caller_link}."
   },
   "Issue": {
     "description": "issues/feedback/SupportFeedbackList.tsx, marketplace/orders/details/OrderDetailsQuickBody.tsx",
@@ -5102,6 +5138,10 @@
   "Label that is visible to users in Marketplace.": {
     "description": "marketplace/offerings/DisplayNameField.tsx",
     "message": "Label that is visible to users in Marketplace."
+  },
+  "Label that is visible to users in service catalog.": {
+    "description": "i18n/constants.ts",
+    "message": "Label that is visible to users in service catalog."
   },
   "Label": {
     "description": "administration/providers/ProviderForm.tsx",
@@ -6764,7 +6804,7 @@
     "message": "Organization dashboard"
   },
   "Organization events": {
-    "description": "customer/workspace/CustomerEventsFilter.tsx",
+    "description": "customer/events.ts, customer/workspace/CustomerEventsFilter.tsx",
     "message": "Organization events"
   },
   "Organization group details of {orgName}": {
@@ -6826,6 +6866,18 @@
   "Organization workspace": {
     "description": "features/FeaturesDescription.ts",
     "message": "Organization workspace"
+  },
+  "Organization {customer_link} has been created.": {
+    "description": "customer/events.ts",
+    "message": "Organization {customer_link} has been created."
+  },
+  "Organization {customer_link} has been updated.": {
+    "description": "customer/events.ts",
+    "message": "Organization {customer_link} has been updated."
+  },
+  "Organization {customer_name} has been deleted.": {
+    "description": "customer/events.ts",
+    "message": "Organization {customer_name} has been deleted."
   },
   "Organization": {
     "description": "administration/InvitationsFilter.tsx, administration/organizations/OrganizationCostPoliciesFilter.tsx, administration/organizations/OrganizationCostPoliciesList.tsx, administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/credits/CreditFormDialog.tsx, customer/details/CustomerRemoveDialog.tsx, customer/list/CustomerList.tsx, customer/routes.ts, events/ExpandableEventDetailsTable.tsx, invitations/actions/UserDetailsGroup.tsx, issues/IssueSummary.tsx, issues/create/IssueHeader.tsx, issues/list/IssuesList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/deploy/steps/FormCustomerStep.tsx, marketplace/details/CustomerField.tsx, marketplace/landing/MarketplaceLandingFilter.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/expandable/OfferingCustomersList.tsx, marketplace/offerings/import/tabs.ts, marketplace/offerings/list/OfferingsList.tsx, marketplace/orders/details/OrderDetailsHeaderBody.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ResourcesAllListTable.tsx, marketplace/robot-accounts/ProviderRobotAccountFilter.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, marketplace/service-providers/ProviderOfferingUsersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace-checklist/ChecklistOverview.tsx, marketplace-remote/BaseProjectUpdateRequestsList.tsx, marketplace-remote/OrganizationProjectUpdateRequestListFilter.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx, navigation/sidebar/resources-filter/utils.tsx, permissions/constants.tsx, project/create/OrganizationGroup.tsx, proposals/PublicCallsList.tsx, proposals/offering-requests/OfferingRequestsTableFilter.tsx, reporting/resource-usage/ResourceUsageFilter.tsx, resource/support/SharedProviderCustomers.tsx, resource/support/SharedProviderResources.tsx, support/SupportEventsFilter.tsx, user/UserPermissionRequestsList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/affiliations/UserAffiliationsList.tsx, user/support/UserDetailsTable.tsx, user/support/UserFilter.tsx, user/support/UserList.tsx",
@@ -6935,6 +6987,10 @@
     "description": "SettingsDescription.ts",
     "message": "Password for access user"
   },
+  "Password has been changed for user {affected_user_link}.": {
+    "description": "user/events.ts",
+    "message": "Password has been changed for user {affected_user_link}."
+  },
   "Password": {
     "description": "auth/SigninForm.tsx, azure/sql/AzureSQLServerSummary.tsx, openstack/OpenStackForm.tsx, openstack/openstack-tenant/OpenStackTenantSummary.tsx, rancher/catalog/CatalogCreateDialog.tsx, vmware/VMwareForm.tsx",
     "message": "Password"
@@ -6955,9 +7011,21 @@
     "description": "invoices/details/InvoicePayButton.tsx",
     "message": "Pay"
   },
+  "Payment events": {
+    "description": "paypal/events.ts",
+    "message": "Payment events"
+  },
   "Payment failed.": {
     "description": "invoices/details/BillingDetails.tsx",
     "message": "Payment failed."
+  },
+  "Payment for {customer_link} has been approved.": {
+    "description": "paypal/events.ts",
+    "message": "Payment for {customer_link} has been approved."
+  },
+  "Payment for {customer_link} has been cancelled.": {
+    "description": "paypal/events.ts",
+    "message": "Payment for {customer_link} has been cancelled."
   },
   "Payment gateways (monthly)": {
     "description": "customer/payment-profiles/utils.ts",
@@ -7660,7 +7728,7 @@
     "message": "Project estimated cost"
   },
   "Project events": {
-    "description": "customer/workspace/CustomerEventsFilter.tsx, project/ProjectEventsFilter.tsx",
+    "description": "customer/workspace/CustomerEventsFilter.tsx, project/ProjectEventsFilter.tsx, project/events.ts",
     "message": "Project events"
   },
   "Project field name": {
@@ -7746,6 +7814,18 @@
   "Project workspace": {
     "description": "features/FeaturesDescription.ts",
     "message": "Project workspace"
+  },
+  "Project {project_link} has been created.": {
+    "description": "project/events.ts",
+    "message": "Project {project_link} has been created."
+  },
+  "Project {project_link} has been updated.": {
+    "description": "project/events.ts",
+    "message": "Project {project_link} has been updated."
+  },
+  "Project {project_name} has been deleted.": {
+    "description": "project/events.ts",
+    "message": "Project {project_name} has been deleted."
   },
   "Project {project} from {organization} was successfully removed": {
     "description": "project/useProjectDelete.tsx",
@@ -8195,6 +8275,10 @@
     "description": "marketplace/service-providers/ServiceProviderManagement.tsx, marketplace/service-providers/ServiceProviderSecretCodeGenerateConfirm.tsx",
     "message": "Regenerate"
   },
+  "Register as a customer of our portal and provide your cloud services through the service catalog.": {
+    "description": "i18n/constants.ts",
+    "message": "Register as a customer of our portal and provide your cloud services through the service catalog."
+  },
   "Register as service provider": {
     "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "Register as service provider"
@@ -8531,6 +8615,10 @@
     "description": "issues/create/utils.ts",
     "message": "Request {requestId} has been created."
   },
+  "Request": {
+    "description": "i18n/constants.ts",
+    "message": "Request"
+  },
   "Request-based item (without Service Desk)": {
     "description": "support/marketplace.ts",
     "message": "Request-based item (without Service Desk)"
@@ -8676,7 +8764,7 @@
     "message": "Resource doesn't have options."
   },
   "Resource events": {
-    "description": "customer/workspace/CustomerEventsFilter.tsx, project/ProjectEventsFilter.tsx",
+    "description": "customer/workspace/CustomerEventsFilter.tsx, project/ProjectEventsFilter.tsx, resource/events.tsx",
     "message": "Resource events"
   },
   "Resource field name.": {
@@ -8702,6 +8790,10 @@
   "Resource is in sync": {
     "description": "resource/state/utils.ts",
     "message": "Resource is in sync"
+  },
+  "Resource is not connected to the service catalog yet.": {
+    "description": "i18n/constants.ts",
+    "message": "Resource is not connected to the service catalog yet."
   },
   "Resource limits change request has been submitted.": {
     "description": "marketplace/resources/store/effects.ts",
@@ -9051,6 +9143,10 @@
     "description": "project/team/ProjectUsersList.tsx",
     "message": "Role in project"
   },
+  "Role management events": {
+    "description": "permissions/events.tsx",
+    "message": "Role management events"
+  },
   "Role name": {
     "description": "user/affiliations/UserAffiliationsList.tsx",
     "message": "Role name"
@@ -9146,6 +9242,18 @@
   "SSH key has been removed.": {
     "description": "user/keys/KeyRemoveButton.tsx",
     "message": "SSH key has been removed."
+  },
+  "SSH key management events": {
+    "description": "user/events.ts",
+    "message": "SSH key management events"
+  },
+  "SSH key {ssh_key_name} has been created for user {user_link}": {
+    "description": "user/events.ts",
+    "message": "SSH key {ssh_key_name} has been created for user {user_link}"
+  },
+  "SSH key {ssh_key_name} has been deleted for user {user_link}": {
+    "description": "user/events.ts",
+    "message": "SSH key {ssh_key_name} has been deleted for user {user_link}"
   },
   "SSH key": {
     "description": "resource/summary/VirtualMachineSummary.tsx",
@@ -9703,6 +9811,14 @@
     "description": "issues/types/constants.tsx",
     "message": "Service Request"
   },
+  "Service catalog offerings": {
+    "description": "i18n/constants.ts",
+    "message": "Service catalog offerings"
+  },
+  "Service catalog": {
+    "description": "i18n/constants.ts",
+    "message": "Service catalog"
+  },
   "Service desk ID or key": {
     "description": "SettingsDescription.ts",
     "message": "Service desk ID or key"
@@ -9766,6 +9882,10 @@
   "Service type": {
     "description": "issues/IssueSummary.tsx, issues/list/IssuesList.tsx, issues/list/IssuesListExpandableRow.tsx",
     "message": "Service type"
+  },
+  "Services can only be provisioned for a certain affiliation. You currently do not have any organizations or projects connected with your account.": {
+    "description": "i18n/constants.ts",
+    "message": "Services can only be provisioned for a certain affiliation. You currently do not have any organizations or projects connected with your account."
   },
   "Services": {
     "description": "rancher/cluster/tabs.ts",
@@ -10391,6 +10511,10 @@
     "description": "azure/vm/AzureVirtualMachineSummary.tsx, issues/IssueDetails.tsx, openstack/openstack-tenant/TenantInstancesList.tsx, proposals/proposal/create/ProjectDetailsSummary.tsx, proposals/proposal/create-review/steps/steps.ts, rancher/cluster/apps/ApplicationDetailsDialog.tsx, rancher/template/TemplateDetail.tsx, resource/summary/VirtualMachineSummary.tsx, vmware/VMwareVirtualMachineSummary.tsx",
     "message": "Summary"
   },
+  "Support request events": {
+    "description": "issues/events.tsx",
+    "message": "Support request events"
+  },
   "Support user": {
     "description": "user/support/utils.ts",
     "message": "Support user"
@@ -10891,6 +11015,10 @@
     "description": "resource/actions/ResourceActionComponent.tsx, table/ActionsDropdown.tsx",
     "message": "There are no actions."
   },
+  "There are no categories in catalog yet.": {
+    "description": "i18n/constants.ts",
+    "message": "There are no categories in catalog yet."
+  },
   "There are no categories in marketplace yet.": {
     "description": "marketplace/landing/CategoriesList.tsx",
     "message": "There are no categories in marketplace yet."
@@ -10926,6 +11054,10 @@
   "There are no matching checklists.": {
     "description": "marketplace-checklist/CustomerChecklistOverview.tsx",
     "message": "There are no matching checklists."
+  },
+  "There are no offerings in catalog yet.": {
+    "description": "i18n/constants.ts",
+    "message": "There are no offerings in catalog yet."
   },
   "There are no offerings in marketplace yet.": {
     "description": "marketplace/common/OfferingGrid.tsx",
@@ -12443,6 +12575,10 @@
     "description": "resource/summary/ResourceMetadataDialog.tsx",
     "message": "Unique ID of a resource created via Marketplace"
   },
+  "Unique ID of a resource created via service catalog": {
+    "description": "i18n/constants.ts",
+    "message": "Unique ID of a resource created via service catalog"
+  },
   "Unique ID of a resource in a backend system": {
     "description": "resource/summary/ResourceMetadataDialog.tsx",
     "message": "Unique ID of a resource in a backend system"
@@ -12919,6 +13055,10 @@
     "description": "navigation/header/quick-issue-drawer/UserIssuesTable.tsx",
     "message": "User issues"
   },
+  "User management events": {
+    "description": "user/events.ts",
+    "message": "User management events"
+  },
   "User management": {
     "description": "marketplace/offerings/OfferingEditUIView.tsx, marketplace/offerings/update/integration/UserManagementSection.tsx",
     "message": "User management"
@@ -12955,6 +13095,22 @@
     "description": "features/FeaturesDescription.ts",
     "message": "User workspace"
   },
+  "User {affected_user_link} has been activated.": {
+    "description": "user/events.ts",
+    "message": "User {affected_user_link} has been activated."
+  },
+  "User {affected_user_link} has been created.": {
+    "description": "user/events.ts",
+    "message": "User {affected_user_link} has been created."
+  },
+  "User {affected_user_link} has been deactivated.": {
+    "description": "user/events.ts",
+    "message": "User {affected_user_link} has been deactivated."
+  },
+  "User {affected_user_link} has been updated.": {
+    "description": "user/events.ts",
+    "message": "User {affected_user_link} has been updated."
+  },
   "User {affected_user_link} has got {role_name} role in {scope_link}.": {
     "description": "permissions/events.tsx",
     "message": "User {affected_user_link} has got {role_name} role in {scope_link}."
@@ -12963,13 +13119,37 @@
     "description": "permissions/events.tsx",
     "message": "User {affected_user_link} has lost {role_name} role in {scope_link}."
   },
+  "User {affected_user_name} has been deleted.": {
+    "description": "user/events.ts",
+    "message": "User {affected_user_name} has been deleted."
+  },
+  "User {user_link} authenticated successfully with SAML2.": {
+    "description": "auth/AuthEvents.ts",
+    "message": "User {user_link} authenticated successfully with SAML2."
+  },
+  "User {user_link} authenticated successfully with username and password.": {
+    "description": "auth/AuthEvents.ts",
+    "message": "User {user_link} authenticated successfully with username and password."
+  },
+  "User {user_link} has granted role to {affected_user_link}.": {
+    "description": "permissions/events.tsx",
+    "message": "User {user_link} has granted role to {affected_user_link}."
+  },
   "User {user_link} has granted {role_name} role in {scope_link} to {affected_user_link}.": {
     "description": "permissions/events.tsx",
     "message": "User {user_link} has granted {role_name} role in {scope_link} to {affected_user_link}."
   },
+  "User {user_link} has revoked {affected_user_link}.": {
+    "description": "permissions/events.tsx",
+    "message": "User {user_link} has revoked {affected_user_link}."
+  },
   "User {user_link} has revoked {role_name} {affected_user_link} from {scope_link}.": {
     "description": "permissions/events.tsx",
     "message": "User {user_link} has revoked {role_name} {affected_user_link} from {scope_link}."
+  },
+  "User {user_link} logged out successfully with SAML2.": {
+    "description": "auth/AuthEvents.ts",
+    "message": "User {user_link} logged out successfully with SAML2."
   },
   "User {user_link} role has been updated.": {
     "description": "permissions/events.tsx",
@@ -13307,6 +13487,10 @@
     "description": "user/hooks/HookTypeField.tsx",
     "message": "Webhook"
   },
+  "Welcome to service catalog": {
+    "description": "i18n/constants.ts",
+    "message": "Welcome to service catalog"
+  },
   "Welcome to": {
     "description": "marketplace/landing/LandingPage.tsx",
     "message": "Welcome to"
@@ -13391,6 +13575,10 @@
     "description": "invitations/actions/create/CustomMessageInput.tsx",
     "message": "You can add a message to be attached to the invitation email the users receives."
   },
+  "You can find offerings to order in the service catalog": {
+    "description": "i18n/constants.ts",
+    "message": "You can find offerings to order in the service catalog"
+  },
   "You can not create group invitations.": {
     "description": "invitations/actions/GroupInvitationCreateButton.tsx",
     "message": "You can not create group invitations."
@@ -13466,6 +13654,10 @@
   "You have no quotas yet.": {
     "description": "quotas/QuotasTable.tsx",
     "message": "You have no quotas yet."
+  },
+  "You have the right to request service without additional approval.": {
+    "description": "i18n/constants.ts",
+    "message": "You have the right to request service without additional approval."
   },
   "You must be staff to modify payment profiles": {
     "description": "customer/payment-profiles/PaymentProfileList.tsx",
@@ -14098,6 +14290,74 @@
   "{resourceType} has state {resourceState}": {
     "description": "resource/state/utils.ts",
     "message": "{resourceType} has state {resourceState}"
+  },
+  "{resource_link} creation has been scheduled by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} creation has been scheduled by {user_link}."
+  },
+  "{resource_link} creation has failed.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} creation has failed."
+  },
+  "{resource_link} deletion has failed.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} deletion has failed."
+  },
+  "{resource_link} has been created.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been created."
+  },
+  "{resource_link} has been imported by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been imported by {user_link}."
+  },
+  "{resource_link} has been restarted.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been restarted."
+  },
+  "{resource_link} has been scheduled to deletion by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been scheduled to deletion by {user_link}."
+  },
+  "{resource_link} has been scheduled to restart by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been scheduled to restart by {user_link}."
+  },
+  "{resource_link} has been scheduled to start by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been scheduled to start by {user_link}."
+  },
+  "{resource_link} has been scheduled to stop by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been scheduled to stop by {user_link}."
+  },
+  "{resource_link} has been started.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been started."
+  },
+  "{resource_link} has been stopped.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been stopped."
+  },
+  "{resource_link} has been updated by {user_link}.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} has been updated by {user_link}."
+  },
+  "{resource_link} restart has failed.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} restart has failed."
+  },
+  "{resource_link} start has failed.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} start has failed."
+  },
+  "{resource_link} stop has failed.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_link} stop has failed."
+  },
+  "{resource_name} has been deleted.": {
+    "description": "resource/events.tsx",
+    "message": "{resource_name} has been deleted."
   },
   "{role} ({name})": {
     "description": "user/support/UserList.tsx",
