@@ -29,7 +29,6 @@ export const waitForConfirmation = (
   title: ReactNode,
   body: ReactNode,
   forDeletion?: boolean,
-  nb?: ReactNode,
 ) => {
   const deferred = createDeferred();
   const params = {
@@ -37,7 +36,6 @@ export const waitForConfirmation = (
       deferred,
       title,
       body,
-      nb,
     },
   };
   dispatch(

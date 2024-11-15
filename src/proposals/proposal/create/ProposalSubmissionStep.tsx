@@ -79,13 +79,18 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
       await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
-        translate(
-          'Are you sure you want to send the proposal to team verification step?',
-        ),
+        <>
+          {translate(
+            'Are you sure you want to send the proposal to team verification step?',
+          )}
+          <br />{' '}
+          <small className="text-danger">
+            {translate(
+              'NB! After clicking Yes, you will not be able to edit the proposal!',
+            )}
+          </small>
+        </>,
         false,
-        translate(
-          'NB! After clicking Yes, you will not be able to edit the proposal!',
-        ),
       );
     } catch {
       return;

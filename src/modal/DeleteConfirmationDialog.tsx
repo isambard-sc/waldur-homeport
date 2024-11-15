@@ -16,13 +16,12 @@ interface DeleteConfirmationDialogProps {
     };
     title: ReactNode;
     body: ReactNode;
-    nb?: ReactNode;
   };
 }
 
 export const DeleteConfirmationDialog: React.FC<
   DeleteConfirmationDialogProps
-> = ({ resolve: { title, body, nb, deferred } }) => {
+> = ({ resolve: { title, body, deferred } }) => {
   const dispatch = useDispatch();
   const closeDialog = () => dispatch(closeModalDialog());
 
@@ -62,8 +61,6 @@ export const DeleteConfirmationDialog: React.FC<
       }
     >
       {body}
-      <br />
-      {nb && <small className="text-danger">{nb}</small>}
     </MetronicModalDialog>
   );
 };
