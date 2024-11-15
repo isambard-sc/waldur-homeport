@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
 
 import { AwesomeCheckbox } from '@waldur/core/AwesomeCheckbox';
 import { required } from '@waldur/core/validators';
+import * as api from '@waldur/customer/payment-profiles/api';
 import { ADD_PAYMENT_PROFILE_FORM_ID } from '@waldur/customer/payment-profiles/constants';
-import { addPaymentProfile } from '@waldur/customer/payment-profiles/store/actions';
 import { getPaymentProfileTypeOptions } from '@waldur/customer/payment-profiles/utils';
 import {
   FormContainer,
@@ -18,19 +17,63 @@ import {
 } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { getCustomer as getCustomerApi } from '@waldur/project/api';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { setCurrentCustomer } from '@waldur/workspace/actions';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 const PaymentProfileCreate = (props) => {
   const [isFixedPrice, setIsFixedPrice] = useState(false);
+  const dispatch = useDispatch();
+  const customer = useSelector(getCustomer);
 
   const paymentProfileTypeOptions = useMemo(
     () => getPaymentProfileTypeOptions(),
     [],
   );
 
+  const addPaymentProfile = async (formData) => {
+    try {
+      const paymentProfile = await api.createPaymentProfile({
+        is_active: false,
+        name: formData.name,
+        organization: customer.url,
+        payment_type: formData.payment_type.value,
+        attributes: {
+          end_date: formData.end_date,
+          agreement_number: formData.agreement_number,
+          contract_sum: formData.contract_sum,
+        },
+      });
+      if (paymentProfile?.uuid && formData.enabled) {
+        await api.enablePaymentProfile(paymentProfile.uuid);
+      }
+      dispatch(
+        showSuccess(
+          formData.enabled
+            ? translate('Payment profile has been created and enabled.')
+            : translate('Payment profile has been created.'),
+        ),
+      );
+      const updatedCustomer = await getCustomerApi(customer.uuid);
+      dispatch(setCurrentCustomer(updatedCustomer));
+      await props.resolve.refetch();
+      dispatch(closeModalDialog());
+    } catch (error) {
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to create payment profile.'),
+        ),
+      );
+    }
+  };
+
   return (
-    <form onSubmit={props.handleSubmit(props.submitRequest)}>
+    <form onSubmit={props.handleSubmit(addPaymentProfile)}>
       <ModalDialog
         title={translate('Add payment profile')}
         footer={
@@ -99,23 +142,8 @@ const PaymentProfileCreate = (props) => {
   );
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  submitRequest: (formData) =>
-    dispatch(
-      addPaymentProfile({
-        formData,
-        refetch: ownProps.resolve.refetch,
-      }),
-    ),
+const enhance = reduxForm({
+  form: ADD_PAYMENT_PROFILE_FORM_ID,
 });
-
-const connector = connect(null, mapDispatchToProps);
-
-const enhance = compose(
-  connector,
-  reduxForm({
-    form: ADD_PAYMENT_PROFILE_FORM_ID,
-  }),
-);
 
 export const PaymentProfileCreateDialog = enhance(PaymentProfileCreate);

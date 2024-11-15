@@ -8,8 +8,6 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { Limits } from '@waldur/marketplace/common/types';
 import { orderCanBeApproved as getOrderCanBeApproved } from '@waldur/marketplace/orders/actions/selectors';
 
-import { changeLimits } from '../store/constants';
-
 import { FetchedData, getData } from './utils';
 
 const FORM_ID = 'marketplaceChangeLimits';
@@ -76,19 +74,7 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps: OwnProps) => ({
-  submitRequest: (data) =>
-    changeLimits(
-      {
-        resource: ownProps.asyncState.value.resource,
-        limits: ownProps.asyncState.value.limitSerializer(data.limits),
-        refetch: ownProps.refetch,
-      },
-      dispatch,
-    ),
-});
-
 export const connector = compose(
   reduxForm<{ plan: any; limits: Limits }, OwnProps>({ form: FORM_ID }),
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(mapStateToProps),
 );

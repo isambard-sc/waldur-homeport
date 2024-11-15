@@ -355,14 +355,14 @@ export const getServiceProviderByCustomer = (params, options?) =>
   getFirst<ServiceProvider>('/marketplace-service-providers/', params, options);
 
 export const getServiceProviderSecretCode = (id) =>
-  get(`/marketplace-service-providers/${id}/api_secret_code/`).then(
-    (response) => response.data,
-  );
+  get<{ api_secret_code: string }>(
+    `/marketplace-service-providers/${id}/api_secret_code/`,
+  ).then((response) => response.data);
 
 export const generateServiceProviderSecretCode = (id) =>
-  post(`/marketplace-service-providers/${id}/api_secret_code/`).then(
-    (response) => response.data,
-  );
+  post<{ api_secret_code: string }>(
+    `/marketplace-service-providers/${id}/api_secret_code/`,
+  ).then((response) => response.data);
 
 export const submitUsageReport = (payload) =>
   post(`/marketplace-component-usages/set_usage/`, payload).then(

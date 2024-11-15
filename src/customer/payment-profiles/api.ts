@@ -1,19 +1,10 @@
 import { deleteById, post, patch } from '@waldur/core/api';
+import { PaymentProfile } from '@waldur/workspace/types';
 
-export const createPaymentProfile = (formData) => {
-  const reqData = {
-    is_active: false,
-    name: formData.name,
-    organization: formData.customer.url,
-    payment_type: formData.payment_type.value,
-    attributes: {
-      end_date: formData.end_date,
-      agreement_number: formData.agreement_number,
-      contract_sum: formData.contract_sum,
-    },
-  };
-  return post('/payment-profiles/', reqData).then((response) => response.data);
-};
+export const createPaymentProfile = (formData) =>
+  post<PaymentProfile>('/payment-profiles/', formData).then(
+    (response) => response.data,
+  );
 
 export const updatePaymentProfile = (uuid, formData) => {
   const reqData = {

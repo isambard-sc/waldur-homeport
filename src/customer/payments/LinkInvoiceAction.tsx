@@ -3,12 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useAsyncFn, useBoolean } from 'react-use';
 
 import { getAll } from '@waldur/core/api';
+import * as api from '@waldur/customer/payments/api';
 import { InvoicesDropdown } from '@waldur/customer/payments/InvoicesDropdown';
+import { translate } from '@waldur/i18n';
 import { Invoice } from '@waldur/invoices/types';
+import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
 
-import { linkInvoice } from './store/actions';
+import { updatePaymentsList } from './utils';
 
 const loadInvoices = (customer: Customer) =>
   getAll<Invoice[]>('/invoices/', {
@@ -35,8 +38,26 @@ export const LinkInvoiceAction: FunctionComponent<{ payment }> = ({
 
   useEffect(loadInvoicesIfOpen, [open]);
 
-  const triggerAction = (selectedInvoice: Invoice) => {
-    dispatch(linkInvoice(payment.uuid, selectedInvoice.url));
+  const triggerAction = async (selectedInvoice: Invoice) => {
+    try {
+      await api.linkInvoice({
+        paymentUuid: payment.uuid,
+        invoiceUrl: selectedInvoice.url,
+      });
+      dispatch(
+        showSuccess(
+          translate('Invoice has been successfully linked to payment.'),
+        ),
+      );
+      dispatch(updatePaymentsList(customer));
+    } catch (error) {
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to link invoice to the payment.'),
+        ),
+      );
+    }
   };
 
   return (
