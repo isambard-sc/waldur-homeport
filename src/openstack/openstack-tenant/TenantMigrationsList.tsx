@@ -46,8 +46,12 @@ export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => formatDateTime(row.created),
         },
         {
-          title: translate('State'),
+          title: translate('Replication state'),
           render: ({ row }) => row.state,
+        },
+        {
+          title: translate('Destination resource state'),
+          render: ({ row }) => row.dst_resource_state,
         },
       ]}
       verboseName={translate('replications')}
