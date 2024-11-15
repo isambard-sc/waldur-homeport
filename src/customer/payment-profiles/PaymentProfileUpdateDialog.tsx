@@ -1,11 +1,10 @@
-import { useMemo, useState, FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
 import { required } from '@waldur/core/validators';
+import * as api from '@waldur/customer/payment-profiles/api';
 import { EDIT_PAYMENT_PROFILE_FORM_ID } from '@waldur/customer/payment-profiles/constants';
-import { editPaymentProfile } from '@waldur/customer/payment-profiles/store/actions';
 import {
   getInitialValues,
   getPaymentProfileTypeOptions,
@@ -20,10 +19,20 @@ import {
 } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { getCustomer as getCustomerApi } from '@waldur/project/api';
+import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { setCurrentCustomer } from '@waldur/workspace/actions';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 const PaymentProfileUpdateDialog: FunctionComponent<any> = (props) => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    props.initialize(getInitialValues(props.resolve.profile));
+  }, [props.resolve.profile]);
+
   const [isFixedPrice, setIsFixedPrice] = useState(
     props.resolve.payment_type === 'fixed_price',
   );
@@ -33,8 +42,28 @@ const PaymentProfileUpdateDialog: FunctionComponent<any> = (props) => {
     [],
   );
 
+  const customer = useSelector(getCustomer);
+
+  const submitRequest = async (formData) => {
+    try {
+      await api.updatePaymentProfile(props.resolve.profile.uuid, formData);
+      dispatch(showSuccess(translate('Payment profile has been updated.')));
+      dispatch(closeModalDialog());
+      await props.resolve.refetch();
+      const updatedCustomer = await getCustomerApi(customer.uuid);
+      dispatch(setCurrentCustomer(updatedCustomer));
+    } catch (error) {
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to update payment profile.'),
+        ),
+      );
+    }
+  };
+
   return (
-    <form onSubmit={props.handleSubmit(props.submitRequest)}>
+    <form onSubmit={props.handleSubmit(submitRequest)}>
       <ModalDialog
         title={translate('Update payment profile')}
         footer={
@@ -93,30 +122,6 @@ const PaymentProfileUpdateDialog: FunctionComponent<any> = (props) => {
   );
 };
 
-const mapStateToProps = (_state, ownProps) => ({
-  initialValues: getInitialValues(ownProps.resolve.profile),
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  submitRequest: (formData) =>
-    dispatch(
-      editPaymentProfile({
-        uuid: ownProps.resolve.profile.uuid,
-        formData,
-        refetch: ownProps.resolve.refetch,
-      }),
-    ),
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-
-const enhance = compose(
-  connector,
-  reduxForm({
-    form: EDIT_PAYMENT_PROFILE_FORM_ID,
-  }),
-);
-
-export const PaymentProfileUpdateDialogContainer = enhance(
-  PaymentProfileUpdateDialog,
-);
+export const PaymentProfileUpdateDialogContainer = reduxForm({
+  form: EDIT_PAYMENT_PROFILE_FORM_ID,
+})(PaymentProfileUpdateDialog);

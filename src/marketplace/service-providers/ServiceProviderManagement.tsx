@@ -9,6 +9,7 @@ import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import * as api from '@waldur/marketplace/common/api';
 import { ServiceProvider } from '@waldur/marketplace/types';
+import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
@@ -17,11 +18,6 @@ import { getCustomer } from '@waldur/workspace/selectors';
 import { SecretValueField } from '../SecretValueField';
 
 import { canRegisterServiceProviderForCustomer } from './selectors';
-import {
-  secretCodeFetchStart,
-  showSecretCodeRegenerateConfirm,
-} from './store/actions';
-import { getServiceProviderSecretCode } from './store/selectors';
 
 export const ServiceProviderManagement: React.FC = () => {
   const dispatch = useDispatch();
@@ -29,12 +25,49 @@ export const ServiceProviderManagement: React.FC = () => {
   const canRegisterServiceProvider = useSelector(
     canRegisterServiceProviderForCustomer,
   );
-  const secretCode = useSelector(getServiceProviderSecretCode);
-
+  const [secretCode, setSecretCode] = useState<string>();
+  const [isGenerating, setIsGenerating] = useState(false);
   const [registering, setRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
   const [serviceProvider, setServiceProvider] =
     useState<ServiceProvider | null>(null);
+
+  const showSecretCodeRegenerateConfirm = async () => {
+    try {
+      await waitForConfirmation(
+        dispatch,
+        translate('Regenerate secret API code'),
+        translate(
+          'After secret API code has been regenerated, it will not be possible to submit usage with the old key.',
+        ),
+        true,
+      );
+    } catch {
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const data = await api.generateServiceProviderSecretCode(
+        serviceProvider.uuid,
+      );
+      setSecretCode(data.api_secret_code);
+      dispatch(
+        showSuccess(
+          translate('Service provider API secret code has been generated.'),
+        ),
+      );
+    } catch (error) {
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to generate service provider API secret code.'),
+        ),
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const registerServiceProvider = async () => {
     const successMessage = translate('Service provider has been registered.');
@@ -82,20 +115,33 @@ export const ServiceProviderManagement: React.FC = () => {
   };
 
   const getServiceProvider = async () => {
-    const errorMessage = translate('Unable to load service provider.');
     try {
       setLoading(true);
       const serviceProvider = await api.getServiceProviderByCustomer({
         customer_uuid: customer.uuid,
       });
-      setLoading(false);
       setServiceProvider(serviceProvider);
       if (serviceProvider) {
-        dispatch(secretCodeFetchStart(serviceProvider));
+        try {
+          const data = await api.getServiceProviderSecretCode(
+            serviceProvider.uuid,
+          );
+          setSecretCode(data.api_secret_code);
+        } catch (error) {
+          dispatch(
+            showErrorResponse(
+              error,
+              translate('Unable to get service provider API secret code.'),
+            ),
+          );
+        }
       }
     } catch (error) {
+      dispatch(
+        showErrorResponse(error, translate('Unable to load service provider.')),
+      );
+    } finally {
       setLoading(false);
-      dispatch(showErrorResponse(error, errorMessage));
     }
   };
 
@@ -119,16 +165,14 @@ export const ServiceProviderManagement: React.FC = () => {
             </p>
             <p>
               {translate('API secret code:')}
-              <SecretValueField value={secretCode.code} />
+              <SecretValueField value={secretCode} />
             </p>
           </div>
           <div>
             <ActionButton
               title={translate('Regenerate')}
-              action={() =>
-                dispatch(showSecretCodeRegenerateConfirm(serviceProvider))
-              }
-              pending={secretCode.generating}
+              action={showSecretCodeRegenerateConfirm}
+              pending={isGenerating}
               className="btn btn-primary"
             />
           </div>

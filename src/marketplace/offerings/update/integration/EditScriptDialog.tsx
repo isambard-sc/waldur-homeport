@@ -1,4 +1,3 @@
-import delay from '@redux-saga/delay-p';
 import { useCallback, useState } from 'react';
 import { Button, Col, Modal, Row } from 'react-bootstrap';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -6,6 +5,7 @@ import { Field, getFormValues, initialize, reduxForm } from 'redux-form';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
+import { wait } from '@waldur/core/utils';
 import { SubmitButton, SelectField } from '@waldur/form';
 import { MonacoField } from '@waldur/form/MonacoField';
 import { translate } from '@waldur/i18n';
@@ -86,7 +86,7 @@ export const EditScriptDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
         if (asyncDryRunResult.data.get_state_display === 'erred') {
           break;
         }
-        await delay(3000);
+        await wait(3000);
       } while (asyncDryRunResult.data.get_state_display !== 'done');
       setExecuting(false);
       return asyncDryRunResult;

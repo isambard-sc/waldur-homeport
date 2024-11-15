@@ -1,11 +1,10 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { reduxForm } from 'redux-form';
+import { change, reduxForm } from 'redux-form';
 
 import { OfferingComponent } from '@waldur/marketplace/types';
 
-import { periodChanged } from '../store/actions';
-import { submitUsage, FORM_ID } from '../store/constants';
+import { FORM_ID } from '../store/constants';
 
 import { ResourceUsageForm } from './ResourceUsageForm';
 import { UsageReportContext, ComponentUsage } from './types';
@@ -42,8 +41,21 @@ const mapStateToProps = (_, ownProps: OwnProps) =>
     : {};
 
 const mapDispatchToProps = (dispatch) => ({
-  submitReport: (data) => submitUsage(data, dispatch),
-  onPeriodChange: (option) => dispatch(periodChanged(option.value)),
+  onPeriodChange: (option) => {
+    const period = option.value;
+    for (const component of period.components) {
+      dispatch(
+        change(FORM_ID, `components.${component.type}.amount`, component.usage),
+      );
+      dispatch(
+        change(
+          FORM_ID,
+          `components.${component.type}.description`,
+          component.description,
+        ),
+      );
+    }
+  },
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
