@@ -1,46 +1,19 @@
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
-import {
-  UserAgreementComponent,
-  USER_AGREEMENT_TYPES,
-} from '@waldur/UserAgreementComponent';
 
 import { lazyComponent } from './core/lazyComponent';
 import { loadContext } from './marketplace/resolve';
-import { useTitle } from './navigation/title';
-
-const Layout = lazyComponent(() =>
-  import('@waldur/navigation/Layout').then((module) => ({
-    default: module.Layout,
-  })),
-);
-
-const TosPage = () => {
-  useTitle(translate('User agreements'));
-  return (
-    <UserAgreementComponent
-      agreement_type={USER_AGREEMENT_TYPES.terms_of_service}
-      title={translate('Terms of Service')}
-    />
-  );
-};
-
-const PrivacyPage = () => {
-  useTitle(translate('User agreements'));
-  return (
-    <UserAgreementComponent
-      agreement_type={USER_AGREEMENT_TYPES.privacy_policy}
-      title={translate('Privacy Policy')}
-    />
-  );
-};
 
 export const states: StateDeclaration[] = [
   {
     name: 'about',
     url: '',
     abstract: true,
-    component: Layout,
+    component: lazyComponent(() =>
+      import('@waldur/navigation/Layout').then((module) => ({
+        default: module.Layout,
+      })),
+    ),
     data: {
       title: () => translate('About'),
     },
@@ -55,7 +28,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'about.tos',
     url: '/tos/',
-    component: TosPage,
+    component: lazyComponent(() =>
+      import('./TosPage').then((module) => ({
+        default: module.TosPage,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Terms of Service'),
     },
@@ -64,7 +41,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'about.privacy',
     url: '/privacy/',
-    component: PrivacyPage,
+    component: lazyComponent(() =>
+      import('./PrivacyPage').then((module) => ({
+        default: module.PrivacyPage,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Privacy policy'),
     },

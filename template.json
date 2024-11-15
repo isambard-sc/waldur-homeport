@@ -7636,7 +7636,7 @@
     "message": "Priority"
   },
   "Privacy Policy": {
-    "description": "about.tsx",
+    "description": "PrivacyPage.tsx",
     "message": "Privacy Policy"
   },
   "Privacy policy link": {
@@ -10800,7 +10800,7 @@
     "message": "Termination"
   },
   "Terms of Service": {
-    "description": "about.tsx, marketplace/details/OfferingTabs.tsx, marketplace/orders/TermsOfServiceDialog.tsx",
+    "description": "TosPage.tsx, about.tsx, marketplace/details/OfferingTabs.tsx, marketplace/orders/TermsOfServiceDialog.tsx",
     "message": "Terms of Service"
   },
   "Terms of service link": {
@@ -12980,7 +12980,7 @@
     "message": "User agreement was updated"
   },
   "User agreements": {
-    "description": "about.tsx, administration/routes.ts",
+    "description": "PrivacyPage.tsx, TosPage.tsx, administration/routes.ts",
     "message": "User agreements"
   },
   "User could not be updated": {
