@@ -7,6 +7,7 @@ import { Field, FieldArray, formValueSelector, reduxForm } from 'redux-form';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { FormGroup, SelectField, SubmitButton } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
 import { offeringsAutocomplete } from '@waldur/marketplace/common/autocompletes';
@@ -61,6 +62,7 @@ export const MigrateTenantDialog = connect<
                 src_cidr: type.source,
                 dst_cidr: type.destination,
               })),
+              skip_connection_extnet: formData.skip_connection_extnet,
             },
           });
           dispatch(
@@ -176,6 +178,14 @@ export const MigrateTenantDialog = connect<
                     </Form.Group>
                   </>
                 ) : null}
+
+                <Field
+                  name="skip_connection_extnet"
+                  label={translate('Skip connection to external network')}
+                  component={FormGroup}
+                >
+                  <AwesomeCheckboxField />
+                </Field>
               </>
             )}
           </ModalDialog>

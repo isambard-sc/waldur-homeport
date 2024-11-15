@@ -10224,7 +10224,7 @@
     "message": "Size"
   },
   "Skip connection to external network": {
-    "description": "openstack/OpenStackPackageDetails.tsx",
+    "description": "openstack/OpenStackPackageDetails.tsx, openstack/openstack-tenant/actions/MigrateTenantDialog.tsx",
     "message": "Skip connection to external network"
   },
   "Skip floating IP assignment": {
