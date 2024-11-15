@@ -1,21 +1,15 @@
-import { Check, Spinner, Trash, X } from '@phosphor-icons/react';
-import { useMutation } from '@tanstack/react-query';
 import { FC, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { ENV } from '@waldur/configs/default';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { CustomerFeatures } from '@waldur/FeaturesEnums';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { waitForConfirmation } from '@waldur/modal/actions';
 import { getNativeNameVisible } from '@waldur/store/config';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { ActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-import { SetLocationButton } from '../list/SetLocationButton';
-
+import { CustomerLocationRow } from './CustomerLocationRow';
 import { CustomerMediaPanel } from './CustomerMediaPanel';
 import { FieldEditButton } from './FieldEditButton';
 import { CustomerEditPanelProps } from './types';
@@ -23,30 +17,6 @@ import { CustomerEditPanelProps } from './types';
 export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
   const nativeNameVisible = getNativeNameVisible();
   const user = useSelector(getUser);
-
-  const dispatch = useDispatch();
-  const { mutate: removeLocation, isLoading: isRemovingLocation } = useMutation(
-    async () => {
-      try {
-        await waitForConfirmation(
-          dispatch,
-          translate('Confirmation'),
-          translate('Are you sure you want to remove the location?'),
-        );
-      } catch {
-        return;
-      }
-
-      try {
-        await props.callback({ latitude: null, longitude: null }, dispatch);
-        dispatch(showSuccess(translate('Location has been removed.')));
-      } catch (e) {
-        dispatch(
-          showErrorResponse(e, translate('Unable to remove the location.')),
-        );
-      }
-    },
-  );
 
   const detailsRows = useMemo(
     () =>
@@ -155,32 +125,9 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
               }
             />
           ))}
-          <FormTable.Item
-            label={translate('Location')}
-            value={
-              props.customer.latitude && props.customer.longitude ? (
-                <Check weight="bold" className="text-info" />
-              ) : (
-                <X weight="bold" className="text-danger" />
-              )
-            }
-            actions={
-              <>
-                <ActionButton
-                  iconNode={
-                    !isRemovingLocation ? (
-                      <Trash weight="bold" className="text-danger" />
-                    ) : (
-                      <Spinner className="animation-spin" />
-                    )
-                  }
-                  action={removeLocation}
-                  variant="secondary"
-                  className="btn-sm btn-icon me-3"
-                />
-                <SetLocationButton customer={props.customer} />
-              </>
-            }
+          <CustomerLocationRow
+            customer={props.customer}
+            callback={props.callback}
           />
         </FormTable>
       </FormTable.Card>
