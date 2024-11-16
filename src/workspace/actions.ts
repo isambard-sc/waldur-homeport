@@ -1,12 +1,10 @@
 import {
   SET_CURRENT_CUSTOMER,
   SET_CURRENT_PROJECT,
-  SET_CURRENT_WORKSPACE,
-  SET_CURRENT_USER,
   SET_CURRENT_RESOURCE,
-  REFRESH_CURRENT_CUSTOMER,
+  SET_CURRENT_USER,
 } from './constants';
-import { WorkspaceType, Project } from './types';
+import { Project } from './types';
 
 export const setCurrentCustomer = (customer) => ({
   type: SET_CURRENT_CUSTOMER,
@@ -15,21 +13,10 @@ export const setCurrentCustomer = (customer) => ({
   },
 });
 
-export const refreshCurrentCustomer = () => ({
-  type: REFRESH_CURRENT_CUSTOMER,
-});
-
 export const setCurrentProject = (project: Project) => ({
   type: SET_CURRENT_PROJECT,
   payload: {
     project,
-  },
-});
-
-export const setCurrentWorkspace = (workspace: WorkspaceType) => ({
-  type: SET_CURRENT_WORKSPACE,
-  payload: {
-    workspace,
   },
 });
 

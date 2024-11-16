@@ -1,9 +1,7 @@
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC, PropsWithChildren } from 'react';
-import { useSelector } from 'react-redux';
 
 import { Link } from '@waldur/core/Link';
-import { getWorkspace } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 interface ProviderLinkProps {
   customer_uuid: string;
@@ -15,12 +13,11 @@ export const ProviderLink: FC<PropsWithChildren<ProviderLinkProps>> = ({
   className,
   children,
 }) => {
-  const workspace = useSelector(getWorkspace);
-
+  const { state } = useCurrentStateAndParams();
   return (
     <Link
       state={
-        workspace === WorkspaceType.ORGANIZATION
+        state.parent === 'organization'
           ? 'marketplace-provider-details-customer'
           : 'marketplace-provider-details'
       }

@@ -1,12 +1,9 @@
 import { identity, isMatch, pickBy, uniqueId } from 'lodash';
 import { useCallback, useState } from 'react';
 
-import { getItem, removeItem, setItem } from '@waldur/auth/AuthStorage';
-
 import { SearchItemProps } from './SearchItem';
 
 const RECENT_SEARCH_KEY = 'waldur/search/recent';
-const STORAGE_FOR_RECENT_SEARCH = 'localStorage';
 const MAX_ALLOWED_ITEMS = 5;
 
 interface RecentSearchItem {
@@ -28,15 +25,11 @@ class RecentSearchServiceClass {
     const newList = prevList
       .slice(Math.max(0, prevList.length - MAX_ALLOWED_ITEMS + 1))
       .concat(newItem);
-    setItem(
-      RECENT_SEARCH_KEY,
-      JSON.stringify(newList),
-      STORAGE_FOR_RECENT_SEARCH,
-    );
+    localStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(newList));
   };
 
   list = (): RecentSearchItem[] => {
-    const prevList = getItem(RECENT_SEARCH_KEY, STORAGE_FOR_RECENT_SEARCH);
+    const prevList = localStorage.getItem(RECENT_SEARCH_KEY);
     if (prevList) {
       try {
         const jsonList = JSON.parse(prevList);
@@ -44,7 +37,7 @@ class RecentSearchServiceClass {
           return jsonList;
         }
       } catch {
-        removeItem(RECENT_SEARCH_KEY, STORAGE_FOR_RECENT_SEARCH);
+        localStorage.removeItem(RECENT_SEARCH_KEY);
       }
     }
     return [];
@@ -53,11 +46,7 @@ class RecentSearchServiceClass {
   remove = (item: RecentSearchItem) => {
     const prevList = this.list();
     const newList = prevList.filter((x) => x.id !== item.id);
-    setItem(
-      RECENT_SEARCH_KEY,
-      JSON.stringify(newList),
-      STORAGE_FOR_RECENT_SEARCH,
-    );
+    localStorage.setItem(RECENT_SEARCH_KEY, JSON.stringify(newList));
   };
 }
 

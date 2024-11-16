@@ -21,7 +21,6 @@ export const states: StateDeclaration[] = [
     data: {
       auth: true,
       title: () => translate('Call management'),
-      skipInitWorkspace: true,
     },
     resolve: [
       {

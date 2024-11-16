@@ -6787,10 +6787,6 @@
     "description": "marketplace/deploy/steps/ResourceNameGroup.tsx",
     "message": "Organization and project need to be selected."
   },
-  "Organization could not be refreshed.": {
-    "description": "workspace/effects.ts",
-    "message": "Organization could not be refreshed."
-  },
   "Organization credit": {
     "description": "customer/cost-policies/CostPoliciesList.tsx",
     "message": "Organization credit"
@@ -11718,6 +11714,10 @@
   "Unable to delete offering user.": {
     "description": "marketplace/service-providers/ProviderOfferingUserDeleteButton.tsx",
     "message": "Unable to delete offering user."
+  },
+  "Unable to delete organization.": {
+    "description": "customer/details/CustomerRemoveDialog.tsx",
+    "message": "Unable to delete organization."
   },
   "Unable to delete payment.": {
     "description": "customer/payments/DeletePaymentButton.tsx",

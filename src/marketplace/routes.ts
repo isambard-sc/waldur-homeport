@@ -7,9 +7,8 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
 import { isOwnerOrStaff } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
-import { fetchProvider, loadContext } from './resolve';
+import { fetchProvider } from './resolve';
 import { ResourceDetailsContainer } from './resources/details/ResourceDetailsContainer';
 
 export const states: StateDeclaration[] = [
@@ -19,13 +18,6 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     parent: 'layout',
-    resolve: [
-      {
-        token: 'public-context',
-        resolveFn: loadContext,
-        deps: ['$transition$'],
-      },
-    ],
     data: {
       auth: false,
     },
@@ -191,7 +183,6 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       auth: true,
-      workspace: WorkspaceType.ORGANIZATION,
       title: () => translate('Service provider'),
     },
     resolve: [
