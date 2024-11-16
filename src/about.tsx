@@ -2,7 +2,6 @@ import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 
 import { lazyComponent } from './core/lazyComponent';
-import { loadContext } from './marketplace/resolve';
 
 export const states: StateDeclaration[] = [
   {
@@ -17,13 +16,6 @@ export const states: StateDeclaration[] = [
     data: {
       title: () => translate('About'),
     },
-    resolve: [
-      {
-        token: 'public-context',
-        resolveFn: loadContext,
-        deps: ['$transition$'],
-      },
-    ],
   },
   {
     name: 'about.tos',

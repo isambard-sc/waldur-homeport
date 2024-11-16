@@ -5,11 +5,9 @@ import store from '@waldur/store/store';
 import {
   setCurrentCustomer,
   setCurrentProject,
-  setCurrentWorkspace,
 } from '@waldur/workspace/actions';
-import { WorkspaceType } from '@waldur/workspace/types';
 
-import { getProject, getCustomer } from './api';
+import { getCustomer, getProject } from './api';
 
 export function loadProject(transition: Transition) {
   if (!transition.params().uuid) {
@@ -18,7 +16,6 @@ export function loadProject(transition: Transition) {
 
   async function loadData() {
     try {
-      store.dispatch(setCurrentWorkspace(WorkspaceType.PROJECT));
       const project = await getProject(transition.params().uuid);
       const customer = await getCustomer(project.customer_uuid);
       store.dispatch(setCurrentCustomer(customer));

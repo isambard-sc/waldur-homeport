@@ -6,7 +6,6 @@ import { StateDeclaration } from '@waldur/core/types';
 import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 import { UsersService } from './UsersService';
 
@@ -18,7 +17,6 @@ export const states: StateDeclaration[] = [
     abstract: true,
     data: {
       auth: true,
-      workspace: WorkspaceType.USER,
       title: () => UsersService.getCachedUser()?.full_name,
     },
     component: lazyComponent(() =>

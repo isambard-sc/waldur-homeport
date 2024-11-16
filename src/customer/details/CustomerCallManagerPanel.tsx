@@ -9,15 +9,15 @@ import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { getCustomer as getCustomerApi } from '@waldur/project/api';
 import {
   disableCallManagingOrganization,
   enableCallManagingOrganization,
   getCallManagingOrganization,
 } from '@waldur/proposals/api';
 import { showErrorResponse } from '@waldur/store/notify';
+import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
-
-import { refreshCurrentCustomer } from '../api';
 
 export const CustomerCallManagerPanel: FunctionComponent = () => {
   const customer = useSelector(getCustomer);
@@ -60,7 +60,8 @@ export const CustomerCallManagerPanel: FunctionComponent = () => {
         };
         try {
           const result = await enableCallManagingOrganization(payload);
-          await refreshCurrentCustomer(customer.uuid);
+          const newCustomer = await getCustomerApi(customer.uuid);
+          dispatch(setCurrentCustomer(newCustomer));
           setInfoUuid(result.uuid);
           return result;
         } catch (error) {
@@ -73,7 +74,8 @@ export const CustomerCallManagerPanel: FunctionComponent = () => {
         if (!infoUuid) return null;
         try {
           const result = await disableCallManagingOrganization(infoUuid);
-          await refreshCurrentCustomer(customer.uuid);
+          const newCustomer = await getCustomerApi(customer.uuid);
+          dispatch(setCurrentCustomer(newCustomer));
           return result;
         } catch (error) {
           dispatch(

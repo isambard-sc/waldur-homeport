@@ -162,18 +162,10 @@ export interface Customer {
   users_count?: number;
 }
 
-export enum WorkspaceType {
-  ORGANIZATION = 'WORKSPACE/ORGANIZATION',
-  SUPPORT = 'WORKSPACE/SUPPORT',
-  PROJECT = 'WORKSPACE/PROJECT',
-  USER = 'WORKSPACE/USER',
-}
-
 export interface WorkspaceState {
   user: User;
   impersonatorUser: User;
   customer?: Customer;
   project?: Project;
-  workspace?: WorkspaceType;
   resource?;
 }

@@ -5,15 +5,17 @@ import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import {
+  getCustomer as getCustomerApi,
+  deleteProject,
+} from '@waldur/project/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import {
-  refreshCurrentCustomer,
+  setCurrentCustomer,
   setCurrentProject,
 } from '@waldur/workspace/actions';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 import { Project } from '@waldur/workspace/types';
-
-import { deleteProject } from './api';
 
 export const useProjectDelete = ({
   project,
@@ -62,7 +64,8 @@ export const useProjectDelete = ({
       if (refetch) {
         await refetch();
       }
-      dispatch(refreshCurrentCustomer());
+      const newCustomer = await getCustomerApi(currentCustomer.uuid);
+      dispatch(setCurrentCustomer(newCustomer));
       if (isCurrentProject) {
         router.stateService.go('organization.projects', {
           uuid: project.customer_uuid,

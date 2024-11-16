@@ -4,7 +4,6 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 import { loadProject } from './resolve';
 
@@ -21,9 +20,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       auth: true,
-      workspace: WorkspaceType.PROJECT,
       title: () => translate('Project'),
-      skipInitWorkspace: true,
     },
     resolve: [
       {
@@ -42,7 +39,6 @@ export const states: StateDeclaration[] = [
     url: '',
     data: {
       breadcrumb: () => translate('Team'),
-      skipInitWorkspace: true,
       priority: 120,
     },
   },
@@ -152,7 +148,6 @@ export const states: StateDeclaration[] = [
     parent: 'project-team',
     data: {
       breadcrumb: () => translate('Users'),
-      skipInitWorkspace: true,
     },
   },
   {
@@ -166,7 +161,6 @@ export const states: StateDeclaration[] = [
     parent: 'project-team',
     data: {
       breadcrumb: () => translate('Invitations'),
-      skipInitWorkspace: true,
     },
   },
   {
@@ -180,7 +174,6 @@ export const states: StateDeclaration[] = [
     parent: 'project-team',
     data: {
       breadcrumb: () => translate('Permissions log'),
-      skipInitWorkspace: true,
     },
   },
 ];

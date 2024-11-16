@@ -1,9 +1,5 @@
 import { uniqueId } from 'lodash';
 
-import { getItem, removeItem, setItem } from '@waldur/auth/AuthStorage';
-
-const STORAGE_FOR_SAVED_FILTERS = 'localStorage';
-
 export interface TableFiltersGroup {
   id: string;
   title: string;
@@ -33,11 +29,11 @@ class TableFilterServiceClass {
     } else {
       newData = JSON.stringify(prevList.concat(newGroup));
     }
-    setItem(key, newData, STORAGE_FOR_SAVED_FILTERS);
+    localStorage.setItem(key, newData);
   };
 
   list = (key: string): TableFiltersGroup[] => {
-    const prevList = getItem(key, STORAGE_FOR_SAVED_FILTERS);
+    const prevList = localStorage.getItem(key);
     if (prevList) {
       try {
         const jsonList = JSON.parse(prevList);
@@ -45,7 +41,7 @@ class TableFilterServiceClass {
           return jsonList;
         }
       } catch {
-        removeItem(key, STORAGE_FOR_SAVED_FILTERS);
+        localStorage.removeItem(key);
       }
     }
     return [];
@@ -54,7 +50,7 @@ class TableFilterServiceClass {
   remove = (key: string, filtersGroup: TableFiltersGroup) => {
     const prevList = this.list(key);
     const newList = prevList.filter((p) => p.id !== filtersGroup.id);
-    setItem(key, JSON.stringify(newList), STORAGE_FOR_SAVED_FILTERS);
+    localStorage.setItem(key, JSON.stringify(newList));
   };
 }
 

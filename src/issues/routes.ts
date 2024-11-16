@@ -4,7 +4,6 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 import { hasSupport } from './hooks';
 
@@ -17,7 +16,6 @@ export const states: StateDeclaration[] = [
     abstract: true,
     data: {
       auth: true,
-      workspace: WorkspaceType.SUPPORT,
       title: () => translate('Support'),
       permissions: [isStaffOrSupport],
     },

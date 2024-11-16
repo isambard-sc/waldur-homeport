@@ -4,12 +4,7 @@ import { createSelector } from 'reselect';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { Table, createFetcher, useTable } from '@waldur/table';
-import {
-  getCustomer,
-  getProject,
-  getWorkspace,
-} from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 import { OfferingCard } from '../common/OfferingCard';
 
@@ -37,9 +32,8 @@ const field = [
 const mapStateToFilter = createSelector(
   getCustomer,
   getProject,
-  getWorkspace,
   getMarketplaceFilters,
-  (customer, project, workspace, marketplaceFilters) => {
+  (customer, project, marketplaceFilters) => {
     let contextFilter = getContextFiltersForOfferings(marketplaceFilters);
     if (!contextFilter) {
       contextFilter = {
@@ -47,16 +41,12 @@ const mapStateToFilter = createSelector(
         project_uuid: project?.uuid,
       };
     }
-    const filter: Record<string, any> = {
+    return {
       page_size: 6,
       field,
       state: ['Active', 'Paused'],
       ...contextFilter,
     };
-    if (workspace === WorkspaceType.USER) {
-      filter.shared = true;
-    }
-    return filter;
   },
 );
 

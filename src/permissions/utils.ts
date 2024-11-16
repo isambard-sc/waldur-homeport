@@ -32,8 +32,5 @@ export const formatRole = (name: string) => {
   return role?.description || role?.name;
 };
 
-export const getProjectPermission = (user) =>
-  user.permissions?.find(({ scope_type }) => scope_type === 'project');
-
 export const formatRoleType = (content_type: RoleType) =>
   ROLE_TYPES.find(({ value }) => value === content_type)?.label || content_type;

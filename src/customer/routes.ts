@@ -9,7 +9,6 @@ import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 import { fetchCustomer } from './workspace/CustomerWorkspace';
 
@@ -20,9 +19,7 @@ export const states: StateDeclaration[] = [
     abstract: true,
     data: {
       auth: true,
-      workspace: WorkspaceType.ORGANIZATION,
       title: () => translate('Organization'),
-      skipInitWorkspace: true,
     },
     parent: 'layout',
     component: lazyComponent(() =>

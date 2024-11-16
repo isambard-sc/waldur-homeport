@@ -4,7 +4,6 @@ import { ComponentType } from 'react';
 import { PluginConfiguration } from '@waldur/auth/types';
 import { FeaturesEnum } from '@waldur/FeaturesEnums';
 import { Role } from '@waldur/permissions/types';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 interface DataDeclaration {
   /** State is disabled as long as its feature is disabled */
@@ -21,8 +20,6 @@ interface DataDeclaration {
   /** Page header component is concealed as long as this parameter is set to true. */
   hideHeader: boolean;
   hideHeaderMenu: boolean;
-  /** Workspace declaration is used by workspace selector. */
-  workspace: WorkspaceType;
   skipAuth: boolean;
   title?(): string;
   breadcrumb?(): string;
@@ -30,7 +27,6 @@ interface DataDeclaration {
   priority?: number;
   permissions: Array<(state) => boolean>;
   useExtraTabs?: boolean;
-  skipInitWorkspace?: boolean;
   skipHero?: boolean;
 }
 

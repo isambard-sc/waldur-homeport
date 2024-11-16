@@ -9,12 +9,7 @@ import { TextWithoutFormatting } from '@waldur/core/TextWithoutFormatting';
 import { truncate } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
-import {
-  getCustomer,
-  getProject,
-  getWorkspace,
-} from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 import { OfferingLink } from '../links/OfferingLink';
 import { Offering } from '../types';
@@ -54,7 +49,6 @@ const OfferingListItem: FC<{ row: Offering }> = ({ row }) => {
 export const OfferingsSearchBox = () => {
   const customer = useSelector(getCustomer);
   const project = useSelector(getProject);
-  const workspace: WorkspaceType = useSelector(getWorkspace);
 
   const params = useMemo(() => {
     const field = [
@@ -67,18 +61,14 @@ export const OfferingsSearchBox = () => {
       'state',
       'paused_reason',
     ];
-    const _params: Record<string, any> = {
+    return {
       o: '-created',
       state: ['Active', 'Paused'],
       field,
       allowed_customer_uuid: customer?.uuid,
       project_uuid: project?.uuid,
     };
-    if (workspace === WorkspaceType.USER) {
-      _params.shared = true;
-    }
-    return _params;
-  }, [customer, project, workspace]);
+  }, [customer, project]);
 
   return (
     <AsyncSearchBox

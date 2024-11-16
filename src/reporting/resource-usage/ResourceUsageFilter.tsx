@@ -1,8 +1,7 @@
 import { FunctionComponent } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { reduxForm, formValueSelector } from 'redux-form';
-import { createSelector } from 'reselect';
+import { reduxForm } from 'redux-form';
 
 import { AccountingPeriodField } from '@waldur/customer/list/AccountingPeriodField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
@@ -12,9 +11,8 @@ import { translate } from '@waldur/i18n';
 import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { ProjectFilter } from '@waldur/marketplace/resources/list/ProjectFilter';
-import { RootState } from '@waldur/store/reducers';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
-import { Customer, WorkspaceType } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 interface ResourceUsageFilterProps {
   options: PeriodOption[];
@@ -68,15 +66,9 @@ const PureResourceUsageFilter: FunctionComponent<ResourceUsageFilterProps> = (
 
 export const FORM_ID = 'ResourceUsageFilter';
 
-const selector = formValueSelector(FORM_ID);
-
-const mapStateToProps = createSelector(
-  (state: RootState) => selector(state, WorkspaceType.ORGANIZATION),
-  (customer) => ({
-    customer,
-    options: makeLastTwelveMonthsFilterPeriods(),
-  }),
-);
+const mapStateToProps = () => ({
+  options: makeLastTwelveMonthsFilterPeriods(),
+});
 
 const enhance = compose(
   reduxForm({
