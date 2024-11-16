@@ -1,7 +1,5 @@
 import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { InjectedFormProps, reduxForm } from 'redux-form';
+import { reduxForm, InjectedFormProps } from 'redux-form';
 
 import { FormContainer, SubmitButton, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -12,53 +10,45 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 interface OwnProps {
   resolve: {
     title: string;
-    submitRequest;
+    submitRequest: (comment: string) => void;
   };
 }
 
 const PurePermissionRequestActionDialog: FunctionComponent<
-  InjectedFormProps & OwnProps & { handleSubmit; submitRequest }
-> = (props) => (
-  <form onSubmit={props.handleSubmit(props.submitRequest)}>
-    <ModalDialog
-      title={props.resolve.title}
-      footer={
-        <>
-          <CloseDialogButton />
-          <SubmitButton
-            disabled={props.invalid}
-            submitting={props.submitting}
-            label={translate('Submit')}
+  InjectedFormProps & OwnProps & { handleSubmit }
+> = (props) => {
+  const submitRequest = (formData) => {
+    props.resolve.submitRequest(formData?.comment);
+  };
+
+  return (
+    <form onSubmit={props.handleSubmit(submitRequest)}>
+      <ModalDialog
+        title={props.resolve.title}
+        footer={
+          <>
+            <CloseDialogButton />
+            <SubmitButton
+              disabled={props.invalid}
+              submitting={props.submitting}
+              label={translate('Submit')}
+            />
+          </>
+        }
+      >
+        <FormContainer submitting={props.submitting}>
+          <TextField
+            name="comment"
+            label={translate('Comment')}
+            maxLength={150}
+            rows={4}
           />
-        </>
-      }
-    >
-      <FormContainer submitting={props.submitting}>
-        <TextField
-          name="comment"
-          label={translate('Comment')}
-          maxLength={150}
-          rows={4}
-        />
-      </FormContainer>
-    </ModalDialog>
-  </form>
-);
+        </FormContainer>
+      </ModalDialog>
+    </form>
+  );
+};
 
-const mapDispatchToProps = (_dispatch, ownProps: OwnProps) => ({
-  submitRequest: (formData) =>
-    ownProps.resolve.submitRequest(formData?.comment),
-});
-
-const connector = connect(null, mapDispatchToProps);
-
-const enhance = compose(
-  connector,
-  reduxForm({
-    form: USER_PERMISSION_REQUESTS_ACTION_FORM_ID,
-  }),
-);
-
-export const PermissionRequestActionDialog = enhance(
-  PurePermissionRequestActionDialog,
-);
+export const PermissionRequestActionDialog = reduxForm({
+  form: USER_PERMISSION_REQUESTS_ACTION_FORM_ID,
+})(PurePermissionRequestActionDialog);
