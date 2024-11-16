@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { compose } from 'redux';
 import { Field, reduxForm } from 'redux-form';
 
 import {
@@ -49,14 +48,10 @@ const PureNotificationFilter: FunctionComponent<{ form }> = ({ form }) => {
   );
 };
 
-const enhance = compose(
-  reduxForm({
-    form: 'notificationFilter',
-    onChange: syncFiltersToURL,
-    destroyOnUnmount: false,
-    initialValues: getInitialValues(),
-    enableReinitialize: true,
-  }),
-);
-
-export const NotificationFilter = enhance(PureNotificationFilter);
+export const NotificationFilter = reduxForm({
+  form: 'notificationFilter',
+  onChange: syncFiltersToURL,
+  destroyOnUnmount: false,
+  initialValues: getInitialValues(),
+  enableReinitialize: true,
+})(PureNotificationFilter);

@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { compose } from 'redux';
 import { Field, reduxForm } from 'redux-form';
 
 import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
@@ -40,14 +39,10 @@ const PureCustomerEventsFilter: FunctionComponent = () => (
   </TableFilterItem>
 );
 
-const enhance = compose(
-  reduxForm({
-    form: 'customerEventsFilter',
-    initialValues: {
-      feature: [choices[0]],
-    },
-    destroyOnUnmount: false,
-  }),
-);
-
-export const CustomerEventsFilter = enhance(PureCustomerEventsFilter);
+export const CustomerEventsFilter = reduxForm({
+  form: 'customerEventsFilter',
+  initialValues: {
+    feature: [choices[0]],
+  },
+  destroyOnUnmount: false,
+})(PureCustomerEventsFilter);

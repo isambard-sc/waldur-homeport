@@ -1,14 +1,11 @@
 import { FC, ReactNode, useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { reduxForm, InjectedFormProps, getFormValues } from 'redux-form';
+import { InjectedFormProps, reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { WizardStepIndicator } from '@waldur/form/WizardStepIndicator';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { RootState } from '@waldur/store/reducers';
 
 import './wizard.scss';
 
@@ -92,18 +89,8 @@ const WizardFormPure: FC<WizardFormProps> = (props) => {
   );
 };
 
-export const WizardForm = compose(
-  connect((state: RootState, ownProps: WizardFormStepProps) => {
-    return {
-      form: ownProps.form,
-      initialValues: ownProps.initialValues,
-      validate: ownProps.validate,
-      formValues: getFormValues(ownProps.form)(state) || {},
-    };
-  }),
-  reduxForm<{}, any>({
-    destroyOnUnmount: false,
-    forceUnregisterOnUnmount: true,
-    keepDirtyOnReinitialize: true,
-  }),
-)(WizardFormPure);
+export const WizardForm = reduxForm<{}, any>({
+  destroyOnUnmount: false,
+  forceUnregisterOnUnmount: true,
+  keepDirtyOnReinitialize: true,
+})(WizardFormPure);
