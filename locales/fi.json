@@ -82,7 +82,6 @@
   "After secret API code has been regenerated, it will not be possible to submit usage with the old key.": "Kun salainen API-koodi on luotu uudelleen, ei ole mahdollista lähettää käyttöä vanhalla avaimella.",
   "Agreement number": "Sopimuksen numero",
   "Agreement type": "Sopimuksen tyyppi",
-  "Alert": "Varoitus",
   "All": "Kaikki",
   "All orders have been approved.": "Kaikki tilaukset on hyväksytty.",
   "All orders have been rejected.": "Kaikki tilaukset on hylätty.",

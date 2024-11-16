@@ -82,7 +82,6 @@
   "After secret API code has been regenerated, it will not be possible to submit usage with the old key.": "গোপন API কোড পুনরায় জেনারেট হওয়ার পরে, পুরানো কী দিয়ে ব্যবহার জমা দেওয়া সম্ভব হবে না।",
   "Agreement number": "চুক্তি নং",
   "Agreement type": "চুক্তির ধরন",
-  "Alert": "সতর্কতা",
   "All": "সব",
   "All orders have been approved.": "সমস্ত আদেশ অনুমোদন করা হয়েছে.",
   "All orders have been rejected.": "সমস্ত আদেশ প্রত্যাখ্যান করা হয়েছে.",

@@ -81,7 +81,6 @@
   "After secret API code has been regenerated, it will not be possible to submit usage with the old key.": "Una vez que se haya regenerado el código secreto de la API, no será posible enviar el uso con la clave anterior.",
   "Agreement number": "Numero de acuerdo",
   "Agreement type": "tipo de acuerdo",
-  "Alert": "Alerta",
   "All": "Todo",
   "All orders have been approved.": "Todos los pedidos han sido aprobados.",
   "All orders have been rejected.": "Todos los pedidos han sido rechazados.",

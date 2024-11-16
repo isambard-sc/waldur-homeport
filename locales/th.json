@@ -83,7 +83,6 @@
   "After secret API code has been regenerated, it will not be possible to submit usage with the old key.": "หลังจากสร้างรหัสลับ API แล้ว จะไม่สามารถส่งการใช้งานด้วยรหัสเก่าได้",
   "Agreement number": "เลขที่ข้อตกลง",
   "Agreement type": "ประเภทข้อตกลง",
-  "Alert": "เตือน",
   "All": "ทั้งหมด",
   "All orders have been approved.": "คำสั่งซื้อทั้งหมดได้รับการอนุมัติแล้ว",
   "All orders have been rejected.": "คำสั่งซื้อทั้งหมดถูกปฏิเสธ",

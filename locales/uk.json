@@ -83,7 +83,6 @@
   "After secret API code has been regenerated, it will not be possible to submit usage with the old key.": "Після зміни старий API токен не можна буде використовувати для відправки звітів про використання ресурсів.",
   "Agreement number": "Номер договору",
   "Agreement type": "Тип договору",
-  "Alert": "Сповіщення",
   "All": "Всі",
   "All orders have been approved.": "Усі накази погоджено.",
   "All orders have been rejected.": "Усі замовлення відхилено.",
