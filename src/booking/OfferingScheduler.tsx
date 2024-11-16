@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { Button, Card } from 'react-bootstrap';
-import { DateTimePickerProps } from 'react-flatpickr';
+import { type DateTimePickerProps } from 'react-flatpickr';
 import { usePrevious } from 'react-use';
 import { Field, WrappedFieldArrayProps } from 'redux-form';
 

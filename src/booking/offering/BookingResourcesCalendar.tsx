@@ -5,6 +5,7 @@ import Flatpickr from 'react-flatpickr';
 
 import { getTimeOptions } from '@waldur/booking/utils';
 import { parseDate } from '@waldur/core/dateUtils';
+import { useFlatpickrTheme } from '@waldur/form/useFlatpickrTheme';
 import { translate } from '@waldur/i18n';
 
 import { BookingResource } from '../types';
@@ -51,6 +52,8 @@ export const BookingResourcesCalendar: FunctionComponent<
       });
     });
   }, [dates, bookingResources]);
+
+  useFlatpickrTheme();
 
   return (
     <Row className="booking-resource-items-calendar mb-10">

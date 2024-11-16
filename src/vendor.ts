@@ -5,7 +5,4 @@ import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
 
-import flatpickr from 'flatpickr';
-flatpickr.l10ns.default.firstDayOfWeek = 1; // Monday
-
 import 'text-security/text-security.css';
