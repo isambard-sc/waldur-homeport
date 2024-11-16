@@ -53,11 +53,12 @@ export const CustomerRemoveDialog = reduxForm<
           <>
             <CloseDialogButton className="flex-grow-1" />
             <Button
-              title={translate('Delete')}
               variant="light-danger"
               className="flex-grow-1"
               type="submit"
-            />
+            >
+              {translate('Delete')}
+            </Button>
           </>
         }
       >
