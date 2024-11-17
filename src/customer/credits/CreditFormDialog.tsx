@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { useEffect } from 'react';
-import { Form, FormControl, Accordion } from 'react-bootstrap';
+import { Form, Accordion } from 'react-bootstrap';
 import { connect, useSelector } from 'react-redux';
 import { getFormValues, reduxForm, formValueSelector } from 'redux-form';
 
@@ -56,12 +56,6 @@ export const CreditFormDialog = connect(
     const formValues = (useSelector(getFormValues(props.formId)) ||
       {}) as CustomerCreditFormData;
 
-    const needToRecalculateMinimalConsumption =
-      !isEdit ||
-      (formValues &&
-        (formValues.end_date !== props.initialValues?.end_date ||
-          Number(formValues.value) !== Number(props.initialValues?.value)));
-
     useEffect(() => {
       if (!props.initialValues?.minimal_consumption_logic) {
         props.change('minimal_consumption_logic', 'fixed');
@@ -70,20 +64,14 @@ export const CreditFormDialog = connect(
 
     useEffect(() => {
       if (formValues.minimal_consumption_logic === 'linear') {
-        props.change('minimal_consumption', null);
         if (
           formValues.end_date &&
           parseDate(formValues.end_date) < getStartOfNextMonth()
         ) {
           props.change('end_date', null);
         }
-      } else if (isEdit) {
-        props.change(
-          'minimal_consumption',
-          props.initialValues?.minimal_consumption,
-        );
       }
-    }, [formValues.minimal_consumption_logic]);
+    });
 
     const customer = useSelector((state) =>
       formValueSelector(props.formId)(state, 'customer'),
@@ -224,46 +212,28 @@ export const CreditFormDialog = connect(
                   label: translate('Fixed'),
                   value: 'fixed',
                   description: translate(
-                    'A minimal guaranteed credit reduction per month',
+                    'A minimal guaranteed credit reduction per month.',
                   ),
                 },
                 {
                   label: translate('Linear'),
                   value: 'linear',
                   description: translate(
-                    'A minimum amount deducted monthly, calculated based on the end date',
+                    'A minimum amount deducted monthly, calculated based on the end date. Updated on the start of the month.',
                   ),
                 },
               ]}
             />
-            {formValues.minimal_consumption_logic === 'fixed' ? (
-              <NumberField
-                label={translate('Minimal consumption (per month)')}
-                name="minimal_consumption"
-                placeholder="0"
-                description={
-                  !isEdit &&
-                  translate('Enter the minimum credit reduction per month')
-                }
-                unit={ENV.plugins.WALDUR_CORE.CURRENCY_NAME}
-              />
-            ) : (
-              <div className="mb-7">
-                <Form.Label>
-                  {translate('Minimal consumption (per month)')}
-                </Form.Label>
-                <FormControl
-                  value={
-                    needToRecalculateMinimalConsumption
-                      ? translate(
-                          'The value will be calculated after saving the credit',
-                        )
-                      : props.initialValues.minimal_consumption
-                  }
-                  readOnly
-                />
-              </div>
-            )}
+            <NumberField
+              label={translate('Minimal consumption (per month)')}
+              name="minimal_consumption"
+              placeholder="0"
+              description={
+                !isEdit &&
+                translate('Enter the minimum credit reduction per month')
+              }
+              unit={ENV.plugins.WALDUR_CORE.CURRENCY_NAME}
+            />
             <Form.Group>
               <FieldError error={props.error} />
             </Form.Group>
