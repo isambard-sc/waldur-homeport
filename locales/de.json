@@ -1271,7 +1271,6 @@
   "Organization": "Organisation",
   "Organization UUID": "UUID der Organisation",
   "Organization abbreviation": "Abkürzung der Organisation",
-  "Organization could not be refreshed.": "Die Organisation konnte nicht aktualisiert werden.",
   "Organization events": "Organisationsveranstaltungen",
   "Organization group": "Organisationsgruppe",
   "Organization group details of {orgName}": "Angaben zur Organisationsgruppe von {orgName}",
