@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { InjectedFormProps } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
+import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { required } from '@waldur/core/validators';
 import {
   FormContainer,
@@ -31,7 +32,6 @@ interface CostPolicyFormProps
 
 export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
   const currentOrganization = useSelector(getCustomer);
-
   return (
     <FormContainer submitting={props.submitting} className="size-lg">
       {props.type === 'project' ? (
@@ -47,16 +47,29 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
               query,
               prevOptions,
               page,
-              { field: ['name', 'uuid', 'url', 'billing_price_estimate'] },
+              {
+                field: [
+                  'name',
+                  'uuid',
+                  'url',
+                  'billing_price_estimate',
+                  'project_credit',
+                ],
+              },
             )
           }
           isMulti
           isDisabled={props.isEdit}
+          getOptionLabel={(option) => {
+            const costField = ProjectCostField({ row: option });
+            const creditField = defaultCurrency(option.project_credit);
+            const creditInfo =
+              option.project_credit != null
+                ? ` / ${translate('project credit')}: ${creditField}`
+                : '';
+            return `${option.name} / est. ${costField} ${translate('this month')}${creditInfo}`;
+          }}
           getOptionValue={(option) => option.url}
-          getOptionLabel={(option) =>
-            `${option.name} / est. ${ProjectCostField({ row: option })} ` +
-            translate('this month')
-          }
           noOptionsMessage={() => translate('No projects')}
         />
       ) : (
@@ -68,13 +81,20 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
           placeholder={translate('Search and select organization') + '...'}
           loadOptions={(query, prevOptions, { page }) =>
             organizationAutocomplete(query, prevOptions, page, {
-              field: ['name', 'uuid', 'url'],
+              field: ['name', 'uuid', 'url', 'customer_credit'],
             })
           }
           isMulti
           isDisabled={props.isEdit}
           getOptionValue={(option) => option.url}
-          getOptionLabel={(option) => option.name}
+          getOptionLabel={(option) => {
+            const creditField = defaultCurrency(option.customer_credit);
+            const creditInfo =
+              option.customer_credit != null
+                ? ` / ${translate('customer credit')}: ${creditField}`
+                : '';
+            return `${option.name}${creditInfo}`;
+          }}
           noOptionsMessage={() => translate('No organizations')}
         />
       )}
