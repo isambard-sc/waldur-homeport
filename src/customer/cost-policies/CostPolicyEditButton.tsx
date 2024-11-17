@@ -75,8 +75,11 @@ export const CostPolicyEditButton = ({
                 uuid: row.scope_uuid,
                 url: row.scope,
                 ...(type === 'project'
-                  ? { billing_price_estimate: row.billing_price_estimate }
-                  : {}),
+                  ? {
+                      billing_price_estimate: row.billing_price_estimate,
+                      project_credit: row.project_credit,
+                    }
+                  : { customer_credit: row.customer_credit }),
               },
             ],
             actions: getCostPolicyActionOptions(type).find(

@@ -13791,6 +13791,10 @@
     "description": "resource/state/utils.ts",
     "message": "current state on backend: {resourceState}."
   },
+  "customer credit": {
+    "description": "customer/cost-policies/CostPolicyForm.tsx",
+    "message": "customer credit"
+  },
   "day": {
     "description": "form/CronField.tsx",
     "message": "day"
@@ -13990,6 +13994,10 @@
   "ports": {
     "description": "openstack/openstack-instance/InternalIpsList.tsx, openstack/openstack-tenant/TenantPortsList.tsx, vmware/PortsList.tsx",
     "message": "ports"
+  },
+  "project credit": {
+    "description": "customer/cost-policies/CostPolicyForm.tsx",
+    "message": "project credit"
   },
   "projects": {
     "description": "marketplace/service-providers/OrganizationProjectsExpandable.tsx, project/ProjectsList.tsx, rancher/ClusterProjectList.tsx, user/affiliations/ProjectsList.tsx",
