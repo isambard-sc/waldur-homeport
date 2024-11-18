@@ -1,19 +1,13 @@
 import flatpickr from 'flatpickr';
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-import darkTheme from 'flatpickr/dist/themes/dark.css?url';
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-import lighTheme from 'flatpickr/dist/themes/light.css?url';
 import { useEffect } from 'react';
 
 import { LanguageUtilsService } from '@waldur/i18n/LanguageUtilsService';
 import { ThemeName } from '@waldur/theme/types';
 import { useTheme } from '@waldur/theme/useTheme';
 
-const themes = {
-  dark: darkTheme,
-  light: lighTheme,
+const hrefs = {
+  dark: () => import('flatpickr/dist/themes/dark.css?url'),
+  ligh: () => import('flatpickr/dist/themes/light.css?url'),
 };
 
 let styleTag: HTMLLinkElement;
@@ -26,7 +20,9 @@ function loadTheme(theme: ThemeName) {
     styleTag.crossOrigin = '';
     document.head.appendChild(styleTag);
   }
-  styleTag.href = themes[theme];
+  hrefs[theme]().then((url) => {
+    styleTag.href = url.default as string;
+  });
 }
 
 export const useFlatpickrTheme = () => {

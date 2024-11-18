@@ -1,20 +1,16 @@
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-import dark from '@waldur/metronic/sass/style.dark.scss?url';
-// @ts-ignore
-// eslint-disable-next-line import/no-unresolved
-import light from '@waldur/metronic/sass/style.scss?url';
-
 import { ENV } from '@waldur/configs/default';
 
 import * as ThemeStorage from './ThemeStorage';
 import { ThemeName } from './types';
 
-const hrefs = { dark, light };
+const hrefs = {
+  dark: () => import('@waldur/metronic/sass/style.dark.scss?url'),
+  light: () => import('@waldur/metronic/sass/style.scss?url'),
+};
 
 let styleTag: HTMLLinkElement;
 
-export function loadTheme(newTheme: ThemeName) {
+export function loadTheme(theme: ThemeName) {
   if (!styleTag) {
     styleTag = document.createElement('link');
     styleTag.rel = 'stylesheet';
@@ -22,7 +18,9 @@ export function loadTheme(newTheme: ThemeName) {
     styleTag.crossOrigin = '';
     document.head.appendChild(styleTag);
   }
-  styleTag.href = hrefs[newTheme];
+  hrefs[theme]().then((url) => {
+    styleTag.href = url.default as string;
+  });
 }
 
 /** Get initial theme from local storage or user preference */

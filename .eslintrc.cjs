@@ -33,6 +33,9 @@ module.exports = {
         map: [['@waldur', './src']],
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
       },
+      "typescript": {
+        paths: "./tsconfig.json",
+      },
     },
   },
   rules: {

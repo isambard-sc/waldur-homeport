@@ -31,7 +31,8 @@
       "dom"
     ],
     "types": [
-      "@testing-library/jest-dom"
+      "@testing-library/jest-dom",
+      "vite/client"
     ]
   },
   "include": [
