@@ -10,7 +10,7 @@ import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
 
-import { fetchCustomer } from './workspace/CustomerWorkspace';
+import { fetchCustomer } from './workspace/fetchCustomer';
 
 export const states: StateDeclaration[] = [
   {

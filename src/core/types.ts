@@ -1,5 +1,6 @@
 import { StateDeclaration as BaseStateDeclaration } from '@uirouter/core';
-import { ComponentType } from 'react';
+import { UIView } from '@uirouter/react';
+import { ComponentType, LazyExoticComponent } from 'react';
 
 import { PluginConfiguration } from '@waldur/auth/types';
 import { FeaturesEnum } from '@waldur/FeaturesEnums';
@@ -31,7 +32,7 @@ interface DataDeclaration {
 }
 
 export interface StateDeclaration extends BaseStateDeclaration {
-  component: ComponentType<any>;
+  component: LazyExoticComponent<ComponentType<any>> | typeof UIView;
   data?: Partial<DataDeclaration>;
 }
 

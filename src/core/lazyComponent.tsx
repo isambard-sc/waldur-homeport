@@ -1,5 +1,5 @@
 import { ErrorBoundary } from '@sentry/react';
-import React from 'react';
+import React, { ComponentType, LazyExoticComponent } from 'react';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { ErrorMessage } from '@waldur/ErrorMessage';
@@ -31,5 +31,5 @@ export function lazyComponent<T = any>(promise: () => Promise<any>) {
       </ErrorBoundary>
     );
   }
-  return LazyLoader as React.ComponentType<T>;
+  return LazyLoader as LazyExoticComponent<ComponentType<T>>;
 }

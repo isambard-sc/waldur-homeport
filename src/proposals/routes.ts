@@ -2,7 +2,7 @@ import { UIView } from '@uirouter/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
-import { fetchCustomer } from '@waldur/customer/workspace/CustomerWorkspace';
+import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';

@@ -2,14 +2,13 @@ import { UIView } from '@uirouter/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
-import { fetchCustomer } from '@waldur/customer/workspace/CustomerWorkspace';
+import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
 import { isOwnerOrStaff } from '@waldur/workspace/selectors';
 
 import { fetchProvider } from './resolve';
-import { ResourceDetailsContainer } from './resources/details/ResourceDetailsContainer';
 
 export const states: StateDeclaration[] = [
   {
@@ -516,7 +515,11 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'layout',
-    component: ResourceDetailsContainer,
+    component: lazyComponent(() =>
+      import('./resources/details/ResourceDetailsContainer').then((module) => ({
+        default: module.ResourceDetailsContainer,
+      })),
+    ),
   },
   {
     name: 'marketplace-resource-details',
