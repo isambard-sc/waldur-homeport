@@ -3,7 +3,7 @@ import './LandingPage.css';
 
 import { CookiesConsent } from '@waldur/navigation/cookies/CookiesConsent';
 
-import { AuthService } from './AuthService';
+import * as AuthService from './AuthService';
 import { HeroColumn } from './HeroColumn';
 import { LoginColumn } from './LoginColumn';
 

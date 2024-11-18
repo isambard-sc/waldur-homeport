@@ -14,7 +14,7 @@ import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { showErrorResponse, showError } from '@waldur/store/notify';
 import { UsersService } from '@waldur/user/UsersService';
 
-import { AuthService } from '../AuthService';
+import * as AuthService from '../AuthService';
 import { SubmitButton } from '../SubmitButton';
 
 import { getAuthResult, login } from './api';

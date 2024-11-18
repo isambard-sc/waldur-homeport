@@ -2,7 +2,7 @@ import store from '@waldur/store/store';
 
 import { MatomoInstance } from './afterBootstrap';
 import { setRedirect } from './auth/AuthRedirectStorage';
-import { AuthService } from './auth/AuthService';
+import * as AuthService from './auth/AuthService';
 import { cleanObject } from './core/utils';
 import { isFeatureVisible } from './features/connect';
 import { tryAcceptInvitation } from './invitations/tryAcceptInvitation';
