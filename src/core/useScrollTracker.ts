@@ -1,4 +1,4 @@
-import { throttle } from 'lodash';
+import { throttle } from 'es-toolkit/compat';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface useScrollTrackerProps {

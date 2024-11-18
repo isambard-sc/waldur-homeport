@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import { debounce } from 'es-toolkit/compat';
 import { useEffect, useRef, useState } from 'react';
 
 import { truncate } from '@waldur/core/utils';

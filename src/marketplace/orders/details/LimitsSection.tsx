@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash';
+import { isEmpty } from 'es-toolkit/compat';
 import { Card } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';

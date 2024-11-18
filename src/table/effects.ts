@@ -1,4 +1,4 @@
-import { concat, uniq } from 'lodash';
+import { concat, uniq } from 'es-toolkit/compat';
 import {
   delay,
   call,

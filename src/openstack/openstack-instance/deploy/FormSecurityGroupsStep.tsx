@@ -1,5 +1,5 @@
 import { Eye, Plus, Warning } from '@phosphor-icons/react';
-import { debounce } from 'lodash';
+import { debounce } from 'es-toolkit/compat';
 import { useCallback, useMemo, useState } from 'react';
 import { Button, FormControl } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';

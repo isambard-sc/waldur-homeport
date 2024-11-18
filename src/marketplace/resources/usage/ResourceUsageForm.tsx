@@ -1,5 +1,5 @@
 import { DotsThree, Question, WarningCircle } from '@phosphor-icons/react';
-import { debounce } from 'lodash';
+import { debounce } from 'es-toolkit/compat';
 import {
   FunctionComponent,
   useCallback,

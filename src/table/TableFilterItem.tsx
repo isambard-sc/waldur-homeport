@@ -1,6 +1,6 @@
 import { CaretDown, X } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { isEqual } from 'lodash';
+import { isEqual } from 'es-toolkit/compat';
 import React, {
   FC,
   PropsWithChildren,

@@ -4,7 +4,7 @@ import {
   useCurrentStateAndParams,
   useRouter,
 } from '@uirouter/react';
-import { identity, isMatch, pickBy, uniqueId } from 'lodash';
+import { isMatch, pickBy, uniqueId } from 'es-toolkit/compat';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -182,7 +182,7 @@ export const useFavoritePages = () => {
   const addFavoritePage = useCallback(
     (page: Omit<FavoritePage, 'id'>, event = null) => {
       event && event.preventDefault();
-      page.params = pickBy(page.params, identity); // remove null and undefined properties
+      page.params = pickBy(page.params, (value) => value !== null);
       if (findFavoritePage(page.state, page.params)) return;
       FavoritePageService.add(page);
       setFavPages(getPagesList());

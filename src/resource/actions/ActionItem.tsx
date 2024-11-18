@@ -1,6 +1,6 @@
 import { IdentificationBadge, Question } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { uniqueId } from 'lodash';
+import { uniqueId } from 'es-toolkit/compat';
 import { FC, ReactNode, useContext } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';

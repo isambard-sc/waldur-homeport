@@ -1,4 +1,4 @@
-import { set, unset } from 'lodash';
+import { set, unset } from 'es-toolkit/compat';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 

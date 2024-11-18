@@ -1,4 +1,4 @@
-import { get, pick } from 'lodash';
+import { get, pick } from 'es-toolkit/compat';
 import { useCallback, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { Field, SubmissionError, change, reduxForm } from 'redux-form';
