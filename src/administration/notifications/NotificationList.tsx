@@ -1,5 +1,5 @@
 import { PencilSimple, Question } from '@phosphor-icons/react';
-import { uniqueId } from 'es-toolkit/compat';
+import { uniqueId } from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';

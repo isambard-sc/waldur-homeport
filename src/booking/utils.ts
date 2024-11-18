@@ -1,4 +1,4 @@
-import { padStart, uniqueId } from 'es-toolkit/compat';
+import { padStart, uniqueId } from 'lodash-es';
 import { Duration } from 'luxon';
 
 import { parseDate } from '@waldur/core/dateUtils';

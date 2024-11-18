@@ -1,5 +1,5 @@
 import { Question } from '@phosphor-icons/react';
-import { uniqueId } from 'es-toolkit/compat';
+import { uniqueId } from 'lodash-es';
 import React, { FC, PropsWithChildren } from 'react';
 import { Card, FormCheck } from 'react-bootstrap';
 

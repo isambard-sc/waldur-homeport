@@ -1,4 +1,4 @@
-import { get } from 'es-toolkit/compat';
+import { get } from 'lodash-es';
 import { FC } from 'react';
 
 import { NumberField, StringField } from '@waldur/form';

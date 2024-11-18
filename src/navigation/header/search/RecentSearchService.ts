@@ -1,4 +1,4 @@
-import { isMatch, pickBy, uniqueId } from 'es-toolkit/compat';
+import { isMatch, pickBy, uniqueId } from 'lodash-es';
 import { useCallback, useState } from 'react';
 
 import { SearchItemProps } from './SearchItem';

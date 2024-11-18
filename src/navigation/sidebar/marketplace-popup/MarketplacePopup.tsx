@@ -1,4 +1,4 @@
-import { debounce } from 'es-toolkit/compat';
+import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';

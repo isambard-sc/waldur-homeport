@@ -1,4 +1,4 @@
-import { uniqueId } from 'es-toolkit/compat';
+import { uniqueId } from 'lodash-es';
 
 export interface TableFiltersGroup {
   id: string;

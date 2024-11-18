@@ -4,7 +4,7 @@ import {
   useCurrentStateAndParams,
   useRouter,
 } from '@uirouter/react';
-import { isMatch, pickBy, uniqueId } from 'es-toolkit/compat';
+import { isMatch, pickBy, uniqueId } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 

@@ -1,4 +1,4 @@
-import { capitalize, words } from 'es-toolkit/compat';
+import { capitalize, words } from 'lodash-es';
 import { FunctionComponent } from 'react';
 import { Form } from 'react-bootstrap';
 

@@ -1,4 +1,4 @@
-import { padStart, clone } from 'es-toolkit/compat';
+import { padStart, clone } from 'lodash-es';
 import { DateTime } from 'luxon';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ListGroup } from 'react-bootstrap';

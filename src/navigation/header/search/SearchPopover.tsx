@@ -5,7 +5,7 @@ import {
   Plus,
   SquaresFour,
 } from '@phosphor-icons/react';
-import { groupBy, isEmpty } from 'es-toolkit/compat';
+import { groupBy, isEmpty } from 'lodash-es';
 import { Fragment, useCallback, useEffect, useRef } from 'react';
 import { Badge, Button, Col, Nav, Row, Tab } from 'react-bootstrap';
 

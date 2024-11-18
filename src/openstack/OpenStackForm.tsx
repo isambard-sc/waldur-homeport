@@ -1,4 +1,4 @@
-import { get } from 'es-toolkit/compat';
+import { get } from 'lodash-es';
 import { FunctionComponent } from 'react';
 
 import { CheckOrX } from '@waldur/core/CheckOrX';

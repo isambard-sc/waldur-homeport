@@ -5,7 +5,7 @@ import {
   Plus,
   Star,
 } from '@phosphor-icons/react';
-import { debounce, isEqual, throttle } from 'es-toolkit/compat';
+import { debounce, isEqual, throttle } from 'lodash-es';
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';

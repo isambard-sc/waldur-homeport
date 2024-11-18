@@ -1,4 +1,4 @@
-import { isEqual } from 'es-toolkit/compat';
+import { isEqual } from 'lodash-es';
 
 import { FilterState } from '../types';
 

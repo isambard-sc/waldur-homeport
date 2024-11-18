@@ -64,6 +64,7 @@ export const useTable = (options: TableOptionsType) => {
             filters,
             setFilter: (item: FilterItem) =>
               dispatch(actions.setFilter(table, item)),
+            apply: () => applyFiltersFn(true),
           },
           footer: TableFilterActions,
         }),

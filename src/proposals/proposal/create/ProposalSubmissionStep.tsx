@@ -1,4 +1,4 @@
-import { get } from 'es-toolkit/compat';
+import { get } from 'lodash-es';
 import { createRef, FC, useCallback, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';

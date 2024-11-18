@@ -1,4 +1,4 @@
-import { pick } from 'es-toolkit/compat';
+import { pick } from 'lodash-es';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 

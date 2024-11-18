@@ -1,4 +1,4 @@
-import { startCase } from 'es-toolkit/compat';
+import { startCase } from 'lodash-es';
 import { FC } from 'react';
 
 import { formatDate } from '@waldur/core/dateUtils';

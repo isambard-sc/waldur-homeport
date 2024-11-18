@@ -1,5 +1,5 @@
 import { CaretDown, Check } from '@phosphor-icons/react';
-import { isEqual } from 'es-toolkit/compat';
+import { isEqual } from 'lodash-es';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import { FormField } from '@waldur/form/types';

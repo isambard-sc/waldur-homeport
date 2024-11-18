@@ -1,4 +1,4 @@
-import { get } from 'es-toolkit/compat';
+import { get } from 'lodash-es';
 import { FunctionComponent, useMemo } from 'react';
 
 import { required } from '@waldur/core/validators';

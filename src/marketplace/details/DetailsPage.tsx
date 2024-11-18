@@ -1,5 +1,5 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { startCase } from 'es-toolkit/compat';
+import { startCase } from 'lodash-es';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';

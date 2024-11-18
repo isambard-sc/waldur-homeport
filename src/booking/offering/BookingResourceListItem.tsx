@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { cloneDeep } from 'es-toolkit/compat';
+import { cloneDeep } from 'lodash-es';
 import { DateTime } from 'luxon';
 import { useCallback, useMemo } from 'react';
 import { Button } from 'react-bootstrap';

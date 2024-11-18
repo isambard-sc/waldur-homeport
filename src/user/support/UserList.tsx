@@ -1,5 +1,5 @@
 import { Question } from '@phosphor-icons/react';
-import { cloneDeep } from 'es-toolkit/compat';
+import { cloneDeep } from 'lodash-es';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';

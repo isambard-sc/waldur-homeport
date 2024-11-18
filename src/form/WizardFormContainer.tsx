@@ -1,4 +1,4 @@
-import { uniq } from 'es-toolkit/compat';
+import { uniq } from 'lodash-es';
 import { useState, createElement, FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { change, getFormValues } from 'redux-form';

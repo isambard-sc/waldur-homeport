@@ -1,6 +1,6 @@
 import { Plus, X } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { uniqueId } from 'es-toolkit/compat';
+import { uniqueId } from 'lodash-es';
 import { DateTime, Duration } from 'luxon';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Button } from 'react-bootstrap';

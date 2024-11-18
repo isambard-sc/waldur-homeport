@@ -1,6 +1,6 @@
 import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
-import { isEqual } from 'es-toolkit/compat';
+import { isEqual } from 'lodash-es';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Card, Col, Row, Stack } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';

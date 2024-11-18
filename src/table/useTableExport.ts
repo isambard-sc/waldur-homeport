@@ -1,4 +1,4 @@
-import { isEqual } from 'es-toolkit/compat';
+import { isEqual } from 'lodash-es';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { isEmpty, orderByFilter } from '@waldur/core/utils';
