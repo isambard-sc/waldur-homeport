@@ -11,7 +11,7 @@ export const ErrorMessage: FallbackRender = (props) => (
     <ImageTablePlaceholder
       illustration={<Illustration />}
       title={translate('An error has occurred.')}
-      description={props.error.message}
+      description={(props.error as Error).message}
       action={
         <Button onClick={() => location.reload()} variant="success">
           <span className="svg-icon svg-icon-2">
@@ -21,6 +21,8 @@ export const ErrorMessage: FallbackRender = (props) => (
         </Button>
       }
     />
-    <pre className="mt-3">{props.componentStack || props.error.stack}</pre>
+    <pre className="mt-3">
+      {props.componentStack || (props.error as Error).stack}
+    </pre>
   </>
 );

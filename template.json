@@ -10816,7 +10816,7 @@
     "message": "Terms of service"
   },
   "Text has been copied": {
-    "description": "core/CopyToClipboardButton.tsx, marketplace/common/CopyToClipboard.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpRow.tsx, resource/ResourceAccessButton.tsx",
+    "description": "core/CopyToClipboardButton.tsx, marketplace/common/CopyToClipboard.tsx, navigation/FooterLinks.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpRow.tsx, resource/ResourceAccessButton.tsx",
     "message": "Text has been copied"
   },
   "Thank you for your response!": {
@@ -14382,10 +14382,6 @@
   "{supportServiceProvider} service desk.": {
     "description": "administration/service-desk/AdministrationServiceDesk.tsx",
     "message": "{supportServiceProvider} service desk."
-  },
-  "{text} has been copied": {
-    "description": "navigation/FooterLinks.tsx",
-    "message": "{text} has been copied"
   },
   "{type} script got an error": {
     "description": "marketplace/offerings/update/integration/EditScriptDialog.tsx",
