@@ -29,6 +29,10 @@ export const createProjectCredit = (formData: ProjectCreditFormData) => {
   return post<CustomerCredit>('/project-credits/', formData);
 };
 
+export const getProjectCredit = (project_uuid: string) => {
+  return getFirst<ProjectCredit>('/project-credits/', { project_uuid });
+};
+
 export const updateProjectCredit = (
   uuid: string,
   formData: ProjectCreditFormData,

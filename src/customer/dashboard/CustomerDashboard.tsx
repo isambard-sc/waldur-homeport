@@ -68,7 +68,10 @@ export const CustomerDashboard: FunctionComponent = () => {
                   className="mb-5"
                   style={COMMON_WIDGET_HEIGHT}
                 >
-                  <CreditStatusWidget customer={customer} />
+                  <CreditStatusWidget
+                    credit={customer.credit}
+                    type="organization"
+                  />
                 </Col>
               )}
             </Row>

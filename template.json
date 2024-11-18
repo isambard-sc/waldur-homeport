@@ -3659,6 +3659,14 @@
     "description": "reporting/quotas/constants.tsx",
     "message": "Esimated price per month"
   },
+  "Estimate for the\ncurrent month": {
+    "description": "customer/dashboard/CreditStatusWidget.tsx",
+    "message": "Estimate for the\ncurrent month"
+  },
+  "Estimate for the current month": {
+    "description": "customer/dashboard/CreditStatusWidget.tsx",
+    "message": "Estimate for the current month"
+  },
   "Estimate usage of {component}": {
     "description": "marketplace/details/plan/EstimateUsageComponentDialog.tsx",
     "message": "Estimate usage of {component}"
