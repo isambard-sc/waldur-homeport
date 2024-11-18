@@ -1,4 +1,4 @@
-import { capitalize } from 'lodash';
+import { capitalize } from 'es-toolkit/compat';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
 

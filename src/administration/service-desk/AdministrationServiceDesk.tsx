@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { capitalize } from 'lodash';
+import { capitalize } from 'es-toolkit/compat';
 import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 

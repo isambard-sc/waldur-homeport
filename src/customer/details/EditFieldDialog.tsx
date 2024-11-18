@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { pick } from 'lodash';
+import { pick } from 'es-toolkit/compat';
 import { useCallback } from 'react';
 import { connect } from 'react-redux';
 import { SubmissionError, reduxForm } from 'redux-form';

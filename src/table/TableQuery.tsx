@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import { debounce } from 'es-toolkit/compat';
 import { Component } from 'react';
 
 import { FilterBox } from '@waldur/form/FilterBox';

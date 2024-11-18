@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from 'es-toolkit/compat';
 import { FunctionComponent } from 'react';
 
 import { ENV } from '@waldur/configs/default';

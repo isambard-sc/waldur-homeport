@@ -1,5 +1,5 @@
 import { QueryFunction, useInfiniteQuery } from '@tanstack/react-query';
-import { debounce } from 'lodash';
+import { debounce } from 'es-toolkit/compat';
 import { ComponentType, FC, useCallback, useState } from 'react';
 
 import { InfiniteList } from '@waldur/core/InfiniteList';

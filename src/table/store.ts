@@ -1,5 +1,5 @@
 import { arrayMove } from '@dnd-kit/sortable';
-import { isEqual } from 'lodash';
+import { isEqual } from 'es-toolkit/compat';
 import { Reducer } from 'redux';
 
 import { createByKey } from '@waldur/store/utils';

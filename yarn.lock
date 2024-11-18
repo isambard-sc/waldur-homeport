@@ -1451,11 +1451,6 @@
   dependencies:
     "@types/geojson" "*"
 
-"@types/lodash@^4.14.21":
-  version "4.14.177"
-  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.177.tgz"
-  integrity sha512-0fDwydE2clKe9MNfvXHBHF9WEahRuj+msTuQqOmAApNORFvhMYZKNGGJdCzuhheVjMps/ti0Ak/iJPACMaevvw==
-
 "@types/luxon@^2.0.4":
   version "2.0.4"
   resolved "https://registry.npmjs.org/@types/luxon/-/luxon-2.0.4.tgz"
@@ -4017,6 +4012,11 @@ es-to-primitive@^1.2.1:
     is-callable "^1.1.4"
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
+
+es-toolkit@^1.27.0:
+  version "1.27.0"
+  resolved "https://registry.yarnpkg.com/es-toolkit/-/es-toolkit-1.27.0.tgz#affc1aaf78d47e42d282c427c14bf8b610923f12"
+  integrity sha512-ETSFA+ZJArcuSCpzD2TjAy6UHpx4E4uqFsoDg9F/nTLogrLmVVZQ+zNxco5h7cWnA1nNak07IXsLcaSMih+ZPQ==
 
 es5-ext@^0.10.35, es5-ext@^0.10.50, es5-ext@~0.10.14:
   version "0.10.53"

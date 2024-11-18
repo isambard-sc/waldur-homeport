@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from 'es-toolkit/compat';
 import { FunctionComponent, useMemo } from 'react';
 
 import { NumberField, SelectField } from '@waldur/form';

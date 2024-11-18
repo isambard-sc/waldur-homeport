@@ -1,6 +1,6 @@
 import { UISref } from '@uirouter/react';
 import classNames from 'classnames';
-import { uniqueId } from 'lodash';
+import { uniqueId } from 'es-toolkit/compat';
 import { PropsWithChildren, forwardRef } from 'react';
 import { Breadcrumb, BreadcrumbItemProps } from 'react-bootstrap';
 
