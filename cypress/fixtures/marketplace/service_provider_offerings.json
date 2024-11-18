@@ -13,6 +13,7 @@
       "tax": 0.0,
       "tax_current": 0.0
     },
+    "customer_uuid": "6983ac22f2bb469189311ab21e493359",
     "components": [
       {
         "uuid": "d09228fea9d14ab0ab5eacc84aaab5f5",
@@ -307,6 +308,7 @@
   {
     "uuid": "60ab04ee998e48129bbf1cfb1030fa16",
     "name": "test",
+    "customer_uuid": "6983ac22f2bb469189311ab21e493359",
     "category_title": "Chromatography",
     "type": "Azure.SQLServer",
     "state": "Draft",
