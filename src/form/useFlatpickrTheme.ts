@@ -7,7 +7,7 @@ import { useTheme } from '@waldur/theme/useTheme';
 
 const hrefs = {
   dark: () => import('flatpickr/dist/themes/dark.css?url'),
-  ligh: () => import('flatpickr/dist/themes/light.css?url'),
+  light: () => import('flatpickr/dist/themes/light.css?url'),
 };
 
 let styleTag: HTMLLinkElement;
