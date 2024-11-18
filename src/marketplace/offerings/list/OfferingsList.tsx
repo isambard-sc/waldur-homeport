@@ -3,8 +3,10 @@ import { FunctionComponent } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { getLabel } from '@waldur/marketplace/common/registry';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { useOfferingDropdownActions } from '../hooks';

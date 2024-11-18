@@ -4,7 +4,9 @@ import { useSelector } from 'react-redux';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { PAYMENT_PROFILES_TABLE } from '@waldur/customer/details/constants';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import {
   getCustomer,
   isStaff as isStaffSelector,

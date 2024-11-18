@@ -1,4 +1,4 @@
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 export const getAttachments = (state: RootState) =>
   state.issues.attachments.items;

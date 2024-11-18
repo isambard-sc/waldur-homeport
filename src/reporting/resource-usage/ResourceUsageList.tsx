@@ -10,9 +10,11 @@ import {
   UsageReport,
   UsageReportRequest,
 } from '@waldur/marketplace/resources/usage/types';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 
 import { FORM_ID, ResourceUsageFilter } from './ResourceUsageFilter';
 

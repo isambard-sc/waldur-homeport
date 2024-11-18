@@ -8,7 +8,7 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { InvitationsFeatures } from '@waldur/FeaturesEnums';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { GROUP_INVITATION_CREATE_FORM_ID } from './constants';
 

@@ -3,7 +3,9 @@ import { FunctionComponent, useMemo } from 'react';
 import { translate } from '@waldur/i18n';
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { SubmitJobAction } from './SubmitJobAction';
 

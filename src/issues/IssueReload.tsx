@@ -8,7 +8,7 @@ import { issueAttachmentsGet } from '@waldur/issues/attachments/actions';
 import { getIsLoading as getAttachmentsIsLoading } from '@waldur/issues/attachments/selectors';
 import { issueCommentsGet } from '@waldur/issues/comments/actions';
 import { getIsLoading as getCommentsIsLoading } from '@waldur/issues/comments/selectors';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import './IssueReload.scss';
 
 interface IssueReloadProps {

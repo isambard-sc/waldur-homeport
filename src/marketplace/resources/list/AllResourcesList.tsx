@@ -8,8 +8,9 @@ import {
   PROJECT_RESOURCES_ALL_FILTER_FORM_ID,
 } from '@waldur/marketplace/resources/list/constants';
 import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
-import { createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { Project } from '@waldur/workspace/types';
 
 import { ResourcesAllListTable } from './ResourcesAllListTable';

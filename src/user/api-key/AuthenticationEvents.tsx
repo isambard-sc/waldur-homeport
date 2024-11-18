@@ -3,7 +3,9 @@ import { FunctionComponent, useMemo } from 'react';
 import { formatRelative } from '@waldur/core/dateUtils';
 import eventsRegistry from '@waldur/events/registry';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 const EventDateField = ({ row }) => <>{formatRelative(row.created)}</>;
 

@@ -7,7 +7,7 @@ import { isDirty } from 'redux-form';
 import { ErrorMessage } from '@waldur/ErrorMessage';
 import { translate } from '@waldur/i18n';
 import { DrawerComponent } from '@waldur/metronic/components';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { closeDrawerDialog } from './actions';
 import { DrawerStateProps } from './reducer';

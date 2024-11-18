@@ -16,7 +16,9 @@ import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandabl
 import { InvitationsFilter } from '@waldur/invitations/InvitationsFilter';
 import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
 import { RoleField } from '@waldur/invitations/RoleField';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 const InvitationsListComponent: FunctionComponent = () => {

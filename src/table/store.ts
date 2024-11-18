@@ -2,39 +2,11 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { isEqual } from 'lodash';
 import { Reducer } from 'redux';
 
-import { RootState } from '@waldur/store/reducers';
 import { createByKey } from '@waldur/store/utils';
 
 import * as actions from './actions';
-import { StateTables, TableState } from './types';
-
-const INITIAL_STATE: TableState = {
-  entities: {},
-  order: [],
-  loading: false,
-  error: null,
-  mode: 'table',
-  pagination: {
-    pageSize: 10,
-    resultCount: 0,
-    currentPage: 1,
-  },
-  sorting: {
-    mode: undefined,
-    field: null,
-    loading: false,
-  },
-  filterPosition: 'menu',
-  filtersStorage: [],
-  savedFilters: [],
-  selectedSavedFilter: null,
-  applyFilters: false,
-  toggled: {},
-  selectedRows: [],
-  firstFetch: true,
-  activeColumns: {},
-  columnPositions: [],
-};
+import { INITIAL_STATE } from './constants';
+import { TableState } from './types';
 
 const deleteEntity = (state, action) => {
   const { [action.payload.uuid]: _, ...entities } = state.entities;
@@ -310,13 +282,3 @@ export const reducer = createByKey(
   (action) => action.payload && action.payload.table,
   (action) => action.payload.table,
 )(pagination) as Reducer<Record<string, TableState>>;
-
-type TableSelector = (table: string) => (state: StateTables) => TableState;
-
-export const getTableState: TableSelector = (table) => (state: RootState) => {
-  if (state.tables && state.tables[table]) {
-    return state.tables[table];
-  } else {
-    return INITIAL_STATE;
-  }
-};

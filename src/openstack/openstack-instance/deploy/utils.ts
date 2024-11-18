@@ -11,7 +11,7 @@ import {
   getQuotas,
 } from '@waldur/openstack/openstack-instance/utils';
 import { parseQuotas, parseQuotasUsage } from '@waldur/openstack/utils';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { Flavor } from '../types';
 

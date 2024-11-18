@@ -5,8 +5,10 @@ import { createSelector } from 'reselect';
 import Avatar from '@waldur/core/Avatar';
 import { renderRoleExpirationDate } from '@waldur/customer/team/CustomerUsersList';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { getProject } from '@waldur/workspace/selectors';
 

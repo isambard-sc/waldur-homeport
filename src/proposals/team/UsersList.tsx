@@ -2,7 +2,7 @@ import { FC } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { GenericPermission } from '@waldur/permissions/types';
-import { Table } from '@waldur/table';
+import Table from '@waldur/table/Table';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 
 import { UserRemoveButton } from './UserRemoveButton';

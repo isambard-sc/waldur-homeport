@@ -7,8 +7,10 @@ import { formatDate } from '@waldur/core/dateUtils';
 import { FinancialReportSendButton } from '@waldur/customer/list/FinancialReportSendButton';
 import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { Customer } from '@waldur/workspace/types';
 

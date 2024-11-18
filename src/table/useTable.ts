@@ -1,18 +1,17 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog, renderDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
 import { getTitle } from '@waldur/navigation/title';
 import { router } from '@waldur/router';
-import { RootState } from '@waldur/store/reducers';
-import { selectTableRows } from '@waldur/table/selectors';
+import { type RootState } from '@waldur/store/reducers';
+import { selectTableRows, getTableState } from '@waldur/table/selectors';
 
 import * as actions from './actions';
 import { registerTable } from './registry';
-import { getTableState } from './store';
 import { TableFilterActions } from './TableFilterActions';
+import { TableFilterContainer } from './TableFilterContainer';
 import {
   DisplayMode,
   FilterItem,
@@ -20,12 +19,6 @@ import {
   Sorting,
   TableOptionsType,
 } from './types';
-
-const TableFilterContainer = lazyComponent(() =>
-  import('./TableFilterContainer').then((module) => ({
-    default: module.TableFilterContainer,
-  })),
-);
 
 const getDefaultTitle = (state: RootState) => {
   const pageTitle = getTitle(state);
@@ -59,7 +52,7 @@ export const useTable = (options: TableOptionsType) => {
     [dispatch, table],
   );
   const openFiltersDrawer = useCallback(
-    (filters: React.ReactNode) => {
+    (filters: JSX.Element) => {
       applyFiltersFn(false);
       return dispatch(
         openDrawerDialog(TableFilterContainer, {
@@ -71,7 +64,6 @@ export const useTable = (options: TableOptionsType) => {
             filters,
             setFilter: (item: FilterItem) =>
               dispatch(actions.setFilter(table, item)),
-            apply: () => applyFiltersFn(true),
           },
           footer: TableFilterActions,
         }),
@@ -80,7 +72,7 @@ export const useTable = (options: TableOptionsType) => {
     [dispatch, table],
   );
   const renderFiltersDrawer = useCallback(
-    (filters: React.ReactNode) => {
+    (filters: JSX.Element) => {
       dispatch(
         renderDrawerDialog(TableFilterContainer, {
           props: {

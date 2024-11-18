@@ -10,7 +10,7 @@ import Oracle from '@waldur/images/appstore/oracle.svg';
 import Rocky from '@waldur/images/appstore/rocky.svg';
 import Ubuntu from '@waldur/images/appstore/ubuntu.svg';
 import Windows from '@waldur/images/appstore/windows.svg';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { ORDER_FORM_ID } from '../details/constants';
 import { orderFormDataSelector } from '../utils';

@@ -8,7 +8,9 @@ import { OrderNameField } from '@waldur/marketplace/orders/list/OrderNameField';
 import { OrderStateCell } from '@waldur/marketplace/orders/list/OrderStateCell';
 import { OrderTypeCell } from '@waldur/marketplace/orders/list/OrderTypeCell';
 import { ResourceNameField } from '@waldur/marketplace/orders/list/ResourceNameField';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { BulkConsumerActions } from './BulkConsumerActions';
 import { PENDING_CONSUMER_ORDERS_FILTER } from './constants';

@@ -5,7 +5,7 @@ import { ENV } from '@waldur/configs/default';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { FormattedJira } from '@waldur/core/FormattedJira';
 import { LoadingOverlay } from '@waldur/issues/comments/LoadingOverlay';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { CommentActions } from './CommentActions';
 import { CommentHeader } from './CommentHeader';

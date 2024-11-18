@@ -7,8 +7,10 @@ import { useDestroyFilterOnLeave } from '@waldur/core/filters';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { getLabel } from '@waldur/marketplace/common/registry';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { useOfferingDropdownActions } from '../offerings/hooks';
 import { CreateOfferingButton } from '../offerings/list/CreateOfferingButton';

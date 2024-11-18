@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { formatJsx, translate } from '@waldur/i18n';
 import { IssueReload } from '@waldur/issues/IssueReload';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import * as actions from './actions';
 import './IssueAttachmentsContainer.scss';

@@ -5,15 +5,14 @@ import { isEmpty, orderByFilter } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { fetchAll } from '@waldur/table/api';
 
 import { DASH_ESCAPE_CODE } from './constants';
 import exportAs from './exporters';
 import { ExportConfig } from './exporters/types';
 import { getTableOptions } from './registry';
-import { selectTableRows } from './selectors';
-import { getTableState } from './store';
+import { selectTableRows, getTableState } from './selectors';
 import { TableRequest } from './types';
 
 export function useTableExport(table, props?) {

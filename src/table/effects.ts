@@ -16,7 +16,7 @@ import { transformRows } from '@waldur/table/utils';
 
 import * as actions from './actions';
 import { getTableOptions } from './registry';
-import { getTableState } from './store';
+import { getTableState } from './selectors';
 import { TableRequest } from './types';
 
 function* fetchList(action) {

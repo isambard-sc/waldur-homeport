@@ -3,7 +3,8 @@ import { describe, it, expect } from 'vitest';
 import { initialState } from '@waldur/table/store.fixture';
 
 import * as actions from './actions';
-import { reducer, getTableState } from './store';
+import { getTableState } from './selectors';
+import { reducer } from './store';
 
 describe('Table reducer', () => {
   it('should return default state', () => {

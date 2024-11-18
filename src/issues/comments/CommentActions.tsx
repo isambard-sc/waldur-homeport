@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { issueCommentsFormToggle } from './actions';
 import { getIsFormToggleDisabled, getIsUiDisabled, getUser } from './selectors';

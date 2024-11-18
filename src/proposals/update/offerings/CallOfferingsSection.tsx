@@ -4,7 +4,9 @@ import { translate } from '@waldur/i18n';
 import { CallOfferingDeleteButton } from '@waldur/proposals/details/CallOfferingDeleteButton';
 import { CallOfferingStateField } from '@waldur/proposals/details/CallOfferingStateField';
 import { Call } from '@waldur/proposals/types';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { AddOfferingButton } from './AddOfferingButton';

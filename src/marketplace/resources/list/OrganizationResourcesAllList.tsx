@@ -4,8 +4,9 @@ import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { PROJECT_RESOURCES_ALL_FILTER_FORM_ID } from '@waldur/marketplace/resources/list/constants';
-import { createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { ResourcesAllListTable } from './ResourcesAllListTable';

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { connect } from 'react-redux';
 
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
 
 import { ExpandableEventDetailsTable } from './ExpandableEventDetailsTable';

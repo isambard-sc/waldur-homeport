@@ -9,7 +9,7 @@ import {
   setSecurityGroupRules,
 } from '@waldur/openstack/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { SecurityGroup } from '../types';
 

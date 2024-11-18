@@ -6,7 +6,9 @@ import { Link } from '@waldur/core/Link';
 import { truncate } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { CategoryGroup } from '@waldur/marketplace/types';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { GroupCreateButton } from './GroupCreateButton';
 import { GroupDeleteButton } from './GroupDeleteButton';

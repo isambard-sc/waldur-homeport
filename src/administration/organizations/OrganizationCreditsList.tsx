@@ -9,7 +9,9 @@ import { CreditActions } from '@waldur/customer/credits/CreditActions';
 import { CreditHistoryLogButton } from '@waldur/customer/credits/CreditHistoryLogButton';
 import { CustomerCredit } from '@waldur/customer/credits/types';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 const OrganizationField = ({ row }) => (
   <Link

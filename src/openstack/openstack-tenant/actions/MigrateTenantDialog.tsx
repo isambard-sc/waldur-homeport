@@ -18,7 +18,7 @@ import { createMigration, loadVolumeTypes } from '@waldur/openstack/api';
 import { TENANT_TYPE } from '@waldur/openstack/constants';
 import { RESOURCE_ACTION_FORM } from '@waldur/resource/actions/constants';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { SubnetsTable } from './SubnetsTable';
 import { VolumeTypesTable } from './VolumeTypesTable';

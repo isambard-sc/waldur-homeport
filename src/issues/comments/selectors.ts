@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 export const getComments = (state: RootState) => state.issues.comments.items;
 export const getIsDeleting = (state: RootState, props) =>

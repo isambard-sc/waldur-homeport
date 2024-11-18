@@ -4,6 +4,7 @@ import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { usePermissionView } from '@waldur/auth/PermissionLayout';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import {
@@ -15,12 +16,17 @@ import { useTitle } from '@waldur/navigation/title';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/utils';
 import { ProjectUsersBadge } from '@waldur/project/ProjectUsersBadge';
-import { ProjectUsersList } from '@waldur/project/team/ProjectUsersList';
 import { setCurrentResource } from '@waldur/workspace/actions';
 
 import { fetchData, getResourceTabs } from './fetchData';
 import { ResourceBreadcrumbPopover } from './ResourceBreadcrumbPopover';
 import { ResourceDetailsHero } from './ResourceDetailsHero';
+
+const ProjectUsersList = lazyComponent(() =>
+  import('@waldur/project/team/ProjectUsersList').then((module) => ({
+    default: module.ProjectUsersList,
+  })),
+);
 
 export const ResourceDetailsContainer: FunctionComponent<{}> = () => {
   const { params } = useCurrentStateAndParams();

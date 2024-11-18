@@ -14,7 +14,7 @@ import {
 } from '@waldur/marketplace/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { DeployPage } from '../../deploy/DeployPage';
 import { getDefaultLimits } from '../utils';

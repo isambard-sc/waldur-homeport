@@ -19,7 +19,7 @@ import {
 import { listClusterTemplates } from '@waldur/rancher/api';
 import { Cluster, NodeField } from '@waldur/rancher/types';
 import { formatFlavor } from '@waldur/resource/utils';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 const CLUSTER_NAME_PATTERN = new RegExp('^[a-z0-9]([-a-z0-9])+[a-z0-9]$');
 

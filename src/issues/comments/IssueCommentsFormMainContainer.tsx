@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import * as actions from './actions';
 import { IssueCommentsFormContainer } from './IssueCommentsFormContainer';
