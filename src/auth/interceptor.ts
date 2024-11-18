@@ -6,7 +6,7 @@ import { cleanObject, wait } from '@waldur/core/utils';
 import { router } from '@waldur/router';
 
 import { setRedirect } from './AuthRedirectStorage';
-import { AuthService } from './AuthService';
+import * as AuthService from './AuthService';
 import { getToken } from './TokenStorage';
 
 export function initAuthToken() {

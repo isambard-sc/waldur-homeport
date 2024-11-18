@@ -4,7 +4,7 @@ import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ImpersonationBar } from '@waldur/administration/ImpersonationBar';
-import { AuthService } from '@waldur/auth/AuthService';
+import * as AuthService from '@waldur/auth/AuthService';
 import { PermissionDataProvider } from '@waldur/auth/PermissionLayout';
 import WarningBar from '@waldur/auth/WarningBar';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';

@@ -19,7 +19,7 @@ import { post } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 
-import { AuthService } from './AuthService';
+import * as AuthService from './AuthService';
 
 export const LogoutPage: FunctionComponent = () => {
   const router = useRouter();

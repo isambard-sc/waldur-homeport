@@ -3,7 +3,7 @@ import copy from 'copy-to-clipboard';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { AuthService } from '@waldur/auth/AuthService';
+import * as AuthService from '@waldur/auth/AuthService';
 import { ENV } from '@waldur/configs/default';
 import { Link } from '@waldur/core/Link';
 import { isFeatureVisible } from '@waldur/features/connect';

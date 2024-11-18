@@ -2,7 +2,7 @@ import { useRouter } from '@uirouter/react';
 import { useEffect, FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { AuthService } from '@waldur/auth/AuthService';
+import * as AuthService from '@waldur/auth/AuthService';
 import { post } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { wait } from '@waldur/core/utils';

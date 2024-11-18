@@ -1,4 +1,4 @@
-import { AuthService } from '@waldur/auth/AuthService';
+import * as AuthService from '@waldur/auth/AuthService';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { createDeferred } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
