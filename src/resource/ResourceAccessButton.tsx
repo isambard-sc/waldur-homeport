@@ -1,5 +1,4 @@
 import { CaretDown, Copy } from '@phosphor-icons/react';
-import copy from 'copy-to-clipboard';
 import { FC, useCallback, useMemo } from 'react';
 import { Button, OverlayTrigger, Popover, Table } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -45,11 +44,14 @@ export const ResourceAccessButton: FC<ResourceAccessButtonProps> = ({
         const valueToCopy = `ssh ${resource.username}@${hostname}${
           port ? ` -p ${port}` : ''
         }`;
-        copy(valueToCopy);
+        navigator.clipboard.writeText(valueToCopy).then(() => {
+          dispatch(showSuccess(translate('Text has been copied')));
+        });
       } else {
-        copy(value);
+        navigator.clipboard.writeText(value).then(() => {
+          dispatch(showSuccess(translate('Text has been copied')));
+        });
       }
-      dispatch(showSuccess(translate('Text has been copied')));
     },
     [dispatch, resource.username],
   );

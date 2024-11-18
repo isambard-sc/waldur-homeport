@@ -1,5 +1,4 @@
 import { Copy, Trash } from '@phosphor-icons/react';
-import copy from 'copy-to-clipboard';
 import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,8 +17,9 @@ export const FloatingIpRow = ({ row, subnets, floatingIps, onRemove }) => {
 
   const onClick = useCallback(
     (value) => {
-      copy(value);
-      dispatch(showSuccess(translate('Text has been copied')));
+      navigator.clipboard.writeText(value).then(() => {
+        dispatch(showSuccess(translate('Text has been copied')));
+      });
     },
     [dispatch],
   );

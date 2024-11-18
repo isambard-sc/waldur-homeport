@@ -1,5 +1,4 @@
 import { Copy } from '@phosphor-icons/react';
-import copy from 'copy-to-clipboard';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -40,8 +39,9 @@ export const FooterLinks = () => {
 
   const copyText = useCallback(
     (text) => {
-      copy(text);
-      dispatch(showSuccess(translate('{text} has been copied', { text })));
+      navigator.clipboard.writeText(text).then(() => {
+        dispatch(showSuccess(translate('Text has been copied')));
+      });
     },
     [dispatch],
   );
