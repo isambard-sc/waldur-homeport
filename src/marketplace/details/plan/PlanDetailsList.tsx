@@ -93,22 +93,21 @@ const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (props) => {
             </tbody>
           </Table>
         )}
-        {usageRows.length > 0 ||
-          (otherLimitedRows.length > 0 && (
-            <>
-              <p>
-                {fixedRows.length > 0
-                  ? translate(
-                      'Additionally service provider can charge for usage of the following components',
-                    )
-                  : translate(
-                      'Service provider can charge for usage of the following components',
-                    )}
-              </p>
-              <LimitlessComponentsList components={usageRows} />
-              <LimitlessComponentsList components={otherLimitedRows} />
-            </>
-          ))}
+        {(usageRows.length > 0 || otherLimitedRows.length > 0) && (
+          <>
+            <p>
+              {fixedRows.length > 0
+                ? translate(
+                    'Additionally service provider can charge for usage of the following components',
+                  )
+                : translate(
+                    'Service provider can charge for usage of the following components',
+                  )}
+            </p>
+            <LimitlessComponentsList components={usageRows} />
+            <LimitlessComponentsList components={otherLimitedRows} />
+          </>
+        )}
         {totalLimitedRows.length > 0 && (
           <>
             <p>
