@@ -58,7 +58,7 @@ export const FormCloudStep = (props: FormStepProps) => {
   const currentProject = useSelector(getProject);
 
   const initialOffering = useRef(props.offering);
-  const initialProjectUuid = useRef(currentProject.uuid);
+  const initialProjectUuid = useRef(currentProject?.uuid);
   const project = useSelector(formProjectSelector);
 
   const context = useInfiniteQuery<any, any, DataPage>(

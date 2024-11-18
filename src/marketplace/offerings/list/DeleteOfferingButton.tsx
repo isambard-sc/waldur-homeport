@@ -7,18 +7,17 @@ import { waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { deleteProviderOffering } from '../../common/api';
 
 export const DeleteOfferingButton = ({ row, refetch }) => {
   const user = useSelector(getUser);
   const dispatch = useDispatch();
-  const customer = useSelector(getCustomer);
 
   const canDeleteOffering = hasPermission(user, {
     permission: PermissionEnum.DELETE_OFFERING,
-    customerId: row.customer_uuid || customer.uuid,
+    customerId: row.customer_uuid,
   });
 
   if (row.state != 'Draft' || row.resources_count || !canDeleteOffering) {

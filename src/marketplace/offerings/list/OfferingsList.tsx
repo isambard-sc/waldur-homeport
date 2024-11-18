@@ -16,6 +16,8 @@ import { OfferingActions } from './OfferingActions';
 import { OfferingNameColumn } from './OfferingNameColumn';
 import { OfferingStateCell } from './OfferingStateCell';
 
+const mandatoryFields = ['customer_uuid', 'components', 'plans'];
+
 export const BaseOfferingsList: FunctionComponent<{
   table: string;
   filter;
@@ -28,6 +30,7 @@ export const BaseOfferingsList: FunctionComponent<{
     filter,
     fetchData: createFetcher('marketplace-provider-offerings'),
     queryField: 'keyword',
+    mandatoryFields,
   });
 
   const organizationColumn = hasOrganizationColumn
