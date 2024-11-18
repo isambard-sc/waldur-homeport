@@ -4,8 +4,9 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { ProposalBadge } from '@waldur/proposals/proposal/ProposalBadge';
 import { Call, Round } from '@waldur/proposals/types';
-import { Table, useTable } from '@waldur/table';
 import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { ProposalRowActions } from '../../proposal/ProposalRowActions';
 

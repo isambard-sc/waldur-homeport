@@ -4,7 +4,8 @@ import { getById } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { UpdateFloatingIpsActionButton } from '@waldur/openstack/openstack-instance/actions/update-floating-ips/UpdateFloatingIpsActionButton';
 import { VirtualMachine } from '@waldur/resource/types';
-import { Table, useTable } from '@waldur/table';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const FloatingIpsList: FunctionComponent<{ resourceScope; refetch }> = ({
   resourceScope,

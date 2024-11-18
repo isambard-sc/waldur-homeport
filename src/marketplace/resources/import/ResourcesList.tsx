@@ -5,7 +5,9 @@ import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { ImportableResource, Offering } from '@waldur/marketplace/types';
 import { ResourceIcon } from '@waldur/resource/ResourceName';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 const serializeResource = (resource) => ({
   name: resource.name,

@@ -4,7 +4,9 @@ import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer'
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { LexisLinkDeleteButton } from '@waldur/marketplace/resources/lexis/LexisLinkDeleteButton';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const BasicLexisLinkList: FunctionComponent<{ filter? }> = ({
   filter,

@@ -9,9 +9,11 @@ import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { SLUG_COLUMN } from '@waldur/table/slug';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { CUSTOMERS_FILTER_FORM_ID } from '../constants';

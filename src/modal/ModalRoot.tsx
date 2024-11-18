@@ -6,7 +6,7 @@ import { isDirty } from 'redux-form';
 
 import { ErrorMessage } from '@waldur/ErrorMessage';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { closeModalDialog } from './actions';
 

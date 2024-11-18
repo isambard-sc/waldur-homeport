@@ -7,7 +7,7 @@ import { NumberField, StringField, SubmitButton } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
 import { FormSectionContainer } from '@waldur/form/FormSectionContainer';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { CustomerEditPanelProps } from './types';
 

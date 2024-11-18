@@ -8,7 +8,7 @@ import { CampaignFooter } from '@waldur/marketplace/service-providers/CampaignFo
 import { CampaignForm } from '@waldur/marketplace/service-providers/CampaignForm';
 import { CAMPAIGN_CREATE_FORM_ID } from '@waldur/marketplace/service-providers/constants';
 import { CampaignFormData } from '@waldur/marketplace/service-providers/types';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 export const CampaignCreateDialog = connect((state: RootState) => ({
   formValues: getFormValues(CAMPAIGN_CREATE_FORM_ID)(state),

@@ -10,7 +10,7 @@ import { useExtraTabs } from '@waldur/navigation/context';
 import { useOfferingCategories } from '@waldur/navigation/sidebar/utils';
 import { Tab } from '@waldur/navigation/Tab';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { getCategoryItems } from './category/utils';
 

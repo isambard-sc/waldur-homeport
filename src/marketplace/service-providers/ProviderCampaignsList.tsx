@@ -8,7 +8,9 @@ import { CampaignCreateButton } from '@waldur/marketplace/service-providers/Camp
 import { ProviderCampaignActions } from '@waldur/marketplace/service-providers/ProviderCampaignActions';
 import { ProviderCampaignFilter } from '@waldur/marketplace/service-providers/ProviderCampaignFilter';
 import { ProviderCampaignResourceExpandable } from '@waldur/marketplace/service-providers/ProviderCampaignResourceExpandable';
-import { useTable, createFetcher, Table } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 

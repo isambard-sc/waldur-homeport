@@ -5,8 +5,9 @@ import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse } from '@waldur/store/notify';
-import { Table, useTable } from '@waldur/table';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { PublicResourceLink } from '../resources/list/PublicResourceLink';
 import { NON_TERMINATED_STATES } from '../resources/list/ResourceStateFilter';

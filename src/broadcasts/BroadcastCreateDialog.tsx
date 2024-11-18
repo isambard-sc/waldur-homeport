@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { getFormValues, reduxForm } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { BroadcastFooter } from './BroadcastFooter';
 import { BroadcastForm } from './BroadcastForm';

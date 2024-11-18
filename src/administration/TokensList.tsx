@@ -1,7 +1,9 @@
 import { TokenDeleteButton } from '@waldur/administration/TokenDeleteButton';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const TokensList = () => {
   const tableProps = useTable({

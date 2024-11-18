@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { policyPeriodOptions } from '@waldur/customer/cost-policies/utils';
 import { translate } from '@waldur/i18n';
 import { useOrganizationGroups } from '@waldur/marketplace/common/utils';
-import { Table } from '@waldur/table';
+import Table from '@waldur/table/Table';
 import { TableProps } from '@waldur/table/types';
 
 import { getOfferingPolicyActionOptions } from '../utils';

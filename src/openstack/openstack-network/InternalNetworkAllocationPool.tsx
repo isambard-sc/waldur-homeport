@@ -5,7 +5,7 @@ import { formValueSelector } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { RESOURCE_ACTION_FORM } from '@waldur/resource/actions/constants';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 const getAllocationPool = (subnetCidr) => {
   const prefix = subnetCidr.split('.').slice(0, 3).join('.');

@@ -8,7 +8,7 @@ import { translate } from '@waldur/i18n';
 import { issueAttachmentsPut } from '@waldur/issues/attachments/actions';
 import { LoadingOverlay } from '@waldur/issues/comments/LoadingOverlay';
 import { IssueReload } from '@waldur/issues/IssueReload';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { Issue } from '../list/types';
 

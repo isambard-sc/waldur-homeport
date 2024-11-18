@@ -7,7 +7,7 @@ import { formValueSelector } from 'redux-form';
 import { translate } from '@waldur/i18n';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { NodeRole } from '@waldur/rancher/types';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 export const LonghornWorkerWarning: FunctionComponent<{ nodeIndex }> = ({
   nodeIndex,

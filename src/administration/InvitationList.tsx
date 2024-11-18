@@ -9,7 +9,9 @@ import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter
 import { RoleField } from '@waldur/invitations/RoleField';
 import { useTitle } from '@waldur/navigation/title';
 import { formatRoleType } from '@waldur/permissions/utils';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { InvitationScopeLink } from './InvitationScopeLink';
 import { InvitationsFilter } from './InvitationsFilter';

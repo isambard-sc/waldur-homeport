@@ -27,7 +27,7 @@ import { OfferingComponent } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { HeaderButtonBullet } from '@waldur/navigation/header/HeaderButtonBullet';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { UsageReportContext } from './types';
 import { getBillingTypeLabel } from './utils';

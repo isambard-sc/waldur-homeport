@@ -2,7 +2,9 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { Badge } from '@waldur/core/Badge';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 const BadgesList = ({ items }) => (
   <>

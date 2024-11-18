@@ -7,7 +7,7 @@ import { CheckoutPricingRow } from '@waldur/marketplace/deploy/CheckoutPricingRo
 import { OrderSummary } from '@waldur/marketplace/details/OrderSummary';
 import { orderFormAttributesSelector } from '@waldur/marketplace/utils';
 import { NodeRole } from '@waldur/rancher/types';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 const countNodesByRole = (role: NodeRole, nodes) =>
   nodes.filter((node) => (node.roles || []).includes(role)).length;

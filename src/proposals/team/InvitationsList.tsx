@@ -8,7 +8,7 @@ import { InvitationCancelButton } from '@waldur/invitations/actions/InvitationCa
 import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSendButton';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { RoleField } from '@waldur/invitations/RoleField';
-import { Table } from '@waldur/table';
+import Table from '@waldur/table/Table';
 
 export const InvitationsList: FunctionComponent<{ table; hideRole }> = ({
   table,

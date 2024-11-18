@@ -16,7 +16,7 @@ import {
   orderFormAttributesSelector,
   orderFormDataSelector,
 } from '@waldur/marketplace/utils';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { formFlavorSelector } from './utils';
 

@@ -14,7 +14,9 @@ import { ExpandableResourceSummary } from '@waldur/marketplace/resources/list/Ex
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { Category, Offering } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import {
   getCustomer,
   getUser,

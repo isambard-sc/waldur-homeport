@@ -3,9 +3,11 @@ import { FC } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
+import Table from '@waldur/table/Table';
 import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 
 import { OrderProviderActions } from '../actions/OrderProviderActions';
 

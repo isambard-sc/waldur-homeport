@@ -6,8 +6,10 @@ import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalA
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { VOLUME_TYPE } from '../constants';
 import { AttachVolumeAction } from '../openstack-instance/actions/AttachVolumeAction';

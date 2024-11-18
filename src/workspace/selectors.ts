@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import { AtLeast } from '@waldur/core/types';
 import { RoleEnum } from '@waldur/permissions/enums';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { Customer, Project, User } from './types';
 

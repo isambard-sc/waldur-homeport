@@ -14,8 +14,10 @@ import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { openModalDialog } from '@waldur/modal/actions';
 import { SecurityGroup } from '@waldur/openstack/openstack-security-groups/types';
-import { Table, createFetcher, useTable } from '@waldur/table';
 import { RowActionButton } from '@waldur/table/ActionButton';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 const OpenStackSecurityGroupsDialog = lazyComponent(() =>
   import(

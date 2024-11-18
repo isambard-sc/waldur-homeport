@@ -1,8 +1,10 @@
 import { Badge } from '@waldur/core/Badge';
 import { translate } from '@waldur/i18n';
 import { formatRoleType } from '@waldur/permissions/utils';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { RoleActions } from './RoleActions';
 import { RoleCreateButton } from './RoleCreateButton';

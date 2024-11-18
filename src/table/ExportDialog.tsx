@@ -9,7 +9,7 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { FormContainer } from '@waldur/form/FormContainer';
 import { translate } from '@waldur/i18n';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { EXPORT_OPTIONS } from './exporters/constants';
 import { ExportConfig, ExportFormat } from './exporters/types';

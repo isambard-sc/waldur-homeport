@@ -3,8 +3,10 @@ import { FC, useMemo } from 'react';
 import { formatDate } from '@waldur/core/dateUtils';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { Customer } from '@waldur/workspace/types';
 

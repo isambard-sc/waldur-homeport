@@ -7,7 +7,8 @@ import { getLabel } from '@waldur/marketplace/common/registry';
 import { OfferingStateField } from '@waldur/marketplace/offerings/OfferingStateField';
 import { Offering } from '@waldur/marketplace/types';
 import { PublicCallsList } from '@waldur/proposals/PublicCallsList';
-import { Table, useTable } from '@waldur/table';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 export const ProviderOfferingsList = (props) => {
   const columns = [

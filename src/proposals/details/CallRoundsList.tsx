@@ -4,7 +4,8 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { Call } from '@waldur/proposals/types';
-import { Table, useTable } from '@waldur/table';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { RoundExpandableRow } from '../update/rounds/RoundExpandableRow';
 import { getRoundsWithStatus } from '../utils';

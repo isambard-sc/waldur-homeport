@@ -7,7 +7,7 @@ import { getSelectData } from '@waldur/core/api';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 const providerAutocomplete = async (
   query: string,

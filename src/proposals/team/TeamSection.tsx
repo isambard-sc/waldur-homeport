@@ -9,7 +9,8 @@ import {
   StepCardTabs,
   TabSpec,
 } from '@waldur/marketplace/deploy/steps/StepCardTabs';
-import { createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import { useTable } from '@waldur/table/useTable';
 
 import { FieldReviewComments } from '../proposal/create-review/FieldReviewComments';
 import { ProposalReview } from '../types';

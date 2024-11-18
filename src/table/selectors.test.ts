@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { selectTableRows } from '@waldur/table/selectors';
 
 describe('SelectTableRows', () => {

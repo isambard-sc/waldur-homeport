@@ -2,7 +2,8 @@ import { FC, useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
-import { createFetcher, useTable } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import { useTable } from '@waldur/table/useTable';
 
 import { PoliciesTable } from './PoliciesTable';
 import { PolicyDeleteButton } from './PolicyDeleteButton';
