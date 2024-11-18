@@ -7,9 +7,8 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-import { ExecuteMigrationAction } from './actions/ExecuteMigrationAction';
+import { MigrationRowActions } from './actions/MigrationRowActions';
 import { CreateMigrationButton } from './CreateMigrationButton';
-import { DeleteMigrationAction } from './DeleteMigrationAction';
 import { MigrationExpandableRow } from './MigrationExpandableRow';
 
 export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
@@ -58,10 +57,7 @@ export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
       ]}
       verboseName={translate('replications')}
       rowActions={({ row }) => (
-        <>
-          <ExecuteMigrationAction resource={row} refetch={props.fetch} />
-          <DeleteMigrationAction resource={row} refetch={props.fetch} />
-        </>
+        <MigrationRowActions row={row} refetch={props.fetch} />
       )}
       tableActions={
         <CreateMigrationButton resource={resourceScope} refetch={props.fetch} />

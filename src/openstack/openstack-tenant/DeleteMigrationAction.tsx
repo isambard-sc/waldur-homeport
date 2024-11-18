@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 import { deleteMigration } from '../api';
 
@@ -24,10 +24,9 @@ export const DeleteMigrationAction = ({ resource, refetch }) => {
     await refetch();
   };
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      variant="outline-danger"
       iconNode={<Trash />}
       size="sm"
     />
