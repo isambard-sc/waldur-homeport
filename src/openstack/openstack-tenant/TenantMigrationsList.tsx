@@ -5,9 +5,8 @@ import { translate } from '@waldur/i18n';
 import { ResourceLink } from '@waldur/resource/ResourceLink';
 import { Table, createFetcher, useTable } from '@waldur/table';
 
-import { ExecuteMigrationAction } from './actions/ExecuteMigrationAction';
+import { MigrationRowActions } from './actions/MigrationRowActions';
 import { CreateMigrationButton } from './CreateMigrationButton';
-import { DeleteMigrationAction } from './DeleteMigrationAction';
 import { MigrationExpandableRow } from './MigrationExpandableRow';
 
 export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
@@ -56,10 +55,7 @@ export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
       ]}
       verboseName={translate('replications')}
       rowActions={({ row }) => (
-        <>
-          <ExecuteMigrationAction resource={row} refetch={props.fetch} />
-          <DeleteMigrationAction resource={row} refetch={props.fetch} />
-        </>
+        <MigrationRowActions row={row} refetch={props.fetch} />
       )}
       tableActions={
         <CreateMigrationButton resource={resourceScope} refetch={props.fetch} />
