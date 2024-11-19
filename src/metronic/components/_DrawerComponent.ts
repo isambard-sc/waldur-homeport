@@ -270,11 +270,11 @@ class DrawerComponent {
   };
 
   // Event API
-  public on = (name: string, handler: Function) => {
+  public on = (name: string, handler: (event: Event) => void) => {
     return EventHandlerUtil.on(this.element, name, handler);
   };
 
-  public one = (name: string, handler: Function) => {
+  public one = (name: string, handler: (event: Event) => void) => {
     return EventHandlerUtil.one(this.element, name, handler);
   };
 

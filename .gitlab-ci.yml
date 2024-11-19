@@ -112,7 +112,7 @@ Run unit tests:
 
 Run E2E tests:
   image:
-    name: registry.hpc.ut.ee/mirror/cypress/included:13.2.0
+    name: registry.hpc.ut.ee/mirror/cypress/included:13.15.0
     entrypoint: [""]
   stage: test
   interruptible: true

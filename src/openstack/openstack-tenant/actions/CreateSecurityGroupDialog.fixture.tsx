@@ -1,12 +1,12 @@
-import { mount, ReactWrapper } from 'enzyme';
-import { Provider } from 'react-redux';
-import { Store } from 'redux';
-
 import {
   actWait,
   findButtonByText,
   updateWrapper,
 } from '@waldur/core/testUtils';
+import { mount, ReactWrapper } from 'enzyme';
+import { Provider } from 'react-redux';
+import { Store } from 'redux';
+
 import { SecurityGroup } from '@waldur/openstack/openstack-security-groups/types';
 
 import { OpenStackTenant } from '../types';

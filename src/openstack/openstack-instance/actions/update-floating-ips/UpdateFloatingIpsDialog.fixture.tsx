@@ -1,13 +1,13 @@
-import { mount, ReactWrapper } from 'enzyme';
-import { Provider } from 'react-redux';
-import { Store } from 'redux';
-
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import {
   actWait,
   findButtonByText,
   updateWrapper,
 } from '@waldur/core/testUtils';
+import { mount, ReactWrapper } from 'enzyme';
+import { Provider } from 'react-redux';
+import { Store } from 'redux';
+
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import {
   FloatingIp,
   OpenStackInstance,

@@ -22,7 +22,7 @@ export const serializer = (attributes, offering) => {
       if (!options) {
         return;
       }
-      if (!attributes.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(attributes, key)) {
         return;
       }
       let value = attributes[key];

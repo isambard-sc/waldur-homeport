@@ -1,10 +1,9 @@
 import { useTitle } from 'react-use';
 
-import { translate } from './i18n';
-import {
-  UserAgreementComponent,
-  USER_AGREEMENT_TYPES,
-} from './UserAgreementComponent';
+import { translate } from '../i18n';
+
+import { USER_AGREEMENT_TYPES } from './const';
+import { UserAgreementComponent } from './UserAgreementComponent';
 
 export const TosPage = () => {
   useTitle(translate('User agreements'));

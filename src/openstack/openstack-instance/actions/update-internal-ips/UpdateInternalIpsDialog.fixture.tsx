@@ -1,8 +1,8 @@
+import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { mount, ReactWrapper } from 'enzyme';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 
-import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import {
   OpenStackInstance,
   Subnet,

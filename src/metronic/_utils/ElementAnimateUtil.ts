@@ -7,8 +7,8 @@ export class ElementAnimateUtil {
     from: number,
     to: number,
     duration: number,
-    update: Function,
-    complete?: Function,
+    update: (value: number) => void,
+    complete?: () => void,
   ) {
     /**
      * TinyAnimate.easings
@@ -22,7 +22,6 @@ export class ElementAnimateUtil {
 
     // Create mock done() function if necessary
     if (!complete) {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       complete = function () {};
     }
 
@@ -60,7 +59,7 @@ export class ElementAnimateUtil {
   public static animateClass(
     element: HTMLElement,
     animationName: string,
-    callBack?: Function,
+    callBack?: () => void,
   ): void {
     const animateClasses = animationName.split(' ');
     animateClasses.forEach((cssClass) => element.classList.add(cssClass));
@@ -73,11 +72,11 @@ export class ElementAnimateUtil {
     }
   }
 
-  public static transitionEnd(element: HTMLElement, callBack: Function) {
+  public static transitionEnd(element: HTMLElement, callBack: () => void) {
     DOMEventHandlerUtil.one(element, 'transitionend', callBack);
   }
 
-  public static animationEnd(element: HTMLElement, callBack: Function) {
+  public static animationEnd(element: HTMLElement, callBack: () => void) {
     DOMEventHandlerUtil.one(element, 'animationend', callBack);
   }
 

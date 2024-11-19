@@ -21,7 +21,7 @@ const PureProposalResourcesFilter: FC<OwnProps> = ({ offerings }) => (
   </TableFilterItem>
 );
 
-export const ProposalResourcesFilter = reduxForm<any, OwnProps>({
+export const ProposalResourcesFilter = reduxForm<{}, OwnProps>({
   form: 'ProposalResourcesFilter',
   destroyOnUnmount: false,
 })(PureProposalResourcesFilter);

@@ -21,7 +21,7 @@ export const states: StateDeclaration[] = [
     name: 'about.tos',
     url: '/tos/',
     component: lazyComponent(() =>
-      import('./TosPage').then((module) => ({
+      import('./about/TosPage').then((module) => ({
         default: module.TosPage,
       })),
     ),
@@ -34,7 +34,7 @@ export const states: StateDeclaration[] = [
     name: 'about.privacy',
     url: '/privacy/',
     component: lazyComponent(() =>
-      import('./PrivacyPage').then((module) => ({
+      import('./about/PrivacyPage').then((module) => ({
         default: module.PrivacyPage,
       })),
     ),

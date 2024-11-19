@@ -14,7 +14,7 @@ interface AttributeItemProps {
 
 export const AttributeItem: FunctionComponent<AttributeItemProps> = (props) => {
   const filteredAttributes = props.section.attributes.filter((attr) =>
-    props.attributes.hasOwnProperty(attr.key),
+    Object.prototype.hasOwnProperty.call(props.attributes, attr.key),
   );
   return filteredAttributes.length ? (
     <div

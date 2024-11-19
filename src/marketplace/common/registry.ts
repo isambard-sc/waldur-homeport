@@ -1,9 +1,9 @@
 import { AzureSQLServerOffering } from '@waldur/azure/sql/marketplace';
 import { AzureVirtualMachineOffering } from '@waldur/azure/vm/marketplace';
 import { BookingOffering } from '@waldur/booking/marketplace';
+import { Offering, OfferingComponent } from '@waldur/marketplace/types';
 import { RemoteOffering } from '@waldur/marketplace-remote/marketplace';
 import { ScriptOffering } from '@waldur/marketplace-script/marketplace';
-import { Offering, OfferingComponent } from '@waldur/marketplace/types';
 import { OpenStackTenantOffering } from '@waldur/openstack/marketplace';
 import { OpenStackInstanceOffering } from '@waldur/openstack/openstack-instance/marketplace';
 import { OpenStackVolumeOffering } from '@waldur/openstack/openstack-volume/marketplace';
@@ -28,21 +28,21 @@ function registerOfferingType(config: OfferingConfiguration) {
 
 export function getOrderFormComponent(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].orderFormComponent
   );
 }
 
 export function getDetailsComponent(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].detailsComponent
   );
 }
 
 export function getFormSerializer(offeringType: string) {
   return (
-    (REGISTRY.hasOwnProperty(offeringType) &&
+    (Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
       REGISTRY[offeringType].serializer) ||
     ((x) => x)
   );
@@ -50,7 +50,7 @@ export function getFormSerializer(offeringType: string) {
 
 export function getFormLimitSerializer(offeringType: string) {
   return (
-    (REGISTRY.hasOwnProperty(offeringType) &&
+    (Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
       REGISTRY[offeringType].limitSerializer) ||
     ((x) => x)
   );
@@ -58,7 +58,7 @@ export function getFormLimitSerializer(offeringType: string) {
 
 export function getFormLimitParser(offeringType: string) {
   return (
-    (REGISTRY.hasOwnProperty(offeringType) &&
+    (Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
       REGISTRY[offeringType].limitParser) ||
     ((x) => x)
   );
@@ -66,7 +66,7 @@ export function getFormLimitParser(offeringType: string) {
 
 export function getCheckoutSummaryComponent(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].checkoutSummaryComponent
   );
 }
@@ -94,21 +94,21 @@ export function getCreatableOfferings(): Option[] {
 
 export function showBackendId(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].showBackendId
   );
 }
 
 export function allowToUpdateService(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].allowToUpdateService
   );
 }
 
 export function hidePlanAddButton(offeringType: string, fields: Array<any>) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].onlyOnePlan &&
     fields.length
   );
@@ -116,54 +116,57 @@ export function hidePlanAddButton(offeringType: string, fields: Array<any>) {
 
 export function isOfferingTypeSchedulable(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) && REGISTRY[offeringType].schedulable
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
+    REGISTRY[offeringType].schedulable
   );
 }
 
 export function getPluginOptionsForm(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].pluginOptionsForm
   );
 }
 
 export function getSecretOptionsForm(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].secretOptionsForm
   );
 }
 
 export function getProvisioningConfigForm(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].provisioningConfigForm
   );
 }
 
 export function showComponentsList(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].showComponents
   );
 }
 
 export function getProviderType(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) && REGISTRY[offeringType].providerType
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
+    REGISTRY[offeringType].providerType
   );
 }
 
 export function getLabel(offeringType: string) {
   return (
-    (REGISTRY.hasOwnProperty(offeringType) && REGISTRY[offeringType].label) ||
+    (Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
+      REGISTRY[offeringType].label) ||
     offeringType
   );
 }
 
 function getOfferingComponentsFilter(offeringType: string) {
   return (
-    REGISTRY.hasOwnProperty(offeringType) &&
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].offeringComponentsFilter
   );
 }

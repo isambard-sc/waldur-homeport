@@ -2,8 +2,8 @@ import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { REMOTE_OFFERING_TYPE } from '@waldur/marketplace-remote/constants';
 import * as api from '@waldur/marketplace/common/api';
+import { REMOTE_OFFERING_TYPE } from '@waldur/marketplace-remote/constants';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import {
   getUser,

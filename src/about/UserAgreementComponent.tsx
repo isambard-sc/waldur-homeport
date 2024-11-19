@@ -1,28 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import Axios from 'axios';
 import Markdown from 'markdown-to-jsx';
 import { FunctionComponent } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { LoadingSpinner } from '../core/LoadingSpinner';
+import { translate } from '../i18n';
 
-import { LoadingSpinner } from './core/LoadingSpinner';
-import { translate } from './i18n';
-
-export const USER_AGREEMENT_TYPES = {
-  privacy_policy: 'PP',
-  terms_of_service: 'TOS',
-};
+import { getUserAgreement } from './api';
 
 interface TemplateComponentProps {
   agreement_type: string;
   title: string;
-}
-
-async function getUserAgreement(agreement_type) {
-  const response = await Axios.get(`${ENV.apiEndpoint}api/user-agreements/`, {
-    params: { agreement_type: agreement_type },
-  });
-  return response.data[0];
 }
 
 export const UserAgreementComponent: FunctionComponent<

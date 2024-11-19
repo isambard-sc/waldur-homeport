@@ -32,7 +32,7 @@ export const format = (error, parseResponse?) => {
     );
   }
 
-  if (!error.hasOwnProperty('status')) {
+  if (!Object.prototype.hasOwnProperty.call(error, 'status')) {
     return error;
   }
 

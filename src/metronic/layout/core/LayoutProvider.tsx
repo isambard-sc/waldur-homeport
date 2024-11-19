@@ -34,7 +34,7 @@ const LayoutContext = createContext<LayoutContextModel>({
   classes: getEmptyCssClasses(),
   attributes: getEmptyHTMLAttributes(),
   cssVariables: getEmptyCSSVariables(),
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   setLayout: () => {},
 });
 

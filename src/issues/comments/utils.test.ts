@@ -23,7 +23,7 @@ describe('JIRA markup formatter', () => {
   it('linkifies text even if JIRA markup is not used explicitly', () => {
     test(
       `In particular, https://github.com/opennode/waldur-openstack/blob/develop/src/waldur_openstack/openstack_tenant/tasks.py#L138 was displayed as a broken link.`,
-      // eslint-disable-next-line
+
       `In particular, <a href="https://github.com/opennode/waldur-openstack/blob/develop/src/waldur_openstack/openstack_tenant/tasks.py#L138">https://github.com/opennode/waldur-openstack/blob/develop/src/waldur_openstack/openstack_tenant/tasks.py#L138</a> was displayed as a broken link.`,
     );
   });
