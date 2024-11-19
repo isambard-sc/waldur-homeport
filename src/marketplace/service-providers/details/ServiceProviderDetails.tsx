@@ -1,6 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
-import { useTitle } from '@waldur/navigation/title';
 
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -9,6 +8,7 @@ import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
 import { Offering, ServiceProvider } from '@waldur/marketplace/types';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
+import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { Field } from '@waldur/resource/summary';

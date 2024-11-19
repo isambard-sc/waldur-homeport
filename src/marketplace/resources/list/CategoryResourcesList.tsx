@@ -1,6 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { useTitle } from '@waldur/navigation/title';
 import { getFormValues } from 'redux-form';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -10,6 +9,7 @@ import { translate } from '@waldur/i18n';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { CategoryColumn } from '@waldur/marketplace/types';
 import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
+import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
