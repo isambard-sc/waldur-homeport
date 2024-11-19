@@ -15,7 +15,13 @@ import { NON_TERMINATED_STATES } from '../resources/list/ResourceStateFilter';
 import { AggregateLimitsExpandableRow } from './AggregateLimitsExpandableRow';
 import { getMarketplaceResources } from './api';
 
-const requiredFields = ['name', 'current_usages', 'limits', 'uuid'];
+const requiredFields = [
+  'name',
+  'current_usages',
+  'limits',
+  'uuid',
+  'limit_usage',
+];
 
 export const AggregateLimitDetailsDialog = ({
   resolve: { project, customer, components },
@@ -82,11 +88,18 @@ export const AggregateLimitDetailsDialog = ({
       render: PublicResourceLink,
       copyField: (row) => row.name,
     },
-    {
-      title: translate('Usage'),
-      render: ({ row }) =>
-        row.current_usages?.[selectedComponentType?.type] || DASH_ESCAPE_CODE,
-    },
+    selectedComponentType.billing_type === 'limit'
+      ? {
+          title: translate('Limit usage'),
+          render: ({ row }) =>
+            row.limit_usage?.[selectedComponentType?.type] || DASH_ESCAPE_CODE,
+        }
+      : {
+          title: translate('Usage'),
+          render: ({ row }) =>
+            row.current_usages?.[selectedComponentType?.type] ||
+            DASH_ESCAPE_CODE,
+        },
     {
       title: translate('Limit'),
       render: ({ row }) =>
