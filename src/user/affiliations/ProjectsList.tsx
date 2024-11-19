@@ -1,5 +1,4 @@
 import { useSelector } from 'react-redux';
-import { useTitle } from '@waldur/navigation/title';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
@@ -8,6 +7,7 @@ import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
+import { useTitle } from '@waldur/navigation/title';
 import { PROJECTS_LIST } from '@waldur/project/constants';
 import { GlobalProjectCreateButton } from '@waldur/project/create/GlobalProjectCreateButton';
 import { ProjectLink } from '@waldur/project/ProjectLink';

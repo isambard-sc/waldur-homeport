@@ -1,6 +1,5 @@
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
-import { useTitle } from '@waldur/navigation/title';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
@@ -10,6 +9,7 @@ import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
+import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { SLUG_COLUMN } from '@waldur/table/slug';
