@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 import { useAsyncFn, useEffectOnce } from 'react-use';
+import { Field } from 'redux-form';
 
 import { getNotificationMessagesTemplates } from '@waldur/administration/notifications/api';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 
 export const CustomMessageWrapper = () => {
@@ -26,20 +28,24 @@ export const CustomMessageWrapper = () => {
   }, [value]);
 
   return (
-    <>
-      <h2 className="mb-10">{translate('Invite by email')}</h2>
-      <div className="scroll-y mh-400px pb-6 pe-2">
-        {loading ? (
-          <LoadingSpinner />
-        ) : error ? (
-          <LoadingErred loadData={loadTemplate} />
-        ) : (
-          <FormattedHtml html={htmlMessage} />
+    <div className="custom-message pe-2">
+      {loading ? (
+        <LoadingSpinner />
+      ) : error ? (
+        <LoadingErred loadData={loadTemplate} />
+      ) : (
+        <FormattedHtml html={htmlMessage} />
+      )}
+      <Field
+        name="extra_invitation_text"
+        component={TextField}
+        placeholder={translate('Enter custom message') + '...'}
+      />
+      <p className="text-muted mb-0">
+        {translate(
+          'You can add a message to be attached to the invitation email the users receive.',
         )}
-        <div className="py-8 px-6 bg-secondary text-gray-700 rounded">
-          {translate('Your custom message will appear here')}
-        </div>
-      </div>
-    </>
+      </p>
+    </div>
   );
 };

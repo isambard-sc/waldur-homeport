@@ -1,9 +1,16 @@
+import {
+  CheckCircle,
+  DownloadSimple,
+  File,
+  Trash,
+} from '@phosphor-icons/react';
 import Papa from 'papaparse';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useState } from 'react';
+import { Button, Col, Row, Stack } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
-import { DropzoneFiles } from '@waldur/core/DropzoneFiles';
-import { translate } from '@waldur/i18n';
+import { FileUploadField } from '@waldur/form';
+import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { showError } from '@waldur/store/notify';
 import saveAsCsv from '@waldur/table/exporters/csv';
 
@@ -21,14 +28,19 @@ interface OwnProps {
 
 export const BulkUpload: FC<OwnProps> = (props) => {
   const dispatch = useDispatch();
+  const [file, setFile] = useState<File>(null);
+  const [importedUsersCount, setImportedUsersCount] = useState(0);
 
   const parseCsvFile = useCallback(
     (acceptedFiles: File[]) => {
-      if (!acceptedFiles[0]) {
-        dispatch(showError('Invalid format, please import .csv files'));
+      const _file = acceptedFiles[0];
+
+      if (!_file || _file.type !== 'text/csv') {
+        dispatch(showError('Invalid format, please import a .csv file'));
         return;
       }
-      Papa.parse(acceptedFiles[0], {
+      setFile(_file);
+      Papa.parse(_file, {
         complete: function (results: { data: Array<Array<string>> }) {
           if (Array.isArray(results?.data) && Array.isArray(results?.data[0])) {
             const emailIndex = results.data[0].findIndex((str) =>
@@ -55,42 +67,92 @@ export const BulkUpload: FC<OwnProps> = (props) => {
                 items.push({ email, role, project });
               }
             });
+            setImportedUsersCount(items.length);
             props.onImport(items);
           }
         },
       });
     },
-    [dispatch, props.onImport],
+    [dispatch, props.onImport, setFile, setImportedUsersCount],
   );
 
   const onDownloadClick = useCallback(() => {
     saveAsCsv('example_file', example_file);
   }, []);
 
-  return (
-    <>
-      <h2 className="mb-6">{translate('Bulk upload')}</h2>
-      <p className="mb-6">
-        {translate(
-          'Upload a CSV file containing the email. Optionally you may specify role and project. If you are unsure, you can download an example file as a template.',
-        )}
-        :
-      </p>
-      <DropzoneFiles
-        multiple={false}
-        accept={{
-          'text/csv': ['.csv'],
-        }}
-        onDrop={parseCsvFile}
-        className="mb-4"
-      />
-      <button
-        className="btn btn-link btn-color-muted btn-active-color-primary"
-        type="button"
-        onClick={onDownloadClick}
-      >
-        <u>{translate('Download')} example_file.csv</u>
-      </button>
-    </>
+  const removeFile = () => {
+    setFile(null);
+    setImportedUsersCount(0);
+    props.onImport([{ email: '', project: '', role: '' }]);
+  };
+
+  return file ? (
+    <div className="border rounded px-2 mb-7">
+      <Row className="h-60px align-items-center gx-5 fs-6">
+        <Col xs="auto" className="ps-6">
+          <File weight="bold" size={22} className="text-muted" />
+        </Col>
+        <Col>
+          <Stack
+            direction="horizontal"
+            gap={2}
+            className="align-items-center fw-bold"
+          >
+            <span className="fw-bold">{file.name}</span>
+            <CheckCircle size={16} weight="fill" className="text-success" />
+          </Stack>
+          <p className="text-muted mb-0">
+            {translate('{count} users', { count: importedUsersCount })}
+            {' - '}
+            {translate('{percentage}% uploaded', { percentage: 100 })}
+          </p>
+        </Col>
+        <Col xs="auto">
+          <Button
+            variant="active-light-danger"
+            className="btn-icon btn-icon-danger"
+            onClick={removeFile}
+          >
+            <span className="svg-icon svg-icon-1">
+              <Trash weight="bold" />
+            </span>
+          </Button>
+        </Col>
+      </Row>
+    </div>
+  ) : (
+    <Row className="border-top border-bottom h-60px align-items-center mb-7 fs-6">
+      <Col>
+        <p className="fs-6 fw-bold text-gray-700 mb-0">
+          {translate('Bulk import contacts')}
+        </p>
+        <p className="text-muted mb-0">
+          {translate(
+            'Import your mailing list from a .csv file. You can download an {example}',
+            {
+              example: (
+                <button
+                  className="text-anchor"
+                  type="button"
+                  onClick={onDownloadClick}
+                >
+                  example_file.csv
+                </button>
+              ),
+            },
+            formatJsxTemplate,
+          )}
+        </p>
+      </Col>
+      <Col xs="auto">
+        <FileUploadField
+          input={{ onChange: (file) => parseCsvFile([file]) } as any}
+          accept=".csv"
+          buttonLabel={translate('Import')}
+          iconNode={<DownloadSimple weight="bold" />}
+          className="btn btn-secondary"
+        />
+      </Col>
+    </Row>
   );
 };

@@ -1,5 +1,5 @@
-import { PlusCircle, Question, Trash } from '@phosphor-icons/react';
-import { Fragment, useCallback, useState } from 'react';
+import { Plus, Question, Trash } from '@phosphor-icons/react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
@@ -11,6 +11,8 @@ import { InvitationsFeatures } from '@waldur/FeaturesEnums';
 import { EmailField } from '@waldur/form/EmailField';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
+import { MIN_PAGE_SIZE } from '@waldur/table/constants';
+import { TablePagination } from '@waldur/table/TablePagination';
 
 import { LoadUserDetailsButton } from '../LoadUserDetailsButton';
 import { GroupInviteRow, StoredUserDetails } from '../types';
@@ -29,6 +31,14 @@ export const EmailsListGroup = ({
 }) => {
   const [warn, setWarn] = useState(false);
 
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(MIN_PAGE_SIZE);
+
+  const changePageSize = (newSize) => {
+    setPage(1);
+    setPageSize(newSize);
+  };
+
   const addRow = useCallback(() => {
     let emptyEmails = 0;
     if (fields._isFieldArray) {
@@ -39,13 +49,24 @@ export const EmailsListGroup = ({
     if (emptyEmails < 5) {
       if (project) fields.push({ project });
       else fields.push({});
+      // We have to give pagination a timeout to create the new page, otherwise we will get an error.
+      setTimeout(() => {
+        setPage(Math.ceil((fields.length + 1) / pageSize));
+      }, 250);
     } else {
       setWarn(true);
       setTimeout(() => setWarn(false), 2000);
     }
-  }, [fields, project]);
+  }, [fields, project, setPage, pageSize]);
 
-  const removeRow = (index) => fields._isFieldArray && fields.remove(index);
+  const removeRow = (index) => {
+    const isLastOne = visibleFields.filter(Boolean).length === 1;
+    const lastPage = Math.ceil((fields.length + 1) / pageSize);
+    fields._isFieldArray && fields.remove(index);
+    if (isLastOne && page === lastPage && page !== 1) {
+      setPage((prev) => prev - 1);
+    }
+  };
 
   const getUserDetails = useCallback(
     (user: GroupInviteRow): StoredUserDetails =>
@@ -60,14 +81,22 @@ export const EmailsListGroup = ({
     [],
   );
 
+  // Visible fields for each page without lossing indexes
+  const visibleFields = useMemo(() => {
+    const end = page * pageSize;
+    const start = (page - 1) * pageSize;
+
+    return fields.map((field, i) => (i >= start && i < end ? field : null));
+  }, [fields, page, pageSize]);
+
   return (
-    <div className="scroll-y mh-400px">
-      {fields.length > 0 && (
-        <Form.Group id="emails-list-group">
-          <div>
-            <table className="table">
+    <div className="mb-3">
+      <div id="emails-list-group">
+        {fields.length > 0 && (
+          <Form.Group>
+            <table className="table px-0 gy-2 mb-0">
               <thead>
-                <tr>
+                <tr className="fs-6 fw-bold">
                   <td className="w-250px">{translate('Email')}</td>
                   {!isFeatureVisible(
                     InvitationsFeatures.conceal_civil_number,
@@ -97,14 +126,16 @@ export const EmailsListGroup = ({
                 </tr>
               </thead>
               <tbody>
-                {fields.map((user, i) => {
+                {visibleFields.map((user, i) => {
+                  if (!user) return null;
                   const userDetails = getUserDetails(fields.get(i));
                   return (
                     <Fragment key={user}>
-                      <tr>
+                      <tr className="fs-6">
                         <td>
                           <Field
                             name={`${user}.email`}
+                            placeholder={translate('Enter email address')}
                             required={true}
                             component={EmailField}
                             validate={[required, email]}
@@ -116,7 +147,9 @@ export const EmailsListGroup = ({
                           <td>
                             <Field
                               name={`${user}.civil_number`}
+                              placeholder={translate('e.g. 123456789')}
                               component={InputField}
+                              className={null}
                               disabled={disabled}
                               validate={
                                 isFeatureVisible(
@@ -134,7 +167,9 @@ export const EmailsListGroup = ({
                           <td>
                             <Field
                               name={`${user}.tax_number`}
+                              placeholder={translate('e.g. 123456789')}
                               component={InputField}
+                              className={null}
                               disabled={disabled}
                               validate={
                                 isFeatureVisible(
@@ -165,12 +200,13 @@ export const EmailsListGroup = ({
                         </td>
                         <td>
                           <Button
-                            variant="light-danger"
-                            className="btn-icon"
+                            variant="active-light-danger"
+                            className="btn-icon btn-icon-danger"
                             onClick={() => removeRow(i)}
+                            disabled={fields.length === 1}
                           >
-                            <span className="svg-icon svg-icon-2">
-                              <Trash />
+                            <span className="svg-icon svg-icon-1x">
+                              <Trash weight="bold" />
                             </span>
                           </Button>
                         </td>
@@ -189,26 +225,39 @@ export const EmailsListGroup = ({
                 })}
               </tbody>
             </table>
-          </div>
-        </Form.Group>
-      )}
-      <div>
-        <Button
-          variant="light"
-          className="btn-icon"
-          disabled={warn}
-          onClick={addRow}
-        >
-          <div className="svg-icon svg-icon-2">
-            <PlusCircle />
-          </div>
-        </Button>
-        {warn && (
-          <span className="text-danger ms-2">
-            {translate('Too many empty fields')}
-          </span>
+          </Form.Group>
         )}
+        <div>
+          <Button
+            variant="active-light-primary"
+            className="btn-icon-primary btn-text-primary"
+            disabled={warn}
+            onClick={addRow}
+          >
+            <div className="svg-icon svg-icon-2">
+              <Plus />
+            </div>
+            {fields.length > 0
+              ? translate('Add another user')
+              : translate('Add user')}
+          </Button>
+          {warn && (
+            <span className="text-danger ms-2">
+              {translate('Too many empty fields')}
+            </span>
+          )}
+        </div>
       </div>
+
+      <TablePagination
+        currentPage={page}
+        pageSize={pageSize}
+        resultCount={fields.length}
+        hasRows={fields.length > MIN_PAGE_SIZE}
+        showPageSizeSelector
+        updatePageSize={changePageSize}
+        gotoPage={setPage}
+      />
     </div>
   );
 };

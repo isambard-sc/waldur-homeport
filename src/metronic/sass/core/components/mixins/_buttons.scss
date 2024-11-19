@@ -15,7 +15,8 @@
   $color-dark: null,
   $icon-color-dark: null,
   $border-color-dark: null,
-  $bg-color-dark: null
+  $bg-color-dark: null,
+  $bg-color-disabled: null
 ) {
   @if ($color != null) {
     color: $color;
@@ -115,6 +116,13 @@
 
     @if ($bg-color-dark != null) {
       background-color: $bg-color-dark !important;
+    }
+  }
+
+  @if ($bg-color-disabled != null) {
+    &.disabled,
+    &:disabled {
+      background-color: $bg-color-disabled;
     }
   }
 }

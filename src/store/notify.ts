@@ -3,9 +3,10 @@ import { notify } from 'reapop';
 
 import { format } from '@waldur/core/ErrorMessageFormatter';
 
-export const showSuccess = (message) =>
+export const showSuccess = (message, title = undefined) =>
   notify({
     status: 'success',
+    title,
     message,
     position: 'top-right',
     dismissAfter: 7000,

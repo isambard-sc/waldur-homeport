@@ -10,17 +10,17 @@
 
   &.disabled,
   &:disabled {
-    background-color: $grey-100;
-    color: $grey-400;
+    color: $grey-400 !important;
+    border-color: transparent !important;
 
     i {
-      color: $grey-400;
+      color: $grey-400 !important;
     }
     .svg-icon {
-      @include svg-icon-color($grey-400);
+      @include svg-icon-color($grey-400, true);
     }
     &.dropdown-toggle:after {
-      color: $grey-400;
+      color: $grey-400 !important;
     }
 
     &.btn-secondary {

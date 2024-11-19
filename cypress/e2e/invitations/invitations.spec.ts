@@ -179,9 +179,9 @@ describe('Invitations', () => {
 
     // Testing "add" and "remove" user row buttons
     // Adding 3 more rows
-    cy.get('#emails-list-group')
+    cy.get('#emails-list-group > div')
       .next()
-      .find('button.btn-icon')
+      .find('button')
       .click()
       .click()
       .click();
@@ -224,10 +224,6 @@ describe('Invitations', () => {
       .click()
       .wait('@createInvitation')
 
-      .get('.invitation-create-dialog')
-      .contains('Success')
-      .should('be.visible')
-
       // Check the requests
       .get('@createInvitation.all')
       .then((xhrs: any) => {
@@ -238,33 +234,8 @@ describe('Invitations', () => {
         });
       });
 
-    // Check status
-    cy.get('.invitation-create-dialog')
-      .contains('Sending status')
-      .should('be.visible')
-      .next()
-      .should('include.text', 'Completed')
-      .next()
-      .should('include.text', 'Admin')
-      .next()
-      .should('include.text', '2021-11-12')
-      .next()
-      .should('include.text', '2021-11-19');
-
-    // Allows to send more invitations
-    cy.get('.invitation-create-dialog')
-      .contains('button', 'Send more')
-      .click()
-      .get('.invitation-create-dialog')
-      .contains('Invite by email')
-      .should('be.visible')
-
-      // Close the dialog
-      .get('.invitation-create-dialog')
-      .contains('button', 'Cancel')
-      .click()
-      .get('.invitation-create-dialog')
-      .should('not.exist');
+    // Assure modal is closed
+    cy.get('.invitation-create-dialog').should('not.exist');
   });
 
   it('Can select all the toggle buttons in Invitations component', () => {

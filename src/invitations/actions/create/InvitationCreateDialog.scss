@@ -1,14 +1,22 @@
 .invitation-create-dialog {
-  .success-step {
-    font-size: 12rem;
+  #emails-list-group {
+    min-height: 360px;
 
-    i {
-      transition: 0.5s scale;
-      scale: 0;
+    table thead tr {
+      background-color: transparent;
 
-      &.show {
-        scale: 1;
+      td {
+        padding-bottom: 0;
       }
+    }
+  }
+
+  .custom-message {
+    color: var(--bs-grey-500);
+
+    a {
+      text-decoration: underline;
+      color: var(--bs-grey-500);
     }
   }
 }

@@ -10,6 +10,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 import { translate } from '@waldur/i18n';
 import Pagination from '@waldur/table/Pagination';
 
+import { MIN_PAGE_SIZE } from './constants';
 import { TablePageSize } from './TablePageSize';
 import { Pagination as PaginationProps } from './types';
 
@@ -19,8 +20,6 @@ interface TablePaginationProps extends PaginationProps {
   showPageSizeSelector: boolean;
   hasRows: boolean;
 }
-
-const MIN_PAGE_SIZE = 5;
 
 export const TablePagination: FunctionComponent<TablePaginationProps> = (
   props,
