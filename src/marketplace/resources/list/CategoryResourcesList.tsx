@@ -1,5 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { useTitle } from '@waldur/navigation/title';
 import { getFormValues } from 'redux-form';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -42,6 +43,9 @@ interface OwnProps {
 export const CategoryResourcesList: FunctionComponent<OwnProps> = (
   ownProps,
 ) => {
+  useTitle(
+    translate('{category} resources', { category: ownProps.category_title }),
+  );
   const filterValues: any = useSelector(
     getFormValues(CATEGORY_RESOURCES_ALL_FILTER_FORM_ID),
   );

@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useTitle } from '@waldur/navigation/title';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
@@ -47,6 +48,7 @@ const mandatoryFields = [
 ];
 
 export const ProjectsList = () => {
+  useTitle(translate('Projects'));
   const filter = useSelector(mapStateToFilter);
   const props = useTable({
     table: PROJECTS_LIST,

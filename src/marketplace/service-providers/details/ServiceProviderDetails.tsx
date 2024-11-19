@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
-import { useTitle } from 'react-use';
+import { useTitle } from '@waldur/navigation/title';
 
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
 import { isFeatureVisible } from '@waldur/features/connect';

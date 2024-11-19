@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
+import { useTitle } from '@waldur/navigation/title';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
@@ -42,6 +43,8 @@ const mapStateToFilter = createSelector(
 );
 
 export const OrganizationsList: FunctionComponent = () => {
+  useTitle(translate('Organizations'));
+
   const filter = useSelector(mapStateToFilter);
 
   const props = useTable({

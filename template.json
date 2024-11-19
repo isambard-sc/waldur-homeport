@@ -580,7 +580,7 @@
     "message": "All resources will be scheduled for termination once the date is reached."
   },
   "All resources": {
-    "description": "navigation/sidebar/ResourcesMenu.tsx",
+    "description": "marketplace/resources/list/AllResourcesList.tsx, navigation/sidebar/ResourcesMenu.tsx",
     "message": "All resources"
   },
   "All results": {
@@ -14202,6 +14202,10 @@
   "{amount} spent last month": {
     "description": "customer/dashboard/CreditStatusWidget.tsx",
     "message": "{amount} spent last month"
+  },
+  "{category} resources": {
+    "description": "marketplace/resources/list/CategoryResourcesList.tsx",
+    "message": "{category} resources"
   },
   "{changes} vs last month": {
     "description": "customer/dashboard/CustomerDashboardChart.tsx, dashboard/TeamWidget.tsx, project/ProjectDashboardCostLimits.tsx",

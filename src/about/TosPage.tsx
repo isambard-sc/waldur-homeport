@@ -1,4 +1,4 @@
-import { useTitle } from 'react-use';
+import { useTitle } from '@waldur/navigation/title';
 
 import { translate } from '../i18n';
 
