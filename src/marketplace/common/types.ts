@@ -1,4 +1,4 @@
-import { ComponentType } from 'react';
+import { ComponentType, LazyExoticComponent } from 'react';
 
 import { CheckoutSummaryProps } from '../deploy/types';
 import { OfferingEditPanelFormProps } from '../offerings/update/integration/types';
@@ -13,30 +13,20 @@ export interface OfferingConfiguration<
   RequestPayloadType = any,
 > {
   type: string;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  orderFormComponent?: ComponentType<any>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  pluginOptionsForm?: ComponentType<OfferingEditPanelFormProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  secretOptionsForm?: ComponentType<OfferingEditPanelFormProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  provisioningConfigForm?: ComponentType<OfferingEditPanelFormProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  detailsComponent?: ComponentType<OrderDetailsProps>;
-  /**
-   *  Please use only lazy component here to enable code-splitting.
-   */
-  checkoutSummaryComponent?: ComponentType<CheckoutSummaryProps>;
+  orderFormComponent?: LazyExoticComponent<ComponentType<any>>;
+  pluginOptionsForm?: LazyExoticComponent<
+    ComponentType<OfferingEditPanelFormProps>
+  >;
+  secretOptionsForm?: LazyExoticComponent<
+    ComponentType<OfferingEditPanelFormProps>
+  >;
+  provisioningConfigForm?: LazyExoticComponent<
+    ComponentType<OfferingEditPanelFormProps>
+  >;
+  detailsComponent?: LazyExoticComponent<ComponentType<OrderDetailsProps>>;
+  checkoutSummaryComponent?: LazyExoticComponent<
+    ComponentType<CheckoutSummaryProps>
+  >;
   serializer?: (
     attributes: AttributesType,
     offering: Offering,
