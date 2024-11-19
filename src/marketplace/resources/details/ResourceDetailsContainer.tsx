@@ -14,7 +14,7 @@ import {
 } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { ProjectUsersBadge } from '@waldur/project/ProjectUsersBadge';
 import { setCurrentResource } from '@waldur/workspace/actions';
 

@@ -1,28 +1,27 @@
 import { PencilSimple } from '@phosphor-icons/react';
-import { useCurrentStateAndParams } from '@uirouter/react';
 import { Dropdown } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { isDescendantOf } from '@waldur/navigation/useTabs';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { getUser } from '@waldur/workspace/selectors';
+import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { DropdownLink } from './DropdownLink';
 
 export const EditOfferingButton = ({ row }) => {
   const user = useSelector(getUser);
+  const customer = useSelector(getCustomer);
 
   const canUpdateOffering = hasPermission(user, {
     permission: PermissionEnum.UPDATE_OFFERING,
     customerId: row.customer_uuid,
   });
 
-  const { state } = useCurrentStateAndParams();
-  const targetState = isDescendantOf('admin', state)
-    ? 'admin-marketplace-offering-update'
-    : 'marketplace-offering-update';
+  const targetState =
+    row.customer_uuid !== customer?.uuid
+      ? 'admin-marketplace-offering-update'
+      : 'marketplace-offering-update';
 
   if (!canUpdateOffering) {
     return null;

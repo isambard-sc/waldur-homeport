@@ -8,7 +8,7 @@ import { translate } from '@waldur/i18n';
 import { getCategory, getPublicOffering } from '@waldur/marketplace/common/api';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { ANONYMOUS_CONFIG } from '@waldur/table/api';
 import { getUser } from '@waldur/workspace/selectors';
 

@@ -12,7 +12,7 @@ import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { IBreadcrumbItem, PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { UserProfileHero } from '@waldur/user/dashboard/UserProfileHero';
 import { getUser } from '@waldur/user/support/api';
 import { getUser as getUserSelecor } from '@waldur/workspace/selectors';

@@ -1,30 +1,9 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { useEffect, useMemo } from 'react';
-
-import { router } from '@waldur/router';
+import { useMemo, useEffect } from 'react';
 
 import { useExtraTabs } from './context';
 import { Tab } from './Tab';
 import { PageBarTab } from './types';
-
-let state;
-let params;
-
-export function setPrevState(newState) {
-  state = newState;
-}
-
-export function setPrevParams(newParams) {
-  params = newParams;
-}
-
-export const goBack = () => {
-  if (state && state.name && state.name !== 'errorPage.notFound') {
-    router.stateService.go(state.name, params);
-  } else {
-    router.stateService.go('profile.details');
-  }
-};
 
 export const usePageTabsTransmitter = (tabs: PageBarTab[]) => {
   const { state, params } = useCurrentStateAndParams();

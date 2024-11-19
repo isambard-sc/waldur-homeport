@@ -9,7 +9,7 @@ import { getOrderBreadcrumbItems } from '@waldur/marketplace/utils';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import { OrderActionsButton } from '../actions/OrderActionsButton';
 

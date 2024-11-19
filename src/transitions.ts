@@ -4,10 +4,10 @@ import { MatomoInstance } from './afterBootstrap';
 import { setRedirect } from './auth/AuthRedirectStorage';
 import * as AuthService from './auth/AuthService';
 import { cleanObject } from './core/utils';
+import { setPrevParams, setPrevState } from './error/utils';
 import { isFeatureVisible } from './features/connect';
 import { tryAcceptInvitation } from './invitations/tryAcceptInvitation';
 import { closeModalDialog } from './modal/actions';
-import { setPrevParams, setPrevState } from './navigation/utils';
 import { router } from './router';
 import { UsersService } from './user/UsersService';
 

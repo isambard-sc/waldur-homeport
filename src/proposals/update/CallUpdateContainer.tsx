@@ -9,7 +9,7 @@ import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { RoleEnum } from '@waldur/permissions/enums';
 
 import { getProtectedCall } from '../api';
