@@ -8,7 +8,7 @@ import {
   useState,
 } from 'react';
 import { Dropdown, Nav, Tab } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Field, getFormSyncErrors, InjectedFormProps } from 'redux-form';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -22,11 +22,8 @@ import {
 } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
-import * as api from '@waldur/marketplace/common/api';
 import { OfferingComponent } from '@waldur/marketplace/types';
-import { closeModalDialog } from '@waldur/modal/actions';
 import { HeaderButtonBullet } from '@waldur/navigation/header/HeaderButtonBullet';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { type RootState } from '@waldur/store/reducers';
 
 import { UsageReportContext } from './types';
@@ -102,30 +99,8 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
     handleWindowResize();
   }, [errors]);
 
-  const dispatch = useDispatch();
-
-  const submitReport = async ({ period, components }) => {
-    const payload = {
-      plan_period: period.value?.uuid,
-      usages: Object.keys(components).map((key) => ({
-        type: key,
-        ...components[key],
-      })),
-    };
-
-    try {
-      await api.submitUsageReport(payload);
-      dispatch(showSuccess(translate('Usage report has been submitted.')));
-      dispatch(closeModalDialog());
-    } catch (error) {
-      dispatch(
-        showErrorResponse(error, translate('Unable to submit usage report.')),
-      );
-    }
-  };
-
   return (
-    <form onSubmit={props.handleSubmit(submitReport)}>
+    <form onSubmit={props.handleSubmit(props.submitReport)}>
       <div className="text-grey-500 mb-4">
         <SummaryField
           label={translate('Client organization')}

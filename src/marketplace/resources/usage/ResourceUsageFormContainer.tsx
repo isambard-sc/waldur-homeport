@@ -2,7 +2,11 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { change, reduxForm } from 'redux-form';
 
+import { translate } from '@waldur/i18n';
+import { submitUsageReport } from '@waldur/marketplace/common/api';
 import { OfferingComponent } from '@waldur/marketplace/types';
+import { closeModalDialog } from '@waldur/modal/actions';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { FORM_ID } from '../store/constants';
 
@@ -53,6 +57,25 @@ const mapDispatchToProps = (dispatch) => ({
           `components.${component.type}.description`,
           component.description,
         ),
+      );
+    }
+  },
+  submitReport: async ({ period, components }) => {
+    const payload = {
+      plan_period: period.value?.uuid,
+      usages: Object.keys(components).map((key) => ({
+        type: key,
+        ...components[key],
+      })),
+    };
+
+    try {
+      await submitUsageReport(payload);
+      dispatch(showSuccess(translate('Usage report has been submitted.')));
+      dispatch(closeModalDialog());
+    } catch (error) {
+      dispatch(
+        showErrorResponse(error, translate('Unable to submit usage report.')),
       );
     }
   },
