@@ -8892,7 +8892,7 @@
     "message": "Resource usage for {resourceName}"
   },
   "Resource usage": {
-    "description": "marketplace/resources/usage/ResourceCreateUsageDialog.tsx",
+    "description": "marketplace/resources/usage/ResourceCreateUsageDialog.test.tsx, marketplace/resources/usage/ResourceCreateUsageDialog.tsx",
     "message": "Resource usage"
   },
   "Resource {type} process": {
