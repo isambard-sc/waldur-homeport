@@ -1,12 +1,23 @@
-import { screen, render, act } from '@testing-library/react';
+import {
+  screen,
+  render,
+  act,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { translate } from '@waldur/i18n';
+import { submitUsageReport } from '@waldur/marketplace/common/api';
 import { createActionStore } from '@waldur/resource/actions/testUtils';
 
 import * as api from './api';
 import { ResourceCreateUsageDialog } from './ResourceCreateUsageDialog';
+
+vi.mock('@waldur/marketplace/common/api', () => ({
+  submitUsageReport: vi.fn(),
+}));
 
 const loader = vi.spyOn(api, 'getProviderUsageComponents');
 
@@ -97,5 +108,39 @@ describe('ResourceCreateUsageDialog', () => {
     expect(
       screen.getByText('Test customer', { exact: false }),
     ).toBeInTheDocument();
+  });
+
+  it('submits form with usage values', async () => {
+    loader.mockResolvedValue(mockData);
+    const submitSpy = vi.mocked(submitUsageReport);
+    submitSpy.mockResolvedValue({});
+
+    await act(() => {
+      renderDialog(props);
+    });
+
+    const amountInput = screen.getByPlaceholderText('Amount *');
+    const descInput = screen.getByPlaceholderText('Enter a description...');
+    const submitBtn = screen.getByText('Submit usage report');
+
+    fireEvent.change(amountInput, { target: { value: '10' } });
+    fireEvent.change(descInput, { target: { value: 'Test usage' } });
+
+    await act(() => {
+      fireEvent.click(submitBtn);
+    });
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledWith({
+        plan_period: 'period-1',
+        usages: [
+          {
+            type: 'comp1',
+            amount: '10',
+            description: 'Test usage',
+          },
+        ],
+      });
+    });
   });
 });
