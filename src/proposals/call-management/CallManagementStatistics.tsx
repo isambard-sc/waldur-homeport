@@ -107,7 +107,7 @@ export const CallManagementStatistics = () => {
             />
           </Col>
           <Col>
-            <Card className="mb-6">
+            <Card className="card-bordered mb-6">
               <Card.Body>
                 <div className="d-flex justify-content-start justify-content-lg-between flex-wrap">
                   <FlatStatistics

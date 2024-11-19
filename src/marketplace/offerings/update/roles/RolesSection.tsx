@@ -23,7 +23,7 @@ export const RolesSection: FC<OfferingSectionProps> = (props) => {
 
   return (
     <Card className="card-bordered">
-      <Card.Header className="border-2 border-bottom">
+      <Card.Header>
         <Card.Title className="h5">
           <span className="me-2">{translate('Roles')}</span>
           <RefreshButton refetch={props.refetch} loading={props.loading} />

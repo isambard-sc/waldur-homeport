@@ -19,8 +19,8 @@ export const OfferingOptionsSectionPure: FC<
   const { readOnlyFields } = useContext(FormFieldsContext);
   const data = props.offering[props.type];
   return (
-    <Card id={props.type}>
-      <Card.Header className="border-2 border-bottom">
+    <Card id={props.type} className="card-bordered">
+      <Card.Header>
         <Card.Title className="h5">
           {props.title}
           <RefreshButton refetch={props.refetch} loading={props.loading} />

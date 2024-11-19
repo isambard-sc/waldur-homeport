@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { FC } from 'react';
 import { Card } from 'react-bootstrap';
 
@@ -38,8 +39,11 @@ const PlanGroup = ({ plan }: { plan: PlanUsageRow }) => (
 
 export const PlanUsageList: FC<OwnProps> = (props) => {
   return (
-    <Card className={props.className} id={props.id}>
-      <Card.Header className="border-2 border-bottom">
+    <Card
+      className={classNames('card-bordered', props.className)}
+      id={props.id}
+    >
+      <Card.Header>
         <Card.Title>{translate('Plans')}</Card.Title>
       </Card.Header>
       <Card.Body>

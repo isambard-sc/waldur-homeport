@@ -24,7 +24,7 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
   onAddCommentClick,
   ...props
 }) => (
-  <Card>
+  <Card className="card-bordered">
     {!props.hideHeader && (
       <Card.Header className={props.paddingless ? 'px-0' : ''}>
         <Card.Title>{translate('Proposal summary')}</Card.Title>

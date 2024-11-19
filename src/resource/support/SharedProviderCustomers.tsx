@@ -64,6 +64,7 @@ export const SharedProviderCustomers: FC<{ provider_uuid: string }> = ({
       verboseName={translate('organizations')}
       showPageSizeSelector={true}
       enableExport={true}
+      cardBordered={false}
     />
   );
 };

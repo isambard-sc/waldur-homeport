@@ -35,7 +35,7 @@ function CustomToggle({ children, eventKey }) {
 }
 
 export const PublicOfferingFAQ: FunctionComponent = () => (
-  <Card className="mb-10" id="faq">
+  <Card className="card-bordered mb-10" id="faq">
     <Card.Body>
       <PublicOfferingCardTitle>{translate('FAQ')}</PublicOfferingCardTitle>
       <Row>

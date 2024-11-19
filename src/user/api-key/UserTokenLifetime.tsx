@@ -51,7 +51,7 @@ export const UserTokenLifetime: React.FC<UserEditTokenComponentProps> = (
   };
 
   return (
-    <Card className="mb-6">
+    <Card className="card-bordered mb-6">
       <Card.Header>
         <Row className="card-toolbar g-0 gap-4 w-100">
           <Col xs className="order-0 mw-sm-25">

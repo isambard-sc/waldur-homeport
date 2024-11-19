@@ -55,7 +55,7 @@ export const IssueCommentsContainer = ({
             />
           )}
           <input {...getInputProps()} />
-          <Card>
+          <Card className="card-bordered">
             <div className="card-header content-between-center">
               <h4>{translate('Comments')}</h4>
               <div>

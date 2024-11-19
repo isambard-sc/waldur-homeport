@@ -10,10 +10,11 @@ import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandabl
 import { RoleField } from '@waldur/invitations/RoleField';
 import Table from '@waldur/table/Table';
 
-export const InvitationsList: FunctionComponent<{ table; hideRole }> = ({
-  table,
-  hideRole,
-}) => {
+export const InvitationsList: FunctionComponent<{
+  table;
+  hideRole;
+  cardBordered?;
+}> = ({ table, hideRole, cardBordered }) => {
   return (
     <Table
       {...table}
@@ -63,6 +64,7 @@ export const InvitationsList: FunctionComponent<{ table; hideRole }> = ({
       )}
       title={translate('Invitations')}
       verboseName={translate('invitations')}
+      cardBordered={cardBordered}
       hasQuery={true}
       expandableRow={InvitationExpandableRow}
     />

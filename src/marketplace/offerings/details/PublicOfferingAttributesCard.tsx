@@ -33,7 +33,7 @@ export const PublicOfferingAttributesCard: FunctionComponent<
     return null;
   }
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Body>
         <PublicOfferingCardTitle>
           {translate('Attributes')}

@@ -30,7 +30,7 @@ export const ResourceRequestsSummary = ({
   });
 
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>{translate('Resource requests')}</Card.Title>
       </Card.Header>

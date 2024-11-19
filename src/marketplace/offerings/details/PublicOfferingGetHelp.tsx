@@ -5,7 +5,7 @@ import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 
 export const PublicOfferingGetHelp: FunctionComponent = () => (
-  <Card className="mb-10">
+  <Card className="card-bordered mb-10">
     <Card.Body>
       <div className="text-center">
         <h2 className="mb-10">{translate('Get help')}</h2>

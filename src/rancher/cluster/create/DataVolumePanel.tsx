@@ -21,7 +21,7 @@ interface OwnProps {
 }
 
 export const DataVolumePanel: FunctionComponent<OwnProps> = (props) => (
-  <Card>
+  <Card className="card-bordered">
     <Card.Header>
       <RemoveButton onClick={() => props.onRemove(props.volumeIndex)} />
       <h4>

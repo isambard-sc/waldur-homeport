@@ -70,7 +70,7 @@ export const IssueDetails: FunctionComponent = () => {
   return (
     <Row>
       <Col sm={8}>
-        <Card className="mb-6">
+        <Card className="card-bordered mb-6">
           <Card.Header>
             <Card.Title>
               {issue.key ? `${issue.key}: ${issue.summary}` : issue.summary}
@@ -87,7 +87,7 @@ export const IssueDetails: FunctionComponent = () => {
         <IssueCommentsContainer issue={issue} />
       </Col>
       <Col sm={4}>
-        <Card className="mb-6">
+        <Card className="card-bordered mb-6">
           <Card.Header>
             <Card.Title>{translate('Summary')}</Card.Title>
           </Card.Header>
