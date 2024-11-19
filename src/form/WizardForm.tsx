@@ -1,6 +1,7 @@
 import { FC, ReactNode, useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { InjectedFormProps, reduxForm } from 'redux-form';
+import { useSelector } from 'react-redux';
+import { getFormValues, InjectedFormProps, reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { WizardStepIndicator } from '@waldur/form/WizardStepIndicator';
@@ -25,8 +26,8 @@ export interface WizardFormStepProps
 }
 
 interface WizardFormProps extends WizardFormStepProps, InjectedFormProps {
-  formValues: any;
   children: ReactNode | FC<WizardFormProps>;
+  formValues: any;
   submit(): void;
 }
 
@@ -36,6 +37,8 @@ const WizardFormPure: FC<WizardFormProps> = (props) => {
     props.reinitialize();
     if (!props.anyTouched) props.touch();
   }, []);
+
+  const formValues = useSelector(getFormValues(props.form));
 
   return (
     <form className="wizard" onSubmit={props.handleSubmit(props.onSubmit)}>
@@ -61,7 +64,7 @@ const WizardFormPure: FC<WizardFormProps> = (props) => {
           />
           <div className="content clearfix">
             {typeof props.children === 'function'
-              ? props.children(props)
+              ? props.children({ ...props, formValues })
               : props.children}
           </div>
         </div>
