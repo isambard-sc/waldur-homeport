@@ -12292,7 +12292,7 @@
     "message": "Unable to submit review."
   },
   "Unable to submit usage report.": {
-    "description": "marketplace/resources/usage/ResourceUsageForm.tsx",
+    "description": "marketplace/resources/usage/ResourceUsageFormContainer.tsx",
     "message": "Unable to submit usage report."
   },
   "Unable to sync FreeIPA profile.": {
@@ -12928,7 +12928,7 @@
     "message": "Usage policy"
   },
   "Usage report has been submitted.": {
-    "description": "marketplace/resources/usage/ResourceUsageForm.tsx",
+    "description": "marketplace/resources/usage/ResourceUsageFormContainer.tsx",
     "message": "Usage report has been submitted."
   },
   "Usage reports": {
