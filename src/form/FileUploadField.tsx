@@ -1,6 +1,6 @@
 import { UploadSimple } from '@phosphor-icons/react';
 import accepts from 'attr-accept';
-import { useRef, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 
 import { FormField } from './types';
 
@@ -8,6 +8,7 @@ export interface FileUploadFieldProps extends FormField {
   accept?: string;
   showFileName?: boolean;
   buttonLabel: string;
+  iconNode?: ReactNode;
   className?: string;
 }
 
@@ -18,6 +19,7 @@ export const FileUploadField = ({
   className = 'btn btn-sm btn-primary',
   disabled,
   input,
+  iconNode = <UploadSimple />,
 }: FileUploadFieldProps) => {
   const [fileName, setFileName] = useState<string | undefined>(undefined);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,10 +60,7 @@ export const FileUploadField = ({
         onClick={openFileDialog}
         disabled={disabled}
       >
-        <span className="svg-icon svg-icon-2">
-          <UploadSimple />
-        </span>{' '}
-        {buttonLabel}
+        <span className="svg-icon svg-icon-2">{iconNode}</span> {buttonLabel}
       </button>
       <input
         type="file"

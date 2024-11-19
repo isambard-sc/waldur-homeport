@@ -1,3 +1,4 @@
+import { CaretLeft } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Button } from 'react-bootstrap';
 
@@ -9,8 +10,6 @@ interface FormButtonsProps {
   step;
   setStep;
   submitting;
-  reset;
-  finish;
   valid;
 }
 
@@ -18,8 +17,6 @@ export const FormButtons: FC<FormButtonsProps> = ({
   step,
   setStep,
   submitting,
-  reset,
-  finish,
   valid,
 }) => {
   return step === 1 ? (
@@ -27,7 +24,7 @@ export const FormButtons: FC<FormButtonsProps> = ({
       <CloseDialogButton className="w-150px" />
       <Button
         type="button"
-        className="w-150px ms-12"
+        className="w-150px"
         onClick={() => valid && setStep(2)}
         disabled={!valid}
       >
@@ -37,37 +34,22 @@ export const FormButtons: FC<FormButtonsProps> = ({
   ) : step === 2 ? (
     <>
       <Button
-        variant="secondary"
+        variant="outline btn-outline-default"
         className="w-150px"
         onClick={() => setStep(1)}
       >
+        <div className="svg-icon svg-icon-2">
+          <CaretLeft />
+        </div>
         {translate('Go back')}
       </Button>
+      <CloseDialogButton className="ms-auto w-150px" />
       <SubmitButton
         label={translate('Send invitation')}
         submitting={submitting}
-        className="btn btn-primary min-w-150px ms-12"
+        className="btn btn-primary min-w-150px"
         disabled={!valid}
       />
-    </>
-  ) : step === 3 ? (
-    <>
-      <Button
-        type="button"
-        variant="secondary"
-        className="w-150px ms-12"
-        onClick={reset}
-      >
-        {translate('Send more')}
-      </Button>
-      <Button
-        type="button"
-        variant="primary"
-        className="w-150px ms-12"
-        onClick={() => finish()}
-      >
-        {translate('Close')}
-      </Button>
     </>
   ) : null;
 };

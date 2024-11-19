@@ -2,7 +2,6 @@ import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
-import Avatar from '@waldur/core/Avatar';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -49,11 +48,6 @@ export const InvitationsList: FunctionComponent = () => {
           title: translate('Email'),
           render: ({ row }) => (
             <div className="d-flex align-items-center gap-1">
-              <Avatar
-                className="symbol symbol-25px"
-                name={row.email}
-                size={25}
-              />
               {row.email}
               <CopyToClipboardButton value={row.email} />
             </div>

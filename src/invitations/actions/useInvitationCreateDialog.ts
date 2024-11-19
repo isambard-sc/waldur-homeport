@@ -82,7 +82,6 @@ export const useInvitationCreateDialog = (context: InvitationContext) => {
     [roles, context],
   );
 
-  const [creationResult, setCreationResult] = useState(null);
   const createInvitations = useCallback(
     (formData: GroupInvitationFormData) => {
       return new Promise((resolve, reject) => {
@@ -103,19 +102,24 @@ export const useInvitationCreateDialog = (context: InvitationContext) => {
             return InvitationService.createInvitation(payload);
           });
           Promise.all(promises)
-            .then((res) => {
-              if (Array.isArray(res)) {
-                // We need just one of invitation results
-                setCreationResult(res[0]?.data);
-              }
-              dispatch(showSuccess('Invitations has been created.'));
+            .then(() => {
+              dispatch(
+                showSuccess(
+                  translate(
+                    'All invitation emails have been successfully sent.',
+                  ),
+                  translate('Invitation emails sent'),
+                ),
+              );
               if (context.refetch) {
                 context.refetch();
               }
               resolve(true);
             })
             .catch((e) => {
-              dispatch(showErrorResponse(e, 'Unable to create invitation.'));
+              dispatch(
+                showErrorResponse(e, translate('Unable to send invitations.')),
+              );
               reject(e);
             });
         } catch (e) {
@@ -130,7 +134,6 @@ export const useInvitationCreateDialog = (context: InvitationContext) => {
 
   return {
     createInvitations,
-    creationResult,
     finish,
     roles,
     defaultRole,
