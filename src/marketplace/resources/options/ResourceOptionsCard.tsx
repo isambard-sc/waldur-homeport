@@ -43,7 +43,7 @@ export const ResourceOptionsCard: FC<ResourceOptionsCardProps> = (props) => {
   }
   return (
     <Card className="card-bordered">
-      <Card.Header className="border-2 border-bottom">
+      <Card.Header>
         <Card.Title className="h5">
           {translate('Options')}
           <RefreshButton refetch={props.refetch} loading={props.isLoading} />

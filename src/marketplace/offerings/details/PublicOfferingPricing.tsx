@@ -29,7 +29,7 @@ export const PublicOfferingPricing: FC<PublicOfferingPricingProps> = ({
   const isSinglePlan = offering.plans.length === 1;
 
   return (
-    <Card className="public-offering-pricing mb-10" id="pricing">
+    <Card className="public-offering-pricing card-bordered mb-10" id="pricing">
       <Card.Body>
         <PublicOfferingCardTitle>
           {translate('Pricing')}

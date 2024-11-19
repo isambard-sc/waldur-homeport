@@ -32,33 +32,31 @@ const providerAutocomplete = async (
 };
 
 const SharedProviderFilter: FunctionComponent = () => (
-  <Card>
-    <Card.Body>
-      <div className="row">
-        <Form.Group className="col-sm-3">
-          <Form.Label>{translate('Provider')}</Form.Label>
-          <Field
-            name="provider"
-            component={(fieldProps) => (
-              <AsyncPaginate
-                placeholder={translate('Select provider...')}
-                defaultOptions
-                loadOptions={(query, prevOptions, { page }) =>
-                  providerAutocomplete(query, prevOptions, page)
-                }
-                getOptionValue={(option) => option.uuid}
-                getOptionLabel={(option) => option.name}
-                value={fieldProps.input.value}
-                onChange={(value) => fieldProps.input.onChange(value)}
-                noOptionsMessage={() => translate('No providers')}
-                isClearable={true}
-              />
-            )}
-          />
-        </Form.Group>
-      </div>
-    </Card.Body>
-  </Card>
+  <Card.Body>
+    <div className="row">
+      <Form.Group className="col-sm-3">
+        <Form.Label>{translate('Provider')}</Form.Label>
+        <Field
+          name="provider"
+          component={(fieldProps) => (
+            <AsyncPaginate
+              placeholder={translate('Select provider...')}
+              defaultOptions
+              loadOptions={(query, prevOptions, { page }) =>
+                providerAutocomplete(query, prevOptions, page)
+              }
+              getOptionValue={(option) => option.uuid}
+              getOptionLabel={(option) => option.name}
+              value={fieldProps.input.value}
+              onChange={(value) => fieldProps.input.onChange(value)}
+              noOptionsMessage={() => translate('No providers')}
+              isClearable={true}
+            />
+          )}
+        />
+      </Form.Group>
+    </div>
+  </Card.Body>
 );
 
 const FORM_ID = 'SharedProviderFilter';

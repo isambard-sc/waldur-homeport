@@ -64,7 +64,7 @@ export const UserStatus = ({ user }: { user: UserDetails }) => {
   return (
     <Panel
       title={translate('Account status')}
-      className="card-bordered"
+      cardBordered
       actions={
         <AwesomeCheckbox
           value={!isActive}

@@ -18,7 +18,7 @@ export const ProjectDelete: FC<ProjectDeleteProps> = ({ project }) => {
   return canDelete ? (
     <Panel
       title={translate('Delete project')}
-      className="card-bordered"
+      cardBordered
       actions={
         <Button variant="light-danger" onClick={callback}>
           <span className="svg-icon svg-icon-2">

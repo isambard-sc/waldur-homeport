@@ -22,6 +22,7 @@ export const BaseEventsList: FunctionComponent<{
   className?;
   actions?;
   hasActionBar?;
+  cardBordered?;
 }> = ({
   filter,
   filters,
@@ -32,6 +33,7 @@ export const BaseEventsList: FunctionComponent<{
   className,
   actions,
   hasActionBar = true,
+  cardBordered,
 }) => {
   const options = useMemo(
     () => ({
@@ -73,6 +75,7 @@ export const BaseEventsList: FunctionComponent<{
         },
       ]}
       hasQuery={true}
+      cardBordered={cardBordered}
       title={title || translate('Events')}
       verboseName={translate('events')}
       tableActions={actions || <EventTypesButton />}

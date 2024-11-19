@@ -14,7 +14,7 @@ interface PublicOfferingGettingStartedProps {
 export const PublicOfferingGettingStarted: FunctionComponent<
   PublicOfferingGettingStartedProps
 > = ({ offering }) => (
-  <Card className="mb-10" id="getting-started">
+  <Card className="card-bordered mb-10" id="getting-started">
     <Card.Body>
       <PublicOfferingCardTitle>
         {translate('Getting started')}

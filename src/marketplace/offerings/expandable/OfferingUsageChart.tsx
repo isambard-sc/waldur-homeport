@@ -35,13 +35,11 @@ export const OfferingUsageChart: FunctionComponent<OfferingUsageChartProps> = ({
   }, [offering]);
 
   return (
-    <Card className="mb-10">
-      <Card.Header className="border-2 border-bottom">
-        <div className="card-toolbar">
-          <Card.Title className="h5">
-            {translate('Component usage chart')}
-          </Card.Title>
-        </div>
+    <Card className="card-bordered mb-10">
+      <Card.Header>
+        <Card.Title className="h5">
+          {translate('Component usage chart')}
+        </Card.Title>
       </Card.Header>
       <Card.Body
         className="mt-3 p-m"

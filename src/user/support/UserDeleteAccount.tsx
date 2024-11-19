@@ -57,7 +57,7 @@ export const UserDeleteAccount: FC<{ user: UserDetails }> = ({ user }) => {
   return (
     <Panel
       title={translate('Delete account')}
-      className="card-bordered"
+      cardBordered
       actions={
         <Button
           variant="light-danger"

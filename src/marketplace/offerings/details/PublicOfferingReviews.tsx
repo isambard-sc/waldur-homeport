@@ -39,7 +39,7 @@ const ReviewStars = ({ className }: { className? }) => {
 };
 
 export const PublicOfferingReviews: FunctionComponent = () => (
-  <Card className="mb-10" id="reviews">
+  <Card className="card-bordered mb-10" id="reviews">
     <Card.Body>
       <PublicOfferingCardTitle>{translate('Reviews')}</PublicOfferingCardTitle>
       <Row>

@@ -19,7 +19,7 @@ export const PublicOfferingLocation: FunctionComponent<OwnProps> = ({
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
 
   return (
-    <Card className="mb-10">
+    <Card className="card-bordered mb-10">
       <Card.Body>
         <PublicOfferingCardTitle>
           {translate('Location')}

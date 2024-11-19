@@ -58,7 +58,8 @@ export const UserDelete = ({ user }: { user: UserDetails }) => {
   return (
     <Panel
       title={translate('Delete account')}
-      className="card-bordered mb-5"
+      className="mb-5"
+      cardBordered
       actions={
         <Button
           variant="light-danger"

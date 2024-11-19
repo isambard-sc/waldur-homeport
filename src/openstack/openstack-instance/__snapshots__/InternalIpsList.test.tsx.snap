@@ -6,7 +6,7 @@ exports[`InternalIpsList > renders list 1`] = `
     class="card-table full-width card-bordered card"
   >
     <div
-      class="border-2 border-bottom card-header"
+      class="border-bottom card-header"
     >
       <div
         class="card-toolbar g-0 gap-4 w-100 row"

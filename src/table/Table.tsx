@@ -155,7 +155,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           id={this.props.id}
         >
           {this.props.hasActionBar && (
-            <Card.Header className="border-2 border-bottom">
+            <Card.Header className="border-bottom">
               <Row className="card-toolbar g-0 gap-4 w-100">
                 {!this.props.standalone && (
                   <Col xs className="order-0 mw-sm-25">
@@ -203,7 +203,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           )}
 
           {this.props.filterPosition === 'header' && this.props.filters ? (
-            <Card.Header className="table-filter border-2 border-bottom align-items-stretch">
+            <Card.Header className="table-filter border-bottom align-items-stretch">
               <TableFilterContainer filters={this.props.filters} />
             </Card.Header>
           ) : null}
@@ -213,7 +213,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
                 (this.props.filterPosition === 'sidebar' &&
                   this.props.filtersStorage.length > 0)) && (
                 <Card.Header
-                  className={classNames('border-2 border-bottom', {
+                  className={classNames('border-bottom', {
                     'd-none':
                       !this.state.showFilterMenuToggle &&
                       this.props.filterPosition === 'menu',
@@ -237,7 +237,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           {!this.state.closedHiddenActionsMessage &&
             this.props.hasOptionalColumns &&
             this.props.activeColumns[OPTIONAL_COLUMN_ACTIONS_KEY] === false && (
-              <Card.Header className="border-2 border-bottom">
+              <Card.Header className="border-bottom">
                 <HiddenActionsMessage
                   toggleColumn={this.props.toggleColumn}
                   close={() =>

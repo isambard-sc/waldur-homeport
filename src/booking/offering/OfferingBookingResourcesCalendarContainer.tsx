@@ -57,7 +57,7 @@ export const OfferingBookingResourcesCalendarContainer: FunctionComponent<
   }
 
   return (
-    <Card className="offering-bookings">
+    <Card className="card-bordered offering-bookings">
       <Card.Header>
         <Card.Title>
           <span className="me-2">{translate('Bookings')}</span>

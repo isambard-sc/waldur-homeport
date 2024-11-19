@@ -74,6 +74,7 @@ export const SharedProviderResources: FC<{ provider_uuid: string }> = ({
       verboseName={translate('resources')}
       showPageSizeSelector={true}
       enableExport={true}
+      cardBordered={false}
       rowActions={({ row }) => (
         <ResourceRowActions resource={row} refetch={props.fetch} />
       )}

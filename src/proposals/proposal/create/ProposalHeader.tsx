@@ -5,7 +5,7 @@ import { translate } from '@waldur/i18n';
 import { ProposalBadge } from '../ProposalBadge';
 
 export const ProposalHeader = ({ proposal }) => (
-  <Card>
+  <Card className="card-bordered">
     <Card.Body>
       <div className="d-flex mb-4">
         <h3 className="mb-0">

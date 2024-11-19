@@ -13,8 +13,8 @@ import { EditCategoryButton } from './EditCategoryButton';
 export const AttributesSection: FC<OfferingSectionProps & { category }> = (
   props,
 ) => (
-  <Card>
-    <Card.Header className="border-2 border-bottom">
+  <Card className="card-bordered">
+    <Card.Header>
       <Card.Title className="h5">
         <span className="me-2">{translate('Category')}</span>
         <RefreshButton refetch={props.refetch} loading={props.loading} />

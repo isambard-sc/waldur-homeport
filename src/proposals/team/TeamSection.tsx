@@ -82,7 +82,7 @@ export const TeamSection: FC<
 
   return (
     <Card className="card-bordered">
-      <Card.Header>
+      <Card.Header className="pt-4 pb-2">
         <Card.Title>
           <h3>{props.title}</h3>
         </Card.Title>
@@ -106,15 +106,21 @@ export const TeamSection: FC<
             table={usersTable}
             scope={props.scope}
             hideRole={hideRole}
+            cardBordered={false}
           />
         )}
         {tab.key === 'invitations' && (
-          <InvitationsList table={invitationsTable} hideRole={hideRole} />
+          <InvitationsList
+            table={invitationsTable}
+            hideRole={hideRole}
+            cardBordered={false}
+          />
         )}
         {tab.key === 'permissions' && (
           <BaseEventsList
             table={`permissions-log${props.scope.url}`}
             filter={eventsFilter}
+            cardBordered={false}
           />
         )}
 

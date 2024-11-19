@@ -133,7 +133,7 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
 
   return (
     <>
-      <Card>
+      <Card className="card-bordered">
         <Card.Header>
           <Card.Title>
             <h3>{translate('Availability')}</h3>

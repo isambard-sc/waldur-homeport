@@ -47,8 +47,8 @@ export const OfferingCostsChart: FunctionComponent<OfferingCostChartProps> = (
   );
 
   return (
-    <Card className="mb-10">
-      <Card.Header className="border-2 border-bottom">
+    <Card className="card-bordered mb-10">
+      <Card.Header>
         <Card.Title>{translate('Offering cost chart')}</Card.Title>
         <div className="card-toolbar">
           <OfferingCustomersListFilter uniqueFormId={uniqueFormId} />
