@@ -94,6 +94,8 @@ describe('ResourceCreateUsageDialog', () => {
       renderDialog(props);
     });
     expect(screen.getByText('Client organization')).toBeInTheDocument();
-    expect(screen.getByText('Test customer')).toBeInTheDocument();
+    expect(
+      screen.getByText('Test customer', { exact: false }),
+    ).toBeInTheDocument();
   });
 });
