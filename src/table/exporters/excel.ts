@@ -143,7 +143,7 @@ function getSheet(sharedStrings: SharedStrings, rows: any[][]) {
 export default function exportExcel(table, data) {
   const zip = new JSZip();
   for (const path in templates) {
-    if (templates.hasOwnProperty(path)) {
+    if (Object.prototype.hasOwnProperty.call(templates, path)) {
       addToZip(zip, path, templates[path]);
     }
   }

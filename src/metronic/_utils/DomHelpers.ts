@@ -109,8 +109,10 @@ function getElementParents(element: Element, selector: string) {
     Element.prototype.matches = function (s) {
       const matches = (document || this.ownerDocument).querySelectorAll(s);
       let i = matches.length;
-      // eslint-disable-next-line no-empty
-      while (--i >= 0 && matches.item(i) !== this) {}
+
+      while (--i >= 0 && matches.item(i) !== this) {
+        /* empty */
+      }
       return i > -1;
     };
   }
@@ -181,7 +183,7 @@ function isVisibleElement(element: HTMLElement): boolean {
 }
 
 // Throttle function: Input as function which needs to be throttled and delay is the time interval in milliseconds
-function throttle(timer: number | undefined, func: Function, delay?: number) {
+function throttle(timer: number | undefined, func: () => void, delay?: number) {
   // If setTimeout is already scheduled, no need to do anything
   if (timer) {
     return;

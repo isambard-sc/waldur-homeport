@@ -33,9 +33,9 @@ interface PageBarProviderProps {
 
 export const PageBarContext = createContext<PageBarContextModel>({
   tabs: [],
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   addTabs: () => {},
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   clearTabs: () => {},
 });
 

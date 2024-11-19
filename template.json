@@ -7636,7 +7636,7 @@
     "message": "Priority"
   },
   "Privacy Policy": {
-    "description": "PrivacyPage.tsx",
+    "description": "about/PrivacyPage.tsx",
     "message": "Privacy Policy"
   },
   "Privacy policy link": {
@@ -10804,7 +10804,7 @@
     "message": "Termination"
   },
   "Terms of Service": {
-    "description": "TosPage.tsx, about.tsx, marketplace/details/OfferingTabs.tsx, marketplace/orders/TermsOfServiceDialog.tsx",
+    "description": "about/TosPage.tsx, about.tsx, marketplace/details/OfferingTabs.tsx, marketplace/orders/TermsOfServiceDialog.tsx",
     "message": "Terms of Service"
   },
   "Terms of service link": {
@@ -11976,7 +11976,7 @@
     "message": "Unable to load organizations"
   },
   "Unable to load page": {
-    "description": "UserAgreementComponent.tsx",
+    "description": "about/UserAgreementComponent.tsx",
     "message": "Unable to load page"
   },
   "Unable to load plan details.": {
@@ -12984,7 +12984,7 @@
     "message": "User agreement was updated"
   },
   "User agreements": {
-    "description": "PrivacyPage.tsx, TosPage.tsx, administration/routes.ts",
+    "description": "about/PrivacyPage.tsx, about/TosPage.tsx, administration/routes.ts",
     "message": "User agreements"
   },
   "User could not be updated": {
@@ -13896,7 +13896,7 @@
     "message": "invoices"
   },
   "is not defined.": {
-    "description": "UserAgreementComponent.tsx",
+    "description": "about/UserAgreementComponent.tsx",
     "message": "is not defined."
   },
   "jobs": {

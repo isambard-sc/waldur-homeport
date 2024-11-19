@@ -17,7 +17,7 @@ export const getTabs = (props: OfferingTabsProps): OfferingTab[] => {
   const attributes = props.offering.attributes;
   const filterSection = (section: Section) =>
     section.attributes.some((attr) =>
-      props.offering.attributes.hasOwnProperty(attr.key),
+      Object.prototype.hasOwnProperty.call(props.offering.attributes, attr.key),
     );
   const sections = props.sections.filter(filterSection);
 

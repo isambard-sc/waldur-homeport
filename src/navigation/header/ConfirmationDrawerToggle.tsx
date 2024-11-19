@@ -5,8 +5,8 @@ import { useAsync } from 'react-use';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
-import { countProjectUpdateRequestsList } from '@waldur/marketplace-remote/api';
 import { countOrders } from '@waldur/marketplace/common/api';
+import { countProjectUpdateRequestsList } from '@waldur/marketplace-remote/api';
 
 import {
   PENDING_CONSUMER_ORDERS_FILTER,

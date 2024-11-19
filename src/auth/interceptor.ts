@@ -29,7 +29,7 @@ Axios.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       error.config.url !== ENV.apiEndpoint + 'api-auth/password/' &&
-      !error.config.hasOwnProperty('__skipLogout__')
+      !Object.prototype.hasOwnProperty.call(error.config, '__skipLogout__')
     ) {
       if (router.globals.transition) {
         const target = router.globals.transition.targetState();

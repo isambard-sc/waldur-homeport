@@ -1,10 +1,10 @@
+import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { mount } from 'enzyme';
 import React from 'react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { Await } from '@waldur/core/types';
 import { SET_TITLE } from '@waldur/navigation/title';
 

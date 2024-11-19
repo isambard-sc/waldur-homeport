@@ -21,9 +21,9 @@ export const staticReducers = {
   title,
 };
 
-const rootReducer = combineReducers(staticReducers);
+const _rootReducer = combineReducers(staticReducers);
 
-export type RootState = ReturnType<typeof rootReducer> & {
+export type RootState = ReturnType<typeof _rootReducer> & {
   tables: Record<string, TableState>;
   issues: {
     attachments: IssueAttachmentState;

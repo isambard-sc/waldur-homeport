@@ -148,7 +148,7 @@ export function attachTransitions() {
   router.transitionService.onSuccess({}, (transition) => {
     if (
       transition.to().data?.auth &&
-      !transition.params().hasOwnProperty('toState')
+      !Object.prototype.hasOwnProperty.call(transition.params(), 'toState')
     ) {
       setRedirect({
         toState: transition.to().name,

@@ -37,9 +37,8 @@ export const generateSystemImageChoices = (data: any[]) => {
   const _choices = data.reduce<BoxRadioChoice[]>((acc, value) => {
     const image = findImage(value.name);
     if (image) {
-      /* eslint-disable no-useless-escape */
       const version = value.name
-        .replace(new RegExp(`.*${image.name}\D*`, 'gi'), '')
+        .replace(new RegExp(`.*${image.name}\\D*`, 'gi'), '')
         .trim();
 
       const prevChoice = acc.find((choice) => choice.value === image.name);

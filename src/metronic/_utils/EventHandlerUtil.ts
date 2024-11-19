@@ -3,7 +3,7 @@ import { getUniqueIdWithPrefix } from './_TypesHelpers';
 
 interface EventMeta {
   name: string;
-  callback: Function;
+  callback: (event: Event) => void;
   one: boolean;
   fired: boolean;
 }
@@ -67,14 +67,14 @@ export class EventHandlerUtil {
   private static addEvent(
     element: HTMLElement,
     name: string,
-    callback: Function,
+    callback: (event: Event) => void,
     one = false,
   ) {
     const handlerId = getUniqueIdWithPrefix('event');
     DataUtil.set(element, name, handlerId);
     const meta: EventMeta = {
       name: name,
-      callback: callback,
+      callback,
       one: one,
       fired: false,
     };
@@ -137,7 +137,7 @@ export class EventHandlerUtil {
   public static on = function (
     element: HTMLElement,
     name: string,
-    callBack: Function,
+    callBack: (event: Event) => void,
   ): void {
     EventHandlerUtil.addEvent(element, name, callBack, false);
   };
@@ -145,7 +145,7 @@ export class EventHandlerUtil {
   public static one(
     element: HTMLElement,
     name: string,
-    callBack: Function,
+    callBack: (event: Event) => void,
   ): void {
     EventHandlerUtil.addEvent(element, name, callBack, true);
   }

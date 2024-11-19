@@ -64,7 +64,6 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
   // Reset input on changing initial value
   useEffect(() => {
     changeImage(initialValue);
-    // eslint-disable-next-line
   }, [initialValue]);
 
   const isChanged = Boolean(
@@ -90,7 +89,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
         </div>
 
         {/* Pick image */}
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+
         <label
           className="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
           data-kt-image-input-action="change"
