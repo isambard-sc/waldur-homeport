@@ -5227,6 +5227,10 @@
     "description": "marketplace/offerings/update/components/ComponentLimitPeriodField.tsx",
     "message": "Limit period"
   },
+  "Limit usage": {
+    "description": "marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx",
+    "message": "Limit usage"
+  },
   "Limit": {
     "description": "marketplace/aggregate-limits/AggregateLimitDetailsDialog.tsx, marketplace/offerings/details/PlanUsageList.tsx, marketplace/offerings/details/policies/ComponentLimitsField.tsx, marketplace/orders/details/LimitsSection.tsx, project/utils.ts, reporting/plan-usage/PlanUsageList.tsx",
     "message": "Limit"

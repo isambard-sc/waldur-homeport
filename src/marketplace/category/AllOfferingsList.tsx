@@ -2,7 +2,9 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+import { translate } from '@waldur/i18n';
 import { useExtraToolbar, useToolbarActions } from '@waldur/navigation/context';
+import { useTitle } from '@waldur/navigation/title';
 
 import { PageBarFilters } from '../landing/filter/PageBarFilters';
 import {
@@ -18,7 +20,7 @@ export const AllOfferingsList = () => {
   const {
     params: { initialMode },
   } = useCurrentStateAndParams();
-
+  useTitle(translate('Offerings'));
   useMarketplacePublicTabs();
   const filters = useSelector(getMarketplaceFilters);
   useToolbarActions(<MarketplaceLandingFilter />);
