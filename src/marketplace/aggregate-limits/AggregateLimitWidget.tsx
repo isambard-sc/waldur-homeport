@@ -29,7 +29,11 @@ const AggregateLimitDetailsDialog = lazyComponent(() =>
 export const ComponentItem = ({ component }) => {
   return (
     <QuotaCell
-      usage={component.usage}
+      usage={
+        component.billing_type === 'limit'
+          ? component.limit_usage
+          : component.usage
+      }
       limit={component.limit}
       title={component.name}
       description={component.description}
