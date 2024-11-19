@@ -17,6 +17,7 @@ export const states: StateDeclaration[] = [
     data: {
       title: () => translate('Administration'),
       permissions: [isStaffOrSupport],
+      workspace: 'admin',
     },
   },
 

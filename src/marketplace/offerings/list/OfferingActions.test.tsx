@@ -13,6 +13,13 @@ vi.mock('@waldur/permissions/hasPermission', () => ({
 
 vi.mock('@uirouter/react', () => ({
   useRouter: vi.fn(),
+  useCurrentStateAndParams: () => ({
+    state: {
+      data: {
+        workspace: 'admin',
+      },
+    },
+  }),
 }));
 
 const renderOfferingActions = (props?) => {
