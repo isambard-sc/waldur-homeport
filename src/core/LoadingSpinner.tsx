@@ -5,6 +5,7 @@ export const LoadingSpinnerIcon = ({ className }: { className? }) => (
   <Spinner
     className={'animation-spin ' + (className || '')}
     data-testid="spinner"
+    role="status"
   />
 );
 

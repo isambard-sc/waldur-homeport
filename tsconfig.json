@@ -48,7 +48,6 @@
     "**/*.spec.tsx",
     "**/*.spec.ts",
     "**/*.fixture.tsx",
-    "./src/core/testUtils.ts",
     "./src/form/testUtils.tsx",
   ],
   "typeRoots": [
