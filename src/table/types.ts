@@ -63,6 +63,8 @@ export interface Column<RowType = any> {
   keys?: string[];
   optional?: boolean;
   filter?: string;
+  /** Enable it so that a filter icon appears on the row when hovering. By clicking on it, the filter defined here will be added. */
+  inlineFilter?: (row: RowType) => any;
   export?: string | boolean | ((row: RowType) => string | number);
   exportTitle?: string;
   exportKeys?: string[];

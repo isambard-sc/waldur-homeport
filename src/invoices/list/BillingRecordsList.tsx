@@ -13,7 +13,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 
 import { formatPeriod } from '../utils';
 
-import { InvoicesFilter } from './InvoicesFilter';
+import { getInvoiceStatusOptions, InvoicesFilter } from './InvoicesFilter';
 import { SendNotificationButton } from './SendNotificationButton';
 
 const RecordPeriodField = ({ row }) => formatPeriod(row);
@@ -69,6 +69,9 @@ export const BillingRecordsList: FunctionComponent = () => {
           title: translate('State'),
           render: ({ row }) => row.state,
           filter: 'state',
+          inlineFilter: (row) => [
+            getInvoiceStatusOptions().find((s) => s.value === row.state),
+          ],
           export: 'state',
         },
         {

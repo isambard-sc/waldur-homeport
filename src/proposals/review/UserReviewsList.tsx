@@ -6,7 +6,10 @@ import { createSelector } from 'reselect';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { ProposalReview } from '@waldur/proposals/types';
-import { formatReviewState } from '@waldur/proposals/utils';
+import {
+  formatReviewState,
+  getReviewStateOptions,
+} from '@waldur/proposals/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -84,6 +87,7 @@ export const UserReviewsList: FC = () => {
           title: translate('Call'),
           render: ({ row }) => <>{renderFieldOrDash(row.call_name)}</>,
           filter: 'call',
+          inlineFilter: (row) => ({ name: row.call_name, uuid: row.call_uuid }),
           keys: ['call_name'],
           id: 'call',
         },
@@ -104,6 +108,8 @@ export const UserReviewsList: FC = () => {
           title: translate('State'),
           render: ({ row }) => <>{formatReviewState(row.state)}</>,
           filter: 'state',
+          inlineFilter: (row) =>
+            getReviewStateOptions().filter((s) => s.value === row.state),
           keys: ['state'],
           id: 'state',
         },

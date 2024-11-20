@@ -75,6 +75,7 @@ export const UserProposalsList: FC = () => {
       render: ({ row }) => <>{renderFieldOrDash(row.call_name)}</>,
       keys: ['call_name'],
       filter: 'call',
+      inlineFilter: (row) => ({ name: row.call_name, uuid: row.call_uuid }),
       id: 'call',
     },
     {
@@ -89,6 +90,8 @@ export const UserProposalsList: FC = () => {
       keys: ['state'],
       orderField: 'state',
       filter: 'state',
+      inlineFilter: (row) =>
+        getProposalStateOptions().filter((s) => s.value === row.state),
       id: 'state',
     },
     {

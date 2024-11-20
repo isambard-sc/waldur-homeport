@@ -11,6 +11,7 @@ import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
+import { FilterContextProvider } from './FilterContextProvider';
 import { GridBody } from './GridBody';
 import { HiddenActionsMessage } from './HiddenActionsMessage';
 import { TableBody } from './TableBody';
@@ -127,7 +128,10 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
 
   render() {
     return (
-      <>
+      <FilterContextProvider
+        {...this.props}
+        toggleFilterMenu={this.toggleFilterMenu}
+      >
         {this.props.standalone && (
           <div className="d-flex justify-content-between gap-4 mb-6">
             <Stack direction="horizontal" gap={2}>
@@ -268,7 +272,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
             {this.props.footer}
           </Card.Body>
         </Card>
-      </>
+      </FilterContextProvider>
     );
   }
 

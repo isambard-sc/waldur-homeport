@@ -30,7 +30,7 @@ import { ExpandableResourceSummary } from './ExpandableResourceSummary';
 import { ResourceActionsButton } from './ResourceActionsButton';
 import { ResourceNameField } from './ResourceNameField';
 import { ResourceStateField } from './ResourceStateField';
-import { NON_TERMINATED_STATES } from './ResourceStateFilter';
+import { getStates, NON_TERMINATED_STATES } from './ResourceStateFilter';
 import { resourcesListRequiredFields } from './utils';
 
 interface OwnProps {
@@ -119,6 +119,10 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       title: translate('Offering'),
       render: ({ row }) => row.offering_name,
       filter: 'offering',
+      inlineFilter: (row) => ({
+        name: row.offering_name,
+        uuid: row.offering_uuid,
+      }),
       id: 'offering',
       keys: ['offering_name'],
       export: (row) => row.offering_name,
@@ -159,16 +163,21 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
     title: translate('Organization'),
     render: ({ row }) => <>{row.customer_name}</>,
     filter: 'organization',
+    inlineFilter: (row) => ({
+      name: row.customer_name,
+      uuid: row.customer_uuid,
+    }),
     id: 'organization',
-    keys: ['customer_name'],
+    keys: ['customer_name', 'customer_uuid'],
     export: (row) => row.customer_name,
   });
   columns.push({
     title: translate('Project'),
     render: ({ row }) => <>{row.project_name}</>,
     filter: 'project',
+    inlineFilter: (row) => ({ name: row.project_name, uuid: row.project_uuid }),
     id: 'project',
-    keys: ['project_name'],
+    keys: ['project_name', 'project_uuid'],
     export: (row) => row.project_name,
   });
   columns.push(
@@ -176,6 +185,7 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       title: translate('State'),
       render: ({ row }) => <ResourceStateField resource={row} outline pill />,
       filter: 'state',
+      inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       id: 'state',
       keys: ['state', 'backend_metadata'],
       export: (row) =>

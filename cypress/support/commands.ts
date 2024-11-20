@@ -1,7 +1,6 @@
+import { recurse } from 'cypress-recurse';
 import { Info } from 'luxon';
-import { recurse } from 'cypress-recurse'
 
-/* eslint-disable no-redeclare */
 // Must be declared global to be detected by typescript (allows import/export)
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -112,8 +111,8 @@ Cypress.Commands.add(
   (label, value, apply = true, type = false) => {
     cy.acceptCookies();
     cy.get('.card-table button.btn-toggle-filters').should('exist').click();
-    let filterType: 'select' | 'checkbox' = 'select'
-    cy.wrap(filterType).as('filterType')
+    let filterType: 'select' | 'checkbox' = 'select';
+    cy.wrap(filterType).as('filterType');
     cy.get('.card-table .table-filters-menu:not(.column-filter)').within(() => {
       cy.contains('.menu-link', label)
         .click()
@@ -123,40 +122,50 @@ Cypress.Commands.add(
           cy.get('.menu-sub .filter-field > *').then(($el) => {
             if ($el.hasClass('form-check')) {
               filterType = 'checkbox';
-              cy.wrap(filterType).as('filterType')
+              cy.wrap(filterType).as('filterType');
             }
           });
 
           cy.get('@filterType').then(() => {
             if (filterType === 'checkbox') {
-              cy.get(`.menu-sub .filter-field .form-check input`).click({ force: true });
+              cy.get(`.menu-sub .filter-field .form-check input`).click({
+                force: true,
+              });
             } else if (filterType === 'select') {
               if (type && value) {
-                cy.get(`.menu-sub .filter-field div[class$="-control"]`).click().type(value);
+                cy.get(`.menu-sub .filter-field div[class$="-control"]`)
+                  .click()
+                  .type(value);
               } else {
-                cy.get(`.menu-sub .filter-field div[class$="-control"]`).click();
+                cy.get(
+                  `.menu-sub .filter-field div[class$="-control"]`,
+                ).click();
               }
             }
-          })
+          });
         });
     });
-    
+
     cy.get('@filterType').then(() => {
       if (filterType === 'select') {
         if (value === null || value === undefined) {
           cy.selectTheFirstOptionOfDropdown();
         } else {
-          cy.get('*div[id^="react-select"]').contains(value).click({ force: true });
+          cy.get('*div[id^="react-select"]')
+            .contains(value)
+            .click({ force: true });
         }
       }
-    })
+    });
     if (apply) {
-      cy.get('.card-table .table-filters-menu:not(.column-filter)').within(() => {
-        cy.contains('.menu-link', label)
-          .parent()
-          .contains('.filter-footer button', 'Apply')
-          .click({ force: true });
-      });
+      cy.get('.card-table .table-filters-menu:not(.column-filter)').within(
+        () => {
+          cy.contains('.menu-link', label)
+            .parent()
+            .contains('.filter-footer button', 'Apply')
+            .click({ force: true });
+        },
+      );
       // Make sure the fetch fn is performed
       cy.get('[data-cy=loading-spinner]')
         .first()
@@ -189,16 +198,16 @@ Cypress.Commands.add('selectFlatpickrDate', (inputQueryPath, date) => {
       .should('be.visible')
       .within(() => {
         // Month
-        const monthName = Info.months('long', {locale: 'en-US'})[d.getMonth()];
+        const monthName = Info.months('long', { locale: 'en-US' })[
+          d.getMonth()
+        ];
         recurse(
-          () => cy.get('.cur-month').then(t => t.text().trim()),
+          () => cy.get('.cur-month').then((t) => t.text().trim()),
           (month) => month === monthName,
-          {delay:0, post: () => cy.get('.flatpickr-next-month').click()}
-        )
+          { delay: 0, post: () => cy.get('.flatpickr-next-month').click() },
+        );
         // Year
-        cy.get('input.cur-year')
-          .clear()
-          .type(d.getFullYear().toString());
+        cy.get('input.cur-year').clear().type(d.getFullYear().toString());
         // Day
         cy.get('.flatpickr-innerContainer .dayContainer')
           .contains('span.flatpickr-day', d.getDate().toString())

@@ -3959,6 +3959,10 @@
     "description": "marketplace/landing/MarketplaceLandingFilter.tsx, navigation/sidebar/resources-filter/FilterByOrgAndProjectDialog.tsx",
     "message": "Filter by organization/project"
   },
+  "Filter by": {
+    "description": "table/TableBody.tsx",
+    "message": "Filter by"
+  },
   "Filter name": {
     "description": "table/SaveFilterDialog.tsx",
     "message": "Filter name"

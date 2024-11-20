@@ -54,7 +54,11 @@ const PureResourceUsageFilter: FunctionComponent<ResourceUsageFilterProps> = (
     <TableFilterItem
       title={translate('Offering')}
       name="offering"
-      badgeValue={(value) => `${value.category_title} / ${value.name}`}
+      badgeValue={(value) =>
+        value.category_title
+          ? `${value.category_title} / ${value.name}`
+          : value.name
+      }
     >
       <OfferingAutocomplete
         offeringFilter={{ shared: true }}

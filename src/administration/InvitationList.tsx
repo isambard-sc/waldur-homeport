@@ -2,6 +2,7 @@ import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
+import { ENV } from '@waldur/configs/default';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -54,6 +55,10 @@ export const InvitationList: FunctionComponent = () => {
           title: translate('Scope type'),
           render: ({ row }) => formatRoleType(row.scope_type),
           filter: 'scope_type',
+          inlineFilter: (row) => ({
+            value: row.scope_type,
+            label: formatRoleType(row.scope_type),
+          }),
         },
         {
           title: translate('Scope'),
@@ -63,12 +68,17 @@ export const InvitationList: FunctionComponent = () => {
           title: translate('Role'),
           render: ({ row }) => <RoleField invitation={row} />,
           filter: 'role',
+          inlineFilter: (row) =>
+            ENV.roles.find((role) => role.name === row.role_name),
         },
         {
           title: translate('Status'),
           orderField: 'state',
           render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
+          inlineFilter: (row) => [
+            { value: row.state, label: formatInvitationState(row.state) },
+          ],
         },
         {
           title: translate('Created at'),

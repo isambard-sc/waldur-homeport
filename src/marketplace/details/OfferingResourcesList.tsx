@@ -17,7 +17,10 @@ import { useTable } from '@waldur/table/useTable';
 
 import { ProviderResourceActions } from '../resources/list/ProviderResourceActions';
 import { ResourceStateField } from '../resources/list/ResourceStateField';
-import { NON_TERMINATED_STATES } from '../resources/list/ResourceStateFilter';
+import {
+  getStates,
+  NON_TERMINATED_STATES,
+} from '../resources/list/ResourceStateFilter';
 
 import { OfferingResourcesFilter } from './OfferingResourcesFilter';
 
@@ -93,6 +96,7 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
       title: translate('State'),
       render: ({ row }) => <ResourceStateField resource={row} outline pill />,
       filter: 'state',
+      inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       export: 'state',
     },
   ];

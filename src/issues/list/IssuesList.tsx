@@ -16,7 +16,7 @@ import { useTable } from '@waldur/table/useTable';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { IssueCreateButton } from './IssueCreateButton';
-import { IssuesFilter } from './IssuesFilter';
+import { getIssueStatuses, IssuesFilter } from './IssuesFilter';
 
 interface OwnProps {
   hiddenColumns?: (
@@ -71,6 +71,8 @@ export const IssuesList: FC<OwnProps & Partial<TableProps>> = (props) => {
         render: StatusColumn,
         orderField: 'status',
         filter: 'status',
+        inlineFilter: (row) =>
+          getIssueStatuses().filter((op) => op.value === row.status),
         export: (row) => row.status || 'N/A',
         exportKeys: ['status'],
       },

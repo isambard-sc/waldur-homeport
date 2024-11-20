@@ -6,7 +6,10 @@ import { createSelector } from 'reselect';
 import { useDestroyFilterOnLeave } from '@waldur/core/filters';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
-import { getLabel } from '@waldur/marketplace/common/registry';
+import {
+  getLabel,
+  getOfferingTypes,
+} from '@waldur/marketplace/common/registry';
 import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
@@ -15,6 +18,7 @@ import { useTable } from '@waldur/table/useTable';
 import { useOfferingDropdownActions } from '../offerings/hooks';
 import { CreateOfferingButton } from '../offerings/list/CreateOfferingButton';
 import { OfferingActions } from '../offerings/list/OfferingActions';
+import { getStates } from '../offerings/list/OfferingStateFilter';
 import { OfferingStateField } from '../offerings/OfferingStateField';
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 import { ServiceProvider } from '../types';
@@ -81,6 +85,8 @@ const ProviderOfferingsComponent: FC<ProviderOfferingsComponentProps> = ({
           title: translate('Type'),
           render: ({ row }) => getLabel(row.type),
           filter: 'offering_type',
+          inlineFilter: (row) =>
+            getOfferingTypes().find((op) => op.value === row.type),
           id: 'type',
           keys: ['type'],
         },
@@ -101,6 +107,8 @@ const ProviderOfferingsComponent: FC<ProviderOfferingsComponentProps> = ({
           title: translate('State'),
           render: ({ row }) => <OfferingStateField offering={row} />,
           filter: 'state',
+          inlineFilter: (row) =>
+            getStates().filter((op) => op.value === row.state),
           id: 'state',
           keys: ['state'],
         },

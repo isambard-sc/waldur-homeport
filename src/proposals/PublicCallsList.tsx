@@ -16,7 +16,11 @@ import { CALL_FILTER_FORM_ID } from './constants';
 import { PublicCallApplyButton } from './details/PublicCallApplyButton';
 import { PublicCallExpandableRow } from './PublicCallExpandableRow';
 import { Call } from './types';
-import { formatCallState, getRoundsWithStatus } from './utils';
+import {
+  formatCallState,
+  getCallStateOptions,
+  getRoundsWithStatus,
+} from './utils';
 
 interface PublicCallsListProps {
   offering_uuid: string;
@@ -55,6 +59,8 @@ const CallColumns = [
     title: translate('State'),
     render: ({ row }) => <>{formatCallState(row.state)}</>,
     filter: 'state',
+    inlineFilter: (row) =>
+      getCallStateOptions().filter((s) => s.value === row.state),
   },
   {
     title: translate('Active round'),

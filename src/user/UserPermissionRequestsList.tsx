@@ -17,6 +17,7 @@ import {
 import { getUser } from '@waldur/workspace/selectors';
 
 import { UserPermissionRequestsListFilter } from './UserPermissionRequestsListFilter';
+import { getStates } from './UserPermissionRequestsStateFilter';
 
 const mapStateToProps = createSelector(
   getUser,
@@ -74,6 +75,7 @@ export const UserPermissionRequestsList = () => {
       title: translate('State'),
       render: PermissionRequestStateField,
       filter: 'state',
+      inlineFilter: (row) => getStates().filter((s) => s.value === row.state),
     },
   ];
   return (

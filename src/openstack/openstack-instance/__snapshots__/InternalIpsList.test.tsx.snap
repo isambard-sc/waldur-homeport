@@ -118,19 +118,29 @@ exports[`InternalIpsList > renders list 1`] = `
             </thead>
             <tbody>
               <tr>
-                <td>
+                <td
+                  class=""
+                >
                   192.168.42.14
                 </td>
-                <td>
+                <td
+                  class=""
+                >
                   fa:16:3e:93:f0:7d
                 </td>
-                <td>
+                <td
+                  class=""
+                >
                   theses-and-papers-on-mach-sub-net
                 </td>
-                <td>
+                <td
+                  class=""
+                >
                   192.168.42.0/24
                 </td>
-                <td>
+                <td
+                  class=""
+                >
                   <button
                     class="btn btn-outline btn-outline-default"
                     type="button"

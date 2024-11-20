@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
+import { ENV } from '@waldur/configs/default';
 import Avatar from '@waldur/core/Avatar';
 import { formatDate } from '@waldur/core/dateUtils';
 import { CUSTOMER_USERS_LIST_FILTER_FORM_ID } from '@waldur/customer/team/constants';
@@ -118,6 +119,8 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
           title: translate('Role in organization'),
           render: RoleField,
           filter: 'organization_role',
+          inlineFilter: (row) =>
+            ENV.roles.filter((role) => role.name === row.role_name),
           export: exportRoleField,
           id: 'role_name',
           keys: ['role_name'],
