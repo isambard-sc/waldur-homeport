@@ -14,7 +14,7 @@ import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { formatCallState } from '../utils';
+import { formatCallState, getCallStateOptions } from '../utils';
 
 import { CallCreateButton } from './CallCreateButton';
 import { CallEditButton } from './CallEditButton';
@@ -73,6 +73,8 @@ export const CallManagementPage: FunctionComponent = () => {
           orderField: 'state',
           render: ({ row }) => <>{formatCallState(row.state)}</>,
           filter: 'state',
+          inlineFilter: (row) =>
+            getCallStateOptions().filter((s) => s.value === row.state),
         },
       ]}
       verboseName={translate('Calls')}

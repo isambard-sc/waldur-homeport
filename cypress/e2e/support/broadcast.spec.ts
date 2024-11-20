@@ -3,9 +3,13 @@ describe('Broadcast', () => {
     cy.mockUser()
       .mockChecklists()
 
-      .intercept('GET', '/api/broadcast-messages/?page=1&page_size=10&field=uuid&field=author_full_name&field=subject&field=state&field=created&field=body&field=query&field=send_at', {
-        fixture: 'support/notifications.json',
-      })
+      .intercept(
+        'GET',
+        '/api/broadcast-messages/?page=1&page_size=10&field=uuid&field=author_full_name&field=subject&field=state&field=created&field=body&field=query&field=send_at',
+        {
+          fixture: 'support/notifications.json',
+        },
+      )
       .as('getNotifications')
       .intercept(
         'GET',

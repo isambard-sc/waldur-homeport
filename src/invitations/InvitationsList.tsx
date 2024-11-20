@@ -65,6 +65,9 @@ export const InvitationsList: FunctionComponent = () => {
           orderField: 'state',
           render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
+          inlineFilter: (row) => [
+            { value: row.state, label: formatInvitationState(row.state) },
+          ],
           export: (row) => row.state,
         },
         {

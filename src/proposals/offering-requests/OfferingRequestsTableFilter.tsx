@@ -25,10 +25,7 @@ const PureOfferingRequestsTableFilter: FunctionComponent<{}> = () => (
       name="call"
       badgeValue={(value) => value?.name}
     >
-      <CallAutocomplete
-        protectedCalls
-        reactSelectProps={REACT_SELECT_TABLE_FILTER}
-      />
+      <CallAutocomplete reactSelectProps={REACT_SELECT_TABLE_FILTER} />
     </TableFilterItem>
     <TableFilterItem title={translate('Status')} name="state">
       <Field
@@ -53,7 +50,6 @@ const PureOfferingRequestsTableFilter: FunctionComponent<{}> = () => (
     >
       <OfferingAutocomplete
         offeringFilter={{ shared: true }}
-        providerOfferings={false}
         reactSelectProps={REACT_SELECT_TABLE_FILTER}
       />
     </TableFilterItem>

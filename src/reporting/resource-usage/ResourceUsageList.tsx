@@ -38,18 +38,30 @@ export const ResourceUsageList: FC = () => {
       title: translate('Client organization'),
       render: ({ row }) => <>{row.customer_name}</>,
       filter: 'organization',
+      inlineFilter: (row) => ({
+        name: row.customer_name,
+        uuid: row.customer_uuid,
+      }),
       export: 'customer_name',
     },
     {
       title: translate('Client project'),
       render: ({ row }) => <>{row.project_name}</>,
       filter: 'project',
+      inlineFilter: (row) => ({
+        name: row.project_name,
+        uuid: row.project_uuid,
+      }),
       export: 'project_name',
     },
     {
       title: translate('Offering'),
       render: ({ row }) => <>{row.offering_name}</>,
       filter: 'offering',
+      inlineFilter: (row) => ({
+        name: row.offering_name,
+        uuid: row.offering_uuid,
+      }),
       export: 'offering_name',
     },
     {

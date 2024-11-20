@@ -23,6 +23,7 @@ import { ProjectResourcesAllFilter } from './ProjectResourcesAllFilter';
 import { ResourceActionsButton } from './ResourceActionsButton';
 import { ResourceNameField } from './ResourceNameField';
 import { ResourceStateField } from './ResourceStateField';
+import { getStates } from './ResourceStateFilter';
 
 interface FieldProps {
   row: Resource;
@@ -87,16 +88,24 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
           title: translate('Category'),
           render: ({ row }: FieldProps) => <>{row.category_title}</>,
           filter: 'category',
+          inlineFilter: (row) => ({
+            title: row.category_title,
+            uuid: row.category_uuid,
+          }),
           id: 'category',
-          keys: ['category_title'],
+          keys: ['category_title', 'category_uuid'],
           export: (row) => row.category_title,
         },
         {
           title: translate('Offering'),
           render: ({ row }: FieldProps) => <>{row.offering_name}</>,
           filter: 'offering',
+          inlineFilter: (row) => ({
+            name: row.offering_name,
+            uuid: row.offering_uuid,
+          }),
           id: 'offering',
-          keys: ['offering_name'],
+          keys: ['offering_name', 'offering_uuid'],
           export: (row) => row.offering_name,
         },
         {
@@ -112,6 +121,10 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
                 title: translate('Organization'),
                 render: ({ row }) => <>{row.customer_name}</>,
                 filter: 'organization',
+                inlineFilter: (row) => ({
+                  name: row.customer_name,
+                  uuid: row.customer_uuid,
+                }),
                 id: 'organization',
                 keys: ['customer_name'],
                 export: (row) => row.customer_name,
@@ -124,8 +137,12 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
                 title: translate('Project'),
                 render: ({ row }) => <>{row.project_name}</>,
                 filter: 'project',
+                inlineFilter: (row) => ({
+                  name: row.project_name,
+                  uuid: row.project_uuid,
+                }),
                 id: 'project',
-                keys: ['project_name'],
+                keys: ['project_name', 'project_uuid'],
                 export: (row) => row.project_name,
               },
             ]
@@ -159,6 +176,8 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
             <ResourceStateField resource={row} outline pill />
           ),
           filter: 'state',
+          inlineFilter: (row) =>
+            getStates().filter((op) => op.value === row.state),
           id: 'state',
           keys: ['state', 'backend_metadata'],
           export: (row) =>

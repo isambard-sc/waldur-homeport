@@ -16,7 +16,7 @@ import { Field, change, formValueSelector } from 'redux-form';
 import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 
-import { TableFilterContext } from './TableFilterContainer';
+import { TableFilterContext } from './FilterContextProvider';
 
 interface TableFilterItem {
   title: string;
@@ -254,8 +254,14 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   },
   ...props
 }) => {
-  const { setFilter, form, apply, columnFilter, selectedSavedFilter } =
-    React.useContext(TableFilterContext);
+  const {
+    setFilter,
+    form,
+    apply,
+    columnFilter,
+    selectedSavedFilter,
+    registerFilterComponent,
+  } = React.useContext(TableFilterContext);
 
   const _setFilter = useCallback(
     (value) => {
@@ -277,6 +283,14 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     },
     [props, setFilter],
   );
+
+  // Register the filter renderer to access it from outside (from table cells)
+  useEffect(() => {
+    registerFilterComponent({
+      name: props.name,
+      setFilter: _setFilter,
+    });
+  }, [props.name, _setFilter]);
 
   const dispatch = useDispatch();
   const removeValue = useCallback(

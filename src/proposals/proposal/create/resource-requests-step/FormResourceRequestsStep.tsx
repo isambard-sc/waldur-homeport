@@ -79,6 +79,10 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
             title: translate('Offering'),
             render: ({ row }) => <>{row.requested_offering.offering_name}</>,
             filter: 'offering',
+            inlineFilter: (row) => ({
+              offering_name: row.requested_offering.offering_name,
+              offering_uuid: row.requested_offering.offering_uuid,
+            }),
           },
           {
             title: translate('Provider'),

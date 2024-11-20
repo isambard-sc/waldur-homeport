@@ -25,12 +25,20 @@ export const PlanUsageList: FunctionComponent = () => {
       title: translate('Service provider'),
       render: ({ row }: PlanUsageRowProps) => <>{row.customer_provider_name}</>,
       filter: 'provider',
+      inlineFilter: (row) => ({
+        customer_name: row.customer_provider_name,
+        customer_uuid: row.customer_provider_uuid,
+      }),
       export: 'customer_provider_name',
     },
     {
       title: translate('Offering'),
       render: ({ row }: PlanUsageRowProps) => <>{row.offering_name}</>,
       filter: 'offering',
+      inlineFilter: (row) => ({
+        name: row.offering_name,
+        uuid: row.offering_uuid,
+      }),
       export: 'offering_name',
     },
     {

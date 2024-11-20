@@ -15,6 +15,7 @@ import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSend
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { InvitationsFilter } from '@waldur/invitations/InvitationsFilter';
 import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
+import { choices } from '@waldur/invitations/InvitationStateFilter';
 import { RoleField } from '@waldur/invitations/RoleField';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -58,6 +59,7 @@ const InvitationsListComponent: FunctionComponent = () => {
           orderField: 'state',
           render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
+          inlineFilter: (row) => choices.filter((s) => s.value === row.state),
         },
         {
           title: translate('Created at'),

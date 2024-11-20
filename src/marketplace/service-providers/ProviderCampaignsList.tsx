@@ -15,6 +15,7 @@ import { useTable } from '@waldur/table/useTable';
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 
 import { CampaignStateIndicator } from './CampaignStateIndicator';
+import { getCampaignStateOptions } from './ProviderCampaignStateFilter';
 
 const ProviderCampaignsListComponent: FunctionComponent<{ provider }> = ({
   provider,
@@ -66,6 +67,10 @@ const ProviderCampaignsListComponent: FunctionComponent<{ provider }> = ({
           title: translate('Status'),
           render: CampaignStateIndicator,
           filter: 'state',
+          inlineFilter: (row) =>
+            getCampaignStateOptions().filter(
+              (op) => op.value === (row.state ?? '').toLowerCase(),
+            ),
         },
         {
           title: translate('Start date'),

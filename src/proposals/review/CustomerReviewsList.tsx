@@ -8,7 +8,10 @@ import { translate } from '@waldur/i18n';
 import { EndingField } from '@waldur/proposals/EndingField';
 import { ReviewsTableFilter } from '@waldur/proposals/review/ReviewsTableFilter';
 import { ProposalReview } from '@waldur/proposals/types';
-import { formatReviewState } from '@waldur/proposals/utils';
+import {
+  formatReviewState,
+  getReviewStateOptions,
+} from '@waldur/proposals/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -94,6 +97,7 @@ export const CustomerReviewsList: FC<{}> = () => {
             />
           ),
           filter: 'call',
+          inlineFilter: (row) => ({ name: row.call_name, uuid: row.call_uuid }),
           keys: ['call_name'],
           id: 'call',
         },
@@ -114,6 +118,8 @@ export const CustomerReviewsList: FC<{}> = () => {
           title: translate('State'),
           render: ({ row }) => <>{formatReviewState(row.state)}</>,
           filter: 'state',
+          inlineFilter: (row) =>
+            getReviewStateOptions().filter((s) => s.value === row.state),
           keys: ['state'],
           id: 'state',
         },

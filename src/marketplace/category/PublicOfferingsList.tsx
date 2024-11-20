@@ -4,7 +4,10 @@ import { useSelector } from 'react-redux';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { getLabel } from '@waldur/marketplace/common/registry';
+import {
+  getLabel,
+  getOfferingTypes,
+} from '@waldur/marketplace/common/registry';
 import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
@@ -17,6 +20,7 @@ import { OfferingCard } from '../common/OfferingCard';
 import { OfferingLink } from '../links/OfferingLink';
 import { AdminOfferingsFilter } from '../offerings/admin/AdminOfferingsFilter';
 import { mapStateToFilter } from '../offerings/admin/AdminOfferingsList';
+import { getStates } from '../offerings/list/OfferingStateFilter';
 import { OfferingStateField } from '../offerings/OfferingStateField';
 import { isOfferingRestrictedToProject } from '../offerings/utils';
 import { Offering } from '../types';
@@ -94,6 +98,9 @@ export const PublicOfferingsList: FunctionComponent<{
       title: translate('Organization'),
       render: ({ row }) => renderFieldOrDash(row.customer_name),
       filter: showOrganization ? 'organization' : undefined,
+      inlineFilter: showOrganization
+        ? (row) => ({ name: row.customer_name, uuid: row.customer_uuid })
+        : undefined,
       id: 'organization',
       keys: ['customer_name'],
     },
@@ -101,6 +108,8 @@ export const PublicOfferingsList: FunctionComponent<{
       title: translate('Type'),
       render: ({ row }) => <>{getLabel(row.type)}</>,
       filter: 'offering_type',
+      inlineFilter: (row) =>
+        getOfferingTypes().find((op) => op.value === row.type),
       id: 'offering_type',
       keys: ['type'],
     },
@@ -108,6 +117,7 @@ export const PublicOfferingsList: FunctionComponent<{
       title: translate('State'),
       render: ({ row }) => <OfferingStateField offering={row} />,
       filter: 'state',
+      inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       id: 'state',
       keys: ['state'],
     },
@@ -119,8 +129,12 @@ export const PublicOfferingsList: FunctionComponent<{
       title: translate('Category'),
       render: ({ row }) => row.category_title,
       filter: 'category',
+      inlineFilter: (row) => ({
+        uuid: row.category_uuid,
+        title: row.category_title,
+      }),
       id: 'category',
-      keys: ['category_title'],
+      keys: ['category_title', 'category_uuid'],
     });
   }
 

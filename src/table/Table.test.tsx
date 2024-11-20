@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Table from './Table';
@@ -6,6 +8,12 @@ import Table from './Table';
 vi.mock('@waldur/table/useTableLoader', () => ({
   useTableLoader: () => false,
 }));
+
+const TableWrapper = (component) => {
+  const store = createStore(() => ({}));
+
+  return <Provider store={store}>{component}</Provider>;
+};
 
 describe('Table', () => {
   const fetch = vi.fn();
@@ -28,17 +36,21 @@ describe('Table', () => {
 
   describe('special states', () => {
     it('renders message if list is empty', () => {
-      render(<Table {...props} />);
+      render(TableWrapper(<Table {...props} />));
       expect(screen.getByText('There are no items yet.')).toBeInTheDocument();
     });
 
     it('renders custom message if list is empty and verboseName is set', () => {
-      render(<Table {...props} verboseName="projects" />);
+      render(TableWrapper(<Table {...props} verboseName="projects" />));
       expect(screen.getByText('No projects found')).toBeInTheDocument();
     });
 
     it('renders custom message if list is empty and verboseName is set and query is set', () => {
-      render(<Table {...props} verboseName="projects" query="my projects" />);
+      render(
+        TableWrapper(
+          <Table {...props} verboseName="projects" query="my projects" />,
+        ),
+      );
       expect(
         screen.getByText(
           'Your search "my projects" did not match any projects.',
@@ -50,37 +62,39 @@ describe('Table', () => {
   describe('data rendering', () => {
     beforeEach(() => {
       render(
-        <Table
-          fetch={fetch}
-          resetSelection={vi.fn()}
-          setFilterPosition={vi.fn()}
-          initColumnPositions={vi.fn()}
-          loading={false}
-          error={null}
-          pagination={{
-            resultCount: 1,
-            currentPage: 1,
-            pageSize: 10,
-          }}
-          columns={[
-            {
-              title: 'Resource type',
-              render: ({ row }) => row.type,
-            },
-            {
-              title: 'Resource name',
-              render: ({ row }) => row.name,
-            },
-          ]}
-          rows={[
-            {
-              type: 'OpenStack Instance',
-              name: 'Web server',
-            },
-          ]}
-          activeColumns={{}}
-          columnPositions={[]}
-        />,
+        TableWrapper(
+          <Table
+            fetch={fetch}
+            resetSelection={vi.fn()}
+            setFilterPosition={vi.fn()}
+            initColumnPositions={vi.fn()}
+            loading={false}
+            error={null}
+            pagination={{
+              resultCount: 1,
+              currentPage: 1,
+              pageSize: 10,
+            }}
+            columns={[
+              {
+                title: 'Resource type',
+                render: ({ row }) => row.type,
+              },
+              {
+                title: 'Resource name',
+                render: ({ row }) => row.name,
+              },
+            ]}
+            rows={[
+              {
+                type: 'OpenStack Instance',
+                name: 'Web server',
+              },
+            ]}
+            activeColumns={{}}
+            columnPositions={[]}
+          />,
+        ),
       );
     });
 

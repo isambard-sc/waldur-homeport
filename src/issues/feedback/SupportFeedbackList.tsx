@@ -17,6 +17,7 @@ import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
 import { SupportFeedbackListFilter } from './SupportFeedbackListFilter';
+import { feedbackOptions } from './utils';
 
 export const SupportFeedbackList: FC = () => {
   const filter = useSelector(mapStateToProps);
@@ -44,6 +45,8 @@ export const SupportFeedbackList: FC = () => {
       render: ({ row }) => row.evaluation,
       orderField: 'evaluation',
       filter: 'evaluation',
+      inlineFilter: (row) =>
+        feedbackOptions().find((op) => op.value === row.evaluation),
       export: 'evaluation',
     },
     {

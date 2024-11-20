@@ -13,7 +13,10 @@ export const CallOfferingFilter: React.FC<{ options: CallOffering[] }> = ({
     component={(fieldProps) => (
       <Select
         placeholder={translate('Select offering...')}
-        options={options}
+        options={options.map((op) => ({
+          offering_name: op.offering_name,
+          offering_uuid: op.offering_uuid,
+        }))}
         value={fieldProps.input.value}
         onChange={(value) => fieldProps.input.onChange(value)}
         isClearable={true}

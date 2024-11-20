@@ -13,6 +13,7 @@ import { getProject } from '@waldur/workspace/selectors';
 
 import { ProjectUpdateRequestExpandable } from './ProjectUpdateRequestExpandable';
 import { ProjectUpdateRequestListFilter } from './ProjectUpdateRequestListFilter';
+import { getStates } from './RequestStateFilter';
 
 const mapStateToFilter = createSelector(
   getProject,
@@ -43,6 +44,8 @@ export const ProjectUpdateRequestsList: FunctionComponent = () => {
           title: translate('State'),
           render: ({ row }) => row.state,
           filter: 'state',
+          inlineFilter: (row) =>
+            getStates().filter((s) => s.value === row.state),
         },
         {
           title: translate('Created'),

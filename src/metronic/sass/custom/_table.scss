@@ -91,6 +91,38 @@
         }
       }
     }
+
+    // Inline filter
+    > td.has-filter {
+      position: relative;
+
+      button.inline-filter {
+        position: absolute;
+        right: 0.75rem;
+        transition: $transition-fade;
+        opacity: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: opacity 0.15s linear;
+        background: rgba($light, 0.75);
+        padding: 0.2rem 0.5rem;
+        border-radius: 5px;
+
+        svg {
+          color: $grey-400;
+        }
+        &:hover {
+          background: $light;
+
+          svg {
+            color: $grey-500;
+          }
+        }
+      }
+    }
+    &:hover > td.has-filter button.inline-filter {
+      opacity: 1;
+    }
   }
 }
 
