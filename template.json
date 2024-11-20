@@ -6544,7 +6544,7 @@
     "message": "Offerings images"
   },
   "Offerings": {
-    "description": "administration/dashboard/AdminStatistics.tsx, broadcasts/BroadcastExpandableRow.tsx, broadcasts/BroadcastForm.tsx, broadcasts/RecipientsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/category/utils.ts, marketplace/landing/OfferingsGroup.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/service-providers/CampaignForm.tsx, marketplace/service-providers/CampaignUpdateForm.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace/utils.ts, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx, proposals/details/CallOfferingsCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/offerings/CallOfferingsSection.tsx",
+    "description": "administration/dashboard/AdminStatistics.tsx, broadcasts/BroadcastExpandableRow.tsx, broadcasts/BroadcastForm.tsx, broadcasts/RecipientsList.tsx, marketplace/category/AllOfferingsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/category/utils.ts, marketplace/landing/OfferingsGroup.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/service-providers/CampaignForm.tsx, marketplace/service-providers/CampaignUpdateForm.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace/utils.ts, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx, proposals/details/CallOfferingsCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/offerings/CallOfferingsSection.tsx",
     "message": "Offerings"
   },
   "Ok": {
@@ -6872,7 +6872,7 @@
     "message": "Organization removal"
   },
   "Organization role": {
-    "description": "customer/team/CustomerUsersListFilter.tsx",
+    "description": "customer/team/CustomerUsersListFilter.tsx, user/support/UserFilter.tsx",
     "message": "Organization role"
   },
   "Organization roles": {
@@ -7800,7 +7800,7 @@
     "message": "Project removal"
   },
   "Project role": {
-    "description": "customer/team/CustomerUsersListFilter.tsx",
+    "description": "customer/team/CustomerUsersListFilter.tsx, user/support/UserFilter.tsx",
     "message": "Project role"
   },
   "Project roles": {

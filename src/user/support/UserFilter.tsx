@@ -3,11 +3,8 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { Field, InjectedFormProps, reduxForm } from 'redux-form';
 
-import {
-  getInitialValues,
-  syncFiltersToURL,
-  useReinitializeFilterFromUrl,
-} from '@waldur/core/filters';
+import { OrganizationRoleSelectField } from '@waldur/customer/team/OrganizationRoleSelectField';
+import { ProjectRoleSelectField } from '@waldur/customer/team/ProjectRoleSelectField';
 import { SelectField } from '@waldur/form';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
@@ -24,9 +21,7 @@ interface UserFilterProps extends InjectedFormProps {
   nativeNameVisible: boolean;
 }
 
-const PureUserFilter: FunctionComponent<UserFilterProps> = ({ form }) => {
-  useReinitializeFilterFromUrl(form);
-
+const PureUserFilter: FunctionComponent<UserFilterProps> = () => {
   return (
     <>
       <TableFilterItem
@@ -37,6 +32,20 @@ const PureUserFilter: FunctionComponent<UserFilterProps> = ({ form }) => {
         <OrganizationAutocomplete
           reactSelectProps={REACT_SELECT_TABLE_FILTER}
         />
+      </TableFilterItem>
+      <TableFilterItem
+        title={translate('Project role')}
+        name="project_role"
+        getValueLabel={(value) => value.description || value.name}
+      >
+        <ProjectRoleSelectField />
+      </TableFilterItem>
+      <TableFilterItem
+        title={translate('Organization role')}
+        name="organization_role"
+        getValueLabel={(value) => value.description || value.name}
+      >
+        <OrganizationRoleSelectField />
       </TableFilterItem>
       <TableFilterItem name="role" title={translate('Role')}>
         <Field
@@ -90,9 +99,7 @@ const mapStateToProps = () => ({
 const enhance = compose(
   reduxForm({
     form: 'userFilter',
-    onChange: syncFiltersToURL,
     destroyOnUnmount: false,
-    initialValues: getInitialValues(),
     enableReinitialize: true,
   }),
   connect(mapStateToProps),
