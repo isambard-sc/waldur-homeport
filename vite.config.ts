@@ -11,10 +11,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '@waldur': path.resolve(__dirname, './src/'),
-      '~sass': path.resolve(__dirname, './src/sass/'),
-      '~': path.resolve(__dirname),
-      '~flatpickr': path.resolve('node_modules/flatpickr'),
-      '~bootstrap': path.resolve('node_modules/bootstrap'),
       'react-windowed-select': path.resolve(
         'node_modules/react-windowed-select/dist/main.js',
       ),
