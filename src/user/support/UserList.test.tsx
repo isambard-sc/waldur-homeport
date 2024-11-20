@@ -51,7 +51,7 @@ describe('formatRoleFilter', () => {
       is_staff: true,
       is_support: true,
     };
-    expect(formatRoleFilter(filterMock)).toEqual(expected);
+    expect(formatRoleFilter(filterMock.role)).toEqual(expected);
   });
 });
 
