@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 // WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_permissions_description.py
 // Do not edit it manually. All manual changes would be overridden.
 import { translate } from '@waldur/i18n';
@@ -135,31 +134,11 @@ export const PermissionOptions = [
     ],
   },
   {
-    label: translate('Resource'),
+    label: translate('Provider actions for resources'),
     options: [
-      {
-        label: translate('Terminate resource'),
-        value: 'RESOURCE.TERMINATE',
-      },
-      {
-        label: translate('List importable resources'),
-        value: 'RESOURCE.LIST_IMPORTABLE',
-      },
-      {
-        label: translate('Set resource end date'),
-        value: 'RESOURCE.SET_END_DATE',
-      },
       {
         label: translate('Set resource usage'),
         value: 'RESOURCE.SET_USAGE',
-      },
-      {
-        label: translate('Switch resource plan'),
-        value: 'RESOURCE.SET_PLAN',
-      },
-      {
-        label: translate('Update resource limits'),
-        value: 'RESOURCE.SET_LIMITS',
       },
       {
         label: translate('Set resource backend id'),
@@ -170,20 +149,16 @@ export const PermissionOptions = [
         value: 'RESOURCE.SUBMIT_REPORT',
       },
       {
-        label: translate('List resource users'),
-        value: 'RESOURCE.LIST_USERS',
+        label: translate('Set resource end date'),
+        value: 'RESOURCE.SET_END_DATE',
       },
       {
-        label: translate('Complete resource downscaling'),
-        value: 'RESOURCE.COMPLETE_DOWNSCALING',
+        label: translate('Set resource state'),
+        value: 'RESOURCE.SET_STATE',
       },
       {
-        label: translate('Accept booking request'),
-        value: 'RESOURCE.ACCEPT_BOOKING_REQUEST',
-      },
-      {
-        label: translate('Reject booking request'),
-        value: 'RESOURCE.REJECT_BOOKING_REQUEST',
+        label: translate('Set resource backend metadata'),
+        value: 'RESOURCE.SET_BACKEND_METADATA',
       },
       {
         label: translate('Create robot account'),
@@ -196,6 +171,51 @@ export const PermissionOptions = [
       {
         label: translate('Delete robot account'),
         value: 'RESOURCE.DELETE_ROBOT_ACCOUNT',
+      },
+      {
+        label: translate('Manage resource users'),
+        value: 'RESOURCE.MANAGE_USERS',
+      },
+    ],
+  },
+  {
+    label: translate('Customer actions for resources'),
+    options: [
+      {
+        label: translate('Set resource end date'),
+        value: 'RESOURCE.SET_END_DATE',
+      },
+      {
+        label: translate('Terminate resource'),
+        value: 'RESOURCE.TERMINATE',
+      },
+      {
+        label: translate('List importable resources'),
+        value: 'RESOURCE.LIST_IMPORTABLE',
+      },
+      {
+        label: translate('Switch resource plan'),
+        value: 'RESOURCE.SET_PLAN',
+      },
+      {
+        label: translate('Update resource limits'),
+        value: 'RESOURCE.SET_LIMITS',
+      },
+      {
+        label: translate('Accept booking request'),
+        value: 'RESOURCE.ACCEPT_BOOKING_REQUEST',
+      },
+      {
+        label: translate('Reject booking request'),
+        value: 'RESOURCE.REJECT_BOOKING_REQUEST',
+      },
+      {
+        label: translate('Update resource options'),
+        value: 'RESOURCE.UPDATE_OPTIONS',
+      },
+      {
+        label: translate('Set resource consumption limitation'),
+        value: 'RESOURCE.CONSUMPTION_LIMITATION',
       },
     ],
   },
