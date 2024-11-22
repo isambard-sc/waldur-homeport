@@ -14,7 +14,7 @@ import {
   setCurrentCustomer,
   setCurrentProject,
 } from '@waldur/workspace/actions';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+import { getProject, getUser } from '@waldur/workspace/selectors';
 import { Project } from '@waldur/workspace/types';
 
 export const useProjectDelete = ({
@@ -28,14 +28,13 @@ export const useProjectDelete = ({
   const dispatch = useDispatch();
 
   const user = useSelector(getUser);
-  const currentCustomer = useSelector(getCustomer);
   const currentProject = useSelector(getProject);
 
-  const isCurrentProject = project.uuid === currentProject.uuid;
+  const isCurrentProject = project.uuid === currentProject?.uuid;
   const canDelete =
     hasPermission(user, {
       permission: PermissionEnum.DELETE_PROJECT,
-      customerId: currentCustomer.uuid,
+      customerId: project.customer_uuid,
     }) ||
     hasPermission(user, {
       permission: PermissionEnum.DELETE_PROJECT,
@@ -64,7 +63,7 @@ export const useProjectDelete = ({
       if (refetch) {
         await refetch();
       }
-      const newCustomer = await getCustomerApi(currentCustomer.uuid);
+      const newCustomer = await getCustomerApi(project.customer_uuid);
       dispatch(setCurrentCustomer(newCustomer));
       if (isCurrentProject) {
         router.stateService.go('organization.projects', {

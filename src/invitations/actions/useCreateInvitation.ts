@@ -48,8 +48,9 @@ export const useCreateInvitation = (
         }
         const permission = PermissionMap[roleType];
         return (
-          checkScope(user, 'customer', customer.uuid, permission) ||
-          checkScope(user, roleType, scope.uuid, permission)
+          (customer &&
+            checkScope(user, 'customer', customer.uuid, permission)) ||
+          (scope && checkScope(user, roleType, scope.uuid, permission))
         );
       }),
     [context, user, customer, project],
