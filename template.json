@@ -2015,10 +2015,6 @@
     "description": "invoices/details/InvoiceItemCompensationDialog.tsx",
     "message": "Compensation has been created."
   },
-  "Complete resource downscaling": {
-    "description": "administration/roles/PermissionOptions.tsx",
-    "message": "Complete resource downscaling"
-  },
   "Complete your profile.": {
     "description": "user/CompleteYourProfileBanner.tsx",
     "message": "Complete your profile."
@@ -2626,6 +2622,10 @@
   "Custom scripts": {
     "description": "marketplace-script/marketplace.ts",
     "message": "Custom scripts"
+  },
+  "Customer actions for resources": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Customer actions for resources"
   },
   "Customer satisfaction field name": {
     "description": "SettingsDescription.ts",
@@ -5295,10 +5295,6 @@
     "description": "navigation/header/favorite-pages/FavoritePageService.ts",
     "message": "List of resources"
   },
-  "List resource users": {
-    "description": "administration/roles/PermissionOptions.tsx",
-    "message": "List resource users"
-  },
   "Load more": {
     "description": "core/InfiniteList.tsx, marketplace/deploy/steps/FormCloudStep.tsx",
     "message": "Load more"
@@ -5430,6 +5426,10 @@
   "Manage profile": {
     "description": "user/support/IdentityProviderIndicator.tsx",
     "message": "Manage profile"
+  },
+  "Manage resource users": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Manage resource users"
   },
   "Manage security groups": {
     "description": "openstack/openstack-instance/ManageSecurityGroupsButton.tsx",
@@ -8019,6 +8019,10 @@
     "description": "marketplace/orders/details/OrderMetadataTab.tsx",
     "message": "Provider UUID"
   },
+  "Provider actions for resources": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Provider actions for resources"
+  },
   "Provider actions": {
     "description": "marketplace/resources/actions/ProviderActionsGroup.tsx, resource/actions/ResourceActionComponent.tsx",
     "message": "Provider actions"
@@ -8908,7 +8912,7 @@
     "message": "Resource {type} process"
   },
   "Resource": {
-    "description": "administration/roles/PermissionOptions.tsx, customer/credits/CreditUsageDialog.tsx, events/ExpandableEventDetailsTable.tsx, issues/create/IssueHeader.tsx, marketplace/orders/list/OrdersListExpandableRow.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx",
+    "description": "customer/credits/CreditUsageDialog.tsx, events/ExpandableEventDetailsTable.tsx, issues/create/IssueHeader.tsx, marketplace/orders/list/OrdersListExpandableRow.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx",
     "message": "Resource"
   },
   "Resources import has failed.": {
@@ -9951,9 +9955,21 @@
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "Set resource backend id"
   },
+  "Set resource backend metadata": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Set resource backend metadata"
+  },
+  "Set resource consumption limitation": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Set resource consumption limitation"
+  },
   "Set resource end date": {
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "Set resource end date"
+  },
+  "Set resource state": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Set resource state"
   },
   "Set resource usage": {
     "description": "administration/roles/PermissionOptions.tsx",
@@ -12818,6 +12834,10 @@
   "Update resource limits": {
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "Update resource limits"
+  },
+  "Update resource options": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Update resource options"
   },
   "Update robot account": {
     "description": "administration/roles/PermissionOptions.tsx",

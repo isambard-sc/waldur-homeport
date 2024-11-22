@@ -77,6 +77,9 @@ export const ProjectsList = () => {
       ),
       keys: ['customer_uuid', 'customer_name'],
       filter: 'organization',
+      inlineFilter: (row) => [
+        { name: row.customer_name, uuid: row.customer_uuid },
+      ],
       id: 'organization',
       export: 'customer_name',
     },
