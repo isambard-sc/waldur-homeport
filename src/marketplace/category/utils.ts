@@ -85,10 +85,12 @@ export const getGroupedCategories = (
       if (existGroup) {
         existGroup.categories.push(category);
         existGroup.offering_count += category.offering_count;
+        existGroup.resource_count += category.resource_count;
       } else {
         Object.assign(categoryGroup, { categories: [category] });
         Object.assign(categoryGroup, {
           offering_count: category.offering_count,
+          resource_count: category.resource_count,
         });
         acc.push(categoryGroup);
       }

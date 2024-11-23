@@ -207,6 +207,7 @@ export interface CategoryGroup {
   /** generated on frontend side */
   categories?: Category[];
   offering_count: number;
+  resource_count?: number;
 }
 
 export interface Category {
@@ -220,6 +221,8 @@ export interface Category {
   components?: BaseComponent[];
   description?: string;
   group?: string;
+  /** generated on frontend side */
+  resource_count?: number;
 }
 
 export interface OfferingsListType {

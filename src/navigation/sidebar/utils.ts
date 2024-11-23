@@ -9,7 +9,7 @@ export const useOfferingCategories = (anonymous = false) => {
     () =>
       getCategories({
         params: {
-          field: ['uuid', 'title'],
+          field: ['uuid', 'title', 'group'],
           has_offerings: true,
         },
         ...(anonymous ? ANONYMOUS_CONFIG : {}),
