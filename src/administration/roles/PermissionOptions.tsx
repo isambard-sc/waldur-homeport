@@ -134,7 +134,7 @@ export const PermissionOptions = [
     ],
   },
   {
-    label: translate('Provider actions for resources'),
+    label: translate('Provider actions'),
     options: [
       {
         label: translate('Set resource usage'),
@@ -175,6 +175,62 @@ export const PermissionOptions = [
       {
         label: translate('Manage resource users'),
         value: 'RESOURCE.MANAGE_USERS',
+      },
+      {
+        label: translate('Get API secret code'),
+        value: 'SERVICE_PROVIDER.GET_API_SECRET_CODE',
+      },
+      {
+        label: translate('Generate API secret code'),
+        value: 'SERVICE_PROVIDER.GENERATE_API_SECRET_CODE',
+      },
+      {
+        label: translate('List service provider customers'),
+        value: 'SERVICE_PROVIDER.LIST_CUSTOMERS',
+      },
+      {
+        label: translate('List service provider customer projects'),
+        value: 'SERVICE_PROVIDER.LIST_CUSTOMER_PROJECTS',
+      },
+      {
+        label: translate('List service provider projects'),
+        value: 'SERVICE_PROVIDER.LIST_PROJECTS',
+      },
+      {
+        label: translate('List service provider project permissions'),
+        value: 'SERVICE_PROVIDER.LIST_PROJECT_PERMISSIONS',
+      },
+      {
+        label: translate('List service provider keys'),
+        value: 'SERVICE_PROVIDER.LIST_KEYS',
+      },
+      {
+        label: translate('List service provider users'),
+        value: 'SERVICE_PROVIDER.LIST_USERS',
+      },
+      {
+        label: translate('List service provider user customers'),
+        value: 'SERVICE_PROVIDER.LIST_USER_CUSTOMERS',
+      },
+      {
+        label: translate('Set offerings username'),
+        value: 'SERVICE_PROVIDER.SET_OFFERINGS_USERNAME',
+      },
+      {
+        label: translate('Get service provider statistics'),
+        value: 'SERVICE_PROVIDER.GET_STATISTICS',
+      },
+      {
+        label: translate('Get service provider revenue'),
+        value: 'SERVICE_PROVIDER.GET_REVENUE',
+      },
+      {
+        label: translate('Get service provider robot account customers'),
+        value: 'SERVICE_PROVIDER.GET_ROBOT_ACCOUNT_CUSTOMERS',
+      },
+      {
+        label: translate('Get service provider robot account projects'),
+        value: 'SERVICE_PROVIDER.GET_ROBOT_ACCOUNT_PROJECTS',
       },
     ],
   },
