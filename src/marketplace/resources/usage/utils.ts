@@ -18,6 +18,7 @@ const formatChart = (
   color: string,
   labels: string[],
   usages: RowData[],
+  serieName: string = undefined,
 ) => ({
   toolbox: {
     feature: {
@@ -25,6 +26,16 @@ const formatChart = (
         title: translate('Save'),
         name: `components-usage-chart-${DateTime.now().toISODate()}`,
         show: true,
+      },
+      dataView: {
+        title: translate('View data'),
+        show: true,
+        lang: [
+          translate('Data view'),
+          translate('Turn off'),
+          translate('Refresh'),
+        ],
+        readOnly: true,
       },
     },
   },
@@ -79,6 +90,7 @@ const formatChart = (
   series: [
     {
       type: 'bar',
+      name: serieName,
       data: usages,
       color,
     },
@@ -93,7 +105,7 @@ const getMonthsPeriods = (months): DateTime[] => {
   return periods;
 };
 
-const getUsages = (
+export const getFormattedUsages = (
   periods: DateTime[],
   usages: ComponentUsage[],
   userUsages: ComponentUserUsage[] = [],
@@ -125,13 +137,7 @@ const getUsages = (
   return result;
 };
 
-export const getEChartOptions = (
-  component: OfferingComponent,
-  usages: ComponentUsage[],
-  userUsages: ComponentUserUsage[],
-  months: number,
-  color: string,
-) => {
+export const getUsagePeriods = (usages: ComponentUsage[], months: number) => {
   let numberOfMonths = months;
   if (!numberOfMonths) {
     // Calculate number of months from usages, if months param is not given
@@ -146,12 +152,29 @@ export const getEChartOptions = (
   }
   const periods = getMonthsPeriods(numberOfMonths);
   const labels = periods.map((date) => `${date.month} - ${date.year}`);
-  const formattedUsages = getUsages(
+  return { periods, labels };
+};
+
+export const getEChartOptions = (
+  component: OfferingComponent,
+  usages: ComponentUsage[],
+  userUsages: ComponentUserUsage[],
+  months: number,
+  color: string,
+) => {
+  const { labels, periods } = getUsagePeriods(usages, months);
+  const formattedUsages = getFormattedUsages(
     periods,
     usages.filter((usage) => usage.type === component.type),
     userUsages?.filter((usage) => usage.component_type === component.type),
   );
-  return formatChart(component.measured_unit, color, labels, formattedUsages);
+  return formatChart(
+    component.measured_unit,
+    color,
+    labels,
+    formattedUsages,
+    component.name,
+  );
 };
 
 export const getUsageHistoryPeriodOptions = (startDate = null) => {

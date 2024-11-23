@@ -4,11 +4,17 @@ import React, { useEffect, useRef, useState } from 'react';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { useTheme } from '@waldur/theme/useTheme';
 
+import { EChartActions } from './EChartActions';
+
 interface ChartProps {
   width?: string;
   height?: string;
   options: any;
   className?: string;
+  exportPdf?: boolean;
+  exportCsv?: boolean;
+  exportExcel?: boolean;
+  exportTitle?: string;
 }
 
 export const EChart: React.FC<ChartProps> = ({
@@ -16,6 +22,7 @@ export const EChart: React.FC<ChartProps> = ({
   height = '100%',
   options,
   className,
+  ...props
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<any>(null);
@@ -83,6 +90,7 @@ export const EChart: React.FC<ChartProps> = ({
       style={style}
     >
       {loading && <LoadingSpinner />}
+      <EChartActions chartInstance={chartRef.current} {...props} />
       <div
         className={classNames({ hidden: loading })}
         style={style}
