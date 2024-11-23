@@ -37,7 +37,7 @@ export const MenuItem: FC<MenuItemProps> = (props) => {
             </span>
           )}
           <span className="menu-title">{props.title}</span>
-          {props.badge && (
+          {Boolean(props.badge) && (
             <span className="menu-badge">
               <Badge bg="" pill>
                 {props.badge}
