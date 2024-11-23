@@ -11,12 +11,14 @@ import { ComponentUsage, ComponentUserUsage } from './types';
 import { getBillingTypeLabel } from './utils';
 
 interface ResourceUsageTabsProps {
+  resource?: { name };
   components: OfferingComponent[];
   usages: ComponentUsage[];
   userUsages?: ComponentUserUsage[];
   months?: number;
   colors: string[];
   displayMode?: 'chart' | 'table';
+  hasExport?: boolean;
 }
 
 export const ResourceUsageTabs: FunctionComponent<ResourceUsageTabsProps> = (
@@ -53,11 +55,13 @@ export const ResourceUsageTabs: FunctionComponent<ResourceUsageTabsProps> = (
           ) : (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <ResourceUsageChart
+                resource={props.resource}
                 offeringComponent={component}
                 usages={props.usages}
                 userUsages={props.userUsages}
                 months={props.months}
                 chartColor={props.colors[index]}
+                hasExport={props.hasExport}
               />
             </div>
           )}

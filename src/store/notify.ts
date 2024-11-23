@@ -24,6 +24,16 @@ export const showError = (message) =>
     dismissible: true,
   });
 
+export const showInfo = (message) =>
+  notify({
+    status: 'info',
+    message,
+    position: 'top-right',
+    dismissAfter: 7000,
+    showDismissButton: true,
+    dismissible: true,
+  });
+
 export const showRedirectMessage = (title, message) =>
   notify({
     title,

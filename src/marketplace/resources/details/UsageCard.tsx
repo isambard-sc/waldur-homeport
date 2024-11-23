@@ -2,19 +2,24 @@ import { ChartBar, Table } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Button, Card, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { useAsync } from 'react-use';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { getResourceTeam } from '@waldur/marketplace/common/api';
 
+import { getComponentsAndUsages } from '../usage/api';
 import { ResourceUsageTabsContainer } from '../usage/ResourceUsageTabsContainer';
+import { UsageExportDropdown } from '../usage/UsageExportDropdown';
 import { getUsageHistoryPeriodOptions } from '../usage/utils';
 
 export const UsageCard = ({ resource, offering }) => {
   const [mode, setMode] = useState<'chart' | 'table'>('chart');
   const resourceRef = useMemo(
     () => ({
+      name: resource.name,
       offering_uuid: resource.offering_uuid,
       resource_uuid: resource.uuid,
     }),
@@ -40,6 +45,17 @@ export const UsageCard = ({ resource, offering }) => {
     ['ResourceTeam', resource.uuid],
     () => getResourceTeam(resource.uuid),
     { staleTime: 3 * 60 * 1000 },
+  );
+
+  const { loading, error, value } = useAsync(
+    () =>
+      getComponentsAndUsages(
+        resourceRef.resource_uuid,
+        offering,
+        period,
+        resourceRef.offering_uuid,
+      ),
+    [resourceRef, period],
   );
 
   return resource.is_usage_based || resource.is_limit_based ? (
@@ -85,6 +101,11 @@ export const UsageCard = ({ resource, offering }) => {
               ))}
             </ToggleButtonGroup>
           )}
+          <UsageExportDropdown
+            resource={resourceRef}
+            data={value}
+            months={period}
+          />
           <Button
             variant="outline-default"
             className="btn-outline btn-icon"
@@ -99,14 +120,28 @@ export const UsageCard = ({ resource, offering }) => {
         </div>
       </Card.Header>
       <Card.Body>
-        <ResourceUsageTabsContainer
-          resource={resourceRef}
-          offering={offering}
-          months={period}
-          hideHeader={true}
-          displayMode={mode}
-          users={users}
-        />
+        {loading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <>
+            {translate('Unable to load data')}
+            <br />
+            {error.message}
+          </>
+        ) : !value.components.length ? (
+          <h3>
+            {translate('Offering does not have any usage-based components.')}
+          </h3>
+        ) : (
+          <ResourceUsageTabsContainer
+            resource={resourceRef}
+            data={value}
+            months={period}
+            hideHeader={true}
+            displayMode={mode}
+            users={users}
+          />
+        )}
       </Card.Body>
     </Card>
   ) : null;

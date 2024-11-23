@@ -1611,6 +1611,10 @@
     "description": "rancher/cluster/hpas/utils.ts, rancher/node/RancherNodeSummary.tsx",
     "message": "CPU"
   },
+  "CSV": {
+    "description": "marketplace/resources/usage/UsageExportDropdown.tsx",
+    "message": "CSV"
+  },
   "Calendar": {
     "description": "marketplace/offerings/details/GoogleCalendarLink.tsx",
     "message": "Calendar"
@@ -1830,6 +1834,10 @@
   "Charset": {
     "description": "azure/sql/AzureSQLDatabaseSummary.tsx",
     "message": "Charset"
+  },
+  "Chart is empty": {
+    "description": "core/EChartActions.tsx, marketplace/resources/usage/UsageExportDropdown.tsx",
+    "message": "Chart is empty"
   },
   "Check name": {
     "description": "navigation/BackendHealthStatusDialog.tsx",
@@ -2683,6 +2691,10 @@
     "description": "rancher/cluster/create/FormDataStorageStep.tsx, rancher/cluster/create/steps.ts",
     "message": "Data storage"
   },
+  "Data view": {
+    "description": "marketplace/resources/usage/utils.ts",
+    "message": "Data view"
+  },
   "Data volume #{index}": {
     "description": "rancher/cluster/create/DataVolumePanel.tsx",
     "message": "Data volume #{index}"
@@ -2728,7 +2740,7 @@
     "message": "Date of reporting"
   },
   "Date": {
-    "description": "customer/payments/PaymentCreateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, customer/payments/PaymentsList.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedbackListFilter.tsx, marketplace/resources/usage/ResourceUsageTable.tsx, marketplace/resources/usage/utils.ts",
+    "description": "customer/payments/PaymentCreateDialog.tsx, customer/payments/PaymentUpdateDialog.tsx, customer/payments/PaymentsList.tsx, invoices/list/MarkAsPaidDialog.tsx, issues/feedback/SupportFeedbackListFilter.tsx, marketplace/resources/usage/ResourceUsageTable.tsx, marketplace/resources/usage/UsageExportDropdown.tsx, marketplace/resources/usage/utils.ts",
     "message": "Date"
   },
   "Days": {
@@ -3787,6 +3799,10 @@
     "description": "marketplace/resources/report/SubmitReportDialog.tsx",
     "message": "Example: [{\"header\": \"Database instance info\", \"body\": \"data\"}]"
   },
+  "Excel": {
+    "description": "marketplace/resources/usage/UsageExportDropdown.tsx",
+    "message": "Excel"
+  },
   "Execute": {
     "description": "openstack/openstack-tenant/actions/ExecuteMigrationAction.tsx",
     "message": "Execute"
@@ -3834,6 +3850,10 @@
   "Explore {deployment} service catalog": {
     "description": "i18n/translate.tsx",
     "message": "Explore {deployment} service catalog"
+  },
+  "Export all": {
+    "description": "marketplace/resources/usage/UsageExportDropdown.tsx",
+    "message": "Export all"
   },
   "Export as": {
     "description": "table/ExportDialog.tsx",
@@ -6404,7 +6424,7 @@
     "message": "Offering details"
   },
   "Offering does not have any usage-based components.": {
-    "description": "marketplace/resources/usage/ResourceCreateUsageDialog.tsx, marketplace/resources/usage/ResourceUsageTabsContainer.tsx",
+    "description": "marketplace/resources/details/UsageCard.tsx, marketplace/resources/usage/ResourceCreateUsageDialog.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx",
     "message": "Offering does not have any usage-based components."
   },
   "Offering doesn't have components.": {
@@ -6958,6 +6978,10 @@
   "Owner": {
     "description": "project/manage/ProjectGeneral.tsx",
     "message": "Owner"
+  },
+  "PDF": {
+    "description": "marketplace/resources/usage/UsageExportDropdown.tsx",
+    "message": "PDF"
   },
   "PID": {
     "description": "marketplace/referral/ReferralsList.tsx",
@@ -8292,7 +8316,7 @@
     "message": "Referrals for {name}"
   },
   "Refresh": {
-    "description": "marketplace/common/RefreshButton.tsx, navigation/BackendHealthStatusDialog.tsx",
+    "description": "marketplace/common/RefreshButton.tsx, marketplace/resources/usage/utils.ts, navigation/BackendHealthStatusDialog.tsx",
     "message": "Refresh"
   },
   "Regenerate secret API code": {
@@ -11391,6 +11415,10 @@
     "description": "user/UserPopover.tsx",
     "message": "Try again"
   },
+  "Turn off": {
+    "description": "marketplace/resources/usage/utils.ts",
+    "message": "Turn off"
+  },
   "Type in name of offering or provider": {
     "description": "marketplace/landing/OfferingsSearchBox.tsx",
     "message": "Type in name of offering or provider"
@@ -11920,7 +11948,7 @@
     "message": "Unable to load customer support satisfaction overall rating."
   },
   "Unable to load data": {
-    "description": "administration/SystemInfoPage.tsx, invoices/list/OverviewLastMonths.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/expandable/OfferingUsageChart.tsx, marketplace/resources/usage/ResourceUsageTabsContainer.tsx, marketplace/service-providers/dashboard/ProviderWidgets.tsx",
+    "description": "administration/SystemInfoPage.tsx, invoices/list/OverviewLastMonths.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/expandable/OfferingUsageChart.tsx, marketplace/resources/details/UsageCard.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/dashboard/ProviderWidgets.tsx",
     "message": "Unable to load data"
   },
   "Unable to load data.": {
@@ -12940,7 +12968,7 @@
     "message": "Usage based"
   },
   "Usage history": {
-    "description": "marketplace/resources/details/UsageCard.tsx",
+    "description": "marketplace/resources/details/UsageCard.tsx, marketplace/resources/usage/ResourceUsageChart.tsx, marketplace/resources/usage/UsageExportDropdown.tsx",
     "message": "Usage history"
   },
   "Usage policies": {
@@ -13406,6 +13434,10 @@
   "View call": {
     "description": "proposals/CallCard.tsx",
     "message": "View call"
+  },
+  "View data": {
+    "description": "marketplace/resources/usage/utils.ts",
+    "message": "View data"
   },
   "View detailed information about a user, including its permissions and contact details": {
     "description": "user/support/UserDetailsDialog.tsx",

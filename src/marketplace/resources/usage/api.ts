@@ -68,7 +68,7 @@ export const getComponentsAndUsages = async (
   offering_uuid: string,
 ) => {
   if (!resource_uuid) {
-    return { components: null, usages: null };
+    return { components: null, usages: null, userUsages: null };
   }
 
   let components;
