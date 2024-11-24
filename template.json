@@ -4227,6 +4227,10 @@
     "description": "marketplace/offerings/OfferingEditUIView.tsx, marketplace/offerings/update/overview/OverviewSection.tsx, project/ProjectManageContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/general/CallGeneralSection.tsx",
     "message": "General"
   },
+  "Generate API secret code": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Generate API secret code"
+  },
   "Generate Kubeconfig file": {
     "description": "rancher/cluster/actions/KubeconfigFileAction.tsx",
     "message": "Generate Kubeconfig file"
@@ -4235,9 +4239,29 @@
     "description": "rancher/template/PasswordField.tsx",
     "message": "Generate password"
   },
+  "Get API secret code": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Get API secret code"
+  },
   "Get help": {
     "description": "marketplace/offerings/OfferingPublicUIView.tsx, marketplace/offerings/details/PublicOfferingGetHelp.tsx",
     "message": "Get help"
+  },
+  "Get service provider revenue": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Get service provider revenue"
+  },
+  "Get service provider robot account customers": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Get service provider robot account customers"
+  },
+  "Get service provider robot account projects": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Get service provider robot account projects"
+  },
+  "Get service provider statistics": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Get service provider statistics"
   },
   "Getting started instructions": {
     "description": "marketplace/offerings/update/overview/EditGettingStartedDialog.tsx, marketplace/offerings/update/overview/OverviewSection.tsx",
@@ -5314,6 +5338,34 @@
   "List of resources": {
     "description": "navigation/header/favorite-pages/FavoritePageService.ts",
     "message": "List of resources"
+  },
+  "List service provider customer projects": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider customer projects"
+  },
+  "List service provider customers": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider customers"
+  },
+  "List service provider keys": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider keys"
+  },
+  "List service provider project permissions": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider project permissions"
+  },
+  "List service provider projects": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider projects"
+  },
+  "List service provider user customers": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider user customers"
+  },
+  "List service provider users": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List service provider users"
   },
   "Load more": {
     "description": "core/InfiniteList.tsx, marketplace/deploy/steps/FormCloudStep.tsx",
@@ -8043,12 +8095,8 @@
     "description": "marketplace/orders/details/OrderMetadataTab.tsx",
     "message": "Provider UUID"
   },
-  "Provider actions for resources": {
-    "description": "administration/roles/PermissionOptions.tsx",
-    "message": "Provider actions for resources"
-  },
   "Provider actions": {
-    "description": "marketplace/resources/actions/ProviderActionsGroup.tsx, resource/actions/ResourceActionComponent.tsx",
+    "description": "administration/roles/PermissionOptions.tsx, marketplace/resources/actions/ProviderActionsGroup.tsx, resource/actions/ResourceActionComponent.tsx",
     "message": "Provider actions"
   },
   "Provider details": {
@@ -9974,6 +10022,10 @@
   "Set location": {
     "description": "map/SetLocationDialog.tsx",
     "message": "Set location"
+  },
+  "Set offerings username": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "Set offerings username"
   },
   "Set resource backend id": {
     "description": "administration/roles/PermissionOptions.tsx",

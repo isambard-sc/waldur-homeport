@@ -63,7 +63,7 @@ export const ProjectCreditFormDialog = connect(
       ) : error ? (
         <LoadingErred loadData={refetch} />
       ) : (
-        organizationCredit?.value ?? 0
+        (organizationCredit?.value ?? 0)
       ),
     };
 
