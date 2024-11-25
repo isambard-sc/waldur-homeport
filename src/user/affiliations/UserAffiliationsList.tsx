@@ -1,9 +1,10 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { formatRoleType } from '@waldur/permissions/utils';
+import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -18,16 +19,12 @@ interface UserAffiliationsListProps {
 export const UserAffiliationsList: FunctionComponent<
   UserAffiliationsListProps
 > = ({ user, hasActionBar = true }) => {
+  const filter = useMemo(() => ({ user: user.uuid }), [user]);
   const props = useTable({
     table: 'UserAffiliationsList',
-    fetchData: () =>
-      Promise.resolve({
-        rows: user.permissions.sort((a, b) =>
-          a.scope_type.localeCompare(b.scope_type),
-        ),
-        resultCount: user.permissions.length,
-      }),
+    fetchData: createFetcher('user-permissions'),
     queryField: 'name',
+    filter,
   });
 
   const columns = [

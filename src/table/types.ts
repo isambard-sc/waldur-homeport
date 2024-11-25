@@ -35,7 +35,7 @@ export type Fetcher = <RowType = any>(
 
 export interface TableOptionsType<RowType = any> {
   table: string;
-  fetchData: any;
+  fetchData: (request: TableRequest) => any;
   onFetch?: (rows: RowType[], totalCount: number, firstFetch: boolean) => void;
   onApplyFilter?: (filters: FilterItem[]) => void;
   staleTime?: number;
