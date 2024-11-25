@@ -112,6 +112,10 @@ export const PermissionOptions = [
     label: translate('Order'),
     options: [
       {
+        label: translate('List orders'),
+        value: 'ORDER.LIST',
+      },
+      {
         label: translate('Approve order'),
         value: 'ORDER.APPROVE',
       },
@@ -238,6 +242,10 @@ export const PermissionOptions = [
     label: translate('Customer actions for resources'),
     options: [
       {
+        label: translate('List resources'),
+        value: 'RESOURCE.LIST',
+      },
+      {
         label: translate('Set resource end date'),
         value: 'RESOURCE.SET_END_DATE',
       },
@@ -319,6 +327,10 @@ export const PermissionOptions = [
   {
     label: translate('Project'),
     options: [
+      {
+        label: translate('List projects'),
+        value: 'PROJECT.LIST',
+      },
       {
         label: translate('Create project'),
         value: 'PROJECT.CREATE',
