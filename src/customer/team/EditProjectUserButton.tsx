@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 import { NestedCustomerPermission, NestedProjectPermission } from './types';
 
@@ -38,10 +38,10 @@ export const EditProjectUserButton: React.FC<EditProjectUserButtonProps> = ({
       }),
     );
   return (
-    <ActionButton
-      action={callback}
+    <ActionItem
       title={translate('Edit')}
-      iconNode={<PencilSimple />}
+      action={callback}
+      iconNode={<PencilSimple weight="bold" />}
     />
   );
 };

@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionButton } from '@waldur/table/ActionButton';
 
 import { NestedCustomerPermission } from './types';
@@ -18,11 +19,13 @@ const AddProjectUserDialog = lazyComponent(() =>
 interface AddProjectUserButtonProps {
   customer: NestedCustomerPermission;
   refetch;
+  asDropdownItem?: boolean;
 }
 
 export const AddProjectUserButton: React.FC<AddProjectUserButtonProps> = ({
   customer,
   refetch,
+  asDropdownItem,
 }) => {
   const dispatch = useDispatch();
   const callback = () =>
@@ -34,7 +37,13 @@ export const AddProjectUserButton: React.FC<AddProjectUserButtonProps> = ({
         },
       }),
     );
-  return (
+  return asDropdownItem ? (
+    <ActionItem
+      title={translate('Add project role')}
+      action={callback}
+      iconNode={<PlusCircle weight="bold" />}
+    />
+  ) : (
     <ActionButton
       action={callback}
       title={translate('Add')}

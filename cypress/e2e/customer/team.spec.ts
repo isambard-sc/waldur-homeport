@@ -52,19 +52,30 @@ describe('Team', () => {
   });
 
   it('Allows to view permission details', () => {
-    cy.get('.row-actions button').contains('Details').click({ force: true });
+    cy.get('.row-actions')
+      .first()
+      .within(() => {
+        cy.get('button').click({ force: true });
+        cy.get('.dropdown-menu .dropdown-item')
+          .contains('Details')
+          .click({ force: true });
+      });
     cy.get('.modal-title').contains('User details');
     cy.get('.modal-content').get('table').should('be.visible');
     cy.wait('@getUserDetails');
   });
 
   it('Allows to remove team member', () => {
-    cy.get('.row-actions button')
-      .contains('Remove')
-      .click({ force: true })
-      .get('button')
-      .contains('Yes')
-      .click();
+    cy.get('.row-actions')
+      .first()
+      .within(() => {
+        cy.get('button').click({ force: true });
+        cy.get('.dropdown-menu .dropdown-item')
+          .contains('Remove')
+          .click({ force: true });
+      });
+
+    cy.get('.modal button').contains('Yes').click();
 
     // Notification should be shown
     cy.get("[data-testid='notification']")
@@ -73,20 +84,27 @@ describe('Team', () => {
   });
 
   it('Allows to edit permission', () => {
-    cy.get('.row-actions button').contains('Edit').click({ force: true });
+    cy.get('.row-actions')
+      .first()
+      .within(() => {
+        cy.get('button').click({ force: true });
+        cy.get('.dropdown-menu .dropdown-item')
+          .contains('Edit')
+          .click({ force: true });
+      });
     cy.get('.modal-title')
       .contains('Edit organization member')
       .get('.modal-content')
 
       // Open Role dropdown
-      .get('label')
+      .get('.modal label')
       .contains('Role')
       .next()
-      .get('[class*="-control"]')
+      .get('.modal [class*="-control"]')
       .first()
       .click(0, 0, { force: true })
 
-      .get('button')
+      .get('.modal button')
       .contains('Save')
       .click()
 

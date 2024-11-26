@@ -118,6 +118,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
         {
           title: translate('Role in organization'),
           render: RoleField,
+          className: 'w-25',
           filter: 'organization_role',
           inlineFilter: (row) =>
             ENV.roles.filter((role) => role.name === row.role_name),
@@ -128,6 +129,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
         {
           title: translate('Role expiration'),
           render: ({ row }) => renderRoleExpirationDate(row),
+          className: 'w-45px',
           export: (row) => renderRoleExpirationDate(row),
           id: 'expiration_time',
           keys: ['expiration_time'],
@@ -142,6 +144,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
       expandableRow={({ row }) => (
         <CustomerUsersListExpandableRow row={row} refetch={props.fetch} />
       )}
+      expandableRowClassName="p-0 ps-12"
       tableActions={<UserAddButton refetch={props.fetch} />}
       hasOptionalColumns
     />
