@@ -375,7 +375,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
             TR(row, rowIndex)
           )}
           {expandableRow && toggled[getId(row, rowIndex)] && (
-            <tr className={expandableRowClassName}>
+            <tr>
               <td
                 colSpan={
                   columns.length +
@@ -383,6 +383,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
                   (rowActions ? 1 : 0) +
                   (enableMultiSelect || fieldType ? 1 : 0)
                 }
+                className={expandableRowClassName}
               >
                 {React.createElement(expandableRow, { row })}
               </td>

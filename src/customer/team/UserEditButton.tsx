@@ -1,11 +1,13 @@
+import { PencilSimple } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { NestedCustomerPermission } from './types';
@@ -45,5 +47,11 @@ export const UserEditButton: React.FC<UserEditButtonProps> = ({
   ) {
     return null;
   }
-  return <EditButton onClick={callback} size="sm" />;
+  return (
+    <ActionItem
+      title={translate('Edit')}
+      action={callback}
+      iconNode={<PencilSimple weight="bold" />}
+    />
+  );
 };

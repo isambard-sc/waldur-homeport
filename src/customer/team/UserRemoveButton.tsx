@@ -7,8 +7,8 @@ import { waitForConfirmation } from '@waldur/modal/actions';
 import { deleteCustomerUser, deleteProjectUser } from '@waldur/permissions/api';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { NestedCustomerPermission } from './types';
@@ -72,11 +72,12 @@ export const UserRemoveButton: React.FC<UserRemoveButtonProps> = ({
     }
   };
   return (
-    <RowActionButton
-      action={callback}
+    <ActionItem
+      className="text-danger border-top"
+      iconColor="danger"
       title={translate('Remove')}
-      iconNode={<Trash />}
-      size="sm"
+      action={callback}
+      iconNode={<Trash weight="bold" />}
     />
   );
 };

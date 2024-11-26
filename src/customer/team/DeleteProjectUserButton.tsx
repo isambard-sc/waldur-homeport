@@ -5,8 +5,8 @@ import { useDispatch } from 'react-redux';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { deleteProjectUser } from '@waldur/permissions/api';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { ActionButton } from '@waldur/table/ActionButton';
 
 import { NestedCustomerPermission, NestedProjectPermission } from './types';
 
@@ -49,10 +49,12 @@ export const DeleteProjectUserButton: React.FC<
     }
   };
   return (
-    <ActionButton
-      action={callback}
+    <ActionItem
+      className="text-danger border-top"
+      iconColor="danger"
       title={translate('Remove')}
-      iconNode={<Trash />}
+      action={callback}
+      iconNode={<Trash weight="bold" />}
     />
   );
 };
