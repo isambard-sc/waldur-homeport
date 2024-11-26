@@ -5343,6 +5343,18 @@
     "description": "navigation/header/favorite-pages/FavoritePageService.ts",
     "message": "List of resources"
   },
+  "List orders": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List orders"
+  },
+  "List projects": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List projects"
+  },
+  "List resources": {
+    "description": "administration/roles/PermissionOptions.tsx",
+    "message": "List resources"
+  },
   "List service provider customer projects": {
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "List service provider customer projects"
