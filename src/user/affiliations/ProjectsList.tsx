@@ -7,6 +7,7 @@ import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { PROJECTS_LIST } from '@waldur/project/constants';
 import { GlobalProjectCreateButton } from '@waldur/project/create/GlobalProjectCreateButton';
@@ -57,11 +58,28 @@ export const ProjectsList = () => {
     filter,
     mandatoryFields,
   });
+
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources();
+
   const columns: Column[] = [
     {
       title: translate('Name'),
       orderField: 'name',
-      render: ProjectLink,
+      render: ({ row }) => (
+        <ProjectLink
+          row={row}
+          onClick={() =>
+            syncResourceFilters({
+              organization: {
+                name: row.customer_name,
+                uuid: row.customer_uuid,
+              },
+              project: row,
+            })
+          }
+        />
+      ),
       copyField: (row) => row.name,
       keys: ['name', 'is_industry'],
       id: 'name',
@@ -73,6 +91,15 @@ export const ProjectsList = () => {
       render: ({ row }) => (
         <OrganizationNameField
           row={{ uuid: row.customer_uuid, name: row.customer_name }}
+          onClick={() =>
+            syncResourceFilters({
+              organization: {
+                uuid: row.customer_uuid,
+                name: row.customer_name,
+              },
+              project: null,
+            })
+          }
         />
       ),
       keys: ['customer_uuid', 'customer_name'],
