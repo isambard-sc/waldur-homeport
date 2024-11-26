@@ -9,6 +9,7 @@ import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -54,11 +55,21 @@ export const OrganizationsList: FunctionComponent = () => {
     filter,
   });
 
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources();
+
   const columns = [
     {
       title: translate('Organization'),
       orderField: 'name',
-      render: OrganizationNameField,
+      render: ({ row }) => (
+        <OrganizationNameField
+          row={row}
+          onClick={() =>
+            syncResourceFilters({ organization: row, project: null })
+          }
+        />
+      ),
       keys: ['name'],
       id: 'organization',
     },
