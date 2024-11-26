@@ -287,6 +287,10 @@ export const PermissionOptions = [
     label: translate('Team members'),
     options: [
       {
+        label: translate('List invitations'),
+        value: 'INVITATION.LIST',
+      },
+      {
         label: translate('Create project permission'),
         value: 'PROJECT.CREATE_PERMISSION',
       },
