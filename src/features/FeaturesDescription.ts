@@ -17,6 +17,10 @@ export const FeaturesDescription: FeatureSection[] = [
         key: 'show_domain',
         description: translate('Allows to hide domain field in organization detail.'),
       },
+      {
+        key: 'show_permission_reviews',
+        description: translate('Allows to show permission reviews tab and popups.'),
+      },
     ],
   },
   {

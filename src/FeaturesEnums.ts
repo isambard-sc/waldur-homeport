@@ -4,6 +4,7 @@
 export enum CustomerFeatures {
   payments_for_staff_only = 'customer.payments_for_staff_only',
   show_domain = 'customer.show_domain',
+  show_permission_reviews = 'customer.show_permission_reviews',
 }
 
 export enum InvitationsFeatures {
