@@ -214,6 +214,7 @@ export const states: StateDeclaration[] = [
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Reviews'),
+      feature: CustomerFeatures.show_permission_reviews,
     },
   },
 
