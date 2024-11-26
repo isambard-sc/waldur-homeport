@@ -1,6 +1,8 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { CustomerFeatures } from '@waldur/FeaturesEnums';
 import { openModalDialog } from '@waldur/modal/actions';
 import { SET_CURRENT_CUSTOMER } from '@waldur/workspace/constants';
 import { checkIsOwner, getUser } from '@waldur/workspace/selectors';
@@ -14,6 +16,9 @@ const PendingReviewDialog = lazyComponent(() =>
 );
 
 function* checkPendingReview(action) {
+  if (!isFeatureVisible(CustomerFeatures.show_permission_reviews)) {
+    return;
+  }
   const user = yield select(getUser);
   const { customer } = action.payload;
   // Skip review if user is not customer owner
