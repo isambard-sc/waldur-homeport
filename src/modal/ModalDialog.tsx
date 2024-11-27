@@ -11,6 +11,7 @@ export interface ModalDialogProps {
   iconColor?: string;
   footer?: ReactNode;
   closeButton?: boolean;
+  className?: string;
   bodyClassName?: string;
   headerClassName?: string;
   footerClassName?: string;
@@ -27,13 +28,14 @@ export const ModalDialog: FC<ModalDialogProps> = ({
   iconColor,
   children,
   footer,
+  className,
   bodyClassName,
   headerClassName,
   footerClassName,
   headerLess,
   actions,
 }) => (
-  <div>
+  <div className={className}>
     {!headerLess && (
       <Modal.Header
         closeButton={closeButton}

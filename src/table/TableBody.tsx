@@ -165,6 +165,7 @@ const TableCells = ({
                 className={classNames(
                   column.className,
                   column.inlineFilter && 'has-filter',
+                  column.ellipsis && 'ellipsis',
                 )}
                 onClick={
                   column.disabledClick ? (e) => e.stopPropagation() : undefined

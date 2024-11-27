@@ -2,6 +2,11 @@
 
 /* TABLE */
 .table {
+  th,
+  td {
+    height: 44px;
+  }
+
   thead > tr {
     background-color: if(isDarkMode(), $primary-50, $gray-50);
 
@@ -53,6 +58,12 @@
     &.expanded,
     &.expanded + tr {
       background-color: if(isDarkMode(), $primary-50, $gray-50);
+    }
+    &.expanded + tr {
+      > td {
+        padding-top: 16px;
+        padding-bottom: 16px;
+      }
     }
   }
   thead > tr > th.header-actions {
@@ -120,6 +131,17 @@
         }
       }
     }
+
+    > td.ellipsis {
+      max-width: 300px;
+
+      > * {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow-x: hidden;
+      }
+    }
+
     &:hover > td.has-filter button.inline-filter {
       opacity: 1;
     }
@@ -169,10 +191,6 @@
   &.grid-table .table-container {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
-  }
-
-  .card-header {
-    border-bottom-style: dashed;
   }
 
   .table-filter {

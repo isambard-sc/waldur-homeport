@@ -39,7 +39,7 @@
 
   tfoot,
   tbody {
-    tr:last-child {
+    > tr:last-child {
       border-bottom: 0 !important;
 
       th,

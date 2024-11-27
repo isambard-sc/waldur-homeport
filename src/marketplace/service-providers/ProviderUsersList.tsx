@@ -22,7 +22,9 @@ const UserNameColumn = ({ row }) => (
       label={renderFieldOrDash(row.full_name)}
       className="fw-bold"
     />
-    {row.organization ? <p className="text-muted">{row.organization}</p> : null}
+    {row.organization ? (
+      <p className="text-muted mb-0">{row.organization}</p>
+    ) : null}
   </>
 );
 
@@ -45,14 +47,17 @@ const ProviderUsersListComponent = ({ provider }) => {
         {
           title: translate('User'),
           render: UserNameColumn,
+          ellipsis: true,
         },
         {
           title: translate('Contact'),
           render: CustomerContactColumn,
+          ellipsis: true,
         },
         {
           title: translate('Affiliations'),
           render: ProjectsCountColumn,
+          ellipsis: true,
         },
       ]}
       rowActions={UserDetailsButton}
