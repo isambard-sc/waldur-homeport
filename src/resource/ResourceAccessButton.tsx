@@ -1,6 +1,6 @@
-import { CaretDown, Copy } from '@phosphor-icons/react';
+import { ArrowSquareOut, CaretDown, Copy } from '@phosphor-icons/react';
 import { FC, useCallback, useMemo } from 'react';
-import { Button, OverlayTrigger, Popover, Table } from 'react-bootstrap';
+import { Button, Dropdown } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -65,63 +65,57 @@ export const ResourceAccessButton: FC<ResourceAccessButtonProps> = ({
     return null;
   }
   return (
-    <OverlayTrigger
-      trigger="click"
-      placement="bottom-end"
-      overlay={
-        <Popover className="w-350px">
-          <Table bordered>
-            <tbody>
-              {endpoints.map((endpoint, index) => (
-                <tr key={index} style={{ borderBottom: '1px solid #e5e5e5' }}>
-                  <td>
-                    <a
-                      href={
-                        isSshFormat(endpoint.url) && resource.username
-                          ? extendURLWithUsername(endpoint.url)
-                          : endpoint.url
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {endpoint.name}
-                    </a>
-                  </td>
-                  <td className="col-sm-1">
-                    <Tip
-                      id="resource-endpoint-tooltip"
-                      label={
-                        isSshFormat(endpoint.url) && resource.username
-                          ? extendURLWithUsername(endpoint.url)
-                          : endpoint.url
-                      }
-                    >
-                      <Button
-                        variant="link"
-                        className="p-0"
-                        onClick={() => copyText(endpoint.url)}
-                      >
-                        <Copy />
-                      </Button>
-                    </Tip>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Popover>
-      }
-      rootClose={true}
-    >
-      <Button
-        variant="outline-dark"
-        className="d-flex btn-outline btn-active-secondary border-gray-400"
+    <Dropdown placement="bottom-end">
+      <Dropdown.Toggle
+        variant="outline btn-outline-default"
+        className="no-arrow btn-icon-right"
       >
-        <div className="me-2">{translate('Access resource')}</div>
-        <div className="svg-icon svg-icon-2">
-          <CaretDown />
-        </div>
-      </Button>
-    </OverlayTrigger>
+        {translate('Access resource')}
+        <span className="svg-icon svg-icon-2 rotate-180">
+          <CaretDown weight="bold" />
+        </span>
+      </Dropdown.Toggle>
+      <Dropdown.Menu flip>
+        {endpoints.map((endpoint, index) => (
+          <Dropdown.Item
+            key={index}
+            eventKey={endpoint.url}
+            href={endpoint.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="d-flex justify-content-between text-anchor text-primary px-5 py-3"
+          >
+            <span className="d-flex flex-center me-6">
+              <span className="svg-icon svg-icon-2 svg-icon-primary">
+                <ArrowSquareOut weight="bold" />
+              </span>
+              {endpoint.name}
+            </span>
+            <Tip
+              id="resource-endpoint-tooltip"
+              label={
+                isSshFormat(endpoint.url) && resource.username
+                  ? extendURLWithUsername(endpoint.url)
+                  : endpoint.url
+              }
+            >
+              <Button
+                variant="link"
+                size="sm"
+                className="btn-icon h-20px"
+                onClick={(e) => {
+                  copyText(endpoint.url);
+                  e.preventDefault();
+                }}
+              >
+                <span className="svg-icon svg-icon-2">
+                  <Copy weight="bold" />
+                </span>
+              </Button>
+            </Tip>
+          </Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
   );
 };
