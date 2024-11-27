@@ -83,7 +83,7 @@ exports[`InternalIpsList > renders list 1`] = `
           class="table-container table-hover-shadow"
         >
           <table
-            class="table align-middle table-row-bordered fs-6 gy-4 no-footer"
+            class="table align-middle table-row-bordered fs-6 gy-0 no-footer"
           >
             <thead>
               <tr

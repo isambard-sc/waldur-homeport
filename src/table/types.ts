@@ -69,6 +69,7 @@ export interface Column<RowType = any> {
   exportTitle?: string;
   exportKeys?: string[];
   disabledClick?: boolean;
+  ellipsis?: boolean;
 }
 
 export type DisplayMode = 'table' | 'grid';

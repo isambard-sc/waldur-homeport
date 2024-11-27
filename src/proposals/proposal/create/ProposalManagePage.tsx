@@ -53,7 +53,7 @@ export const ProposalManagePage = () => {
       <ProgressSteps
         proposal={proposal}
         bgClass="bg-body"
-        className="mb-10 pt-8 pb-6"
+        className="border-bottom mb-10 pt-8 pb-6"
       />
       {proposal.state === 'team_verification' ? (
         <ProposalTeamVerificationStep

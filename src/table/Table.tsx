@@ -50,7 +50,7 @@ const TableComponent = (
   return (
     <table
       className={classNames(
-        'table align-middle table-row-bordered fs-6 gy-4 no-footer',
+        'table align-middle table-row-bordered fs-6 gy-0 no-footer',
         {
           'table-expandable': Boolean(props.expandableRow),
           'table-hover': props.hoverable,
