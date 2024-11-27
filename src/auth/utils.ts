@@ -3,7 +3,7 @@ import Qs from 'qs';
 import { EDUTEAMS_IDP } from './providers/constants';
 
 const getStateId = () =>
-  encodeURIComponent(Math.random().toString(36).substr(2));
+  encodeURIComponent(Math.random().toString(36).substring(2));
 
 export const getRedirectUri = (provider) =>
   `${document.baseURI}oauth_login_completed/${provider}/`;
