@@ -232,7 +232,11 @@ $custom-aside: (
             border: 1px solid get($value, filter-badge-border) !important;
 
             button {
-              color: get($value, filter-badge-color);
+              color: get($value, filter-label) !important;
+
+              &:hover {
+                color: get($value, filter-badge-color) !important;
+              }
             }
           }
         }
