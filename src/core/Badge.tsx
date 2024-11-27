@@ -7,6 +7,7 @@ import { Tip } from '@waldur/core/Tooltip';
 
 interface OwnProps extends BadgeProps {
   leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
   tooltip?: string;
   variant?: Variant;
   roundless?: boolean;
@@ -29,6 +30,7 @@ const wrapTooltip = (label, children) =>
 export const Badge: FunctionComponent<OwnProps> = ({
   variant = 'primary',
   leftIcon,
+  rightIcon,
   tooltip,
   roundless,
   light,
@@ -63,5 +65,6 @@ export const Badge: FunctionComponent<OwnProps> = ({
     >
       {Boolean(leftIcon) && <span className="left-icon">{leftIcon}</span>}
       {children}
+      {Boolean(rightIcon) && <span className="right-icon">{rightIcon}</span>}
     </BsBadge>,
   );
