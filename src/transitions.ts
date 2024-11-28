@@ -94,9 +94,14 @@ export function attachTransitions() {
       to: (state) =>
         state.data &&
         state.data.permissions &&
-        !state.data.permissions.every((permission) =>
-          permission(store.getState()),
-        ),
+        !state.data.permissions.every((permission) => {
+          try {
+            return permission(store.getState());
+          } catch {
+            // Swallow errors if permission check fails.
+            return true;
+          }
+        }),
     },
     (transition) =>
       transition.router.stateService.target(

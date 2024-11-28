@@ -1,7 +1,7 @@
 import { Check, X } from '@phosphor-icons/react';
 import React, { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
@@ -17,12 +17,7 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import {
-  getCustomer,
-  getUser,
-  isOwnerOrStaff,
-  isServiceManagerSelector,
-} from '@waldur/workspace/selectors';
+import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import {
@@ -281,11 +276,8 @@ const TableOptions = {
 
 const mapStateToFilter = createSelector(
   getCustomer,
-  getUser,
-  isServiceManagerSelector,
-  isOwnerOrStaff,
   (state, formId) => getFormValues(formId)(state),
-  (customer, user, isServiceManager, ownerOrStaff, filters: ResourceFilter) => {
+  (customer, filters: ResourceFilter) => {
     const filter: Record<string, string | string[] | boolean> = {};
 
     // Public resources should only contain resources from billable offerings.
@@ -315,9 +307,6 @@ const mapStateToFilter = createSelector(
     }
     if (filters?.category) {
       filter.category_uuid = filters.category.uuid;
-    }
-    if (isServiceManager && !ownerOrStaff) {
-      filter.service_manager_uuid = user.uuid;
     }
     return filter;
   },

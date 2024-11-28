@@ -2,10 +2,12 @@ import { UIView } from '@uirouter/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
+import { userHasCustomerPermission } from '@waldur/customer/utils';
 import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
+import { PermissionEnum } from '@waldur/permissions/enums';
 import { isOwnerOrStaff } from '@waldur/workspace/selectors';
 
 import { fetchProvider } from './resolve';
@@ -407,6 +409,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Projects'),
       priority: 105,
+      permissions: [userHasCustomerPermission(PermissionEnum.LIST_PROJECTS)],
     },
   },
 

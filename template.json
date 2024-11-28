@@ -8488,7 +8488,7 @@
     "message": "Reload issue data"
   },
   "Reload": {
-    "description": "ErrorMessage.tsx, core/LoadingErred.tsx",
+    "description": "ErrorMessage.tsx, LoadingScreen.tsx, core/LoadingErred.tsx",
     "message": "Reload"
   },
   "Remaining amount": {
@@ -9108,7 +9108,7 @@
     "message": "Retention time"
   },
   "Retry": {
-    "description": "LoadingScreen.tsx, marketplace/resources/resource-pending/OrderErredView.tsx",
+    "description": "marketplace/resources/resource-pending/OrderErredView.tsx",
     "message": "Retry"
   },
   "Retype OpenStack Volume": {

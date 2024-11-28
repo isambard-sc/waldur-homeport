@@ -8,8 +8,10 @@ import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
+import { PermissionEnum } from '@waldur/permissions/enums';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
 
+import { userHasCustomerPermission } from './utils';
 import { fetchCustomer } from './workspace/fetchCustomer';
 
 export const states: StateDeclaration[] = [
@@ -48,6 +50,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Resources'),
       priority: 110,
+      permissions: [userHasCustomerPermission(PermissionEnum.LIST_RESOURCES)],
     },
   },
   {
@@ -62,6 +65,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Orders'),
       priority: 120,
+      permissions: [userHasCustomerPermission(PermissionEnum.LIST_ORDERS)],
     },
   },
   {
@@ -73,6 +77,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Team'),
       priority: 130,
+      permissions: [userHasCustomerPermission(PermissionEnum.LIST_INVITATIONS)],
     },
   },
 
