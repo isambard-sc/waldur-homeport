@@ -8404,7 +8404,7 @@
     "message": "Referrals for {name}"
   },
   "Refresh": {
-    "description": "marketplace/common/RefreshButton.tsx, marketplace/resources/usage/utils.ts, navigation/BackendHealthStatusDialog.tsx",
+    "description": "marketplace/common/RefreshButton.tsx, marketplace/resources/usage/utils.ts",
     "message": "Refresh"
   },
   "Regenerate secret API code": {
