@@ -1,4 +1,4 @@
-@import '@waldur/sass/mediaqueries';
+@use '@waldur/sass/mediaqueries';
 
 /* noscript message */
 
@@ -7,7 +7,7 @@
   padding: 50px;
   margin-top: 20px;
 
-  @include bp(xs) {
+  @include mediaqueries.bp(xs) {
     padding: 20px;
     margin-top: 0;
   }
@@ -28,15 +28,15 @@
     a {
       display: inline-block;
 
-      @include bp(md) {
+      @include mediaqueries.bp(md) {
         padding: 5px 0;
       }
 
-      @include bp(sm) {
+      @include mediaqueries.bp(sm) {
         padding: 5px 0;
       }
 
-      @include bp(xs) {
+      @include mediaqueries.bp(xs) {
         padding: 5px 0;
       }
     }
