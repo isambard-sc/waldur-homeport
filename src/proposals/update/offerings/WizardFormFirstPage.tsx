@@ -20,7 +20,7 @@ export const WizardFormFirstPage: FunctionComponent<WizardFormStepProps> = (
   return (
     <WizardForm {...props}>
       {(wizardProps) => {
-        const { category_uuid, offering } = wizardProps.formValues;
+        const { category_uuid, offering } = wizardProps.formValues || {};
         return (
           <FormContainer
             submitting={wizardProps.submitting}
