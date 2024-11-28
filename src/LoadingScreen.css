@@ -83,26 +83,3 @@
       0.5em 0 0 #2f4050;
   }
 }
-
-.erred-screen {
-  position: relative;
-  top: 25%;
-  text-align: center;
-  color: #676a6c;
-  max-width: 500px;
-}
-
-@media (width <= 768px) {
-  .erred-screen-message {
-    font-size: 17px;
-    margin: 15px;
-  }
-
-  .erred-screen {
-    top: 15%;
-  }
-}
-
-.erred-screen-icon {
-  font-size: 100pt;
-}
