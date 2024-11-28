@@ -1,10 +1,7 @@
-import { useRouter, useCurrentStateAndParams } from '@uirouter/react';
-import Axios from 'axios';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import Qs from 'qs';
-import { useState, useEffect, FunctionComponent } from 'react';
+import { FunctionComponent, useEffect, useState } from 'react';
 
-import { getIdentityProvider } from '@waldur/administration/api';
-import { ENV } from '@waldur/configs/default';
 import { Link } from '@waldur/core/Link';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { getQueryString } from '@waldur/core/utils';
@@ -12,7 +9,6 @@ import { translate } from '@waldur/i18n';
 import { UsersService } from '@waldur/user/UsersService';
 
 import * as AuthService from '../AuthService';
-import { getRedirectUri } from '../utils';
 
 export const OauthLoginCompleted: FunctionComponent = () => {
   const router = useRouter();
@@ -24,16 +20,8 @@ export const OauthLoginCompleted: FunctionComponent = () => {
   useEffect(() => {
     async function fetchToken() {
       const qs = Qs.parse(getQueryString());
-      const url = `${ENV.apiEndpoint}api-auth/${provider}/`;
       try {
-        const { client_id } = await getIdentityProvider(provider);
-        const response = await Axios.post(url, {
-          clientId: client_id,
-          code: qs.code,
-          state: qs.state,
-          redirectUri: getRedirectUri(provider),
-        });
-        AuthService.setAuthHeader(response.data.token);
+        AuthService.setAuthHeader(qs.token);
         const user = await UsersService.getCurrentUser();
         AuthService.loginSuccess({
           data: { ...user, method: provider },

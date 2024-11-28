@@ -3,6 +3,8 @@ import Axios, { AxiosRequestConfig } from 'axios';
 import { ENV } from '@waldur/configs/default';
 import { get, getAll, parseResultCount, post, put } from '@waldur/core/api';
 
+import { OIDCConfig } from './types';
+
 export const getCustomersCount = () =>
   Axios.head(`${ENV.apiEndpoint}api/customers/`).then((response) =>
     parseResultCount(response),
@@ -40,12 +42,7 @@ export const getVersion = () =>
   );
 
 export const getIdentityProviders = () =>
-  getAll<{ provider }>('/identity-providers/');
-
-export const getIdentityProvider = (type) =>
-  get<{ client_id; logout_url }>(`/identity-providers/${type}/`).then(
-    (response) => response.data,
-  );
+  getAll<OIDCConfig>('/identity-providers/');
 
 export const createIdentityProvider = (formData) =>
   post('/identity-providers/', formData);
