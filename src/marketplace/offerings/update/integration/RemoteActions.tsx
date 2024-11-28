@@ -1,7 +1,10 @@
+import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
+import * as api from '@waldur/marketplace/common/api';
 import { REMOTE_OFFERING_TYPE } from '@waldur/marketplace-remote/constants';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import {
   getUser,
   isOwner as isOwnerSelector,
@@ -9,22 +12,216 @@ import {
 } from '@waldur/workspace/selectors';
 
 import { ActionsDropdown } from '../../actions/ActionsDropdown';
-import {
-  pullRemoteOfferingDetails,
-  pullRemoteOfferingInvoices,
-  pullRemoteOfferingOrders,
-  pullRemoteOfferingResources,
-  pullRemoteOfferingRobotAccounts,
-  pullRemoteOfferingUsage,
-  pullRemoteOfferingUsers,
-  pushRemoteOfferingProjectData,
-} from '../../store/actions';
+
+const usePullRemoteOfferingDetails = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingDetails(uuid);
+        dispatch(
+          showSuccess(
+            translate('Offering details synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering details.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+const usePullRemoteOfferingUsers = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingUsers(uuid);
+        dispatch(
+          showSuccess(
+            translate('Offering users synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering users.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+const usePushRemoteOfferingProjectData = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pushRemoteOfferingProjectData(uuid);
+        dispatch(
+          showSuccess(
+            translate(
+              'Offering project data synchronization has been scheduled.',
+            ),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering project data.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+const usePullRemoteOfferingUsage = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingUsage(uuid);
+        dispatch(
+          showSuccess(
+            translate('Offering usage synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering usage.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+const usePullRemoteOfferingResources = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingResources(uuid);
+        dispatch(
+          showSuccess(
+            translate('Offering resources synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering resources.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+const usePullRemoteOfferingOrders = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingOrders(uuid);
+        dispatch(
+          showSuccess(
+            translate('Offering orders synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering orders.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+
+const usePullRemoteOfferingInvoices = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingInvoices(uuid);
+        dispatch(
+          showSuccess(
+            translate('Offering invoices synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize offering invoices.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
+
+const usePullRemoteOfferingRobotAccounts = () => {
+  const dispatch = useDispatch();
+
+  return useCallback(
+    async (uuid: string) => {
+      try {
+        await api.pullRemoteOfferingRobotAccounts(uuid);
+        dispatch(
+          showSuccess(
+            translate('Robot accounts synchronization has been scheduled.'),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(
+            error,
+            translate('Unable to synchronize robot accounts.'),
+          ),
+        );
+      }
+    },
+    [dispatch],
+  );
+};
 
 export const RemoteActions = ({ offering }) => {
-  const dispatch = useDispatch();
   const user = useSelector(getUser);
   const isOwner = useSelector(isOwnerSelector);
   const isServiceManager = useSelector(isServiceManagerSelector);
+  const pullRemoteOfferingDetails = usePullRemoteOfferingDetails();
+  const pullRemoteOfferingUsers = usePullRemoteOfferingUsers();
+  const pushRemoteOfferingProjectData = usePushRemoteOfferingProjectData();
+  const pullRemoteOfferingUsage = usePullRemoteOfferingUsage();
+  const pullRemoteOfferingResources = usePullRemoteOfferingResources();
+  const pullRemoteOfferingOrders = usePullRemoteOfferingOrders();
+  const pullRemoteOfferingInvoices = usePullRemoteOfferingInvoices();
+  const pullRemoteOfferingRobotAccounts = usePullRemoteOfferingRobotAccounts();
   const isVisible =
     offering.type === REMOTE_OFFERING_TYPE &&
     (user?.is_staff || isOwner || isServiceManager);
@@ -34,35 +231,35 @@ export const RemoteActions = ({ offering }) => {
   const actions = [
     {
       label: translate('Pull offering details'),
-      handler: () => dispatch(pullRemoteOfferingDetails(offering.uuid)),
+      handler: () => pullRemoteOfferingDetails(offering.uuid),
     },
     {
       label: translate('Pull offering users'),
-      handler: () => dispatch(pullRemoteOfferingUsers(offering.uuid)),
+      handler: () => pullRemoteOfferingUsers(offering.uuid),
     },
     {
       label: translate('Pull usage'),
-      handler: () => dispatch(pullRemoteOfferingUsage(offering.uuid)),
+      handler: () => pullRemoteOfferingUsage(offering.uuid),
     },
     {
       label: translate('Pull resources'),
-      handler: () => dispatch(pullRemoteOfferingResources(offering.uuid)),
+      handler: () => pullRemoteOfferingResources(offering.uuid),
     },
     {
       label: translate('Pull orders'),
-      handler: () => dispatch(pullRemoteOfferingOrders(offering.uuid)),
+      handler: () => pullRemoteOfferingOrders(offering.uuid),
     },
     {
       label: translate('Push project data'),
-      handler: () => dispatch(pushRemoteOfferingProjectData(offering.uuid)),
+      handler: () => pushRemoteOfferingProjectData(offering.uuid),
     },
     {
       label: translate('Pull resources invoices'),
-      handler: () => dispatch(pullRemoteOfferingInvoices(offering.uuid)),
+      handler: () => pullRemoteOfferingInvoices(offering.uuid),
     },
     {
       label: translate('Pull robot accounts'),
-      handler: () => dispatch(pullRemoteOfferingRobotAccounts(offering.uuid)),
+      handler: () => pullRemoteOfferingRobotAccounts(offering.uuid),
     },
   ];
   return <ActionsDropdown actions={actions} />;

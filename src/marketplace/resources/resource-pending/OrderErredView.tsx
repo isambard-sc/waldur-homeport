@@ -1,7 +1,8 @@
+import { ArrowsClockwise, Info, XCircle } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
-import { triggerTransition } from '@uirouter/redux';
+import { useRouter } from '@uirouter/react';
 import { FC } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -17,16 +18,17 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { Resource } from '../types';
 
-const ResourceOrderErrorDialog = lazyComponent(
-  () => import('./ResourceOrderErrorDialog'),
-  'ResourceOrderErrorDialog',
+const ResourceOrderErrorDialog = lazyComponent(() =>
+  import('./ResourceOrderErrorDialog').then((module) => ({
+    default: module.ResourceOrderErrorDialog,
+  })),
 );
 
 interface OrderErredViewProps {
   resource: Resource;
 }
 
-const ShowError = ({ resource }) => {
+const ShowErrorButton = ({ resource }) => {
   const dispatch = useDispatch();
   const showErrorDialog = () => {
     dispatch(
@@ -37,17 +39,12 @@ const ShowError = ({ resource }) => {
     );
   };
   return (
-    <>
-      (
-      <button
-        type="button"
-        className="text-link text-danger fw-bolder"
-        onClick={showErrorDialog}
-      >
-        {translate('Show error')}
-      </button>
-      )
-    </>
+    <Button variant="light-danger" size="sm" onClick={showErrorDialog}>
+      <span className="svg-icon svg-icon-4">
+        <XCircle weight="bold" />
+      </span>
+      {translate('Show error')}
+    </Button>
   );
 };
 
@@ -55,33 +52,33 @@ const getSortedSteps = (resource: Resource) => [
   {
     label: translate('Order submitted'),
     description: [
-      resource.creation_order.created_by_full_name,
-      formatDateTime(resource.creation_order.created),
+      [
+        resource.creation_order.created_by_full_name,
+        formatDateTime(resource.creation_order.created),
+      ].join(', '),
     ],
     state: [],
   },
   {
     label: translate('Approved'),
     description: [
-      resource.creation_order.consumer_reviewed_by_full_name,
-      formatDateTime(resource.creation_order.consumer_reviewed_at),
+      [
+        resource.creation_order.consumer_reviewed_by_full_name,
+        formatDateTime(resource.creation_order.consumer_reviewed_at),
+      ].join(', '),
     ],
     state: [],
   },
   {
-    label: (
-      <>
-        {translate('Creation has failed')} <ShowError resource={resource} />
-      </>
-    ),
+    label: translate('Creation has failed'),
     description: [
-      translate('System'),
-      formatDateTime(resource.creation_order.modified),
+      [
+        translate('System'),
+        formatDateTime(resource.creation_order.modified),
+      ].join(', '),
     ],
     state: ['erred'],
-    icon: 'fa-times',
-    color: 'bg-danger',
-    labelClass: 'text-danger',
+    variant: 'danger',
   },
 ];
 
@@ -103,6 +100,7 @@ const getSteps = (resource: Resource) => {
 
 export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { mutate, isLoading } = useMutation(async () => {
     await waitForConfirmation(
       dispatch,
@@ -117,7 +115,10 @@ export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
           // We only need the url in the order request
           url: resource.plan || resource.creation_order.plan,
         },
-        project: resource.project || resource.creation_order.project,
+        project: {
+          // We only need the url in the order request
+          url: resource.project || resource.creation_order.project,
+        },
       },
       offering: {
         // We only need the url in the order request
@@ -127,11 +128,9 @@ export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
     try {
       const order: any = await createOrder(formatOrderForCreate(item));
       dispatch(showSuccess(translate('Order has been submitted.')));
-      dispatch(
-        triggerTransition('marketplace-resource-details', {
-          resource_uuid: order.data.marketplace_resource_uuid,
-        }),
-      );
+      router.stateService.go('marketplace-resource-details', {
+        resource_uuid: order.data.marketplace_resource_uuid,
+      });
     } catch (error) {
       dispatch(showErrorResponse(error, translate('Unable to submit order.')));
     }
@@ -142,33 +141,43 @@ export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
   }
   const steps = getSteps(resource);
   return (
-    <ProgressSteps steps={steps} bgClass="bg-gray-100">
-      <div className="fw-bolder mb-5">
-        <span>
-          {translate(
-            "We're sorry, but the resource creation process has failed.",
-          )}
-        </span>
-        <div className="ms-6 d-inline-block">
-          <OrderDetailsLink
-            order_uuid={resource.creation_order.uuid}
-            project_uuid={resource.creation_order.project_uuid}
-            className="btn btn-sm btn-outline btn-outline-success bg-body me-4"
-          >
-            {translate('View order')}
-          </OrderDetailsLink>
-          <Button
-            variant="success"
-            size="sm"
-            className="btn-icon-right"
-            onClick={() => mutate()}
-            disabled={isLoading}
-          >
-            {translate('Retry')}
-            <i className={'fa fa-refresh' + (isLoading ? ' fa-spin' : '')} />
-          </Button>
-        </div>
-      </div>
-    </ProgressSteps>
+    <div className="container-fluid mt-6">
+      <Card className="card-bordered overflow-hidden">
+        <Card.Body className="d-flex flex-column flex-sm-row align-items-center gap-4">
+          <ProgressSteps
+            steps={steps}
+            bgClass="bg-body"
+            className="flex-grow-1"
+          />
+          <div className="d-flex flex-sm-column gap-3 text-nowrap">
+            <Button
+              variant="outline btn-outline-default"
+              size="sm"
+              onClick={() => mutate()}
+              disabled={isLoading}
+            >
+              <span className="svg-icon svg-icon-4">
+                <ArrowsClockwise
+                  weight="bold"
+                  className={isLoading ? ' animation-spin' : ''}
+                />
+              </span>
+              {translate('Retry')}
+            </Button>
+            <OrderDetailsLink
+              order_uuid={resource.creation_order.uuid}
+              project_uuid={resource.creation_order.project_uuid}
+              className="btn btn-sm btn-outline btn-outline-default"
+            >
+              <span className="svg-icon svg-icon-4">
+                <Info weight="bold" />
+              </span>
+              {translate('View order')}
+            </OrderDetailsLink>
+            <ShowErrorButton resource={resource} />
+          </div>
+        </Card.Body>
+      </Card>
+    </div>
   );
 };

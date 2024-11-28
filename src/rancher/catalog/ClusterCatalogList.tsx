@@ -2,8 +2,9 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CatalogCreateButton } from './CatalogCreateButton';
 import { CatalogDeleteButton } from './CatalogDeleteButton';
@@ -37,6 +38,7 @@ export const ClusterCatalogList: FunctionComponent<{ resourceScope }> = ({
             label={row.name}
           />
         ),
+        copyField: (row) => row.name,
         export: 'name',
       },
       {
@@ -60,7 +62,7 @@ export const ClusterCatalogList: FunctionComponent<{ resourceScope }> = ({
       tableActions={<CatalogCreateButton cluster={resourceScope} />}
       rowActions={({ row }) =>
         row.scope_type === 'cluster' ? (
-          <CatalogDeleteButton catalog={row} />
+          <CatalogDeleteButton catalog={row} refetch={props.fetch} />
         ) : null
       }
     />

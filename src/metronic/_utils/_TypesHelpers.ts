@@ -1,6 +1,6 @@
 function getObjectPropertyValueByKey(obj: any, key: string): any | undefined {
   const map = new Map(Object.entries(obj));
-  if (obj.hasOwnProperty(key) && map) {
+  if (Object.prototype.hasOwnProperty.call(obj, key) && map) {
     return map.get(key);
   }
 }
@@ -19,9 +19,8 @@ function getUniqueIdWithPrefix(prefix: string | undefined): string {
   return `${prefix}${result}`;
 }
 
-/* eslint-disable no-useless-escape */
 function stringSnakeToCamel(str: string): string {
-  return str.replace(/(\-\w)/g, function (m) {
+  return str.replace(/(-\w)/g, function (m) {
     return m[1].toUpperCase();
   });
 }

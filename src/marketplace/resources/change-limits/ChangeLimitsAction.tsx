@@ -1,3 +1,5 @@
+import { PencilSimple } from '@phosphor-icons/react';
+
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
@@ -6,9 +8,10 @@ import { ActionItemType } from '@waldur/resource/actions/types';
 import { useModalDialogCallback } from '@waldur/resource/actions/useModalDialogCallback';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 
-const ChangeLimitsDialog = lazyComponent(
-  () => import('./ChangeLimitsDialog'),
-  'ChangeLimitsDialog',
+const ChangeLimitsDialog = lazyComponent(() =>
+  import('./ChangeLimitsDialog').then((module) => ({
+    default: module.ChangeLimitsDialog,
+  })),
 );
 
 const validators = [validateState('OK')];
@@ -27,7 +30,7 @@ const useChangeLimits = ({ resource, refetch }) => {
     action,
     tooltip,
     disabled,
-    iconClass: 'fa-edit',
+    iconNode: <PencilSimple />,
     important: true,
   };
 };

@@ -36,9 +36,7 @@ const FixedRows = (props: { components: Component[] }) => (
   </>
 );
 
-export const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (
-  props,
-) => {
+const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (props) => {
   if (props.components.length === 0) {
     return null;
   }
@@ -72,12 +70,10 @@ export const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (
     (subTotal, component) => subTotal + component.subTotal,
     0,
   );
-  const hasExtraRows = fixedRows.length > 0 || otherLimitedRows.length > 0;
-
   return (
     <div className={props.formGroupClassName}>
       <div className={props.columnClassName}>
-        {hasExtraRows && (
+        {fixedRows.length > 0 && (
           <Table bordered={true}>
             <thead>
               <HeaderRow
@@ -85,10 +81,7 @@ export const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (
               />
             </thead>
             <tbody>
-              {fixedRows.length > 0 && <FixedRows components={fixedRows} />}
-              {otherLimitedRows.length > 0 && (
-                <FixedRows components={otherLimitedRows} />
-              )}
+              <FixedRows components={fixedRows} />
               {!activeFixedPriceProfile ? (
                 <tr>
                   <td colSpan={1}>{translate('Total')}</td>
@@ -100,10 +93,10 @@ export const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (
             </tbody>
           </Table>
         )}
-        {usageRows.length > 0 && (
+        {(usageRows.length > 0 || otherLimitedRows.length > 0) && (
           <>
             <p>
-              {hasExtraRows
+              {fixedRows.length > 0
                 ? translate(
                     'Additionally service provider can charge for usage of the following components',
                   )
@@ -112,6 +105,7 @@ export const PureDetailsList: FunctionComponent<PlanDetailsTableProps> = (
                   )}
             </p>
             <LimitlessComponentsList components={usageRows} />
+            <LimitlessComponentsList components={otherLimitedRows} />
           </>
         )}
         {totalLimitedRows.length > 0 && (

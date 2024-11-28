@@ -1,14 +1,13 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
+import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
-const UserAgreementsEditDialog = lazyComponent(
-  () => import('./UserAgreementsEditDialog'),
-  'UserAgreementsEditDialog',
+const UserAgreementsEditDialog = lazyComponent(() =>
+  import('./UserAgreementsEditDialog').then((module) => ({
+    default: module.UserAgreementsEditDialog,
+  })),
 );
 
 export const UserAgreementsEditButton = ({ row, refetch }) => {
@@ -27,12 +26,5 @@ export const UserAgreementsEditButton = ({ row, refetch }) => {
         size: 'lg',
       }),
     );
-  return (
-    <RowActionButton
-      action={callback}
-      title={translate('Edit')}
-      iconNode={<PencilSimple />}
-      size="sm"
-    />
-  );
+  return <EditButton onClick={callback} size="sm" />;
 };

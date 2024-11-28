@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 // WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_permissions_description.py
 // Do not edit it manually. All manual changes would be overridden.
 import { translate } from '@waldur/i18n';
@@ -102,6 +101,10 @@ export const PermissionOptions = [
       {
         label: translate('Create offering user'),
         value: 'OFFERING.CREATE_USER',
+      },
+      {
+        label: translate('Update offering user'),
+        value: 'OFFERING.UPDATE_USER',
       },
     ],
   },

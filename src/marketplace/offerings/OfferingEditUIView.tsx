@@ -2,71 +2,99 @@ import { useQuery } from '@tanstack/react-query';
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
 
+import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constants';
 import {
   getCategory,
   getPlugins,
   getProviderOffering,
 } from '@waldur/marketplace/common/api';
 import { Offering } from '@waldur/marketplace/types';
+import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constants';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import {
+  allowToUpdateService,
   getPluginOptionsForm,
+  getProvisioningConfigForm,
   getSecretOptionsForm,
   showComponentsList,
-  showOfferingOptions,
 } from '../common/registry';
 import { ValidationIcon } from '../common/ValidationIcon';
 
+import { PROVIDER_OFFERING_DATA_QUERY_KEY } from './constants';
 import { OfferingViewHero } from './OfferingViewHero';
 import { getServiceSettingsForm } from './update/integration/registry';
 import { SCRIPT_ROWS } from './update/integration/utils';
 import { getOfferingBreadcrumbItems } from './utils';
 
-const OverviewSection = lazyComponent(
-  () => import('./update/overview/OverviewSection'),
-  'OverviewSection',
+const OverviewSection = lazyComponent(() =>
+  import('./update/overview/OverviewSection').then((module) => ({
+    default: module.OverviewSection,
+  })),
 );
-const IntegrationSection = lazyComponent(
-  () => import('./update/integration/IntegrationSection'),
-  'IntegrationSection',
+const CredentialsSection = lazyComponent(() =>
+  import('./update/integration/CredentialsSection').then((module) => ({
+    default: module.CredentialsSection,
+  })),
 );
-const OfferingEndpointsSection = lazyComponent(
-  () => import('./update/endpoints/OfferingEndpointsSection'),
-  'OfferingEndpointsSection',
+const LifecyclePolicySection = lazyComponent(() =>
+  import('./update/integration/LifecyclePolicySection').then((module) => ({
+    default: module.LifecyclePolicySection,
+  })),
 );
-const OfferingOptionsSection = lazyComponent(
-  () => import('./update/options/OfferingOptionsSection'),
-  'OfferingOptionsSection',
+const UserManagementSection = lazyComponent(() =>
+  import('./update/integration/UserManagementSection').then((module) => ({
+    default: module.UserManagementSection,
+  })),
 );
-const OfferingResourceOptionsSection = lazyComponent(
-  () => import('./update/options/OfferingResourceOptionsSection'),
-  'OfferingResourceOptionsSection',
+const ProvisioningConfigSection = lazyComponent(() =>
+  import('./update/integration/ProvisioningConfigSection').then((module) => ({
+    default: module.ProvisioningConfigSection,
+  })),
 );
-const AttributesSection = lazyComponent(
-  () => import('./update/attributes/AttributesSection'),
-  'AttributesSection',
+const OfferingEndpointsSection = lazyComponent(() =>
+  import('./update/endpoints/OfferingEndpointsSection').then((module) => ({
+    default: module.OfferingEndpointsSection,
+  })),
 );
-const ComponentsSection = lazyComponent(
-  () => import('./update/components/ComponentsSection'),
-  'ComponentsSection',
+const OfferingOptionsSection = lazyComponent(() =>
+  import('./update/options/OfferingOptionsSection').then((module) => ({
+    default: module.OfferingOptionsSection,
+  })),
 );
-const PlansSection = lazyComponent(
-  () => import('./update/plans/PlansSection'),
-  'PlansSection',
+const OfferingResourceOptionsSection = lazyComponent(() =>
+  import('./update/options/OfferingResourceOptionsSection').then((module) => ({
+    default: module.OfferingResourceOptionsSection,
+  })),
 );
-const OfferingImagesList = lazyComponent(
-  () => import('./images/OfferingImagesList'),
-  'OfferingImagesList',
+const AttributesSection = lazyComponent(() =>
+  import('./update/attributes/AttributesSection').then((module) => ({
+    default: module.AttributesSection,
+  })),
 );
-const RolesSection = lazyComponent(
-  () => import('./update/roles/RolesSection'),
-  'RolesSection',
+const ComponentsSection = lazyComponent(() =>
+  import('./update/components/ComponentsSection').then((module) => ({
+    default: module.ComponentsSection,
+  })),
+);
+const PlansSection = lazyComponent(() =>
+  import('./update/plans/PlansSection').then((module) => ({
+    default: module.PlansSection,
+  })),
+);
+const OfferingImagesList = lazyComponent(() =>
+  import('./images/OfferingImagesList').then((module) => ({
+    default: module.OfferingImagesList,
+  })),
+);
+const RolesSection = lazyComponent(() =>
+  import('./update/roles/RolesSection').then((module) => ({
+    default: module.RolesSection,
+  })),
 );
 
 const getOfferingData = async (offering_uuid) => {
@@ -92,11 +120,16 @@ const getTabs = (offering: Offering): PageBarTab[] => {
   const ServiceSettingsForm = getServiceSettingsForm(offering.type);
   const SecretOptionsForm = getSecretOptionsForm(offering.type);
   const PluginOptionsForm = getPluginOptionsForm(offering.type);
+  const provisioningConfigForm = getProvisioningConfigForm(offering.type);
 
-  if (ServiceSettingsForm || SecretOptionsForm || PluginOptionsForm) {
+  if (
+    ServiceSettingsForm ||
+    SecretOptionsForm ||
+    PluginOptionsForm ||
+    provisioningConfigForm
+  ) {
     tabs.push({
       key: 'integration',
-      component: IntegrationSection,
       title: (
         <>
           <ValidationIcon
@@ -110,69 +143,101 @@ const getTabs = (offering: Offering): PageBarTab[] => {
           {translate('Integration')}
         </>
       ),
-    });
-  }
-
-  tabs.push({
-    key: 'endpoints',
-    component: OfferingEndpointsSection,
-    title: translate('Endpoints'),
-  });
-
-  // Offering options & Resource options
-  if (showOfferingOptions(offering.type)) {
-    tabs.push(
-      {
-        key: 'options',
-        component: OfferingOptionsSection,
-        title: translate('User input'),
-      },
-      {
-        key: 'resource_options',
-        component: OfferingResourceOptionsSection,
-        title: translate('Resource options'),
-      },
-    );
-  }
-
-  tabs.push({
-    key: 'category',
-    component: AttributesSection,
-    title: translate('Category'),
-  });
-
-  // Components
-  if (showComponentsList(offering.type)) {
-    tabs.push({
-      key: 'components',
-      component: ComponentsSection,
-      title: (
-        <>
-          <ValidationIcon value={offering.components.length > 0} />
-          {translate('Accounting components')}
-        </>
-      ),
+      children: [
+        ServiceSettingsForm && allowToUpdateService(offering.type)
+          ? {
+              key: 'credentials',
+              component: CredentialsSection,
+              title: translate('Credentials'),
+            }
+          : null,
+        {
+          key: 'lifecycle-policy',
+          component: LifecyclePolicySection,
+          title: translate('Lifecycle policy'),
+        },
+        SecretOptionsForm || PluginOptionsForm
+          ? {
+              key: 'user-management',
+              component: UserManagementSection,
+              title: translate('User management'),
+            }
+          : null,
+        provisioningConfigForm ||
+        [OFFERING_TYPE_CUSTOM_SCRIPTS, OFFERING_TYPE_BOOKING].includes(
+          offering.type,
+        )
+          ? {
+              key: 'provisioning-configuration',
+              component: ProvisioningConfigSection,
+              title: translate('Provisioning configuration'),
+            }
+          : null,
+      ].filter(Boolean),
     });
   }
 
   tabs.push(
     {
-      key: 'plans',
-      component: PlansSection,
-      title: (
-        <>
-          <ValidationIcon value={offering.plans.length > 0} />
-          {translate('Accounting plans')}
-        </>
-      ),
+      key: 'public_information',
+      title: translate('Public information'),
+      children: [
+        {
+          key: 'endpoints',
+          component: OfferingEndpointsSection,
+          title: translate('Endpoints'),
+        },
+        {
+          key: 'category',
+          component: AttributesSection,
+          title: translate('Category'),
+        },
+        {
+          key: 'images',
+          component: OfferingImagesList,
+          title: translate('Images'),
+        },
+      ],
     },
     {
-      key: 'images',
-      component: OfferingImagesList,
-      title: translate('Images'),
+      key: 'options',
+      component: OfferingOptionsSection,
+      title: translate('User input'),
+    },
+    {
+      key: 'resource_options',
+      component: OfferingResourceOptionsSection,
+      title: translate('Resource options'),
     },
     { key: 'roles', component: RolesSection, title: translate('Roles') },
   );
+
+  tabs.push({
+    title: translate('Accounting'),
+    key: 'accounting',
+    children: [
+      {
+        title: (
+          <>
+            <ValidationIcon value={offering.plans.length > 0} />
+            {translate('Accounting plans')}
+          </>
+        ),
+        key: 'plans',
+        component: PlansSection,
+      },
+      showComponentsList(offering.type) && {
+        key: 'components',
+        component: ComponentsSection,
+        title: (
+          <>
+            <ValidationIcon value={offering.components.length > 0} />
+            {translate('Accounting components')}
+          </>
+        ),
+      },
+    ].filter(Boolean),
+  });
 
   return tabs;
 };
@@ -183,7 +248,7 @@ export const OfferingEditUIView = () => {
   } = useCurrentStateAndParams();
 
   const { isLoading, error, data, refetch, isRefetching } = useQuery(
-    ['providerOfferingData', offering_uuid],
+    [PROVIDER_OFFERING_DATA_QUERY_KEY, offering_uuid],
     () => getOfferingData(offering_uuid),
     { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
   );
@@ -229,8 +294,8 @@ export const OfferingEditUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           data={{
             ...data,

@@ -11,13 +11,15 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { OpenStackInstance } from '../types';
 
-const AttachVolumeDialog = lazyComponent(
-  () => import('./AttachVolumeDialog'),
-  'AttachVolumeDialog',
+const AttachVolumeDialog = lazyComponent(() =>
+  import('./AttachVolumeDialog').then((module) => ({
+    default: module.AttachVolumeDialog,
+  })),
 );
 
 interface AttachVolumeActionProps {
   resource: OpenStackInstance;
+  refetch;
 }
 
 const validators = [
@@ -27,6 +29,7 @@ const validators = [
 
 export const AttachVolumeAction: FC<AttachVolumeActionProps> = ({
   resource,
+  refetch,
 }) => (
   <DialogActionButton
     title={translate('Attach volume')}
@@ -34,5 +37,6 @@ export const AttachVolumeAction: FC<AttachVolumeActionProps> = ({
     modalComponent={AttachVolumeDialog}
     resource={resource}
     validators={validators}
+    extraResolve={{ refetch }}
   />
 );

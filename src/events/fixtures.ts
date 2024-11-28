@@ -1,4 +1,4 @@
-import { Event, EventGroup } from './types';
+import { Event } from './types';
 
 export const event: Event = {
   uuid: 'uuid',
@@ -13,33 +13,3 @@ export const event: Event = {
   message:
     'User alice with full name Alice Lebowski authenticated successfully with username and password.',
 };
-
-export const eventGroups: EventGroup[] = [
-  {
-    title: 'Authentication events',
-    events: [
-      {
-        key: 'auth_logged_in_with_username',
-        title:
-          'User {user_link} authenticated successfully with username and password.',
-      },
-    ],
-  },
-  {
-    title: 'Payment events',
-    events: [
-      {
-        key: 'payment_approval_succeeded',
-        title: 'Payment for {customer_link} has been approved.',
-      },
-      {
-        key: 'payment_cancel_succeeded',
-        title: 'Payment for {customer_link} has been cancelled.',
-      },
-      {
-        key: 'payment_creation_succeeded',
-        title: 'Created a new payment for {customer_link}.',
-      },
-    ],
-  },
-];

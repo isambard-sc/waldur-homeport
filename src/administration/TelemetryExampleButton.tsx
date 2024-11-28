@@ -6,9 +6,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const TelemetryExampleDialog = lazyComponent(
-  () => import('./TelemetryExampleDialog'),
-  'TelemetryExampleDialog',
+const TelemetryExampleDialog = lazyComponent(() =>
+  import('./TelemetryExampleDialog').then((module) => ({
+    default: module.TelemetryExampleDialog,
+  })),
 );
 
 export const TelemetryExampleButton = () => {

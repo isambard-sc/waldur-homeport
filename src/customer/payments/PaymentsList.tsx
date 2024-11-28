@@ -7,8 +7,9 @@ import { PaymentInvoiceRenderer } from '@waldur/customer/payments/PaymentInvoice
 import { PaymentProofRenderer } from '@waldur/customer/payments/PaymentProofRenderer';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { CreatePaymentButton } from './CreatePaymentButton';

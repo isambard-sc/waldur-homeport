@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback } from 'react';
-import { Button, Col, Row, Stack } from 'react-bootstrap';
+import { Badge, Button, Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 import { change, getFormValues } from 'redux-form';
@@ -7,8 +7,8 @@ import { change, getFormValues } from 'redux-form';
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { translate } from '@waldur/i18n';
 
-import { TableProps } from './Table';
 import { TableFiltersMenu } from './TableFiltersMenu';
+import { TableProps } from './types';
 import { getFiltersFormId } from './utils';
 
 interface TableFiltersProps
@@ -47,6 +47,7 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
     if (props.filterPosition === 'sidebar') {
       props.renderFiltersDrawer(props.filters);
     }
+    props.applyFiltersFn(true);
   }, [dispatch, props, formValues]);
 
   const isMd = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.md });
@@ -62,21 +63,24 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
           }
         >
           {props.filtersStorage.map((item) => (
-            <Stack
+            <Badge
               key={item.name}
-              direction="horizontal"
-              gap={2}
-              className="flex-nowrap fw-bold"
+              bg="light"
+              className={
+                'min-h-40px d-flex align-items-center pe-0' +
+                (isMd ? '' : ' flex-wrap')
+              }
             >
-              {item.label}
+              <span className="text-gray-700 fw-bold">{item.label}:</span>
               <item.component />
-            </Stack>
+            </Badge>
           ))}
           {props.filterPosition === 'menu' && (
             <TableFiltersMenu
               table={props.table}
               filters={props.filters}
               filterPosition={props.filterPosition}
+              filtersStorage={props.filtersStorage}
               setFilter={props.setFilter}
               applyFiltersFn={props.applyFiltersFn}
               selectedSavedFilter={props.selectedSavedFilter}

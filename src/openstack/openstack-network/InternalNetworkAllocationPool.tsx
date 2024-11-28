@@ -5,7 +5,7 @@ import { formValueSelector } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { RESOURCE_ACTION_FORM } from '@waldur/resource/actions/constants';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 const getAllocationPool = (subnetCidr) => {
   const prefix = subnetCidr.split('.').slice(0, 3).join('.');
@@ -21,8 +21,7 @@ export const InternalNetworkAllocationPool: FunctionComponent = () => {
   const body = cidr ? getAllocationPool(cidr) : <>&mdash;</>;
   return (
     <Form.Group>
-      <label>{translate('Internal network allocation pool')}</label>
-      {body}
+      <label>{translate('Internal network allocation pool')}</label> {body}
     </Form.Group>
   );
 };

@@ -1,3 +1,4 @@
+import { FileCode } from '@phosphor-icons/react';
 import { useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -7,9 +8,10 @@ import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 import { getUser } from '@waldur/workspace/selectors';
 
-const RancherClusterKubeconfigDialog = lazyComponent(
-  () => import('./RancherClusterKubeconfigDialog'),
-  'RancherClusterKubeconfigDialog',
+const RancherClusterKubeconfigDialog = lazyComponent(() =>
+  import('./RancherClusterKubeconfigDialog').then((module) => ({
+    default: module.RancherClusterKubeconfigDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {
@@ -31,6 +33,7 @@ export const KubeconfigFileAction: ActionItemType = ({ resource }) => {
       modalComponent={RancherClusterKubeconfigDialog}
       resource={resource}
       validators={validators}
+      iconNode={<FileCode />}
     />
   );
 };

@@ -1,21 +1,14 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { pick } from '@waldur/core/utils';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import icon from '@waldur/images/appstore/icon-azure.png';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
-const AzureForm = lazyComponent(() => import('./AzureForm'), 'AzureForm');
+const AzureForm = lazyComponent(() =>
+  import('./AzureForm').then((module) => ({ default: module.AzureForm })),
+);
 
-const serializer = pick([
-  'tenant_id',
-  'client_id',
-  'client_secret',
-  'subscription_id',
-]);
-
-ProvidersRegistry.register({
+export const AzureProviderConfig: ProviderConfig = {
   name: 'Azure',
   type: 'Azure',
-  icon: 'icon-azure.png',
-  endpoint: 'azure',
+  icon,
   component: AzureForm,
-  serializer,
-});
+};

@@ -63,7 +63,7 @@ const PageHero = ({ customer }) => {
   const dashboardState = getDashboardState(router.globals.current);
 
   return (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       {showTabs && (
         <Tabs
           defaultActiveKey={dashboardState}

@@ -3,9 +3,10 @@ import { FC, useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
+import { useTable } from '@waldur/table/useTable';
 
 import { ResourceRowActions } from '../actions/ResourceRowActions';
 import { ResourceName } from '../ResourceName';
@@ -35,6 +36,7 @@ export const SharedProviderResources: FC<{ provider_uuid: string }> = ({
     {
       title: translate('Name'),
       render: ({ row }) => <ResourceName resource={row} />,
+      copyField: (row) => row.name,
       export: 'name',
     },
     {
@@ -72,6 +74,7 @@ export const SharedProviderResources: FC<{ provider_uuid: string }> = ({
       verboseName={translate('resources')}
       showPageSizeSelector={true}
       enableExport={true}
+      cardBordered={false}
       rowActions={({ row }) => (
         <ResourceRowActions resource={row} refetch={props.fetch} />
       )}

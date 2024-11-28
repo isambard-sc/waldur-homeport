@@ -1,52 +1,16 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { pick } from '@waldur/core/utils';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import icon from '@waldur/images/appstore/icon-openstack.png';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
-const OpenStackForm = lazyComponent(
-  () => import('./OpenStackForm'),
-  'OpenStackForm',
-);
-const OpenStackTenantForm = lazyComponent(
-  () => import('./OpenStackTenantForm'),
-  'OpenStackTenantForm',
+const OpenStackForm = lazyComponent(() =>
+  import('./OpenStackForm').then((module) => ({
+    default: module.OpenStackForm,
+  })),
 );
 
-ProvidersRegistry.register({
-  name: 'OpenStack',
-  type: 'OpenStackTenant',
-  icon: 'icon-openstack.png',
-  endpoint: 'openstacktenant',
-  component: OpenStackTenantForm,
-  serializer: pick([
-    'backend_url',
-    'username',
-    'password',
-    'tenant_id',
-    'external_network_id',
-    'domain',
-    'availability_zone',
-    'flavor_exclude_regex',
-    'verify_ssl',
-  ]),
-});
-
-ProvidersRegistry.register({
+export const OpenStackProviderConfig: ProviderConfig = {
   name: 'OpenStack',
   type: 'OpenStack',
-  icon: 'icon-openstack.png',
-  endpoint: 'openstack',
+  icon,
   component: OpenStackForm,
-  serializer: pick([
-    'backend_url',
-    'domain',
-    'username',
-    'password',
-    'tenant_name',
-    'external_network_id',
-    'availability_zone',
-    'verify_ssl',
-    'max_concurrent_provision_instance',
-    'max_concurrent_provision_volume',
-    'max_concurrent_provision_snapshot',
-  ]),
-});
+};

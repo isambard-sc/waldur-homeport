@@ -2,8 +2,9 @@ import { FunctionComponent } from 'react';
 
 import { CustomerEditPanelProps } from '@waldur/customer/details/types';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { AccessSubnetCreateButton } from './AccessSubnetCreateButton';
 import { AccessSubnetDeleteButton } from './AccessSubnetDeleteButton';
@@ -25,7 +26,6 @@ export const CustomerAccessControlPanel: FunctionComponent<
     <Table
       {...tableProps}
       id="access-control"
-      className="card-bordered"
       title={translate('Access control')}
       columns={[
         {

@@ -4,8 +4,8 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { Call } from '@waldur/proposals/types';
-import { Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { RoundExpandableRow } from '../update/rounds/RoundExpandableRow';
 import { getRoundsWithStatus } from '../utils';
@@ -28,7 +28,6 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
     <Table
       {...tableProps}
       id="rounds"
-      className="mb-7"
       columns={[
         {
           title: translate('Round name'),
@@ -48,6 +47,8 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
             <StateIndicator
               label={row.status.label}
               variant={row.status.color}
+              outline
+              pill
             />
           ),
         },

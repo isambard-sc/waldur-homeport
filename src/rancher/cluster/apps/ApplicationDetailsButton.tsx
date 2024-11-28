@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const ApplicationDetailsDialog = lazyComponent(
-  () => import('./ApplicationDetailsDialog'),
-  'ApplicationDetailsDialog',
+const ApplicationDetailsDialog = lazyComponent(() =>
+  import('./ApplicationDetailsDialog').then((module) => ({
+    default: module.ApplicationDetailsDialog,
+  })),
 );
 
 const applicationDetailsDialog = (application) =>

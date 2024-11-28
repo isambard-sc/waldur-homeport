@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+ 
 // WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_features_description.py
 // Do not edit it manually. All manual changes would be overridden.
 import { FeatureSection } from '@waldur/features/types';
@@ -78,6 +78,10 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'hide_volume_type_selector',
         description: translate('Allow to hide OpenStack volume type selector when instance or volume is provisioned.'),
+      },
+      {
+        key: 'show_migrations',
+        description: translate('Show OpenStack tenant migrations action and tab'),
       },
     ],
   },

@@ -8,18 +8,16 @@ import {
 } from '@waldur/customer/list/AccountingRunningField';
 import { GROWTH_FILTER_ID } from '@waldur/invoices/constants';
 
-export const PureGrowthFilter: FunctionComponent = () => (
-  <Card>
-    <Card.Body className="border-bottom mt-3">
-      <form className="form-inline">
-        <Row>
-          <Col sm={3}>
-            <AccountingRunningField />
-          </Col>
-        </Row>
-      </form>
-    </Card.Body>
-  </Card>
+const PureGrowthFilter: FunctionComponent = () => (
+  <Card.Body className="border-bottom mt-3">
+    <form className="form-inline">
+      <Row>
+        <Col sm={3}>
+          <AccountingRunningField />
+        </Col>
+      </Row>
+    </form>
+  </Card.Body>
 );
 
 export const GrowthFilter = reduxForm<{}, any>({

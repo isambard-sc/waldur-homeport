@@ -1,3 +1,4 @@
+import { Star } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Button, Card, Col, Row } from 'react-bootstrap';
 
@@ -10,27 +11,27 @@ const ReviewStars = ({ className }: { className? }) => {
     <div className={`rating ${className}`}>
       <div className="rating-label checked">
         <span className="svg-icon">
-          <i className="fa fa-star text-gray-600" />
+          <Star className="text-gray-600" />
         </span>
       </div>
       <div className="rating-label checked">
         <span className="svg-icon">
-          <i className="fa fa-star text-gray-600" />
+          <Star className="text-gray-600" />
         </span>
       </div>
       <div className="rating-label checked">
         <span className="svg-icon">
-          <i className="fa fa-star text-gray-600" />
+          <Star className="text-gray-600" />
         </span>
       </div>
       <div className="rating-label">
         <span className="svg-icon">
-          <i className="fa fa-star text-gray-300" />
+          <Star className="text-gray-300" />
         </span>
       </div>
       <div className="rating-label">
         <span className="svg-icon">
-          <i className="fa fa-star text-gray-300" />
+          <Star className="text-gray-300" />
         </span>
       </div>
     </div>
@@ -38,7 +39,7 @@ const ReviewStars = ({ className }: { className? }) => {
 };
 
 export const PublicOfferingReviews: FunctionComponent = () => (
-  <Card className="mb-10" id="reviews">
+  <Card className="card-bordered mb-10" id="reviews">
     <Card.Body>
       <PublicOfferingCardTitle>{translate('Reviews')}</PublicOfferingCardTitle>
       <Row>

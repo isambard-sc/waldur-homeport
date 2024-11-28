@@ -1,22 +1,31 @@
 import { WarningCircle } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { FC, PropsWithChildren, ReactNode } from 'react';
+import {
+  cloneElement,
+  FC,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+} from 'react';
 import { Card, Table } from 'react-bootstrap';
 
+import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
 import { wrapTooltip } from '@waldur/table/ActionButton';
+
 import './FormTable.scss';
 
-interface FormTableItemProps {
+export interface FormTableItemProps {
   label?: ReactNode;
   description?: ReactNode;
   value: ReactNode;
   warnTooltip?: string;
   actions?: ReactNode;
+  disabled?: boolean;
 }
 
-const FormTableItem: FC<FormTableItemProps> = (props) => {
+const FormTableItem: FC<FormTableItemProps> = ({ actions, ...props }) => {
   return (
-    <tr>
+    <tr className={classNames(props.disabled && 'opacity-50')}>
       {props.description ? (
         <th className="col-md-4">
           <div className="fw-bolder">
@@ -24,7 +33,11 @@ const FormTableItem: FC<FormTableItemProps> = (props) => {
             {Boolean(props.warnTooltip) &&
               wrapTooltip(
                 props.warnTooltip,
-                <WarningCircle size={20} className="ms-2 text-warning mb-1" />,
+                <WarningCircle
+                  size={20}
+                  className="ms-2 text-warning mb-1"
+                  data-testid="warning"
+                />,
               )}
           </div>
           <div className="fw-normal">{props.description}</div>
@@ -42,7 +55,9 @@ const FormTableItem: FC<FormTableItemProps> = (props) => {
       <td className="col-md" colSpan={props.label ? undefined : 2}>
         {props.value}
       </td>
-      <td className="col-md-auto col-actions">{props.actions}</td>
+      <td className="col-md-auto col-actions">
+        {actions ? cloneElement(actions as ReactElement, props) : actions}
+      </td>
     </tr>
   );
 };
@@ -51,6 +66,9 @@ type FormTableCardProps = FC<
   PropsWithChildren<{
     title?: ReactNode;
     className?: string;
+    refetch?(): void;
+    loading?: boolean;
+    actions?: ReactNode;
   }>
 >;
 
@@ -61,7 +79,13 @@ const FormTableCard: FormTableCardProps = (props) => {
         <Card.Header>
           <Card.Title>
             <h3>{props.title}</h3>
+            {props.refetch && (
+              <RefreshButton refetch={props.refetch} loading={props.loading} />
+            )}
           </Card.Title>
+          {props.actions && (
+            <div className="card-toolbar gap-3">{props.actions}</div>
+          )}
         </Card.Header>
       )}
       <Card.Body>{props.children}</Card.Body>
@@ -69,12 +93,19 @@ const FormTableCard: FormTableCardProps = (props) => {
   );
 };
 
-const FormTable: FC<PropsWithChildren> & {
+const FormTable: FC<PropsWithChildren<{ detailsTable?: boolean }>> & {
   Item: FC<FormTableItemProps>;
   Card: FormTableCardProps;
 } = (props) => {
   return (
-    <Table bordered={true} responsive={true} className="form-table">
+    <Table
+      bordered={true}
+      responsive={true}
+      className={classNames(
+        'form-table',
+        props.detailsTable && 'details-table',
+      )}
+    >
       <tbody>{props.children}</tbody>
     </Table>
   );

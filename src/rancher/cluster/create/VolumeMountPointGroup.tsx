@@ -5,7 +5,7 @@ import { Field, change, formValueSelector } from 'redux-form';
 import { required } from '@waldur/core/validators';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { getMinSize } from './getMinSize';
 import { SimpleSelectField } from './SimpleSelectField';

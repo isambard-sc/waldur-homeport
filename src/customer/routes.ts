@@ -1,5 +1,6 @@
 import { UIView } from '@uirouter/react';
 
+import { ENV } from '@waldur/configs/default';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -7,86 +8,9 @@ import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
-import { OrganizationUIView } from '@waldur/organization/OrganizationUIView';
-import { getConfig } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 import { isOwnerOrStaff, isStaff } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
-import { CustomerManageContainer } from './details/CustomerManageContainer';
-import { fetchCustomer } from './workspace/CustomerWorkspace';
-
-const ProjectsList = lazyComponent(
-  () => import('@waldur/project/ProjectsList'),
-  'ProjectsList',
-);
-const CustomerDashboard = lazyComponent(
-  () => import('./dashboard/CustomerDashboard'),
-  'CustomerDashboard',
-);
-const CustomerManage = lazyComponent(
-  () => import('./details/CustomerManage'),
-  'CustomerManage',
-);
-const PaymentProfilesPanel = lazyComponent(
-  () => import('./payment-profiles/PaymentProfilesPanel'),
-  'PaymentProfilesPanel',
-);
-const CustomerPayments = lazyComponent(
-  () => import('./details/CustomerPayments'),
-  'CustomerPayments',
-);
-const CustomerUsersTab = lazyComponent(
-  () => import('./team/CustomerUsersTab'),
-  'CustomerUsersTab',
-);
-const InvitationsList = lazyComponent(
-  () => import('../invitations/InvitationsList'),
-  'InvitationsList',
-);
-const GroupInvitationsList = lazyComponent(
-  () => import('../invitations/GroupInvitationsList'),
-  'GroupInvitationsList',
-);
-const CustomerPermissionsLogList = lazyComponent(
-  () => import('./team/CustomerPermissionsLogList'),
-  'CustomerPermissionsLogList',
-);
-const CustomerPermissionsReviewList = lazyComponent(
-  () => import('./team/CustomerPermissionsReviewList'),
-  'CustomerPermissionsReviewList',
-);
-
-const CustomerEventsList = lazyComponent(
-  () => import('./workspace/CustomerEventsList'),
-  'CustomerEventsList',
-);
-const CustomerIssuesList = lazyComponent(
-  () => import('./workspace/CustomerIssuesList'),
-  'CustomerIssuesList',
-);
-
-const IssueDetailsContainer = lazyComponent(
-  () => import('../issues/IssueDetails'),
-  'IssueDetails',
-);
-
-const CostPoliciesList = lazyComponent(
-  () => import('./cost-policies/CostPoliciesList'),
-  'CostPoliciesList',
-);
-const OrganizationResourcesAllList = lazyComponent(
-  () => import('../marketplace/resources/list/OrganizationResourcesAllList'),
-  'OrganizationResourcesAllList',
-);
-const CustomerOrdersList = lazyComponent(
-  () => import('./orders/CustomerOrdersList'),
-  'CustomerOrdersList',
-);
-const CustomerChecklistOverview = lazyComponent(
-  () => import('../marketplace-checklist/CustomerChecklistOverview'),
-  'CustomerChecklistOverview',
-);
+import { fetchCustomer } from './workspace/fetchCustomer';
 
 export const states: StateDeclaration[] = [
   {
@@ -95,12 +19,14 @@ export const states: StateDeclaration[] = [
     abstract: true,
     data: {
       auth: true,
-      workspace: WorkspaceType.ORGANIZATION,
       title: () => translate('Organization'),
-      skipInitWorkspace: true,
     },
     parent: 'layout',
-    component: OrganizationUIView,
+    component: lazyComponent(() =>
+      import('@waldur/organization/OrganizationUIView').then((module) => ({
+        default: module.OrganizationUIView,
+      })),
+    ),
     resolve: [
       {
         token: 'fetchCustomer',
@@ -114,7 +40,11 @@ export const states: StateDeclaration[] = [
     name: 'organization-resources',
     parent: 'organization',
     url: 'marketplace-resources/',
-    component: OrganizationResourcesAllList,
+    component: lazyComponent(() =>
+      import('../marketplace/resources/list/OrganizationResourcesAllList').then(
+        (module) => ({ default: module.OrganizationResourcesAllList }),
+      ),
+    ),
     data: {
       breadcrumb: () => translate('Resources'),
       priority: 110,
@@ -124,7 +54,11 @@ export const states: StateDeclaration[] = [
     name: 'organization-orders',
     parent: 'organization',
     url: 'marketplace-orders/',
-    component: CustomerOrdersList,
+    component: lazyComponent(() =>
+      import('./orders/CustomerOrdersList').then((module) => ({
+        default: module.CustomerOrdersList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Orders'),
       priority: 120,
@@ -145,17 +79,24 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization.dashboard',
     url: 'dashboard/',
-    component: CustomerDashboard,
+    component: lazyComponent(() =>
+      import('./dashboard/CustomerDashboard').then((module) => ({
+        default: module.CustomerDashboard,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Organization dashboard'),
       priority: 100,
     },
   },
-
   {
     name: 'organization.events',
     url: 'events/',
-    component: CustomerEventsList,
+    component: lazyComponent(() =>
+      import('./workspace/CustomerEventsList').then((module) => ({
+        default: module.CustomerEventsList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Audit logs'),
       priority: 180,
@@ -165,7 +106,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization.issues',
     url: 'issues/',
-    component: CustomerIssuesList,
+    component: lazyComponent(() =>
+      import('./workspace/CustomerIssuesList').then((module) => ({
+        default: module.CustomerIssuesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Issues'),
       skipBreadcrumb: true,
@@ -176,7 +121,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization.issue-details',
     url: 'issue/:issue_uuid/',
-    component: IssueDetailsContainer,
+    component: lazyComponent(() =>
+      import('../issues/IssueDetails').then((module) => ({
+        default: module.IssueDetails,
+      })),
+    ),
     data: {
       permissions: [hasSupport],
     },
@@ -185,7 +134,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization.projects',
     url: 'projects/',
-    component: ProjectsList,
+    component: lazyComponent(() =>
+      import('@waldur/project/ProjectsList').then((module) => ({
+        default: module.ProjectsList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Projects'),
       skipBreadcrumb: true,
@@ -195,7 +148,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization-users',
     url: 'users/',
-    component: CustomerUsersTab,
+    component: lazyComponent(() =>
+      import('./team/CustomerUsersTab').then((module) => ({
+        default: module.CustomerUsersTab,
+      })),
+    ),
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Users'),
@@ -206,7 +163,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization-invitations',
     url: 'invitations/',
-    component: InvitationsList,
+    component: lazyComponent(() =>
+      import('../invitations/InvitationsList').then((module) => ({
+        default: module.InvitationsList,
+      })),
+    ),
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Invitations'),
@@ -216,21 +177,26 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization-group-invitations',
     url: 'group-invitations/',
-    component: GroupInvitationsList,
+    component: lazyComponent(() =>
+      import('../invitations/GroupInvitationsList').then((module) => ({
+        default: module.GroupInvitationsList,
+      })),
+    ),
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Group invitations'),
-      permissions: [
-        (state: RootState) =>
-          !getConfig(state).plugins.WALDUR_CORE.INVITATION_USE_WEBHOOKS,
-      ],
+      permissions: [() => !ENV.plugins.WALDUR_CORE.INVITATION_USE_WEBHOOKS],
     },
   },
 
   {
     name: 'organization-permissions-log',
     url: 'permissions-log/',
-    component: CustomerPermissionsLogList,
+    component: lazyComponent(() =>
+      import('./team/CustomerPermissionsLogList').then((module) => ({
+        default: module.CustomerPermissionsLogList,
+      })),
+    ),
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Permission log'),
@@ -240,7 +206,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'organization-permissions-reviews',
     url: 'permissions-reviews/',
-    component: CustomerPermissionsReviewList,
+    component: lazyComponent(() =>
+      import('./team/CustomerPermissionsReviewList').then((module) => ({
+        default: module.CustomerPermissionsReviewList,
+      })),
+    ),
     parent: 'organization-team',
     data: {
       breadcrumb: () => translate('Reviews'),
@@ -252,12 +222,20 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'organization',
-    component: CustomerManageContainer,
+    component: lazyComponent(() =>
+      import('./details/CustomerManageContainer').then((module) => ({
+        default: module.CustomerManageContainer,
+      })),
+    ),
   },
   {
     name: 'organization-manage',
     url: 'manage/?tab',
-    component: CustomerManage,
+    component: lazyComponent(() =>
+      import('./details/CustomerManage').then((module) => ({
+        default: module.CustomerManage,
+      })),
+    ),
     parent: 'organization-manage-container',
     data: {
       breadcrumb: () => translate('Settings'),
@@ -282,7 +260,11 @@ export const states: StateDeclaration[] = [
     name: 'organization-payment-profiles',
     url: 'payment-profiles/',
     parent: 'organization-billing',
-    component: PaymentProfilesPanel,
+    component: lazyComponent(() =>
+      import('./payment-profiles/PaymentProfilesPanel').then((module) => ({
+        default: module.PaymentProfilesPanel,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Payment profiles'),
       permissions: [
@@ -300,7 +282,11 @@ export const states: StateDeclaration[] = [
     name: 'organization-payment-list',
     url: 'payments/',
     parent: 'organization-billing',
-    component: CustomerPayments,
+    component: lazyComponent(() =>
+      import('./details/CustomerPayments').then((module) => ({
+        default: module.CustomerPayments,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Payments list'),
       permissions: [
@@ -326,7 +312,11 @@ export const states: StateDeclaration[] = [
     name: 'organization-cost-policies',
     url: 'cost-policies/',
     parent: 'organization-billing',
-    component: CostPoliciesList,
+    component: lazyComponent(() =>
+      import('./cost-policies/CostPoliciesList').then((module) => ({
+        default: module.CostPoliciesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Cost policies'),
       permissions: [isOwnerOrStaff],
@@ -335,9 +325,33 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'project-credit-management',
+    url: 'credit-management/',
+    parent: 'organization-billing',
+    component: lazyComponent(() =>
+      import('./credits/ProjectCreditsList').then((module) => ({
+        default: module.ProjectCreditsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Credit management'),
+      permissions: [
+        isOwnerOrStaff,
+        (state) =>
+          !state.workspace.customer || Boolean(state.workspace.customer.credit),
+      ],
+      priority: 137,
+    },
+  },
+
+  {
     name: 'organization.checklists',
     url: 'checklists/',
-    component: CustomerChecklistOverview,
+    component: lazyComponent(() =>
+      import('../marketplace-checklist/CustomerChecklistOverview').then(
+        (module) => ({ default: module.CustomerChecklistOverview }),
+      ),
+    ),
     data: {
       breadcrumb: () => translate('Checklists'),
       feature: MarketplaceFeatures.show_experimental_ui_components,

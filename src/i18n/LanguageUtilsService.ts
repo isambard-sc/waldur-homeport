@@ -1,5 +1,4 @@
 import Axios from 'axios';
-import flatpickr from 'flatpickr';
 import { Settings } from 'luxon';
 
 import { ENV } from '@waldur/configs/default';
@@ -27,7 +26,6 @@ class LanguageUtilsServiceClass {
     });
     Settings.defaultLocale = language.code;
     Axios.defaults.headers['Accept-Language'] = language.code;
-    flatpickr.localize(flatpickr.l10ns[language.code]);
   }
 
   checkLanguage() {

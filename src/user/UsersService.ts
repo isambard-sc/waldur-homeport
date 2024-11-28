@@ -6,18 +6,21 @@ import store from '@waldur/store/store';
 import { setCurrentUser } from '@waldur/workspace/actions';
 import { getUser } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
-import { WorkspaceStorage } from '@waldur/workspace/WorkspaceStorage';
+import {
+  setImpersonatedUserUuid,
+  clearImpersonatedUserUuid,
+} from '@waldur/workspace/WorkspaceStorage';
 
 export const getCurrentUser = (config?) =>
   get<UserDetails>('/users/me/', config).then((response) => response.data);
 
 export const setImpersonationData = (userUuid) => {
   Axios.defaults.headers['X-IMPERSONATED-USER-UUID'] = userUuid;
-  WorkspaceStorage.setImpersonatedUserUuid(userUuid);
+  setImpersonatedUserUuid(userUuid);
 };
 export const clearImpersonationData = () => {
   delete Axios.defaults.headers['X-IMPERSONATED-USER-UUID'];
-  WorkspaceStorage.clearImpersonatedUserUuid();
+  clearImpersonatedUserUuid();
 };
 
 class UsersServiceClass {
@@ -50,8 +53,9 @@ class UsersServiceClass {
   isCurrentUserValid() {
     return this.getCurrentUser().then((user) => {
       return (
-        !this.mandatoryFieldsMissing(user) &&
-        (user as UserDetails).agreement_date
+        user.is_staff ||
+        (!this.mandatoryFieldsMissing(user) &&
+          (user as UserDetails).agreement_date)
       );
     });
   }

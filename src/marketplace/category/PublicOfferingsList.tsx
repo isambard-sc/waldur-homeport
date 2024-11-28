@@ -1,12 +1,16 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
+import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { getLabel } from '@waldur/marketplace/common/registry';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { OfferingCard } from '../common/OfferingCard';
@@ -32,6 +36,23 @@ const RowActions = ({ row }) => {
   );
 };
 
+const mandatoryFields = [
+  // OfferingCard
+  'uuid',
+  'name',
+  'state',
+  'paused_reason',
+  'customer_name',
+  'project_name',
+  'thumbnail',
+  'image',
+  'type',
+  // OfferingCard and RowActions
+  'customer_uuid',
+  'shared',
+  'project_uuid',
+];
+
 export const PublicOfferingsList: FunctionComponent<{
   filter?;
   showCategory?;
@@ -50,9 +71,10 @@ export const PublicOfferingsList: FunctionComponent<{
     filter: mergedFilter,
     fetchData: createFetcher('marketplace-public-offerings'),
     queryField: 'keyword',
+    mandatoryFields,
   });
 
-  const columns = [
+  const columns: Column[] = [
     {
       title: translate('Name'),
       render: ({ row }: { row: Offering }) => (
@@ -63,6 +85,7 @@ export const PublicOfferingsList: FunctionComponent<{
           {row.name}
         </Link>
       ),
+      copyField: (row) => row.name,
       orderField: 'name',
       id: 'name',
       keys: ['name'],
@@ -101,6 +124,14 @@ export const PublicOfferingsList: FunctionComponent<{
     });
   }
 
+  columns.push({
+    title: translate('Created at'),
+    render: ({ row }) => formatDateTime(row.created),
+    orderField: 'created',
+    id: 'created',
+    keys: ['created'],
+  });
+
   return (
     <Table
       {...props}
@@ -115,6 +146,7 @@ export const PublicOfferingsList: FunctionComponent<{
           showOrganization={showOrganization}
         />
       }
+      initialSorting={{ field: 'created', mode: 'desc' }}
       initialMode={initialMode === 'table' ? 'table' : 'grid'}
       standalone
       title={translate('Offerings')}

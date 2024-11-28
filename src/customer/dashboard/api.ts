@@ -1,7 +1,9 @@
 import { getList } from '@waldur/core/api';
-import { formatCostChart } from '@waldur/dashboard/api';
-import { getScopeChartOptions } from '@waldur/dashboard/chart';
-import { LINE_CHART_COLOR } from '@waldur/dashboard/constants';
+import { formatCostChart, getTeamSizeChart } from '@waldur/dashboard/api';
+import {
+  getLineChartOptions,
+  getLineChartOptionsWithAxis,
+} from '@waldur/dashboard/chart';
 import { Scope, Chart, InvoiceSummary } from '@waldur/dashboard/types';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 
@@ -12,25 +14,40 @@ const getInvoiceSummary = (customer: string) =>
     field: ['year', 'month', 'price'],
   });
 
-async function getCustomerCharts(customer: Scope): Promise<Chart[]> {
-  const charts: Chart[] = [];
+async function getCustomerCostChart(customer: Scope): Promise<Chart> {
   if (!getActiveFixedPricePaymentProfile(customer.payment_profiles)) {
     const invoices = await getInvoiceSummary(customer.url);
     const costChart = formatCostChart(invoices);
-    charts.push(costChart);
+    return costChart;
   }
-  return charts;
+  return null;
+}
+
+export async function getCustomerCostChartData(
+  customer: Scope,
+  withAxis = false,
+) {
+  const costChart = await getCustomerCostChart(customer);
+  return costChart
+    ? {
+        chart: costChart,
+        options: withAxis
+          ? getLineChartOptionsWithAxis(costChart)
+          : getLineChartOptions(costChart),
+      }
+    : null;
 }
 
 export const loadSummary = async (customer) => {
-  const charts: Chart[] = await getCustomerCharts(customer);
-  return charts.map((chart) => ({
-    chart,
-    options: getScopeChartOptions(
-      chart.data.map((item) => item.label),
-      chart.data.map((item) => item.value),
-      null,
-      LINE_CHART_COLOR,
-    ),
-  }));
+  const costChartData = await getCustomerCostChartData(customer);
+  const teamChart = await getTeamSizeChart(customer);
+  return {
+    costChart: costChartData,
+    teamChart: teamChart
+      ? {
+          chart: teamChart,
+          options: getLineChartOptions(teamChart),
+        }
+      : null,
+  };
 };

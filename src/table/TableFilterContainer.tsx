@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { SavedFilterSelect } from './SavedFilterSelect';
 import { FilterItem, TableState } from './types';
@@ -14,7 +14,7 @@ interface ITableFilterContext {
   filterPosition: TableState['filterPosition'];
   form: string;
   setFilter: (item: FilterItem) => void;
-  apply?: () => void;
+  apply?: (hideMenu?: boolean) => void;
   columnFilter?: boolean;
   selectedSavedFilter?: TableState['selectedSavedFilter'];
 }

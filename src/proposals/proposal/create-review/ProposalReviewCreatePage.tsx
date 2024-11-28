@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { createRef, useCallback, useRef, useState } from 'react';
-import { Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { Badge } from '@waldur/core/Badge';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -11,6 +11,7 @@ import { getUUID } from '@waldur/core/utils';
 import { Form } from '@waldur/form/Form';
 import { SidebarLayout } from '@waldur/form/SidebarLayout';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
+import { PageBarProvider } from '@waldur/marketplace/context';
 import {
   closeModalDialog,
   openModalDialog,
@@ -26,15 +27,17 @@ import {
 } from '@waldur/proposals/api';
 import { PROPOSAL_UPDATE_REVIEW_FORM_ID } from '@waldur/proposals/constants';
 import { ProposalReview } from '@waldur/proposals/types';
+import { formatReviewState } from '@waldur/proposals/utils';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { CreatePageSidebar } from './CreatePageSidebar';
-import { createProposalSteps } from './steps/steps';
+import { createReviewSteps } from './steps/steps';
 
-const CommentFormDialog = lazyComponent(
-  () => import('./CommentFormDialog'),
-  'CommentFormDialog',
+const CommentFormDialog = lazyComponent(() =>
+  import('./CommentFormDialog').then((module) => ({
+    default: module.CommentFormDialog,
+  })),
 );
 
 const loadData = async (reviewUuid) => {
@@ -68,7 +71,7 @@ export const ProposalReviewCreatePage = (props) => {
     },
   );
 
-  const formSteps = createProposalSteps;
+  const formSteps = createReviewSteps;
 
   const stepRefs = useRef([]);
   stepRefs.current = formSteps.map(
@@ -142,39 +145,47 @@ export const ProposalReviewCreatePage = (props) => {
   }
 
   return (
-    <Form form={PROPOSAL_UPDATE_REVIEW_FORM_ID} onSubmit={submit}>
-      <SidebarLayout.Container>
-        <SidebarLayout.Body>
-          <Card className="mt-10">
-            <Card.Body>
-              <h6>
-                {translate(
-                  'Welcome to the review portal. Please review the application below. If you want to add a comment to a specific field, click on the comment action in the corresponding field.',
-                )}
-              </h6>
-            </Card.Body>
-          </Card>
-
-          {formSteps.map((step, i) => (
-            <div ref={stepRefs.current[i]} key={step.id}>
-              <step.component
-                id={step.id}
-                title={step.label}
-                observed={false}
-                change={props.change}
-                params={{
-                  proposal: data.proposal,
-                  reviews: data.review ? [data.review] : null,
-                  onAddCommentClick: openCommentFormDialog,
-                }}
-              />
+    <PageBarProvider scrollTrackSide="top" scrollOffset={200}>
+      <Form form={PROPOSAL_UPDATE_REVIEW_FORM_ID} onSubmit={submit}>
+        <div className="container-fluid">
+          <div className="my-8 border-bottom">
+            <div className="hstack gap-4 mb-2">
+              <h1 className="mb-0">{data.review.proposal_name}</h1>
+              <Badge variant="default" outline pill>
+                {formatReviewState(data.review.state)}
+              </Badge>
             </div>
-          ))}
-        </SidebarLayout.Body>
-        <SidebarLayout.Sidebar>
-          <CreatePageSidebar proposal={data.proposal} steps={formSteps} />
-        </SidebarLayout.Sidebar>
-      </SidebarLayout.Container>
-    </Form>
+            <p className="text-grey-500 mb-8">
+              {translate(
+                'Please review the application below. If you want to add a comment to a specific field, click on the comment action in the corresponding field.',
+              )}
+            </p>
+          </div>
+        </div>
+        <SidebarLayout.Container>
+          <SidebarLayout.Body>
+            {formSteps.map((step, i) => (
+              <div ref={stepRefs.current[i]} key={step.id}>
+                <step.component
+                  id={step.id}
+                  title={step.label}
+                  observed={false}
+                  change={props.change}
+                  params={{
+                    proposal: data.proposal,
+                    reviews: data.review ? [data.review] : null,
+                    onAddCommentClick: openCommentFormDialog,
+                    readOnly: true,
+                  }}
+                />
+              </div>
+            ))}
+          </SidebarLayout.Body>
+          <SidebarLayout.Sidebar transparent>
+            <CreatePageSidebar />
+          </SidebarLayout.Sidebar>
+        </SidebarLayout.Container>
+      </Form>
+    </PageBarProvider>
   );
 };

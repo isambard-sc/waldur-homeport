@@ -5,8 +5,8 @@ import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
-import { Table } from '@waldur/table/index';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { formatFilter } from './utils';
 
@@ -28,7 +28,7 @@ export const ImagesList: FunctionComponent<{}> = () => {
 
   const props = useTable({
     table: 'imagesList',
-    fetchData: createFetcher('openstacktenant-images/usage_stats'),
+    fetchData: createFetcher('openstack-images/usage_stats'),
     filter,
   });
 

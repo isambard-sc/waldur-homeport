@@ -6,12 +6,12 @@ import NotificationsSystem, {
   dismissNotification,
 } from 'reapop';
 
-import { themeSelector } from './navigation/theme/store';
+import { useTheme } from '@waldur/theme/useTheme';
 
 export const NotificationContainer: FunctionComponent = () => {
   const dispatch = useDispatch();
   const notifications = useSelector((state: any) => state.notifications);
-  const theme = useSelector(themeSelector);
+  const { theme } = useTheme();
   return (
     <NotificationsSystem
       theme={theme === 'dark' ? atalhoTheme : bootstrapTheme}

@@ -1,4 +1,4 @@
-import { triggerTransition } from '@uirouter/redux';
+import { useRouter } from '@uirouter/react';
 import { useState, FunctionComponent } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -15,8 +15,9 @@ export const PendingReviewDialog: FunctionComponent<{
   resolve: { reviewId };
 }> = ({ resolve: { reviewId } }) => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const gotoTeam = () => {
-    dispatch(triggerTransition('organization-permissions-reviews', {}));
+    router.stateService.go('organization-permissions-reviews');
     dispatch(closeModalDialog());
   };
   const [submitting, setSubmitting] = useState(false);

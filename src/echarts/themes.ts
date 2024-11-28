@@ -3,7 +3,7 @@
  * dark-metronic theme
  */
 
-import echarts from 'echarts';
+import * as echarts from 'echarts';
 
 function registerDarkTheme() {
   const log = function (msg) {
@@ -72,6 +72,10 @@ function registerDarkTheme() {
         crossStyle: {
           color: contrastColor,
         },
+      },
+      backgroundColor: 'rgba(255,255,255,0.6)',
+      textStyle: {
+        color: '#000',
       },
     },
     legend: {
@@ -204,6 +208,9 @@ function registerLightTheme() {
 
     tooltip: {
       backgroundColor: 'rgba(0,0,0,0.6)',
+      textStyle: {
+        color: '#fff',
+      },
     },
 
     dataZoom: {

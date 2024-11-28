@@ -4,7 +4,7 @@ export const redirectPost = (url: string, data: object) => {
   form.method = 'POST';
   form.action = url;
   for (const name in data) {
-    if (data.hasOwnProperty(name)) {
+    if (Object.prototype.hasOwnProperty.call(data, name)) {
       const input = document.createElement('input');
       input.type = 'hidden';
       input.name = name;

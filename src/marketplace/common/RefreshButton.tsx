@@ -8,17 +8,19 @@ interface RefreshButtonProps {
   size?: 'sm' | 'lg';
   refetch;
   isLoading?: boolean;
+  className?: string;
 }
 
 export const RefreshButton = ({
   size,
   refetch,
   isLoading,
+  className,
 }: RefreshButtonProps) => {
   return (
     <Button
-      variant="outline-dark"
-      className="btn-outline btn-active-secondary btn-icon-dark border-gray-400 w-100px px-2"
+      variant="outline btn-outline-default"
+      className={'min-w-100px' + (className ? ` ${className}` : '')}
       size={size}
       onClick={!isLoading ? refetch : undefined}
     >

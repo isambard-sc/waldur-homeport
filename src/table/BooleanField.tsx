@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { Check, Minus } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
 interface BooleanFieldProps {
@@ -8,10 +8,5 @@ interface BooleanFieldProps {
 export const BooleanField: FunctionComponent<BooleanFieldProps> = ({
   value,
 }) => (
-  <i
-    className={classNames('fa', {
-      'fa-check': value,
-      'fa-minus': !value,
-    })}
-  />
+  <span className="svg-icon svg-icon-5">{value ? <Check /> : <Minus />}</span>
 );

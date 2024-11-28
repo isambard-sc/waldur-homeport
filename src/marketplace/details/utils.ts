@@ -1,4 +1,4 @@
-import { formValueSelector, isDirty } from 'redux-form';
+import { formValueSelector } from 'redux-form';
 
 import {
   getFormLimitSerializer,
@@ -19,15 +19,13 @@ const formatLimits = (props) => {
       .filter((c) => c.billing_type === 'limit')
       .map((c) => c.type);
     // Filter out disabled plan quotas
-    limits = {
-      ...Object.keys(planQuotas).reduce(
-        (acc, key) =>
-          limitedComponents.includes(key)
-            ? { ...acc, [key]: planQuotas[key] }
-            : acc,
-        {},
-      ),
-    };
+    limits = Object.keys(planQuotas).reduce(
+      (acc, key) =>
+        limitedComponents.includes(key)
+          ? { ...acc, [key]: planQuotas[key] }
+          : acc,
+      {},
+    );
   }
   const limitSerializer = getFormLimitSerializer(props.offering.type);
   limits = {
@@ -58,15 +56,14 @@ const formatAttributes = (props) => {
 
 export const formatOrderForCreate = (props: OrderSummaryProps) => ({
   offering: props.offering.url,
-  project: props.formData?.project?.url,
+  project: props.formData?.project?.url || props.offering.project,
   plan: props.formData?.plan?.url,
   attributes: formatAttributes(props),
   limits: formatLimits(props),
+  accepting_terms_of_service: true,
 });
 
-export const orderFormValues = formValueSelector(ORDER_FORM_ID);
-
-export const orderFormIsDirty = isDirty(ORDER_FORM_ID);
+const orderFormValues = formValueSelector(ORDER_FORM_ID);
 
 export const orderCustomerSelector = (state) =>
   orderFormValues(state, 'customer');

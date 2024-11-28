@@ -3,8 +3,9 @@ import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CustomerQuotasFilter } from './CustomerQuotasFilter';
 import { CustomerQuota, QuotaChoice } from './types';
@@ -34,6 +35,7 @@ export const CustomerQuotasList = () => {
           render: ({ row }) => (
             <>{row.customer_abbreviation || row.customer_name}</>
           ),
+          copyField: (row) => row.customer_abbreviation || row.customer_name,
           orderField: 'name',
         },
         {

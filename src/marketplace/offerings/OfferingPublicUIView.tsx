@@ -5,60 +5,63 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import {
-  getCategory,
-  getPlugins,
-  getCategories,
-  getPublicOffering,
-} from '@waldur/marketplace/common/api';
-import * as actions from '@waldur/marketplace/offerings/store/actions';
-import { filterPluginsData } from '@waldur/marketplace/offerings/store/utils';
+import { getCategory, getPublicOffering } from '@waldur/marketplace/common/api';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { ANONYMOUS_CONFIG } from '@waldur/table/api';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { isExperimentalUiComponentsVisible } from '../utils';
 
+import { PUBLIC_OFFERING_DATA_QUERY_KEY } from './constants';
 import { OfferingViewHero } from './OfferingViewHero';
 import { getPublicOfferingBreadcrumbItems } from './utils';
 
-const PublicOfferingInfo = lazyComponent(
-  () => import('./details/PublicOfferingInfo'),
-  'PublicOfferingInfo',
+const PublicOfferingInfo = lazyComponent(() =>
+  import('./details/PublicOfferingInfo').then((module) => ({
+    default: module.PublicOfferingInfo,
+  })),
 );
-const PublicOfferingComponents = lazyComponent(
-  () => import('./details/PublicOfferingComponents'),
-  'PublicOfferingComponents',
+const PublicOfferingComponents = lazyComponent(() =>
+  import('./details/PublicOfferingComponents').then((module) => ({
+    default: module.PublicOfferingComponents,
+  })),
 );
-const PublicOfferingImages = lazyComponent(
-  () => import('./details/PublicOfferingImages'),
-  'PublicOfferingImages',
+const PublicOfferingImages = lazyComponent(() =>
+  import('./details/PublicOfferingImages').then((module) => ({
+    default: module.PublicOfferingImages,
+  })),
 );
-const PublicOfferingGettingStarted = lazyComponent(
-  () => import('./details/PublicOfferingGettingStarted'),
-  'PublicOfferingGettingStarted',
+const PublicOfferingGettingStarted = lazyComponent(() =>
+  import('./details/PublicOfferingGettingStarted').then((module) => ({
+    default: module.PublicOfferingGettingStarted,
+  })),
 );
-const PublicOfferingFAQ = lazyComponent(
-  () => import('./details/PublicOfferingFAQ'),
-  'PublicOfferingFAQ',
+const PublicOfferingFAQ = lazyComponent(() =>
+  import('./details/PublicOfferingFAQ').then((module) => ({
+    default: module.PublicOfferingFAQ,
+  })),
 );
-const PublicOfferingReviews = lazyComponent(
-  () => import('./details/PublicOfferingReviews'),
-  'PublicOfferingReviews',
+const PublicOfferingReviews = lazyComponent(() =>
+  import('./details/PublicOfferingReviews').then((module) => ({
+    default: module.PublicOfferingReviews,
+  })),
 );
-const PublicOfferingPricing = lazyComponent(
-  () => import('./details/PublicOfferingPricing'),
-  'PublicOfferingPricing',
+const PublicOfferingPricing = lazyComponent(() =>
+  import('./details/PublicOfferingPricing').then((module) => ({
+    default: module.PublicOfferingPricing,
+  })),
 );
-const PublicOfferingLocation = lazyComponent(
-  () => import('./details/PublicOfferingLocation'),
-  'PublicOfferingLocation',
+const PublicOfferingLocation = lazyComponent(() =>
+  import('./details/PublicOfferingLocation').then((module) => ({
+    default: module.PublicOfferingLocation,
+  })),
 );
-const PublicOfferingGetHelp = lazyComponent(
-  () => import('./details/PublicOfferingGetHelp'),
-  'PublicOfferingGetHelp',
+const PublicOfferingGetHelp = lazyComponent(() =>
+  import('./details/PublicOfferingGetHelp').then((module) => ({
+    default: module.PublicOfferingGetHelp,
+  })),
 );
 
 const getTabs = (offering?): PageBarTab[] => {
@@ -143,37 +146,12 @@ export const OfferingPublicUIView = () => {
   const user = useSelector(getUser);
 
   const { isLoading, error, data, refetch, isRefetching } = useQuery(
-    ['publicOfferingData', uuid, user?.uuid],
+    [PUBLIC_OFFERING_DATA_QUERY_KEY, uuid, user?.uuid],
     async () => {
-      if (user) {
-        const offering = await getPublicOffering(uuid);
-        const category = await getCategory(offering.category_uuid);
-        const categories = await getCategories();
-        const pluginsData = await getPlugins();
-        const plugins = filterPluginsData(pluginsData);
-        dispatch(
-          actions.loadDataSuccess({
-            offering,
-            categories,
-            plugins,
-          }),
-        );
-        return { offering, category };
-      } else {
-        const offering = await getPublicOffering(uuid, ANONYMOUS_CONFIG);
-        const category = await getCategory(
-          offering.category_uuid,
-          ANONYMOUS_CONFIG,
-        );
-        const categories = await getCategories(ANONYMOUS_CONFIG);
-        dispatch(
-          actions.loadDataSuccess({
-            offering,
-            categories,
-          }),
-        );
-        return { offering, category };
-      }
+      const options = user ? undefined : ANONYMOUS_CONFIG;
+      const offering = await getPublicOffering(uuid, options);
+      const category = await getCategory(offering.category_uuid, options);
+      return { offering, category };
     },
     { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
   );
@@ -204,8 +182,8 @@ export const OfferingPublicUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           data={data}
           isLoading={isLoading}

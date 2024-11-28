@@ -13,60 +13,80 @@ import {
 import { Offering } from '@waldur/marketplace/types';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import { isExperimentalUiComponentsVisible } from '../utils';
 
+import { PROVIDER_OFFERING_DATA_QUERY_KEY } from './constants';
 import { OfferingViewHero } from './OfferingViewHero';
 import { getOfferingBreadcrumbItems } from './utils';
 
-const OfferingDetailsStatistics = lazyComponent(
-  () =>
-    import('@waldur/marketplace/offerings/details/OfferingDetailsStatistics'),
-  'OfferingDetailsStatistics',
+const OfferingDetailsStatistics = lazyComponent(() =>
+  import(
+    '@waldur/marketplace/offerings/details/OfferingDetailsStatistics'
+  ).then((module) => ({ default: module.OfferingDetailsStatistics })),
 );
-const OfferingBookingResourcesCalendarContainer = lazyComponent(
-  () =>
-    import(
-      '@waldur/booking/offering/OfferingBookingResourcesCalendarContainer'
-    ),
-  'OfferingBookingResourcesCalendarContainer',
+const OfferingBookingResourcesCalendarContainer = lazyComponent(() =>
+  import(
+    '@waldur/booking/offering/OfferingBookingResourcesCalendarContainer'
+  ).then((module) => ({
+    default: module.OfferingBookingResourcesCalendarContainer,
+  })),
 );
-const OfferingResourcesList = lazyComponent(
-  () => import('../details/OfferingResourcesList'),
-  'OfferingResourcesList',
+const OfferingResourcesList = lazyComponent(() =>
+  import('../details/OfferingResourcesList').then((module) => ({
+    default: module.OfferingResourcesList,
+  })),
 );
-const OfferingOrdersList = lazyComponent(
-  () => import('./details/OfferingOrdersList'),
-  'OfferingOrdersList',
+const OfferingOrdersList = lazyComponent(() =>
+  import('./details/OfferingOrdersList').then((module) => ({
+    default: module.OfferingOrdersList,
+  })),
 );
-const PlanUsageList = lazyComponent(
-  () => import('./details/PlanUsageList'),
-  'PlanUsageList',
+const PlanUsageList = lazyComponent(() =>
+  import('./details/PlanUsageList').then((module) => ({
+    default: module.PlanUsageList,
+  })),
 );
-const OfferingUsersTable = lazyComponent(
-  () => import('./details/OfferingUsersTable'),
-  'OfferingUsersTable',
+const OfferingUsersTable = lazyComponent(() =>
+  import('./details/OfferingUsersTable').then((module) => ({
+    default: module.OfferingUsersTable,
+  })),
 );
-const OfferingPermissionsList = lazyComponent(
-  () => import('./details/permissions/OfferingPermissionsList'),
-  'OfferingPermissionsList',
+const OfferingPermissionsList = lazyComponent(() =>
+  import('./details/permissions/OfferingPermissionsList').then((module) => ({
+    default: module.OfferingPermissionsList,
+  })),
 );
-const OfferingCustomersList = lazyComponent(
-  () => import('./expandable/OfferingCustomersList'),
-  'OfferingCustomersList',
+const OfferingCustomersList = lazyComponent(() =>
+  import('./expandable/OfferingCustomersList').then((module) => ({
+    default: module.OfferingCustomersList,
+  })),
 );
-const OfferingCostsChart = lazyComponent(
-  () => import('./expandable/OfferingCostsChart'),
-  'OfferingCostsChart',
+const OfferingCostsChart = lazyComponent(() =>
+  import('./expandable/OfferingCostsChart').then((module) => ({
+    default: module.OfferingCostsChart,
+  })),
 );
-const OfferingUsageChart = lazyComponent(
-  () => import('./expandable/OfferingUsageChart'),
-  'OfferingUsageChart',
+const OfferingUsageChart = lazyComponent(() =>
+  import('./expandable/OfferingUsageChart').then((module) => ({
+    default: module.OfferingUsageChart,
+  })),
 );
-const OfferingEventsList = lazyComponent(
-  () => import('./expandable/OfferingEventsList'),
-  'OfferingEventsList',
+const OfferingCostPolicies = lazyComponent(() =>
+  import('./details/policies/OfferingCostPolicies').then((module) => ({
+    default: module.OfferingCostPolicies,
+  })),
+);
+const OfferingUsagePolicies = lazyComponent(() =>
+  import('./details/policies/OfferingUsagePolicies').then((module) => ({
+    default: module.OfferingUsagePolicies,
+  })),
+);
+const OfferingEventsList = lazyComponent(() =>
+  import('./expandable/OfferingEventsList').then((module) => ({
+    default: module.OfferingEventsList,
+  })),
 );
 
 async function loadOfferingData(offering_uuid: string) {
@@ -139,6 +159,22 @@ const getTabs = (offering: Offering): PageBarTab[] => {
         }
       : null,
     {
+      title: translate('Policy'),
+      key: 'policy',
+      children: [
+        {
+          key: 'cost-policy',
+          title: translate('Cost policy'),
+          component: OfferingCostPolicies,
+        },
+        {
+          key: 'usage-policy',
+          title: translate('Usage policy'),
+          component: OfferingUsagePolicies,
+        },
+      ],
+    },
+    {
       title: translate('Events'),
       key: 'events',
       component: OfferingEventsList,
@@ -158,7 +194,7 @@ export const OfferingDetailsUIView = () => {
     refetch: refetchOffering,
     isRefetching: isRefetchingOffering,
   } = useQuery(
-    ['providerOfferingData', offering_uuid],
+    [PROVIDER_OFFERING_DATA_QUERY_KEY, offering_uuid],
     () => loadOfferingData(offering_uuid),
     { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
   );
@@ -213,8 +249,8 @@ export const OfferingDetailsUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           data={{
             ...offeringData,

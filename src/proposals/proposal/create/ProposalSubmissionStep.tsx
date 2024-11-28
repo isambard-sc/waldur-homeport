@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 import { createRef, FC, useCallback, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
@@ -79,12 +79,18 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
       await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
-        translate(
-          'Are you sure you want to send the proposal to team verification step?',
-        ),
-        translate(
-          'NB! After clicking Yes, you will not be able to edit the proposal!',
-        ),
+        <>
+          {translate(
+            'Are you sure you want to send the proposal to team verification step?',
+          )}
+          <br />{' '}
+          <small className="text-danger">
+            {translate(
+              'NB! After clicking Yes, you will not be able to edit the proposal!',
+            )}
+          </small>
+        </>,
+        false,
       );
     } catch {
       return;

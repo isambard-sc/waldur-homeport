@@ -8,9 +8,10 @@ import { RowActionButton } from '@waldur/table/ActionButton';
 
 import type { PlanUsageRowProps } from './types';
 
-const PlanUsageDialog = lazyComponent(
-  () => import('./PlanUsageDialog'),
-  'PlanUsageDialog',
+const PlanUsageDialog = lazyComponent(() =>
+  import('./PlanUsageDialog').then((module) => ({
+    default: module.PlanUsageDialog,
+  })),
 );
 
 export const PlanUsageButton: FunctionComponent<PlanUsageRowProps> = (

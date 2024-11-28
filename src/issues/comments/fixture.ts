@@ -1,4 +1,6 @@
-import { Comment, Issue } from './types';
+import { Issue } from '../list/types';
+
+import { Comment } from './types';
 
 export const comment: Comment = {
   author_name: 'author_name',
@@ -17,6 +19,6 @@ export const comment: Comment = {
   update_is_available: true,
 };
 
-export const issue: Issue = {
+export const issue: Partial<Issue> = {
   url: 'https://example.com/en-US/docs/Web/CSS/pointer-events',
 };

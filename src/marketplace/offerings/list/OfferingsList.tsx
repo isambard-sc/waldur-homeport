@@ -3,15 +3,20 @@ import { FunctionComponent } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { getLabel } from '@waldur/marketplace/common/registry';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import { SLUG_COLUMN } from '@waldur/table/slug';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { useOfferingDropdownActions } from '../hooks';
 
+import { CreateOfferingButton } from './CreateOfferingButton';
 import { OfferingActions } from './OfferingActions';
 import { OfferingNameColumn } from './OfferingNameColumn';
-import { OfferingsListTablePlaceholder } from './OfferingsListTablePlaceholder';
 import { OfferingStateCell } from './OfferingStateCell';
+
+const mandatoryFields = ['customer_uuid', 'components', 'plans'];
 
 export const BaseOfferingsList: FunctionComponent<{
   table: string;
@@ -25,6 +30,7 @@ export const BaseOfferingsList: FunctionComponent<{
     filter,
     fetchData: createFetcher('marketplace-provider-offerings'),
     queryField: 'keyword',
+    mandatoryFields,
   });
 
   const organizationColumn = hasOrganizationColumn
@@ -34,6 +40,8 @@ export const BaseOfferingsList: FunctionComponent<{
           render: ({ row }) => renderFieldOrDash(row.customer_name),
           filter: 'organization',
           export: 'customer_name',
+          keys: ['customer_name'],
+          id: 'organization',
         },
       ]
     : [];
@@ -44,6 +52,8 @@ export const BaseOfferingsList: FunctionComponent<{
       render: OfferingNameColumn,
       orderField: 'name',
       export: 'name',
+      keys: ['name'],
+      id: 'name',
     },
     ...organizationColumn,
     {
@@ -51,6 +61,8 @@ export const BaseOfferingsList: FunctionComponent<{
       render: ({ row }) => <>{row.category_title}</>,
       filter: 'category',
       export: 'category_title',
+      keys: ['category_title'],
+      id: 'category',
     },
     {
       title: translate('Created'),
@@ -58,12 +70,16 @@ export const BaseOfferingsList: FunctionComponent<{
       orderField: 'created',
       export: (row) => formatDateTime(row.created),
       exportKeys: ['created'],
+      keys: ['created'],
+      id: 'created',
     },
     {
       title: translate('State'),
       render: OfferingStateCell,
       filter: 'state',
       export: 'state',
+      keys: ['state'],
+      id: 'state',
     },
     {
       title: translate('Type'),
@@ -71,7 +87,10 @@ export const BaseOfferingsList: FunctionComponent<{
       filter: 'offering_type',
       export: (row) => getLabel(row.type),
       exportKeys: ['type'],
+      keys: ['type'],
+      id: 'type',
     },
+    SLUG_COLUMN,
   ];
 
   const dropdownActions = useOfferingDropdownActions();
@@ -79,8 +98,8 @@ export const BaseOfferingsList: FunctionComponent<{
   return (
     <Table
       {...props}
-      placeholderComponent={
-        <OfferingsListTablePlaceholder showActions={showActions} />
+      placeholderActions={
+        showActions && <CreateOfferingButton className="w-175px mw-350px" />
       }
       columns={columns}
       verboseName={translate('Offerings')}
@@ -94,6 +113,7 @@ export const BaseOfferingsList: FunctionComponent<{
       }
       hasQuery={true}
       filters={filters}
+      hasOptionalColumns
     />
   );
 };

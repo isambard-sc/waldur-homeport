@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const ResourceSummaryModal = lazyComponent(
-  () => import('./ResourceSummaryModal'),
-  'ResourceSummaryModal',
+const ResourceSummaryModal = lazyComponent(() =>
+  import('./ResourceSummaryModal').then((module) => ({
+    default: module.ResourceSummaryModal,
+  })),
 );
 
 interface ResourceSummaryButtonProps {

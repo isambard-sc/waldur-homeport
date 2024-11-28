@@ -1,5 +1,6 @@
+import { UploadSimple } from '@phosphor-icons/react';
 import accepts from 'attr-accept';
-import { Component } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 
 import { FormField } from './types';
 
@@ -7,68 +8,69 @@ export interface FileUploadFieldProps extends FormField {
   accept?: string;
   showFileName?: boolean;
   buttonLabel: string;
+  iconNode?: ReactNode;
   className?: string;
 }
 
-export class FileUploadField extends Component<FileUploadFieldProps> {
-  private fileInput: HTMLInputElement;
+export const FileUploadField = ({
+  accept,
+  showFileName,
+  buttonLabel,
+  className = 'btn btn-sm btn-primary',
+  disabled,
+  input,
+  iconNode = <UploadSimple />,
+}: FileUploadFieldProps) => {
+  const [fileName, setFileName] = useState<string | undefined>(undefined);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  state = {
-    fileName: undefined,
+  const openFileDialog = () => {
+    fileInputRef.current?.click();
   };
 
-  static defaultProps = {
-    className: 'btn btn-sm btn-primary',
-  };
-
-  openFileDialog = () => {
-    this.fileInput.click();
-  };
-
-  handleFile = (event) => {
+  const handleFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files.length === 1) {
+    if (files?.length === 1) {
       const file = files[0];
       if (
-        !this.props.accept ||
+        !accept ||
         accepts(
           {
             type: file.type,
             name: file.name,
           },
-          this.props.accept,
+          accept,
         )
       ) {
-        this.setState({ fileName: file.name });
-        this.props.input.onChange(file);
+        setFileName(file.name);
+        input.onChange(file);
         return;
       }
     }
-    this.setState({ fileName: undefined });
-    this.props.input.onChange(null);
+    setFileName(undefined);
+    input.onChange(null);
   };
 
-  render() {
-    return (
-      <>
-        {this.props.showFileName ? this.state.fileName || 'None' : null}{' '}
-        <button
-          type="button"
-          className={this.props.className}
-          onClick={this.openFileDialog}
-          disabled={this.props.disabled}
-        >
-          <i className="fa fa-upload" /> {this.props.buttonLabel}
-        </button>
-        <input
-          type="file"
-          style={{ display: 'none' }}
-          ref={(input) => (this.fileInput = input)}
-          accept={this.props.accept}
-          onChange={this.handleFile}
-          disabled={this.props.disabled}
-        />
-      </>
-    );
-  }
-}
+  return (
+    <>
+      {showFileName ? fileName || 'None' : null}{' '}
+      <button
+        type="button"
+        className={className}
+        onClick={openFileDialog}
+        disabled={disabled}
+      >
+        <span className="svg-icon svg-icon-2">{iconNode}</span> {buttonLabel}
+      </button>
+      <input
+        type="file"
+        style={{ display: 'none' }}
+        ref={fileInputRef}
+        accept={accept}
+        onChange={handleFile}
+        disabled={disabled}
+        data-testid="upload"
+      />
+    </>
+  );
+};

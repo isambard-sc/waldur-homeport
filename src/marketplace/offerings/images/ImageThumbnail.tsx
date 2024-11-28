@@ -10,9 +10,10 @@ interface ImageThumbnailProps {
   image: Image;
 }
 
-const ImageDetailsDialog = lazyComponent(
-  () => import('./ImageDetailsDialog'),
-  'ImageDetailsDialog',
+const ImageDetailsDialog = lazyComponent(() =>
+  import('./ImageDetailsDialog').then((module) => ({
+    default: module.ImageDetailsDialog,
+  })),
 );
 
 export const ImageThumbnail: FunctionComponent<ImageThumbnailProps> = (

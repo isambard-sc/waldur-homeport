@@ -26,6 +26,7 @@ export const CallUpdateHero: FC<CallUpdateHeroProps> = ({ call, refetch }) => {
     <PublicDashboardHero2
       logo={customer?.image}
       logoAlt={call.name}
+      cardBordered
       title={
         <>
           <div className="d-flex flex-wrap gap-2 mb-2 align-items-center">
@@ -33,7 +34,7 @@ export const CallUpdateHero: FC<CallUpdateHeroProps> = ({ call, refetch }) => {
             <StateIndicator
               variant={status.color}
               label={status.label}
-              light
+              outline
               pill
             />
           </div>

@@ -3,8 +3,9 @@ import { FunctionComponent } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { useMarketplacePublicTabs } from '../utils';
 
@@ -27,7 +28,13 @@ export const ServiceProvidersList: FunctionComponent = () => {
           label={row.customer_name}
         />
       ),
+      copyField: (row) => row.customer_name,
       keys: ['customer_name'],
+    },
+    {
+      title: translate('Description'),
+      render: ({ row }) => row.description || '—',
+      keys: ['description'],
     },
     {
       title: translate('Created at'),

@@ -25,7 +25,7 @@ export const ProviderDashboardChart: FunctionComponent<
   }
   if (Array.isArray(value) && value[0]) {
     return (
-      <Card className="min-h-225px mb-6">
+      <Card className="card-bordered min-h-225px mb-5">
         <Card.Body>
           <Row>
             <Col xs={7}>

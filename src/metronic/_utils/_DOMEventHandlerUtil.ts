@@ -48,7 +48,7 @@ export class DOMEventHandlerUtil {
   public static one(
     element: HTMLElement,
     eventName: string,
-    callBack: Function,
+    callBack: (e: Event) => void,
   ): void {
     element.addEventListener(eventName, function calee(e) {
       // remove event

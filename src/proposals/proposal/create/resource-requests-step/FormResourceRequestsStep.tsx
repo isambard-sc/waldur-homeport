@@ -1,15 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import {
-  VStepperFormStepCard,
-  VStepperFormStepProps,
-} from '@waldur/form/VStepperFormStep';
+import { VStepperFormStepProps } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { getPublicCall } from '@waldur/proposals/api';
 import {
@@ -17,8 +13,10 @@ import {
   ProposalResource,
   ProposalReview,
 } from '@waldur/proposals/types';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { AddCommentButton } from '../../create-review/AddCommentButton';
 import { FieldReviewComments } from '../../create-review/FieldReviewComments';
@@ -58,19 +56,11 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
     },
   );
 
-  const filterValues = useSelector(mapStateToFilter);
-
-  const filter = useMemo(
-    () => ({
-      proposal_uuid: proposal.uuid,
-      ...filterValues,
-    }),
-    [proposal, filterValues],
-  );
+  const filter = useSelector(mapStateToFilter);
 
   const tableProps = useTable({
     table: 'ProposalResourcesList',
-    fetchData: createFetcher('proposal-requested-resources'),
+    fetchData: createFetcher(`proposal-proposals/${proposal.uuid}/resources`),
     filter,
     onFetch(rows) {
       if (change) {
@@ -80,32 +70,10 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
   });
 
   return (
-    <VStepperFormStepCard
-      title={props.title}
-      step={props.step}
-      id={props.id}
-      completed={props.observed}
-      actions={
-        !readOnlyMode ? (
-          <div className="d-flex justify-content-end flex-grow-1">
-            <AddResourceButton
-              proposal={props.params.proposal}
-              refetch={tableProps.fetch}
-            />
-          </div>
-        ) : onAddCommentClick ? (
-          <div className="d-flex justify-content-end flex-grow-1">
-            <AddCommentButton
-              onClick={() => onAddCommentClick('comment_resource_requests')}
-            />
-          </div>
-        ) : null
-      }
-      refetch={tableProps.fetch}
-      refetching={tableProps.loading}
-    >
+    <>
       <Table<ProposalResource>
         {...tableProps}
+        id={props.id}
         columns={[
           {
             title: translate('Offering'),
@@ -123,10 +91,10 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
             ),
           },
         ]}
-        title={translate('Requests for offerings')}
-        verboseName={translate('Requests for offerings')}
+        title={props.title}
+        verboseName={props.title}
         filters={
-          isLoading ? (
+          readOnlyMode ? null : isLoading ? (
             <LoadingSpinner />
           ) : error ? (
             <LoadingErred loadData={refetchCall} />
@@ -134,7 +102,19 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
             <ProposalResourcesFilter offerings={call?.offerings} />
           )
         }
-        hasActionBar={false}
+        tableActions={
+          !readOnlyMode ? (
+            <AddResourceButton
+              proposal={props.params.proposal}
+              refetch={tableProps.fetch}
+            />
+          ) : onAddCommentClick ? (
+            <AddCommentButton
+              review={reviews?.[0]}
+              onClick={() => onAddCommentClick('comment_resource_requests')}
+            />
+          ) : null
+        }
         expandableRow={ResourceRequestExpandableRow}
         rowActions={({ row, fetch }) =>
           !readOnlyMode ? (
@@ -150,6 +130,6 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
         reviews={reviews}
         fieldName="comment_resource_requests"
       />
-    </VStepperFormStepCard>
+    </>
   );
 };

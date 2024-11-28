@@ -6,8 +6,9 @@ import { INSTANCE_TYPE } from '@waldur/openstack/constants';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CreateNodeAction } from '../cluster/actions/CreateNodeAction';
 

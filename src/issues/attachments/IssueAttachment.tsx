@@ -1,50 +1,47 @@
-import { Trash } from '@phosphor-icons/react';
+import { Trash, Warning } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-
-import { isImage } from '../comments/utils';
+import { openModalDialog } from '@waldur/modal/actions';
 
 import * as actions from './actions';
 import './IssueAttachment.scss';
+import { FileDownloader } from './FileDownloader';
+import { ImageFetcher } from './ImageFetcher';
 import { getIsDeleting } from './selectors';
 import { Attachment } from './types';
-import * as utils from './utils';
 
-interface PureIssueAttachmentProps {
+const IssueAttachmentModal = lazyComponent(() =>
+  import('./IssueAttachmentModal').then((module) => ({
+    default: module.IssueAttachmentModal,
+  })),
+);
+
+interface IssueAttachmentProps {
   attachment: Attachment;
-  isDeleting: boolean;
-  deleteAttachment(): void;
-  openModal(): void;
 }
 
-const getThumbnail = (attachment: Attachment, openModalHandler) => {
-  if (isImage(attachment.mime_type)) {
-    return (
-      <img
-        src={attachment.file}
-        onClick={openModalHandler}
-        alt="thumb"
-        aria-hidden="true"
-      />
-    );
-  } else {
-    return (
-      <a href={attachment.file} download="true">
-        <i className="fa fa-file" aria-hidden="true" />
-      </a>
-    );
-  }
-};
+export const IssueAttachment: FunctionComponent<IssueAttachmentProps> = ({
+  attachment,
+}) => {
+  const isDeleting = useSelector((state) =>
+    getIsDeleting(state, { attachment }),
+  );
+  const dispatch = useDispatch();
+  const deleteAttachment = () =>
+    dispatch(actions.issueAttachmentsDelete(attachment.uuid));
 
-export const PureIssueAttachment: FunctionComponent<
-  PureIssueAttachmentProps
-> = (props) => {
-  const { attachment, isDeleting, deleteAttachment, openModal } = props;
+  const openModal = () =>
+    dispatch(
+      openModalDialog(IssueAttachmentModal, {
+        resolve: { url: attachment.file, name: attachment.file_name },
+      }),
+    );
 
   return (
     <div className="attachment-item">
@@ -56,13 +53,23 @@ export const PureIssueAttachment: FunctionComponent<
       {attachment.file ? (
         <>
           <div className="attachment-item__thumb">
-            {getThumbnail(attachment, openModal)}
+            {attachment.mime_type.startsWith('image') ? (
+              <button onClick={openModal}>
+                <ImageFetcher
+                  url={attachment.file}
+                  name={attachment.file_name}
+                />
+              </button>
+            ) : (
+              <FileDownloader
+                url={attachment.file}
+                name={attachment.file_name}
+              />
+            )}
           </div>
           <div className="attachment-item__description">
             <div className="attachment-item__description-name">
-              <a href={attachment.file} download="true">
-                {attachment.file_name}
-              </a>
+              {attachment.file_name}
               <button
                 className="attachment-item__delete text-btn"
                 type="button"
@@ -86,7 +93,7 @@ export const PureIssueAttachment: FunctionComponent<
       ) : (
         <>
           <div className="attachment-item__thumb">
-            <i className="fa fa-exclamation-triangle" />
+            <Warning />
           </div>
           <div className="attachment-item__description">
             <div className="attachment-item__description-name">
@@ -98,26 +105,3 @@ export const PureIssueAttachment: FunctionComponent<
     </div>
   );
 };
-
-const mapStateToProps = (state, ownProps) => ({
-  isDeleting: getIsDeleting(state, ownProps),
-});
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-  return {
-    deleteAttachment: (): void =>
-      dispatch(actions.issueAttachmentsDelete(ownProps.attachment.uuid)),
-    openModal: (): void =>
-      dispatch(
-        utils.openAttachmentModal(
-          ownProps.attachment.file,
-          ownProps.attachment.file_name,
-        ),
-      ),
-  };
-};
-
-export const IssueAttachment = connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(PureIssueAttachment);

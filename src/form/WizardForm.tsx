@@ -1,14 +1,12 @@
 import { FC, ReactNode, useEffect } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { reduxForm, InjectedFormProps, getFormValues } from 'redux-form';
+import { useSelector } from 'react-redux';
+import { getFormValues, InjectedFormProps, reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { WizardStepIndicator } from '@waldur/form/WizardStepIndicator';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { RootState } from '@waldur/store/reducers';
 
 import './wizard.scss';
 
@@ -24,19 +22,23 @@ export interface WizardFormStepProps
   onStep?(step: number): void;
   validate?(values: any): any;
   data?: any;
+  reinitialize(): void;
 }
 
 interface WizardFormProps extends WizardFormStepProps, InjectedFormProps {
-  formValues: any;
   children: ReactNode | FC<WizardFormProps>;
+  formValues: any;
   submit(): void;
 }
 
 const WizardFormPure: FC<WizardFormProps> = (props) => {
   useEffect(() => {
     // Touch the form at the beginning to avoid going to the next step without a validation
+    props.reinitialize();
     if (!props.anyTouched) props.touch();
   }, []);
+
+  const formValues = useSelector(getFormValues(props.form));
 
   return (
     <form className="wizard" onSubmit={props.handleSubmit(props.onSubmit)}>
@@ -62,7 +64,7 @@ const WizardFormPure: FC<WizardFormProps> = (props) => {
           />
           <div className="content clearfix">
             {typeof props.children === 'function'
-              ? props.children(props)
+              ? props.children({ ...props, formValues })
               : props.children}
           </div>
         </div>
@@ -90,19 +92,8 @@ const WizardFormPure: FC<WizardFormProps> = (props) => {
   );
 };
 
-export const WizardForm = compose(
-  connect((state: RootState, ownProps: WizardFormStepProps) => {
-    return {
-      form: ownProps.form,
-      initialValues: ownProps.initialValues,
-      validate: ownProps.validate,
-      formValues: getFormValues(ownProps.form)(state) || {},
-    };
-  }),
-  reduxForm<{}, any>({
-    destroyOnUnmount: false,
-    forceUnregisterOnUnmount: true,
-    enableReinitialize: true,
-    keepDirtyOnReinitialize: true,
-  }),
-)(WizardFormPure);
+export const WizardForm = reduxForm<{}, any>({
+  destroyOnUnmount: false,
+  forceUnregisterOnUnmount: true,
+  keepDirtyOnReinitialize: true,
+})(WizardFormPure);

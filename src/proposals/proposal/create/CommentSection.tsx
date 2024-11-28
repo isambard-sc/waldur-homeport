@@ -6,8 +6,6 @@ import { Proposal, ProposalReview } from '@waldur/proposals/types';
 import { AddCommentButton } from '../create-review/AddCommentButton';
 import { FieldReviewComments } from '../create-review/FieldReviewComments';
 
-import { QuestionMark } from './QuestionMark';
-
 interface CommentSectionProps {
   proposal: Proposal;
   reviews?: ProposalReview[];
@@ -16,6 +14,7 @@ interface CommentSectionProps {
   label: string;
   tooltip: string;
   floating?: boolean;
+  inline?: boolean;
   onAddCommentClick?;
 }
 
@@ -26,6 +25,7 @@ export const CommentSection: FC<PropsWithChildren<CommentSectionProps>> = ({
   label,
   tooltip,
   floating,
+  inline,
   onAddCommentClick,
   reviews,
   children,
@@ -35,15 +35,16 @@ export const CommentSection: FC<PropsWithChildren<CommentSectionProps>> = ({
       label={label}
       value={proposal[valueField]}
       floating={floating}
+      inline={inline}
+      tooltip={tooltip}
       actions={
-        <>
-          <QuestionMark tooltip={tooltip} />
-          {onAddCommentClick && (
-            <AddCommentButton
-              onClick={() => onAddCommentClick({ commentField, label })}
-            />
-          )}
-        </>
+        onAddCommentClick && (
+          <AddCommentButton
+            review={reviews?.[0]}
+            onClick={() => onAddCommentClick({ commentField, label })}
+            className={floating ? '' : 'mt-11'}
+          />
+        )
       }
     >
       {children}

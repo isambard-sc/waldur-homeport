@@ -3,23 +3,22 @@ import { UIView } from '@uirouter/react';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
-const ProjectAvatar = lazyComponent(
-  () => import('./manage/ProjectAvatar'),
-  'ProjectAvatar',
+const ProjectGeneral = lazyComponent(() =>
+  import('./manage/ProjectGeneral').then((module) => ({
+    default: module.ProjectGeneral,
+  })),
 );
-const ProjectGeneral = lazyComponent(
-  () => import('./manage/ProjectGeneral'),
-  'ProjectGeneral',
+const ProjectMetadata = lazyComponent(() =>
+  import('./manage/ProjectMetadata').then((module) => ({
+    default: module.ProjectMetadata,
+  })),
 );
-const ProjectMetadata = lazyComponent(
-  () => import('./manage/ProjectMetadata'),
-  'ProjectMetadata',
-);
-const ProjectDelete = lazyComponent(
-  () => import('./manage/ProjectDelete'),
-  'ProjectDelete',
+const ProjectDelete = lazyComponent(() =>
+  import('./manage/ProjectDelete').then((module) => ({
+    default: module.ProjectDelete,
+  })),
 );
 
 const tabs: PageBarTab[] = [
@@ -27,11 +26,6 @@ const tabs: PageBarTab[] = [
     key: 'general',
     component: ProjectGeneral,
     title: translate('General'),
-  },
-  {
-    key: 'avatar',
-    component: ProjectAvatar,
-    title: translate('Avatar'),
   },
   {
     key: 'metadata',
@@ -51,7 +45,7 @@ export const ProjectManageContainer = () => {
   return (
     <UIView
       render={(Component, { key, ...props }) => (
-        <Component {...props} key={key} tabSpec={tabSpec} />
+        <Component key={key} {...props} tabSpec={tabSpec} />
       )}
     />
   );

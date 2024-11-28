@@ -25,16 +25,16 @@ export const isSshFormat = (url) => {
   try {
     const parsedUrl = new URL(url);
     return parsedUrl.protocol === 'ssh:';
-  } catch (error) {
+  } catch {
     return false;
   }
 };
 
-const RESOURCE_TYPE_LABELS = {};
-
-export function registerResourceTypeLabel(resourceType: string, label: string) {
-  RESOURCE_TYPE_LABELS[resourceType] = label;
-}
+const RESOURCE_TYPE_LABELS = {
+  'VMware.VirtualMachine': 'vSphere Virtual Machine',
+  'VMware.Disk': 'VM Disk',
+  'VMware.Port': 'VM Network Adapter',
+};
 
 export const formatResourceType = (resource) => {
   if (!resource.resource_type) return '';
@@ -95,7 +95,7 @@ export const formatRetentionTime = (props: ResourceSummaryProps<Schedule>) =>
 export const getData = async (url) => {
   try {
     return await get(url).then((response) => response.data);
-  } catch (e) {
+  } catch {
     return null;
   }
 };

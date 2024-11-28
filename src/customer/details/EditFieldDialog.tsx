@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { pick } from 'lodash';
+import { pick } from 'lodash-es';
 import { useCallback } from 'react';
 import { connect } from 'react-redux';
 import { SubmissionError, reduxForm } from 'redux-form';
@@ -16,6 +16,8 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
+import { SelectCountryField } from '../list/SelectCountryField';
+
 import { EDIT_CUSTOMER_FORM_ID } from './constants';
 import { EditCustomerProps } from './types';
 
@@ -23,7 +25,15 @@ type FormData = Record<string, any>;
 
 export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
   (_, ownProps) => ({
-    initialValues: pick(ownProps.resolve.customer, ownProps.resolve.name),
+    initialValues: {
+      ...pick(ownProps.resolve.customer, ownProps.resolve.name),
+      country: ownProps.resolve.customer.country
+        ? {
+            value: ownProps.resolve.customer.country,
+            label: ownProps.resolve.customer.country_name,
+          }
+        : null,
+    },
   }),
 )(
   reduxForm<FormData, { resolve: EditCustomerProps }>({
@@ -109,7 +119,6 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
                   getOptionLabel={(option) => option.name}
                   getOptionValue={(option) => option.value}
                   simpleValue
-                  floating={false}
                 />
               )
             ) : props.resolve.name === 'domain' ? (
@@ -120,6 +129,8 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
               />
             ) : props.resolve.name === 'address' ? (
               <StringField name="address" label={translate('Address')} />
+            ) : props.resolve.name === 'country' ? (
+              <SelectCountryField />
             ) : props.resolve.name === 'access_subnets' ? (
               <StringField
                 name="access_subnets"
@@ -164,6 +175,9 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
               />
             ) : props.resolve.name === 'homepage' ? (
               <StringField name="homepage" label={translate('Homepage')} />
+            ) : // Service provider
+            props.resolve.name === 'description' ? (
+              <TextField name="description" label={translate('Description')} />
             ) : null}
           </FormContainer>
         </ModalDialog>

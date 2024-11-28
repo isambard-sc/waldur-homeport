@@ -20,8 +20,8 @@ export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
     return null;
   }
   return (
-    <Card id="components">
-      <Card.Header className="border-2 border-bottom">
+    <Card id="components" className="card-bordered">
+      <Card.Header>
         <Card.Title className="h5">
           <ValidationIcon value={props.offering.components.length > 0} />
           <span className="me-2">{translate('Accounting components')}</span>
@@ -48,6 +48,7 @@ export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
               {props.offering.components.map((component, componentIndex) => (
                 <tr key={componentIndex}>
                   <td className="col-md-3">{component.name}</td>
+                  <td className="col-md-3">{component.type}</td>
                   <td className="col-md-3">{component.measured_unit}</td>
                   <td className="col-md-3">
                     {getBillingTypeLabel(component.billing_type)}

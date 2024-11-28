@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 
 import { EstimatedCostField } from '@waldur/customer/list/EstimatedCostField';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CustomerContactColumn } from './CustomerContactColumn';
 import { CustomerMembersColumn } from './CustomerMembersColumn';
@@ -28,6 +29,7 @@ export const ProviderUserCustomersList = ({ user, provider }) => {
     {
       title: translate('Name'),
       render: CustomerNameColumn,
+      copyField: (row) => row.name,
     },
     {
       title: translate('Projects'),

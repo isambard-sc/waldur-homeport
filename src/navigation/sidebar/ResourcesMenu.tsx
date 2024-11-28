@@ -1,4 +1,4 @@
-import { CaretDoubleDown, SquaresFour } from '@phosphor-icons/react';
+import { CaretDown, SquaresFour } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import classNames from 'classnames';
@@ -6,43 +6,55 @@ import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { getCategories } from '@waldur/marketplace/common/api';
-import { ANONYMOUS_CONFIG } from '@waldur/table/api';
+import { ALL_RESOURCES_TABLE_ID } from '@waldur/marketplace/resources/list/constants';
+import { selectFiltersStorage } from '@waldur/table/selectors';
 import { getResource } from '@waldur/workspace/selectors';
 
 import { getGlobalCounters } from '../workspace/api';
 
 import { MenuAccordion } from './MenuAccordion';
 import { MenuItem } from './MenuItem';
+import { ResourcesMenuFilterButton } from './resources-filter/ResourcesMenuFilterButton';
+import { ResourcesMenuFilters } from './resources-filter/ResourcesMenuFilters';
+import { useOfferingCategories } from './utils';
 
 const MAX_COLLAPSE_MENU_COUNT = 5;
 
-const CustomToggle = ({ onClick, itemsCount, badge, expanded }) => (
+const CustomToggle = ({
+  onClick,
+  itemsCount,
+  moreResourcesCount,
+  expanded,
+}) => (
   <div
-    className="menu-item"
+    className={classNames('menu-item menu-show-more', expanded && 'active')}
     data-kt-menu-trigger="trigger"
     aria-hidden="true"
     onClick={onClick}
   >
-    <span className="menu-link">
+    <span
+      className="menu-link"
+      title={
+        !expanded
+          ? moreResourcesCount + ' ' + translate('More resources')
+          : null
+      }
+    >
+      <span className="menu-bullet" />
       <span className="menu-title">
-        <div
-          className={classNames(
-            'btn btn-flex btn-color-success fs-base p-0 ms-2 mb-2 collapsible rotate collapsed',
-            expanded && 'active',
-          )}
-        >
+        <div className="btn btn-flex btn-color-primary-300 p-0 collapsible collapsed">
           <span>
             {expanded
               ? translate('Show less')
               : translate('Show {count} more', { count: itemsCount })}
           </span>
-          <span className="svg-icon ms-2 svg-icon-3 rotate-180">
-            <CaretDoubleDown />
-          </span>
         </div>
       </span>
-      {!expanded && <span className="menu-badge">{badge}</span>}
+      <span className={classNames('menu-badge rotate', expanded && 'active')}>
+        <span className="svg-icon svg-icon-3 svg-icon-primary-300 rotate-180">
+          <CaretDown weight="bold" />
+        </span>
+      </span>
     </span>
   </div>
 );
@@ -73,28 +85,34 @@ const RenderMenuItems = ({ items, counters = {} }) => {
   );
 };
 
-export const useOfferingCategories = (anonymous = false) => {
-  const { data: categories } = useQuery(
-    ['ResourcesMenu', 'Categories'],
-    () =>
-      getCategories({
-        params: {
-          field: ['uuid', 'title'],
-          has_offerings: true,
-        },
-        ...(anonymous ? ANONYMOUS_CONFIG : {}),
-      }),
-    { refetchOnWindowFocus: false },
-  );
-  return categories;
-};
-
 export const ResourcesMenu = ({ anonymous = false, user }) => {
   const categories = useOfferingCategories(anonymous);
+
+  const resourcesFilters = useSelector((state: any) =>
+    selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID),
+  );
+  const filtersObj = useMemo(() => {
+    if (!resourcesFilters) return undefined;
+    const project = resourcesFilters.find((item) => item.name === 'project');
+    const organization = resourcesFilters.find(
+      (item) => item.name === 'organization',
+    );
+    return {
+      project_uuid: project?.value?.uuid,
+      customer_uuid: organization?.value?.uuid,
+    };
+  }, [resourcesFilters]);
+
   // We will clean counters on impersonation (on change user)
   const { data: counters = {} } = useQuery(
-    ['ResourcesMenu', 'Counters', user?.uuid],
-    getGlobalCounters,
+    [
+      'ResourcesMenu',
+      'Counters',
+      user?.uuid,
+      filtersObj?.customer_uuid,
+      filtersObj?.customer_uuid,
+    ],
+    () => getGlobalCounters(filtersObj),
     { refetchOnWindowFocus: false },
   );
   const [expanded, setExpanded] = useState(false);
@@ -127,8 +145,10 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
     <MenuAccordion
       title={translate('Resources')}
       itemId="resources-menu"
-      icon={<SquaresFour />}
+      icon={<SquaresFour weight="bold" />}
+      badge={<ResourcesMenuFilterButton />}
     >
+      <ResourcesMenuFilters />
       <MenuItem
         title={translate('All resources')}
         badge={allResourcesCount}
@@ -149,7 +169,7 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
           )}
           <CustomToggle
             itemsCount={sortedCategories.slice(MAX_COLLAPSE_MENU_COUNT).length}
-            badge={collapsedResourcesCount}
+            moreResourcesCount={collapsedResourcesCount}
             onClick={() => setExpanded(!expanded)}
             expanded={expanded}
           />

@@ -1,10 +1,10 @@
 import { FC } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { RoundReviewersListExpandableRow } from '@waldur/proposals/round/reviewers/RoundReviewersListExpandableRow';
 import { Reviewer, Round } from '@waldur/proposals/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 interface RoundReviewersListProps {
   round: Round;
@@ -20,7 +20,6 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
     <Table<Reviewer>
       {...tableProps}
       id="reviewers"
-      className="mb-7"
       columns={[
         {
           title: translate('Full name'),
@@ -30,10 +29,21 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
           title: translate('Email'),
           render: ({ row }) => <>{row.email || '-'} </>,
         },
+        {
+          title: translate('Proposals in progress'),
+          render: ({ row }) => <>{row.in_review_proposals}</>,
+        },
+        {
+          title: translate('Accepted proposals'),
+          render: ({ row }) => <>{row.accepted_proposals}</>,
+        },
+        {
+          title: translate('Rejected proposals'),
+          render: ({ row }) => <>{row.rejected_proposals}</>,
+        },
       ]}
       title={translate('Reviewers')}
       verboseName={translate('Reviewers')}
-      expandableRow={RoundReviewersListExpandableRow}
     />
   );
 };

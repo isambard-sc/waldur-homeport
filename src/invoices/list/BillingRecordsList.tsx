@@ -6,8 +6,9 @@ import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { formatPeriod } from '../utils';

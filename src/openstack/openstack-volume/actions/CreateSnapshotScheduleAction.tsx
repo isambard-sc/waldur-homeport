@@ -8,15 +8,17 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { VolumeActionProps } from './VolumeActionProps';
 
-const CreateSnapshotScheduleDialog = lazyComponent(
-  () => import('./CreateSnapshotScheduleDialog'),
-  'CreateSnapshotScheduleDialog',
+const CreateSnapshotScheduleDialog = lazyComponent(() =>
+  import('./CreateSnapshotScheduleDialog').then((module) => ({
+    default: module.CreateSnapshotScheduleDialog,
+  })),
 );
 
 const validators = [validateState('OK')];
 
 export const CreateSnapshotScheduleAction: FC<VolumeActionProps> = ({
   resource,
+  refetch,
 }) => (
   <DialogActionButton
     title={translate('Create')}
@@ -24,5 +26,6 @@ export const CreateSnapshotScheduleAction: FC<VolumeActionProps> = ({
     modalComponent={CreateSnapshotScheduleDialog}
     resource={resource}
     validators={validators}
+    extraResolve={{ refetch }}
   />
 );

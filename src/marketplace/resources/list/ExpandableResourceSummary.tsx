@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { Container } from 'react-bootstrap';
 import { useAsync } from 'react-use';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -7,16 +6,19 @@ import { translate } from '@waldur/i18n';
 import { getResourceDetails } from '@waldur/marketplace/common/api';
 import { PlanDetailsLink } from '@waldur/marketplace/details/plan/PlanDetailsLink';
 import { Field } from '@waldur/resource/summary';
+import { ResourceComponentsSummary } from '@waldur/resource/summary/ResourceComponentsSummary';
 import { ResourceSummary as ResourceSummaryResources } from '@waldur/resource/summary/ResourceSummary';
 import {
   BASIC_OFFERING_TYPE,
   SUPPORT_OFFERING_TYPE,
 } from '@waldur/support/constants';
+import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
 import { KeyValueButton } from '../KeyValueButton';
+import { Resource } from '../types';
 
 const StaticResourceSummary: FunctionComponent<{ row }> = ({ row }) => (
-  <Container>
+  <ExpandableContainer hasMultiSelect asTable>
     <Field
       label={translate('Plan details')}
       value={row.plan_uuid && <PlanDetailsLink resource={row.uuid} />}
@@ -33,7 +35,7 @@ const StaticResourceSummary: FunctionComponent<{ row }> = ({ row }) => (
         )
       }
     />
-  </Container>
+  </ExpandableContainer>
 );
 
 const DynamicResourceSummary: FunctionComponent<{ row }> = ({ row }) => {
@@ -58,14 +60,21 @@ const DynamicResourceSummary: FunctionComponent<{ row }> = ({ row }) => {
         parent_uuid: row.parent_uuid,
         parent_name: row.parent_name,
       }}
+      hasMultiSelect
     />
   );
 };
 
-export const ExpandableResourceSummary: FunctionComponent<{ row }> = ({
-  row,
-}) => (
+export const ExpandableResourceSummary: FunctionComponent<{
+  row: Resource;
+}> = ({ row }) => (
   <>
+    {(row.is_limit_based || row.is_usage_based) &&
+      !(row.resource_type || '').startsWith('OpenStack') && (
+        <ExpandableContainer hasMultiSelect>
+          <ResourceComponentsSummary resource={row} />
+        </ExpandableContainer>
+      )}
     {!row.scope ||
     [SUPPORT_OFFERING_TYPE, BASIC_OFFERING_TYPE].includes(row.offering_type) ? (
       <StaticResourceSummary row={row} />

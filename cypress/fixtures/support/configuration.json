@@ -84,19 +84,12 @@
     "ONLY_STAFF_MANAGES_SERVICES": false,
     "PROTECT_USER_DETAILS_FOR_REGISTRATION_METHODS": [],
     "TRANSLATION_DOMAIN": "",
-    "GOOGLE_ANALYTICS_ID": "",
     "SUPPORT_PORTAL_URL": "",
     "DOCS_URL": "",
     "EXTERNAL_LINKS": [],
     "SHORT_PAGE_TITLE": "Waldur",
     "FULL_PAGE_TITLE": "Waldur | Cloud Service Management",
     "USER_MANDATORY_FIELDS": ["full_name", "email"],
-    "USER_REGISTRATION_HIDDEN_FIELDS": [
-      "registration_method",
-      "job_title",
-      "phone_number",
-      "organization"
-    ],
     "INVITATION_CIVIL_NUMBER_LABEL": "",
     "INVITATION_TAX_NUMBER_LABEL": "",
     "HOMEPORT_SENTRY_DSN": null,
@@ -119,9 +112,7 @@
     "ENABLED": false
   },
   "WALDUR_OPENSTACK": {
-    "TENANT_CREDENTIALS_VISIBLE": false
-  },
-  "WALDUR_OPENSTACK_TENANT": {
+    "TENANT_CREDENTIALS_VISIBLE": false,
     "ALLOW_CUSTOMER_USERS_OPENSTACK_CONSOLE_ACCESS": true,
     "REQUIRE_AVAILABILITY_ZONE": false
   },

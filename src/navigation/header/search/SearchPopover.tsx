@@ -5,7 +5,7 @@ import {
   Plus,
   SquaresFour,
 } from '@phosphor-icons/react';
-import { groupBy, isEmpty } from 'lodash';
+import { groupBy, isEmpty } from 'lodash-es';
 import { Fragment, useCallback, useEffect, useRef } from 'react';
 import { Badge, Button, Col, Nav, Row, Tab } from 'react-bootstrap';
 
@@ -201,7 +201,7 @@ const AllResultsTabContent = ({
                       }}
                       image={resource.offering_thumbnail}
                       title={resource.name}
-                      subtitle={`${resource.customer_name} / ${resource.project_name}`}
+                      subtitle={`${resource.customer_name} / ${resource.project_name} / ${resource.category_title}`}
                       isFavorite={isFavorite}
                       addFavoritePage={addFavoritePage}
                       removeFavorite={removeFavorite}
@@ -319,7 +319,7 @@ const ResourcesTabContent = ({
   close,
 }: TabContentProps) => {
   const resourceGroups = result.data?.resources
-    ? groupBy(result.data.resources, 'category_title')
+    ? groupBy(result.data.resources, (item) => item.category_title)
     : null;
   return (
     <>

@@ -1,43 +1,15 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 
-const AuthLoginCompleted = lazyComponent(
-  () => import('./AuthLoginCompleted'),
-  'AuthLoginCompleted',
-);
-
-const OauthLoginCompleted = lazyComponent(
-  () => import('./OauthLoginCompleted'),
-  'OauthLoginCompleted',
-);
-
-const SAML2DiscoveryCompleted = lazyComponent(
-  () => import('./SAML2DiscoveryCompleted'),
-  'SAML2DiscoveryCompleted',
-);
-
-const AuthLoginFailed = lazyComponent(
-  () => import('./AuthLoginFailed'),
-  'AuthLoginFailed',
-);
-
-const AuthLogoutCompleted = lazyComponent(
-  () => import('./AuthLogoutCompleted'),
-  'AuthLogoutCompleted',
-);
-
-const AuthLogoutFailed = lazyComponent(
-  () => import('./AuthLogoutFailed'),
-  'AuthLogoutFailed',
-);
-
-const OIDCLogout = lazyComponent(() => import('./OIDCLogout'), 'OIDCLogout');
-
 export const states: StateDeclaration[] = [
   {
     name: 'home.login_completed',
     url: '/login_completed/:token/:method/',
-    component: AuthLoginCompleted,
+    component: lazyComponent(() =>
+      import('./AuthLoginCompleted').then((module) => ({
+        default: module.AuthLoginCompleted,
+      })),
+    ),
     data: {
       anonymous: true,
     },
@@ -46,7 +18,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'home.oauth_login_completed',
     url: '/oauth_login_completed/:provider/',
-    component: OauthLoginCompleted,
+    component: lazyComponent(() =>
+      import('./OauthLoginCompleted').then((module) => ({
+        default: module.OauthLoginCompleted,
+      })),
+    ),
     data: {
       anonymous: true,
     },
@@ -55,7 +31,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'home.saml2_discovery_completed',
     url: '/saml2_discovery_completed/',
-    component: SAML2DiscoveryCompleted,
+    component: lazyComponent(() =>
+      import('./SAML2DiscoveryCompleted').then((module) => ({
+        default: module.SAML2DiscoveryCompleted,
+      })),
+    ),
     data: {
       anonymous: true,
     },
@@ -64,7 +44,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'home.login_failed',
     url: '/login_failed/',
-    component: AuthLoginFailed,
+    component: lazyComponent(() =>
+      import('./AuthLoginFailed').then((module) => ({
+        default: module.AuthLoginFailed,
+      })),
+    ),
     data: {
       erred: true,
     },
@@ -73,24 +57,23 @@ export const states: StateDeclaration[] = [
   {
     name: 'home.logout_completed',
     url: '/logout_completed/',
-    component: AuthLogoutCompleted,
+    component: lazyComponent(() =>
+      import('./AuthLogoutCompleted').then((module) => ({
+        default: module.AuthLogoutCompleted,
+      })),
+    ),
   },
 
   {
     name: 'home.logout_failed',
     url: '/logout_failed/',
-    component: AuthLogoutFailed,
+    component: lazyComponent(() =>
+      import('./AuthLogoutFailed').then((module) => ({
+        default: module.AuthLogoutFailed,
+      })),
+    ),
     data: {
       erred: true,
-    },
-  },
-
-  {
-    name: 'home.oidc_logout',
-    url: '/oidc_logout/:provider/',
-    component: OIDCLogout,
-    data: {
-      anonymous: true,
     },
   },
 ];

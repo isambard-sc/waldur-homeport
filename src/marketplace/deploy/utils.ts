@@ -1,6 +1,7 @@
 import { createElement } from 'react';
 import { getFormSyncErrors, isValid } from 'redux-form';
 
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import CentOS from '@waldur/images/appstore/centos.svg';
 import Debian from '@waldur/images/appstore/debian.svg';
@@ -9,8 +10,7 @@ import Oracle from '@waldur/images/appstore/oracle.svg';
 import Rocky from '@waldur/images/appstore/rocky.svg';
 import Ubuntu from '@waldur/images/appstore/ubuntu.svg';
 import Windows from '@waldur/images/appstore/windows.svg';
-import { isVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { ORDER_FORM_ID } from '../details/constants';
 import { orderFormDataSelector } from '../utils';
@@ -37,9 +37,8 @@ export const generateSystemImageChoices = (data: any[]) => {
   const _choices = data.reduce<BoxRadioChoice[]>((acc, value) => {
     const image = findImage(value.name);
     if (image) {
-      /* eslint-disable no-useless-escape */
       const version = value.name
-        .replace(new RegExp(`.*${image.name}\D*`, 'gi'), '')
+        .replace(new RegExp(`.*${image.name}\\D*`, 'gi'), '')
         .trim();
 
       const prevChoice = acc.find((choice) => choice.value === image.name);
@@ -89,8 +88,8 @@ export const hasStepWithField = (
   steps &&
   steps.some((step) => step.fields && step.fields.some((key) => key === field));
 
-export const concealPricesSelector = (state: RootState) =>
-  isVisible(state, MarketplaceFeatures.conceal_prices);
+export const concealPricesSelector = () =>
+  isFeatureVisible(MarketplaceFeatures.conceal_prices);
 
 export const formProjectSelector = (state: RootState) => {
   const formData = orderFormDataSelector(state);

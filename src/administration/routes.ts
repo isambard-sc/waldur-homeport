@@ -5,107 +5,7 @@ import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures, SupportFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
-import { UserManageContainer } from '@waldur/user/UserManageContainer';
 import { isStaff, isStaffOrSupport } from '@waldur/workspace/selectors';
-
-const AdministrationDashboard = lazyComponent(
-  () => import('./dashboard/AdministrationDashboard'),
-  'AdministrationDashboard',
-);
-
-const AdministrationBranding = lazyComponent(
-  () => import('./settings/AdministrationBranding'),
-  'AdministrationBranding',
-);
-
-const AdministrationServiceDesk = lazyComponent(
-  () => import('./service-desk/AdministrationServiceDesk'),
-  'AdministrationServiceDesk',
-);
-
-const FeaturesList = lazyComponent(
-  () => import('./FeaturesList'),
-  'FeaturesList',
-);
-
-const UserAgreementsList = lazyComponent(
-  () => import('./agreements/UserAgreementsList'),
-  'UserAgreementsList',
-);
-
-const CategoryGroupsList = lazyComponent(
-  () => import('@waldur/marketplace/category/admin/CategoryGroupsList'),
-  'CategoryGroupsList',
-);
-
-const AdminCategoriesPage = lazyComponent(
-  () => import('@waldur/marketplace/category/admin/AdminCategoriesPage'),
-  'AdminCategoriesPage',
-);
-
-const ProviderRobotAccountList = lazyComponent(
-  () => import('@waldur/marketplace/robot-accounts/ProviderRobotAccountList'),
-  'ProviderRobotAccountList',
-);
-
-const BasicLexisLinkList = lazyComponent(
-  () => import('@waldur/marketplace/resources/lexis/BasicLexisLinkList'),
-  'BasicLexisLinkList',
-);
-
-const UserList = lazyComponent(
-  () => import('@waldur/user/support/UserList'),
-  'UserList',
-);
-
-const UserManage = lazyComponent(
-  () => import('@waldur/user/UserManage'),
-  'UserManage',
-);
-
-const InvitationList = lazyComponent(
-  () => import('./InvitationList'),
-  'InvitationList',
-);
-
-const IdentityProvidersList = lazyComponent(
-  () => import('./providers/IdentityProvidersList'),
-  'IdentityProvidersList',
-);
-
-const RolesList = lazyComponent(() => import('./roles/RolesList'), 'RolesList');
-const TokensList = lazyComponent(() => import('./TokensList'), 'TokensList');
-const HooksList = lazyComponent(() => import('./hooks/HooksList'), 'HooksList');
-
-const NotificationList = lazyComponent(
-  () => import('./notifications/NotificationList'),
-  'NotificationList',
-);
-
-const OrganizationGroupsList = lazyComponent(
-  () => import('./organizations/OrganizationGroupsList'),
-  'OrganizationGroupsList',
-);
-
-const OrganizationGroupTypesList = lazyComponent(
-  () => import('./organizations/OrganizationGroupTypesList'),
-  'OrganizationGroupTypesList',
-);
-
-const OrganizationCostPoliciesList = lazyComponent(
-  () => import('./organizations/OrganizationCostPoliciesList'),
-  'OrganizationCostPoliciesList',
-);
-
-const AdministrationLanguages = lazyComponent(
-  () => import('./languages/AdministrationLanguages'),
-  'AdministrationLanguages',
-);
-
-const OfferingUsersList = lazyComponent(
-  () => import('./users/OfferingUsersList'),
-  'OfferingUsersList',
-);
 
 export const states: StateDeclaration[] = [
   {
@@ -117,13 +17,18 @@ export const states: StateDeclaration[] = [
     data: {
       title: () => translate('Administration'),
       permissions: [isStaffOrSupport],
+      workspace: 'admin',
     },
   },
 
   {
     name: 'admin.dashboard',
     url: '',
-    component: AdministrationDashboard,
+    component: lazyComponent(() =>
+      import('./dashboard/AdministrationDashboard').then((module) => ({
+        default: module.AdministrationDashboard,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Dashboard'),
       priority: 100,
@@ -163,10 +68,28 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-system-info',
+    url: 'system-info/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./SystemInfoPage').then((module) => ({
+        default: module.SystemInfoPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('System info'),
+    },
+  },
+
+  {
     name: 'admin-branding',
     url: 'branding/',
     parent: 'admin-settings',
-    component: AdministrationBranding,
+    component: lazyComponent(() =>
+      import('./settings/AdministrationBranding').then((module) => ({
+        default: module.AdministrationBranding,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Branding'),
     },
@@ -176,7 +99,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-languages',
     url: 'languages/',
     parent: 'admin-settings',
-    component: AdministrationLanguages,
+    component: lazyComponent(() =>
+      import('./languages/AdministrationLanguages').then((module) => ({
+        default: module.AdministrationLanguages,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Languages'),
     },
@@ -186,7 +113,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-service-desk',
     url: 'service-desk/',
     parent: 'admin-settings',
-    component: AdministrationServiceDesk,
+    component: lazyComponent(() =>
+      import('./service-desk/AdministrationServiceDesk').then((module) => ({
+        default: module.AdministrationServiceDesk,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Service desk'),
     },
@@ -196,7 +127,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-features',
     url: 'features/',
     parent: 'admin-settings',
-    component: FeaturesList,
+    component: lazyComponent(() =>
+      import('./FeaturesList').then((module) => ({
+        default: module.FeaturesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Features'),
     },
@@ -206,7 +141,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-user-agreements',
     url: 'user-agreements/',
     parent: 'admin-settings',
-    component: UserAgreementsList,
+    component: lazyComponent(() =>
+      import('./agreements/UserAgreementsList').then((module) => ({
+        default: module.UserAgreementsList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('User agreements'),
     },
@@ -216,7 +155,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-user-users',
     url: 'users/?role',
     parent: 'admin-accounts',
-    component: UserList,
+    component: lazyComponent(() =>
+      import('@waldur/user/support/UserList').then((module) => ({
+        default: module.UserList,
+      })),
+    ),
     data: {
       feature: SupportFeatures.users,
       breadcrumb: () => translate('Users'),
@@ -226,7 +169,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-user-user-manage-container',
     url: '',
     parent: 'admin-accounts',
-    component: UserManageContainer,
+    component: lazyComponent(() =>
+      import('@waldur/user/UserManageContainer').then((module) => ({
+        default: module.UserManageContainer,
+      })),
+    ),
     abstract: true,
     data: { skipBreadcrumb: true },
   },
@@ -234,7 +181,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-user-user-manage',
     url: 'users/:user_uuid/?tab',
     parent: 'admin-user-user-manage-container',
-    component: UserManage,
+    component: lazyComponent(() =>
+      import('@waldur/user/UserManage').then((module) => ({
+        default: module.UserManage,
+      })),
+    ),
     data: {
       feature: SupportFeatures.users,
     },
@@ -243,7 +194,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-user-notifications',
     url: 'users/notifications/',
     parent: 'admin-accounts',
-    component: HooksList,
+    component: lazyComponent(() =>
+      import('./hooks/HooksList').then((module) => ({
+        default: module.HooksList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Notifications'),
     },
@@ -252,15 +207,34 @@ export const states: StateDeclaration[] = [
     name: 'admin-user-active-sessions',
     url: 'users/active-sessions/',
     parent: 'admin-accounts',
-    component: TokensList,
+    component: lazyComponent(() =>
+      import('./TokensList').then((module) => ({ default: module.TokensList })),
+    ),
     data: {
       breadcrumb: () => translate('Active sessions'),
     },
   },
   {
+    name: 'admin-user-freeipa-users',
+    url: 'freeipa-users/',
+    parent: 'admin-accounts',
+    component: lazyComponent(() =>
+      import('./users/FreeIPAUsersList').then((module) => ({
+        default: module.FreeIPAUsersList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('FreeIPA users'),
+    },
+  },
+  {
     name: 'admin-user-robot-accounts',
     url: 'robot-accounts/',
-    component: ProviderRobotAccountList,
+    component: lazyComponent(() =>
+      import(
+        '@waldur/marketplace/robot-accounts/ProviderRobotAccountList'
+      ).then((module) => ({ default: module.ProviderRobotAccountList })),
+    ),
     parent: 'admin-accounts',
     data: {
       breadcrumb: () => translate('Robot accounts'),
@@ -269,7 +243,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'admin-user-offering-users',
     url: 'offering-users/',
-    component: OfferingUsersList,
+    component: lazyComponent(() =>
+      import('./users/OfferingUsersList').then((module) => ({
+        default: module.OfferingUsersList,
+      })),
+    ),
     parent: 'admin-accounts',
     data: {
       breadcrumb: () => translate('Offering users'),
@@ -278,7 +256,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'admin-user-lexis-links-list',
     url: 'lexis-links/',
-    component: BasicLexisLinkList,
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/resources/lexis/BasicLexisLinkList').then(
+        (module) => ({ default: module.BasicLexisLinkList }),
+      ),
+    ),
     parent: 'admin-accounts',
     data: {
       breadcrumb: () => translate('LEXIS links'),
@@ -295,7 +277,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'admin-invitations',
     url: 'invitations/',
-    component: InvitationList,
+    component: lazyComponent(() =>
+      import('./InvitationList').then((module) => ({
+        default: module.InvitationList,
+      })),
+    ),
     parent: 'admin-accounts',
     data: {
       breadcrumb: () => translate('Invitations'),
@@ -306,7 +292,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-marketplace-category-groups',
     url: 'category-groups',
     parent: 'admin-marketplace',
-    component: CategoryGroupsList,
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/category/admin/CategoryGroupsList').then(
+        (module) => ({ default: module.CategoryGroupsList }),
+      ),
+    ),
     data: {
       breadcrumb: () => translate('Category groups'),
     },
@@ -316,7 +306,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-marketplace-categories',
     url: 'categories/',
     parent: 'admin-marketplace',
-    component: AdminCategoriesPage,
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/category/admin/AdminCategoriesPage').then(
+        (module) => ({ default: module.AdminCategoriesPage }),
+      ),
+    ),
     data: {
       breadcrumb: () => translate('Categories'),
     },
@@ -335,7 +329,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-organizations-group-list',
     url: 'organization-groups/',
     parent: 'admin-organizations',
-    component: OrganizationGroupsList,
+    component: lazyComponent(() =>
+      import('./organizations/OrganizationGroupsList').then((module) => ({
+        default: module.OrganizationGroupsList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Organization groups'),
     },
@@ -344,7 +342,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-organization-group-types-list',
     url: 'organization-group-types/',
     parent: 'admin-organizations',
-    component: OrganizationGroupTypesList,
+    component: lazyComponent(() =>
+      import('./organizations/OrganizationGroupTypesList').then((module) => ({
+        default: module.OrganizationGroupTypesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Organization group types'),
     },
@@ -353,17 +355,40 @@ export const states: StateDeclaration[] = [
     name: 'admin-organization-cost-policies',
     url: 'organization-cost-policies/',
     parent: 'admin-organizations',
-    component: OrganizationCostPoliciesList,
+    component: lazyComponent(() =>
+      import('./organizations/OrganizationCostPoliciesList').then((module) => ({
+        default: module.OrganizationCostPoliciesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Cost policies'),
       permissions: [isStaff],
     },
   },
   {
+    name: 'admin-organization-credit-management',
+    url: 'organization-credits/',
+    parent: 'admin-organizations',
+    component: lazyComponent(() =>
+      import('./organizations/OrganizationCreditsList').then((module) => ({
+        default: module.OrganizationCreditsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Credit management'),
+      permissions: [isStaff],
+    },
+  },
+
+  {
     name: 'admin-identity',
     url: 'identity/',
     parent: 'admin-settings',
-    component: IdentityProvidersList,
+    component: lazyComponent(() =>
+      import('./providers/IdentityProvidersList').then((module) => ({
+        default: module.IdentityProvidersList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Identity providers'),
     },
@@ -373,7 +398,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-roles',
     url: 'roles/',
     parent: 'admin-settings',
-    component: RolesList,
+    component: lazyComponent(() =>
+      import('./roles/RolesList').then((module) => ({
+        default: module.RolesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('User roles'),
     },
@@ -383,7 +412,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-notification-messages',
     url: 'notification-messages/',
     parent: 'admin-settings',
-    component: NotificationList,
+    component: lazyComponent(() =>
+      import('./notifications/NotificationList').then((module) => ({
+        default: module.NotificationList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Notifications'),
     },

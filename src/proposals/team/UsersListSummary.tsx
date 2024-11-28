@@ -1,7 +1,7 @@
 import { FC } from 'react';
 
-import { createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import { useTable } from '@waldur/table/useTable';
 
 import { FieldReviewComments } from '../proposal/create-review/FieldReviewComments';
 

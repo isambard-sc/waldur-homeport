@@ -2,16 +2,16 @@ import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
-
-import { RowEditButton } from '../RowEditButton';
 
 import { EDIT_SCRIPT_FORM_ID } from './constants';
 import { ScriptEditorProps } from './types';
 
-const EditScriptDialog = lazyComponent(
-  () => import('./EditScriptDialog'),
-  'EditScriptDialog',
+const EditScriptDialog = lazyComponent(() =>
+  import('./EditScriptDialog').then((module) => ({
+    default: module.EditScriptDialog,
+  })),
 );
 
 export const EditScriptButton: FunctionComponent<ScriptEditorProps> = (
@@ -27,5 +27,5 @@ export const EditScriptButton: FunctionComponent<ScriptEditorProps> = (
       }),
     );
   };
-  return <RowEditButton onClick={callback} size="sm" />;
+  return <EditButton onClick={callback} size="sm" />;
 };

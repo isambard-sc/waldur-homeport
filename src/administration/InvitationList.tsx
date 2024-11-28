@@ -5,11 +5,13 @@ import { getFormValues } from 'redux-form';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
+import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
 import { RoleField } from '@waldur/invitations/RoleField';
 import { useTitle } from '@waldur/navigation/title';
 import { formatRoleType } from '@waldur/permissions/utils';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { InvitationScopeLink } from './InvitationScopeLink';
 import { InvitationsFilter } from './InvitationsFilter';
@@ -65,7 +67,7 @@ export const InvitationList: FunctionComponent = () => {
         {
           title: translate('Status'),
           orderField: 'state',
-          render: ({ row }) => row.state,
+          render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
         },
         {

@@ -8,7 +8,12 @@ export const MultiSelectField: FunctionComponent<{ input; options }> = ({
   input,
   options,
 }) => (
-  <ListGroup>
+  <ListGroup
+    style={{
+      height: 300,
+      overflow: 'scroll',
+    }}
+  >
     {options.map((option, index) => (
       <ListGroupItem key={index} className="py-3" disabled={option.disabled}>
         <FormCheck id={`checkbox-${index}`}>

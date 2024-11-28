@@ -11,9 +11,9 @@ import { InvitationService } from '../InvitationService';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
 
-const statesForResend = ['pending', 'expired'];
+const statesForResend = ['pending', 'expired', 'canceled'];
 
-export const InvitationSendButton = ({ row }) => {
+export const InvitationSendButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const customer = useSelector(getCustomer);
@@ -23,6 +23,7 @@ export const InvitationSendButton = ({ row }) => {
     try {
       await InvitationService.resend(row.uuid);
       dispatch(showSuccess(translate('Invitation has been sent again.')));
+      refetch();
     } catch (e) {
       dispatch(showErrorResponse(e, translate('Unable to resend invitation.')));
     }
@@ -55,7 +56,7 @@ export const InvitationSendButton = ({ row }) => {
 
     if (statesForResend.indexOf(row.state) === -1) {
       return translate(
-        'Only pending and expired invitations can be sent again.',
+        'Only pending, expired and canceled invitations can be sent again.',
       );
     }
   }, [user, customer, row]);

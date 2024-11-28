@@ -1,7 +1,6 @@
 import { escapeHtml } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { Attachment } from '@waldur/issues/attachments/types';
-import { openUserPopover } from '@waldur/user/actions';
 
 import { Comment } from './types';
 
@@ -28,7 +27,7 @@ export const createJiraComment = (
   }
 
   for (const attachment of attachments) {
-    const jiraMarkup = isImage(attachment.mime_type)
+    const jiraMarkup = attachment.mime_type.startsWith('image')
       ? `!${attachment.file_name}|thumbnail!`
       : `[^${attachment.file_name}]`;
 
@@ -37,8 +36,6 @@ export const createJiraComment = (
 
   return comment;
 };
-
-export const isImage = (mimeType: string) => /^image/.test(mimeType);
 
 export const commentExist = (
   comments: Comment[],
@@ -123,6 +120,3 @@ export const formatJiraMarkup = (
     })
 
     .replace(/\n/g, '<br/>');
-
-export const openUserModal = (uuid: string) =>
-  openUserPopover({ user_uuid: uuid });

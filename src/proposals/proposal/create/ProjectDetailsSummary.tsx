@@ -9,7 +9,6 @@ import { Proposal, ProposalReview } from '@waldur/proposals/types';
 
 import { CommentSection } from './CommentSection';
 import { DocumentationFiles } from './DocumentationFiles';
-import { QuestionMark } from './QuestionMark';
 
 interface ProjectDetailsSummaryProps {
   proposal: Proposal;
@@ -25,7 +24,7 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
   onAddCommentClick,
   ...props
 }) => (
-  <Card>
+  <Card className="card-bordered">
     {!props.hideHeader && (
       <Card.Header className={props.paddingless ? 'px-0' : ''}>
         <Card.Title>{translate('Proposal summary')}</Card.Title>
@@ -33,37 +32,34 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
     )}
     <Card.Body className={props.paddingless ? 'p-0' : ''}>
       <CommentSection
-        label={translate('Project title')}
+        label={translate('Name')}
         valueField="name"
         commentField="comment_project_title"
         tooltip={translate(
           'Short title for the project, which explains the project goal as much as possible.',
         )}
-        floating
         proposal={proposal}
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
       />
 
       <CommentSection
-        label={translate('Project summary')}
+        label={translate('Summary')}
         valueField="project_summary"
         commentField="comment_project_summary"
         tooltip={translate('Brief description of the project.')}
-        floating
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
         proposal={proposal}
       />
 
       <CommentSection
-        label={translate('Detailed description')}
+        label={translate('Description')}
         valueField="description"
         commentField="comment_project_description"
         tooltip={translate(
           'Explanation of the scientific case of the project for which the resources are intended to be used.',
         )}
-        floating
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
         proposal={proposal}
@@ -79,6 +75,8 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
         proposal={proposal}
+        floating
+        inline
       >
         <AwesomeCheckboxField />
       </CommentSection>
@@ -86,13 +84,11 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
       <ReadOnlyFormControl
         label={translate('Research field (OECD code)')}
         value={proposal.oecd_fos_2007_label || 'N/A'}
-        floating
+        tooltip={translate('Select the main research field for the project.')}
         actions={
-          <QuestionMark
-            tooltip={translate(
-              'Select the main research field for the project.',
-            )}
-          />
+          <div className="w-30px">
+            {/* Dummy spacing to align with other fields. */}
+          </div>
         }
       />
 
@@ -106,6 +102,8 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
         proposal={proposal}
+        floating
+        inline
       >
         <AwesomeCheckboxField />
       </CommentSection>
@@ -117,7 +115,6 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
         tooltip={translate(
           'Expected project duration in days once resources have been granted.',
         )}
-        floating
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
         proposal={proposal}

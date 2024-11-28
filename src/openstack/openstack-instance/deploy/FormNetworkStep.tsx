@@ -1,4 +1,4 @@
-import { Plus } from '@phosphor-icons/react';
+import { Plus, X } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -106,7 +106,9 @@ const renderNetworkRows = ({ fields, subnets, floatingIps }: any) => {
               className="btn-icon btn-active-light-danger"
               onClick={() => fields.remove(index)}
             >
-              <i className="fa fa-times fs-4" />
+              <span className="svg-icon svg-icon-2">
+                <X weight="bold" />
+              </span>
             </Button>
           </Col>
         </Row>
@@ -130,11 +132,15 @@ export const FormNetworkStep = (props: FormStepProps) => {
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
 
   const { data, isLoading } = useQuery(
-    ['network-step', props.offering.uuid],
+    ['network-step', props.offering.scope_uuid],
     () => {
       return Promise.all([
-        loadSubnets(props.offering.scope_uuid),
-        loadFloatingIps(props.offering.scope_uuid),
+        loadSubnets({ tenant_uuid: props.offering.scope_uuid }),
+        loadFloatingIps({
+          tenant_uuid: props.offering.scope_uuid,
+          free: 'True',
+          fields: ['url', 'address'],
+        }),
       ]).then((res) => {
         return {
           subnets: res[0],

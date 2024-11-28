@@ -2,8 +2,9 @@ import { BroadcastTemplateActions } from '@waldur/broadcasts/BroadcastTemplateAc
 import { BroadcastTemplateCreateButton } from '@waldur/broadcasts/BroadcastTemplateCreateButton';
 import { BroadcastTemplateExpandableRow } from '@waldur/broadcasts/BroadcastTemplateExpandableRow';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const BroadcastTemplateList = () => {
   const tableProps = useTable({
@@ -17,6 +18,7 @@ export const BroadcastTemplateList = () => {
         {
           title: translate('Name'),
           render: ({ row }) => row.name,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Subject'),

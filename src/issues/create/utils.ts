@@ -1,9 +1,8 @@
-import { triggerTransition } from '@uirouter/redux';
-
 import { post } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { putAttachment } from '@waldur/issues/attachments/api';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { router } from '@waldur/router';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
 import { IssueRequestPayload, IssueResponse } from './types';
@@ -11,7 +10,7 @@ import { IssueRequestPayload, IssueResponse } from './types';
 export const sendIssueCreateRequest = async (
   payload: IssueRequestPayload,
   dispatch,
-  refetch,
+  refetch?,
   files?: FileList,
 ) => {
   try {
@@ -29,11 +28,11 @@ export const sendIssueCreateRequest = async (
         }),
       ),
     );
-    refetch();
-    dispatch(triggerTransition('support.detail', { uuid: issue.uuid }));
+    if (refetch) refetch();
+    router.stateService.go('support.detail', { uuid: issue.uuid });
     dispatch(closeModalDialog());
   } catch (e) {
     dispatch(showErrorResponse(e, translate('Unable to create request.')));
-    refetch();
+    if (refetch) refetch();
   }
 };

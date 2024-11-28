@@ -6,7 +6,7 @@ import { change, formValueSelector } from 'redux-form';
 import { translate } from '@waldur/i18n';
 import { getTemplates, IssueTemplate } from '@waldur/issues/api';
 import { ISSUE_IDS } from '@waldur/issues/types/constants';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { getProject, getUser } from '@waldur/workspace/selectors';
 
 import { getIssueTypes, getShowAllTypes } from '../types/utils';

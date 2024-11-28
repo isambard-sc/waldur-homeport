@@ -67,7 +67,7 @@ export const AdministrationProfile = ({
   );
 
   return (
-    <Card className="mb-6">
+    <Card className="card-bordered mb-5">
       <Card.Body>
         <Row>
           <Col xs="auto" className="mb-4">

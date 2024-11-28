@@ -1,3 +1,4 @@
+import { FileText } from '@phosphor-icons/react';
 import { useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -11,9 +12,10 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { validateStaffAction } from '../actions/utils';
 
-const SubmitReportDialog = lazyComponent(
-  () => import('./SubmitReportDialog'),
-  'SubmitReportDialog',
+const SubmitReportDialog = lazyComponent(() =>
+  import('./SubmitReportDialog').then((module) => ({
+    default: module.SubmitReportDialog,
+  })),
 );
 
 const validators = [validateState('OK', 'Erred'), validateStaffAction];
@@ -36,6 +38,7 @@ export const SubmitReportAction: ActionItemType = ({
     <DialogActionItem
       validators={validators}
       title={translate('Submit report')}
+      iconNode={<FileText />}
       modalComponent={SubmitReportDialog}
       dialogSize="xl"
       resource={marketplaceResource || resource}

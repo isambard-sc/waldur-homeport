@@ -1,4 +1,4 @@
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 export const getAttachments = (state: RootState) =>
   state.issues.attachments.items;
@@ -10,5 +10,3 @@ export const getIsLoading = (state: RootState) =>
   state.issues.attachments.loading;
 export const getUploading = (state: RootState) =>
   state.issues.attachments.uploading;
-export const getExludedTypes = (state: RootState) =>
-  state.config.excludedAttachmentTypes;

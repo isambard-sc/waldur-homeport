@@ -48,14 +48,17 @@ Run linters:
         - yarn.lock
         - tsconfig.json
         - typings.d.ts
-        - webpack.*
-        - .eslintrc.js
+        - vite.config.ts
+        - .eslintrc.cjs
         - .eslintignore
   script:
+    - yarn oxlint
     - yarn format:check
+    - yarn tsc -b
     - yarn lint:check
     - yarn style:check
-    - yarn deps:check
+    - yarn deps:unused
+    - yarn deps:circular
 
 Run code duplication detection:
   stage: test
@@ -76,7 +79,7 @@ Run code duplication detection:
     - npx jscpd src/ --exitCode 1 -r consoleFull --pattern "**/*.scss"
     - npx jscpd src/ --exitCode 1 -r consoleFull --pattern "**/*.tsx" -k 250
 
-Run jest tests:
+Run unit tests:
   stage: test
   interruptible: true
   rules:
@@ -93,12 +96,11 @@ Run jest tests:
         - yarn.lock
         - tsconfig.json
         - typings.d.ts
-        - webpack.*
+        - vite.config.ts
         - test/*
-        - jest.config.js
       allow_failure: true
   script:
-    - yarn test
+    - yarn vitest --run --reporter junit --outputFile junit.xml
   coverage: /All\sfiles.*?\s+(\d+.\d+)/
   artifacts:
     when: always
@@ -110,7 +112,7 @@ Run jest tests:
 
 Run E2E tests:
   image:
-    name: registry.hpc.ut.ee/mirror/cypress/included:13.2.0
+    name: registry.hpc.ut.ee/mirror/cypress/included:13.15.0
     entrypoint: [""]
   stage: test
   interruptible: true
@@ -128,9 +130,9 @@ Run E2E tests:
         - yarn.lock
         - tsconfig.json
         - typings.d.ts
-        - webpack.*
+        - vite.config.ts
         - cypress/**/*
-        - cypress.config.ts
+        - cypress.config.js
       allow_failure: true
   script:
     - NO_COLOR=1 yarn ci:test
@@ -155,14 +157,10 @@ Build artifact:
     - yarn build
   artifacts:
     paths:
-      - build/
+      - dist/
     expire_in: 1 week
 
 Publish latest docker image:
-  before_script:
-    - echo '[+] Build and publish latest docker image'
-    - mkdir build-info
-    - echo $CI_COMMIT_SHA > build-info/COMMIT_SHA
   script:
     - AUTH=$(echo -n "${WALDUR_DOCKER_HUB_USER}:${WALDUR_DOCKER_HUB_PASSWORD}" | base64)
     - |
@@ -179,14 +177,11 @@ Publish latest docker image:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --build-arg="DOCKER_REGISTRY=${DOCKER_REGISTRY}"
+      --build-arg="COMMIT_INFO=${CI_COMMIT_SHA}"
       --build-arg="VERSION=latest"
       --destination "opennode/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}"
 
 Publish docker image with specific version:
-  before_script:
-    - echo "[+] Build and publish $CI_COMMIT_TAG docker image"
-    - mkdir build-info
-    - echo $CI_COMMIT_TAG > build-info/COMMIT_TAG
   script:
     - AUTH=$(echo -n "${WALDUR_DOCKER_HUB_USER}:${WALDUR_DOCKER_HUB_PASSWORD}" | base64)
     - |
@@ -203,6 +198,7 @@ Publish docker image with specific version:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --build-arg="DOCKER_REGISTRY=${DOCKER_REGISTRY}"
+      --build-arg="COMMIT_INFO=${CI_COMMIT_TAG}"
       --build-arg="VERSION=$CI_COMMIT_TAG"
       --destination "opennode/${CI_PROJECT_NAME}:${CI_COMMIT_TAG}"
 
@@ -318,14 +314,14 @@ Build test docker image:
         }
       }
       EOF
-    - cat /kaniko/.docker/config.json
     - /kaniko/executor
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-      --cache=true
+      --registry-map docker.io=registry.hpc.ut.ee/mirror
+      --registry-map index.docker.io=registry.hpc.ut.ee/mirror
       --build-arg="DOCKER_REGISTRY=${DOCKER_REGISTRY}"
       --build-arg="ASSET_PATH=/${CI_MERGE_REQUEST_ID}/"
-      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}:${CI_MERGE_REQUEST_ID}"
 
 Test k8s deployment:
   stage: validate
@@ -357,11 +353,15 @@ Test k8s deployment:
     - kubectl apply -f k8s-test/ingress.yaml
     - kubectl rollout restart deployment waldur-homeport-test-${CI_MERGE_REQUEST_ID}
     # Wait for rollout completion
-    - kubectl rollout status deployment waldur-homeport-test-${CI_MERGE_REQUEST_ID} -w --timeout 120s
-    - POD_NAME=$(kubectl get pods -o name -l app=waldur-homeport-test-${CI_MERGE_REQUEST_ID})
+    - kubectl rollout status deployment waldur-homeport-test-${CI_MERGE_REQUEST_ID} --timeout 120s
+    # Wait a bit more to avoid race conditions
+    - sleep 5
+    - kubectl get pods -l app=waldur-homeport-test-${CI_MERGE_REQUEST_ID} --field-selector=status.phase=Running
+    - POD_NAME=$(kubectl get pod -l app=waldur-homeport-test-${CI_MERGE_REQUEST_ID} --sort-by=.metadata.creationTimestamp -o name | tail -n1)
     - echo $POD_NAME
     # Wait until the pod is ready to ensure the image is pulled
-    - kubectl wait --timeout=120s --for=condition=Ready=true $POD_NAME
+    - kubectl wait --timeout=180s --for=condition=Ready=true $POD_NAME
+    - kubectl get pods -l app=waldur-homeport-test-${CI_MERGE_REQUEST_ID}
   allow_failure: true
 
 Cleanup test k8s deployment:

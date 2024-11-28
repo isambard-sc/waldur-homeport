@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
 import { Table } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { Field } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
 import { formatCurrency } from '@waldur/core/formatCurrency';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
@@ -13,8 +13,6 @@ import {
   parseIntField,
 } from '@waldur/marketplace/common/utils';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
-import { isVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 
 import { Component } from './types';
 
@@ -27,11 +25,11 @@ interface TotalLimitComponentsTableProps {
 export const TotalLimitComponentsTable: FunctionComponent<
   TotalLimitComponentsTableProps
 > = (props) => {
-  const shouldConcealPrices = useSelector((state: RootState) =>
-    isVisible(state, MarketplaceFeatures.conceal_prices),
+  const shouldConcealPrices = isFeatureVisible(
+    MarketplaceFeatures.conceal_prices,
   );
   return (
-    <Table className="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer">
+    <Table className="table align-middle table-row-dashed fs-6 gy-5 no-footer">
       <thead>
         <tr className="text-start text-muted bg-light fw-bolder fs-7 text-uppercase gs-0">
           <th className="col-sm-1">{translate('Component name')}</th>

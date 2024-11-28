@@ -4,9 +4,9 @@ import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { PROJECT_RESOURCES_ALL_FILTER_FORM_ID } from '@waldur/marketplace/resources/list/constants';
-import { createFetcher } from '@waldur/table';
-import { TableProps } from '@waldur/table/Table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { Project } from '@waldur/workspace/types';
 
 import { ResourcesAllListTable } from './ResourcesAllListTable';
@@ -39,7 +39,6 @@ const mapStateToFilter = createSelector(
         result.state = NON_TERMINATED_STATES.map((option) => option.value);
       }
     }
-    result.field = resourcesListRequiredFields();
     return result;
   },
 );
@@ -59,6 +58,7 @@ export const ProjectResourcesList: FC<ProjectResourcesListProps> = (props) => {
     fetchData: createFetcher('marketplace-resources'),
     queryField: 'query',
     filter,
+    mandatoryFields: resourcesListRequiredFields(),
   });
 
   return <ResourcesAllListTable {...tableProps} {...props} context="project" />;

@@ -1,38 +1,25 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import icon from '@waldur/images/appstore/icon-slurm.png';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
-const SlurmForm = lazyComponent(() => import('./SlurmForm'), 'SlurmForm');
-
-const SlurmRemoteForm = lazyComponent(
-  () => import('./SlurmForm'),
-  'SlurmRemoteForm',
+const SlurmForm = lazyComponent(() =>
+  import('./SlurmForm').then((module) => ({ default: module.SlurmForm })),
 );
 
-const serializer = (fields) => ({
-  hostname: fields.hostname,
-  username: fields.username,
-  port: fields.port,
-  gateway: fields.gateway,
-  use_sudo: fields.use_sudo,
-  default_account: fields.default_account,
-});
+const SlurmRemoteForm = lazyComponent(() =>
+  import('./SlurmForm').then((module) => ({ default: module.SlurmRemoteForm })),
+);
 
-const serializerRemote = () => ({});
-
-ProvidersRegistry.register({
+export const SlurmProviderConfig: ProviderConfig = {
   name: 'Batch processing',
   type: 'SLURM',
-  icon: 'icon-slurm.png',
-  endpoint: 'slurm',
+  icon,
   component: SlurmForm,
-  serializer,
-});
+};
 
-ProvidersRegistry.register({
+export const SlurmRemoteProviderConfig: ProviderConfig = {
   name: 'Batch processing (agent)',
   type: 'SLURM remote',
-  icon: 'icon-slurm.png',
-  endpoint: 'slurm',
+  icon,
   component: SlurmRemoteForm,
-  serializer: serializerRemote,
-});
+};

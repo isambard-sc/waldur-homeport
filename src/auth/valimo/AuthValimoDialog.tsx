@@ -1,5 +1,4 @@
 import { SignIn } from '@phosphor-icons/react';
-import delay from '@redux-saga/delay-p';
 import { useRouter } from '@uirouter/react';
 import { useState } from 'react';
 import { Form, InputGroup, Modal } from 'react-bootstrap';
@@ -8,13 +7,14 @@ import { useMountedState } from 'react-use';
 import { reduxForm, Field } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
+import { wait } from '@waldur/core/utils';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { showErrorResponse, showError } from '@waldur/store/notify';
 import { UsersService } from '@waldur/user/UsersService';
 
-import { AuthService } from '../AuthService';
+import * as AuthService from '../AuthService';
 import { SubmitButton } from '../SubmitButton';
 
 import { getAuthResult, login } from './api';
@@ -33,7 +33,7 @@ export const AuthValimoDialog = reduxForm({ form: 'AuthValimoDialog' })(({
     let result;
     do {
       result = await getAuthResult(authResultId);
-      await delay(2000);
+      await wait(2000);
     } while (
       isMounted() &&
       (result.state === 'Scheduled' || result.state === 'Processing')

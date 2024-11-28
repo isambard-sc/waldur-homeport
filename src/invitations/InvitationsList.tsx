@@ -2,14 +2,14 @@ import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
-import Avatar from '@waldur/core/Avatar';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { useTitle } from '@waldur/navigation/title';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { exportRoleField } from '@waldur/user/affiliations/RolePopover';
 import { getCustomer } from '@waldur/workspace/selectors';
 
@@ -17,6 +17,7 @@ import { InvitationCreateButton } from './actions/create/InvitationCreateButton'
 import { InvitationActions } from './InvitationActions';
 import { InvitationsFilter } from './InvitationsFilter';
 import { InvitationsMultiSelectActions } from './InvitationsMultiSelectActions';
+import { formatInvitationState } from './InvitationStateFilter';
 import { RoleField } from './RoleField';
 
 export const InvitationsList: FunctionComponent = () => {
@@ -47,11 +48,6 @@ export const InvitationsList: FunctionComponent = () => {
           title: translate('Email'),
           render: ({ row }) => (
             <div className="d-flex align-items-center gap-1">
-              <Avatar
-                className="symbol symbol-25px"
-                name={row.email}
-                size={25}
-              />
               {row.email}
               <CopyToClipboardButton value={row.email} />
             </div>
@@ -67,7 +63,7 @@ export const InvitationsList: FunctionComponent = () => {
         {
           title: translate('Status'),
           orderField: 'state',
-          render: ({ row }) => row.state,
+          render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
           export: (row) => row.state,
         },

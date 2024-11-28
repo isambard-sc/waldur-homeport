@@ -3,8 +3,9 @@ import { ReactNode } from 'react';
 import { createDeferred } from '@waldur/core/utils';
 
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
-export type DialogSizeType = 'lg' | 'xl';
+export type DialogSizeType = 'sm' | 'lg' | 'xl';
 
 export const openModalDialog = <P = any>(
   modalComponent: React.ComponentType<P>,
@@ -27,7 +28,7 @@ export const waitForConfirmation = (
   dispatch,
   title: ReactNode,
   body: ReactNode,
-  nb?: ReactNode,
+  forDeletion?: boolean,
 ) => {
   const deferred = createDeferred();
   const params = {
@@ -35,9 +36,13 @@ export const waitForConfirmation = (
       deferred,
       title,
       body,
-      nb,
     },
   };
-  dispatch(openModalDialog(ConfirmationDialog, params));
+  dispatch(
+    openModalDialog(
+      forDeletion ? DeleteConfirmationDialog : ConfirmationDialog,
+      forDeletion ? { ...params, size: 'sm' } : params,
+    ),
+  );
   return deferred.promise;
 };

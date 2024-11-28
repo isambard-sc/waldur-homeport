@@ -3,8 +3,9 @@ import { FunctionComponent, useMemo } from 'react';
 import { translate } from '@waldur/i18n';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { SetRoutersButton } from './SetRoutersButton';
 
@@ -30,6 +31,7 @@ export const TenantRoutersList: FunctionComponent<{ resourceScope }> = ({
         'state',
         'error_message',
         'fixed_ips',
+        'offering_external_ips',
         'project_uuid',
       ],
     }),
@@ -48,6 +50,7 @@ export const TenantRoutersList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Fixed IPs'),

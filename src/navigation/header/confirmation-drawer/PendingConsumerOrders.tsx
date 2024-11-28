@@ -8,8 +8,9 @@ import { OrderNameField } from '@waldur/marketplace/orders/list/OrderNameField';
 import { OrderStateCell } from '@waldur/marketplace/orders/list/OrderStateCell';
 import { OrderTypeCell } from '@waldur/marketplace/orders/list/OrderTypeCell';
 import { ResourceNameField } from '@waldur/marketplace/orders/list/ResourceNameField';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { BulkConsumerActions } from './BulkConsumerActions';
 import { PENDING_CONSUMER_ORDERS_FILTER } from './constants';
@@ -22,51 +23,51 @@ export const PendingConsumerOrders: React.FC<{}> = () => {
   });
 
   return (
-    <>
-      <Table
-        {...tableProps}
-        columns={[
-          {
-            title: translate('Offering'),
-            render: OrderNameField,
-          },
-          {
-            title: translate('Resource'),
-            render: ResourceNameField,
-          },
-          {
-            title: translate('Organization'),
-            render: ({ row }) => row.customer_name,
-          },
-          {
-            title: translate('Project'),
-            render: ({ row }) => row.project_name,
-          },
-          {
-            title: translate('Type'),
-            render: OrderTypeCell,
-          },
-          {
-            title: translate('State'),
-            render: OrderStateCell,
-          },
-        ]}
-        title={translate('Orders')}
-        verboseName={translate('Orders')}
-        initialSorting={{ field: 'created', mode: 'desc' }}
-        initialPageSize={5}
-        rowActions={({ row }) => (
-          <OrderConsumerActions
-            order={row}
-            refetch={tableProps.fetch}
-            as={Button}
-          />
-        )}
-      />
-      <BulkConsumerActions
-        orders={tableProps.rows}
-        refetch={tableProps.fetch}
-      />
-    </>
+    <Table
+      {...tableProps}
+      columns={[
+        {
+          title: translate('Offering'),
+          render: OrderNameField,
+        },
+        {
+          title: translate('Resource'),
+          render: ResourceNameField,
+        },
+        {
+          title: translate('Organization'),
+          render: ({ row }) => row.customer_name,
+        },
+        {
+          title: translate('Project'),
+          render: ({ row }) => row.project_name,
+        },
+        {
+          title: translate('Type'),
+          render: OrderTypeCell,
+        },
+        {
+          title: translate('State'),
+          render: OrderStateCell,
+        },
+      ]}
+      title={translate('Orders')}
+      verboseName={translate('Orders')}
+      initialSorting={{ field: 'created', mode: 'desc' }}
+      initialPageSize={5}
+      tableActions={
+        <BulkConsumerActions
+          orders={tableProps.rows}
+          refetch={tableProps.fetch}
+        />
+      }
+      rowActions={({ row }) => (
+        <OrderConsumerActions
+          order={row}
+          refetch={tableProps.fetch}
+          as={Button}
+        />
+      )}
+    />
   );
 };

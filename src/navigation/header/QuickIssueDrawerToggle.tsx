@@ -5,9 +5,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
 
-const QuickIssueContainer = lazyComponent(
-  () => import('./quick-issue-drawer/QuickIssueContainer'),
-  'QuickIssueContainer',
+const QuickIssueContainer = lazyComponent(() =>
+  import('./quick-issue-drawer/QuickIssueContainer').then((module) => ({
+    default: module.QuickIssueContainer,
+  })),
 );
 
 export const QuickIssueDrawerToggle: React.FC = () => {
@@ -26,11 +27,11 @@ export const QuickIssueDrawerToggle: React.FC = () => {
       <button
         id="quick-issue-toggle"
         type="button"
-        className="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary position-relative w-35px h-35px w-md-40px h-md-40px"
+        className="btn btn-icon btn-icon-grey-500 btn-active-secondary w-35px h-35px w-md-40px h-md-40px"
         onClick={openDrawer}
       >
-        <span className="svg-icon svg-icon-1" title={translate('Issues')}>
-          <ChatsCircle />
+        <span className="svg-icon" title={translate('Issues')}>
+          <ChatsCircle className="w-20px h-20px" weight="bold" />
         </span>
       </button>
     </div>

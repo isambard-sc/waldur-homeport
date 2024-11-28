@@ -4,9 +4,11 @@ import { ENV } from '@waldur/configs/default';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { OrganizationExpandableRow } from '@waldur/user/affiliations/OrganizationExpandableRow';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 

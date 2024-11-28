@@ -1,11 +1,5 @@
 import { TableFiltersGroup } from './TableFilterService';
-import {
-  DisplayMode,
-  ExportConfig,
-  FilterItem,
-  FilterPosition,
-  Sorting,
-} from './types';
+import { DisplayMode, FilterItem, FilterPosition, Sorting } from './types';
 
 export const FETCH_LIST_START = 'waldur/table/FETCH_START';
 export const FETCH_LIST_DONE = 'waldur/table/FETCH_DONE';
@@ -13,9 +7,6 @@ export const FETCH_LIST_ERROR = 'waldur/table/FETCH_ERROR';
 export const FETCH_LIST_GOTO_PAGE = 'waldur/table/GOTO_PAGE';
 export const SET_MODE = 'waldur/table/SET_MODE';
 export const SET_FILTER_QUERY = 'waldur/table/SET_QUERY';
-export const EXPORT_TABLE_AS = 'waldur/table/EXPORT';
-export const BLOCK_START = 'waldur/table/BLOCK_START';
-export const BLOCK_STOP = 'waldur/table/BLOCK_STOP';
 export const RESET_PAGINATION = 'waldur/table/RESET_PAGINATION';
 export const ENTITY_CREATE = 'waldur/table/ENTITY_CREATE';
 export const ENTITY_UPDATE = 'waldur/table/ENTITY_UPDATE';
@@ -40,12 +31,14 @@ export const fetchListStart = (
   table: string,
   extraFilter?: Record<string, any>,
   pullInterval?: number | (() => number),
+  force?: boolean,
 ) => ({
   type: FETCH_LIST_START,
   payload: {
     table,
     extraFilter,
     pullInterval,
+    force,
   },
 });
 
@@ -77,29 +70,6 @@ export const fetchListGotoPage = (table: string, page: number) => ({
   payload: {
     table,
     page,
-  },
-});
-
-export const exportTableAs = (table: string, config: ExportConfig, props?) => ({
-  type: EXPORT_TABLE_AS,
-  payload: {
-    table,
-    config,
-    props,
-  },
-});
-
-export const blockStart = (table: string) => ({
-  type: BLOCK_START,
-  payload: {
-    table,
-  },
-});
-
-export const blockStop = (table: string) => ({
-  type: BLOCK_STOP,
-  payload: {
-    table,
   },
 });
 

@@ -2,161 +2,13 @@ import { UIView } from '@uirouter/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
-import { fetchCustomer } from '@waldur/customer/workspace/CustomerWorkspace';
+import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
-import { OrganizationUIView } from '@waldur/organization/OrganizationUIView';
-import { UserManageContainer } from '@waldur/user/UserManageContainer';
 import { isOwnerOrStaff } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
-import { fetchProvider, loadContext } from './resolve';
-
-const AdminOfferingsList = lazyComponent(
-  () => import('@waldur/marketplace/offerings/admin/AdminOfferingsList'),
-  'AdminOfferingsList',
-);
-const ResourceDetailsPage = lazyComponent(
-  () => import('@waldur/marketplace/resources/details/ResourceDetailsPage'),
-  'ResourceDetailsPage',
-);
-const ProviderDashboard = lazyComponent(
-  () =>
-    import('@waldur/marketplace/service-providers/dashboard/ProviderDashboard'),
-  'ProviderDashboard',
-);
-const CategoryPage = lazyComponent(
-  () => import('./category/CategoryPage'),
-  'CategoryPage',
-);
-const CategoryGroupPage = lazyComponent(
-  () => import('./category/CategoryGroupPage'),
-  'CategoryGroupPage',
-);
-const AllOfferingsList = lazyComponent(
-  () => import('./category/AllOfferingsList'),
-  'AllOfferingsList',
-);
-const OfferingDetailsPage = lazyComponent(
-  () => import('./details/DetailsPage'),
-  'OfferingDetailsPage',
-);
-const LandingPage = lazyComponent(
-  () => import('./landing/LandingPage'),
-  'LandingPage',
-);
-const OfferingContainer = lazyComponent(
-  () => import('./offerings/details/OfferingContainer'),
-  'OfferingContainer',
-);
-const PublicOfferingDetailsContainer = lazyComponent(
-  () => import('./offerings/details/PublicOfferingDetailsContainer'),
-  'PublicOfferingDetailsContainer',
-);
-const MyOfferingsList = lazyComponent(
-  () => import('./offerings/list/MyOfferingsList'),
-  'MyOfferingsList',
-);
-const ProviderOfferingsList = lazyComponent(
-  () => import('./service-providers/ProviderOfferingsList'),
-  'ProviderOfferingsList',
-);
-const OfferingUpdateContainer = lazyComponent(
-  () => import('./offerings/update/OfferingUpdateContainer'),
-  'OfferingUpdateContainer',
-);
-const MarketplaceOrdersList = lazyComponent(
-  () => import('./orders/list/MarketplaceOrdersList'),
-  'MarketplaceOrdersList',
-);
-const PublicResourcesList = lazyComponent(
-  () => import('./resources/list/PublicResourcesList'),
-  'PublicResourcesList',
-);
-const ProviderDetails = lazyComponent(
-  () => import('./service-providers/ProviderDetails'),
-  'ProviderDetails',
-);
-const ProviderOrganizationsList = lazyComponent(
-  () => import('./service-providers/ProviderOrganizationsList'),
-  'ProviderOrganizationsList',
-);
-const ProviderUsersList = lazyComponent(
-  () => import('./service-providers/ProviderUsersList'),
-  'ProviderUsersList',
-);
-const UserManage = lazyComponent(
-  () => import('@waldur/user/UserManage'),
-  'UserManage',
-);
-const ProviderCampaignsList = lazyComponent(
-  () => import('./service-providers/ProviderCampaignsList'),
-  'ProviderCampaignsList',
-);
-const OfferingPermissionsList = lazyComponent(
-  () => import('./service-providers/OfferingPermissionsList'),
-  'OfferingPermissionsList',
-);
-const ProviderOfferingUsersList = lazyComponent(
-  () => import('./service-providers/ProviderOfferingUsersList'),
-  'ProviderOfferingUsersList',
-);
-const ProviderRobotAccountList = lazyComponent(
-  () => import('@waldur/marketplace/robot-accounts/ProviderRobotAccountList'),
-  'ProviderRobotAccountList',
-);
-const OfferingRequestsList = lazyComponent(
-  () => import('@waldur/proposals/offering-requests/OfferingRequestsList'),
-  'OfferingRequestsList',
-);
-const ProjectsList = lazyComponent(
-  () => import('@waldur/project/ProjectsList'),
-  'ProjectsList',
-);
-const OfferingPublicUIView = lazyComponent(
-  () => import('./offerings/OfferingPublicUIView'),
-  'OfferingPublicUIView',
-);
-const OfferingDetailsUIView = lazyComponent(
-  () => import('./offerings/OfferingDetailsUIView'),
-  'OfferingDetailsUIView',
-);
-const OfferingEditUIView = lazyComponent(
-  () => import('./offerings/OfferingEditUIView'),
-  'OfferingEditUIView',
-);
-const ServiceProvidersList = lazyComponent(
-  () => import('./service-providers/ServiceProvidersList'),
-  'ServiceProvidersList',
-);
-const ProviderEventsTable = lazyComponent(
-  () => import('./service-providers/dashboard/ProviderEventsTable'),
-  'ProviderEventsTable',
-);
-
-const OrderDetailsContainer = lazyComponent(
-  () => import('./orders/OrderDetailsContainer'),
-  'OrderDetailsContainer',
-);
-
-const ProviderDetailsContainer = lazyComponent(
-  () => import('./service-providers/details/ProviderDetailsContainer'),
-  'ProviderDetailsContainer',
-);
-
-const getPublicRoutesParams = () => ({
-  resolve: [
-    {
-      token: 'public-context',
-      resolveFn: loadContext,
-      deps: ['$transition$'],
-    },
-  ],
-  data: {
-    auth: false,
-  },
-});
+import { fetchProvider } from './resolve';
 
 export const states: StateDeclaration[] = [
   {
@@ -165,13 +17,19 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     parent: 'layout',
-    ...getPublicRoutesParams(),
+    data: {
+      auth: false,
+    },
   },
 
   {
     name: 'marketplace-offering-public',
     url: '/marketplace-provider-offering/:offering_uuid/',
-    component: OfferingDetailsPage,
+    component: lazyComponent(() =>
+      import('./details/DetailsPage').then((module) => ({
+        default: module.OfferingDetailsPage,
+      })),
+    ),
     parent: 'public',
   },
 
@@ -180,12 +38,20 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'marketplace-provider',
-    component: OfferingDetailsUIView,
+    component: lazyComponent(() =>
+      import('./offerings/OfferingDetailsUIView').then((module) => ({
+        default: module.OfferingDetailsUIView,
+      })),
+    ),
   },
   {
     name: 'marketplace-offering-details',
     url: 'marketplace-provider-offering-details/:offering_uuid/?tab',
-    component: OfferingContainer,
+    component: lazyComponent(() =>
+      import('./offerings/details/OfferingContainer').then((module) => ({
+        default: module.OfferingContainer,
+      })),
+    ),
     parent: 'provider-offering-details',
     data: {
       skipHero: true,
@@ -195,7 +61,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'public.marketplace-landing',
     url: '/marketplace/',
-    component: LandingPage,
+    component: lazyComponent(() =>
+      import('./landing/LandingPage').then((module) => ({
+        default: module.LandingPage,
+      })),
+    ),
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
     },
@@ -204,7 +74,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'public.marketplace-orders',
     url: '/marketplace-orders/',
-    component: MarketplaceOrdersList,
+    component: lazyComponent(() =>
+      import('./orders/list/MarketplaceOrdersList').then((module) => ({
+        default: module.MarketplaceOrdersList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Orders'),
     },
@@ -215,12 +89,20 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'public',
-    component: OfferingPublicUIView,
+    component: lazyComponent(() =>
+      import('./offerings/OfferingPublicUIView').then((module) => ({
+        default: module.OfferingPublicUIView,
+      })),
+    ),
   },
   {
     name: 'public-offering.marketplace-public-offering',
     url: '/marketplace-public-offering/:uuid/?tab',
-    component: PublicOfferingDetailsContainer,
+    component: lazyComponent(() =>
+      import('./offerings/details/PublicOfferingDetailsContainer').then(
+        (module) => ({ default: module.PublicOfferingDetailsContainer }),
+      ),
+    ),
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
@@ -229,7 +111,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'public.marketplace-category',
     url: '/marketplace-category/:category_uuid/',
-    component: CategoryPage,
+    component: lazyComponent(() =>
+      import('./category/CategoryPage').then((module) => ({
+        default: module.CategoryPage,
+      })),
+    ),
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
@@ -238,7 +124,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'public.offerings',
     url: '/marketplace-public-offerings/?{initialMode}',
-    component: AllOfferingsList,
+    component: lazyComponent(() =>
+      import('./category/AllOfferingsList').then((module) => ({
+        default: module.AllOfferingsList,
+      })),
+    ),
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
@@ -247,7 +137,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'public.marketplace-category-group',
     url: '/marketplace-category-group/:group_uuid/',
-    component: CategoryGroupPage,
+    component: lazyComponent(() =>
+      import('./category/CategoryGroupPage').then((module) => ({
+        default: module.CategoryGroupPage,
+      })),
+    ),
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
@@ -257,14 +151,22 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-provider-details',
     url: 'marketplace-provider-details/:customer_uuid/',
-    component: ProviderDetails,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderDetails').then((module) => ({
+        default: module.ProviderDetails,
+      })),
+    ),
     parent: 'project',
   },
 
   {
     name: 'marketplace-provider-details-customer',
     url: 'marketplace-provider-details/:customer_uuid/',
-    component: ProviderDetails,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderDetails').then((module) => ({
+        default: module.ProviderDetails,
+      })),
+    ),
     parent: 'organization',
   },
 
@@ -273,10 +175,13 @@ export const states: StateDeclaration[] = [
     abstract: true,
     url: '/providers/:uuid/',
     parent: 'layout',
-    component: OrganizationUIView,
+    component: lazyComponent(() =>
+      import('@waldur/organization/OrganizationUIView').then((module) => ({
+        default: module.OrganizationUIView,
+      })),
+    ),
     data: {
       auth: true,
-      workspace: WorkspaceType.ORGANIZATION,
       title: () => translate('Service provider'),
     },
     resolve: [
@@ -304,13 +209,21 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-providers.details',
     url: ':customer_uuid/?tab',
-    component: ProviderDetailsContainer,
+    component: lazyComponent(() =>
+      import('./service-providers/details/ProviderDetailsContainer').then(
+        (module) => ({ default: module.ProviderDetailsContainer }),
+      ),
+    ),
   },
 
   {
     name: 'marketplace-provider-dashboard',
     url: 'dashboard/',
-    component: ProviderDashboard,
+    component: lazyComponent(() =>
+      import(
+        '@waldur/marketplace/service-providers/dashboard/ProviderDashboard'
+      ).then((module) => ({ default: module.ProviderDashboard })),
+    ),
     parent: 'marketplace-provider',
     data: {
       breadcrumb: () => translate('Dashboard'),
@@ -321,7 +234,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-provider-events',
     url: 'events/',
-    component: ProviderEventsTable,
+    component: lazyComponent(() =>
+      import('./service-providers/dashboard/ProviderEventsTable').then(
+        (module) => ({ default: module.ProviderEventsTable }),
+      ),
+    ),
     parent: 'marketplace-provider',
     data: {
       breadcrumb: () => translate('Audit logs'),
@@ -381,7 +298,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-vendor-offerings',
     url: 'offerings/?{state}',
-    component: ProviderOfferingsList,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderOfferingsList').then((module) => ({
+        default: module.ProviderOfferingsList,
+      })),
+    ),
     parent: 'provider-marketplace',
     data: {
       breadcrumb: () => translate('Offerings'),
@@ -391,7 +312,13 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-vendor-offering-users',
     url: 'offering-users/',
-    component: ProviderOfferingUsersList,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderOfferingUsersList').then(
+        (module) => ({
+          default: module.ProviderOfferingUsersList,
+        }),
+      ),
+    ),
     parent: 'provider-marketplace',
     data: {
       breadcrumb: () => translate('Offering users'),
@@ -402,7 +329,13 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-organizations',
     parent: 'marketplace-provider-customers',
     url: 'organizations/',
-    component: ProviderOrganizationsList,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderOrganizationsList').then(
+        (module) => ({
+          default: module.ProviderOrganizationsList,
+        }),
+      ),
+    ),
     data: {
       breadcrumb: () => translate('Organizations'),
     },
@@ -412,29 +345,34 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-users',
     parent: 'marketplace-provider-customers',
     url: 'users/',
-    component: ProviderUsersList,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderUsersList').then((module) => ({
+        default: module.ProviderUsersList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Users'),
     },
   },
   {
-    name: 'marketplace-provider-user-manage-container',
-    parent: 'marketplace-provider-customers',
-    url: '',
-    component: UserManageContainer,
-    abstract: true,
-  },
-  {
     name: 'marketplace-provider-user-manage',
     parent: 'marketplace-provider-user-manage-container',
     url: 'users/:user_uuid/?tab',
-    component: UserManage,
+    component: lazyComponent(() =>
+      import('@waldur/user/UserManage').then((module) => ({
+        default: module.UserManage,
+      })),
+    ),
   },
 
   {
     name: 'organization-offering-permissions',
     url: 'offering-permissions/',
-    component: OfferingPermissionsList,
+    component: lazyComponent(() =>
+      import('./service-providers/OfferingPermissionsList').then((module) => ({
+        default: module.OfferingPermissionsList,
+      })),
+    ),
     parent: 'provider-marketplace',
     data: {
       breadcrumb: () => translate('Offering managers'),
@@ -444,7 +382,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-my-offerings',
     url: 'marketplace-my-offerings/',
-    component: MyOfferingsList,
+    component: lazyComponent(() =>
+      import('./offerings/list/MyOfferingsList').then((module) => ({
+        default: module.MyOfferingsList,
+      })),
+    ),
     parent: 'organization',
     data: {
       breadcrumb: () => translate('My offerings'),
@@ -456,7 +398,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-projects',
     url: 'marketplace-projects/',
-    component: ProjectsList,
+    component: lazyComponent(() =>
+      import('@waldur/project/ProjectsList').then((module) => ({
+        default: module.ProjectsList,
+      })),
+    ),
     parent: 'organization',
     data: {
       breadcrumb: () => translate('Projects'),
@@ -469,12 +415,20 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'marketplace-provider',
-    component: OfferingEditUIView,
+    component: lazyComponent(() =>
+      import('./offerings/OfferingEditUIView').then((module) => ({
+        default: module.OfferingEditUIView,
+      })),
+    ),
   },
   {
     name: 'marketplace-offering-update',
     url: 'offering-update/:offering_uuid/?tab',
-    component: OfferingUpdateContainer,
+    component: lazyComponent(() =>
+      import('./offerings/update/OfferingUpdateContainer').then((module) => ({
+        default: module.OfferingUpdateContainer,
+      })),
+    ),
     parent: 'provider-offering-update',
     data: {
       skipHero: true,
@@ -492,13 +446,21 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-orders.details',
     url: ':order_uuid/?tab',
-    component: OrderDetailsContainer,
+    component: lazyComponent(() =>
+      import('./orders/OrderDetailsContainer').then((module) => ({
+        default: module.OrderDetailsContainer,
+      })),
+    ),
   },
 
   {
     name: 'marketplace-public-resources',
     url: 'resources-list/?{state}',
-    component: PublicResourcesList,
+    component: lazyComponent(() =>
+      import('./resources/list/ProviderResourcesList').then((module) => ({
+        default: module.ProviderResourcesList,
+      })),
+    ),
     parent: 'provider-resources',
     data: {
       breadcrumb: () => translate('Resources'),
@@ -508,7 +470,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-provider-robots',
     url: 'robots/',
-    component: ProviderRobotAccountList,
+    component: lazyComponent(() =>
+      import(
+        '@waldur/marketplace/robot-accounts/ProviderRobotAccountList'
+      ).then((module) => ({ default: module.ProviderRobotAccountList })),
+    ),
     parent: 'provider-resources',
     data: {
       breadcrumb: () => translate('Robot accounts'),
@@ -516,9 +482,27 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-provider-orders',
+    url: 'orders/',
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/service-providers/ProviderOrdersList').then(
+        (module) => ({ default: module.ProviderOrdersList }),
+      ),
+    ),
+    parent: 'provider-resources',
+    data: {
+      breadcrumb: () => translate('Orders'),
+    },
+  },
+
+  {
     name: 'marketplace-provider-offering-requests',
     url: 'offering-requests/',
-    component: OfferingRequestsList,
+    component: lazyComponent(() =>
+      import('@waldur/proposals/offering-requests/OfferingRequestsList').then(
+        (module) => ({ default: module.OfferingRequestsList }),
+      ),
+    ),
     parent: 'provider-calls',
     data: {
       feature: MarketplaceFeatures.show_call_management_functionality,
@@ -527,10 +511,25 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-resource-container',
+    url: '',
+    abstract: true,
+    parent: 'layout',
+    component: lazyComponent(() =>
+      import('./resources/details/ResourceDetailsContainer').then((module) => ({
+        default: module.ResourceDetailsContainer,
+      })),
+    ),
+  },
+  {
     name: 'marketplace-resource-details',
     url: '/resource-details/:resource_uuid?tab',
-    parent: 'layout',
-    component: ResourceDetailsPage,
+    parent: 'marketplace-resource-container',
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/resources/details/ResourceDetailsPage').then(
+        (module) => ({ default: module.ResourceDetailsPage }),
+      ),
+    ),
     data: {
       useExtraTabs: true,
       skipBreadcrumb: true,
@@ -541,7 +540,11 @@ export const states: StateDeclaration[] = [
     name: 'admin-marketplace-offerings',
     parent: 'admin-marketplace',
     url: 'offerings/',
-    component: AdminOfferingsList,
+    component: lazyComponent(() =>
+      import('@waldur/marketplace/offerings/admin/AdminOfferingsList').then(
+        (module) => ({ default: module.AdminOfferingsList }),
+      ),
+    ),
     data: {
       breadcrumb: () => translate('Available offerings'),
     },
@@ -552,12 +555,20 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'admin',
-    component: OfferingDetailsUIView,
+    component: lazyComponent(() =>
+      import('./offerings/OfferingDetailsUIView').then((module) => ({
+        default: module.OfferingDetailsUIView,
+      })),
+    ),
   },
   {
     name: 'admin-marketplace-offering-details',
     url: 'offerings/:offering_uuid/?tab',
-    component: OfferingContainer,
+    component: lazyComponent(() =>
+      import('./offerings/details/OfferingContainer').then((module) => ({
+        default: module.OfferingContainer,
+      })),
+    ),
     parent: 'admin-offering-details',
   },
 
@@ -566,12 +577,20 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'admin',
-    component: OfferingEditUIView,
+    component: lazyComponent(() =>
+      import('./offerings/OfferingEditUIView').then((module) => ({
+        default: module.OfferingEditUIView,
+      })),
+    ),
   },
   {
     name: 'admin-marketplace-offering-update',
     url: 'offerings/:offering_uuid/update/?tab',
-    component: OfferingUpdateContainer,
+    component: lazyComponent(() =>
+      import('./offerings/update/OfferingUpdateContainer').then((module) => ({
+        default: module.OfferingUpdateContainer,
+      })),
+    ),
     parent: 'admin-offering-update',
   },
 
@@ -579,7 +598,11 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-campaigns',
     parent: 'provider-marketplace',
     url: 'marketplace-provider-campaigns/',
-    component: ProviderCampaignsList,
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderCampaignsList').then((module) => ({
+        default: module.ProviderCampaignsList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Campaigns'),
     },
@@ -588,7 +611,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'public.marketplace-providers',
     url: '/marketplace-providers/',
-    component: ServiceProvidersList,
+    component: lazyComponent(() =>
+      import('./service-providers/ServiceProvidersList').then((module) => ({
+        default: module.ServiceProvidersList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Service providers'),
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,

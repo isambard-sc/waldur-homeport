@@ -14,9 +14,10 @@ interface UserAddButtonProps {
   refetch;
 }
 
-const AddUserDialog = lazyComponent(
-  () => import('@waldur/project/team/AddUserDialog'),
-  'AddUserDialog',
+const AddUserDialog = lazyComponent(() =>
+  import('@waldur/project/team/AddUserDialog').then((module) => ({
+    default: module.AddUserDialog,
+  })),
 );
 
 export const UserAddButton: FunctionComponent<UserAddButtonProps> = ({
@@ -45,7 +46,7 @@ export const UserAddButton: FunctionComponent<UserAddButtonProps> = ({
           }),
         )
       }
-      title={translate('Add member')}
+      title={translate('Add')}
       iconNode={<PlusCircle />}
       disabled={!canAddUser}
     />

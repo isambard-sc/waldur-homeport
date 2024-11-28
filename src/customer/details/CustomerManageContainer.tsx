@@ -8,38 +8,45 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { canRegisterServiceProviderForCustomer } from '@waldur/marketplace/service-providers/selectors';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { getCustomer, getUser, isStaff } from '@waldur/workspace/selectors';
 
-const CustomerDetailsPanel = lazyComponent(
-  () => import('./CustomerDetailsPanel'),
-  'CustomerDetailsPanel',
+const CustomerDetailsPanel = lazyComponent(() =>
+  import('./CustomerDetailsPanel').then((module) => ({
+    default: module.CustomerDetailsPanel,
+  })),
 );
-const CustomerContactPanel = lazyComponent(
-  () => import('./CustomerContactPanel'),
-  'CustomerContactPanel',
+const CustomerContactPanel = lazyComponent(() =>
+  import('./CustomerContactPanel').then((module) => ({
+    default: module.CustomerContactPanel,
+  })),
 );
-const CustomerAccessControlPanel = lazyComponent(
-  () => import('./CustomerAccessControlPanel'),
-  'CustomerAccessControlPanel',
+const CustomerAccessControlPanel = lazyComponent(() =>
+  import('./CustomerAccessControlPanel').then((module) => ({
+    default: module.CustomerAccessControlPanel,
+  })),
 );
-const CustomerBillingPanel = lazyComponent(
-  () => import('./CustomerBillingPanel'),
-  'CustomerBillingPanel',
+const CustomerBillingPanel = lazyComponent(() =>
+  import('./CustomerBillingPanel').then((module) => ({
+    default: module.CustomerBillingPanel,
+  })),
 );
-const CustomerCallManagerPanel = lazyComponent(
-  () => import('./CustomerCallManagerPanel'),
-  'CustomerCallManagerPanel',
+const CustomerCallManagerPanel = lazyComponent(() =>
+  import('./CustomerCallManagerPanel').then((module) => ({
+    default: module.CustomerCallManagerPanel,
+  })),
 );
-const CustomerMarketplacePanel = lazyComponent(
-  () => import('./CustomerMarketplacePanel'),
-  'CustomerMarketplacePanel',
+const CustomerMarketplacePanel = lazyComponent(() =>
+  import('./CustomerMarketplacePanel').then((module) => ({
+    default: module.CustomerMarketplacePanel,
+  })),
 );
-const CustomerRemovePanel = lazyComponent(
-  () => import('./CustomerRemovePanel'),
-  'CustomerRemovePanel',
+const CustomerRemovePanel = lazyComponent(() =>
+  import('./CustomerRemovePanel').then((module) => ({
+    default: module.CustomerRemovePanel,
+  })),
 );
 
 export const CustomerManageContainer = () => {
@@ -108,7 +115,7 @@ export const CustomerManageContainer = () => {
   return (
     <UIView
       render={(Component, { key, ...props }) => (
-        <Component {...props} key={key} tabSpec={tabSpec} />
+        <Component key={key} {...props} tabSpec={tabSpec} />
       )}
     />
   );

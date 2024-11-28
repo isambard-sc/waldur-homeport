@@ -11,6 +11,7 @@ interface ActionButtonProps {
   title?: string;
   action: (event?: any) => void;
   iconNode?: ReactNode;
+  iconRight?: boolean;
   className?: string;
   disabled?: boolean;
   tooltip?: string;
@@ -42,17 +43,25 @@ const ActionButtonPure: FC<ActionButtonProps> = ({
     <Button
       className={classNames(className, {
         disabled: props.disabled || props.pending,
+        'btn-icon': !props.title && props.iconNode,
+        'btn-icon-right': props.iconRight,
       })}
       size={props.size}
       onClick={props.action}
       variant={variant}
+      data-testid={props['data-testid']}
     >
+      {props.iconRight && props.title}
       {props.pending ? (
         <LoadingSpinnerIcon />
       ) : props.iconNode ? (
-        <span className="svg-icon svg-icon-2">{props.iconNode}</span>
-      ) : null}{' '}
-      {props.title}
+        <span
+          className={`svg-icon svg-icon-${props.size === 'sm' ? '4' : '2'}`}
+        >
+          {props.iconNode}
+        </span>
+      ) : null}
+      {!props.iconRight && props.title}
     </Button>,
   );
 
@@ -75,7 +84,7 @@ export const RowActionButton: FC<ActionButtonProps> = ({
     props.tooltip,
     <Button
       className={classNames(
-        'btn-outline border-gray-400 btn-active-secondary px-2',
+        'btn-outline border-gray-400 btn-active-secondary bg-gray-25 px-2',
         className,
         { disabled: props.disabled || props.pending },
       )}

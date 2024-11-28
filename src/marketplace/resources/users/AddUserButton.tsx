@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { USER_FORM_ID } from './constants';
 
-const AddUserDialog = lazyComponent(
-  () => import('./AddUserDialog'),
-  'AddUserDialog',
+const AddUserDialog = lazyComponent(() =>
+  import('./AddUserDialog').then((module) => ({
+    default: module.AddUserDialog,
+  })),
 );
 
 export const AddUserButton: FunctionComponent<{

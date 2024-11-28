@@ -21,7 +21,7 @@ export const RejectionSummary: FC<RejectionSummaryProps> = ({ reviews }) => {
     );
   }, [reviews]);
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title className="text-danger">
           {translate('Proposal rejected')}

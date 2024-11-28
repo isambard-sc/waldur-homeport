@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { capitalize } from 'lodash';
+import { capitalize } from 'lodash-es';
 import { Button, Card, Col, Row, Table } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
@@ -15,9 +15,10 @@ import { SettingsDescription } from '@waldur/SettingsDescription';
 import { getDBSettings } from '../settings/api';
 import { FieldRow } from '../settings/FieldRow';
 
-const AdministrationServiceDeskUpdateDialog = lazyComponent(
-  () => import('./AdministrationServiceDeskUpdateDialog'),
-  'AdministrationServiceDeskUpdateDialog',
+const AdministrationServiceDeskUpdateDialog = lazyComponent(() =>
+  import('./AdministrationServiceDeskUpdateDialog').then((module) => ({
+    default: module.AdministrationServiceDeskUpdateDialog,
+  })),
 );
 
 const INTEGRATION_SETTINGS = SettingsDescription.find(
@@ -94,7 +95,7 @@ export const AdministrationServiceDesk = () => {
       <FormTable.Card
         title={INTEGRATION_SETTINGS.description}
         key={INTEGRATION_SETTINGS.description}
-        className="card-bordered mb-3"
+        className="card-bordered mb-5"
       >
         <Table bordered={true} responsive={true} className="form-table">
           {INTEGRATION_SETTINGS.items.map((item) => (
@@ -102,7 +103,7 @@ export const AdministrationServiceDesk = () => {
           ))}
         </Table>
       </FormTable.Card>
-      <Card>
+      <Card className="card-bordered">
         <Card.Body>
           <Row>
             {serviceDeskProviders.map((serviceDeskProvider, index) => (

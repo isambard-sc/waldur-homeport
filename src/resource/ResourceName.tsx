@@ -1,3 +1,4 @@
+import { Warning } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
 import { Link } from '@waldur/core/Link';
@@ -17,6 +18,7 @@ interface ResourceIconProps {
 
 interface ResourceNameProps {
   resource: {
+    marketplace_uuid?: string;
     name: string;
     uuid: string;
     resource_type: string;
@@ -48,7 +50,7 @@ const ResourceWarning = (props: ResourceNameProps) =>
       label={translate('Provider does not comply with project policies')}
     >
       {' '}
-      <i className="fa fa-exclamation-triangle text-muted" />
+      <Warning className="text-muted" />
     </Tip>
   ) : null;
 
@@ -61,14 +63,14 @@ export const ResourceName = (props: ResourceNameProps) =>
       }}
       label={props.resource.name}
     />
-  ) : (
+  ) : props.resource.marketplace_uuid ? (
     <>
       <ResourceLink
-        uuid={props.resource.uuid}
-        type={props.resource.resource_type}
-        project={props.resource.project_uuid}
+        uuid={props.resource.marketplace_uuid}
         label={<ResourceIcon resource={props.resource} />}
       />
       <ResourceWarning resource={props.resource} />
     </>
+  ) : (
+    <ResourceIcon resource={props.resource} />
   );

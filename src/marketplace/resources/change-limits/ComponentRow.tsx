@@ -3,7 +3,7 @@ import { Form, InputGroup } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
 import { AwesomeCheckbox } from '@waldur/core/AwesomeCheckbox';
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import {
   parseIntField,
   formatIntField,

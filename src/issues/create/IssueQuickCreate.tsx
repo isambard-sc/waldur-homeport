@@ -9,7 +9,7 @@ import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { formatResourceShort } from '@waldur/marketplace/utils';
 import { isDescendantOf } from '@waldur/navigation/useTabs';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { checkIsOwner, getUser } from '@waldur/workspace/selectors';
 
 import { refreshProjects, refetchs } from './api';

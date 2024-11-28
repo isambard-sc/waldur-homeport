@@ -7,9 +7,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const AddRemoteUserDialog = lazyComponent(
-  () => import('./AddRemoteUserDialog'),
-  'AddRemoteUserDialog',
+const AddRemoteUserDialog = lazyComponent(() =>
+  import('./AddRemoteUserDialog').then((module) => ({
+    default: module.AddRemoteUserDialog,
+  })),
 );
 
 export const UserTableActions = ({ refetch }) => {

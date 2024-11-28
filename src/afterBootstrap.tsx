@@ -1,13 +1,9 @@
 import MatomoTracker from '@jonkoops/matomo-tracker';
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
 
 import { initAuthToken } from './auth/interceptor';
 import { ENV } from './configs/default';
 import { LanguageUtilsService } from './i18n/LanguageUtilsService';
-import { initTheme } from './navigation/theme/store';
-import { initConfig } from './store/config';
-import store from './store/store';
 import { attachTransitions } from './transitions';
 
 function initSentry() {
@@ -16,15 +12,11 @@ function initSentry() {
     Sentry.init({
       release: `waldur-homeport@${ENV.buildId}`,
       dsn: ENV.plugins.WALDUR_CORE.HOMEPORT_SENTRY_DSN,
-      integrations: [
-        new BrowserTracing({
-          tracePropagationTargets: [hostname, /^\//],
-        }),
-      ],
       environment:
         ENV.plugins.WALDUR_CORE.HOMEPORT_SENTRY_ENVIRONMENT || 'unknown',
       tracesSampleRate:
         ENV.plugins.WALDUR_CORE.HOMEPORT_SENTRY_TRACES_SAMPLE_RATE || 0.2,
+      tracePropagationTargets: [hostname, /^\//],
     });
   }
 }
@@ -52,8 +44,6 @@ export function afterBootstrap() {
     });
   initSentry();
   initAuthToken();
-  store.dispatch(initConfig(ENV));
-  store.dispatch(initTheme(ENV));
   LanguageUtilsService.checkLanguage();
   attachTransitions();
   initCssVariables();

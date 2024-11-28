@@ -11,7 +11,7 @@ import {
   getQuotas,
 } from '@waldur/openstack/openstack-instance/utils';
 import { parseQuotas, parseQuotasUsage } from '@waldur/openstack/utils';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { Flavor } from '../types';
 
@@ -53,7 +53,7 @@ export const useVolumeDataLoader = (offering: Offering) => {
     ['volumeTypes', offering.uuid],
     async () => {
       const volumeTypes = offering.scope_uuid
-        ? await loadVolumeTypes(offering.scope_uuid)
+        ? await loadVolumeTypes({ tenant_uuid: offering.scope_uuid })
         : [];
       const volumeTypeChoices = formatVolumeTypeChoices(volumeTypes);
       const defaultVolumeType = getDefaultVolumeType(volumeTypeChoices);

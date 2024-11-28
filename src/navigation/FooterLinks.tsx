@@ -1,9 +1,8 @@
 import { Copy } from '@phosphor-icons/react';
-import copy from 'copy-to-clipboard';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { AuthService } from '@waldur/auth/AuthService';
+import * as AuthService from '@waldur/auth/AuthService';
 import { ENV } from '@waldur/configs/default';
 import { Link } from '@waldur/core/Link';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -40,8 +39,9 @@ export const FooterLinks = () => {
 
   const copyText = useCallback(
     (text) => {
-      copy(text);
-      dispatch(showSuccess(translate('{text} has been copied', { text })));
+      navigator.clipboard.writeText(text).then(() => {
+        dispatch(showSuccess(translate('Text has been copied')));
+      });
     },
     [dispatch],
   );
@@ -51,10 +51,7 @@ export const FooterLinks = () => {
   }, []);
 
   return (
-    <ul
-      className="menu menu-gray-600 menu-hover-primary fw-bold order-1"
-      data-kt-menu="true"
-    >
+    <ul className="menu menu-primary fw-bold order-1" data-kt-menu="true">
       {!AuthService.isAuthenticated() && (
         <>
           {isFeatureVisible(

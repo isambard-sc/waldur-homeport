@@ -3,8 +3,9 @@ import { useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { PublicResourceLink } from '@waldur/marketplace/resources/list/PublicResourceLink';
-import { createFetcher, Table } from '@waldur/table/index';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const ProviderCampaignResourceExpandable = ({ campaign }) => {
   const tableOptions = useMemo(
@@ -24,6 +25,7 @@ export const ProviderCampaignResourceExpandable = ({ campaign }) => {
         {
           title: translate('Name'),
           render: PublicResourceLink,
+          copyField: (row) => row.name || row.offering_name,
         },
         {
           title: translate('Category'),

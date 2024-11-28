@@ -31,6 +31,7 @@ export const OrganizationGroupDeleteButton = (
           { name: <strong>{props.row.name}</strong> },
           formatJsxTemplate,
         ),
+        true,
       );
       setRemoving(true);
       await removeOrganizationGroup(props.row.uuid);

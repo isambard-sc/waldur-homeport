@@ -9,8 +9,8 @@ import {
   StepCardTabs,
   TabSpec,
 } from '@waldur/marketplace/deploy/steps/StepCardTabs';
-import { createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import { useTable } from '@waldur/table/useTable';
 
 import { FieldReviewComments } from '../proposal/create-review/FieldReviewComments';
 import { ProposalReview } from '../types';
@@ -81,8 +81,8 @@ export const TeamSection: FC<
   );
 
   return (
-    <Card>
-      <Card.Header>
+    <Card className="card-bordered">
+      <Card.Header className="pt-4 pb-2">
         <Card.Title>
           <h3>{props.title}</h3>
         </Card.Title>
@@ -92,6 +92,7 @@ export const TeamSection: FC<
           </div>
           <div className="col d-flex justify-content-end text-nowrap">
             <AddUserButton refetch={usersTable.fetch} {...props} />
+            &nbsp;
             <InvitationCreateButton
               {...props}
               refetch={invitationsTable.fetch}
@@ -105,15 +106,21 @@ export const TeamSection: FC<
             table={usersTable}
             scope={props.scope}
             hideRole={hideRole}
+            cardBordered={false}
           />
         )}
         {tab.key === 'invitations' && (
-          <InvitationsList table={invitationsTable} hideRole={hideRole} />
+          <InvitationsList
+            table={invitationsTable}
+            hideRole={hideRole}
+            cardBordered={false}
+          />
         )}
         {tab.key === 'permissions' && (
           <BaseEventsList
             table={`permissions-log${props.scope.url}`}
             filter={eventsFilter}
+            cardBordered={false}
           />
         )}
 

@@ -10,7 +10,7 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { createHPA, listWorkloads, listNamespaces } from '@waldur/rancher/api';
 import { Resource } from '@waldur/resource/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { createEntity } from '@waldur/table/actions';
 
 import { MetricOption, HPACreateFormData } from './types';

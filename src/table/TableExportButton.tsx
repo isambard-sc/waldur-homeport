@@ -4,22 +4,16 @@ import { Button } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
+import { useExportDialog } from './useExportDialog';
 
-interface TableExportButtonProps {
-  openExportDialog?: TableProps['openExportDialog'];
-  rows?;
-}
-
-export const TableExportButton: FunctionComponent<TableExportButtonProps> = ({
-  openExportDialog,
-  ...props
-}) => {
+export const TableExportButton: FunctionComponent<TableProps> = (props) => {
+  const openExportDialog = useExportDialog();
   return (
     <Button
       variant="outline-default"
       className="btn-outline"
-      onClick={() => openExportDialog('clipboard', props)}
+      onClick={() => openExportDialog(props.table, 'clipboard', props)}
       disabled={props.rows?.length === 0}
     >
       <span className="svg-icon svg-icon-1">

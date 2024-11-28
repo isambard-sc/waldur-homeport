@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const AccessSubnetCreateForm = lazyComponent(
-  () => import('./AccessSubnetCreateForm'),
-  'AccessSubnetCreateForm',
+const AccessSubnetCreateForm = lazyComponent(() =>
+  import('./AccessSubnetCreateForm').then((module) => ({
+    default: module.AccessSubnetCreateForm,
+  })),
 );
 
 const AccessSubnetCreateDialog = (refetch, customer_uuid) =>

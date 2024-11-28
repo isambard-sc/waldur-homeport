@@ -1,13 +1,6 @@
 import accept from 'attr-accept';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-
-const IssueAttachmentModal = lazyComponent(
-  () => import('./IssueAttachmentModal'),
-  'IssueAttachmentModal',
-);
 
 export const validateFiles = (
   files: File[] = [],
@@ -59,6 +52,3 @@ export const getErrorMessage = (files: File[]): string => {
     files.length > 1 ? filesMessage : fileMessage
   }: ${fileList} \n ${reasonMessage}`;
 };
-
-export const openAttachmentModal = (url: string, name: string) =>
-  openModalDialog(IssueAttachmentModal, { resolve: { url, name } });

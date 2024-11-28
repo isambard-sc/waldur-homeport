@@ -25,6 +25,9 @@ export function checkScope(
 }
 
 export const hasPermission = (user: User, request: PermissionRequest) => {
+  if (user.is_staff) {
+    return true;
+  }
   if (request.projectId) {
     if (checkScope(user, 'project', request.projectId, request.permission)) {
       return true;
@@ -32,6 +35,14 @@ export const hasPermission = (user: User, request: PermissionRequest) => {
   }
   if (request.customerId) {
     if (checkScope(user, 'customer', request.customerId, request.permission)) {
+      return true;
+    }
+  }
+  if (request.scopeId) {
+    if (
+      checkScope(user, 'call', request.scopeId, request.permission) ||
+      checkScope(user, 'proposal', request.scopeId, request.permission)
+    ) {
       return true;
     }
   }

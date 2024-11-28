@@ -2,21 +2,22 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const TenantImagesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
   const filter = useMemo(
     () => ({
-      settings_uuid: resourceScope.child_settings,
+      tenant_uuid: resourceScope.uuid,
     }),
     [resourceScope],
   );
   const props = useTable({
-    table: 'openstacktenant-images',
-    fetchData: createFetcher('openstacktenant-images'),
+    table: 'openstack-images',
+    fetchData: createFetcher('openstack-images'),
     filter,
     queryField: 'name',
   });
@@ -27,6 +28,7 @@ export const TenantImagesList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => row.name,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Minimal RAM'),

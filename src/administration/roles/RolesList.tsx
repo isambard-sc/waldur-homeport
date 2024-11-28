@@ -1,10 +1,10 @@
-import { Badge } from 'react-bootstrap';
-
+import { Badge } from '@waldur/core/Badge';
 import { translate } from '@waldur/i18n';
 import { formatRoleType } from '@waldur/permissions/utils';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { RoleActions } from './RoleActions';
 import { RoleCreateButton } from './RoleCreateButton';
@@ -25,12 +25,13 @@ export const RolesList = () => {
             <>
               {row.name}{' '}
               {row.is_system_role && (
-                <Badge bg="primary" className="ms-2">
+                <Badge outline pill className="ms-2">
                   {translate('System role')}
                 </Badge>
               )}
             </>
           ),
+          copyField: (row) => row.name,
         },
         {
           title: translate('Scope'),

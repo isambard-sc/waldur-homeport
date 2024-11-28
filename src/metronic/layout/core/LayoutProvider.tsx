@@ -34,7 +34,7 @@ const LayoutContext = createContext<LayoutContextModel>({
   classes: getEmptyCssClasses(),
   attributes: getEmptyHTMLAttributes(),
   cssVariables: getEmptyCSSVariables(),
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+
   setLayout: () => {},
 });
 
@@ -87,7 +87,7 @@ const LayoutProvider: FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-export { LayoutContext, LayoutProvider };
+export { LayoutProvider };
 
 export function useLayout() {
   return useContext(LayoutContext);

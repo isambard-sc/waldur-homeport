@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 
+import { goBack } from '@waldur/error/utils';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
-import { goBack } from '@waldur/navigation/utils';
 
 import Image from './404.png';
 

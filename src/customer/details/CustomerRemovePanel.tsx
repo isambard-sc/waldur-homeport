@@ -1,5 +1,4 @@
 import { Trash } from '@phosphor-icons/react';
-import { useRouter } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,14 +8,13 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { deleteCustomer } from '@waldur/project/api';
 import { showError } from '@waldur/store/notify';
-import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-const CustomerRemoveDialog = lazyComponent(
-  () => import('@waldur/customer/details/CustomerRemoveDialog'),
-  'CustomerRemoveDialog',
+const CustomerRemoveDialog = lazyComponent(() =>
+  import('@waldur/customer/details/CustomerRemoveDialog').then((module) => ({
+    default: module.CustomerRemoveDialog,
+  })),
 );
 
 export const CustomerRemovePanel: FunctionComponent = () => {
@@ -27,7 +25,6 @@ export const CustomerRemovePanel: FunctionComponent = () => {
     customerId: customer.uuid,
   });
   const dispatch = useDispatch();
-  const router = useRouter();
 
   const removeCustomer = () => {
     const hasProjects = customer.projects.length > 0;
@@ -41,19 +38,7 @@ export const CustomerRemovePanel: FunctionComponent = () => {
     dispatch(
       openModalDialog(CustomerRemoveDialog, {
         resolve: {
-          action: () => {
-            return deleteCustomer(customer.uuid)
-              .then(() => {
-                router.stateService.go('organizations').then(() => {
-                  dispatch(setCurrentCustomer(null));
-                });
-              })
-              .catch((error) => {
-                const msg = error.response.data?.detail || error.message;
-                dispatch(showError(msg));
-              });
-          },
-          customerName: customer.name,
+          customer,
         },
         size: 'sm',
       }),

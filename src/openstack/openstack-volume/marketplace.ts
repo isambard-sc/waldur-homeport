@@ -1,20 +1,23 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { VOLUME_TYPE } from '../constants';
 
-const CheckoutSummary = lazyComponent(
-  () => import('./deploy/CheckoutSummary'),
-  'CheckoutSummary',
+const CheckoutSummary = lazyComponent(() =>
+  import('./deploy/CheckoutSummary').then((module) => ({
+    default: module.CheckoutSummary,
+  })),
 );
-const OpenstackVolumeDetails = lazyComponent(
-  () => import('./OpenstackVolumeDetails'),
-  'OpenstackVolumeDetails',
+const OpenstackVolumeDetails = lazyComponent(() =>
+  import('./OpenstackVolumeDetails').then((module) => ({
+    default: module.OpenstackVolumeDetails,
+  })),
 );
-const OpenstackVolumeOrder = lazyComponent(
-  () => import('./deploy/OpenstackVolumeOrder'),
-  'OpenstackVolumeOrder',
+const OpenstackVolumeOrder = lazyComponent(() =>
+  import('./deploy/OpenstackVolumeOrder').then((module) => ({
+    default: module.OpenstackVolumeOrder,
+  })),
 );
 
 const serializer = (attrs) => ({
@@ -22,7 +25,7 @@ const serializer = (attrs) => ({
   type: attrs.type && attrs.type.value,
 });
 
-registerOfferingType({
+export const OpenStackVolumeOffering: OfferingConfiguration = {
   type: VOLUME_TYPE,
   get label() {
     return translate('OpenStack volume');
@@ -33,4 +36,4 @@ registerOfferingType({
   serializer,
   disableOfferingCreation: true,
   allowToUpdateService: true,
-});
+};

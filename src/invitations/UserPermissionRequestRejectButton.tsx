@@ -14,9 +14,10 @@ interface UserPermissionRequestRejectButtonProps {
   refetch;
 }
 
-const PermissionRequestActionDialog = lazyComponent(
-  () => import('./PermissionRequestActionDialog'),
-  'PermissionRequestActionDialog',
+const PermissionRequestActionDialog = lazyComponent(() =>
+  import('./PermissionRequestActionDialog').then((module) => ({
+    default: module.PermissionRequestActionDialog,
+  })),
 );
 
 const openPermissionRequestActionDialog = (resolve) =>

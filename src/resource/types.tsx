@@ -69,15 +69,16 @@ interface SubnetReference {
   subnet_cidr: string;
 }
 
-export interface InternalIP extends Partial<SubnetReference> {
+export interface Port extends Partial<SubnetReference> {
   fixed_ips?: FixedIP[];
   allowed_address_pairs?: any;
   mac_address?: string;
 }
 
 export interface VirtualMachine extends Resource {
-  internal_ips_set?: InternalIP[];
+  ports?: Port[];
   floating_ips?: any[];
+  external_address?: any[];
   cores: number;
   disk: number;
   ram: number;

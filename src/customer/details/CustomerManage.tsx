@@ -20,9 +20,10 @@ import { CustomerManagePageBar } from './CustomerManagePageBar';
 import { CustomerMarketplacePanel } from './CustomerMarketplacePanel';
 import { CustomerRemovePanel } from './CustomerRemovePanel';
 
-const CustomerErrorDialog = lazyComponent(
-  () => import('./CustomerErrorDialog'),
-  'CustomerErrorDialog',
+const CustomerErrorDialog = lazyComponent(() =>
+  import('./CustomerErrorDialog').then((module) => ({
+    default: module.CustomerErrorDialog,
+  })),
 );
 
 interface OwnProps {

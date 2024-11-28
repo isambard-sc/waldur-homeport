@@ -3,14 +3,10 @@ import { createSelector } from 'reselect';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
-import {
-  getCustomer,
-  getProject,
-  getWorkspace,
-} from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 import { OfferingCard } from '../common/OfferingCard';
 
@@ -38,9 +34,8 @@ const field = [
 const mapStateToFilter = createSelector(
   getCustomer,
   getProject,
-  getWorkspace,
   getMarketplaceFilters,
-  (customer, project, workspace, marketplaceFilters) => {
+  (customer, project, marketplaceFilters) => {
     let contextFilter = getContextFiltersForOfferings(marketplaceFilters);
     if (!contextFilter) {
       contextFilter = {
@@ -48,16 +43,12 @@ const mapStateToFilter = createSelector(
         project_uuid: project?.uuid,
       };
     }
-    const filter: Record<string, any> = {
+    return {
       page_size: 6,
       field,
       state: ['Active', 'Paused'],
       ...contextFilter,
     };
-    if (workspace === WorkspaceType.USER) {
-      filter.shared = true;
-    }
-    return filter;
   },
 );
 
@@ -80,7 +71,10 @@ export const OfferingsGroup = () => {
       verboseName={translate('Offerings')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       tableActions={
-        <Link state="public.offerings" className="btn btn-light">
+        <Link
+          state="public.offerings"
+          className="btn btn-outline btn-outline-default"
+        >
           {translate('All offerings')}
         </Link>
       }

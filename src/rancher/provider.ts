@@ -1,25 +1,16 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { pick } from '@waldur/core/utils';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import icon from '@waldur/images/appstore/icon-rancher.png';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
-const RancherProviderForm = lazyComponent(
-  () => import('./RancherProviderForm'),
-  'RancherProviderForm',
+const RancherProviderForm = lazyComponent(() =>
+  import('./RancherProviderForm').then((module) => ({
+    default: module.RancherProviderForm,
+  })),
 );
 
-const serializer = pick([
-  'backend_url',
-  'username',
-  'password',
-  'base_image_name',
-  'cloud_init_template',
-]);
-
-ProvidersRegistry.register({
+export const RancherProviderConfig: ProviderConfig = {
   name: 'Rancher',
   type: 'Rancher',
-  icon: 'icon-rancher.png',
-  endpoint: 'rancher',
+  icon,
   component: RancherProviderForm,
-  serializer,
-});
+};

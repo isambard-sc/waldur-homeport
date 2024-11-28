@@ -8,8 +8,8 @@ import { AttachDocumentsButton } from './AttachDocumentsButton';
 
 export const CallDocumentsSection = ({ call, refetch }) => {
   return (
-    <Card>
-      <Card.Header className="border-2 border-bottom">
+    <Card className="card-bordered">
+      <Card.Header>
         <Card.Title>{translate('Documents')}</Card.Title>
         <div className="card-toolbar">
           <AttachDocumentsButton call={call} refetch={refetch} />
@@ -23,7 +23,7 @@ export const CallDocumentsSection = ({ call, refetch }) => {
                 <tr key={i}>
                   <td className="col-md-3">
                     {decodeURIComponent(
-                      document.file
+                      document.file_name
                         .split('/')
                         .pop()
                         .replace(/_[^_]+\./, '.'),

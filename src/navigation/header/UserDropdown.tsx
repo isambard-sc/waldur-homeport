@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
-import { AuthService } from '@waldur/auth/AuthService';
 import { ENV } from '@waldur/configs/default';
 import Avatar from '@waldur/core/Avatar';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
@@ -10,7 +9,7 @@ import { translate } from '@waldur/i18n';
 import { getUser } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
 
-import { ThemeSwitcher } from '../theme/ThemeSwitcher';
+import { ThemeSwitcher } from '../../theme/ThemeSwitcher';
 
 import { LanguageSelectorDropdown } from './LanguageSelectorDropdown';
 import { UserDropdownMenuItems } from './UserDropdownMenuItems';
@@ -28,15 +27,7 @@ export const UserDropdownMenu: FunctionComponent = () => {
         data-kt-menu-flip="bottom"
         data-cy="user-dropdown-trigger"
       >
-        <div className="d-none d-md-flex flex-column align-items-end justify-content-center me-2">
-          <span className="text-muted fs-7 fw-semibold lh-1 mb-2">
-            {translate('Hello')}
-          </span>
-          <span className="text-dark fs-base fw-bold lh-1">
-            {user ? user.first_name : translate('Guest')}
-          </span>
-        </div>
-        <div className="cursor-pointer symbol symbol-30px symbol-md-40px">
+        <div className="cursor-pointer symbol symbol-30px symbol-md-40px justify-content-center">
           {!user ? (
             <ImagePlaceholder width="40px" height="40px" />
           ) : user.image ? (
@@ -50,6 +41,21 @@ export const UserDropdownMenu: FunctionComponent = () => {
               name={user.full_name}
               size={40}
             />
+          )}
+        </div>
+        <div className="d-none d-md-flex flex-column align-items-center justify-content-center me-2 mt-2">
+          {!user?.is_staff && (
+            <span className="text-muted fs-7 fw-semibold lh-1 mb-2">
+              {translate('Hello')}
+            </span>
+          )}
+          <span className="text-dark fs-base fw-bold lh-1">
+            {user ? user.first_name : translate('Guest')}
+          </span>
+          {user?.is_staff && (
+            <span className="badge badge-light-info fs-8 lh-1 mt-1 align-items-end">
+              {translate('Staff')}
+            </span>
           )}
         </div>
       </div>
@@ -117,13 +123,12 @@ export const UserDropdownMenu: FunctionComponent = () => {
 
         {user && (
           <div className="menu-item px-5" data-kt-menu-trigger="click">
-            <span
-              onClick={AuthService.logout}
+            <Link
+              state="logout"
               className="menu-link px-5"
               aria-hidden="true"
-            >
-              {translate('Log out')}
-            </span>
+              label={translate('Log out')}
+            />
           </div>
         )}
 

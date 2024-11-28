@@ -1,6 +1,5 @@
-import { useRef, useCallback, useEffect, FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
-import { Scrollbars } from 'react-custom-scrollbars';
 
 export const BaseList: FunctionComponent<{
   items;
@@ -17,24 +16,8 @@ export const BaseList: FunctionComponent<{
   ItemComponent,
   linkState,
 }) => {
-  const scrollBarRef = useRef<Scrollbars>();
-  const itemId = selectedItem?.uuid;
-
-  const adjustScroll = useCallback(() => {
-    if (itemId) {
-      const view = scrollBarRef.current.view;
-      const query = `[data-uuid="${itemId}"]`;
-      const itemElement = view.querySelector(query);
-      if (itemElement) {
-        view.scrollTop = itemElement.offsetTop;
-      }
-    }
-  }, [scrollBarRef, itemId]);
-
-  useEffect(adjustScroll, []);
-
   return (
-    <Scrollbars ref={scrollBarRef} className="scrollbar">
+    <div className="scrollbar">
       <ListGroup>
         {items.length === 0 ? (
           <ListGroupItem>
@@ -52,6 +35,6 @@ export const BaseList: FunctionComponent<{
           ))
         )}
       </ListGroup>
-    </Scrollbars>
+    </div>
   );
 };

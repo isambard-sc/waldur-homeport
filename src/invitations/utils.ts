@@ -1,4 +1,4 @@
-import { AuthService } from '@waldur/auth/AuthService';
+import * as AuthService from '@waldur/auth/AuthService';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { createDeferred } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -16,14 +16,16 @@ import { setCurrentUser } from '@waldur/workspace/actions';
 import { InvitationService } from './InvitationService';
 import { clearInvitationToken, setInvitationToken } from './InvitationStorage';
 
-const InvitationConfirmDialog = lazyComponent(
-  () => import('./InvitationConfirmDialog'),
-  'InvitationConfirmDialog',
+const InvitationConfirmDialog = lazyComponent(() =>
+  import('./InvitationConfirmDialog').then((module) => ({
+    default: module.InvitationConfirmDialog,
+  })),
 );
 
-const GroupInvitationConfirmDialog = lazyComponent(
-  () => import('./GroupInvitationConfirmDialog'),
-  'GroupInvitationConfirmDialog',
+const GroupInvitationConfirmDialog = lazyComponent(() =>
+  import('./GroupInvitationConfirmDialog').then((module) => ({
+    default: module.GroupInvitationConfirmDialog,
+  })),
 );
 
 export function checkAndAccept(token) {

@@ -1,16 +1,14 @@
 import { Question } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Table } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
 import { ENV } from '@waldur/configs/default';
 import { formatCurrency } from '@waldur/core/formatCurrency';
 import { Tip } from '@waldur/core/Tooltip';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
-import { isVisible } from '@waldur/store/config';
-import { RootState } from '@waldur/store/reducers';
 
 import { Component } from './types';
 
@@ -29,8 +27,8 @@ const getTipLabel = (component) =>
 export const TotalLimitComponentsList: FunctionComponent<
   TotalLimitComponentsListProps
 > = (props) => {
-  const shouldConcealPrices = useSelector((state: RootState) =>
-    isVisible(state, MarketplaceFeatures.conceal_prices),
+  const shouldConcealPrices = isFeatureVisible(
+    MarketplaceFeatures.conceal_prices,
   );
   return (
     <Table bordered={true}>

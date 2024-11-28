@@ -4,7 +4,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 
 import { attachment } from './fixture';
-import { PureIssueAttachment } from './IssueAttachment';
+import { IssueAttachment } from './IssueAttachment';
 
 describe('IssueAttachment', () => {
   const inititalProps = {
@@ -14,7 +14,7 @@ describe('IssueAttachment', () => {
     openModal: () => undefined,
   };
   const renderWrapper = (props?) =>
-    shallow(<PureIssueAttachment {...inititalProps} {...props} />);
+    shallow(<IssueAttachment {...inititalProps} {...props} />);
 
   it('renders thumbnail', () => {
     const wrapper = renderWrapper({ attachment });
@@ -56,7 +56,7 @@ describe('IssueAttachment', () => {
   });
 
   it('invokes deleteAttachment on click', () => {
-    const deleteAttachment = jest.fn();
+    const deleteAttachment = vi.fn();
     const wrapper = renderWrapper({ attachment, deleteAttachment });
     const deleteBtn = wrapper.find('.attachment-item__delete');
     deleteBtn.simulate('click');
@@ -64,7 +64,7 @@ describe('IssueAttachment', () => {
   });
 
   it('opens modal dialog when user clicks on image thumbnail', () => {
-    const openModal = jest.fn();
+    const openModal = vi.fn();
     const wrapper = renderWrapper({ openModal });
     const thumbnail = wrapper.find('.attachment-item__thumb img');
     thumbnail.simulate('click');

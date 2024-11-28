@@ -5,7 +5,7 @@ import { FunctionComponent } from 'react';
 import { getQueryString } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 
-import { AuthService } from '../AuthService';
+import * as AuthService from '../AuthService';
 
 export const AuthLogoutFailed: FunctionComponent = () => {
   const qs = Qs.parse(getQueryString());

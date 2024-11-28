@@ -8,9 +8,10 @@ import { Offering } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const OfferingReferralsDialog = lazyComponent(
-  () => import('./OfferingReferralsDialog'),
-  'OfferingReferralsDialog',
+const OfferingReferralsDialog = lazyComponent(() =>
+  import('./OfferingReferralsDialog').then((module) => ({
+    default: module.OfferingReferralsDialog,
+  })),
 );
 
 interface ReferralDetailsButtonProps {

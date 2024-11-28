@@ -1,10 +1,14 @@
+import { PencilSimple } from '@phosphor-icons/react';
+
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 
 import { userCanModifyTenant } from './utils';
 
-const EditDialog = lazyComponent(() => import('./EditDialog'), 'EditDialog');
+const EditDialog = lazyComponent(() =>
+  import('./EditDialog').then((module) => ({ default: module.EditDialog })),
+);
 
 const validators = [userCanModifyTenant];
 
@@ -15,5 +19,6 @@ export const EditAction = ({ resource, refetch }) => (
     modalComponent={EditDialog}
     resource={resource}
     extraResolve={{ refetch }}
+    iconNode={<PencilSimple />}
   />
 );

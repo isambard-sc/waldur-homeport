@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react';
 
 import { Offering } from '@waldur/marketplace/types';
-import { TableProps } from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
 
 interface ResourceTab {
   key: string;
@@ -24,4 +24,9 @@ export interface ResourceParentTab {
   title: string;
   key: string;
   children: ResourceTab[];
+}
+
+export interface ResourceTabsConfiguration {
+  type: string;
+  tabs: ResourceParentTab[];
 }

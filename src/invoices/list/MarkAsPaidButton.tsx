@@ -8,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const MarkAsPaidDialog = lazyComponent(
-  () => import('./MarkAsPaidDialog'),
-  'MarkAsPaidDialog',
+const MarkAsPaidDialog = lazyComponent(() =>
+  import('./MarkAsPaidDialog').then((module) => ({
+    default: module.MarkAsPaidDialog,
+  })),
 );
 
 export const MarkAsPaidButton: FunctionComponent<{ row; refetch }> = ({

@@ -5,32 +5,32 @@ import { reduxForm } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { loadSubnets, updateInternalIps } from '@waldur/openstack/api';
+import { loadSubnets, updatePorts } from '@waldur/openstack/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { OpenStackInstance } from '../../types';
 import { formatSubnet } from '../../utils';
 
-interface UpdateInternalIpsFormData {
-  internal_ips_set: { value: string; label: string }[];
+interface UpdatePortsFormData {
+  ports: { value: string; label: string }[];
 }
 
-export const useUpdateInternalIpsForm = (resource: OpenStackInstance) => {
+export const useUpdatePortsForm = (resource: OpenStackInstance, refetch) => {
   const asyncState = useAsync(
     () =>
-      loadSubnets(resource.service_settings_uuid).then((subnets) =>
+      loadSubnets({ tenant_uuid: resource.tenant_uuid }).then((subnets) =>
         subnets.map((subnet) => ({
           label: formatSubnet(subnet),
           value: subnet.url,
         })),
       ),
-    [resource.service_settings_uuid],
+    [resource.tenant_uuid],
   );
   const dispatch = useDispatch();
-  const submitRequest = async (formData: UpdateInternalIpsFormData) => {
+  const submitRequest = async (formData: UpdatePortsFormData) => {
     try {
-      await updateInternalIps(resource.uuid, {
-        internal_ips_set: formData.internal_ips_set.map((item) => ({
+      await updatePorts(resource.uuid, {
+        ports: formData.ports.map((item) => ({
           subnet: item.value,
         })),
       });
@@ -42,6 +42,7 @@ export const useUpdateInternalIpsForm = (resource: OpenStackInstance) => {
         ),
       );
       dispatch(closeModalDialog());
+      await refetch();
     } catch (e) {
       dispatch(
         showErrorResponse(
@@ -51,24 +52,24 @@ export const useUpdateInternalIpsForm = (resource: OpenStackInstance) => {
       );
     }
   };
-  const initialValues = useMemo<UpdateInternalIpsFormData>(
+  const initialValues = useMemo<UpdatePortsFormData>(
     () => ({
-      internal_ips_set: resource.internal_ips_set.map((item) => ({
+      ports: resource.ports.map((item) => ({
         value: item.subnet,
         label: formatSubnet({ name: item.subnet_name, cidr: item.subnet_cidr }),
       })),
     }),
-    [resource.internal_ips_set],
+    [resource.ports],
   );
   return { resource, asyncState, submitRequest, initialValues };
 };
 
 const FORM_NAME = 'UpdateInternalIps';
 
-type UpdateInternalIpsOwnProps = ReturnType<typeof useUpdateInternalIpsForm>;
+type UpdateInternalIpsOwnProps = ReturnType<typeof useUpdatePortsForm>;
 
 export const connectForm = reduxForm<
-  UpdateInternalIpsFormData,
+  UpdatePortsFormData,
   UpdateInternalIpsOwnProps
 >({
   form: FORM_NAME,

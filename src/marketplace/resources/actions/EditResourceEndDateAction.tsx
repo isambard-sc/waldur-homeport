@@ -1,3 +1,4 @@
+import { PencilSimpleLine } from '@phosphor-icons/react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { ENV } from '@waldur/configs/default';
@@ -11,9 +12,10 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { getUser } from '@waldur/workspace/selectors';
 
-const EditResourceEndDateDialog = lazyComponent(
-  () => import('./EditResourceEndDateDialog'),
-  'EditResourceEndDateDialog',
+const EditResourceEndDateDialog = lazyComponent(() =>
+  import('./EditResourceEndDateDialog').then((module) => ({
+    default: module.EditResourceEndDateDialog,
+  })),
 );
 
 export const EditResourceEndDateAction: ActionItemType = ({
@@ -48,6 +50,10 @@ export const EditResourceEndDateAction: ActionItemType = ({
     return null;
   }
   return (
-    <ActionItem title={translate('Set termination date')} action={callback} />
+    <ActionItem
+      title={translate('Set termination date')}
+      action={callback}
+      iconNode={<PencilSimpleLine />}
+    />
   );
 };

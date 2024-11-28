@@ -1,12 +1,5 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  FC,
-  PropsWithChildren,
-  createContext,
-  useContext,
-  useState,
-} from 'react';
+import { FC, PropsWithChildren, createContext, useState } from 'react';
 
 interface PageLink {
   title: string;
@@ -49,8 +42,4 @@ const PageDataProvider: FC<PropsWithChildren> = ({ children }) => {
   );
 };
 
-function usePageData() {
-  return useContext(PageDataContext);
-}
-
-export { PageDataProvider, usePageData };
+export { PageDataProvider };

@@ -5,9 +5,10 @@ import { ExternalLink } from '@waldur/core/ExternalLink';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const TermsOfServiceDialog = lazyComponent(
-  () => import('@waldur/marketplace/orders/TermsOfServiceDialog'),
-  'TermsOfServiceDialog',
+const TermsOfServiceDialog = lazyComponent(() =>
+  import('@waldur/marketplace/orders/TermsOfServiceDialog').then((module) => ({
+    default: module.TermsOfServiceDialog,
+  })),
 );
 
 interface ProviderTermsOfServiceProps {

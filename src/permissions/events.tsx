@@ -1,13 +1,13 @@
 import { UISref } from '@uirouter/react';
 
-import eventsRegistry from '@waldur/events/registry';
+import { EventGroup } from '@waldur/events/types';
 import {
   AffectedUserContext,
   getAffectedUserContext,
   getUserContext,
   UserContext,
 } from '@waldur/events/utils';
-import { formatJsxTemplate, gettext, translate } from '@waldur/i18n';
+import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { RolePopover } from '@waldur/user/affiliations/RolePopover';
 
 import { PermissionsEnum } from '../EventsEnums';
@@ -103,25 +103,25 @@ const formatRoleUpdatedEvent = (event: RoleEvent) => {
   );
 };
 
-eventsRegistry.registerGroup({
-  title: gettext('Role management events'),
+export const RoleEvents: EventGroup = {
+  title: translate('Role management events'),
   events: [
     {
       key: PermissionsEnum.role_granted,
-      title: gettext(
+      title: translate(
         'User {user_link} has granted role to {affected_user_link}.',
       ),
       formatter: formatRoleGrantedEvent,
     },
     {
       key: PermissionsEnum.role_updated,
-      title: gettext('User {user_link} role has been updated.'),
+      title: translate('User {user_link} role has been updated.'),
       formatter: formatRoleUpdatedEvent,
     },
     {
       key: PermissionsEnum.role_revoked,
-      title: gettext('User {user_link} has revoked {affected_user_link}.'),
+      title: translate('User {user_link} has revoked {affected_user_link}.'),
       formatter: formatRoleRevokedEvent,
     },
   ],
-});
+};

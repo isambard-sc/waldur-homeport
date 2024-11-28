@@ -1,8 +1,8 @@
+import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { mount, ReactWrapper } from 'enzyme';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 
-import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import {
   OpenStackInstance,
   Subnet,
@@ -11,7 +11,7 @@ import {
 import { UpdateInternalIpsDialog } from './UpdateInternalIpsDialog';
 
 export const fakeSubnet = {
-  url: '/api/openstacktenant-subnets/51e584157094493ca121f71642c0a409/',
+  url: '/api/openstack-subnets/51e584157094493ca121f71642c0a409/',
   name: 'p60347-sub-net',
   cidr: '192.168.42.0/24',
 } as unknown as Subnet;
@@ -21,7 +21,7 @@ export const fakeInstance = {
   uuid: 'bcbb973635754084a5b292ecb2274e33',
   service_settings_uuid: 'a500a20d8f7040eabb9e0103d5f119af',
   floating_ips: [],
-  internal_ips_set: [
+  ports: [
     {
       subnet: fakeSubnet.url,
       subnet_name: fakeSubnet.name,

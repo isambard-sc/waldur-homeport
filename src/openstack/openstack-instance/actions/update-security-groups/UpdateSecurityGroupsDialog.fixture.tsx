@@ -1,8 +1,8 @@
+import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { mount, ReactWrapper } from 'enzyme';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
 
-import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import { SecurityGroup } from '@waldur/openstack/openstack-security-groups/types';
 
@@ -10,11 +10,11 @@ import { UpdateSecurityGroupsDialog } from './UpdateSecurityGroupsDialog';
 
 export const fakeSecurityGroups = [
   {
-    url: '/api/openstacktenant-security-groups/fce1fed2b8dd40b8b98252c4df76007f/',
+    url: '/api/openstack-security-groups/fce1fed2b8dd40b8b98252c4df76007f/',
     name: 'SSH',
   },
   {
-    url: '/api/openstacktenant-security-groups/5bf390b13f194a1fa3fd397631eaac19/',
+    url: '/api/openstack-security-groups/5bf390b13f194a1fa3fd397631eaac19/',
     name: 'Default',
   },
 ] as unknown as SecurityGroup[];

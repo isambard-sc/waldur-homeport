@@ -1,14 +1,14 @@
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 import { COMMON_OPTIONS } from '@waldur/support/marketplace';
 
 import { OFFERING_TYPE_CUSTOM_SCRIPTS } from './constants';
 
-registerOfferingType({
+export const ScriptOffering: OfferingConfiguration = {
   ...COMMON_OPTIONS,
   type: OFFERING_TYPE_CUSTOM_SCRIPTS,
   get label() {
     return translate('Custom scripts');
   },
   allowToUpdateService: true,
-});
+};

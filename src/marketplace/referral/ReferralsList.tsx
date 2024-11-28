@@ -5,9 +5,9 @@ import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { REFERRALS_TABLE } from '@waldur/marketplace/referral/constants';
 import { ReferralTypeIcon } from '@waldur/marketplace/referral/ReferralTypeIcon';
-import { createFetcher, Table } from '@waldur/table';
-import { ANONYMOUS_CONFIG } from '@waldur/table/api';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher, ANONYMOUS_CONFIG } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const ReferralsList: FunctionComponent<{ offering }> = ({
   offering,

@@ -5,8 +5,9 @@ import { translate } from '@waldur/i18n';
 import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { INSTANCE_TYPE } from '../constants';
 import { CreateBackupAction } from '../openstack-instance/actions/CreateBackupAction';
@@ -17,7 +18,7 @@ export const BackupsList: FunctionComponent<{ resourceScope }> = ({
   const filter = useMemo(() => {
     const fields = {
       [INSTANCE_TYPE]: 'instance',
-      'OpenStackTenant.BackupSchedule': 'backup_schedule',
+      'OpenStack.BackupSchedule': 'backup_schedule',
     };
     const { resource_type, url } = resourceScope;
     const field = fields[resource_type];
@@ -28,8 +29,8 @@ export const BackupsList: FunctionComponent<{ resourceScope }> = ({
     }
   }, [resourceScope]);
   const props = useTable({
-    table: 'openstacktenant-backups',
-    fetchData: createFetcher('openstacktenant-backups'),
+    table: 'openstack-backups',
+    fetchData: createFetcher('openstack-backups'),
     filter,
   });
   return (
@@ -39,6 +40,7 @@ export const BackupsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
           orderField: 'name',
         },
         {

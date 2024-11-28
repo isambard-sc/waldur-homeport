@@ -11,7 +11,7 @@ import { getQueryString } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { UsersService } from '@waldur/user/UsersService';
 
-import { AuthService } from '../AuthService';
+import * as AuthService from '../AuthService';
 import { getRedirectUri } from '../utils';
 
 export const OauthLoginCompleted: FunctionComponent = () => {

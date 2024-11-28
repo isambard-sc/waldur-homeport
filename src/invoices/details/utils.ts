@@ -5,6 +5,9 @@ import { PaymentProfile } from '@waldur/workspace/types';
 
 import { InvoiceItem } from '../types';
 
+const getResourceKey = (item: InvoiceItem) =>
+  item.resource_uuid || item.details?.scope_uuid || item.details.resource_uuid;
+
 export const groupInvoiceItems = (
   items: InvoiceItem[],
   sortKey = 'name',
@@ -18,7 +21,7 @@ export const groupInvoiceItems = (
   }, {});
 
   const resourcesMap = items.reduce((map, item) => {
-    const resourceKey = item.resource_uuid || item.details.scope_uuid;
+    const resourceKey = getResourceKey(item);
     if (!resourceKey) {
       return map;
     }
@@ -37,10 +40,11 @@ export const groupInvoiceItems = (
   const itemsMap = items.reduce((map, item) => {
     const projectKey = item.project_uuid || 'default';
     const project = (map[projectKey] = map[projectKey] || {});
-    if (!project[item.resource_uuid]) {
-      project[item.resource_uuid] = [];
+    const resourceKey = getResourceKey(item);
+    if (!project[resourceKey]) {
+      project[resourceKey] = [];
     }
-    project[item.resource_uuid].push(item);
+    project[resourceKey].push(item);
     return map;
   }, {});
 

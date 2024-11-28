@@ -1,3 +1,4 @@
+import { CheckCircle } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC } from 'react';
 
@@ -25,7 +26,12 @@ export const Step: FC<StepProps> = ({
     onClick={() => onClick()}
   >
     <h4 className="step-title">
-      {complete && <i className="fa fa-check-circle" />} {title}
+      {complete && (
+        <span className="svg-icon svg-icon-2">
+          <CheckCircle />
+        </span>
+      )}{' '}
+      {title}
     </h4>
   </button>
 );

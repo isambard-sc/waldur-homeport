@@ -12,23 +12,31 @@ import Bg from './Background.svg';
 interface NoResultProps {
   title?: string;
   message?: ReactNode;
+  actions?: ReactNode;
   buttonTitle?: string;
   callback?(): void;
   isVisible?: boolean;
+  className?: string;
   style?: CSSProperties;
 }
 
 export const NoResult: FC<NoResultProps> = ({
   title = translate('No results found'),
   message = '',
+  actions,
   buttonTitle = translate('Clear search'),
   callback,
   isVisible = true,
+  className,
   style,
 }) => {
   return (
     <div
-      className={classNames('search-no-result', !isVisible && 'd-none')}
+      className={classNames(
+        'search-no-result',
+        !isVisible && 'd-none',
+        className,
+      )}
       style={style}
     >
       <Bg className="background" />
@@ -50,14 +58,22 @@ export const NoResult: FC<NoResultProps> = ({
               ))}
           </div>
         </div>
-        {callback && (
-          <Button
-            variant="outline"
-            className="btn-outline-default w-50 mw-350px"
-            onClick={callback}
-          >
-            {buttonTitle}
-          </Button>
+        {(actions || callback) && (
+          <div className="d-flex justify-content-center gap-4 w-100">
+            {Boolean(callback) && (
+              <Button
+                variant="outline"
+                className={classNames(
+                  'btn-outline-default mw-350px',
+                  actions ? 'w-175px' : 'w-50',
+                )}
+                onClick={callback}
+              >
+                {buttonTitle}
+              </Button>
+            )}
+            {actions}
+          </div>
         )}
       </div>
     </div>

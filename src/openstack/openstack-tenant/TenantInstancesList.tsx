@@ -8,8 +8,9 @@ import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
 import { ResourceSummaryField } from '@waldur/resource/summary/VirtualMachineSummary';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { INSTANCE_TYPE } from '../constants';
 
@@ -18,15 +19,17 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
 }) => {
   const filter = useMemo(
     () => ({
-      service_settings_uuid: resourceScope.child_settings,
+      tenant_uuid: resourceScope.uuid,
       field: [
         'uuid',
         'url',
         'name',
         'description',
         'created',
+        'ports',
         'internal_ips',
         'external_ips',
+        'external_address',
         'state',
         'runtime_state',
         'resource_type',
@@ -48,8 +51,8 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
     [resourceScope],
   );
   const props = useTable({
-    table: 'openstacktenant-instances',
-    fetchData: createFetcher('openstacktenant-instances'),
+    table: 'openstack-instances',
+    fetchData: createFetcher('openstack-instances'),
     queryField: 'name',
     filter,
   });
@@ -60,6 +63,7 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Summary'),

@@ -9,7 +9,7 @@ import { ROLE_TYPES } from '../../permissions/constants';
 
 import { PermissionField } from './PermissionField';
 
-export const RoleForm = reduxForm<any, { onSubmit; onCancel; role? }>({
+export const RoleForm = reduxForm<{}, { onSubmit; onCancel; role? }>({
   form: 'RoleForm',
 })((props) => {
   return (

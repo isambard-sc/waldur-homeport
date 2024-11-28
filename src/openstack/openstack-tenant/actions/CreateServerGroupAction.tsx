@@ -8,15 +8,17 @@ import { DialogActionButton } from '@waldur/resource/actions/DialogActionButton'
 
 import { TenantActionProps } from './types';
 
-const CreateServerGroupDialog = lazyComponent(
-  () => import('./CreateServerGroupDialog'),
-  'CreateServerGroupDialog',
+const CreateServerGroupDialog = lazyComponent(() =>
+  import('./CreateServerGroupDialog').then((module) => ({
+    default: module.CreateServerGroupDialog,
+  })),
 );
 
 const validators = [validateState('OK')];
 
 export const CreateServerGroupAction: FC<TenantActionProps> = ({
   resource,
+  refetch,
 }) => (
   <DialogActionButton
     title={translate('Create')}
@@ -24,5 +26,6 @@ export const CreateServerGroupAction: FC<TenantActionProps> = ({
     modalComponent={CreateServerGroupDialog}
     resource={resource}
     validators={validators}
+    extraResolve={{ refetch }}
   />
 );

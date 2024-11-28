@@ -6,8 +6,9 @@ import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CreateDiskAction } from './actions/CreateDiskAction';
 
@@ -33,6 +34,7 @@ export const DisksList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
           orderField: 'name',
         },
         {

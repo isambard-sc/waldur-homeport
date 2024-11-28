@@ -7,9 +7,10 @@ import { checkIsOwner, getUser } from '@waldur/workspace/selectors';
 
 import * as api from '../api';
 
-const PendingReviewDialog = lazyComponent(
-  () => import('@waldur/customer/team/PendingReviewDialog'),
-  'PendingReviewDialog',
+const PendingReviewDialog = lazyComponent(() =>
+  import('@waldur/customer/team/PendingReviewDialog').then((module) => ({
+    default: module.PendingReviewDialog,
+  })),
 );
 
 function* checkPendingReview(action) {
@@ -29,7 +30,7 @@ function* checkPendingReview(action) {
         }),
       );
     }
-  } catch (error) {
+  } catch {
     // Silently swallow error
   }
 }

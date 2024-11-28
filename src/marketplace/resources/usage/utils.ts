@@ -5,11 +5,12 @@ import { translate } from '@waldur/i18n';
 import { getAccountingTypeOptions } from '@waldur/marketplace/offerings/update/components/ComponentAccountingTypeField';
 import { OfferingComponent } from '@waldur/marketplace/types';
 
-import { ComponentUsage } from './types';
+import { ComponentUsage, ComponentUserUsage } from './types';
 
 interface RowData {
   value: number;
   description: string;
+  details?: Array<any>;
 }
 
 const formatChart = (
@@ -39,15 +40,19 @@ const formatChart = (
       const date = params[0].axisValue;
       const value = params[0].data.value;
       const description = params[0].data.description;
+      const details: RowData['details'] = params[0].data.details;
       if (!value) {
         return null;
       }
-      const tooltip =
+      let tooltip =
         `${translate('Date')}: ${date}` +
         `<br/>${translate('Value')}: ${value}` +
         `${
           description ? `<br/>${translate('Description')}: ${description}` : ''
         }`;
+      details.forEach((d) => {
+        tooltip += `<br/>${d.username} - ${d.usage} ${d.measured_unit}`;
+      });
       return `<span>${tooltip}</span>`;
     },
   },
@@ -67,6 +72,8 @@ const formatChart = (
       axisLabel: {
         formatter: '{value}',
       },
+      axisLine: { show: true },
+      axisTick: { show: true },
     },
   ],
   series: [
@@ -89,17 +96,20 @@ const getMonthsPeriods = (months): DateTime[] => {
 const getUsages = (
   periods: DateTime[],
   usages: ComponentUsage[],
+  userUsages: ComponentUserUsage[] = [],
 ): RowData[] => {
   const result = [];
   for (let i = 0; i < periods.length; i++) {
     for (let j = 0; j < usages.length; j++) {
-      if (
-        periods[i].toFormat('yyyy-MM') ===
-        parseDate(usages[j].billing_period).toFormat('yyyy-MM')
-      ) {
+      const usageDate = parseDate(usages[j].date).toFormat('yyyy-MM');
+      if (periods[i].toFormat('yyyy-MM') === usageDate) {
+        const details = userUsages.filter(
+          (u) => parseDate(u.date).toFormat('yyyy-MM') === usageDate,
+        );
         result.push({
           value: usages[j].usage,
           description: usages[j].description,
+          details,
         });
         break;
       }
@@ -107,6 +117,7 @@ const getUsages = (
         result.push({
           value: 0,
           description: '',
+          details: [],
         });
       }
     }
@@ -117,6 +128,7 @@ const getUsages = (
 export const getEChartOptions = (
   component: OfferingComponent,
   usages: ComponentUsage[],
+  userUsages: ComponentUserUsage[],
   months: number,
   color: string,
 ) => {
@@ -137,26 +149,35 @@ export const getEChartOptions = (
   const formattedUsages = getUsages(
     periods,
     usages.filter((usage) => usage.type === component.type),
+    userUsages?.filter((usage) => usage.component_type === component.type),
   );
   return formatChart(component.measured_unit, color, labels, formattedUsages);
 };
 
 export const getUsageHistoryPeriodOptions = (startDate = null) => {
-  const diff = Math.abs(parseDate(startDate).diffNow().as('months'));
-  const options = [];
-  if (diff > 6) {
+  const now = DateTime.now();
+  const start = parseDate(startDate);
+  let totalMonths = Math.max(
+    0,
+    (now.year - start.year) * 12 + (now.month - start.month),
+  );
+  if (now.day >= start.day || totalMonths > 0) {
+    totalMonths += 1;
+  }
+  const options: Array<{ value; label }> = [];
+  if (totalMonths > 6) {
     options.push({
       value: 6,
-      label: translate('Last {month} month', { month: 6 }),
+      label: translate('{month} months', { month: 6 }),
     });
   }
-  if (diff > 12) {
+  if (totalMonths > 12) {
     options.push({
       value: 12,
-      label: translate('Last {month} month', { month: 12 }),
+      label: translate('{month} months', { month: 12 }),
     });
   }
-  options.push({ value: Math.ceil(diff), label: translate('From creation') });
+  options.push({ value: totalMonths, label: translate('From creation') });
   return options;
 };
 
@@ -172,7 +193,7 @@ export const getTableData = (
     .filter((usage) => usage.type === component.type)
     .map((usage) => {
       return {
-        date: parseDate(usage.billing_period).toFormat('MM/yyyy'),
+        date: parseDate(usage.date).toFormat('MM/yyyy'),
         usage: Number(usage.usage),
       };
     });

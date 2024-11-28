@@ -27,7 +27,7 @@ const hasClosedContent = (container) =>
 
 describe('IssueCommentsFormMainContainer', () => {
   it('toggle content', () => {
-    const toggle = jest.fn();
+    const toggle = vi.fn();
     const wrapper = renderWrapper({ toggle });
     clickTogglerButton(wrapper);
     expect(toggle).toBeCalled();

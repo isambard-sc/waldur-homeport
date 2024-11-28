@@ -1,15 +1,15 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
 
 import { EditProjectProps } from '../types';
 
-const EditFieldDialog = lazyComponent(
-  () => import('./EditFieldDialog'),
-  'EditFieldDialog',
+const EditFieldDialog = lazyComponent(() =>
+  import('./EditFieldDialog').then((module) => ({
+    default: module.EditFieldDialog,
+  })),
 );
 
 export const FieldEditButton = (props: EditProjectProps) => {
@@ -22,12 +22,5 @@ export const FieldEditButton = (props: EditProjectProps) => {
       }),
     );
   };
-  return (
-    <ActionButton
-      action={callback}
-      iconNode={<PencilSimple weight="bold" />}
-      variant="secondary"
-      className="btn-sm btn-icon"
-    />
-  );
+  return <EditButton onClick={callback} size="sm" />;
 };

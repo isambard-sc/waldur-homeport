@@ -1,12 +1,13 @@
-import { CaretDown } from '@phosphor-icons/react';
+import { CaretDown, WarningCircle } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import { FormCheck } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
+import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { Tip } from '@waldur/core/Tooltip';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 import { getId } from './utils';
 
 type TableBodyProps = Pick<
@@ -14,6 +15,7 @@ type TableBodyProps = Pick<
   | 'rows'
   | 'columns'
   | 'rowClass'
+  | 'rowKey'
   | 'expandableRow'
   | 'expandableRowClassName'
   | 'rowActions'
@@ -44,16 +46,63 @@ const TableCells = ({
           .map(
             (id) =>
               (columnsMap[id].visible ?? true) && (
-                <td key={id} className={columnsMap[id].className}>
-                  {React.createElement(columnsMap[id].render, { row })}
+                <td
+                  key={id}
+                  className={columnsMap[id].className}
+                  onClick={
+                    columnsMap[id].disabledClick
+                      ? (e) => e.stopPropagation()
+                      : undefined
+                  }
+                >
+                  {(() => {
+                    const renderedContent = React.createElement(
+                      columnsMap[id].render,
+                      { row },
+                    );
+                    const valueToCopy = columnsMap[id].copyField
+                      ? columnsMap[id].copyField(row)
+                      : '';
+                    if (columnsMap[id].copyField) {
+                      return (
+                        <div className="d-flex align-items-center gap-1">
+                          {renderedContent}
+                          <CopyToClipboardButton value={valueToCopy} />
+                        </div>
+                      );
+                    }
+                    return renderedContent;
+                  })()}
                 </td>
               ),
           )
       : columns.map(
           (column, colIndex) =>
             (column.visible ?? true) && (
-              <td key={colIndex} className={column.className}>
-                {React.createElement(column.render, { row })}
+              <td
+                key={colIndex}
+                className={column.className}
+                onClick={
+                  column.disabledClick ? (e) => e.stopPropagation() : undefined
+                }
+              >
+                {(() => {
+                  const renderedContent = React.createElement(column.render, {
+                    row,
+                  });
+                  const valueToCopy = column.copyField
+                    ? column.copyField(row)
+                    : '';
+                  if (column.copyField) {
+                    return (
+                      <div className="d-flex align-items-center gap-1">
+                        {renderedContent}
+                        <CopyToClipboardButton value={valueToCopy} />
+                      </div>
+                    );
+                  }
+                  return renderedContent;
+                })()}
               </td>
             ),
         )}
@@ -64,6 +113,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
   rows,
   columns,
   rowClass,
+  rowKey,
   expandableRow,
   expandableRowClassName,
   rowActions,
@@ -106,14 +156,14 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
 
   const isRowSelected = (row: any) => {
     if (!selectedRows) return false;
-    return selectedRows.some((item) => item.uuid === row.uuid);
+    return selectedRows.some((item) => item[rowKey] === row[rowKey]);
   };
 
   const onChangeField = useCallback(
     (row, input) => {
       if (fieldType === 'checkbox') {
         const newValues: any[] = input.value || [];
-        const index = newValues.findIndex((v) => v.uuid === row.uuid);
+        const index = newValues.findIndex((v) => v[rowKey] === row[rowKey]);
         // Is field checked
         if (index > -1) {
           newValues.splice(index, 1);
@@ -133,9 +183,11 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
     let isChecked = false;
     if (fieldProps) {
       if (Array.isArray(fieldProps.input.value)) {
-        isChecked = fieldProps.input.value.some((v) => v.uuid === row.uuid);
+        isChecked = fieldProps.input.value.some(
+          (v) => v[rowKey] === row[rowKey],
+        );
       } else {
-        isChecked = fieldProps.input.value?.uuid === row.uuid;
+        isChecked = fieldProps.input.value?.[rowKey] === row[rowKey];
       }
     } else {
       isChecked = isRowSelected(row);
@@ -171,7 +223,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
                         id={`tableErrorTip-${rowIndex}`}
                         className="error-mark"
                       >
-                        <i className="fa fa-exclamation-circle" />
+                        <WarningCircle />
                       </Tip>
                     )}
                   <FormCheck
@@ -195,7 +247,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
         )}
         {expandableRow && (
           <td
-            data-cy="row-expander"
+            data-testid="row-expander"
             className={toggled[getId(row, rowIndex)] ? 'active' : ''}
           >
             <CaretDown size={20} weight="bold" className="rotate-180" />
@@ -232,7 +284,14 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
           )}
           {expandableRow && toggled[getId(row, rowIndex)] && (
             <tr className={expandableRowClassName}>
-              <td colSpan={columns.length + 1 + (rowActions ? 1 : 0)}>
+              <td
+                colSpan={
+                  columns.length +
+                  1 +
+                  (rowActions ? 1 : 0) +
+                  (enableMultiSelect || fieldType ? 1 : 0)
+                }
+              >
                 {React.createElement(expandableRow, { row })}
               </td>
             </tr>

@@ -1,5 +1,4 @@
 import { Copy } from '@phosphor-icons/react';
-import copy from 'copy-to-clipboard';
 import { useCallback } from 'react';
 import { Button, FormControl, InputGroup } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -11,8 +10,9 @@ export const UserToken = ({ token }) => {
   const dispatch = useDispatch();
 
   const onClick = useCallback(() => {
-    copy(token);
-    dispatch(showSuccess(translate('Token has been copied')));
+    navigator.clipboard.writeText(token).then(() => {
+      dispatch(showSuccess(translate('Token has been copied')));
+    });
   }, [dispatch, token]);
 
   return (

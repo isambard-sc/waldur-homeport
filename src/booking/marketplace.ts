@@ -3,26 +3,30 @@ import { DateTime } from 'luxon';
 import { parseDate } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
-
-const BookingDetails = lazyComponent(
-  () => import('@waldur/booking/BookingDetails'),
-  'BookingDetails',
-);
-const BookingCheckoutSummary = lazyComponent(
-  () => import('@waldur/booking/BookingCheckoutSummary'),
-  'BookingCheckoutSummary',
-);
-const UserPluginOptionsForm = lazyComponent(
-  () => import('@waldur/marketplace/UserPluginOptionsForm'),
-  'UserPluginOptionsForm',
-);
-const BookingOrderForm = lazyComponent(
-  () => import('./deploy/BookingOrderForm'),
-  'BookingOrderForm',
-);
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { OFFERING_TYPE_BOOKING } from './constants';
+
+const BookingDetails = lazyComponent(() =>
+  import('@waldur/booking/BookingDetails').then((module) => ({
+    default: module.BookingDetails,
+  })),
+);
+const BookingCheckoutSummary = lazyComponent(() =>
+  import('@waldur/booking/BookingCheckoutSummary').then((module) => ({
+    default: module.BookingCheckoutSummary,
+  })),
+);
+const UserPluginOptionsForm = lazyComponent(() =>
+  import('@waldur/marketplace/UserPluginOptionsForm').then((module) => ({
+    default: module.UserPluginOptionsForm,
+  })),
+);
+const BookingOrderForm = lazyComponent(() =>
+  import('./deploy/BookingOrderForm').then((module) => ({
+    default: module.BookingOrderForm,
+  })),
+);
 
 /* Since back-end doesn't allow slots in the past,
  * this function detects slots that are in the past and
@@ -63,7 +67,7 @@ export const handlePastSlotsForBookingOffering = (attributes) => {
 
 const serializer = (attrs) => handlePastSlotsForBookingOffering(attrs);
 
-registerOfferingType({
+export const BookingOffering: OfferingConfiguration = {
   type: OFFERING_TYPE_BOOKING,
   get label() {
     return translate('Booking');
@@ -72,8 +76,7 @@ registerOfferingType({
   checkoutSummaryComponent: BookingCheckoutSummary,
   pluginOptionsForm: UserPluginOptionsForm,
   detailsComponent: BookingDetails,
-  showOptions: true,
   showComponents: true,
   schedulable: true,
   serializer,
-});
+};

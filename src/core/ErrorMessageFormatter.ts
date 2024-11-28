@@ -32,8 +32,12 @@ export const format = (error, parseResponse?) => {
     );
   }
 
-  if (!error.hasOwnProperty('status')) {
+  if (!Object.prototype.hasOwnProperty.call(error, 'status')) {
     return error;
+  }
+
+  if (error.response && error.response.status === 413) {
+    return translate('File too large. Please select a smaller file.');
   }
 
   let message = `${error.status}: ${error.statusText}.`;

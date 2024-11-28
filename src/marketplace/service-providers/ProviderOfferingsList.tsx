@@ -7,15 +7,15 @@ import { useDestroyFilterOnLeave } from '@waldur/core/filters';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { getLabel } from '@waldur/marketplace/common/registry';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
-import { TableProps } from '@waldur/table/Table';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { useOfferingDropdownActions } from '../offerings/hooks';
 import { CreateOfferingButton } from '../offerings/list/CreateOfferingButton';
 import { OfferingActions } from '../offerings/list/OfferingActions';
-import { OfferingStateCell } from '../offerings/list/OfferingStateCell';
+import { OfferingStateField } from '../offerings/OfferingStateField';
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 import { ServiceProvider } from '../types';
 
@@ -26,7 +26,6 @@ import { ResourcesCountColumn } from './ResourcesCountColumn';
 
 interface ProviderOfferingsComponentProps {
   provider: ServiceProvider;
-  extraTableProps?: Partial<TableProps>;
 }
 
 const mapStateToFilter = createSelector(
@@ -43,9 +42,18 @@ const mapStateToFilter = createSelector(
   },
 );
 
-export const ProviderOfferingsComponent: FC<
-  ProviderOfferingsComponentProps
-> = ({ provider, extraTableProps = {} }) => {
+const mandatoryFields = [
+  'uuid',
+  'customer_uuid', // EditOfferingButton, DeleteOfferingButton
+  'state', // PreviewOfferingButton, DeleteOfferingButton
+  'components', // PreviewOfferingButton
+  'type', // PreviewOfferingButton
+  'resources_count', // DeleteOfferingButton
+];
+
+const ProviderOfferingsComponent: FC<ProviderOfferingsComponentProps> = ({
+  provider,
+}) => {
   const filter = useSelector(mapStateToFilter);
 
   const tableProps = useTable({
@@ -55,6 +63,7 @@ export const ProviderOfferingsComponent: FC<
     ),
     filter,
     queryField: 'name',
+    mandatoryFields,
   });
   const dropdownActions = useOfferingDropdownActions();
 
@@ -90,7 +99,7 @@ export const ProviderOfferingsComponent: FC<
         },
         {
           title: translate('State'),
-          render: OfferingStateCell,
+          render: ({ row }) => <OfferingStateField offering={row} />,
           filter: 'state',
           id: 'state',
           keys: ['state'],
@@ -103,7 +112,6 @@ export const ProviderOfferingsComponent: FC<
       rowActions={(row) => (
         <OfferingActions row={row.row} refetch={tableProps.fetch} />
       )}
-      {...extraTableProps}
       filters={<ProviderOfferingsFilter />}
       hasQuery={true}
       hasOptionalColumns
@@ -117,12 +125,5 @@ export const ProviderOfferingsList = ({ provider }) => {
   if (!provider) {
     return <CustomerResourcesListPlaceholder />;
   }
-  return (
-    <ProviderOfferingsComponent
-      provider={provider}
-      extraTableProps={{
-        filters: <ProviderOfferingsFilter />,
-      }}
-    />
-  );
+  return <ProviderOfferingsComponent provider={provider} />;
 };

@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { NoResult } from '@waldur/navigation/header/search/NoResult';
 
-import { TableProps } from './Table';
+import { TableProps } from './types';
 import { getNoResultMessage, getNoResultTitle } from './utils';
 
 interface TablePlaceholderProps
@@ -12,12 +12,14 @@ interface TablePlaceholderProps
     'query' | 'verboseName' | 'fetch' | 'filtersStorage'
   > {
   clearSearch(): void;
+  actions?: ReactNode;
 }
 
 export const TablePlaceholder: FunctionComponent<TablePlaceholderProps> = ({
   query,
   verboseName,
   clearSearch,
+  actions,
   fetch,
   filtersStorage,
 }) => {
@@ -26,7 +28,7 @@ export const TablePlaceholder: FunctionComponent<TablePlaceholderProps> = ({
 
   return (
     <NoResult
-      callback={query ? clearSearch : fetch}
+      callback={query ? clearSearch : () => fetch(true)}
       title={title}
       message={
         <>
@@ -44,6 +46,7 @@ export const TablePlaceholder: FunctionComponent<TablePlaceholderProps> = ({
       buttonTitle={
         query ? translate('Clear search') : translate('Search again')
       }
+      actions={actions}
     />
   );
 };

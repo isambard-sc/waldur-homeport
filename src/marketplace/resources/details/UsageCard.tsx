@@ -1,9 +1,12 @@
 import { ChartBar, Table } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { Button, Card, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 
-import { SelectControl } from '@waldur/form/SelectControl';
+import { LoadingErred } from '@waldur/core/LoadingErred';
+import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
+import { getResourceTeam } from '@waldur/marketplace/common/api';
 
 import { ResourceUsageTabsContainer } from '../usage/ResourceUsageTabsContainer';
 import { getUsageHistoryPeriodOptions } from '../usage/utils';
@@ -23,24 +26,64 @@ export const UsageCard = ({ resource, offering }) => {
   );
   const [period, setPeriod] = useState(
     periodOptions.length > 1
-      ? periodOptions[periodOptions.length - 2]
-      : periodOptions[0],
+      ? periodOptions[periodOptions.length - 2].value
+      : periodOptions[0].value,
+  );
+
+  const [users, setUsers] = useState([]);
+  const {
+    data: team,
+    isLoading: teamIsLoading,
+    error: teamError,
+    refetch: refetchTeam,
+  } = useQuery(
+    ['ResourceTeam', resource.uuid],
+    () => getResourceTeam(resource.uuid),
+    { staleTime: 3 * 60 * 1000 },
   );
 
   return resource.is_usage_based || resource.is_limit_based ? (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>
           <h3>{translate('Usage history')}</h3>
         </Card.Title>
         <div className="card-toolbar gap-4">
-          {periodOptions.length > 1 && (
-            <SelectControl
-              options={periodOptions}
-              value={period}
-              onChange={setPeriod}
-              className="w-150px"
+          {teamError ? (
+            <LoadingErred message={translate('Error')} loadData={refetchTeam} />
+          ) : (
+            <Select
+              getOptionValue={(option) => option.uuid}
+              getOptionLabel={(option) => option.full_name}
+              value={users}
+              isMulti
+              placeholder={translate('All users')}
+              onChange={(value) => setUsers(value)}
+              options={team || []}
+              isLoading={teamIsLoading}
+              className="metronic-select-container min-w-150px min-w-lg-200px"
+              classNamePrefix="metronic-select"
             />
+          )}
+          {periodOptions.length > 1 && (
+            <ToggleButtonGroup
+              type="radio"
+              name="period"
+              value={period}
+              defaultValue={period}
+              onChange={setPeriod}
+            >
+              {periodOptions.map((option) => (
+                <ToggleButton
+                  key={option.value}
+                  id={'tbg-' + option.value}
+                  value={option.value}
+                  variant="outline btn-outline-default"
+                >
+                  {option.label}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
           )}
           <Button
             variant="outline-default"
@@ -59,9 +102,10 @@ export const UsageCard = ({ resource, offering }) => {
         <ResourceUsageTabsContainer
           resource={resourceRef}
           offering={offering}
-          months={period.value}
+          months={period}
           hideHeader={true}
           displayMode={mode}
+          users={users}
         />
       </Card.Body>
     </Card>

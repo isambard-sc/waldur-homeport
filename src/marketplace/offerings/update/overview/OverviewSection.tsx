@@ -3,6 +3,7 @@ import { FC } from 'react';
 import { Card, Table } from 'react-bootstrap';
 
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
+import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { REMOTE_OFFERING_TYPE } from '@waldur/marketplace-remote/constants';
 
@@ -61,8 +62,8 @@ const attributes: Attribute[] = [
 
 export const OverviewSection: FC<OfferingSectionProps> = (props) => {
   return (
-    <Card>
-      <Card.Header className="border-2 border-bottom">
+    <Card className="card-bordered">
+      <Card.Header>
         <Card.Title className="h5">
           <span className="me-2">{translate('General')}</span>
           <RefreshButton refetch={props.refetch} loading={props.loading} />
@@ -81,17 +82,31 @@ export const OverviewSection: FC<OfferingSectionProps> = (props) => {
                     props.offering[attribute.key] || 'N/A'
                   )}
                 </td>
-                {props.offering.type === REMOTE_OFFERING_TYPE ? null : (
-                  <td className="row-actions">
-                    <div>
+                <td className="row-actions">
+                  <div>
+                    {props.offering.type === REMOTE_OFFERING_TYPE ? (
+                      <Tip
+                        label={translate(
+                          'Field is synchronised from the remote offering',
+                        )}
+                        id="remote-offering-tip"
+                      >
+                        <EditOverviewButton
+                          offering={props.offering}
+                          refetch={props.refetch}
+                          attribute={attribute}
+                          disabled={true}
+                        />
+                      </Tip>
+                    ) : (
                       <EditOverviewButton
                         offering={props.offering}
                         refetch={props.refetch}
                         attribute={attribute}
                       />
-                    </div>
-                  </td>
-                )}
+                    )}
+                  </div>
+                </td>
               </tr>
             ))}
             <tr>

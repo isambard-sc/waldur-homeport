@@ -10,6 +10,7 @@ export const ResourceStateField = ({
   outline,
   pill,
   hasBullet,
+  size,
 }: {
   resource: Resource;
   roundless?: boolean;
@@ -17,24 +18,29 @@ export const ResourceStateField = ({
   outline?: boolean;
   pill?: boolean;
   hasBullet?: boolean;
+  size?: 'sm' | 'lg';
 }) => {
   const runtimeState = resource.backend_metadata?.runtime_state;
   const backendState = resource.backend_metadata?.state;
   const isActive =
     ['Creating', 'Updating', 'Terminating'].includes(resource.state) ||
-    (backendState && !['OK', 'Erred'].includes(backendState));
+    (backendState && !['OK', 'Erred', 'Deleted'].includes(backendState));
+  const isErred = [runtimeState, resource.state, backendState].includes(
+    'Erred',
+  );
+  const isDead = resource.state === 'Terminated' || backendState === 'Deleted';
 
   const state = runtimeState || backendState || resource.state;
   return (
     <StateIndicator
       label={state}
       variant={
-        state === 'Erred'
+        isErred
           ? 'danger'
-          : state === 'Terminated'
+          : isDead
             ? 'warning'
             : ['SHUTOFF', 'STOPPED', 'SUSPENDED'].includes(runtimeState)
-              ? 'secondary'
+              ? 'default'
               : 'primary'
       }
       active={isActive}
@@ -43,8 +49,9 @@ export const ResourceStateField = ({
       outline={outline}
       pill={pill}
       hasBullet={hasBullet}
+      size={size}
       tooltip={
-        resource.backend_metadata.action
+        resource.backend_metadata?.action
           ? translate('{action} in progress', {
               action: resource.backend_metadata.action,
             })

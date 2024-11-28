@@ -1,5 +1,5 @@
 import { ENV } from '@waldur/configs/default';
-import { deleteById, sendForm } from '@waldur/core/api';
+import { deleteById, getAll, post, put, sendForm } from '@waldur/core/api';
 
 import { Category, CategoryGroup } from '../../types';
 
@@ -28,7 +28,7 @@ export const updateCategory = (data, uuid) => {
     title: data.title,
     description: data.description,
     icon: data.icon,
-    group: data.group,
+    group: data.group?.url || null,
     default_vm_category: data.default_vm_category,
     default_volume_category: data.default_volume_category,
     default_tenant_category: data.default_tenant_category,
@@ -78,3 +78,15 @@ export const updateCategoryGroup = (data, uuid) => {
     formData,
   );
 };
+
+export const getCategoryColumns = (params) =>
+  getAll<any>(`/marketplace-category-columns/`, { params });
+
+export const updateCategoryColumn = (uuid, data) =>
+  put(`/marketplace-category-columns/${uuid}/`, data);
+
+export const createCategoryColumn = (data) =>
+  post(`/marketplace-category-columns/`, data);
+
+export const deleteCategoryColumn = (uuid) =>
+  deleteById('/marketplace-category-columns/', uuid);

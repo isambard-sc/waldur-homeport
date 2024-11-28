@@ -9,7 +9,7 @@ import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { RoleEnum } from '@waldur/permissions/enums';
 
 import { getProtectedCall } from '../api';
@@ -24,7 +24,7 @@ import { CallOfferingsSection } from './offerings/CallOfferingsSection';
 import { CallRoundsList } from './rounds/CallRoundsList';
 
 const PageHero = ({ call, refetch }) => (
-  <div className="container-fluid mb-8 mt-6">
+  <div className="container-fluid my-5">
     <CallTabs call={call} />
     <CallUpdateHero call={call} refetch={refetch} />
   </div>

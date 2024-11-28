@@ -1,5 +1,5 @@
-import { Question } from '@phosphor-icons/react';
-import { uniqueId } from 'lodash';
+import { PencilSimple, Question } from '@phosphor-icons/react';
+import { uniqueId } from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
@@ -7,9 +7,10 @@ import { createSelector } from 'reselect';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { NotificationActions } from './NotificationActions';
 import { NotificationExpandableRow } from './NotificationExpandableRow';
@@ -56,7 +57,9 @@ export const NotificationList = () => {
             <>
               {row.key}
               {hasOverriddenTemplate(row) && (
-                <i className="fa fa-pencil" style={{ marginLeft: '5px' }} />
+                <span className="svg-icon svg-icon-5 ms-3">
+                  <PencilSimple />
+                </span>
               )}
               {row.description && (
                 <Tip

@@ -9,8 +9,9 @@ import { translate } from '@waldur/i18n';
 import { CallAllFilters } from '@waldur/proposals/call-management/CallAllFilters';
 import { CALL_FILTER_FORM_ID } from '@waldur/proposals/constants';
 import { Call } from '@waldur/proposals/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { formatCallState } from '../utils';
@@ -60,6 +61,7 @@ export const CallManagementPage: FunctionComponent = () => {
               label={row.name}
             />
           ),
+          copyField: (row) => row.name,
         },
         {
           title: translate('Created'),

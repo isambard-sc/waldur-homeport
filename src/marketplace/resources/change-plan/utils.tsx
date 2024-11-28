@@ -12,7 +12,6 @@ import { Resource } from '../types';
 
 export interface FetchedData {
   resource: Resource;
-  offering: Offering;
   columns: SelectDialogFieldColumn[];
   choices: SelectDialogFieldChoice[];
   initialValues: {
@@ -86,5 +85,5 @@ export async function loadData(resource_uuid): Promise<FetchedData> {
   const choices = getChoices(offering, resource);
   const validPlan = choices.find((choice) => !choice.disabled);
   const initialValues = validPlan ? { plan: validPlan } : undefined;
-  return { offering, resource, columns, choices, initialValues };
+  return { resource, columns, choices, initialValues };
 }

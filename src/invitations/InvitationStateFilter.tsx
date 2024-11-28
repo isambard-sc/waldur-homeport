@@ -4,7 +4,7 @@ import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
-export const choices = [
+const choices = [
   {
     label: translate('Requested'),
     value: 'requested',
@@ -16,6 +16,10 @@ export const choices = [
   {
     label: translate('Pending'),
     value: 'pending',
+  },
+  {
+    label: translate('Pending project start'),
+    value: 'project',
   },
   {
     label: translate('Canceled'),
@@ -30,6 +34,12 @@ export const choices = [
     value: 'accepted',
   },
 ];
+
+export const formatInvitationState = (value) => {
+  const choice = choices.find((choice) => choice.value === value);
+  return choice ? choice.label : null;
+};
+
 export const InvitationStateFilter = () => (
   <TableFilterItem title={translate('State')} name="state">
     <Field

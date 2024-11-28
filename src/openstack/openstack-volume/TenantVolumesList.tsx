@@ -7,27 +7,28 @@ import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalA
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { VOLUME_TYPE } from '../constants';
 
 import { formatInstance } from './OpenStackVolumeSummary';
 
-export const TenantVolumesList: FunctionComponent<{ resource }> = ({
-  resource,
+export const TenantVolumesList: FunctionComponent<{ resourceScope }> = ({
+  resourceScope,
 }) => {
   const filter = useMemo(
     () => ({
-      service_settings_uuid: resource.child_settings,
+      tenant_uuid: resourceScope.uuid,
     }),
-    [resource],
+    [resourceScope],
   );
 
   const props = useTable({
-    table: 'openstacktenant-volumes',
-    fetchData: createFetcher('openstacktenant-volumes'),
+    table: 'openstack-volumes',
+    fetchData: createFetcher('openstack-volumes'),
     filter,
     queryField: 'name',
   });
@@ -39,6 +40,7 @@ export const TenantVolumesList: FunctionComponent<{ resource }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Size'),
@@ -63,7 +65,10 @@ export const TenantVolumesList: FunctionComponent<{ resource }> = ({
       ]}
       hasQuery={true}
       tableActions={
-        <AddResourceButton resource={resource} offeringType={VOLUME_TYPE} />
+        <AddResourceButton
+          resource={resourceScope}
+          offeringType={VOLUME_TYPE}
+        />
       }
       verboseName={translate('volumes')}
       expandableRow={({ row }) => <ResourceSummary resource={row} />}

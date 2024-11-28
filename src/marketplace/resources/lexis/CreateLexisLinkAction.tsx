@@ -1,3 +1,4 @@
+import { LinkSimple } from '@phosphor-icons/react';
 import { FC } from 'react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -10,9 +11,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { useModalDialogCallback } from '@waldur/resource/actions/useModalDialogCallback';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 
-const CreateLexisLinkDialog = lazyComponent(
-  () => import('./CreateLexisLinkDialog'),
-  'CreateLexisLinkDialog',
+const CreateLexisLinkDialog = lazyComponent(() =>
+  import('./CreateLexisLinkDialog').then((module) => ({
+    default: module.CreateLexisLinkDialog,
+  })),
 );
 
 const validators = [validateState('OK', 'Erred')];
@@ -49,6 +51,6 @@ export const CreateLexisLinkAction: FC<CreateLexisLinkActionProps> = ({
   ) {
     return null;
   } else {
-    return <ActionItem {...props} />;
+    return <ActionItem {...props} iconNode={<LinkSimple />} />;
   }
 };

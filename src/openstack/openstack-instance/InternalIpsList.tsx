@@ -2,26 +2,26 @@ import { FunctionComponent, useCallback } from 'react';
 
 import { getById } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
-import { VirtualMachine, InternalIP } from '@waldur/resource/types';
-import { Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { VirtualMachine, Port } from '@waldur/resource/types';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { UpdateInternalIpsAction } from './actions/update-internal-ips/UpdateInternalIpsSetAction';
 import { SetAllowedAddressPairsButton } from './SetAllowedAddressPairsButton';
 import { formatAddressList } from './utils';
 
-export const InternalIpsList: FunctionComponent<{ resourceScope }> = ({
+export const InternalIpsList: FunctionComponent<{ resourceScope; refetch }> = ({
   resourceScope,
+  refetch,
 }) => {
   const fetchData = useCallback(
     () =>
-      getById<VirtualMachine>(
-        '/openstacktenant-instances/',
-        resourceScope.uuid,
-      ).then((vm) => ({
-        rows: vm.internal_ips_set,
-        resultCount: vm.internal_ips_set.length,
-      })),
+      getById<VirtualMachine>('/openstack-instances/', resourceScope.uuid).then(
+        (vm) => ({
+          rows: vm.ports,
+          resultCount: vm.ports.length,
+        }),
+      ),
     [resourceScope],
   );
   const props = useTable({
@@ -29,7 +29,7 @@ export const InternalIpsList: FunctionComponent<{ resourceScope }> = ({
     fetchData,
   });
   return (
-    <Table<InternalIP>
+    <Table<Port>
       {...props}
       columns={[
         {
@@ -51,15 +51,20 @@ export const InternalIpsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Actions'),
           render: ({ row }) => (
-            <SetAllowedAddressPairsButton
-              instance={resourceScope}
-              internalIp={row}
-            />
+            <SetAllowedAddressPairsButton instance={resourceScope} port={row} />
           ),
         },
       ]}
-      verboseName={translate('internal IPs')}
-      tableActions={<UpdateInternalIpsAction resource={resourceScope} />}
+      verboseName={translate('ports')}
+      tableActions={
+        <UpdateInternalIpsAction
+          resource={resourceScope}
+          refetch={() => {
+            refetch();
+            props.fetch();
+          }}
+        />
+      }
     />
   );
 };

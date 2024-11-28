@@ -4,9 +4,9 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { ProposalBadge } from '@waldur/proposals/proposal/ProposalBadge';
 import { Call, Round } from '@waldur/proposals/types';
-import { Table } from '@waldur/table';
 import { createFetcher } from '@waldur/table/api';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { ProposalRowActions } from '../../proposal/ProposalRowActions';
 
@@ -30,11 +30,11 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
     <Table
       {...tableProps}
       id="proposals"
-      className="mb-7"
       columns={[
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
         },
         {
           title: translate('By'),

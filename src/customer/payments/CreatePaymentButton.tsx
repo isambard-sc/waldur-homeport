@@ -1,15 +1,15 @@
-import { PlusCircle } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const PaymentCreateDialogContainer = lazyComponent(
-  () => import('@waldur/customer/payments/PaymentCreateDialog'),
-  'PaymentCreateDialogContainer',
+const PaymentCreateDialogContainer = lazyComponent(() =>
+  import('@waldur/customer/payments/PaymentCreateDialog').then((module) => ({
+    default: module.PaymentCreateDialogContainer,
+  })),
 );
 
 export const CreatePaymentButton = ({ activePaymentProfile }) => {
@@ -25,11 +25,8 @@ export const CreatePaymentButton = ({ activePaymentProfile }) => {
       }),
     );
   return (
-    <ActionButton
-      title={translate('Add payment')}
+    <AddButton
       action={action}
-      iconNode={<PlusCircle />}
-      variant="primary"
       disabled={!user.is_staff}
       tooltip={
         !user.is_staff

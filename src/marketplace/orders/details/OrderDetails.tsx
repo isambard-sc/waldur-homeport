@@ -9,7 +9,7 @@ import { getOrderBreadcrumbItems } from '@waldur/marketplace/utils';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import { OrderActionsButton } from '../actions/OrderActionsButton';
 
@@ -86,7 +86,8 @@ interface OrderDetailsProps {
 
 const PageHero = ({ data, isRefetching }) => (
   <PublicDashboardHero2
-    className="container-fluid mb-8 mt-6"
+    className="container-fluid my-5"
+    cardBordered
     logo={data.offering.thumbnail}
     logoAlt={data.offering.name}
     logoTooltip={data.offering.name}
@@ -109,7 +110,12 @@ const PageHero = ({ data, isRefetching }) => (
 
 export const OrderDetails: FunctionComponent<OrderDetailsProps> = (data) => {
   useTitle(translate('Order details'));
-  usePageHero(<PageHero data={data} isRefetching={data.isRefetching} />);
+  usePageHero(<PageHero data={data} isRefetching={data.isRefetching} />, [
+    data.isRefetching,
+    data.offering,
+    data.order,
+    data.refetch,
+  ]);
   const breadcrumbItems = useMemo(
     () => getOrderBreadcrumbItems(data.order),
     [data.order],

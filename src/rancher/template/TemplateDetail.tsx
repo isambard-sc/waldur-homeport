@@ -1,17 +1,17 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import Markdown from 'markdown-to-jsx';
 import { useMemo, useCallback, FunctionComponent } from 'react';
 import { Card, Accordion } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 import { formValueSelector } from 'redux-form';
 
-import { FormattedMarkdown } from '@waldur/core/FormattedMarkdown';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 import { TemplateQuestions } from '@waldur/rancher/template/TemplateQuestions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { createApp } from '../api';
 
@@ -107,7 +107,7 @@ export const TemplateDetail: FunctionComponent = () => {
               <Card.Title>{translate('Summary')}</Card.Title>
             </Card.Header>
             <Card.Body>
-              <FormattedMarkdown text={state.value.version.readme} />
+              <Markdown>{state.value.version.readme}</Markdown>
             </Card.Body>
           </Accordion.Item>
         )}

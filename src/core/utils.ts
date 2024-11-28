@@ -1,11 +1,12 @@
 import { ENV } from '@waldur/configs/default';
+import { translate } from '@waldur/i18n';
 import { PhoneNumber } from '@waldur/workspace/types';
 
 export function wait(amount = 0) {
   return new Promise((resolve) => setTimeout(resolve, amount));
 }
 
-export const FILESIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+const FILESIZE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
 
 export const formatFilesize = (
   input,
@@ -62,6 +63,9 @@ export const formatPhoneNumber = (phoneNumber: PhoneNumber) => {
   if (typeof phoneNumber === 'string') return phoneNumber;
   return phoneNumber.country_code + '-' + phoneNumber.national_number;
 };
+
+export const formatYesNo = (value) =>
+  value === true ? translate('Yes') : translate('No');
 
 export const listToDict = (key, value) => (list) => {
   const dict = {};
@@ -174,7 +178,7 @@ export const orderByFilter = (sorting: {
  * const x = {a: {z: "z1", x: "x1"}, b: "b1"};
  * flattenObject(x) === {'a.z': "z1", 'a.x': "x1", b: "b1"}
  */
-export const flattenObject = (obj) => {
+export const flattenObject = (obj): Record<string, any> => {
   const result = {};
 
   for (const i in obj) {

@@ -1,12 +1,15 @@
+import { X } from '@phosphor-icons/react';
+
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
-const ForceDestroyDialog = lazyComponent(
-  () => import('./ForceDestroyDialog'),
-  'ForceDestroyDialog',
+const ForceDestroyDialog = lazyComponent(() =>
+  import('./ForceDestroyDialog').then((module) => ({
+    default: module.ForceDestroyDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {
@@ -29,5 +32,7 @@ export const ForceDestroyAction: ActionItemType = ({ resource, refetch }) => (
     className="text-danger"
     resource={resource}
     extraResolve={{ refetch }}
+    iconNode={<X />}
+    iconColor="danger"
   />
 );

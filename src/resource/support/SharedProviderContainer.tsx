@@ -1,13 +1,14 @@
 import { FunctionComponent } from 'react';
+import { Card } from 'react-bootstrap';
 
 import { SharedProviderFilterContainer } from './SharedProviderFilter';
-import { SharedProviderTabsContainer } from './SharedProviderTabs';
+import { SharedProviderTabs } from './SharedProviderTabs';
 
 export const SharedProviderContainer: FunctionComponent = () => {
   return (
-    <>
+    <Card className="card-bordered">
       <SharedProviderFilterContainer />
-      <SharedProviderTabsContainer />
-    </>
+      <SharedProviderTabs />
+    </Card>
   );
 };

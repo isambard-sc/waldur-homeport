@@ -6,7 +6,7 @@ import { Field, formValueSelector } from 'redux-form';
 import { required } from '@waldur/core/validators';
 import { FieldError } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { Namespace } from '../types';
 

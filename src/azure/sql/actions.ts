@@ -1,5 +1,8 @@
-import { ActionRegistry } from '@waldur/resource/actions/registry';
+import { ActionConfiguration } from '@waldur/resource/actions/types';
 
 import { DestroyServerAction } from './DestroyServerAction';
 
-ActionRegistry.register('Azure.SQLServer', [DestroyServerAction]);
+export const AzureSqlServerActions: ActionConfiguration = {
+  type: 'Azure.SQLServer',
+  actions: [DestroyServerAction],
+};

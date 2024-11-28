@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon';
 
+import { ENV } from '@waldur/configs/default';
 import { get } from '@waldur/core/api';
 import { parseDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 
-import { Chart, InvoiceSummary, Scope } from './types';
+import { Scope, Chart, ChartData, InvoiceSummary } from './types';
 
 interface DailyQuota {
   [key: string]: number[];
@@ -21,17 +22,47 @@ const getDailyQuotas = (params) =>
     (response) => response.data,
   );
 
-export async function getDailyQuotasOfCurrentMonth(
-  quota: string,
-  scope: Scope,
-): Promise<number[]> {
-  const firstDayOfMonth = DateTime.now().startOf('month').toISODate();
+const formatTeamSizeChart = (values: number[]): Chart => {
+  const data: ChartData = values.map((value, index) => {
+    const date = DateTime.now()
+      .minus({ days: 30 })
+      .startOf('day')
+      .plus({ days: index });
+    return {
+      label: translate('{value} at {date}', {
+        value,
+        date: date.toISODate(),
+      }),
+      value,
+    };
+  });
+
+  let changesPercent = 0;
+  const lastCount = Number(values[0]);
+  const currentCount = Number(values[values.length - 1]);
+  if (lastCount || currentCount === 0) {
+    changesPercent = ((currentCount - lastCount) / lastCount) * 100;
+  }
+
+  return {
+    title: translate('Team size'),
+    units: null,
+    current: currentCount,
+    total: currentCount,
+    data,
+    changes: changesPercent,
+  };
+};
+
+export async function getTeamSizeChart(scope: Scope): Promise<Chart> {
+  const quota = 'nc_user_count';
+  const start = DateTime.now().minus({ days: 30 }).toISODate();
   const values = await getDailyQuotas({
     scope: scope.url,
-    quota_names: quota,
-    start: firstDayOfMonth,
+    quota_names: [quota],
+    start,
   });
-  return values[quota];
+  return formatTeamSizeChart(values[quota]);
 }
 
 export const padMissingValues = (items: DateValuePair[]): DateValuePair[] =>
@@ -68,13 +99,15 @@ export const formatCostChartLabel = (
 
 export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
   let items: DateValuePair[] = invoices.map((invoice) => ({
-    value: invoice.price,
+    value: Number(invoice.price),
     date: DateTime.fromObject({ year: invoice.year, month: invoice.month }),
   }));
 
   items.reverse();
   items = padMissingValues(items);
+  let total = 0;
   const data = items.map((item, index) => {
+    total += item.value;
     const isEstimate = index === items.length - 1;
     const date = isEstimate
       ? DateTime.now().endOf('month')
@@ -82,6 +115,7 @@ export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
     return {
       label: formatCostChartLabel(item.value, date, isEstimate),
       value: item.value,
+      xAxisValue: date.monthShort,
     };
   });
 
@@ -90,13 +124,18 @@ export const formatCostChart = (invoices: InvoiceSummary[]): Chart => {
   const lastMonthCost = Number(lastMonths[0].value);
   const currentMonthCost = Number(lastMonths[1].value);
   if (lastMonthCost || lastMonthCost === 0) {
-    changesPercent = ((currentMonthCost - lastMonthCost) / lastMonthCost) * 100;
+    changesPercent =
+      ((currentMonthCost - lastMonthCost) / Math.abs(lastMonthCost)) * 100;
   }
 
   return {
     title: translate('Estimated cost'),
     data,
     current: defaultCurrency(items[items.length - 1].value),
+    total,
     changes: changesPercent,
+    yAxisLabel: translate('Cost ({currency})', {
+      currency: ENV.plugins.WALDUR_CORE.CURRENCY_NAME,
+    }),
   };
 };

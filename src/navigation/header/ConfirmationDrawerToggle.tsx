@@ -1,12 +1,12 @@
-import { BellRinging } from '@phosphor-icons/react';
+import { Bell } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
-import { countProjectUpdateRequestsList } from '@waldur/marketplace-remote/api';
 import { countOrders } from '@waldur/marketplace/common/api';
+import { countProjectUpdateRequestsList } from '@waldur/marketplace-remote/api';
 
 import {
   PENDING_CONSUMER_ORDERS_FILTER,
@@ -14,9 +14,10 @@ import {
 } from './confirmation-drawer/constants';
 import { HeaderButtonBullet } from './HeaderButtonBullet';
 
-const PendingConfirmationContainer = lazyComponent(
-  () => import('./confirmation-drawer/PendingConfirmationContainer'),
-  'PendingConfirmationContainer',
+const PendingConfirmationContainer = lazyComponent(() =>
+  import('./confirmation-drawer/PendingConfirmationContainer').then(
+    (module) => ({ default: module.PendingConfirmationContainer }),
+  ),
 );
 
 export const ConfirmationDrawerToggle: React.FC = () => {
@@ -59,14 +60,11 @@ export const ConfirmationDrawerToggle: React.FC = () => {
       <button
         id="pending-confirmations-toggle"
         type="button"
-        className="btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary position-relative w-35px h-35px w-md-40px h-md-40px"
+        className="btn btn-icon btn-icon-grey-500 btn-active-secondary position-relative w-35px h-35px w-md-40px h-md-40px"
         onClick={openDrawer}
       >
-        <span
-          className="svg-icon-1 text-gray"
-          title={translate('Pending tasks')}
-        >
-          <BellRinging size={25} />
+        <span className="svg-icon" title={translate('Pending tasks')}>
+          <Bell className="w-20px h-20px" weight="bold" />
         </span>
         {showBullet && <HeaderButtonBullet />}
       </button>

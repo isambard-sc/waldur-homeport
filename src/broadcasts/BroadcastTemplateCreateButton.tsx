@@ -1,15 +1,14 @@
-import { PlusCircle } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
 
-const BroadcastTemplateCreateDialog = lazyComponent(
-  () => import('./BroadcastTemplateCreateDialog'),
-  'BroadcastTemplateCreateDialog',
+const BroadcastTemplateCreateDialog = lazyComponent(() =>
+  import('./BroadcastTemplateCreateDialog').then((module) => ({
+    default: module.BroadcastTemplateCreateDialog,
+  })),
 );
 
 export const BroadcastTemplateCreateButton: FunctionComponent<{ refetch }> = ({
@@ -26,12 +25,5 @@ export const BroadcastTemplateCreateButton: FunctionComponent<{ refetch }> = ({
         size: 'lg',
       }),
     );
-  return (
-    <ActionButton
-      action={callback}
-      title={translate('Create')}
-      iconNode={<PlusCircle />}
-      variant="primary"
-    />
-  );
+  return <AddButton action={callback} />;
 };

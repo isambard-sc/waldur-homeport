@@ -29,6 +29,10 @@ declare module '*.jpg' {
 }
 
 declare module '*.md' {
-  const value: string;
-  export default value;
+  import React from 'react'
+  const ReactComponent: React.FC;
+  export { ReactComponent };
 }
+
+declare module '*.woff';
+declare module '*.woff2';

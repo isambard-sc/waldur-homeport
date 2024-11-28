@@ -3,7 +3,7 @@ describe('Broadcast', () => {
     cy.mockUser()
       .mockChecklists()
 
-      .intercept('GET', '/api/broadcast-messages/?page=1&page_size=10', {
+      .intercept('GET', '/api/broadcast-messages/?page=1&page_size=10&field=uuid&field=author_full_name&field=subject&field=state&field=created&field=body&field=query&field=send_at', {
         fixture: 'support/notifications.json',
       })
       .as('getNotifications')
@@ -47,7 +47,7 @@ describe('Broadcast', () => {
   it('Create a broadcast', () => {
     cy.wait('@getNotifications').then(() => {
       cy.get('#kt_content_container button.btn-primary')
-        .contains('Create')
+        .contains('Add')
         .click()
         .get('input[name="subject"]')
         .type('Test')
@@ -63,7 +63,7 @@ describe('Broadcast', () => {
   });
 
   it('should expand items when click on arrow icon', () => {
-    cy.get('[data-cy=row-expander]').eq(0).click();
+    cy.get('[data-testid=row-expander]').eq(0).click();
     cy.get('.col-sm-8').contains('Test').should('be.visible');
   });
 

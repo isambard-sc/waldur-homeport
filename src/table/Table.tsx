@@ -1,20 +1,18 @@
 import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
+import { isEqual } from 'lodash-es';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Button, Card, Col, ColProps, Row, Stack } from 'react-bootstrap';
+import { Card, Col, Row, Stack } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
-import { BaseFieldProps } from 'redux-form';
 
 import { GRID_BREAKPOINTS } from '@waldur/core/constants';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
-import { translate } from '@waldur/i18n';
-import { ErrorView } from '@waldur/navigation/header/search/ErrorView';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
 import { GridBody } from './GridBody';
 import { HiddenActionsMessage } from './HiddenActionsMessage';
-import './Table.scss';
 import { TableBody } from './TableBody';
 import { TableButtons } from './TableButtons';
 import { TableFilterContainer } from './TableFilterContainer';
@@ -25,82 +23,14 @@ import { TablePagination } from './TablePagination';
 import { TablePlaceholder } from './TablePlaceholder';
 import { TableQuery } from './TableQuery';
 import { TableRefreshButton } from './TableRefreshButton';
-import {
-  Column,
-  DisplayMode,
-  ExportConfig,
-  FilterItem,
-  FilterPosition,
-  Sorting,
-  TableDropdownItem,
-  TableState,
-} from './types';
+import { TableProps } from './types';
+import { useTableLoader } from './useTableLoader';
 
-export interface TableProps<RowType = any> extends TableState {
-  table?: string;
-  rows: any[];
-  fetch: () => void;
-  gotoPage?: (page: number) => void;
-  hasQuery?: boolean;
-  setQuery?: (query: string) => void;
-  setFilter?: (item: FilterItem) => void;
-  applyFiltersFn?: (apply: boolean) => void;
-  setFilterPosition?: (filterPosition: FilterPosition) => void;
-  columns?: Array<Column<RowType>>;
-  setDisplayMode?: (mode: DisplayMode) => void;
-  gridItem?: React.ComponentType<{ row: RowType }>;
-  gridSize?: ColProps;
-  openExportDialog?: (format: ExportConfig['format'], props?) => void;
-  openFiltersDrawer?: (filters: React.ReactNode) => void;
-  renderFiltersDrawer?: (filters: React.ReactNode) => void;
-  dropdownActions?: TableDropdownItem[];
-  tableActions?: React.ReactNode;
-  verboseName?: string;
-  className?: string;
-  id?: string;
-  rowClass?: (({ row }) => string) | string;
-  hoverable?: boolean;
-  minHeight?: number;
-  showPageSizeSelector?: boolean;
-  updatePageSize?: (size: number) => void;
-  initialPageSize?: number;
-  resetPagination?: () => void;
-  hasPagination?: boolean;
-  sortList?(sorting: Sorting): void;
-  initialSorting?: Sorting;
-  expandableRow?: React.ComponentType<{ row: any }>;
-  expandableRowClassName?: string;
-  rowActions?: React.ComponentType<{ row; fetch }>;
-  toggleRow?(row: any): void;
-  toggled?: Record<string, boolean>;
-  enableExport?: boolean;
-  showExportInDropdown?: boolean;
-  placeholderComponent?: React.ReactNode;
-  filters?: JSX.Element;
-  title?: React.ReactNode;
-  alterTitle?: React.ReactNode;
-  hasActionBar?: boolean;
-  hasHeaders?: boolean;
-  enableMultiSelect?: boolean;
-  multiSelectActions?: React.ComponentType<{ rows: any[]; refetch }>;
-  selectRow?(row: any): void;
-  selectAllRows?(rows: any[]): void;
-  resetSelection?: () => void;
-  filter?: Record<string, any>;
-  fieldType?: 'checkbox' | 'radio';
-  fieldName?: string;
-  validate?: BaseFieldProps['validate'];
-  footer?: React.ReactNode;
-  hasOptionalColumns?: boolean;
-  toggleColumn?(id, column, value?): void;
-  initColumnPositions?(ids: string[]): void;
-  swapColumns?(column1: string, column2: string): void;
-  initialMode?: 'grid' | 'table';
-  standalone?: boolean;
-  hideClearFilters?: boolean;
-}
+import './Table.scss';
 
-const TableComponent = (props: TableProps) => {
+const TableComponent = (
+  props: TableProps & { toggleFilterMenu?(show?): void },
+) => {
   const visibleColumns = useMemo(
     () =>
       props.hasOptionalColumns
@@ -119,7 +49,7 @@ const TableComponent = (props: TableProps) => {
   return (
     <table
       className={classNames(
-        'table align-middle table-row-bordered fs-6 gy-5 dataTable no-footer',
+        'table align-middle table-row-bordered fs-6 gy-4 no-footer',
         {
           'table-expandable': Boolean(props.expandableRow),
           'table-hover': props.hoverable,
@@ -139,16 +69,19 @@ const TableComponent = (props: TableProps) => {
           selectedRows={props.selectedRows}
           fieldType={props.fieldType}
           filters={props.filters}
+          filtersStorage={props.filtersStorage}
           setFilter={props.setFilter}
           applyFiltersFn={props.applyFiltersFn}
           columnPositions={props.columnPositions}
           hasOptionalColumns={props.hasOptionalColumns}
+          toggleFilterMenu={props.toggleFilterMenu}
         />
       )}
       <TableBody
         rows={props.rows}
         columns={visibleColumns}
         rowClass={props.rowClass}
+        rowKey={props.rowKey}
         expandableRow={props.expandableRow}
         expandableRowClassName={props.expandableRowClassName}
         rowActions={showActions ? props.rowActions : undefined}
@@ -172,19 +105,25 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
   static defaultProps = {
     rows: [],
     columns: [],
+    rowKey: 'uuid',
     hasQuery: false,
     hasPagination: true,
     hasActionBar: true,
     hasHeaders: true,
+    cardBordered: true,
   };
 
   state = {
     closedHiddenActionsMessage: false,
-    /** Controls whether the add filter toggle is displayed, \
-     * but only if we don't have an active filter. Otherwise, it has no effect. \
+    /** Controls whether the main add filter toggle is displayed. \
      * Used with `filterPosition = 'menu'`*/
     showFilterMenuToggle: false,
   };
+
+  constructor(props) {
+    super(props);
+    this.toggleFilterMenu = this.toggleFilterMenu.bind(this);
+  }
 
   render() {
     return (
@@ -206,6 +145,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           className={classNames(
             'card-table',
             'full-width',
+            this.props.cardBordered && 'card-bordered',
             this.props.fieldName ? 'field-table' : '',
             this.props.mode === 'grid' &&
               Boolean(this.props.gridItem) &&
@@ -214,14 +154,13 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           )}
           id={this.props.id}
         >
-          {this.props.blocked && <div className="table-block" />}
           {this.props.hasActionBar && (
-            <Card.Header className="border-2 border-bottom">
+            <Card.Header className="border-bottom">
               <Row className="card-toolbar g-0 gap-4 w-100">
                 {!this.props.standalone && (
                   <Col xs className="order-0 mw-sm-25">
                     <Card.Title>
-                      <span className="me-2">
+                      <span className="h3 me-2">
                         {this.props.title ||
                           (this.props.verboseName &&
                             titleCase(this.props.verboseName)) ||
@@ -237,17 +176,12 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
                       <TableButtons
                         {...this.props}
                         showFilterMenuToggle={this.state.showFilterMenuToggle}
-                        toggleFilterMenu={() =>
-                          this.setState({
-                            showFilterMenuToggle:
-                              !this.state.showFilterMenuToggle,
-                          })
-                        }
+                        toggleFilterMenu={this.toggleFilterMenu}
                       />
                     </div>
                   )}
                 </Col>
-                {this.showQueryColumn() && (
+                {this.props.hasQuery && (
                   <Col
                     xs={!this.showActionsColumn()}
                     sm={Boolean(this.showActionsColumn())}
@@ -256,33 +190,11 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
                       !this.props.standalone && 'mx-auto',
                     )}
                   >
-                    {!this.props.selectedRows?.length ? (
-                      this.props.hasQuery && (
-                        <TableQuery
-                          query={this.props.query}
-                          setQuery={this.props.setQuery}
-                        />
-                      )
-                    ) : (
-                      <>
-                        <Button
-                          variant="light"
-                          className="btn-icon me-2"
-                          size="sm"
-                          onClick={this.props.resetSelection}
-                        >
-                          <i className="fa fa-times fs-5" />
-                        </Button>
-                        <span className="me-2 border-bottom-dashed border-2">
-                          {this.props.selectedRows?.length === 1
-                            ? translate('{count} row selected', {
-                                count: this.props.selectedRows?.length,
-                              })
-                            : translate('{count} rows selected', {
-                                count: this.props.selectedRows?.length,
-                              })}
-                        </span>
-                      </>
+                    {this.props.hasQuery && (
+                      <TableQuery
+                        query={this.props.query}
+                        setQuery={this.props.setQuery}
+                      />
                     )}
                   </Col>
                 )}
@@ -291,7 +203,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           )}
 
           {this.props.filterPosition === 'header' && this.props.filters ? (
-            <Card.Header className="table-filter border-2 border-bottom align-items-stretch">
+            <Card.Header className="table-filter border-bottom align-items-stretch">
               <TableFilterContainer filters={this.props.filters} />
             </Card.Header>
           ) : null}
@@ -301,11 +213,10 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
                 (this.props.filterPosition === 'sidebar' &&
                   this.props.filtersStorage.length > 0)) && (
                 <Card.Header
-                  className={classNames('border-2 border-bottom', {
+                  className={classNames('border-bottom', {
                     'd-none':
                       !this.state.showFilterMenuToggle &&
-                      this.props.filterPosition === 'menu' &&
-                      !this.props.filtersStorage.length,
+                      this.props.filterPosition === 'menu',
                   })}
                 >
                   <TableFilters
@@ -326,7 +237,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           {!this.state.closedHiddenActionsMessage &&
             this.props.hasOptionalColumns &&
             this.props.activeColumns[OPTIONAL_COLUMN_ACTIONS_KEY] === false && (
-              <Card.Header className="border-2 border-bottom">
+              <Card.Header className="border-bottom">
                 <HiddenActionsMessage
                   toggleColumn={this.props.toggleColumn}
                   close={() =>
@@ -339,7 +250,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           <Card.Body>
             <div
               className="table-responsive dataTables_wrapper"
-              style={{ minHeight: this.props.minHeight }}
+              style={{ minHeight: this.props.minHeight || 300 }}
             >
               <div className={classNames('table-container table-hover-shadow')}>
                 {this.renderBody()}
@@ -371,7 +282,8 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     }
 
     if (this.props.error) {
-      return <ErrorView />;
+      // @ts-ignore
+      return <ErrorMessage error={this.props.error} />;
     }
 
     if (!this.props.loading && !this.hasRows()) {
@@ -385,6 +297,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
             verboseName={verboseName}
             clearSearch={() => setQuery('')}
             fetch={this.props.fetch}
+            actions={this.props.placeholderActions}
           />
         );
       }
@@ -400,7 +313,10 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
       </ErrorBoundary>
     ) : (
       <ErrorBoundary fallback={ErrorMessage}>
-        <TableComponent {...this.props} />
+        <TableComponent
+          {...this.props}
+          toggleFilterMenu={this.toggleFilterMenu}
+        />
       </ErrorBoundary>
     );
   }
@@ -445,6 +361,8 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     } else if (prevProps.query !== this.props.query) {
       this.props.resetPagination();
       this.props.fetch();
+    } else if (!isEqual(prevProps.filtersStorage, this.props.filtersStorage)) {
+      this.props.resetPagination();
     } else if (
       prevProps.sorting !== this.props.sorting &&
       this.props.sorting.loading
@@ -457,16 +375,16 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     this.props.resetSelection();
   }
 
+  toggleFilterMenu(show: boolean = null) {
+    this.setState({
+      showFilterMenuToggle: show ?? !this.state.showFilterMenuToggle,
+    });
+  }
+
   hasRows() {
     return this.props.rows && this.props.rows.length > 0;
   }
 
-  showQueryColumn() {
-    return (
-      (this.props.enableMultiSelect && this.props.selectedRows?.length) ||
-      this.props.hasQuery
-    );
-  }
   showActionsColumn() {
     return (
       (this.props.enableMultiSelect && this.props.multiSelectActions) ||
@@ -474,12 +392,13 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
       this.props.dropdownActions?.length ||
       this.props.enableExport ||
       this.props.filters ||
+      this.props.hasOptionalColumns ||
       Boolean(this.props.gridItem && this.props.columns.length)
     );
   }
 }
 
-export default function Table<RowType = any>(props: TableProps<RowType>) {
+function Table<RowType = any>(props: TableProps<RowType>) {
   const {
     fetch,
     filterPosition: originalFilterPosition,
@@ -557,4 +476,12 @@ export default function Table<RowType = any>(props: TableProps<RowType>) {
   }, []);
 
   return <TableClass {...props} filterPosition={filterPosition} />;
+}
+
+export default function TableLoader<RowType = any>(props: TableProps<RowType>) {
+  const loading = useTableLoader();
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+  return <Table {...props} />;
 }

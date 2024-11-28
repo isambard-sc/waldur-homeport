@@ -2,14 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { formValueSelector } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
-import { getUUID } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { Offering } from '@waldur/marketplace/types';
 import {
-  getFlavors,
-  getSubnets,
-  getVolumeTypes,
+  loadFlavors,
+  loadSubnets,
+  loadVolumeTypes,
   loadSecurityGroups,
 } from '@waldur/openstack/api';
 import { Flavor, Subnet } from '@waldur/openstack/openstack-instance/types';
@@ -18,9 +17,9 @@ import {
   getDefaultVolumeType,
 } from '@waldur/openstack/openstack-instance/utils';
 import { listClusterTemplates } from '@waldur/rancher/api';
-import { NodeField } from '@waldur/rancher/types';
+import { Cluster, NodeField } from '@waldur/rancher/types';
 import { formatFlavor } from '@waldur/resource/utils';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 const CLUSTER_NAME_PATTERN = new RegExp('^[a-z0-9]([-a-z0-9])+[a-z0-9]$');
 
@@ -40,16 +39,15 @@ const formatFlavorOption = (flavor: Flavor) => ({
   value: flavor.url,
 });
 
-export const loadFlavors = (settings: string, offering: Offering) => {
-  const params = { settings };
-  return getFlavors({
-    ...params,
+export const filterFlavors = (tenant_uuid: string, offering: Offering) => {
+  return loadFlavors({
+    tenant_uuid,
     name_iregex: offering.plugin_options?.flavors_regex,
   }).then((data) => data.map(formatFlavorOption));
 };
 
-export const loadSubnets = (settings: string) =>
-  getSubnets({ settings }).then((data) => data.map(formatSubnetOption));
+export const formatSubnets = (tenant_uuid: string) =>
+  loadSubnets({ tenant_uuid }).then((data) => data.map(formatSubnetOption));
 
 export const getRancherMountPointChoices = () => {
   const mountPoints = ENV.plugins.WALDUR_RANCHER.MOUNT_POINT_CHOICES;
@@ -59,15 +57,18 @@ export const getRancherMountPointChoices = () => {
   }));
 };
 
-export const loadData = async (settings: string, offering: Offering) => {
-  const params = { settings };
-  const flavors = await loadFlavors(settings, offering);
-  const subnets = await loadSubnets(settings);
-  const volumeTypes = await getVolumeTypes(params);
+export const loadData = async (cluster: Cluster, offering: Offering) => {
+  const flavors = await filterFlavors(cluster.tenant_uuid, offering);
+  const subnets = await formatSubnets(cluster.tenant_uuid);
+  const volumeTypes = await loadVolumeTypes({
+    tenant_uuid: cluster.tenant_uuid,
+  });
   const templates = await listClusterTemplates();
   const volumeTypeChoices = formatVolumeTypeChoices(volumeTypes);
   const defaultVolumeType = getDefaultVolumeType(volumeTypeChoices);
-  const securityGroups = await loadSecurityGroups(getUUID(settings));
+  const securityGroups = await loadSecurityGroups({
+    tenant_uuid: cluster.tenant_uuid,
+  });
   return {
     subnets,
     flavors,
@@ -79,11 +80,13 @@ export const loadData = async (settings: string, offering: Offering) => {
   };
 };
 
-export const useVolumeDataLoader = (settings: string) => {
+export const useVolumeDataLoader = (tenant) => {
   return useQuery(
-    ['volumeTypes', settings],
+    ['volumeTypes', tenant],
     async () => {
-      const volumeTypes = settings ? await getVolumeTypes({ settings }) : [];
+      const volumeTypes = tenant
+        ? await loadVolumeTypes({ tenant: tenant.url })
+        : [];
       const volumeTypeChoices = formatVolumeTypeChoices(volumeTypes);
       const defaultVolumeType = getDefaultVolumeType(volumeTypeChoices);
       return {
@@ -107,8 +110,8 @@ export const getDataVolumes = (nodeIndex, allValues) => {
   }
 };
 
-export const formTenantSelector = (state: RootState): string =>
-  formValueSelector(ORDER_FORM_ID)(state, 'attributes.tenant_settings');
+export const formTenantSelector = (state: RootState) =>
+  formValueSelector(ORDER_FORM_ID)(state, 'attributes.tenant');
 
 export const formNodesSelector = (state: RootState): NodeField[] =>
   formValueSelector(ORDER_FORM_ID)(state, 'attributes.nodes');

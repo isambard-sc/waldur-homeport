@@ -1,8 +1,11 @@
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { getProjectCostPolicies } from '@waldur/customer/cost-policies/api';
-import { formatCostChart } from '@waldur/dashboard/api';
-import { getScopeChartOptions } from '@waldur/dashboard/chart';
-import { LINE_CHART_COLOR } from '@waldur/dashboard/constants';
+import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
+import { formatCostChart, getTeamSizeChart } from '@waldur/dashboard/api';
+import {
+  getLineChartOptions,
+  getLineChartOptionsWithAxis,
+} from '@waldur/dashboard/chart';
 import { translate } from '@waldur/i18n';
 import { Category } from '@waldur/marketplace/types';
 import { Project } from '@waldur/workspace/types';
@@ -10,7 +13,7 @@ import { Project } from '@waldur/workspace/types';
 import { fetchLast12MonthProjectCosts } from './api';
 import { ProjectCounterResourceItem } from './types';
 
-export async function loadChart(project: Project) {
+export async function loadChart(project: Project, withAxis = false) {
   const [invoices, costPolicies] = await Promise.all([
     fetchLast12MonthProjectCosts(project.uuid),
     getProjectCostPolicies({
@@ -22,17 +25,32 @@ export async function loadChart(project: Project) {
   const chart = formatCostChart(invoices);
   return {
     chart,
-    options: getScopeChartOptions(
-      chart.data.map((item) => item.label),
-      chart.data.map((item) => item.value),
-      (costPolicies || []).map((item, i) => ({
-        label: `${translate('Policy')}  #${i + 1} (${defaultCurrency(
-          item.limit_cost,
-        )})`,
-        value: item.limit_cost,
-      })),
-      LINE_CHART_COLOR,
-    ),
+    options: !withAxis
+      ? getLineChartOptions(
+          chart,
+          (costPolicies || []).map((item) => {
+            const limitCost = defaultCurrency(item.limit_cost);
+            const projectCredit = item.project_credit
+              ? defaultCurrency(item.project_credit)
+              : null;
+
+            const totalCost = item.limit_cost + (item.project_credit || 0);
+            const totalCostFormatted = defaultCurrency(totalCost);
+            const action = getCostPolicyActionOptions().find(
+              (option) => option.value === item.actions,
+            )?.label;
+
+            const label = projectCredit
+              ? `Policy: ${action}\n${translate('Sum')}: ${totalCostFormatted}, ${translate('Limit')}: ${limitCost}, ${translate('Credit')}: ${projectCredit}`
+              : `Policy: ${action}\n${translate('Limit')}: ${limitCost}`;
+
+            return {
+              label,
+              value: totalCost,
+            };
+          }),
+        )
+      : getLineChartOptionsWithAxis(chart),
   };
 }
 
@@ -54,3 +72,14 @@ export const combineProjectCounterRows = (
   rows
     .filter((item) => item.value)
     .sort((a, b) => a.label.localeCompare(b.label));
+
+export const getProjectTeamChart = async (project: Project) => {
+  const chart = await getTeamSizeChart(project);
+  if (chart) {
+    return {
+      chart,
+      options: getLineChartOptions(chart),
+    };
+  }
+  return null;
+};

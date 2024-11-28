@@ -52,7 +52,7 @@ export const ViewYAMLDialog = reduxForm<
     >
       <MonacoField
         name="yaml"
-        mode="yaml"
+        language="yaml"
         original={value?.yaml}
         diff={showDiff}
         height={400}
@@ -60,7 +60,7 @@ export const ViewYAMLDialog = reduxForm<
       />
       {value?.yaml && (
         <>
-          <CopyToClipboard value={value.yaml} />{' '}
+          <CopyToClipboard value={value.yaml} textButton className="my-2" />{' '}
           <Button onClick={toggleShowDiff}>
             {showDiff ? translate('Hide diff') : translate('Show diff')}
           </Button>

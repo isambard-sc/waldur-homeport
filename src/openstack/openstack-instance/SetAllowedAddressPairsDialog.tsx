@@ -13,7 +13,7 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showError, showSuccess } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { validatePrivateCIDR } from '../utils';
 
@@ -26,7 +26,7 @@ interface AllowedAddressPair {
 
 interface OwnProps {
   resolve: {
-    internalIp: {
+    port: {
       allowed_address_pairs: AllowedAddressPair[];
     };
     instance: {
@@ -103,7 +103,7 @@ const PairsTable: React.FC<any> = ({ fields }) =>
 
 const enhance = compose(
   connect<{}, {}, OwnProps>((_, ownProps) => ({
-    initialValues: { pairs: ownProps.resolve.internalIp.allowed_address_pairs },
+    initialValues: { pairs: ownProps.resolve.port.allowed_address_pairs },
   })),
   reduxForm<FormData, OwnProps>({
     form: 'SetAllowedAddressPairsDialog',
@@ -116,9 +116,9 @@ export const SetAllowedAddressPairsDialog = enhance(
     const setAllowedAddressPairs = async (formData: FormData) => {
       try {
         await post(
-          `/openstacktenant-instances/${resolve.instance.uuid}/update_allowed_address_pairs/`,
+          `/openstack-instances/${resolve.instance.uuid}/update_allowed_address_pairs/`,
           {
-            subnet: resolve.internalIp.subnet,
+            subnet: resolve.port.subnet,
             allowed_address_pairs: formData.pairs || [],
           },
         );
@@ -128,7 +128,10 @@ export const SetAllowedAddressPairsDialog = enhance(
         dispatch(closeModalDialog());
       } catch (e) {
         dispatch(
-          showError(translate('Unable to update allowed address pairs.')),
+          showErrorResponse(
+            e,
+            translate('Unable to update allowed address pairs.'),
+          ),
         );
       }
     };
@@ -140,7 +143,7 @@ export const SetAllowedAddressPairsDialog = enhance(
             'Set allowed address pairs ({instance} / {ipAddress})',
             {
               instance: resolve.instance.name,
-              ipAddress: formatAddressList(resolve.internalIp),
+              ipAddress: formatAddressList(resolve.port),
             },
           )}
           footer={

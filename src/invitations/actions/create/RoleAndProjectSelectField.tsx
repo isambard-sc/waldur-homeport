@@ -1,3 +1,4 @@
+import { CaretDown } from '@phosphor-icons/react';
 import React, {
   useCallback,
   useEffect,
@@ -5,9 +6,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { FormControl } from 'react-bootstrap';
+import { FormControl, FormGroup } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
+import { Tip } from '@waldur/core/Tooltip';
 import { required } from '@waldur/core/validators';
 import { FormField } from '@waldur/form/types';
 import { translate } from '@waldur/i18n';
@@ -16,7 +18,7 @@ import { Role } from '@waldur/permissions/types';
 import { Customer, Project } from '@waldur/workspace/types';
 
 interface RoleAndProjectSelectPopupProps {
-  roles: Role[];
+  roles: (Role & { tooltip? })[];
   customer: Customer;
   currentProject: Project;
   selectedRole: Role;
@@ -39,7 +41,7 @@ const RoleAndProjectSelectPopup: React.FC<RoleAndProjectSelectPopupProps> = ({
       if (role.uuid !== selectedRole?.uuid) {
         select(
           role,
-          selectedProject || currentProject || customer.projects?.[0],
+          selectedProject || currentProject || customer?.projects?.[0],
         );
 
         if (currentProject) {
@@ -69,43 +71,51 @@ const RoleAndProjectSelectPopup: React.FC<RoleAndProjectSelectPopupProps> = ({
   const [query, setQuery] = useState('');
   const projects = useMemo(() => {
     const q = query.toLowerCase();
-    return customer.projects.filter((project) =>
+    return customer?.projects.filter((project) =>
       project.name.toLowerCase().includes(q),
     );
   }, [customer, query]);
 
   const showProjects = selectedRole?.content_type === 'project';
-  const hasProject = Boolean(customer.projects?.length);
+  const hasProject = Boolean(customer?.projects?.length);
 
   return (
     <div
-      className="role-project-select-popup menu menu-sub menu-sub-dropdown menu-rounded menu-gray-600 menu-active-bg-light-primary menu-hover-title-primary border fw-bold rounded-0 fs-6 py-3"
+      className="role-project-select-popup menu menu-sub menu-sub-dropdown menu-gray-700 menu-state-bg-light menu-state-primary border fw-bold fs-6 py-1"
       data-kt-menu="true"
     >
       <div className="d-flex">
-        <div className="mw-250px">
+        <div className="w-200px mw-250px">
           {roles.map((role) =>
             hasProject || !showProjects ? (
-              <div
-                key={role.uuid}
-                className="menu-item px-3"
-                data-kt-menu-trigger
-              >
-                <span
-                  className={
-                    'menu-link px-3' +
-                    (selectedRole?.uuid === role.uuid ? ' active' : '')
-                  }
-                  onClick={() => onClickRole(role)}
-                  aria-hidden="true"
-                >
-                  <span className="menu-title">
-                    {role.description || role.name}
+              <div key={role.uuid} className="menu-item" data-kt-menu-trigger>
+                {role.is_active ? (
+                  <span
+                    className={
+                      'menu-link' +
+                      (selectedRole?.uuid === role.uuid ? ' active' : '')
+                    }
+                    onClick={() => onClickRole(role)}
+                    aria-hidden="true"
+                  >
+                    <span className="menu-title">
+                      {role.description || role.name}
+                    </span>
+                    {role.content_type === 'project' && !currentProject && (
+                      <span className="menu-arrow" />
+                    )}
                   </span>
-                  {showProjects && !currentProject && (
-                    <span className="menu-arrow" />
-                  )}
-                </span>
+                ) : (
+                  <Tip
+                    id={'tip-project-role-' + role.name}
+                    label={role.tooltip}
+                    className="menu-link disabled px-3"
+                  >
+                    <span className="menu-title">
+                      {role.description || role.name}
+                    </span>
+                  </Tip>
+                )}
               </div>
             ) : (
               <div
@@ -142,12 +152,12 @@ const RoleAndProjectSelectPopup: React.FC<RoleAndProjectSelectPopupProps> = ({
               {projects.map((project) => (
                 <div
                   key={project.uuid}
-                  className="menu-item px-3"
+                  className="menu-item"
                   data-kt-menu-trigger
                 >
                   <span
                     className={
-                      'menu-link px-3' +
+                      'menu-link' +
                       (selectedProject?.uuid === project.uuid ? ' active' : '')
                     }
                     onClick={() => onClickProject(project)}
@@ -177,9 +187,7 @@ interface RoleAndProjectSelectProps
   extends Omit<RoleAndProjectSelectFieldProps, 'name'>,
     FormField {}
 
-export const RoleAndProjectSelect: React.FC<RoleAndProjectSelectProps> = (
-  props,
-) => {
+const RoleAndProjectSelect: React.FC<RoleAndProjectSelectProps> = (props) => {
   const { roles, customer, currentProject, placeholder } = props;
 
   const selectedRole = props.input.value?.role;
@@ -191,21 +199,28 @@ export const RoleAndProjectSelect: React.FC<RoleAndProjectSelectProps> = (
 
   return (
     <div className="role-project-select">
-      <FormControl
-        className="form-control-solid"
-        type="text"
-        value={[
-          selectedRole?.description || selectedRole?.name,
-          selectedProject?.name,
-        ]
-          .filter(Boolean)
-          .join(' - ')}
-        placeholder={placeholder}
-        readOnly
+      <FormGroup
+        className="position-relative w-100 rotate"
         data-kt-menu-trigger="click"
         data-kt-menu-attach="parent"
-        data-kt-menu-placement="bottom"
-      />
+        data-kt-menu-placement="bottom-start"
+      >
+        <FormControl
+          type="text"
+          value={[
+            selectedRole?.description || selectedRole?.name,
+            selectedProject?.name,
+          ]
+            .filter(Boolean)
+            .join(' - ')}
+          placeholder={placeholder}
+          readOnly
+          className="pe-12"
+        />
+        <span className="svg-icon svg-icon-1 rotate-180 position-absolute mx-4 end-0 h-100 d-flex align-items-center">
+          <CaretDown />
+        </span>
+      </FormGroup>
       <RoleAndProjectSelectPopup
         roles={roles}
         customer={customer}
@@ -233,14 +248,14 @@ export const RoleAndProjectSelectField: React.FC<
       customer={customer}
       currentProject={currentProject}
       component={RoleAndProjectSelect}
-      placeholder={translate('Select role')}
+      placeholder={translate('Select') + '...'}
       validate={[required]}
     />
   ) : (
     <Field
       name={name}
       component={FormControl}
-      placeholder={translate('Select role')}
+      placeholder={translate('Select') + '...'}
       disabled={disabled}
       validate={[required]}
     />

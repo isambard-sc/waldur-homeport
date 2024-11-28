@@ -1,50 +1,24 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
-import { Attribute } from '@waldur/marketplace/types';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { MARKETPLACE_RANCHER } from './constants';
 
-const RancherClusterCheckoutSummary = lazyComponent(
-  () => import('./RancherClusterCheckoutSummary'),
-  'RancherClusterCheckoutSummary',
+const RancherClusterCheckoutSummary = lazyComponent(() =>
+  import('./RancherClusterCheckoutSummary').then((module) => ({
+    default: module.RancherClusterCheckoutSummary,
+  })),
 );
-const RancherPluginOptionsForm = lazyComponent(
-  () => import('./RancherPluginOptionsForm'),
-  'RancherPluginOptionsForm',
+const RancherPluginOptionsForm = lazyComponent(() =>
+  import('./RancherPluginOptionsForm').then((module) => ({
+    default: module.RancherPluginOptionsForm,
+  })),
 );
-const RancherOrderForm = lazyComponent(
-  () => import('./RancherOrderForm'),
-  'RancherOrderForm',
+const RancherOrderForm = lazyComponent(() =>
+  import('./RancherOrderForm').then((module) => ({
+    default: module.RancherOrderForm,
+  })),
 );
-
-const ServiceSettingsAttributes = (): Attribute[] => [
-  {
-    key: 'backend_url',
-    title: translate('Rancher server URL'),
-    type: 'string',
-  },
-  {
-    key: 'username',
-    title: translate('Rancher access key'),
-    type: 'string',
-  },
-  {
-    key: 'password',
-    title: translate('Rancher secret key'),
-    type: 'password',
-  },
-  {
-    key: 'base_image_name',
-    title: translate('Base image name'),
-    type: 'string',
-  },
-  {
-    key: 'cloud_init_template',
-    title: translate('Cloud init template'),
-    type: 'string',
-  },
-];
 
 const serializeDataVolume = ({ size, ...volumeRest }) => ({
   ...volumeRest,
@@ -66,6 +40,7 @@ const serializer = ({
   nodes,
   ssh_public_key,
   security_groups,
+  tenant,
   ...clusterRest
 }) => ({
   ...clusterRest,
@@ -74,9 +49,10 @@ const serializer = ({
   security_groups: security_groups
     ? security_groups.map((group) => ({ url: group.url }))
     : undefined,
+  tenant: tenant ? tenant.url : undefined,
 });
 
-registerOfferingType({
+export const RancherOffering: OfferingConfiguration = {
   type: MARKETPLACE_RANCHER,
   get label() {
     return translate('Rancher cluster');
@@ -85,7 +61,6 @@ registerOfferingType({
   checkoutSummaryComponent: RancherClusterCheckoutSummary,
   pluginOptionsForm: RancherPluginOptionsForm,
   providerType: 'Rancher',
-  attributes: ServiceSettingsAttributes,
   serializer,
   allowToUpdateService: true,
-});
+};

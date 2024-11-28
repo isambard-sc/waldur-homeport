@@ -9,6 +9,7 @@ import {
   useEffect,
 } from 'react';
 import { Form } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import { clearFields, WrappedFieldMetaProps } from 'redux-form';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -21,10 +22,12 @@ export interface FormGroupProps extends FormField {
   meta: WrappedFieldMetaProps;
   clearOnUnmount?: boolean;
   actions?: ReactNode;
+  containerClassName?: string;
 }
 
 export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
   const context = useContext(FormFieldsContext);
+  const dispatch = useDispatch();
 
   const {
     input,
@@ -35,10 +38,11 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
     hideLabel,
     meta,
     children,
-    floating = false,
     actions,
     clearOnUnmount,
     spaceless,
+    containerClassName,
+    space = 7,
     ...rest
   } = props;
 
@@ -47,7 +51,7 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
       if (clearOnUnmount === false) {
         return;
       }
-      meta.dispatch(clearFields(meta.form, false, false, input.name));
+      dispatch(clearFields(meta.form, false, false, input.name));
     };
   }, []);
 
@@ -76,23 +80,27 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
     <div
       className={classNames(
         {
-          'form-floating': floating,
           'flex-grow-1': Boolean(actions),
         },
         'position-relative',
-        !spaceless && 'mb-7',
+        !actions && containerClassName,
+        !spaceless && `mb-${space}`,
       )}
     >
-      {!floating && labelNode}
+      {labelNode}
       {cloneElement(children as any, newProps)}
-      {floating && labelNode}
       {description && <Form.Text>{description}</Form.Text>}
       {meta.touched && <FieldError error={meta.error} />}
     </div>
   );
   if (actions) {
     return (
-      <div className="d-flex align-items-start gap-4">
+      <div
+        className={classNames(
+          'd-flex align-items-start gap-4',
+          containerClassName,
+        )}
+      >
         {main}
         {actions}
       </div>

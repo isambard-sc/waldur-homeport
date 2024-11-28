@@ -1,3 +1,4 @@
+import { Prohibit } from '@phosphor-icons/react';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -48,8 +49,14 @@ export const RejectAllButton: React.FC<RejectAllButtonProps> = (props) => {
     setLoading(false);
   }, [setLoading, dispatch, props.orders]);
   return (
-    <Button variant="light" onClick={handler} disabled={loading}>
-      {loading ? <LoadingSpinnerIcon /> : <i className="fa fa-times me-1" />}
+    <Button variant="danger" onClick={handler} disabled={loading}>
+      {loading ? (
+        <LoadingSpinnerIcon />
+      ) : (
+        <span className="svg-icon svg-icon-2">
+          <Prohibit weight="bold" />
+        </span>
+      )}
       {translate('Reject all')}
     </Button>
   );

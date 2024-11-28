@@ -1,16 +1,15 @@
-import { PlusCircle } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
+import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n/translate';
 import { openModalDialog } from '@waldur/modal/actions';
 import { Call } from '@waldur/proposals/types';
-import { ActionButton } from '@waldur/table/ActionButton';
 
-const CallRoundCreateDialog = lazyComponent(
-  () => import('./CallRoundCreateDialog'),
-  'CallRoundCreateDialog',
+const CallRoundCreateDialog = lazyComponent(() =>
+  import('./CallRoundCreateDialog').then((module) => ({
+    default: module.CallRoundCreateDialog,
+  })),
 );
 
 interface RoundCreateButtonProps {
@@ -34,12 +33,5 @@ export const RoundCreateButton = ({
     [dispatch],
   );
 
-  return (
-    <ActionButton
-      title={translate('New round')}
-      iconNode={<PlusCircle />}
-      action={openRoundCreateDialog}
-      variant="light"
-    />
-  );
+  return <AddButton action={openRoundCreateDialog} />;
 };

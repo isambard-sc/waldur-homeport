@@ -25,7 +25,7 @@ export const AdministrationBranding = () => {
         <FormTable.Card
           title={group.description}
           key={group.description}
-          className="card-bordered mb-3"
+          className="card-bordered mb-5"
         >
           <Table bordered={true} responsive={true} className="form-table">
             {group.items.map((item) => (

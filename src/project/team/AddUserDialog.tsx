@@ -17,7 +17,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { Role } from '@waldur/permissions/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 import { getCurrentUser } from '@waldur/user/UsersService';
 import { setCurrentUser } from '@waldur/workspace/actions';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
@@ -125,7 +125,7 @@ export const AddUserDialog = reduxForm<
                 ? usersAutocomplete({ query }, prevOptions, page)
                 : customerUsersAutocomplete(
                     currentCustomer.uuid,
-                    { full_name_and_email: query },
+                    { user_keyword: query },
                     prevOptions,
                     page,
                   )

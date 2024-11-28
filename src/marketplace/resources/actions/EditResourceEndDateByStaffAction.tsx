@@ -1,3 +1,4 @@
+import { Clock } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ENV } from '@waldur/configs/default';
@@ -9,9 +10,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
-const EditResourceEndDateDialog = lazyComponent(
-  () => import('./EditResourceEndDateDialog'),
-  'EditResourceEndDateDialog',
+const EditResourceEndDateDialog = lazyComponent(() =>
+  import('./EditResourceEndDateDialog').then((module) => ({
+    default: module.EditResourceEndDateDialog,
+  })),
 );
 
 interface EditResourceEndDateByProviderActionProps {
@@ -47,6 +49,7 @@ export const EditResourceEndDateByStaffAction = ({
       title={translate('Set termination date')}
       action={callback}
       staff
+      iconNode={<Clock />}
     />
   ) : null;
 };

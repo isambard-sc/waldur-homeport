@@ -6,8 +6,9 @@ import { translate } from '@waldur/i18n';
 import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CreateSnapshotAction } from './actions/CreateSnapshotAction';
 
@@ -22,8 +23,8 @@ export const VolumeSnapshotsList: FunctionComponent<{ resourceScope }> = ({
   );
 
   const props = useTable({
-    table: 'openstacktenant-snapshots',
-    fetchData: createFetcher('openstacktenant-snapshots'),
+    table: 'openstack-snapshots',
+    fetchData: createFetcher('openstack-snapshots'),
     filter,
   });
 
@@ -34,6 +35,7 @@ export const VolumeSnapshotsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
           orderField: 'name',
         },
         {
@@ -62,7 +64,9 @@ export const VolumeSnapshotsList: FunctionComponent<{ resourceScope }> = ({
       ]}
       verboseName={translate('snapshots')}
       hasQuery={false}
-      tableActions={<CreateSnapshotAction resource={resourceScope} />}
+      tableActions={
+        <CreateSnapshotAction resource={resourceScope} refetch={props.fetch} />
+      }
     />
   );
 };

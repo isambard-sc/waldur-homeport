@@ -1,11 +1,12 @@
-import { padStart, clone } from 'lodash';
+import { padStart, clone } from 'lodash-es';
 import { DateTime } from 'luxon';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ListGroup } from 'react-bootstrap';
-import Flatpickr, { DateTimePickerProps } from 'react-flatpickr';
+import Flatpickr, { type DateTimePickerProps } from 'react-flatpickr';
 
 import { parseDate } from '@waldur/core/dateUtils';
 import { FormField } from '@waldur/form/types';
+import { useFlatpickrTheme } from '@waldur/form/useFlatpickrTheme';
 import { translate } from '@waldur/i18n';
 
 import { getTimeOptions } from '../utils';
@@ -271,6 +272,8 @@ export const CustomRangeDatePicker = (props: CustomRangeDatePickerProps) => {
       }
     }
   }, []);
+
+  useFlatpickrTheme();
 
   return (
     <div className="flatpickr-range-custom">

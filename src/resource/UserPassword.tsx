@@ -19,8 +19,13 @@ export const UserPassword: React.FC<UserPasswordProps> = (props) => {
           showPassword ? translate('Hide password') : translate('Show password')
         }
         onClick={toggle}
+        data-testid="toggle-password"
       >
-        {showPassword ? <EyeSlash size={17} /> : <Eye size={17} />}
+        {showPassword ? (
+          <EyeSlash size={17} data-testid="eye-slash" />
+        ) : (
+          <Eye size={17} data-testid="eye" />
+        )}
         &nbsp;
       </button>
       {showPassword ? props.password : '***************'}

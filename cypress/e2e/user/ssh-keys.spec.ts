@@ -62,7 +62,7 @@ describe('SSH Keys', () => {
         .contains('button', 'Remove')
         .click();
       cy.get('.modal-footer').should('be.visible');
-      cy.contains('.modal-footer button', 'Yes').click();
+      cy.contains('.modal-footer button', 'Delete').click();
     });
     cy.get("[data-testid='notification']").contains(successKeyRemoved);
   });

@@ -10,16 +10,20 @@ import {
   UsageReport,
   UsageReportRequest,
 } from '@waldur/marketplace/resources/usage/types';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
+import { useTable } from '@waldur/table/useTable';
 
 import { FORM_ID, ResourceUsageFilter } from './ResourceUsageFilter';
 
 const UsageExpandableRow = ({ row }) => (
-  <p>
-    <strong>{translate('Comment')}</strong>: {row.description || 'N/A'}
-  </p>
+  <ExpandableContainer>
+    <p>
+      <strong>{translate('Comment')}</strong>: {row.description || 'N/A'}
+    </p>
+  </ExpandableContainer>
 );
 
 export const ResourceUsageList: FC = () => {
@@ -43,7 +47,7 @@ export const ResourceUsageList: FC = () => {
       export: 'project_name',
     },
     {
-      title: translate('Offering type'),
+      title: translate('Offering'),
       render: ({ row }) => <>{row.offering_name}</>,
       filter: 'offering',
       export: 'offering_name',

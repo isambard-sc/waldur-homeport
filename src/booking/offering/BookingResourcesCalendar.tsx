@@ -1,9 +1,11 @@
+import { Calendar } from '@phosphor-icons/react';
 import { FunctionComponent, useMemo, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Flatpickr from 'react-flatpickr';
 
 import { getTimeOptions } from '@waldur/booking/utils';
 import { parseDate } from '@waldur/core/dateUtils';
+import { useFlatpickrTheme } from '@waldur/form/useFlatpickrTheme';
 import { translate } from '@waldur/i18n';
 
 import { BookingResource } from '../types';
@@ -51,6 +53,8 @@ export const BookingResourcesCalendar: FunctionComponent<
     });
   }, [dates, bookingResources]);
 
+  useFlatpickrTheme();
+
   return (
     <Row className="booking-resource-items-calendar mb-10">
       <Col md="auto">
@@ -81,7 +85,7 @@ export const BookingResourcesCalendar: FunctionComponent<
               ))}
             </ul>
             <ul className="timeline-list-lines">
-              {Array.from(new Array(25)).map((_, i) => (
+              {Array.from({ length: 25 }).map((_, i) => (
                 <hr key={i} />
               ))}
             </ul>
@@ -100,7 +104,7 @@ export const BookingResourcesCalendar: FunctionComponent<
       ) : (
         <Col className="p-4 text-center">
           <div className="pt-10 pb-5">
-            <i className="fa fa-calendar display-5" />
+            <Calendar className="display-5" />
           </div>
           <div className="pb-15 fw-bold">
             <h3 className="text-gray-600 fs-5 mb-2">

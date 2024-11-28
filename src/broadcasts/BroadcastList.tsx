@@ -3,8 +3,9 @@ import { FunctionComponent } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { BroadcastCreateButton } from './BroadcastCreateButton';
 import { BroadcastExpandableRow } from './BroadcastExpandableRow';
@@ -12,11 +13,23 @@ import { BroadcastSendButton } from './BroadcastSendButton';
 import { BroadcastUpdateButton } from './BroadcastUpdateButton';
 import { BroadcastResponseData } from './types';
 
+const mandatoryFields = [
+  'uuid',
+  'author_full_name',
+  'subject',
+  'state',
+  'created',
+  'body',
+  'query',
+  'send_at',
+];
+
 export const BroadcastList: FunctionComponent<{}> = () => {
   const props = useTable({
     table: 'broadcast',
     fetchData: createFetcher('broadcast-messages'),
     queryField: 'subject',
+    mandatoryFields,
   });
   return (
     <Table
@@ -43,11 +56,13 @@ export const BroadcastList: FunctionComponent<{}> = () => {
               label={row.state}
               variant={
                 row.state === 'DRAFT'
-                  ? 'dark'
+                  ? 'default'
                   : row.state === 'SENT'
                     ? 'success'
                     : 'info'
               }
+              outline
+              pill
             />
           ),
         },

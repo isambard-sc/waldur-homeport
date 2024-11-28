@@ -9,12 +9,13 @@ import {
   TABLE_OFFERING_RESOURCE,
 } from '@waldur/marketplace/details/constants';
 import { PublicResourceLink } from '@waldur/marketplace/resources/list/PublicResourceLink';
-import { PublicResourceActions } from '@waldur/marketplace/resources/usage/PublicResourceActions';
 import { Offering } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
+import { useTable } from '@waldur/table/useTable';
 
+import { ProviderResourceActions } from '../resources/list/ProviderResourceActions';
 import { ResourceStateField } from '../resources/list/ResourceStateField';
 import { NON_TERMINATED_STATES } from '../resources/list/ResourceStateFilter';
 
@@ -49,7 +50,7 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
   }, [ownProps.offering, filterValues]);
   const tableProps = useTable({
     table: TABLE_OFFERING_RESOURCE,
-    fetchData: createFetcher('marketplace-resources'),
+    fetchData: createFetcher('marketplace-provider-resources'),
     filter,
     queryField: 'query',
   });
@@ -57,6 +58,7 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
     {
       title: translate('Name'),
       render: PublicResourceLink,
+      copyField: (row) => row.name || row.offering_name,
       orderField: 'name',
       export: 'name',
     },
@@ -106,7 +108,9 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
       initialPageSize={5}
       hasQuery={true}
       showPageSizeSelector={true}
-      rowActions={PublicResourceActions}
+      rowActions={({ row }) => (
+        <ProviderResourceActions resource={row} refetch={tableProps.fetch} />
+      )}
       filters={<OfferingResourcesFilter />}
     />
   );

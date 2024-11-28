@@ -1,19 +1,20 @@
-import { Check, X } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { Badge } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 
+import { BooleanBadge } from '@waldur/core/BooleanBadge';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
 import { ProjectLink } from '@waldur/project/ProjectLink';
-import { Table, createFetcher } from '@waldur/table';
-import { TableProps } from '@waldur/table/Table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { CostPolicyCreateButton } from './CostPolicyCreateButton';
 import { CostPolicyDeleteButton } from './CostPolicyDeleteButton';
+import { CostPolicyEditButton } from './CostPolicyEditButton';
 import { getCostPolicyActionOptions } from './utils';
 
 const filtersSelector = createSelector(getCustomer, (customer) => {
@@ -50,13 +51,13 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
           title: translate('Project'),
           render: ({ row }) => (
             <ProjectLink
-              row={{ ...row, name: row.scope_name, uuid: row.scope_uuid }}
+              row={{
+                is_industry: row.is_industry,
+                name: row.scope_name,
+                uuid: row.scope_uuid,
+              }}
             />
           ),
-        },
-        {
-          title: translate('Cost threshold'),
-          render: ({ row }) => <>{defaultCurrency(row.limit_cost)}</>,
         },
         {
           title: translate('Action'),
@@ -72,27 +73,24 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
         },
         {
           title: translate('Has fired'),
+          render: ({ row }) => <BooleanBadge value={row.has_fired} />,
+        },
+        {
+          title: translate('Organization credit'),
           render: ({ row }) =>
-            row.has_fired === true ? (
-              <Badge
-                bg={null}
-                className="fs-8 fw-bolder lh-base badge-light-danger badge-pill"
-              >
-                <X size={12} className="text-danger me-2" />
-                {translate('No')}
-              </Badge>
-            ) : (
-              <Badge
-                bg={null}
-                className="fs-8 fw-bolder lh-base badge-light-success badge-pill"
-              >
-                <Check size={12} className="text-success me-2" />
-                {translate('Yes')}
-              </Badge>
-            ),
+            row.customer_credit ? defaultCurrency(row.customer_credit) : 'N/A',
+        },
+        {
+          title: translate('Project credit'),
+          render: ({ row }) =>
+            row.project_credit ? defaultCurrency(row.project_credit) : 'N/A',
+        },
+        {
+          title: translate('Cost threshold'),
+          render: ({ row }) => <>{defaultCurrency(row.limit_cost)}</>,
         },
         !hideColumns.includes('price_estimate') && {
-          title: translate('Project estimated current cost'),
+          title: translate('Project estimated cost'),
           render: ({ row }) => (
             <>
               {defaultCurrency(
@@ -107,11 +105,18 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
       verboseName={translate('Cost policies')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       rowActions={({ row }) => (
-        <CostPolicyDeleteButton
-          row={row}
-          type="project"
-          refetch={tableProps.fetch}
-        />
+        <>
+          <CostPolicyEditButton
+            row={row}
+            type="project"
+            refetch={tableProps.fetch}
+          />
+          <CostPolicyDeleteButton
+            row={row}
+            type="project"
+            refetch={tableProps.fetch}
+          />
+        </>
       )}
       hasQuery={true}
       showPageSizeSelector={true}

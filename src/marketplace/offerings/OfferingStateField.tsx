@@ -4,7 +4,18 @@ import { Offering } from '../types';
 
 import { ACTIVE, ARCHIVED, DRAFT, PAUSED } from './store/constants';
 
-export const OfferingStateField = ({ offering }: { offering: Offering }) => {
+interface OfferingStateFieldProps {
+  offering: Offering;
+  mode?: 'light' | 'outline';
+  hasBullet?: boolean;
+}
+
+export const OfferingStateField = ({
+  offering,
+  mode = 'light',
+  hasBullet,
+}: OfferingStateFieldProps) => {
+  const disabled = [DRAFT, ARCHIVED].includes(offering.state);
   return (
     <StateIndicator
       label={offering.state}
@@ -13,10 +24,12 @@ export const OfferingStateField = ({ offering }: { offering: Offering }) => {
           [DRAFT]: 'light',
           [ACTIVE]: 'success',
           [PAUSED]: 'warning',
-          [ARCHIVED]: 'dark',
+          [ARCHIVED]: 'light',
         }[offering.state]
       }
-      light
+      light={mode === 'light' && !disabled}
+      outline={mode === 'outline' && !disabled}
+      hasBullet={hasBullet}
       pill
     />
   );

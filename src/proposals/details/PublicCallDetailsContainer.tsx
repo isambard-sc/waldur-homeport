@@ -8,7 +8,7 @@ import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import { getPublicCall } from '../api';
 import { getCallBreadcrumbItems } from '../utils';
@@ -16,21 +16,25 @@ import { getCallBreadcrumbItems } from '../utils';
 import { CallTabs } from './CallTabs';
 import { PublicCallDetailsHero } from './PublicCallDetailsHero';
 
-const CallDescriptionCard = lazyComponent(
-  () => import('./CallDescriptionCard'),
-  'CallDescriptionCard',
+const CallDescriptionCard = lazyComponent(() =>
+  import('./CallDescriptionCard').then((module) => ({
+    default: module.CallDescriptionCard,
+  })),
 );
-const CallDocumentsCard = lazyComponent(
-  () => import('./CallDocumentsCard'),
-  'CallDocumentsCard',
+const CallDocumentsCard = lazyComponent(() =>
+  import('./CallDocumentsCard').then((module) => ({
+    default: module.CallDocumentsCard,
+  })),
 );
-const CallOfferingsCard = lazyComponent(
-  () => import('./CallOfferingsCard'),
-  'CallOfferingsCard',
+const CallOfferingsCard = lazyComponent(() =>
+  import('./CallOfferingsCard').then((module) => ({
+    default: module.CallOfferingsCard,
+  })),
 );
-const CallRoundsList = lazyComponent(
-  () => import('./CallRoundsList'),
-  'CallRoundsList',
+const CallRoundsList = lazyComponent(() =>
+  import('./CallRoundsList').then((module) => ({
+    default: module.CallRoundsList,
+  })),
 );
 
 const tabs: PageBarTab[] = [
@@ -58,7 +62,7 @@ const tabs: PageBarTab[] = [
 
 const PageHero = ({ call }) =>
   call ? (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       <CallTabs call={call} />
       <PublicCallDetailsHero call={call} />
     </div>
@@ -95,8 +99,8 @@ export const PublicCallDetailsContainer: FunctionComponent = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refresh={refreshCall}
           call={value}
           tabSpec={tabSpec}

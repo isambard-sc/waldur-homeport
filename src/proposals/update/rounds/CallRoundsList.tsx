@@ -2,11 +2,14 @@ import { FC } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
+import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { Call, Round } from '@waldur/proposals/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { getRoundStatus } from '@waldur/proposals/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { RoundCreateButton } from './RoundCreateButton';
 import { RoundExpandableRow } from './RoundExpandableRow';
@@ -21,14 +24,24 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
     fetchData: createFetcher(
       `proposal-protected-calls/${props.call.uuid}/rounds`,
     ),
-    queryField: 'name',
   });
+
+  const renderRoundState = (row: Round) => {
+    const roundState = getRoundStatus(row);
+    return (
+      <StateIndicator
+        label={roundState.label}
+        variant={roundState.color}
+        outline
+        pill
+      />
+    );
+  };
 
   return (
     <Table<Round>
       {...tableProps}
       id="rounds"
-      className="mb-7"
       columns={[
         {
           title: translate('Round name'),
@@ -64,7 +77,7 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
         },
         {
           title: translate('State'),
-          render: () => <>-</>,
+          render: ({ row }) => renderRoundState(row),
         },
       ]}
       title={
@@ -74,7 +87,6 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
         </>
       }
       verboseName={translate('Rounds')}
-      hasQuery={true}
       tableActions={
         <RoundCreateButton call={props.call} refetch={tableProps.fetch} />
       }

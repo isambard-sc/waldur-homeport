@@ -13,7 +13,7 @@ const KubeconfigFilePanel = (props) => {
     <>
       <p>{translate('Put this into ~/.kube/config:')}</p>
       <pre style={{ height: 200 }}>{props.config}</pre>
-      <CopyToClipboard value={props.config} />
+      <CopyToClipboard value={props.config} textButton className="my-2" />
       <p>
         <a
           href="https://kubernetes.io/docs/tasks/tools/install-kubectl/"

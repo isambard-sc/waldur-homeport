@@ -8,11 +8,18 @@ import { SubmitReportAction } from '@waldur/marketplace/resources/report/SubmitR
 import { SetBackendIdAction } from '@waldur/marketplace/resources/SetBackendIdAction';
 import { SetSlugAction } from '@waldur/marketplace/resources/SetSlugAction';
 import { TerminateAction } from '@waldur/marketplace/resources/terminate/TerminateAction';
+import { CreateRobotAccountAction } from '@waldur/marketplace/robot-accounts/CreateRobotAccountAction';
+import { SetErredActionItem } from '@waldur/resource/actions/SetErredActionItem';
 import { UnlinkActionItem } from '@waldur/resource/actions/UnlinkActionItem';
 
 import { ChangeLimitsAction } from '../change-limits/ChangeLimitsAction';
+import { ResourceDetailsAction } from '../details/popup/ResourceDetailsAction';
+import { ReportUsageAction } from '../list/ReportUsageAction';
+import { ShowUsageAction } from '../list/ShowUsageAction';
 
 import { EditAction } from './EditAction';
+import { EditResourceEndDateByProviderAction } from './EditResourceEndDateByProviderAction';
+import { EditResourceEndDateByStaffAction } from './EditResourceEndDateByStaffAction';
 
 export const ActionsList = [
   EditAction,
@@ -25,7 +32,37 @@ export const ActionsList = [
   SetSlugAction,
   TerminateAction,
   UnlinkActionItem,
+  SetErredActionItem,
   EditResourceEndDateAction,
   SyncResourceAction,
   CreateLexisLinkAction,
+];
+
+export const CustomerResourceActions = [
+  EditAction,
+  ShowReportAction,
+  ChangePlanAction,
+  ChangeLimitsAction,
+  EditResourceEndDateAction,
+  SyncResourceAction,
+  TerminateAction,
+];
+
+export const ProviderActionsList = [
+  ShowUsageAction,
+  ReportUsageAction,
+  SetBackendIdAction,
+  SubmitReportAction,
+  CreateLexisLinkAction,
+  CreateRobotAccountAction,
+  SetErredActionItem,
+  EditResourceEndDateByProviderAction,
+  ResourceDetailsAction,
+];
+
+export const StaffActions = [
+  UnlinkActionItem,
+  MoveResourceAction,
+  SetSlugAction,
+  EditResourceEndDateByStaffAction,
 ];

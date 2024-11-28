@@ -1,14 +1,14 @@
+import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { mount } from 'enzyme';
 import React from 'react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { actWait, updateWrapper } from '@waldur/core/testUtils';
 import { Await } from '@waldur/core/types';
 import { SET_TITLE } from '@waldur/navigation/title';
 
-jest.mock('./api');
+vi.mock('./api');
 
 import { AnswersSummary } from './AnswersSummary';
 import { AnswersTable } from './AnswersTable';
@@ -17,25 +17,25 @@ import * as fixtures from './fixtures';
 import { PieChart } from './PieChart';
 import { UserChecklist } from './UserChecklist';
 
-const apiMock = api as jest.Mocked<typeof api>;
+const apiMock = vi.mocked(api);
 
-jest.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/configs/default', () => ({
   ENV: 'localhost',
 }));
 
-jest.mock('@waldur/core/EChart', () => ({
-  EChart: jest.fn(() => null),
+vi.mock('@waldur/core/EChart', () => ({
+  EChart: vi.fn(() => null),
 }));
 
-jest.mock('@uirouter/react', () => ({
+vi.mock('@uirouter/react', () => ({
   useCurrentStateAndParams: jest
     .fn()
     .mockReturnValue({ params: { category: 'mock-category' } }),
-  UISref: jest.fn(() => null),
+  UISref: vi.fn(() => null),
 }));
 
-jest.mock('@waldur/i18n', () => ({
-  translate: jest.fn().mockImplementation((arg) => arg),
+vi.mock('@waldur/i18n', () => ({
+  translate: vi.fn().mockImplementation((arg) => arg),
 }));
 
 const initialExpectAnswers = {

@@ -1,8 +1,9 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const AllocationUsersTable: FunctionComponent<{ resourceScope }> = ({
   resourceScope,

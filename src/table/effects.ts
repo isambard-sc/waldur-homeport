@@ -1,13 +1,13 @@
-import { concat, uniq } from 'lodash';
+import { concat, uniq } from 'lodash-es';
 import {
   delay,
   call,
   put,
   select,
-  takeEvery,
   take,
   race,
   cancelled,
+  takeEvery,
 } from 'redux-saga/effects';
 
 import { takeLatestPerKey } from '@waldur/core/effects';
@@ -15,13 +15,12 @@ import { orderByFilter } from '@waldur/core/utils';
 import { transformRows } from '@waldur/table/utils';
 
 import * as actions from './actions';
-import { exportTable } from './export';
 import { getTableOptions } from './registry';
-import { getTableState } from './store';
+import { getTableState } from './selectors';
 import { TableRequest } from './types';
 
 function* fetchList(action) {
-  const { table, extraFilter, pullInterval } = action.payload;
+  const { table, extraFilter, pullInterval, force } = action.payload;
   const controller = new AbortController();
   try {
     const state = yield select(getTableState(table));
@@ -34,6 +33,9 @@ function* fetchList(action) {
         .filter(Boolean)
         .flat();
       fields = uniq(concat(customFields, activeFields));
+    }
+    if (options.mandatoryFields) {
+      fields = uniq(concat(fields, options.mandatoryFields));
     }
 
     const request: TableRequest = {
@@ -51,7 +53,7 @@ function* fetchList(action) {
       request.filter.o = orderByFilter(state.sorting);
     }
     request.options = { signal: controller.signal };
-    if (options.staleTime) {
+    if (options.staleTime && !force) {
       request.options.staleTime = options.staleTime;
     }
 
@@ -93,11 +95,20 @@ function* fetchList(action) {
   }
 }
 
+function* fireOnApplyFilters(action) {
+  const { table, apply } = action.payload;
+  const state = yield select(getTableState(table));
+  const { onApplyFilter } = getTableOptions(table);
+  if (apply && onApplyFilter) {
+    onApplyFilter(state.filtersStorage);
+  }
+}
+
 export default function* watchFetchList() {
   yield takeLatestPerKey(
     actions.FETCH_LIST_START,
     fetchList,
     ({ payload: { table } }) => table,
   );
-  yield takeEvery(actions.EXPORT_TABLE_AS, exportTable);
+  yield takeEvery(actions.APPLY_FILTERS, fireOnApplyFilters);
 }

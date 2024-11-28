@@ -18,6 +18,7 @@ export const DeleteImageButton = ({ row }) => {
         dispatch,
         translate('Confirmation'),
         translate('Are you sure you want to delete the image?'),
+        true,
       );
     } catch {
       return;

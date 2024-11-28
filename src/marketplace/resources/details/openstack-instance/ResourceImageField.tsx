@@ -11,9 +11,9 @@ const getImageInfo = (imageName: string) => {
   );
   if (image) {
     // Extract the version from the image name
-    /* eslint-disable no-useless-escape */
+
     const version = imageName
-      .replace(new RegExp(`.*${image.name}\D*`, 'gi'), '')
+      .replace(new RegExp(`.*${image.name}\\D*`, 'gi'), '')
       .trim();
 
     return {

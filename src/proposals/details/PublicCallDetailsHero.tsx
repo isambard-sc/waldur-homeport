@@ -25,6 +25,7 @@ export const PublicCallDetailsHero: FC<PublicCallDetailsHeroProps> = ({
     <PublicDashboardHero2
       logo={undefined}
       logoAlt={call.name}
+      cardBordered
       title={
         <>
           <div className="d-flex flex-wrap gap-2 mb-2 align-items-center">
@@ -32,7 +33,7 @@ export const PublicCallDetailsHero: FC<PublicCallDetailsHeroProps> = ({
             <StateIndicator
               variant={status.color}
               label={status.label}
-              light
+              outline
               pill
             />
           </div>

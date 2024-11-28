@@ -5,7 +5,7 @@ import { format } from '@waldur/core/ErrorMessageFormatter';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 
-import { AuthService } from './AuthService';
+import * as AuthService from './AuthService';
 import { InputGroup } from './InputGroup';
 
 interface FormData {

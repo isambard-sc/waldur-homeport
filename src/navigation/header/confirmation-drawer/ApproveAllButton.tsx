@@ -49,17 +49,12 @@ export const ApproveAllButton: React.FC<ApproveAllButtonProps> = (props) => {
     setLoading(false);
   }, [setLoading, dispatch, props.orders]);
   return (
-    <Button
-      variant="primary"
-      className="me-4"
-      onClick={handler}
-      disabled={loading}
-    >
+    <Button variant="primary" onClick={handler} disabled={loading}>
       {loading ? (
         <LoadingSpinnerIcon />
       ) : (
         <span className="svg-icon svg-icon-2">
-          <Check />
+          <Check weight="bold" />
         </span>
       )}
       {translate('Approve all')}

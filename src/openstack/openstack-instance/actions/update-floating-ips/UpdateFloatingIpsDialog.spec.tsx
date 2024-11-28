@@ -9,9 +9,9 @@ import {
   fakeInstance,
 } from './UpdateFloatingIpsDialog.fixture';
 
-jest.mock('@waldur/openstack/api');
+vi.mock('@waldur/openstack/api');
 
-const apiMock = api as jest.Mocked<typeof api>;
+const apiMock = vi.mocked(api);
 
 describe('UpdateFloatingIpsDialog', () => {
   let store: Store;
@@ -61,7 +61,7 @@ describe('UpdateFloatingIpsDialog', () => {
   it('renders placeholder if instance is not connected to internal IPs', async () => {
     const dialog = new DialogFixture(store, {
       ...fakeInstance,
-      internal_ips_set: [],
+      ports: [],
     });
     await dialog.render();
     await dialog.update();
@@ -156,10 +156,9 @@ describe('UpdateFloatingIpsDialog', () => {
     await dialog.update();
 
     // Act
-    const subnet =
-      '/api/openstacktenant-subnets/7350f289a6d14e4bbd780ee59b2899e6/';
+    const subnet = '/api/openstack-subnets/7350f289a6d14e4bbd780ee59b2899e6/';
     const floating_ip =
-      '/api/openstacktenant-floating-ips/377b9ffae7c24783a204ec37c505710c/';
+      '/api/openstack-floating-ips/377b9ffae7c24783a204ec37c505710c/';
     dialog.deleteRow();
     dialog.addRow();
     dialog.subnet = subnet;

@@ -31,9 +31,10 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
 
   const isValidUser = useMemo(
     () =>
-      user &&
-      !UsersService.mandatoryFieldsMissing(user) &&
-      Boolean(user.agreement_date),
+      (user &&
+        !UsersService.mandatoryFieldsMissing(user) &&
+        Boolean(user.agreement_date)) ||
+      user?.is_staff,
     [user],
   );
 
@@ -44,7 +45,7 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
   ) : error ? (
     <LoadingErred loadData={refetch} />
   ) : (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       <Tabs
         defaultActiveKey={
           state.name === 'profile-manage' || !showViewTab
@@ -60,14 +61,14 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
             title={translate('View')}
             disabled={!isValidUser}
             tabClassName={
-              'text-center w-60px' + (isValidUser ? '' : ' opacity-50')
+              'text-center min-w-60px' + (isValidUser ? '' : ' opacity-50')
             }
           />
         )}
         <Tab
           eventKey="profile-manage"
           title={translate('Edit')}
-          tabClassName="text-center w-60px"
+          tabClassName="text-center min-w-60px"
         />
       </Tabs>
       <UserProfile user={user} />

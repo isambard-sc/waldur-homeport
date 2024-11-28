@@ -4,21 +4,21 @@ import { getById } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { UpdateFloatingIpsActionButton } from '@waldur/openstack/openstack-instance/actions/update-floating-ips/UpdateFloatingIpsActionButton';
 import { VirtualMachine } from '@waldur/resource/types';
-import { Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
-export const FloatingIpsList: FunctionComponent<{ resourceScope }> = ({
+export const FloatingIpsList: FunctionComponent<{ resourceScope; refetch }> = ({
   resourceScope,
+  refetch,
 }) => {
   const fetchData = useCallback(
     () =>
-      getById<VirtualMachine>(
-        '/openstacktenant-instances/',
-        resourceScope.uuid,
-      ).then((vm) => ({
-        rows: vm.floating_ips,
-        resultCount: vm.floating_ips.length,
-      })),
+      getById<VirtualMachine>('/openstack-instances/', resourceScope.uuid).then(
+        (vm) => ({
+          rows: vm.floating_ips,
+          resultCount: vm.floating_ips.length,
+        }),
+      ),
     [resourceScope],
   );
   const props = useTable({
@@ -35,7 +35,7 @@ export const FloatingIpsList: FunctionComponent<{ resourceScope }> = ({
         },
         {
           title: translate('MAC address'),
-          render: ({ row }) => row.internal_ip_mac_address,
+          render: ({ row }) => row.port_mac_address,
         },
         {
           title: translate('Subnet name'),
@@ -47,7 +47,15 @@ export const FloatingIpsList: FunctionComponent<{ resourceScope }> = ({
         },
       ]}
       verboseName={translate('floating IPs')}
-      tableActions={<UpdateFloatingIpsActionButton resource={resourceScope} />}
+      tableActions={
+        <UpdateFloatingIpsActionButton
+          resource={resourceScope}
+          refetch={() => {
+            refetch();
+            props.fetch();
+          }}
+        />
+      }
     />
   );
 };

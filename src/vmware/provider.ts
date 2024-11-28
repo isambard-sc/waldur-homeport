@@ -1,25 +1,14 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { pick } from '@waldur/core/utils';
-import * as ProvidersRegistry from '@waldur/marketplace/offerings/update/integration/registry';
+import icon from '@waldur/images/appstore/icon-vmware.png';
+import { ProviderConfig } from '@waldur/marketplace/offerings/update/integration/types';
 
-const VMwareForm = lazyComponent(() => import('./VMwareForm'), 'VMwareForm');
+const VMwareForm = lazyComponent(() =>
+  import('./VMwareForm').then((module) => ({ default: module.VMwareForm })),
+);
 
-const serializer = pick([
-  'backend_url',
-  'username',
-  'password',
-  'default_cluster_label',
-  'max_cpu',
-  'max_ram',
-  'max_disk',
-  'max_disk_total',
-]);
-
-ProvidersRegistry.register({
+export const VMwareProviderConfig: ProviderConfig = {
   name: 'VMware',
   type: 'VMware',
-  icon: 'icon-vmware.png',
-  endpoint: 'vmware',
+  icon,
   component: VMwareForm,
-  serializer,
-});
+};

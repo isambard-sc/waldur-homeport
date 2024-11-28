@@ -1,6 +1,7 @@
 import { ErrorBoundary } from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { UIView } from '@uirouter/react';
+import { UIRouter, UIView } from '@uirouter/react';
+import { AxiosError } from 'axios';
 import { FunctionComponent } from 'react';
 import { Provider } from 'react-redux';
 import { useAsync } from 'react-use';
@@ -15,10 +16,23 @@ import { LoadingScreen } from './LoadingScreen';
 import { LayoutProvider } from './metronic/layout/core';
 import { MasterInit } from './metronic/layout/MasterInit';
 import { NotificationContainer } from './NotificationContainer';
-import { ThemeSelector } from './ThemeSelector';
-import { UIRouter } from './UIRouter';
+import { router } from './router';
+import { states } from './states';
+import { ThemeProvider } from './theme/ThemeProvider';
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      onError: (error) => {
+        if ((error as AxiosError)?.response?.status == 404) {
+          router.stateService.go('errorPage.notFound');
+        }
+      },
+    },
+  },
+});
+
+states.forEach((state) => router.stateRegistry.register(state));
 
 export const Application: FunctionComponent = () => {
   const { loading, error, value } = useAsync(loadConfig);
@@ -28,20 +42,21 @@ export const Application: FunctionComponent = () => {
 
   return (
     <ErrorBoundary fallback={ErrorMessage}>
-      <QueryClientProvider client={queryClient}>
-        <Provider store={store}>
-          <LayoutProvider>
-            <ThemeSelector />
-            <NotificationContainer />
-            <UIRouter>
-              <ModalRoot />
-              <DrawerRoot />
-              <UIView />
-            </UIRouter>
-            <MasterInit />
-          </LayoutProvider>
-        </Provider>
-      </QueryClientProvider>
+      <UIRouter router={router}>
+        <QueryClientProvider client={queryClient}>
+          <Provider store={store}>
+            <LayoutProvider>
+              <ThemeProvider>
+                <NotificationContainer />
+                <ModalRoot />
+                <DrawerRoot />
+                <UIView />
+                <MasterInit />
+              </ThemeProvider>
+            </LayoutProvider>
+          </Provider>
+        </QueryClientProvider>
+      </UIRouter>
     </ErrorBoundary>
   );
 };

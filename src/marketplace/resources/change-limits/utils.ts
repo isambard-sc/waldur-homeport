@@ -1,15 +1,14 @@
 import {
   getPublicOffering,
   getResource,
-  getPlan,
+  getPublicPlan,
 } from '@waldur/marketplace/common/api';
 import {
   getFormLimitSerializer,
   getFormLimitParser,
-  LimitParser,
-  Limits,
   filterOfferingComponents,
 } from '@waldur/marketplace/common/registry';
+import { LimitParser, Limits } from '@waldur/marketplace/common/types';
 import { getBillingPeriods } from '@waldur/marketplace/common/utils';
 import { parseOfferingLimits } from '@waldur/marketplace/offerings/store/limits';
 import { OfferingLimits } from '@waldur/marketplace/offerings/store/types';
@@ -32,7 +31,7 @@ export interface FetchedData {
 export async function loadData(resource_uuid): Promise<FetchedData> {
   const resource = await getResource(resource_uuid);
   const offering = await getPublicOffering(resource.offering_uuid);
-  const plan = await getPlan(resource.plan_uuid);
+  const plan = await getPublicPlan(resource.plan_uuid, resource.offering_uuid);
   const limitParser = getFormLimitParser(offering.type);
   const limitSerializer = getFormLimitSerializer(offering.type);
   const components = filterOfferingComponents(offering).filter(

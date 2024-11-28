@@ -34,7 +34,7 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
   }, [round]);
 
   return (
-    <Card id="submission" className="mb-7">
+    <Card id="submission" className="card-bordered">
       <Card.Header>
         <Card.Title>
           {translate('Submission strategy')}
@@ -57,7 +57,6 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
               : round.start_time
           }
           className="col-12 col-md-6"
-          floating
         />
         <ReadOnlyFormControl
           label={translate('Cutoff date')}
@@ -67,7 +66,6 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
               : round.cutoff_time
           }
           className="col-12 col-md-6"
-          floating
         />
         {translate('Duration')}: {duration || '-'}
       </Card.Body>

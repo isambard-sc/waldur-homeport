@@ -1,22 +1,39 @@
-import { FC, useMemo } from 'react';
+import { FC } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { TableProps } from '@waldur/table/Table';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 
 import { OrderProviderActions } from '../actions/OrderProviderActions';
 
 import { OrdersListExpandableRow } from './OrdersListExpandableRow';
-import { OrderTablePlaceholder } from './OrderTablePlaceholder';
+import { OrderTablePlaceholderActions } from './OrderTablePlaceholderActions';
+import { OrderTypeCell } from './OrderTypeCell';
 
 interface OrdersTableComponentProps extends Partial<TableProps> {
   table: string;
   hideColumns?: 'organization'[];
 }
+
+const mandatoryFields = [
+  'uuid',
+  // Row actions
+  'state',
+  // Expandable row
+  'project_description',
+  'customer_uuid',
+  'project_uuid',
+  'offering_name',
+  'attributes',
+  'resource_name',
+  'type',
+  'plan_name',
+];
 
 export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
   table,
@@ -24,24 +41,12 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
   hideColumns = [],
   ...rest
 }) => {
-  const tableFilter = useMemo(() => {
-    return {
-      field: [
-        'uuid',
-        'project_description',
-        'resource_name',
-        'type',
-        'plan_name',
-        'offering_name',
-      ],
-      ...filter,
-    };
-  }, [filter]);
   const props = useTable({
     table,
     fetchData: createFetcher('marketplace-orders'),
-    filter: tableFilter,
+    filter,
     queryField: 'query',
+    mandatoryFields,
   });
   const columns = [
     {
@@ -50,11 +55,12 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
         <Link
           state="marketplace-orders.details"
           params={{ order_uuid: row.uuid }}
-          label={row.attributes.name}
+          label={row.attributes.name || row.uuid}
         />
       ),
       keys: ['attributes'],
       id: 'name',
+      copyField: (row) => row.attributes.name,
       export: (row) => row.attributes.name,
     },
     {
@@ -79,6 +85,13 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       keys: ['state'],
       filter: 'state',
       id: 'state',
+    },
+    {
+      title: translate('Type'),
+      render: OrderTypeCell,
+      keys: ['type'],
+      filter: 'type',
+      id: 'type',
     },
     {
       title: translate('Project'),
@@ -127,7 +140,7 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
     <Table
       {...props}
       columns={columns}
-      placeholderComponent={<OrderTablePlaceholder />}
+      placeholderActions={<OrderTablePlaceholderActions />}
       verboseName={translate('Orders')}
       hasQuery={true}
       showPageSizeSelector={true}
@@ -135,7 +148,7 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       enableExport={true}
       expandableRow={OrdersListExpandableRow}
       rowActions={({ row }) => (
-        <OrderProviderActions row={row} refetch={props.fetch} />
+        <OrderProviderActions order={row} refetch={props.fetch} />
       )}
       hasOptionalColumns
       {...rest}

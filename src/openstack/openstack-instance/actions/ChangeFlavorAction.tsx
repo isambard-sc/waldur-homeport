@@ -1,3 +1,5 @@
+import { Swap } from '@phosphor-icons/react';
+
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
@@ -8,9 +10,10 @@ import {
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
-const ChangeFlavorDialog = lazyComponent(
-  () => import('./ChangeFlavorDialog'),
-  'ChangeFlavorDialog',
+const ChangeFlavorDialog = lazyComponent(() =>
+  import('./ChangeFlavorDialog').then((module) => ({
+    default: module.ChangeFlavorDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {
@@ -32,5 +35,6 @@ export const ChangeFlavorAction: ActionItemType = ({ resource, refetch }) => (
     validators={validators}
     resource={resource}
     extraResolve={{ refetch }}
+    iconNode={<Swap />}
   />
 );

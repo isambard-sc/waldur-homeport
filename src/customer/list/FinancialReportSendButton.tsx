@@ -6,9 +6,10 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ExportAsEmailDialog = lazyComponent(
-  () => import('./ExportAsEmailDialog'),
-  'ExportAsEmailDialog',
+const ExportAsEmailDialog = lazyComponent(() =>
+  import('./ExportAsEmailDialog').then((module) => ({
+    default: module.ExportAsEmailDialog,
+  })),
 );
 
 export const FinancialReportSendButton = () => {
@@ -17,7 +18,8 @@ export const FinancialReportSendButton = () => {
   return (
     <Button
       onClick={() => dispatch(openModalDialog(ExportAsEmailDialog))}
-      variant="light"
+      variant="outline-default"
+      className="btn-outline"
     >
       <span className="svg-icon svg-icon-2">
         <Share />

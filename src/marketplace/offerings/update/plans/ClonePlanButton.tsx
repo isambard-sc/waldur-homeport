@@ -9,9 +9,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { ADD_PLAN_FORM_ID } from './constants';
 
-const ClonePlanDialog = lazyComponent(
-  () => import('./AddPlanDialog'),
-  'AddPlanDialog',
+const ClonePlanDialog = lazyComponent(() =>
+  import('./AddPlanDialog').then((module) => ({
+    default: module.AddPlanDialog,
+  })),
 );
 
 export const ClonePlanButton: FunctionComponent<{

@@ -31,3 +31,6 @@
   transform: translateX(-50%);
   height: 270px;
 }
+.modal .has-icon .btn-close {
+  align-self: start;
+}

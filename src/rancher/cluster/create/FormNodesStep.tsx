@@ -1,4 +1,4 @@
-import { Plus } from '@phosphor-icons/react';
+import { Plus, X } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback } from 'react';
 import { Button, Form, FormCheck } from 'react-bootstrap';
@@ -19,7 +19,11 @@ import { listClusterTemplates } from '@waldur/rancher/api';
 
 import { NODES_FIELD_ARRAY } from './constants';
 import { LonghornWorkerWarning } from './LonghornWorkerWarning';
-import { formTenantSelector, loadFlavors, useVolumeDataLoader } from './utils';
+import {
+  formTenantSelector,
+  filterFlavors,
+  useVolumeDataLoader,
+} from './utils';
 
 import './FormNodesStep.scss';
 
@@ -147,7 +151,9 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                             className="btn-icon btn-active-light-danger"
                             onClick={() => fields.remove(index)}
                           >
-                            <i className="fa fa-times fs-4" />
+                            <span className="svg-icon svg-icon-2">
+                              <X weight="bold" />
+                            </span>
                           </Button>
                         </td>
                       </tr>
@@ -187,8 +193,11 @@ export const FormNodesStep = (props: FormStepProps) => {
     { staleTime: 3 * 60 * 1000 },
   );
   const { data: flavors, isLoading } = useQuery<{}, {}, Flavor[]>(
-    ['nodes-step-flavors', tenant, props.offering.uuid],
-    () => (tenant && props.offering ? loadFlavors(tenant, props.offering) : []),
+    ['nodes-step-flavors', tenant?.url, props.offering.uuid],
+    () =>
+      tenant && props.offering
+        ? filterFlavors(tenant.uuid, props.offering)
+        : [],
     { staleTime: 3 * 60 * 1000 },
   );
 

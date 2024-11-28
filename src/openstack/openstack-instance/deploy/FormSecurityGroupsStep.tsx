@@ -1,5 +1,5 @@
-import { Eye, Plus } from '@phosphor-icons/react';
-import { debounce } from 'lodash';
+import { Eye, Plus, Warning } from '@phosphor-icons/react';
+import { debounce } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
 import { Button, FormControl } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,16 +14,15 @@ import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { openModalDialog } from '@waldur/modal/actions';
 import { SecurityGroup } from '@waldur/openstack/openstack-security-groups/types';
-import { Table, createFetcher } from '@waldur/table';
 import { RowActionButton } from '@waldur/table/ActionButton';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
-const OpenStackSecurityGroupsDialog = lazyComponent(
-  () =>
-    import(
-      '@waldur/openstack/openstack-security-groups/OpenStackSecurityGroupsDialog'
-    ),
-  'OpenStackSecurityGroupsDialog',
+const OpenStackSecurityGroupsDialog = lazyComponent(() =>
+  import(
+    '@waldur/openstack/openstack-security-groups/OpenStackSecurityGroupsDialog'
+  ).then((module) => ({ default: module.OpenStackSecurityGroupsDialog })),
 );
 
 interface ShowSecurityGroupsButtonProps {
@@ -37,7 +36,7 @@ const ShowSecurityGroupsButton = (props: ShowSecurityGroupsButtonProps) => {
     dispatch(
       openModalDialog(OpenStackSecurityGroupsDialog, {
         resolve: { securityGroups: [props.row] },
-        size: 'lg',
+        size: 'xl',
       }),
     );
   };
@@ -84,15 +83,15 @@ export const FormSecurityGroupsStep = (props: FormStepProps) => {
 
   const filter = useMemo(
     () => ({
-      settings_uuid: props.offering.scope_uuid,
+      tenant_uuid: props.offering.scope_uuid,
       name: query ? query : undefined,
     }),
-    [props.offering, query],
+    [props.offering.scope_uuid, query],
   );
 
   const tableProps = useTable({
     table: 'deploy-security-groups',
-    fetchData: createFetcher('openstacktenant-security-groups'),
+    fetchData: createFetcher('openstack-security-groups'),
     onFetch: (rows, _, firstFetch) => {
       if (!firstFetch || !rows?.length) return;
       const defaultItem = rows.find((row) => row?.name === 'default');
@@ -157,10 +156,7 @@ export const FormSecurityGroupsStep = (props: FormStepProps) => {
                     )}
                     id="default_security_group_tooltip"
                   >
-                    <i
-                      className="fa fa-exclamation-triangle"
-                      style={{ color: 'red' }}
-                    />
+                    <Warning className="text-danger" />
                   </Tip>
                 )}
               </>

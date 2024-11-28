@@ -1,3 +1,4 @@
+import { Clock } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ENV } from '@waldur/configs/default';
@@ -11,9 +12,10 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getUser } from '@waldur/workspace/selectors';
 
-const EditResourceEndDateDialog = lazyComponent(
-  () => import('./EditResourceEndDateDialog'),
-  'EditResourceEndDateDialog',
+const EditResourceEndDateDialog = lazyComponent(() =>
+  import('./EditResourceEndDateDialog').then((module) => ({
+    default: module.EditResourceEndDateDialog,
+  })),
 );
 
 interface EditResourceEndDateByProviderActionProps {
@@ -48,6 +50,10 @@ export const EditResourceEndDateByProviderAction = ({
     permission: PermissionEnum.SET_RESOURCE_END_DATE,
     customerId: resource.customer_uuid,
   }) || user.is_support ? (
-    <ActionItem title={translate('Set termination date')} action={callback} />
+    <ActionItem
+      title={translate('Set termination date')}
+      action={callback}
+      iconNode={<Clock />}
+    />
   ) : null;
 };

@@ -1,5 +1,5 @@
 import { Form } from 'react-bootstrap';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 
 import { required } from '@waldur/core/validators';
 import { SecretField, StringField } from '@waldur/form';
@@ -10,7 +10,7 @@ import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 export const ProviderForm = () => (
   <>
     <FormGroup label={translate('Label')} required={true}>
-      <Field name="label" validate={required} component={StringField} />
+      <Field name="label" validate={required} component={StringField as any} />
     </FormGroup>
     <FormGroup
       label={translate('Client ID')}
@@ -19,27 +19,39 @@ export const ProviderForm = () => (
         'ID of application used for OAuth authentication.',
       )}
     >
-      <Field name="client_id" validate={required} component={StringField} />
+      <Field
+        name="client_id"
+        validate={required}
+        component={StringField as any}
+      />
     </FormGroup>
     <FormGroup
       label={translate('Client secret')}
       required={true}
       description={translate('Application secret key.')}
     >
-      <Field name="client_secret" validate={required} component={SecretField} />
+      <Field
+        name="client_secret"
+        validate={required}
+        component={SecretField as any}
+      />
     </FormGroup>
     <FormGroup
       label={translate('Discovery URL')}
       required={true}
       description={translate('The endpoint for endpoint discovery.')}
     >
-      <Field name="discovery_url" validate={required} component={StringField} />
+      <Field
+        name="discovery_url"
+        validate={required}
+        component={StringField as any}
+      />
     </FormGroup>
     <FormGroup
       label={translate('Profile management URL')}
       description={translate('The endpoint for user details management.')}
     >
-      <Field name="management_url" component={StringField} />
+      <Field name="management_url" component={StringField as any} />
     </FormGroup>
     <FormGroup
       label={translate('Protected fields')}
@@ -47,20 +59,27 @@ export const ProviderForm = () => (
         'Enter a comma separated list of fields of the user profile that would be protected from editing in Waldur.',
       )}
     >
-      <Field name="protected_fields" component={StringField} />
+      <Field name="protected_fields" component={StringField as any} />
     </FormGroup>
     <Form.Group className="mb-7">
       <Field
         name="is_active"
-        component={AwesomeCheckboxField}
+        component={AwesomeCheckboxField as any}
         label={translate('Enabled')}
       />
     </Form.Group>
     <Form.Group className="mb-7">
       <Field
         name="verify_ssl"
-        component={AwesomeCheckboxField}
+        component={AwesomeCheckboxField as any}
         label={translate('Verify SSL')}
+      />
+    </Form.Group>
+    <Form.Group className="mb-7">
+      <Field
+        name="enable_post_logout_redirect"
+        component={AwesomeCheckboxField as any}
+        label={translate('Enable post logout redirect')}
       />
     </Form.Group>
   </>

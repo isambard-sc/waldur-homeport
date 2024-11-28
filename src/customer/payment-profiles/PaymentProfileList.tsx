@@ -4,8 +4,9 @@ import { useSelector } from 'react-redux';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { PAYMENT_PROFILES_TABLE } from '@waldur/customer/details/constants';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import {
   getCustomer,
   isStaff as isStaffSelector,
@@ -52,13 +53,16 @@ export const PaymentProfileList: FunctionComponent<{}> = () => {
       title: translate('Name'),
       render: ({ row }) => row.name,
       orderField: 'name',
+      copyField: (row) => row.name,
     },
     {
       title: translate('Status'),
       render: ({ row }) => (
         <StateIndicator
           label={row.is_active ? translate('Enabled') : translate('Disabled')}
-          variant={row.is_active ? 'success' : 'plain'}
+          variant={row.is_active ? 'success' : 'default'}
+          outline
+          pill
         />
       ),
       orderField: 'is_active',

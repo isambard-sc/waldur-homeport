@@ -1,6 +1,7 @@
+import { Factory } from '@phosphor-icons/react';
 import React from 'react';
 import { Props as SelectProps } from 'react-select';
-import { Field } from 'redux-form';
+import { BaseFieldProps, Field } from 'redux-form';
 
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
@@ -13,6 +14,7 @@ interface ProjectFilterProps {
   placeholder?: string;
   isDisabled?: boolean;
   reactSelectProps?: Partial<SelectProps>;
+  validator?: BaseFieldProps['validate'];
 }
 
 const getOptionLabel = (option) => (
@@ -20,7 +22,9 @@ const getOptionLabel = (option) => (
     {option.name}
     {isFeatureVisible(ProjectFeatures.show_industry_flag) &&
       option.is_industry && (
-        <i className="fa fa-industry fa-lg" style={{ marginLeft: '5px' }} />
+        <span className="svg-icon svg-icon-3 ms-3">
+          <Factory />
+        </span>
       )}
   </div>
 );
@@ -28,6 +32,7 @@ const getOptionLabel = (option) => (
 export const ProjectFilter: React.FC<ProjectFilterProps> = (props) => (
   <Field
     name="project"
+    validate={props.validator}
     component={(fieldProps) => (
       <AsyncPaginate
         placeholder={props.placeholder || translate('Select project...')}

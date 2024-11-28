@@ -1,9 +1,9 @@
-import { VirtualMachine, Volume } from '@waldur/resource/types';
+import { BaseResource, VirtualMachine, Volume } from '@waldur/resource/types';
 
 import { SecurityGroup } from '../openstack-security-groups/types';
 
 interface RancherClusterReference {
-  uuid: string;
+  marketplace_uuid: string;
   name: string;
 }
 
@@ -17,6 +17,7 @@ export interface OpenStackInstance extends VirtualMachine {
   hypervisor_hostname?: string;
   rancher_cluster?: RancherClusterReference;
   volumes?: Volume[];
+  tenant_uuid?: string;
 }
 
 export interface Subnet {
@@ -33,13 +34,8 @@ export interface Subnet {
   network_name?: string;
 }
 
-export interface FloatingIp {
-  url: string;
-  uuid: string;
-  settings: string;
+export interface FloatingIp extends BaseResource {
   address: string;
-  runtime_state: string;
-  is_booked: boolean;
   subnet?: string;
   subnet_name?: string;
 }

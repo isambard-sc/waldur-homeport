@@ -9,9 +9,10 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { ROLE_FORM_ID } from './constants';
 
-const AddRoleDialog = lazyComponent(
-  () => import('./AddRoleDialog'),
-  'AddRoleDialog',
+const AddRoleDialog = lazyComponent(() =>
+  import('./AddRoleDialog').then((module) => ({
+    default: module.AddRoleDialog,
+  })),
 );
 
 export const AddRoleButton: FunctionComponent<{

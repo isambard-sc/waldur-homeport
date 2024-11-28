@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Card } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
@@ -7,8 +6,10 @@ import {
   ProposalResource,
   ProposalReview,
 } from '@waldur/proposals/types';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { FieldReviewComments } from '../create-review/FieldReviewComments';
 
@@ -23,20 +24,13 @@ export const ResourceRequestsSummary = ({
   proposal,
   reviews,
 }: ResourceRequestsSummaryProps) => {
-  const filter = useMemo(
-    () => ({
-      proposal_uuid: proposal.uuid,
-    }),
-    [proposal],
-  );
   const tableProps = useTable({
     table: 'ProposalResourcesList',
-    fetchData: createFetcher('proposal-requested-resources'),
-    filter,
+    fetchData: createFetcher(`proposal-proposals/${proposal.uuid}/resources`),
   });
 
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>{translate('Resource requests')}</Card.Title>
       </Card.Header>

@@ -9,8 +9,6 @@ import { translate } from '@waldur/i18n';
 import { getProviderOfferingComponentStats } from '@waldur/marketplace/offerings/expandable/api';
 import { ResourceUsageTabs } from '@waldur/marketplace/resources/usage/ResourceUsageTabs';
 import { Offering } from '@waldur/marketplace/types';
-import { SLURM_PLUGIN } from '@waldur/slurm/constants';
-import { parseSlurmUsage } from '@waldur/slurm/details/utils';
 
 interface OfferingUsageChartProps {
   offering: Offering;
@@ -33,20 +31,15 @@ export const OfferingUsageChart: FunctionComponent<OfferingUsageChartProps> = ({
         end: DateTime.now().endOf('month').toFormat('yyyy-MM'),
       },
     });
-    if (offering.type === SLURM_PLUGIN) {
-      return usages.map(parseSlurmUsage);
-    }
     return usages;
   }, [offering]);
 
   return (
-    <Card className="mb-10">
-      <Card.Header className="border-2 border-bottom">
-        <div className="card-toolbar">
-          <Card.Title className="h5">
-            {translate('Component usage chart')}
-          </Card.Title>
-        </div>
+    <Card className="card-bordered mb-10">
+      <Card.Header>
+        <Card.Title className="h5">
+          {translate('Component usage chart')}
+        </Card.Title>
       </Card.Header>
       <Card.Body
         className="mt-3 p-m"

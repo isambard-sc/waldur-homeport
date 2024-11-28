@@ -5,7 +5,7 @@ import { formValueSelector, clearFields } from 'redux-form';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { getProjectSecrets } from '../api';
 import { FieldProps } from '../types';

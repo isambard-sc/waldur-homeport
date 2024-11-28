@@ -4,11 +4,10 @@ import {
   useCurrentStateAndParams,
   useRouter,
 } from '@uirouter/react';
-import { identity, isMatch, pickBy, uniqueId } from 'lodash';
+import { isMatch, pickBy, uniqueId } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { getItem, removeItem, setItem } from '@waldur/auth/AuthStorage';
 import { translate } from '@waldur/i18n';
 import {
   getCategory,
@@ -28,7 +27,6 @@ import {
 import { Customer, Project, UserDetails } from '@waldur/workspace/types';
 
 const FAVORITE_PAGES_KEY = 'waldur/favorite/pages';
-const STORAGE_FOR_FAVORITE_PAGES = 'localStorage';
 
 interface FavoritePage {
   id: string;
@@ -54,23 +52,22 @@ class FavoritePageServiceClass {
       id = uniqueId();
     }
     const newPage = { ...page, id };
-    setItem(
+    localStorage.setItem(
       FAVORITE_PAGES_KEY,
       JSON.stringify(prevList.concat(newPage)),
-      STORAGE_FOR_FAVORITE_PAGES,
     );
   };
 
   list = (): FavoritePage[] => {
-    const prevList = getItem(FAVORITE_PAGES_KEY, STORAGE_FOR_FAVORITE_PAGES);
+    const prevList = localStorage.getItem(FAVORITE_PAGES_KEY);
     if (prevList) {
       try {
         const jsonList = JSON.parse(prevList);
         if (Array.isArray(jsonList)) {
           return jsonList;
         }
-      } catch (error) {
-        removeItem(FAVORITE_PAGES_KEY, STORAGE_FOR_FAVORITE_PAGES);
+      } catch {
+        localStorage.removeItem(FAVORITE_PAGES_KEY);
       }
     }
     return [];
@@ -79,15 +76,11 @@ class FavoritePageServiceClass {
   remove = (page: FavoritePage) => {
     const prevList = this.list();
     const newList = prevList.filter((p) => p.id !== page.id);
-    setItem(
-      FAVORITE_PAGES_KEY,
-      JSON.stringify(newList),
-      STORAGE_FOR_FAVORITE_PAGES,
-    );
+    localStorage.setItem(FAVORITE_PAGES_KEY, JSON.stringify(newList));
   };
 }
 
-export const FavoritePageService = new FavoritePageServiceClass();
+const FavoritePageService = new FavoritePageServiceClass();
 
 const getDataForFavoritePage = async (
   state: StateDeclaration,
@@ -189,7 +182,7 @@ export const useFavoritePages = () => {
   const addFavoritePage = useCallback(
     (page: Omit<FavoritePage, 'id'>, event = null) => {
       event && event.preventDefault();
-      page.params = pickBy(page.params, identity); // remove null and undefined properties
+      page.params = pickBy(page.params, (value) => value !== null);
       if (findFavoritePage(page.state, page.params)) return;
       FavoritePageService.add(page);
       setFavPages(getPagesList());

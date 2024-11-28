@@ -8,7 +8,7 @@ import { EChart } from '@waldur/core/EChart';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { getProviderOfferingCostChartData } from './api';
 import { OFFERING_CUSTOMERS_LIST_FILTER } from './constants';
@@ -47,8 +47,8 @@ export const OfferingCostsChart: FunctionComponent<OfferingCostChartProps> = (
   );
 
   return (
-    <Card className="mb-10">
-      <Card.Header className="border-2 border-bottom">
+    <Card className="card-bordered mb-10">
+      <Card.Header>
         <Card.Title>{translate('Offering cost chart')}</Card.Title>
         <div className="card-toolbar">
           <OfferingCustomersListFilter uniqueFormId={uniqueFormId} />

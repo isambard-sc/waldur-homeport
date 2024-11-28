@@ -1,12 +1,13 @@
-import React, { PropsWithChildren, ReactNode } from 'react';
+import { FC, PropsWithChildren, ReactNode } from 'react';
 
 interface MenuAccordionProps {
-  title: React.ReactNode;
+  title: ReactNode;
   itemId?: string;
   icon?: ReactNode;
+  badge?: ReactNode;
 }
 
-export const MenuAccordion: React.FC<PropsWithChildren<MenuAccordionProps>> = (
+export const MenuAccordion: FC<PropsWithChildren<MenuAccordionProps>> = (
   props,
 ) => (
   <div
@@ -22,8 +23,13 @@ export const MenuAccordion: React.FC<PropsWithChildren<MenuAccordionProps>> = (
         </span>
       )}
       <span className="menu-title">{props.title}</span>
+      {Boolean(props.badge) && (
+        <span className="menu-badge">{props.badge}</span>
+      )}
       <span className="menu-arrow" />
     </span>
-    <div className="menu-sub menu-sub-accordion">{props.children}</div>
+    <div className="menu-sub menu-sub-accordion menu-rounded-0">
+      {props.children}
+    </div>
   </div>
 );

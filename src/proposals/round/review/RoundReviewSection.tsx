@@ -33,7 +33,7 @@ export const RoundReviewSection: FC<RoundReviewSectionProps> = ({
   }, [round]);
 
   return (
-    <Card id="review" className="mb-7">
+    <Card id="review" className="card-bordered">
       <Card.Header>
         <Card.Title>
           {translate('Review strategy')}
@@ -48,20 +48,17 @@ export const RoundReviewSection: FC<RoundReviewSectionProps> = ({
           label={translate('Review strategy')}
           value={formatRoundReviewStrategy(round.review_strategy)}
           className="col-12 col-md-6"
-          floating
         />
         <ReadOnlyFormControl
           label={translate('Review duration')}
           value={round.review_duration_in_days}
           className="col-12 col-md-6"
-          floating
           addon="days"
         />
         <ReadOnlyFormControl
           label={translate('Minimum reviewers')}
           value={round.minimum_number_of_reviewers}
           className="col-12 col-md-6"
-          floating
         />
         {translate('Latest review completion date')}: {latestReviewDate}
       </Card.Body>

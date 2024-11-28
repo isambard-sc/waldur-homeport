@@ -1,3 +1,5 @@
+import { Factory } from '@phosphor-icons/react';
+
 import { Link } from '@waldur/core/Link';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
@@ -11,8 +13,8 @@ export const ProjectLink = ({ row }) => (
     />
     {isFeatureVisible(ProjectFeatures.show_industry_flag) &&
       row.is_industry && (
-        <span>
-          <i className="fa fa-industry" style={{ marginLeft: '5px' }} />
+        <span className="svg-icon svg-icon-4 ms-3">
+          <Factory />
         </span>
       )}
   </div>

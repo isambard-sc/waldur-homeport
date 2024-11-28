@@ -3,9 +3,10 @@ import { useSelector } from 'react-redux';
 
 import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
+import { useTable } from '@waldur/table/useTable';
 import { KeysListExpandableRow } from '@waldur/user/keys/KeysListExpandableRow';
 import { getUser } from '@waldur/workspace/selectors';
 

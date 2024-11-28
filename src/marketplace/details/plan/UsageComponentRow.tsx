@@ -10,9 +10,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { Component, PlanPeriod } from './types';
 
-const EstimateUsageComponentDialog = lazyComponent(
-  () => import('./EstimateUsageComponentDialog'),
-  'EstimateUsageComponentDialog',
+const EstimateUsageComponentDialog = lazyComponent(() =>
+  import('./EstimateUsageComponentDialog').then((module) => ({
+    default: module.EstimateUsageComponentDialog,
+  })),
 );
 
 interface UsageComponentRowProps {

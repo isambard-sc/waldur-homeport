@@ -12,7 +12,7 @@ import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { IBreadcrumbItem, PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { UserProfileHero } from '@waldur/user/dashboard/UserProfileHero';
 import { getUser } from '@waldur/user/support/api';
 import { getUser as getUserSelecor } from '@waldur/workspace/selectors';
@@ -21,21 +21,25 @@ import { UserDetails } from '@waldur/workspace/types';
 import { CompleteYourProfileBanner } from './CompleteYourProfileBanner';
 import { UsersService } from './UsersService';
 
-const UserDetailsTable = lazyComponent(
-  () => import('@waldur/user/support/UserDetailsTable'),
-  'UserDetailsTable',
+const UserDetailsTable = lazyComponent(() =>
+  import('@waldur/user/support/UserDetailsTable').then((module) => ({
+    default: module.UserDetailsTable,
+  })),
 );
-const UserEditFormContainer = lazyComponent(
-  () => import('@waldur/user/support/UserEditFormContainer'),
-  'UserEditFormContainer',
+const UserEditTab = lazyComponent(() =>
+  import('@waldur/user/support/UserEditTab').then((module) => ({
+    default: module.UserEditTab,
+  })),
 );
-const UserTermination = lazyComponent(
-  () => import('@waldur/user/support/UserTermination'),
-  'UserTermination',
+const UserTermination = lazyComponent(() =>
+  import('@waldur/user/support/UserTermination').then((module) => ({
+    default: module.UserTermination,
+  })),
 );
-const UserDeleteAccount = lazyComponent(
-  () => import('@waldur/user/support/UserDeleteAccount'),
-  'UserDeleteAccount',
+const UserDeleteAccount = lazyComponent(() =>
+  import('@waldur/user/support/UserDeleteAccount').then((module) => ({
+    default: module.UserDeleteAccount,
+  })),
 );
 
 const NotAllowedTab = () => (
@@ -103,9 +107,7 @@ export const UserManageContainer = ({ isPersonal }) => {
         (currentUser.is_staff || currentUser.is_support || isPersonal) && {
           key: 'user-details',
           component:
-            currentUser.is_staff || isPersonal
-              ? UserEditFormContainer
-              : UserDetailsTable,
+            currentUser.is_staff || isPersonal ? UserEditTab : UserDetailsTable,
           title: translate('User profile'),
         },
         (!isFeatureVisible(UserFeatures.disable_user_termination) ||
@@ -154,7 +156,7 @@ export const UserManageContainer = ({ isPersonal }) => {
   return (
     <UIView
       render={(Component, { key, ...props }) => (
-        <Component {...props} key={key} tabSpec={tabSpec} user={user} />
+        <Component key={key} {...props} tabSpec={tabSpec} user={user} />
       )}
     />
   );

@@ -1,40 +1,54 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { Pencil } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { PermissionEnum } from '@waldur/permissions/enums';
+import { hasPermission } from '@waldur/permissions/hasPermission';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { ServiceProvider } from '../types';
 
 import { OfferingUser } from './types';
 
-const ProviderOfferingUserUpdateDialog = lazyComponent(
-  () => import('./ProviderOfferingUserUpdateDialog'),
-  'ProviderOfferingUserUpdateDialog',
+const ProviderOfferingUserUpdateDialog = lazyComponent(() =>
+  import('./ProviderOfferingUserUpdateDialog').then((module) => ({
+    default: module.ProviderOfferingUserUpdateDialog,
+  })),
 );
 
 export const ProviderOfferingUserUpdateButton: FC<{
   row: OfferingUser;
-  provider: ServiceProvider;
+  provider?: ServiceProvider;
+  offering?: any;
   refetch;
 }> = (props) => {
   const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const canUpdateOfferingUser = hasPermission(user, {
+    permission: PermissionEnum.UPDATE_OFFERING_USER,
+    customerId: props.provider
+      ? props.provider.customer_uuid
+      : props.offering
+        ? props.offering.customer_uuid
+        : undefined,
+  });
   return (
-    <RowActionButton
-      action={() =>
-        dispatch(
-          openModalDialog(ProviderOfferingUserUpdateDialog, {
-            resolve: props,
-            size: 'lg',
-          }),
-        )
-      }
-      title={translate('Edit')}
-      iconNode={<PencilSimple />}
-      size="sm"
-    />
+    canUpdateOfferingUser && (
+      <ActionItem
+        title="Edit"
+        action={() =>
+          dispatch(
+            openModalDialog(ProviderOfferingUserUpdateDialog, {
+              resolve: props,
+              size: 'lg',
+            }),
+          )
+        }
+        iconNode={<Pencil />}
+      />
+    )
   );
 };

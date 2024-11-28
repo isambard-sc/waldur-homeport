@@ -1,21 +1,27 @@
 import { FC } from 'react';
-import { useDispatch } from 'react-redux';
+import { Field, Form } from 'react-final-form';
 import { useAsync } from 'react-use';
 
+import { required } from '@waldur/core/validators';
+import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
+import { useModal } from '@waldur/modal/hooks';
 import { loadVolumeTypes, retypeVolume } from '@waldur/openstack/api';
-import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
+import { AsyncActionDialog } from '@waldur/resource/actions/AsyncActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 
 export const RetypeDialog: FC<ActionDialogProps> = ({
   resolve: { resource, refetch },
 }) => {
-  const dispatch = useDispatch();
+  const { showErrorResponse, showSuccess } = useNotify();
+  const { closeDialog } = useModal();
 
   const asyncState = useAsync(async () => {
-    const types = await loadVolumeTypes(resource.service_settings_uuid);
+    const types = await loadVolumeTypes({
+      tenant_uuid: resource.tenant_uuid,
+    });
     return {
       types: types
         .map((volumeType) => ({
@@ -28,49 +34,50 @@ export const RetypeDialog: FC<ActionDialogProps> = ({
     };
   });
 
-  const fields = asyncState.value
-    ? [
-        {
-          component: () => (
-            <p>
-              <strong>{translate('Current type')}</strong>: {resource.type_name}
-            </p>
-          ),
-        },
-        asyncState.value.types.length > 0
-          ? {
-              name: 'type',
-              label: translate('Volume type'),
-              type: 'select',
-              required: true,
-              options: asyncState.value.types,
-            }
-          : {
-              component: () => (
-                <p>{translate('There are no other volume types available.')}</p>
-              ),
-            },
-      ]
-    : [];
+  const submitRequest = async (formData) => {
+    try {
+      await retypeVolume(resource.uuid, { type: formData.type.value });
+      showSuccess(translate('Volume has been retyped.'));
+      closeDialog();
+      if (refetch) {
+        await refetch();
+      }
+    } catch (e) {
+      showErrorResponse(e, translate('Unable to retype volume.'));
+    }
+  };
 
   return (
-    <ResourceActionDialog
-      dialogTitle={translate('Retype OpenStack Volume')}
-      loading={asyncState.loading}
-      error={asyncState.error}
-      formFields={fields}
-      submitForm={async (formData) => {
-        try {
-          await retypeVolume(resource.uuid, formData);
-          dispatch(showSuccess(translate('Volume has been retyped.')));
-          dispatch(closeModalDialog());
-          if (refetch) {
-            await refetch();
-          }
-        } catch (e) {
-          dispatch(showErrorResponse(e, translate('Unable to retype volume.')));
-        }
-      }}
+    <Form
+      onSubmit={submitRequest}
+      render={({ handleSubmit, submitting, invalid }) => (
+        <form onSubmit={handleSubmit}>
+          <AsyncActionDialog
+            title={translate('Retype OpenStack Volume')}
+            loading={asyncState.loading}
+            error={asyncState.error}
+            submitting={submitting}
+            invalid={invalid}
+          >
+            <p>
+              <strong>{translate('Current type')}:</strong> {resource.type_name}
+            </p>
+            {asyncState.value?.types.length > 0 ? (
+              <FormGroup label={translate('Volume type')} required>
+                <Field
+                  name="type"
+                  validate={required}
+                  render={({ input }) => (
+                    <Select {...input} options={asyncState.value.types} />
+                  )}
+                />
+              </FormGroup>
+            ) : (
+              <p>{translate('There are no other volume types available.')}</p>
+            )}
+          </AsyncActionDialog>
+        </form>
+      )}
     />
   );
 };

@@ -8,7 +8,6 @@ import {
   submitForm,
   renderOptionalFieldForm,
 } from './FormContainer.fixture';
-import { errorOnSubmit, setFieldValue, getTestFormValues } from './testUtils';
 
 describe('FormContainer', () => {
   describe('disable fields on submit', () => {

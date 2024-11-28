@@ -5,6 +5,9 @@ import { translate } from '@waldur/i18n';
 
 import { ChecklistStats } from './types';
 
+const getVariant = (score: number) =>
+  score < 25 ? 'danger' : score < 75 ? 'warning' : 'primary';
+
 export const StatsTable = ({
   stats,
   scopeTitle,
@@ -28,13 +31,11 @@ export const StatsTable = ({
           <td>
             <StateIndicator
               label={`${customer.score} %`}
-              variant={
-                customer.score < 25
-                  ? 'danger'
-                  : customer.score < 75
-                    ? 'warning'
-                    : 'primary'
-              }
+              variant={getVariant(customer.score)}
+              outline
+              pill
+              data-testid="state-indicator"
+              data-variant={getVariant(customer.score)}
             />
           </td>
         </tr>

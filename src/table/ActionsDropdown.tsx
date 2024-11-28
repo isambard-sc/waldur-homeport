@@ -1,6 +1,7 @@
-import { DotsThreeVertical } from '@phosphor-icons/react';
+import { DotsThreeVertical, Spinner } from '@phosphor-icons/react';
 import { FunctionComponent, PropsWithChildren } from 'react';
 import { Dropdown, DropdownProps } from 'react-bootstrap';
+import { Variant } from 'react-bootstrap/esm/types';
 
 import { translate } from '@waldur/i18n';
 
@@ -12,30 +13,40 @@ interface ActionsDropdownProps {
   open?: boolean;
   labeled?: boolean;
   loading?: boolean;
-  error?: object;
-  actions: DropdownActionItemType[];
+  error?: any;
+  actions?: DropdownActionItemType[];
   row?: any;
   refetch?(): void;
+}
+
+interface TableDropdownToggleProps {
+  label?: string;
+  disabled?: boolean;
+  labeled?: boolean;
+  variant?: Variant;
+  className?: string;
 }
 
 export const TableDropdownToggle = ({
   label = '',
   disabled = false,
   labeled = false,
-}) => {
+  variant = 'outline btn-outline-default',
+  className = 'min-w-100px w-100',
+}: TableDropdownToggleProps) => {
   return labeled ? (
     <Dropdown.Toggle
-      variant="outline-dark"
+      variant={variant}
       size="sm"
-      className="outline-dark btn-outline border-gray-400 btn-active-secondary w-100px px-2"
+      className={className}
       disabled={disabled}
     >
       {label || translate('Actions')}
     </Dropdown.Toggle>
   ) : (
     <Dropdown.Toggle
-      variant="active-light-primary"
-      className="btn-icon btn-text-grey-500 no-arrow"
+      variant="active-light"
+      className="btn-icon no-arrow"
       disabled={disabled}
     >
       <DotsThreeVertical size={22} weight="bold" />
@@ -44,10 +55,25 @@ export const TableDropdownToggle = ({
 };
 
 export const ActionsDropdownComponent: FunctionComponent<
-  PropsWithChildren<DropdownProps & { label?; labeled?; disabled? }>
-> = ({ onToggle, disabled, children, label, labeled, ...rest }) => (
+  PropsWithChildren<DropdownProps & TableDropdownToggleProps>
+> = ({
+  onToggle,
+  disabled,
+  children,
+  label,
+  labeled,
+  variant,
+  className,
+  ...rest
+}) => (
   <Dropdown onToggle={onToggle} {...rest}>
-    <TableDropdownToggle label={label} labeled={labeled} disabled={disabled} />
+    <TableDropdownToggle
+      label={label}
+      labeled={labeled}
+      disabled={disabled}
+      variant={variant}
+      className={className}
+    />
     <Dropdown.Menu
       popperConfig={{
         modifiers: [
@@ -65,11 +91,14 @@ export const ActionsDropdownComponent: FunctionComponent<
   </Dropdown>
 );
 
-export const ActionsDropdown: FunctionComponent<ActionsDropdownProps> = ({
+export const ActionsDropdown: FunctionComponent<
+  PropsWithChildren<ActionsDropdownProps>
+> = ({
   open = true,
   loading,
   error,
   actions,
+  children,
   row,
   refetch,
   ...rest
@@ -78,12 +107,15 @@ export const ActionsDropdown: FunctionComponent<ActionsDropdownProps> = ({
     {open ? (
       loading ? (
         <Dropdown.Item eventKey="1">
+          <Spinner size={20} className="animation-spin me-2" />
           {translate('Loading actions')}
         </Dropdown.Item>
       ) : error ? (
         <Dropdown.Item eventKey="1">
           {translate('Unable to load actions')}
         </Dropdown.Item>
+      ) : children ? (
+        children
       ) : actions ? (
         <>
           {actions.map((ActionComponent, index) => (

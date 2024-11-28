@@ -31,6 +31,7 @@ export const OpenStackInstanceActions = (props) => (
       <UpdateSecurityGroupsAction {...props} />
       <UpdateFloatingIpsAction {...props} />
       <ConsoleLogAction {...props} />
+      <ConsoleAction {...props} />
     </ActionGroup>
 
     <ActionGroup title={translate('Billing actions')}>
@@ -43,7 +44,6 @@ export const OpenStackInstanceActions = (props) => (
     <ProviderActionsGroup {...props} />
 
     <ActionGroup title={translate('Staff actions')}>
-      <ConsoleAction {...props} />
       <MoveResourceAction {...props} />
       <UnlinkActionItem {...props} />
     </ActionGroup>

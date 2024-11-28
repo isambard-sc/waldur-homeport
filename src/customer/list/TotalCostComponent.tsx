@@ -5,7 +5,7 @@ import { getFormValues } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import * as api from './api';
 import { TotalCostField } from './TotalCostField';

@@ -4,8 +4,9 @@ import { ButtonGroup } from 'react-bootstrap';
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CreateSecurityGroupAction } from '../openstack-tenant/actions/CreateSecurityGroupAction';
 import { PullSecurityGroupsAction } from '../openstack-tenant/actions/PullSecurityGroupsAction';
@@ -46,6 +47,7 @@ export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
           orderField: 'name',
           export: 'name',
         },

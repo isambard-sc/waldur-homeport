@@ -21,6 +21,8 @@ export const CallEnum = {
 };
 
 export const CustomersEnum = {
+  allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
+  create_of_credit_by_staff: 'create_of_credit_by_staff',
   customer_creation_succeeded: 'customer_creation_succeeded',
   customer_deletion_succeeded: 'customer_deletion_succeeded',
   customer_update_succeeded: 'customer_update_succeeded',
@@ -33,9 +35,17 @@ export const CustomersEnum = {
   payment_added: 'payment_added',
   payment_created: 'payment_created',
   payment_removed: 'payment_removed',
+  reduction_of_credit: 'reduction_of_credit',
+  reduction_of_credit_due_to_minimal_consumption: 'reduction_of_credit_due_to_minimal_consumption',
+  roll_back_customer_credit: 'roll_back_customer_credit',
+  roll_back_project_credit: 'roll_back_project_credit',
+  set_to_zero_overdue_credit: 'set_to_zero_overdue_credit',
+  update_of_credit_by_staff: 'update_of_credit_by_staff',
 };
 
 export const InvoicesEnum = {
+  allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
+  create_of_credit_by_staff: 'create_of_credit_by_staff',
   invoice_canceled: 'invoice_canceled',
   invoice_created: 'invoice_created',
   invoice_creation_succeeded: 'invoice_creation_succeeded',
@@ -47,15 +57,12 @@ export const InvoicesEnum = {
   invoice_update_succeeded: 'invoice_update_succeeded',
   payment_created: 'payment_created',
   payment_removed: 'payment_removed',
-};
-
-export const JiraEnum = {
-  comment_creation_succeeded: 'comment_creation_succeeded',
-  comment_deletion_succeeded: 'comment_deletion_succeeded',
-  comment_update_succeeded: 'comment_update_succeeded',
-  issue_creation_succeeded: 'issue_creation_succeeded',
-  issue_deletion_succeeded: 'issue_deletion_succeeded',
-  issue_update_succeeded: 'issue_update_succeeded',
+  reduction_of_credit: 'reduction_of_credit',
+  reduction_of_credit_due_to_minimal_consumption: 'reduction_of_credit_due_to_minimal_consumption',
+  roll_back_customer_credit: 'roll_back_customer_credit',
+  roll_back_project_credit: 'roll_back_project_credit',
+  set_to_zero_overdue_credit: 'set_to_zero_overdue_credit',
+  update_of_credit_by_staff: 'update_of_credit_by_staff',
 };
 
 export const PaymentsEnum = {
@@ -91,7 +98,6 @@ export const ProvidersEnum = {
   marketplace_resource_create_failed: 'marketplace_resource_create_failed',
   marketplace_resource_create_requested: 'marketplace_resource_create_requested',
   marketplace_resource_create_succeeded: 'marketplace_resource_create_succeeded',
-  marketplace_resource_renamed: 'marketplace_resource_renamed',
   marketplace_resource_terminate_failed: 'marketplace_resource_terminate_failed',
   marketplace_resource_terminate_requested: 'marketplace_resource_terminate_requested',
   marketplace_resource_terminate_succeeded: 'marketplace_resource_terminate_succeeded',
@@ -117,7 +123,8 @@ export const ResourcesEnum = {
   marketplace_resource_create_succeeded: 'marketplace_resource_create_succeeded',
   marketplace_resource_downscaled: 'marketplace_resource_downscaled',
   marketplace_resource_erred_on_backend: 'marketplace_resource_erred_on_backend',
-  marketplace_resource_renamed: 'marketplace_resource_renamed',
+  marketplace_resource_has_been_changed: 'marketplace_resource_has_been_changed',
+  marketplace_resource_paused: 'marketplace_resource_paused',
   marketplace_resource_terminate_canceled: 'marketplace_resource_terminate_canceled',
   marketplace_resource_terminate_failed: 'marketplace_resource_terminate_failed',
   marketplace_resource_terminate_requested: 'marketplace_resource_terminate_requested',
@@ -129,8 +136,6 @@ export const ResourcesEnum = {
   marketplace_resource_update_limits_succeeded: 'marketplace_resource_update_limits_succeeded',
   marketplace_resource_update_requested: 'marketplace_resource_update_requested',
   marketplace_resource_update_succeeded: 'marketplace_resource_update_succeeded',
-  openstack_flavor_created: 'openstack_flavor_created',
-  openstack_flavor_deleted: 'openstack_flavor_deleted',
   openstack_floating_ip_attached: 'openstack_floating_ip_attached',
   openstack_floating_ip_connected: 'openstack_floating_ip_connected',
   openstack_floating_ip_description_updated: 'openstack_floating_ip_description_updated',
@@ -233,9 +238,9 @@ export const ResourcesEnum = {
   resource_update_floating_ips_failed: 'resource_update_floating_ips_failed',
   resource_update_floating_ips_scheduled: 'resource_update_floating_ips_scheduled',
   resource_update_floating_ips_succeeded: 'resource_update_floating_ips_succeeded',
-  resource_update_internal_ips_failed: 'resource_update_internal_ips_failed',
-  resource_update_internal_ips_scheduled: 'resource_update_internal_ips_scheduled',
-  resource_update_internal_ips_succeeded: 'resource_update_internal_ips_succeeded',
+  resource_update_ports_failed: 'resource_update_ports_failed',
+  resource_update_ports_scheduled: 'resource_update_ports_scheduled',
+  resource_update_ports_succeeded: 'resource_update_ports_succeeded',
   resource_update_security_groups_failed: 'resource_update_security_groups_failed',
   resource_update_security_groups_scheduled: 'resource_update_security_groups_scheduled',
   resource_update_security_groups_succeeded: 'resource_update_security_groups_succeeded',

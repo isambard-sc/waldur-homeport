@@ -9,7 +9,7 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { getGrowthChartData } from '@waldur/invoices/api';
 import { GROWTH_FILTER_ID } from '@waldur/invoices/constants';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { formatGrowthChart } from './utils';
 

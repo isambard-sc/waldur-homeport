@@ -37,7 +37,7 @@ export const projectAutocomplete = async (
   const params = {
     name: query,
     customer,
-    field: ['name', 'uuid', 'is_industry', 'customer_uuid'],
+    field: ['name', 'uuid', 'url', 'is_industry', 'customer_uuid'],
     o: 'name',
     page: currentPage,
     page_size: ENV.pageSize,
@@ -104,7 +104,7 @@ export const categoryAutocomplete = async (
 };
 
 export const offeringsAutocomplete = async (
-  query: object,
+  query: string | object,
   prevOptions,
   currentPage: number,
   providerOfferings = true,
@@ -115,13 +115,16 @@ export const offeringsAutocomplete = async (
     'category_title',
     'thumbnail',
     'customer_name',
+    'secret_options',
+    'customer_uuid',
   ],
 ) => {
+  const queryObject = typeof query === 'string' ? { name: query } : query;
   const params = {
     field,
     o: 'name',
     state: 'Active',
-    ...query,
+    ...queryObject,
     page: currentPage,
     page_size: ENV.pageSize,
   };
@@ -143,7 +146,7 @@ export const userAutocomplete = async (
 ) => {
   const params = {
     full_name: query,
-    field: ['full_name', 'url', 'username', 'email'],
+    field: ['full_name', 'url', 'username', 'email', 'uuid'],
     o: ['full_name'],
     page: page,
     page_size: ENV.pageSize,

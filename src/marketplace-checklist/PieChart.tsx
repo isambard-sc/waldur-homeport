@@ -1,3 +1,4 @@
+import { EChartsOption } from 'echarts';
 import { useMemo, FC } from 'react';
 
 import { EChart } from '@waldur/core/EChart';
@@ -16,7 +17,7 @@ export const PieChart: FC<PieChartProps> = ({
   negative = 0,
   unknown = 0,
 }) => {
-  const options = useMemo(
+  const options = useMemo<EChartsOption>(
     () => ({
       legend: {
         orient: 'vertical',
@@ -35,7 +36,7 @@ export const PieChart: FC<PieChartProps> = ({
         {
           type: 'pie',
           radius: ['50%', '70%'],
-          label: false,
+          label: { show: false },
           data: [
             {
               name: translate('Positive'),

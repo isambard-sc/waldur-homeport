@@ -10,7 +10,7 @@ export const InstanceMainComponent = ({ resourceScope }) => {
     return null;
   }
   return (
-    <Card>
+    <Card className="card-bordered">
       <Card.Header>
         <Card.Title>
           <h3>{translate('Details')}</h3>
@@ -32,10 +32,15 @@ export const InstanceMainComponent = ({ resourceScope }) => {
           hasCopy
         />
         <Field
-          label={translate('Floating IP')}
+          label={translate('Floating IPs')}
           value={resourceScope.floating_ips
             .map((item) => item.address)
             .join(', ')}
+          hasCopy
+        />
+        <Field
+          label={translate('External IPs')}
+          value={resourceScope.external_address.join(', ')}
           hasCopy
         />
       </Card.Body>

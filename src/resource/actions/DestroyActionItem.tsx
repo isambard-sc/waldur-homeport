@@ -1,3 +1,4 @@
+import { FileX } from '@phosphor-icons/react';
 import { ReactElement } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -54,6 +55,7 @@ export const DestroyActionItem: <T extends { uuid: string }>(
         dispatch,
         translate('Destroy resource'),
         getConfirmationText(resource) + (dialogSubtitle || ''),
+        true,
       );
     } catch {
       return;
@@ -74,6 +76,8 @@ export const DestroyActionItem: <T extends { uuid: string }>(
       title={translate('Destroy')}
       action={callback}
       className="text-danger"
+      iconNode={<FileX />}
+      iconColor="danger"
       {...validationState}
     />
   );

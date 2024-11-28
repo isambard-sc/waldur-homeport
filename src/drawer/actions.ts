@@ -2,7 +2,7 @@ import { DrawerStateProps } from './reducer';
 
 export const openDrawerDialog = <P = any>(
   drawerComponent: DrawerStateProps<P>['drawerComponent'],
-  drawerProps?: DrawerStateProps<P>['drawerProps'],
+  drawerProps?: any,
 ) => ({
   type: 'SHOW_DRAWER',
   drawerComponent,
@@ -11,7 +11,7 @@ export const openDrawerDialog = <P = any>(
 
 export const renderDrawerDialog = <P = any>(
   drawerComponent: DrawerStateProps<P>['drawerComponent'],
-  drawerProps?: DrawerStateProps<P>['drawerProps'],
+  drawerProps?: any,
 ) => ({
   type: 'RENDER_DRAWER',
   drawerComponent,

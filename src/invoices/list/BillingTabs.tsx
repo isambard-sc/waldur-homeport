@@ -1,5 +1,4 @@
 import { FunctionComponent } from 'react';
-import { Card } from 'react-bootstrap';
 
 import { ENV } from '@waldur/configs/default';
 
@@ -10,16 +9,16 @@ import { OverviewLastMonths } from './OverviewLastMonths';
 
 export const BillingTabs: FunctionComponent = () => {
   return ENV.accountingMode === 'accounting' ? (
-    <Card.Body>
+    <div>
       <OverviewLastMonths />
       <AgreementInfo />
       <BillingRecordsList />
-    </Card.Body>
+    </div>
   ) : (
-    <Card.Body>
+    <div>
       <OverviewLastMonths />
       <AgreementInfo />
       <InvoicesList />
-    </Card.Body>
+    </div>
   );
 };

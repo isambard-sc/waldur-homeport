@@ -1,12 +1,17 @@
 import { Field, reduxForm } from 'redux-form';
 
-import { syncFiltersToURL } from '@waldur/core/filters';
+import {
+  getInitialValues,
+  syncFiltersToURL,
+  useSyncInitialFiltersToURL,
+} from '@waldur/core/filters';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
+import { CATEGORY_RESOURCES_ALL_FILTER_FORM_ID } from './constants';
 import { OfferingFilter } from './OfferingFilter';
 import { ProjectFilter } from './ProjectFilter';
 import { ResourceStateFilter } from './ResourceStateFilter';
@@ -20,7 +25,8 @@ interface FormData {
   state;
 }
 
-const PureProjectResourcesFilter = ({ category_uuid }) => {
+const PureProjectResourcesFilter = ({ category_uuid, initialValues }) => {
+  useSyncInitialFiltersToURL(initialValues);
   return (
     <>
       <TableFilterItem
@@ -72,7 +78,8 @@ const PureProjectResourcesFilter = ({ category_uuid }) => {
 };
 
 export const AllResourcesFilter = reduxForm<FormData, { category_uuid }>({
-  form: 'AllResourcesFilter',
+  form: CATEGORY_RESOURCES_ALL_FILTER_FORM_ID,
   onChange: syncFiltersToURL,
   destroyOnUnmount: false,
+  initialValues: getInitialValues(),
 })(PureProjectResourcesFilter);

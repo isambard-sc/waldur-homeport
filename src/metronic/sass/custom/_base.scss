@@ -7,7 +7,6 @@
   font-size: 14px;
   font-weight: bold;
   color: $gray-700;
-  border-bottom-color: $light;
 }
 
 /* LIST-GROUP & ITEMS */
@@ -118,4 +117,9 @@
 
 .text-pre {
   white-space: pre;
+}
+
+.h-0 {
+  height: 0;
+  overflow: hidden;
 }

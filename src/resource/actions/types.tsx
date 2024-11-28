@@ -57,3 +57,8 @@ export type ActionItemType = ComponentType<{
 export type ActionDialogProps = {
   resolve: { resource; refetch };
 };
+
+export interface ActionConfiguration {
+  type: string;
+  actions: ActionItemType[];
+}

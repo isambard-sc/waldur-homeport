@@ -3,8 +3,9 @@ import { ButtonGroup } from 'react-bootstrap';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { ApplicationDeleteButton } from './ApplicationDeleteButton';
 import { ApplicationDetailsButton } from './ApplicationDetailsButton';
@@ -37,6 +38,7 @@ export const ClusterApplicationsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Project'),

@@ -10,6 +10,7 @@ import { FormattedJira } from '@waldur/core/FormattedJira';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
+import { injectReducer, injectSaga } from '@waldur/store/store';
 
 import { IssueAttachmentsContainer } from './attachments/IssueAttachmentsContainer';
 import { IssueCommentsContainer } from './comments/IssueCommentsContainer';
@@ -22,6 +23,24 @@ const linkify = (s) =>
   );
 
 const loadIssue = (id) => getById<any>('/support-issues/', id);
+
+const loadDependencies = async (issueId: string) => {
+  const [issue, issueAttachmentsSaga, issueCommentsSaga, reducer] =
+    await Promise.all([
+      loadIssue(issueId),
+      import('@waldur/issues/attachments/effects').then(
+        (module) => module.default,
+      ),
+      import('@waldur/issues/comments/effects').then(
+        (module) => module.default,
+      ),
+      import('@waldur/issues/reducers').then((module) => module.reducer),
+    ]);
+  injectSaga('issueAttachmentsSaga', issueAttachmentsSaga);
+  injectSaga('issueCommentsSaga', issueCommentsSaga);
+  injectReducer('issues', reducer);
+  return issue;
+};
 
 export const IssueDetails: FunctionComponent = () => {
   useTitle(translate('Request detail'));
@@ -39,7 +58,7 @@ export const IssueDetails: FunctionComponent = () => {
     loading,
     error,
     value: issue,
-  } = useAsync(() => loadIssue(issue_uuid));
+  } = useAsync(() => loadDependencies(issue_uuid));
 
   if (loading) {
     return <LoadingSpinner />;
@@ -51,24 +70,24 @@ export const IssueDetails: FunctionComponent = () => {
   return (
     <Row>
       <Col sm={8}>
-        <Card className="mb-6">
+        <Card className="card-bordered mb-6">
           <Card.Header>
             <Card.Title>
               {issue.key ? `${issue.key}: ${issue.summary}` : issue.summary}
             </Card.Title>
           </Card.Header>
           <Card.Body>
-            {ENV.plugins.WALDUR_SUPPORT.ACTIVE_BACKEND_TYPE === 'smax' ? (
-              <FormattedHtml html={linkify(issue?.description)} />
-            ) : (
+            {ENV.plugins.WALDUR_SUPPORT.ACTIVE_BACKEND_TYPE === 'atlassian' ? (
               <FormattedJira text={linkify(issue?.description)} />
+            ) : (
+              <FormattedHtml html={linkify(issue?.description)} />
             )}
           </Card.Body>
         </Card>
         <IssueCommentsContainer issue={issue} />
       </Col>
       <Col sm={4}>
-        <Card className="mb-6">
+        <Card className="card-bordered mb-6">
           <Card.Header>
             <Card.Title>{translate('Summary')}</Card.Title>
           </Card.Header>

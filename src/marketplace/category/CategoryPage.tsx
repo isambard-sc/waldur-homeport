@@ -11,6 +11,7 @@ import {
   useFullPage,
   useToolbarActions,
 } from '@waldur/navigation/context';
+import { useTitle } from '@waldur/navigation/title';
 
 import { PageBarFilters } from '../landing/filter/PageBarFilters';
 import { getMarketplaceFilters } from '../landing/filter/store/selectors';
@@ -28,6 +29,7 @@ export const CategoryPage: FunctionComponent = () => {
     queryKey: ['CategoryPage', category_uuid],
     queryFn: () => getCategory(category_uuid),
   });
+
   useFullPage();
 
   useMarketplacePublicTabs();
@@ -35,6 +37,7 @@ export const CategoryPage: FunctionComponent = () => {
   const filters = useSelector(getMarketplaceFilters);
   useToolbarActions(<MarketplaceLandingFilter />);
   useExtraToolbar(filters.length ? <PageBarFilters /> : null, [filters]);
+  useTitle(category?.data?.title);
 
   if (category.isLoading) {
     return <LoadingSpinner />;

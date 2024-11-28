@@ -2,8 +2,9 @@ import { FunctionComponent } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { UserAgreementCreateButton } from './UserAgreementCreateButton';
 import { UserAgreementDeleteButton } from './UserAgreementDeleteButton';
@@ -32,7 +33,10 @@ export const UserAgreementsList: FunctionComponent<{}> = () => {
       rowActions={({ row }) => (
         <>
           <UserAgreementsEditButton row={row} refetch={props.fetch} />
-          <UserAgreementDeleteButton userAgreement={row} />
+          <UserAgreementDeleteButton
+            userAgreement={row}
+            refetch={props.fetch}
+          />
         </>
       )}
       expandableRow={UserAgreementsExpandableRow}

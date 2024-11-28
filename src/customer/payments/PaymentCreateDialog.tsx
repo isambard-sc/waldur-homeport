@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { reduxForm } from 'redux-form';
+import { useDispatch, useSelector } from 'react-redux';
+import { reduxForm, InjectedFormProps } from 'redux-form';
 
+import { formatDate } from '@waldur/core/dateUtils';
+import * as api from '@waldur/customer/payments/api';
 import { ADD_PAYMENT_FORM_ID } from '@waldur/customer/payments/constants';
-import { createPayment } from '@waldur/customer/payments/store/actions';
 import {
   FileUploadField,
   FormContainer,
@@ -13,63 +13,82 @@ import {
 } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { getCustomer } from '@waldur/workspace/selectors';
 
-const PaymentCreateDialog: FunctionComponent<any> = (props) => (
-  <form onSubmit={props.handleSubmit(props.submitRequest)}>
-    <ModalDialog
-      title={translate('Add payment')}
-      footer={
-        <>
-          <CloseDialogButton className="me-3" />
-          <SubmitButton
-            disabled={props.invalid}
-            submitting={props.submitting}
-            label={translate('Submit')}
-          />
-        </>
-      }
-    >
-      <div style={{ paddingBottom: '50px' }}>
-        <FormContainer submitting={false} clearOnUnmount={false}>
-          <DateField
-            name="date_of_payment"
-            label={translate('Date')}
-            required
-          />
+import { updatePaymentsList } from './utils';
 
-          <NumberField name="sum" label={translate('Sum')} required />
+interface PaymentCreateDialogProps extends InjectedFormProps {
+  resolve: {
+    profileUrl: string;
+  };
+}
 
-          <FileUploadField
-            name="proof"
-            label={translate('Proof')}
-            showFileName={true}
-            buttonLabel={translate('Browse')}
-          />
-        </FormContainer>
-      </div>
-    </ModalDialog>
-  </form>
-);
+const PaymentCreateDialog: FunctionComponent<PaymentCreateDialogProps> = (
+  props,
+) => {
+  const dispatch = useDispatch();
+  const customer = useSelector(getCustomer);
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  submitRequest: (formData) =>
-    dispatch(
-      createPayment({
-        formData: formData,
-        profile_url: ownProps.resolve.profileUrl,
-      }),
-    ),
-});
+  const submitRequest = async (formData) => {
+    try {
+      await api.createPayment({
+        date_of_payment: formatDate(formData.date_of_payment),
+        sum: formData.sum,
+        proof: formData.proof,
+        profile: props.resolve.profileUrl,
+      });
+      dispatch(showSuccess(translate('Payment has been created.')));
+      dispatch(closeModalDialog());
+      dispatch(updatePaymentsList(customer));
+    } catch (error) {
+      dispatch(
+        showErrorResponse(error, translate('Unable to create payment.')),
+      );
+    }
+  };
 
-const connector = connect(null, mapDispatchToProps);
+  return (
+    <form onSubmit={props.handleSubmit(submitRequest)}>
+      <ModalDialog
+        title={translate('Add payment')}
+        footer={
+          <>
+            <CloseDialogButton className="me-3" />
+            <SubmitButton
+              disabled={props.invalid}
+              submitting={props.submitting}
+              label={translate('Submit')}
+            />
+          </>
+        }
+      >
+        <div style={{ paddingBottom: '50px' }}>
+          <FormContainer submitting={false} clearOnUnmount={false}>
+            <DateField
+              name="date_of_payment"
+              label={translate('Date')}
+              required
+            />
 
-const enhance = compose(
-  connector,
-  reduxForm({
-    form: ADD_PAYMENT_FORM_ID,
-  }),
-);
+            <NumberField name="sum" label={translate('Sum')} required />
 
-export const PaymentCreateDialogContainer = enhance(PaymentCreateDialog);
+            <FileUploadField
+              name="proof"
+              label={translate('Proof')}
+              showFileName={true}
+              buttonLabel={translate('Browse')}
+            />
+          </FormContainer>
+        </div>
+      </ModalDialog>
+    </form>
+  );
+};
+
+export const PaymentCreateDialogContainer = reduxForm({
+  form: ADD_PAYMENT_FORM_ID,
+})(PaymentCreateDialog);

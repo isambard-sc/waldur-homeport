@@ -4,49 +4,8 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
-import { WorkspaceType } from '@waldur/workspace/types';
 
-import { ProjectContainer } from './ProjectContainer';
-import { ProjectManageContainer } from './ProjectManageContainer';
 import { loadProject } from './resolve';
-
-const ProjectDashboard = lazyComponent(
-  () => import('./ProjectDashboard'),
-  'ProjectDashboard',
-);
-const ProjectManage = lazyComponent(
-  () => import('./ProjectManage'),
-  'ProjectManage',
-);
-const ProjectResourcesPage = lazyComponent(
-  () => import('./ProjectResourcesPage'),
-  'ProjectResourcesPage',
-);
-const ProjectEventsView = lazyComponent(
-  () => import('./ProjectEventsList'),
-  'ProjectEventsView',
-);
-const ProjectIssuesList = lazyComponent(
-  () => import('./ProjectIssuesList'),
-  'ProjectIssuesList',
-);
-const ProjectUsersList = lazyComponent(
-  () => import('./team/ProjectUsersList'),
-  'ProjectUsersList',
-);
-const InvitationsList = lazyComponent(
-  () => import('./team/InvitationsList'),
-  'InvitationsList',
-);
-const ProjectPermissionsLogList = lazyComponent(
-  () => import('./team/ProjectPermissionsLogList'),
-  'ProjectPermissionsLogList',
-);
-
-const IssueDetailsContainer = lazyComponent(
-  () => import('../issues/IssueDetails'),
-  'IssueDetails',
-);
 
 export const states: StateDeclaration[] = [
   {
@@ -54,12 +13,14 @@ export const states: StateDeclaration[] = [
     url: '/projects/:uuid/',
     abstract: true,
     parent: 'layout',
-    component: ProjectContainer,
+    component: lazyComponent(() =>
+      import('./ProjectContainer').then((module) => ({
+        default: module.ProjectContainer,
+      })),
+    ),
     data: {
       auth: true,
-      workspace: WorkspaceType.PROJECT,
       title: () => translate('Project'),
-      skipInitWorkspace: true,
     },
     resolve: [
       {
@@ -78,7 +39,6 @@ export const states: StateDeclaration[] = [
     url: '',
     data: {
       breadcrumb: () => translate('Team'),
-      skipInitWorkspace: true,
       priority: 120,
     },
   },
@@ -86,7 +46,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'project.dashboard',
     url: '',
-    component: ProjectDashboard,
+    component: lazyComponent(() =>
+      import('./ProjectDashboard').then((module) => ({
+        default: module.ProjectDashboard,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Project dashboard'),
       priority: 100,
@@ -98,13 +62,21 @@ export const states: StateDeclaration[] = [
     url: '',
     abstract: true,
     parent: 'project',
-    component: ProjectManageContainer,
+    component: lazyComponent(() =>
+      import('./ProjectManageContainer').then((module) => ({
+        default: module.ProjectManageContainer,
+      })),
+    ),
   },
   {
     name: 'project-manage',
     url: 'manage/?tab',
     parent: 'project-manage-container',
-    component: ProjectManage,
+    component: lazyComponent(() =>
+      import('./ProjectManage').then((module) => ({
+        default: module.ProjectManage,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Settings'),
       skipBreadcrumb: true,
@@ -114,7 +86,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'project.resources',
     url: 'resources/',
-    component: ProjectResourcesPage,
+    component: lazyComponent(() =>
+      import('./ProjectResourcesPage').then((module) => ({
+        default: module.ProjectResourcesPage,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Resources'),
       priority: 110,
@@ -124,7 +100,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'project.issues',
     url: 'issues/',
-    component: ProjectIssuesList,
+    component: lazyComponent(() =>
+      import('./ProjectIssuesList').then((module) => ({
+        default: module.ProjectIssuesList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Issues'),
       permissions: [hasSupport],
@@ -134,7 +114,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'project.issue-details',
     url: 'issue/:issue_uuid/',
-    component: IssueDetailsContainer,
+    component: lazyComponent(() =>
+      import('../issues/IssueDetails').then((module) => ({
+        default: module.IssueDetails,
+      })),
+    ),
     data: {
       permissions: [hasSupport],
     },
@@ -143,7 +127,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'project.events',
     url: 'events/',
-    component: ProjectEventsView,
+    component: lazyComponent(() =>
+      import('./ProjectEventsList').then((module) => ({
+        default: module.ProjectEventsView,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Audit logs'),
       priority: 130,
@@ -152,31 +140,40 @@ export const states: StateDeclaration[] = [
   {
     name: 'project-users',
     url: 'users/',
-    component: ProjectUsersList,
+    component: lazyComponent(() =>
+      import('./team/ProjectUsersList').then((module) => ({
+        default: module.ProjectUsersList,
+      })),
+    ),
     parent: 'project-team',
     data: {
       breadcrumb: () => translate('Users'),
-      skipInitWorkspace: true,
     },
   },
   {
     name: 'project-invitations',
     url: 'invitations/',
-    component: InvitationsList,
+    component: lazyComponent(() =>
+      import('./team/InvitationsList').then((module) => ({
+        default: module.InvitationsList,
+      })),
+    ),
     parent: 'project-team',
     data: {
       breadcrumb: () => translate('Invitations'),
-      skipInitWorkspace: true,
     },
   },
   {
     name: 'project-permissions-log',
     url: 'permissions-log/',
-    component: ProjectPermissionsLogList,
+    component: lazyComponent(() =>
+      import('./team/ProjectPermissionsLogList').then((module) => ({
+        default: module.ProjectPermissionsLogList,
+      })),
+    ),
     parent: 'project-team',
     data: {
       breadcrumb: () => translate('Permissions log'),
-      skipInitWorkspace: true,
     },
   },
 ];

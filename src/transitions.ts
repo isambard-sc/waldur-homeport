@@ -2,12 +2,12 @@ import store from '@waldur/store/store';
 
 import { MatomoInstance } from './afterBootstrap';
 import { setRedirect } from './auth/AuthRedirectStorage';
-import { AuthService } from './auth/AuthService';
+import * as AuthService from './auth/AuthService';
 import { cleanObject } from './core/utils';
+import { setPrevParams, setPrevState } from './error/utils';
 import { isFeatureVisible } from './features/connect';
 import { tryAcceptInvitation } from './invitations/tryAcceptInvitation';
 import { closeModalDialog } from './modal/actions';
-import { setPrevParams, setPrevState } from './navigation/utils';
 import { router } from './router';
 import { UsersService } from './user/UsersService';
 
@@ -109,10 +109,12 @@ export function attachTransitions() {
     // Erred state is terminal, user should not be redirected from erred state to login
     // so that he would be able to read error message details
     if (error && error.detail && error.detail.status === 401) {
-      return AuthService.localLogout({
+      setRedirect({
         toState: transition.to().name,
         toParams: transition.to().params,
       });
+      AuthService.clearAuthCache();
+      return transition.router.stateService.target('login');
     }
     if (error && error['redirectTo'] && error['status'] !== -1) {
       return transition.router.stateService.target(error['redirectTo']);
@@ -146,7 +148,7 @@ export function attachTransitions() {
   router.transitionService.onSuccess({}, (transition) => {
     if (
       transition.to().data?.auth &&
-      !transition.params().hasOwnProperty('toState')
+      !Object.prototype.hasOwnProperty.call(transition.params(), 'toState')
     ) {
       setRedirect({
         toState: transition.to().name,

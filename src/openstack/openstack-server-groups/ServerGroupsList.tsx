@@ -8,8 +8,9 @@ import { ServerGroupType } from '@waldur/openstack/types';
 import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { Resource } from '@waldur/resource/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 interface ResourceRules extends Resource {
   policy: ServerGroupType;
@@ -38,11 +39,13 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => row.name,
+          copyField: (row) => row.name,
           orderField: 'name',
         },
         {
           title: translate('Policy'),
           render: ({ row }) => ResourcePolicy(row),
+          copyField: null,
           orderField: 'policy',
         },
         {
@@ -63,8 +66,14 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
       showPageSizeSelector={true}
       tableActions={
         <ButtonGroup>
-          <PullServerGroupsAction resource={resourceScope} />
-          <CreateServerGroupAction resource={resourceScope} />
+          <PullServerGroupsAction
+            resource={resourceScope}
+            refetch={props.fetch}
+          />
+          <CreateServerGroupAction
+            resource={resourceScope}
+            refetch={props.fetch}
+          />
         </ButtonGroup>
       }
     />

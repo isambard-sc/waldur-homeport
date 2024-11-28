@@ -1,14 +1,16 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
-const AzureVirtualMachineDetails = lazyComponent(
-  () => import('./AzureVirtualMachineDetails'),
-  'AzureVirtualMachineDetails',
+const AzureVirtualMachineDetails = lazyComponent(() =>
+  import('./AzureVirtualMachineDetails').then((module) => ({
+    default: module.AzureVirtualMachineDetails,
+  })),
 );
-const AzureVirtualMachineForm = lazyComponent(
-  () => import('./AzureVirtualMachineForm'),
-  'AzureVirtualMachineForm',
+const AzureVirtualMachineForm = lazyComponent(() =>
+  import('./AzureVirtualMachineForm').then((module) => ({
+    default: module.AzureVirtualMachineForm,
+  })),
 );
 
 const serializer = ({ name, location, image, size }) => ({
@@ -18,7 +20,7 @@ const serializer = ({ name, location, image, size }) => ({
   image: image ? image.url : undefined,
 });
 
-registerOfferingType({
+export const AzureVirtualMachineOffering: OfferingConfiguration = {
   type: 'Azure.VirtualMachine',
   get label() {
     return translate('Azure Virtual Machine');
@@ -28,4 +30,4 @@ registerOfferingType({
   providerType: 'Azure',
   serializer,
   allowToUpdateService: true,
-});
+};

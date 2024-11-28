@@ -8,14 +8,23 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
 import { CategoryColumn } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
+import { useTitle } from '@waldur/navigation/title';
+import { createFetcher } from '@waldur/table/api';
+import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { ResourceImportButton } from '../import/ResourceImportButton';
 
 import { AllResourcesFilter } from './AllResourcesFilter';
 import { CategoryColumnField } from './CategoryColumnField';
+import {
+  CATEGORY_RESOURCES_ALL_FILTER_FORM_ID,
+  CATEGORY_RESOURCES_TABLE_ID,
+} from './constants';
 import { CreateResourceButton } from './CreateResourceButton';
 import { ExpandableResourceSummary } from './ExpandableResourceSummary';
 import { ResourceActionsButton } from './ResourceActionsButton';
@@ -34,7 +43,12 @@ interface OwnProps {
 export const CategoryResourcesList: FunctionComponent<OwnProps> = (
   ownProps,
 ) => {
-  const filterValues: any = useSelector(getFormValues('AllResourcesFilter'));
+  useTitle(
+    translate('{category} resources', { category: ownProps.category_title }),
+  );
+  const filterValues: any = useSelector(
+    getFormValues(CATEGORY_RESOURCES_ALL_FILTER_FORM_ID),
+  );
 
   const filter = useMemo(() => {
     const filter: Record<string, any> = {};
@@ -63,15 +77,27 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
     if (filterValues?.organization) {
       filter.customer_uuid = filterValues.organization.uuid;
     }
-    filter.field = resourcesListRequiredFields();
     return filter;
   }, [filterValues, ownProps.category_uuid]);
 
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources('category-resources');
+
   const props = useTable({
-    table: `UserResourcesList-${ownProps.category_uuid}`,
+    table: `${CATEGORY_RESOURCES_TABLE_ID}-${ownProps.category_uuid}`,
     fetchData: createFetcher('marketplace-resources'),
     filter,
     queryField: 'query',
+    onApplyFilter: (filters) => {
+      const organization = filters.find((item) => item.name === 'organization');
+      const project = filters.find((item) => item.name === 'project');
+      const formValues = {
+        organization: organization?.value,
+        project: project?.value,
+      };
+      syncResourceFilters(formValues);
+    },
+    mandatoryFields: resourcesListRequiredFields(),
   });
   const columns: any[] = [
     {
@@ -83,12 +109,40 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       export: (row) => row.name || row.offering_name, // render as ResourceNameField label
     },
     {
+      title: translate('Backend ID'),
+      render: ({ row }) => renderFieldOrDash(row.backend_id),
+      id: 'backend_id',
+      keys: ['backend_id'],
+      optional: true,
+    },
+    {
       title: translate('Offering'),
       render: ({ row }) => row.offering_name,
       filter: 'offering',
       id: 'offering',
       keys: ['offering_name'],
       export: (row) => row.offering_name,
+    },
+    {
+      title: translate('Paused'),
+      render: ({ row }) => <BooleanField value={row.paused} />,
+      id: 'paused',
+      keys: ['paused'],
+      optional: true,
+    },
+    {
+      title: translate('Downscaled'),
+      render: ({ row }) => <BooleanField value={row.downscaled} />,
+      id: 'downscaled',
+      keys: ['downscaled'],
+      optional: true,
+    },
+    {
+      title: translate('Restrict member access'),
+      render: ({ row }) => <BooleanField value={row.restrict_member_access} />,
+      id: 'restrict_member_access',
+      keys: ['restrict_member_access'],
+      optional: true,
     },
   ];
 

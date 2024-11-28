@@ -7,31 +7,36 @@ import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { IBreadcrumbItem, PageBarTab } from '@waldur/navigation/types';
-import { usePageTabsTransmitter } from '@waldur/navigation/utils';
+import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import { getProtectedCall, getProtectedCallRound } from '../api';
 
 import { RoundPageHero } from './RoundPageHero';
 
-const ProposalsList = lazyComponent(
-  () => import('./proposals/ProposalsList'),
-  'ProposalsList',
+const ProposalsList = lazyComponent(() =>
+  import('./proposals/ProposalsList').then((module) => ({
+    default: module.ProposalsList,
+  })),
 );
-const RoundReviewersList = lazyComponent(
-  () => import('@waldur/proposals/round/reviewers/RoundReviewersList'),
-  'RoundReviewersList',
+const RoundReviewersList = lazyComponent(() =>
+  import('@waldur/proposals/round/reviewers/RoundReviewersList').then(
+    (module) => ({ default: module.RoundReviewersList }),
+  ),
 );
-const RoundSubmissionSection = lazyComponent(
-  () => import('./submission/RoundSubmissionSection'),
-  'RoundSubmissionSection',
+const RoundSubmissionSection = lazyComponent(() =>
+  import('./submission/RoundSubmissionSection').then((module) => ({
+    default: module.RoundSubmissionSection,
+  })),
 );
-const RoundReviewSection = lazyComponent(
-  () => import('./review/RoundReviewSection'),
-  'RoundReviewSection',
+const RoundReviewSection = lazyComponent(() =>
+  import('./review/RoundReviewSection').then((module) => ({
+    default: module.RoundReviewSection,
+  })),
 );
-const RoundAllocationSection = lazyComponent(
-  () => import('./allocation/RoundAllocationSection'),
-  'RoundAllocationSection',
+const RoundAllocationSection = lazyComponent(() =>
+  import('./allocation/RoundAllocationSection').then((module) => ({
+    default: module.RoundAllocationSection,
+  })),
 );
 
 const tabs: PageBarTab[] = [
@@ -155,8 +160,8 @@ export const RoundUIView = () => {
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
-          {...props}
           key={key}
+          {...props}
           refetch={refetch}
           round={round}
           call={call}

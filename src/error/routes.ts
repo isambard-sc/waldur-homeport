@@ -3,15 +3,6 @@ import { UIView } from '@uirouter/react';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 
-const InvalidObjectPage = lazyComponent(
-  () => import('./InvalidObjectPage'),
-  'InvalidObjectPage',
-);
-const InvalidRoutePage = lazyComponent(
-  () => import('./InvalidRoutePage'),
-  'InvalidRoutePage',
-);
-
 export const states: StateDeclaration[] = [
   {
     name: 'errorPage',
@@ -21,12 +12,20 @@ export const states: StateDeclaration[] = [
 
   {
     name: 'errorPage.notFound',
-    component: InvalidObjectPage,
+    component: lazyComponent(() =>
+      import('./InvalidObjectPage').then((module) => ({
+        default: module.InvalidObjectPage,
+      })),
+    ),
   },
 
   {
     name: 'errorPage.otherwise',
     url: '*path',
-    component: InvalidRoutePage,
+    component: lazyComponent(() =>
+      import('./InvalidRoutePage').then((module) => ({
+        default: module.InvalidRoutePage,
+      })),
+    ),
   },
 ];

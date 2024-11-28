@@ -121,7 +121,7 @@ const WidgetItem: FC<{ item: ProviderWidget }> = ({ item }) => (
     as={Link}
     state={item.to.state}
     params={item.to.params}
-    className="flex-grow-1 min-h-225px border border-secondary border-hover"
+    className="card-bordered flex-grow-1 min-h-225px border-hover-primary-300"
   >
     <Card.Body className="py-10 px-6">
       {item.icon && (
@@ -177,7 +177,7 @@ export const ProviderWidgets = ({ provider }) => {
         <>{translate('Unable to load data')}</>
       ) : (
         (value as ProviderWidget[]).map((item, i) => (
-          <Col key={i} xs={6} md={3} lg={6} xxl={3} className="mb-6">
+          <Col key={i} xs={6} md={3} lg={6} xxl={3} className="mb-5">
             <WidgetItem item={item} />
           </Col>
         ))

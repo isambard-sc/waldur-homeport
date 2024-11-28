@@ -7,8 +7,10 @@ import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { ProposalReview } from '@waldur/proposals/types';
 import { formatReviewState } from '@waldur/proposals/utils';
-import { Table, createFetcher } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { USER_REVIEWS_FILTER_FORM_ID } from '@waldur/user/constants';
 import { getUser } from '@waldur/workspace/selectors';
 
@@ -33,6 +35,8 @@ const filtersSelctor = createSelector(
   },
 );
 
+const mandatoryFields = ['uuid', 'proposal_name', 'state'];
+
 export const UserReviewsList: FC = () => {
   const filter = useSelector(filtersSelctor);
 
@@ -41,6 +45,7 @@ export const UserReviewsList: FC = () => {
     fetchData: createFetcher('proposal-reviews'),
     queryField: 'proposal_name',
     filter,
+    mandatoryFields,
   });
 
   const ReviewItemActions = ({ row, fetch }) => (

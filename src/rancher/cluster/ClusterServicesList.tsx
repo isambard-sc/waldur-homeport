@@ -2,8 +2,9 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { ImportYAMLButton } from './ImportYAMLButton';
 import { ServiceActions } from './ServiceActions';
@@ -29,6 +30,7 @@ export const ClusterServicesList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Namespace'),

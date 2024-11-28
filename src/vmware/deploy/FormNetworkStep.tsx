@@ -7,8 +7,9 @@ import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const FormNetworkStep = (props: FormStepProps) => {
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();

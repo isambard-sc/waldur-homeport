@@ -5,6 +5,8 @@ import { OrderDetailsType } from '@waldur/marketplace/orders/types';
 import { Quota } from '@waldur/quotas/types';
 import { Customer, Project } from '@waldur/workspace/types';
 
+import { FieldType } from './offerings/update/options/types';
+
 export type BillingPeriod = 'hour' | 'day' | 'half_month' | 'month';
 
 interface BaseComponent {
@@ -46,10 +48,11 @@ export interface Plan {
   archived: boolean;
   price: number;
   plan_type: string;
+  organization_groups: OrganizationGroup[];
 }
 
 export interface OptionField {
-  type?: string;
+  type?: FieldType;
   label: string;
   help_text?: string;
   required?: boolean;
@@ -117,6 +120,7 @@ export interface Offering extends GeolocationPoint {
   customer_uuid?: string;
   customer_name?: string;
   customer_image?: string;
+  project?: string;
   project_name?: string;
   project_uuid?: string;
   attributes: AttributesType;
@@ -125,6 +129,7 @@ export interface Offering extends GeolocationPoint {
   resource_options?: OfferingOptions;
   plugin_options?: Record<string, any>;
   secret_options?: Record<string, any>;
+  service_attributes?: Record<string, any>;
   plans?: Plan[];
   type: string;
   state: OfferingState;
@@ -186,6 +191,7 @@ export interface Section {
 }
 
 export interface CategoryColumn {
+  uuid?: string;
   index: number;
   title: string;
   attribute?: string;
@@ -216,17 +222,6 @@ export interface Category {
   group?: string;
 }
 
-export interface CategoryComponentUsage {
-  date: string;
-  reported_usage: number;
-  fixed_usage: number;
-  category_uuid: string;
-  category_title: string;
-  name: string;
-  type: string;
-  measured_unit: string;
-}
-
 export interface OfferingsListType {
   items: Offering[];
   loaded: boolean;
@@ -246,6 +241,7 @@ export interface ServiceProvider {
   customer_abbreviation?: string;
   customer_country?: string;
   country?: string;
+  country_name?: string;
   organizationGroup?: string;
   url?: string;
 }
@@ -254,7 +250,6 @@ export interface OfferingConfigurationFormProps extends InjectedFormProps {
   offering: Offering;
   project?: Project;
   plan?: Plan;
-  initialAttributes?: AttributesType;
   initialLimits?: AttributesType;
   customer?: Customer;
   limits: string[];
@@ -287,6 +282,8 @@ export interface PluginMetadata {
 export interface ImportableResource {
   backend_id: string;
   name: string;
+  type: string;
+  description: string;
 }
 
 export interface OfferingPermission {

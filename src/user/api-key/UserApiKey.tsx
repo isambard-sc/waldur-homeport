@@ -6,7 +6,7 @@ import { getUser } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
 
 import { AuthenticationEvents } from './AuthenticationEvents';
-import { UserEditTokenContainer } from './UserEditTokenContainer';
+import { UserTokenLifetime } from './UserTokenLifetime';
 
 export const UserApiKey: FunctionComponent = () => {
   const user = useSelector(getUser) as UserDetails;
@@ -15,7 +15,7 @@ export const UserApiKey: FunctionComponent = () => {
   }
   return (
     <>
-      <UserEditTokenContainer user={user} />
+      <UserTokenLifetime user={user} />
       <AuthenticationEvents user={user} />
     </>
   );

@@ -12,7 +12,7 @@ interface ResourceReference {
   project_end_date?: string;
 }
 
-type ResourceState =
+export type ResourceState =
   | 'Creating'
   | 'OK'
   | 'Erred'
@@ -58,10 +58,15 @@ export interface Resource extends ResourceReference {
   customer_uuid?: string;
   is_usage_based?: boolean;
   is_limit_based?: boolean;
+
+  downscaled: boolean;
+  restrict_member_access: boolean;
+  paused: boolean;
   backend_id?: string;
   effective_id?: string;
   access_url?: string;
   limits: Record<string, number>;
+  limit_usage?: Record<string, number>;
   current_usages?: Record<string, number>;
   plan_uuid?: string;
   plan_name?: string;

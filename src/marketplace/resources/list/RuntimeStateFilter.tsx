@@ -8,18 +8,16 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { getRuntimeStates } from '@waldur/marketplace/common/api';
-import { getProject, getWorkspace } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
+import { getProject } from '@waldur/workspace/selectors';
 
 export const RuntimeStateFilter: React.FC<{}> = () => {
-  const workspace = useSelector(getWorkspace);
   const { params } = useCurrentStateAndParams();
   const project = useSelector(getProject);
 
   const { data, isLoading } = useQuery(
     ['runtime-states', project?.uuid, params.category_uuid],
     () =>
-      workspace === WorkspaceType.PROJECT
+      project
         ? getRuntimeStates(project.uuid, params.category_uuid)
         : getRuntimeStates(),
   );

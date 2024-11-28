@@ -1,69 +1,37 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
-import { Attribute } from '@waldur/marketplace/types';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 import { SLURM_PLUGIN, SLURM_REMOTE_PLUGIN } from '@waldur/slurm/constants';
 
-const UserPluginOptionsForm = lazyComponent(
-  () => import('@waldur/marketplace/UserPluginOptionsForm'),
-  'UserPluginOptionsForm',
+const UserPluginOptionsForm = lazyComponent(() =>
+  import('@waldur/marketplace/UserPluginOptionsForm').then((module) => ({
+    default: module.UserPluginOptionsForm,
+  })),
 );
 
-const UserSecretOptionsForm = lazyComponent(
-  () => import('@waldur/marketplace/UserSecretOptionsForm'),
-  'UserSecretOptionsForm',
+const UserSecretOptionsForm = lazyComponent(() =>
+  import('@waldur/marketplace/UserSecretOptionsForm').then((module) => ({
+    default: module.UserSecretOptionsForm,
+  })),
 );
 
-const SlurmOrderForm = lazyComponent(
-  () => import('./deploy/SlurmOrderForm'),
-  'SlurmOrderForm',
+const SlurmOrderForm = lazyComponent(() =>
+  import('./deploy/SlurmOrderForm').then((module) => ({
+    default: module.SlurmOrderForm,
+  })),
 );
 
-const ServiceSettingsAttributes = (): Attribute[] => [
-  {
-    key: 'hostname',
-    title: translate('Hostname'),
-    type: 'string',
-  },
-  {
-    key: 'username',
-    title: translate('Username'),
-    type: 'string',
-  },
-  {
-    key: 'port',
-    title: translate('Port'),
-    type: 'string',
-  },
-  {
-    key: 'gateway',
-    title: translate('Gateway'),
-    type: 'string',
-  },
-  {
-    key: 'use_sudo',
-    title: translate('Use sudo'),
-    type: 'string',
-  },
-  {
-    key: 'default_account',
-    title: translate('Default account'),
-    type: 'string',
-  },
-];
-
-registerOfferingType({
+export const SlurmOffering: OfferingConfiguration = {
   type: SLURM_PLUGIN,
   get label() {
     return translate('SLURM allocation');
   },
   orderFormComponent: SlurmOrderForm,
   providerType: 'SLURM',
-  attributes: ServiceSettingsAttributes,
   allowToUpdateService: true,
-});
+};
 
-registerOfferingType({
+export const SlurmRemoteOffering: OfferingConfiguration = {
   type: SLURM_REMOTE_PLUGIN,
   get label() {
     return translate('SLURM remote allocation');
@@ -72,7 +40,6 @@ registerOfferingType({
   pluginOptionsForm: UserPluginOptionsForm,
   secretOptionsForm: UserSecretOptionsForm,
   providerType: 'SLURM remote',
-  attributes: (): Attribute[] => [],
   allowToUpdateService: true,
-  showOptions: true,
-});
+  showComponents: true,
+};

@@ -6,9 +6,10 @@ import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalA
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { VOLUME_TYPE } from '../constants';
 import { AttachVolumeAction } from '../openstack-instance/actions/AttachVolumeAction';
@@ -23,8 +24,8 @@ export const InstanceVolumesList: FunctionComponent<{ resourceScope }> = ({
     [resourceScope],
   );
   const props = useTable({
-    table: 'openstacktenant-volumes',
-    fetchData: createFetcher('openstacktenant-volumes'),
+    table: 'openstack-volumes',
+    fetchData: createFetcher('openstack-volumes'),
     filter,
   });
 
@@ -35,6 +36,7 @@ export const InstanceVolumesList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Size'),
@@ -57,7 +59,9 @@ export const InstanceVolumesList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => <ResourceState resource={row} />,
         },
       ]}
-      tableActions={<AttachVolumeAction resource={resourceScope} />}
+      tableActions={
+        <AttachVolumeAction resource={resourceScope} refetch={props.fetch} />
+      }
       verboseName={translate('volumes')}
       rowActions={({ row }) => (
         <ModalActionsRouter

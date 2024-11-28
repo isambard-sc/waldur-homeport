@@ -1,15 +1,15 @@
+import { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
 import { EChart } from '@waldur/core/EChart';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
 import { translate } from '@waldur/i18n';
-import { themeSelector } from '@waldur/navigation/theme/store';
+import { useTheme } from '@waldur/theme/useTheme';
 
 import { QUOTA_CATEGORIES } from './constants';
 import { Quota } from './types';
-import { formatQuotaValue, formatQuotaName } from './utils';
+import { formatQuota, formatQuotaName, formatQuotaValue } from './utils';
 
 interface Resource {
   quotas: Quota[];
@@ -23,16 +23,16 @@ const ResourceQuotaChart = ({ value, max }) => {
   if (percentage > 95) color = '#CC0808';
   else if (percentage > 60) color = '#FCCF5C';
 
-  const theme = useSelector(themeSelector);
+  const { theme } = useTheme();
 
-  const chartOptions = {
+  const chartOptions: EChartsOption = {
     tooltip: {
       trigger: 'item',
     },
     series: [
       {
         type: 'pie',
-        radius: '100%',
+        radius: '95%',
         center: ['50%', '50%'],
         label: { show: false },
         data: [
@@ -41,6 +41,9 @@ const ResourceQuotaChart = ({ value, max }) => {
             value: empty,
             name: translate('Free'),
             itemStyle: { color: theme === 'light' ? '#f5f8fa' : '#1a261d' },
+            emphasis: {
+              itemStyle: { color: theme === 'light' ? '#f5f8fa' : '#1a261d' },
+            },
           },
         ],
         animation: false,
@@ -48,6 +51,7 @@ const ResourceQuotaChart = ({ value, max }) => {
           itemStyle: {
             shadowColor: 'rgba(0, 0, 0, 0.5)',
           },
+          scaleSize: 2,
         },
       },
     ],
@@ -71,26 +75,7 @@ const ResourceQuotaChart = ({ value, max }) => {
 };
 
 const ResourceQuotaItem = ({ quota }: { quota: Quota }) => {
-  const data = useMemo(() => {
-    const formattedUsage = formatQuotaValue(quota.usage, quota.name);
-    const formattedLimit = formatQuotaValue(quota.limit, quota.name);
-    let usage, usageValue;
-    if (formattedUsage === '∞') {
-      usage = formattedUsage;
-      usageValue = Infinity;
-    } else {
-      usage = String(formattedUsage).match(/\d+/)[0];
-      usageValue = Number(usage);
-    }
-    let limitValue;
-    const limit = formattedLimit;
-    if (formattedLimit === '∞') {
-      limitValue = Infinity;
-    } else {
-      limitValue = Number(String(formattedLimit).match(/\d+/)[0]);
-    }
-    return { usage, usageValue, limit, limitValue };
-  }, [quota]);
+  const data = useMemo(() => formatQuota(quota), [quota]);
 
   return (
     <div className="resource-quota-item fw-bold d-flex mb-6">

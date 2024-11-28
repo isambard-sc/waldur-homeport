@@ -1,4 +1,4 @@
-import { Plus } from '@phosphor-icons/react';
+import { Minus, Plus } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Button, Form } from 'react-bootstrap';
 
@@ -42,7 +42,9 @@ export const BoxNumberField: FunctionComponent<BoxNumberFieldProps> = (
           }
           disabled={props.disabled}
         >
-          <i className="fa fa-minus" />
+          <span className="svg-icon svg-icon-2">
+            <Minus />
+          </span>
         </Button>
         <Form.Control
           {...props.input}

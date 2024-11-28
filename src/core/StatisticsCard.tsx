@@ -15,7 +15,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
   value,
   to,
 }) => (
-  <Card className="mb-6">
+  <Card className="card-bordered mb-5">
     <Card.Body className="d-flex d-md-block justify-content-between align-items-center">
       {to && (
         <div className="buttons text-end order-2">

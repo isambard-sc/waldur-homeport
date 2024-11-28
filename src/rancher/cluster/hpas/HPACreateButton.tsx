@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const HPACreateDialog = lazyComponent(
-  () => import('./HPACreateDialog'),
-  'HPACreateDialog',
+const HPACreateDialog = lazyComponent(() =>
+  import('./HPACreateDialog').then((module) => ({
+    default: module.HPACreateDialog,
+  })),
 );
 
 const createHPADialog = (cluster) =>

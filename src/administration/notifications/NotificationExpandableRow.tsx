@@ -1,3 +1,4 @@
+import { PencilSimple } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 
@@ -21,7 +22,9 @@ export const NotificationExpandableRow: FunctionComponent<{
                 {template.is_content_overridden ? (
                   <div>
                     {template.path}
-                    <i className="fa fa-pencil" style={{ marginLeft: '5px' }} />
+                    <span className="svg-icon svg-icon-5 ms-3">
+                      <PencilSimple />
+                    </span>
                   </div>
                 ) : (
                   template.path

@@ -3,8 +3,11 @@ import { FunctionComponent, useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+
+import { OfferingUserRowActions } from '../actions/OfferingUserRowActions';
 
 import { CreateOfferingUserButton } from './CreateOfferingUserButton';
 
@@ -24,12 +27,18 @@ export const OfferingUsersTable: FunctionComponent<{ offering }> = ({
   });
   const columns = [
     {
-      title: translate('Name'),
+      title: translate('UUID'),
       render: ({ row }) => (
         <Link state="users.details" params={{ uuid: row.user_uuid }}>
-          {row.username || row.user_uuid}
+          {row.user_uuid}
         </Link>
       ),
+      copyField: (row) => row.user_uuid,
+    },
+    {
+      title: translate('Name'),
+      render: ({ row }) => row.username || row.user_full_name,
+      copyField: (row) => row.username || row.user_full_name,
     },
     {
       title: translate('Created at'),
@@ -53,6 +62,13 @@ export const OfferingUsersTable: FunctionComponent<{ offering }> = ({
           />
         )
       }
+      rowActions={({ row }) => (
+        <OfferingUserRowActions
+          row={row}
+          fetch={props.fetch}
+          offering={offering}
+        />
+      )}
     />
   );
 };

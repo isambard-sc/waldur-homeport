@@ -1,3 +1,4 @@
+import { ArrowsOutCardinal } from '@phosphor-icons/react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -7,19 +8,26 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 import { Project } from '@waldur/workspace/types';
 
-const MoveProjectDialog = lazyComponent(
-  () => import('./MoveProjectDialog'),
-  'MoveProjectDialog',
+const MoveProjectDialog = lazyComponent(() =>
+  import('./MoveProjectDialog').then((module) => ({
+    default: module.MoveProjectDialog,
+  })),
 );
 
-export const MoveProjectAction = ({ project }: { project: Project }) => {
+export const MoveProjectAction = ({
+  project,
+  refetch,
+}: {
+  project: Project;
+  refetch;
+}) => {
   const dispatch = useDispatch();
   const isStaff = useSelector(isStaffSelector);
 
   const callback = () => {
     dispatch(
       openModalDialog(MoveProjectDialog, {
-        resolve: { project },
+        resolve: { project, refetch },
       }),
     );
   };
@@ -29,6 +37,7 @@ export const MoveProjectAction = ({ project }: { project: Project }) => {
       title={translate('Move project')}
       action={callback}
       disabled={!isStaff}
+      iconNode={<ArrowsOutCardinal />}
     />
   );
 };

@@ -5,9 +5,10 @@ import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions'
 import { formatCrontab } from '@waldur/resource/crontab';
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher } from '@waldur/table';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CreateBackupScheduleAction } from '../openstack-instance/actions/CreateBackupScheduleAction';
 
@@ -22,8 +23,8 @@ export const BackupsSchedulesList: FunctionComponent<{ resourceScope }> = ({
   );
 
   const props = useTable({
-    table: 'openstacktenant-backup-schedules',
-    fetchData: createFetcher('openstacktenant-backup-schedules'),
+    table: 'openstack-backup-schedules',
+    fetchData: createFetcher('openstack-backup-schedules'),
     filter,
   });
 
@@ -34,6 +35,7 @@ export const BackupsSchedulesList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
           orderField: 'name',
         },
         {

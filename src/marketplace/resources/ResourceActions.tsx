@@ -2,15 +2,12 @@ import { useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
-import {
-  INSTANCE_TYPE,
-  TENANT_TYPE,
-  VOLUME_TYPE,
-} from '@waldur/openstack/constants';
-import { ActionRegistry } from '@waldur/resource/actions/registry';
+import { ResourceActionsButton as BaseResourceActionsButton } from '@waldur/marketplace/resources/actions/ResourceActionsButton';
+import { getActions } from '@waldur/resource/actions/registry';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 
 import { ActionsList } from './actions/ActionsList';
+import { ActionsLists } from './actions/ActionsLists';
 
 export const ResourceActions = ({
   resource,
@@ -19,13 +16,26 @@ export const ResourceActions = ({
   labeled = false,
 }) => {
   const extraActions = useMemo(() => {
-    return ActionRegistry.getActions(resource.resource_type).filter(
+    return getActions(resource.resource_type).filter(
       (action) => !ActionsList.includes(action),
     );
   }, [resource]);
-  if (
-    [INSTANCE_TYPE, VOLUME_TYPE, TENANT_TYPE].includes(resource.offering_type)
-  ) {
+  if (!scope) {
+    return (
+      <BaseResourceActionsButton
+        resource={
+          {
+            ...resource,
+            marketplace_resource_uuid: resource.uuid,
+          } as any
+        }
+        refetch={refetch}
+        labeled
+      />
+    );
+  }
+
+  if (ActionsLists[resource.offering_type]) {
     return (
       <ModalActionsRouter
         offering_type={resource.offering_type}
@@ -37,10 +47,7 @@ export const ResourceActions = ({
     );
   }
   return (
-    <ActionsDropdownComponent
-      label={translate('All actions')}
-      labeled={labeled}
-    >
+    <ActionsDropdownComponent label={translate('Actions')} labeled={labeled}>
       {ActionsList.map((ActionComponent, index) => (
         <ActionComponent key={index} resource={resource} refetch={refetch} />
       ))}

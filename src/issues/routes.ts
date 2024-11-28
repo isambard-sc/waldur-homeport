@@ -4,42 +4,8 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 import { hasSupport } from './hooks';
-
-const SupportDashboard = lazyComponent(
-  () => import('@waldur/support/dashboard/SupportDashboard'),
-  'SupportDashboard',
-);
-const SupportFeedback = lazyComponent(
-  () => import('@waldur/issues/feedback/SupportFeedback'),
-  'SupportFeedback',
-);
-const SupportFeedbackList = lazyComponent(
-  () => import('@waldur/issues/feedback/SupportFeedbackList'),
-  'SupportFeedbackList',
-);
-const SupportIssues = lazyComponent(
-  () => import('@waldur/issues/SupportIssues'),
-  'SupportIssues',
-);
-const IssueDetailsContainer = lazyComponent(
-  () => import('./IssueDetails'),
-  'IssueDetails',
-);
-const BroadcastList = lazyComponent(
-  () => import('../broadcasts/BroadcastList'),
-  'BroadcastList',
-);
-const BroadcastTemplateList = lazyComponent(
-  () => import('../broadcasts/BroadcastTemplateList'),
-  'BroadcastTemplateList',
-);
-const BaseEventsList = lazyComponent(
-  () => import('@waldur/events/BaseEventsList'),
-  'BaseEventsList',
-);
 
 export const states: StateDeclaration[] = [
   {
@@ -50,7 +16,6 @@ export const states: StateDeclaration[] = [
     abstract: true,
     data: {
       auth: true,
-      workspace: WorkspaceType.SUPPORT,
       title: () => translate('Support'),
       permissions: [isStaffOrSupport],
     },
@@ -60,7 +25,11 @@ export const states: StateDeclaration[] = [
     name: 'support-dashboard',
     url: '',
     parent: 'support',
-    component: SupportDashboard,
+    component: lazyComponent(() =>
+      import('@waldur/support/dashboard/SupportDashboard').then((module) => ({
+        default: module.SupportDashboard,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Dashboard'),
       priority: 100,
@@ -70,7 +39,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.detail',
     url: 'issue/:issue_uuid/',
-    component: IssueDetailsContainer,
+    component: lazyComponent(() =>
+      import('./IssueDetails').then((module) => ({
+        default: module.IssueDetails,
+      })),
+    ),
     data: {
       permissions: [isStaffOrSupport, hasSupport],
     },
@@ -79,7 +52,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.list',
     url: 'list/?{status}',
-    component: SupportIssues,
+    component: lazyComponent(() =>
+      import('@waldur/issues/SupportIssues').then((module) => ({
+        default: module.SupportIssues,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Issues'),
       permissions: [isStaffOrSupport, hasSupport],
@@ -90,7 +67,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'supportFeedback',
     url: '/support/feedback/?token&evaluation',
-    component: SupportFeedback,
+    component: lazyComponent(() =>
+      import('@waldur/issues/feedback/SupportFeedback').then((module) => ({
+        default: module.SupportFeedback,
+      })),
+    ),
     data: {
       permissions: [hasSupport],
     },
@@ -99,7 +80,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.feedback',
     url: 'feedback/',
-    component: SupportFeedbackList,
+    component: lazyComponent(() =>
+      import('@waldur/issues/feedback/SupportFeedbackList').then((module) => ({
+        default: module.SupportFeedbackList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Feedback'),
       permissions: [isStaffOrSupport, hasSupport],
@@ -110,7 +95,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.broadcast',
     url: 'broadcast/',
-    component: BroadcastList,
+    component: lazyComponent(() =>
+      import('../broadcasts/BroadcastList').then((module) => ({
+        default: module.BroadcastList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Broadcast'),
       priority: 100,
@@ -120,7 +109,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.broadcast-templates',
     url: 'broadcast-templates/',
-    component: BroadcastTemplateList,
+    component: lazyComponent(() =>
+      import('../broadcasts/BroadcastTemplateList').then((module) => ({
+        default: module.BroadcastTemplateList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Broadcast templates'),
       priority: 101,
@@ -130,7 +123,11 @@ export const states: StateDeclaration[] = [
   {
     name: 'support.audit-logs',
     url: 'audit-logs/',
-    component: BaseEventsList,
+    component: lazyComponent(() =>
+      import('@waldur/support/SupportEventsList').then((module) => ({
+        default: module.SupportEventsList,
+      })),
+    ),
     data: {
       breadcrumb: () => translate('Audit logs'),
       priority: 105,

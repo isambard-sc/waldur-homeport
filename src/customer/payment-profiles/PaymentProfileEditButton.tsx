@@ -1,14 +1,13 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
+import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
-const PaymentProfileUpdateDialogContainer = lazyComponent(
-  () => import('./PaymentProfileUpdateDialog'),
-  'PaymentProfileUpdateDialogContainer',
+const PaymentProfileUpdateDialogContainer = lazyComponent(() =>
+  import('./PaymentProfileUpdateDialog').then((module) => ({
+    default: module.PaymentProfileUpdateDialogContainer,
+  })),
 );
 
 export const PaymentProfileEditButton = (props) => {
@@ -21,10 +20,8 @@ export const PaymentProfileEditButton = (props) => {
     );
 
   return (
-    <RowActionButton
-      title={translate('Edit')}
-      action={callback}
-      iconNode={<PencilSimple />}
+    <EditButton
+      onClick={callback}
       size="sm"
       {...props.tooltipAndDisabledAttributes}
     />

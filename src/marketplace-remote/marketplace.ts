@@ -1,42 +1,22 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
-import { Attribute } from '@waldur/marketplace/types';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 import { COMMON_OPTIONS } from '@waldur/support/marketplace';
 
 import { REMOTE_OFFERING_TYPE } from './constants';
 
-const RemoteOfferingSecretOptions = lazyComponent(
-  () => import('./RemoteOfferingSecretOptions'),
-  'RemoteOfferingSecretOptions',
+const RemoteOfferingSecretOptions = lazyComponent(() =>
+  import('./RemoteOfferingSecretOptions').then((module) => ({
+    default: module.RemoteOfferingSecretOptions,
+  })),
 );
 
-const RemoteOfferingOptionsSummary = (): Attribute[] => [
-  {
-    key: 'api_url',
-    title: translate('API URL'),
-    type: 'string',
-  },
-  {
-    key: 'token',
-    title: translate('Token'),
-    type: 'password',
-  },
-  {
-    key: 'customer_uuid',
-    title: translate('Organization UUID'),
-    type: 'string',
-  },
-];
-
-registerOfferingType({
+export const RemoteOffering: OfferingConfiguration = {
   type: REMOTE_OFFERING_TYPE,
   get label() {
     return translate('Remote offering');
   },
   ...COMMON_OPTIONS,
-  showOptions: false,
   showBackendId: true,
-  secretOptionsForm: RemoteOfferingSecretOptions,
-  optionsSummary: RemoteOfferingOptionsSummary,
-});
+  provisioningConfigForm: RemoteOfferingSecretOptions,
+};

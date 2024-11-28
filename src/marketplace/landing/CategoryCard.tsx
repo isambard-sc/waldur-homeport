@@ -12,7 +12,7 @@ interface CategoryCardProps {
 }
 
 export const CategoryCard: FunctionComponent<CategoryCardProps> = (props) => (
-  <Card as={props.as} item={props.item} className="shadow-sm category-card">
+  <Card as={props.as} item={props.item} className="card-bordered category-card">
     <Card.Body className="p-6">
       <div className="category-thumb">
         <OfferingLogo src={props.item.icon} />

@@ -1,15 +1,14 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n/translate';
+import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
-const GroupEditDialog = lazyComponent(
-  () => import('./GroupFromDialog'),
-  'GroupFromDialog',
+const GroupEditDialog = lazyComponent(() =>
+  import('./GroupFromDialog').then((module) => ({
+    default: module.GroupFromDialog,
+  })),
 );
 
 const groupEditDialog = (row, refetch) =>
@@ -25,12 +24,5 @@ export const GroupEditButton = ({ row, refetch }) => {
     [dispatch],
   );
 
-  return (
-    <RowActionButton
-      title={translate('Edit')}
-      action={openFormDialog}
-      iconNode={<PencilSimple />}
-      size="sm"
-    />
-  );
+  return <EditButton onClick={openFormDialog} size="sm" />;
 };

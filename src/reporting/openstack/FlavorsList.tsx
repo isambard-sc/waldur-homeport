@@ -5,8 +5,8 @@ import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
-import { Table } from '@waldur/table/index';
-import { useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { formatFilter } from './utils';
 
@@ -27,7 +27,7 @@ export const FlavorsList: FunctionComponent<{}> = () => {
   const filter = useSelector(mapStateToFilter);
   const tableProps = useTable({
     table: 'flavorsList',
-    fetchData: createFetcher('openstacktenant-flavors/usage_stats'),
+    fetchData: createFetcher('openstack-flavors/usage_stats'),
     filter,
   });
   return (

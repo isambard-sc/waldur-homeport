@@ -1,6 +1,6 @@
 import { Question } from '@phosphor-icons/react';
-import { cloneDeep } from 'lodash';
-import { FunctionComponent, useMemo } from 'react';
+import { cloneDeep } from 'lodash-es';
+import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
@@ -14,11 +14,12 @@ import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { formatRole } from '@waldur/permissions/utils';
+import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import { Table, createFetcher } from '@waldur/table/index';
+import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/utils';
+import { useTable } from '@waldur/table/useTable';
 import { User } from '@waldur/workspace/types';
 
 import { UserDetailsButton } from './UserDetailsButton';
@@ -149,20 +150,37 @@ const DEFAULT_ENABLED_COLUMNS = [
   'is_active',
 ];
 
-export const UserList: FunctionComponent = () => {
-  const filterValues = useSelector(mapStateToFilter);
-  const filter = useMemo(() => {
-    return {
-      ...filterValues,
-      field: ['uuid', 'url', 'identity_provider_fields', 'registration_method'],
-    };
-  }, [filterValues]);
+const mandatoryFields = [
+  'uuid',
+  // UserDetailsButton
+  'full_name',
+  'native_name',
+  'civil_number',
+  'phone_number',
+  'username',
+  'email',
+  'slug',
+  'preferred_language',
+  'identity_provider_label',
+  'date_joined',
+  'organization',
+  'job_title',
+  'affiliations',
+  'is_staff',
+  'is_support',
+  'is_active',
+  'url',
+  'permissions',
+];
 
+export const UserList: FunctionComponent = () => {
+  const filter = useSelector(mapStateToFilter);
   const props = useTable({
     table: `userList`,
     fetchData: createFetcher('users'),
     queryField: 'query',
     filter,
+    mandatoryFields,
   });
 
   const columns: Column[] = [
@@ -192,6 +210,7 @@ export const UserList: FunctionComponent = () => {
       render: OrganizationField,
       orderField: 'organization',
       filter: 'organization',
+      keys: ['organization'],
       id: 'organization',
       export: 'organization',
     },
@@ -208,7 +227,7 @@ export const UserList: FunctionComponent = () => {
       render: ProjectRolesField,
       keys: ['permissions'],
       id: 'project_roles',
-      export: false,
+      export: (row) => getProjectRole(row),
     },
     {
       title: translate('Staff'),
@@ -378,3 +397,19 @@ export const getOrganizationsWhereOwner = (user: Partial<User>) =>
         .map((perm) => perm.scope_name)
         .join(', ')
     : DASH_ESCAPE_CODE;
+
+const getProjectRole = (user: Partial<User>) => {
+  const permissions = user.permissions?.filter(
+    ({ scope_type }) => scope_type === 'project',
+  );
+  if (permissions.length > 0) {
+    return permissions
+      .map(
+        (p) =>
+          `${p.customer_name}/${p.scope_name} (${formatRole(p.role_name)})`,
+      )
+      .join(', ');
+  } else {
+    return DASH_ESCAPE_CODE;
+  }
+};

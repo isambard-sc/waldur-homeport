@@ -11,8 +11,9 @@ import {
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { QuotaUsageBarChart } from '@waldur/quotas/QuotaUsageBarChart';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { Flavor } from '../types';
 
@@ -28,13 +29,13 @@ export const FormFlavorStep = (props: FormStepProps) => {
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
 
   const filter = useMemo(
-    () => ({ settings_uuid: props.offering.scope_uuid }),
-    [props.offering],
+    () => ({ tenant_uuid: props.offering.scope_uuid }),
+    [props.offering.scope_uuid],
   );
 
   const tableProps = useTable({
-    table: 'deploy-openstacktenant-flavors',
-    fetchData: createFetcher('openstacktenant-flavors'),
+    table: 'deploy-openstack-flavors',
+    fetchData: createFetcher('openstack-flavors'),
     filter,
     queryField: 'name',
     staleTime: 3 * 60 * 1000,

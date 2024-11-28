@@ -1,18 +1,19 @@
-import { Check, X } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { Badge } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
+import { BooleanBadge } from '@waldur/core/BooleanBadge';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { CostPolicyCreateButton } from '@waldur/customer/cost-policies/CostPolicyCreateButton';
 import { CostPolicyDeleteButton } from '@waldur/customer/cost-policies/CostPolicyDeleteButton';
+import { CostPolicyEditButton } from '@waldur/customer/cost-policies/CostPolicyEditButton';
 import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { OrganizationCostPoliciesFilter } from './OrganizationCostPoliciesFilter';
 
@@ -51,10 +52,6 @@ export const OrganizationCostPoliciesList: FC = () => {
           filter: 'organization',
         },
         {
-          title: translate('Cost threshold'),
-          render: ({ row }) => <>{defaultCurrency(row.limit_cost)}</>,
-        },
-        {
           title: translate('Action'),
           render: ({ row }) => (
             <>
@@ -68,27 +65,19 @@ export const OrganizationCostPoliciesList: FC = () => {
         },
         {
           title: translate('Has fired'),
-          render: ({ row }) =>
-            row.has_fired === true ? (
-              <Badge
-                bg={null}
-                className="fs-8 fw-bolder lh-base badge-light-danger badge-pill"
-              >
-                <X size={12} className="text-danger me-2" />
-                {translate('No')}
-              </Badge>
-            ) : (
-              <Badge
-                bg={null}
-                className="fs-8 fw-bolder lh-base badge-light-success badge-pill"
-              >
-                <Check size={12} className="text-success me-2" />
-                {translate('Yes')}
-              </Badge>
-            ),
+          render: ({ row }) => <BooleanBadge value={row.has_fired} />,
         },
         {
-          title: translate('Estimated current cost'),
+          title: translate('Credit'),
+          render: ({ row }) =>
+            row.customer_credit ? defaultCurrency(row.customer_credit) : 'N/A',
+        },
+        {
+          title: translate('Cost threshold'),
+          render: ({ row }) => <>{defaultCurrency(row.limit_cost)}</>,
+        },
+        {
+          title: translate('Estimated cost'),
           render: ({ row }) => (
             <>
               {defaultCurrency(
@@ -104,11 +93,18 @@ export const OrganizationCostPoliciesList: FC = () => {
       initialSorting={{ field: 'created', mode: 'desc' }}
       filters={<OrganizationCostPoliciesFilter />}
       rowActions={({ row }) => (
-        <CostPolicyDeleteButton
-          row={row}
-          type="organization"
-          refetch={tableProps.fetch}
-        />
+        <>
+          <CostPolicyEditButton
+            row={row}
+            type="organization"
+            refetch={tableProps.fetch}
+          />
+          <CostPolicyDeleteButton
+            row={row}
+            type="organization"
+            refetch={tableProps.fetch}
+          />
+        </>
       )}
       hasQuery={true}
       showPageSizeSelector={true}

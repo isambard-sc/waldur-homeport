@@ -1,18 +1,18 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { EditButton } from '@waldur/form/EditButton';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
 import { BroadcastResponseData } from './types';
 import { parseBroadcast } from './utils';
 
-const BroadcastUpdateDialog = lazyComponent(
-  () => import('./BroadcastUpdateDialog'),
-  'BroadcastUpdateDialog',
+const BroadcastUpdateDialog = lazyComponent(() =>
+  import('./BroadcastUpdateDialog').then((module) => ({
+    default: module.BroadcastUpdateDialog,
+  })),
 );
 
 export const BroadcastUpdateButton: FunctionComponent<{
@@ -33,11 +33,6 @@ export const BroadcastUpdateButton: FunctionComponent<{
       }),
     );
   return (
-    <RowActionButton
-      action={callback}
-      title={translate('Update')}
-      iconNode={<PencilSimple />}
-      size="sm"
-    />
+    <EditButton label={translate('Update')} onClick={callback} size="sm" />
   );
 };

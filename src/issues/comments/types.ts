@@ -1,8 +1,6 @@
 import { Attachment } from '@waldur/issues/attachments/types';
 
-export interface Issue {
-  [key: string]: string | boolean;
-}
+import { Issue } from '../list/types';
 
 export interface Comment {
   author_name: string;
@@ -21,7 +19,7 @@ export interface Comment {
   destroy_is_available: boolean;
 }
 
-export interface State {
+export interface IssueCommentState {
   loading: boolean;
   errors: any[];
   items: Comment[];

@@ -3,8 +3,9 @@ import { FunctionComponent } from 'react';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { OrganizationGroup } from '@waldur/marketplace/types';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { OrganizationGroupCreateButton } from './OrganizationGroupCreateButton';
 import { OrganizationGroupDeleteButton } from './OrganizationGroupDeleteButton';
@@ -37,6 +38,7 @@ export const OrganizationGroupsList: FunctionComponent = () => {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
           orderField: 'name',
+          copyField: (row) => row.name,
         },
         {
           title: translate('Organisations'),

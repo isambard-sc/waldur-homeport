@@ -3,11 +3,11 @@ import { DateTime } from 'luxon';
 import { formatDateTime, parseDate } from '@waldur/core/dateUtils';
 import {
   getComponentUsages,
+  getComponentUserUsages,
+  getProviderOffering,
   getPublicOffering,
-  getResourcePlanPeriods,
+  getProviderResourcePlanPeriods,
 } from '@waldur/marketplace/common/api';
-import { SLURM_PLUGIN } from '@waldur/slurm/constants';
-import { parseSlurmUsage } from '@waldur/slurm/details/utils';
 
 import { UsageReportContext, ResourcePlanPeriod } from './types';
 
@@ -27,13 +27,15 @@ export const getPeriodLabel = (
   }
 };
 
-export const getUsageComponents = async (params: UsageReportContext) => {
+export const getProviderUsageComponents = async (
+  params: UsageReportContext,
+) => {
   let components = null;
   if (params.offering_uuid) {
-    const offering = await getPublicOffering(params.offering_uuid);
+    const offering = await getProviderOffering(params.offering_uuid);
     components = await getUsageBasedOfferingComponents(offering);
   }
-  const periods = await getResourcePlanPeriods(params.resource_uuid);
+  const periods = await getProviderResourcePlanPeriods(params.resource_uuid);
   const options =
     periods.length > 0
       ? periods.map((period) => ({
@@ -63,12 +65,23 @@ export const getComponentsAndUsages = async (
   resource_uuid: string,
   offering: any,
   months: number,
+  offering_uuid: string,
 ) => {
   if (!resource_uuid) {
     return { components: null, usages: null };
   }
 
   let components;
+  if (!offering) {
+    if (!offering_uuid) {
+      throw new Error('Offering or offering_uuid is missing.');
+    }
+    try {
+      offering = await getPublicOffering(offering_uuid);
+    } catch (error) {
+      throw new Error(`Error while getting offering, ${error.message}`);
+    }
+  }
   try {
     components = await getUsageBasedOfferingComponents(offering);
   } catch (error) {
@@ -82,9 +95,13 @@ export const getComponentsAndUsages = async (
     : undefined;
 
   let usages;
+  let userUsages;
   try {
     usages = await getComponentUsages(resource_uuid, date_after, {
       fields: ['type', 'usage', 'date'],
+    });
+    userUsages = await getComponentUserUsages(resource_uuid, date_after, {
+      fields: ['component_type', 'usage', 'date'],
     });
   } catch (error) {
     throw new Error(
@@ -92,9 +109,5 @@ export const getComponentsAndUsages = async (
     );
   }
 
-  if (offering.type === SLURM_PLUGIN) {
-    usages = usages.map(parseSlurmUsage);
-  }
-
-  return { components, usages };
+  return { components, usages, userUsages };
 };

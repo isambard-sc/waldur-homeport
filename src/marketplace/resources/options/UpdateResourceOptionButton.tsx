@@ -10,9 +10,10 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { getUser } from '@waldur/workspace/selectors';
 
-const UpdateResourceOptionDialog = lazyComponent(
-  () => import('./UpdateResourceOptionDialog'),
-  'UpdateResourceOptionDialog',
+const UpdateResourceOptionDialog = lazyComponent(() =>
+  import('./UpdateResourceOptionDialog').then((module) => ({
+    default: module.UpdateResourceOptionDialog,
+  })),
 );
 
 export const UpdateResourceOptionButton: FunctionComponent<{

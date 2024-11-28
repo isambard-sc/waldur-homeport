@@ -22,7 +22,7 @@ const loadData = async () => {
 const getTotalNumberOfReviews = (feedback): number => {
   let sum = 0;
   for (const item in feedback) {
-    if (feedback.hasOwnProperty(item)) {
+    if (Object.prototype.hasOwnProperty.call(feedback, item)) {
       sum += parseFloat(feedback[item]);
     }
   }

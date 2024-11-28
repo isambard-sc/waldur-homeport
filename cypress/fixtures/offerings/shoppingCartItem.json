@@ -5,7 +5,7 @@
     "offering_uuid": "3bcdcdb0987545f0b50e6eed26bb49d6",
     "offering_description": "",
     "offering_thumbnail": null,
-    "offering_type": "OpenStackTenant.Instance",
+    "offering_type": "OpenStack.Instance",
     "provider_name": "ActiveSys",
     "provider_uuid": "9f43128e9eb24c288b6577568420dc1c",
     "category_title": "Compute",
@@ -18,9 +18,9 @@
     "attributes": {
       "subnets": [
         {
-          "network": "/api/openstacktenant-networks/9b8fa00872fc4c0599b0c0d8ea41f473/",
+          "network": "/api/openstack-networks/9b8fa00872fc4c0599b0c0d8ea41f473/",
           "enable_dhcp": true,
-          "url": "/api/openstacktenant-subnets/8a07dca67f71459daab5f7f02147a367/",
+          "url": "/api/openstack-subnets/8a07dca67f71459daab5f7f02147a367/",
           "dns_nameservers": [],
           "uuid": "8a07dca67f71459daab5f7f02147a367",
           "label": "baip-demo-sub-net (192.168.42.0/24)",
@@ -40,7 +40,7 @@
       "image": {
         "name": "Centosa",
         "settings": "/api/service-settings/b13719a4b49344f699706716058209c5/",
-        "url": "/api/openstacktenant-images/b7c42df5f67a4e36b9ea4ab99d9d3193/",
+        "url": "/api/openstack-images/b7c42df5f67a4e36b9ea4ab99d9d3193/",
         "min_ram": 0,
         "min_disk": 0,
         "uuid": "b7c42df5f67a4e36b9ea4ab99d9d3193"
@@ -54,7 +54,7 @@
       "flavor": {
         "uuid": "a15bd0d6f03b4784966dcb484c2b0f61",
         "settings": "/api/service-settings/b13719a4b49344f699706716058209c5/",
-        "url": "/api/openstacktenant-flavors/a15bd0d6f03b4784966dcb484c2b0f61/",
+        "url": "/api/openstack-flavors/a15bd0d6f03b4784966dcb484c2b0f61/",
         "ram": 2048,
         "disabled": false,
         "cores": 1,
@@ -66,7 +66,7 @@
         {
           "description": "Default security group",
           "settings": "/api/service-settings/b13719a4b49344f699706716058209c5/",
-          "url": "/api/openstacktenant-security-groups/3773c164fc4849a3947cccaa06ba2905/",
+          "url": "/api/openstack-security-groups/3773c164fc4849a3947cccaa06ba2905/",
           "uuid": "3773c164fc4849a3947cccaa06ba2905",
           "rules": [
             {

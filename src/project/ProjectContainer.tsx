@@ -33,14 +33,14 @@ const PageHero = ({ project }) => {
     router.stateService.go(stateName, { uuid: project.uuid });
 
   return (
-    <div className="container-fluid mb-8 mt-6">
+    <div className="container-fluid my-5">
       {canEdit && (
         <Tab.Container defaultActiveKey={state.name} onSelect={goTo}>
           <Nav variant="tabs" className="nav-line-tabs mb-4">
             <Nav.Item>
               <Nav.Link
                 eventKey="project.dashboard"
-                className="text-center w-60px"
+                className="text-center min-w-60px"
               >
                 {translate('View')}
               </Nav.Link>
@@ -48,7 +48,7 @@ const PageHero = ({ project }) => {
             <Nav.Item>
               <Nav.Link
                 eventKey="project-manage"
-                className="text-center w-60px"
+                className="text-center min-w-60px"
               >
                 {translate('Edit')}
               </Nav.Link>

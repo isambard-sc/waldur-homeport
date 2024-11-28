@@ -5,16 +5,17 @@ import { FormField } from './types';
 
 interface EmailFieldProps extends FormField {
   maxLength?: number;
+  solid?: boolean;
 }
 
 export const EmailField: FunctionComponent<EmailFieldProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { input, label, validate, ...rest } = props;
+  const { input, label, validate, solid, ...rest } = props;
   return (
     <Form.Control
       {...props.input}
       type="email"
-      className="form-control-solid"
+      className={solid && 'form-control-solid'}
       {...rest}
     />
   );

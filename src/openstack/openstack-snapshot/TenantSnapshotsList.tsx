@@ -6,21 +6,22 @@ import { translate } from '@waldur/i18n';
 import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
 import { ResourceName } from '@waldur/resource/ResourceName';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const TenantSnapshotsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
   const filter = useMemo(
     () => ({
-      service_settings_uuid: resourceScope.child_settings,
+      tenant_uuid: resourceScope.uuid,
     }),
     [resourceScope],
   );
   const props = useTable({
-    table: 'openstacktenant-snapshots',
-    fetchData: createFetcher('openstacktenant-snapshots'),
+    table: 'openstack-snapshots',
+    fetchData: createFetcher('openstack-snapshots'),
     filter,
   });
   return (
@@ -30,6 +31,7 @@ export const TenantSnapshotsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <ResourceName resource={row} />,
+          copyField: (row) => row.name,
           orderField: 'name',
         },
         {

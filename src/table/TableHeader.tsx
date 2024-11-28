@@ -1,4 +1,3 @@
-import { CaretDown, CaretUp, CaretUpDown } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, useEffect, useMemo, useRef } from 'react';
 import { FormCheck } from 'react-bootstrap';
@@ -7,9 +6,8 @@ import { translate } from '@waldur/i18n';
 
 import './TableHeader.scss';
 
-import { TableProps } from './Table';
 import { TableFiltersMenu } from './TableFiltersMenu';
-import { Column, Sorting } from './types';
+import { TableProps, Column, Sorting } from './types';
 
 interface TableHeaderProps {
   columns: Column[];
@@ -24,34 +22,62 @@ interface TableHeaderProps {
   fieldType?: TableProps['fieldType'];
   activeColumns?: Record<string, boolean>;
   filters?: TableProps['filters'];
+  filtersStorage?: TableProps['filtersStorage'];
   setFilter?: TableProps['setFilter'];
   applyFiltersFn?: TableProps['applyFiltersFn'];
   columnPositions: string[];
   hasOptionalColumns?: boolean;
+  toggleFilterMenu(show?): void;
 }
 
-function handleOrdering(currentSorting: Sorting, field: string): Sorting {
-  let mode: 'asc' | 'desc' = 'asc';
-  if (field === currentSorting.field) {
-    if (currentSorting.mode === 'asc') {
-      mode = 'desc';
-    } else if (currentSorting.mode === 'desc') {
-      mode = 'asc';
-    }
-  }
-  return { field, mode };
-}
-
-function renderSortingIcon(column: Column, sorting: Sorting) {
+function renderSortingIcon(
+  column: Column,
+  sorting: Sorting,
+  sort: TableHeaderProps['onSortClick'],
+) {
   if (!column.orderField || !sorting) {
     return null;
-  } else if (column.orderField !== sorting.field) {
-    return <CaretUpDown size={17} width={30} />;
-  } else if (sorting.mode === 'asc') {
-    return <CaretUp size={17} width={30} />;
-  } else {
-    return <CaretDown size={17} width={30} />;
   }
+  const onClickSort = (mode: Sorting['mode']) =>
+    (column.orderField !== sorting.field || sorting.mode !== mode) &&
+    sort({ field: column.orderField, mode });
+
+  return (
+    <span>
+      <span className="sorting-buttons">
+        <button
+          type="button"
+          data-testid="sort-asc"
+          onClick={() => onClickSort('asc')}
+          className={classNames(
+            'text-btn',
+            column.orderField === sorting.field &&
+              sorting.mode === 'asc' &&
+              'active',
+          )}
+        >
+          <svg width="16" height="8" fill="currentColor" viewBox="0 0 256 128">
+            <path d="M 126 45 l 39.51 39.52 a 12 12 0 0 0 17 -17 l -48 -48 a 12 12 0 0 0 -17 0 l -48 48 a 12 12 0 0 0 17 17 Z" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          data-testid="sort-desc"
+          onClick={() => onClickSort('desc')}
+          className={classNames(
+            'text-btn',
+            column.orderField === sorting.field &&
+              sorting.mode === 'desc' &&
+              'active',
+          )}
+        >
+          <svg width="16" height="8" fill="currentColor" viewBox="0 0 256 128">
+            <path d="M 184.49 39.51 a 12 12 0 0 1 0 17 l -48 48 a 12 12 0 0 1 -17 0 l -48 -48 a 12 12 0 0 1 17 -17 L 128 79 l 39.51 -39.52 A 12 12 0 0 1 184.49 39.51 Z" />
+          </svg>
+        </button>
+      </span>
+    </span>
+  );
 }
 
 const TableTh = ({
@@ -59,28 +85,33 @@ const TableTh = ({
   onSortClick,
   currentSorting,
   filters,
+  filtersStorage,
   setFilter,
   applyFiltersFn,
+  toggleFilterMenu,
 }) => (
   <th
     className={
-      classNames(column.className, column.orderField && 'sorting-column') ||
-      undefined
-    }
-    onClick={
-      column.orderField &&
-      (() => onSortClick(handleOrdering(currentSorting, column.orderField)))
+      classNames(
+        column.className,
+        column.orderField && 'sorting-column',
+        column.filter && filters && 'filter-column',
+      ) || undefined
     }
   >
-    {column.title}
-    {renderSortingIcon(column, currentSorting)}
+    <span>
+      {column.title}
+      {renderSortingIcon(column, currentSorting, onSortClick)}
+    </span>
     {column.filter && filters && (
       <TableFiltersMenu
         filters={filters}
         filterPosition="menu"
+        filtersStorage={filtersStorage}
         setFilter={setFilter}
         applyFiltersFn={applyFiltersFn}
         openName={column.filter}
+        toggleFilterMenu={toggleFilterMenu}
       />
     )}
   </th>
@@ -99,9 +130,11 @@ export const TableHeader: FC<TableHeaderProps> = ({
   selectedRows,
   fieldType,
   filters,
+  filtersStorage,
   setFilter,
   applyFiltersFn,
   hasOptionalColumns,
+  toggleFilterMenu,
 }) => {
   const isAllSelected = selectedRows?.length >= rows?.length;
 
@@ -124,13 +157,14 @@ export const TableHeader: FC<TableHeaderProps> = ({
 
   return (
     <thead>
-      <tr className="text-start text-muted bg-light fw-bolder fs-7 text-uppercase gs-0">
+      <tr className="text-start text-muted fw-bolder fs-7 gs-0 align-middle">
         {fieldType ? (
           <th style={{ width: '10px' }} />
         ) : enableMultiSelect ? (
           <th style={{ width: '10px' }}>
             <FormCheck
               ref={refCheck}
+              data-testid="select-all"
               className="form-check form-check-custom form-check-sm"
               checked={isAllSelected}
               onChange={() => onSelectAllRows(rows)}
@@ -150,8 +184,10 @@ export const TableHeader: FC<TableHeaderProps> = ({
                       onSortClick={onSortClick}
                       currentSorting={currentSorting}
                       filters={filters}
+                      filtersStorage={filtersStorage}
                       setFilter={setFilter}
                       applyFiltersFn={applyFiltersFn}
+                      toggleFilterMenu={toggleFilterMenu}
                     />
                   ),
               )
@@ -164,8 +200,10 @@ export const TableHeader: FC<TableHeaderProps> = ({
                     onSortClick={onSortClick}
                     currentSorting={currentSorting}
                     filters={filters}
+                    filtersStorage={filtersStorage}
                     setFilter={setFilter}
                     applyFiltersFn={applyFiltersFn}
+                    toggleFilterMenu={toggleFilterMenu}
                   />
                 ),
             )}

@@ -15,7 +15,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 
 import { getCallManagementStatistics } from '../api';
 
-export const FlatStatistics = ({ count, title }) => {
+const FlatStatistics = ({ count, title }) => {
   return (
     <Col className="text-md-center mb-4">
       <strong className="d-block fs-2">{count}</strong>
@@ -107,7 +107,7 @@ export const CallManagementStatistics = () => {
             />
           </Col>
           <Col>
-            <Card className="mb-6">
+            <Card className="card-bordered mb-6">
               <Card.Body>
                 <div className="d-flex justify-content-start justify-content-lg-between flex-wrap">
                   <FlatStatistics

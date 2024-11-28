@@ -19,7 +19,7 @@ interface ConfirmationDialogProps {
 }
 
 export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
-  resolve: { title, body, nb, deferred },
+  resolve: { title, body, deferred },
 }) => {
   const dispatch = useDispatch();
   const closeDialog = () => dispatch(closeModalDialog());
@@ -47,8 +47,6 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       }
     >
       {body}
-      <br />
-      {nb && <small className="text-danger">{nb}</small>}
     </ModalDialog>
   );
 };

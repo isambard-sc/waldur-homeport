@@ -5,7 +5,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { ReadOnlyFormControl } from '@waldur/form/ReadOnlyFormControl';
 import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
-import { Call as Call, Round } from '@waldur/proposals/types';
+import { Call, Round } from '@waldur/proposals/types';
 import {
   formatRoundAllocationStrategy,
   formatRoundAllocationTime,
@@ -27,7 +27,7 @@ export const RoundAllocationSection: FC<RoundAllocationSectionProps> = ({
   loading,
 }) => {
   return (
-    <Card id="allocation" className="mb-7">
+    <Card id="allocation" className="card-bordered">
       <Card.Header>
         <Card.Title>
           {translate('Allocation strategy')}
@@ -46,19 +46,16 @@ export const RoundAllocationSection: FC<RoundAllocationSectionProps> = ({
           label={translate('Deciding entity')}
           value={formatRoundAllocationStrategy(round.deciding_entity)}
           className="col-12 col-md-6"
-          floating
         />
         <ReadOnlyFormControl
           label={translate('Minimum average scoring for allocation')}
           value={round.minimal_average_scoring}
           className="col-12 col-md-6"
-          floating
         />
         <ReadOnlyFormControl
           label={translate('Allocation time')}
           value={formatRoundAllocationTime(round.allocation_time)}
           className="col-12 col-md-6"
-          floating
         />
         {round.allocation_time === 'fixed_date' && (
           <ReadOnlyFormControl
@@ -69,7 +66,6 @@ export const RoundAllocationSection: FC<RoundAllocationSectionProps> = ({
                 : round.allocation_date
             }
             className="col-12 col-md-6"
-            floating
           />
         )}
       </Card.Body>

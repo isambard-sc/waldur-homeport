@@ -1,14 +1,14 @@
 import React from 'react';
-import { Container } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { useOfferingCategories } from '@waldur/navigation/sidebar/ResourcesMenu';
+import { useOfferingCategories } from '@waldur/navigation/sidebar/utils';
 import {
   combineProjectCounterRows,
   parseProjectCounters,
 } from '@waldur/project/utils';
 import { Field } from '@waldur/resource/summary';
+import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { getUser } from '@waldur/workspace/selectors';
 import { Project } from '@waldur/workspace/types';
 
@@ -25,7 +25,7 @@ export const ProjectExpandableRow: React.FC<{
   );
   const counters = combineProjectCounterRows(counterRows);
   return (
-    <Container>
+    <ExpandableContainer asTable>
       {user.permissions
         .filter(
           (perm) =>
@@ -34,10 +34,10 @@ export const ProjectExpandableRow: React.FC<{
         .map((permission, index) => (
           <PermissionDetails key={index} permission={permission} />
         ))}
-      {counters.map((row, index) => (
-        <Field key={index} label={row.label} value={row.value} />
+      {counters.map((item, index) => (
+        <Field key={index} label={item.label} value={item.value} />
       ))}
       <Field label={translate('Description')} value={row.description} />
-    </Container>
+    </ExpandableContainer>
   );
 };

@@ -18,9 +18,10 @@ import { Project } from '@waldur/workspace/types';
 
 import { loadChart } from './utils';
 
-const CostPoliciesDetailsDialog = lazyComponent(
-  () => import('./CostPoliciesDetailsDialog'),
-  'CostPoliciesDetailsDialog',
+const CostPoliciesDetailsDialog = lazyComponent(() =>
+  import('./CostPoliciesDetailsDialog').then((module) => ({
+    default: module.CostPoliciesDetailsDialog,
+  })),
 );
 
 export const ProjectDashboardCostLimits = ({
@@ -99,10 +100,11 @@ export const ProjectDashboardCostLimits = ({
             )
           : null
       }
-    >
-      <Col xs={7}>
-        <EChart options={data.options} height="100px" />
-      </Col>
-    </WidgetCard>
+      right={
+        <Col xs={7}>
+          <EChart options={data.options} height="100px" />
+        </Col>
+      }
+    />
   );
 };

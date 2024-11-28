@@ -1,3 +1,4 @@
+import { Eye } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
@@ -7,9 +8,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { ACTIVE, PAUSED } from '../store/constants';
 
-const PreviewOfferingDialog = lazyComponent(
-  () => import('./PreviewOfferingDialog'),
-  'PreviewOfferingDialog',
+const PreviewOfferingDialog = lazyComponent(() =>
+  import('./PreviewOfferingDialog').then((module) => ({
+    default: module.PreviewOfferingDialog,
+  })),
 );
 export const PreviewOfferingButton = ({ row }) => {
   const dispatch = useDispatch();
@@ -29,6 +31,9 @@ export const PreviewOfferingButton = ({ row }) => {
         );
       }}
     >
+      <span className="svg-icon svg-icon-2">
+        <Eye />
+      </span>
       {translate('Preview order form')}
     </Dropdown.Item>
   );

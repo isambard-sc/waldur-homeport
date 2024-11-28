@@ -112,7 +112,6 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
             : translate('Upload an image JPG or PNG')}
         </p>
         <div className="d-flex gap-2 mb-4">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label
             className="btn btn-outline btn-outline-default btn-sm btn-icon-right"
             data-image-input-action="change"

@@ -1,4 +1,4 @@
-import { padStart, uniqueId } from 'lodash';
+import { padStart, uniqueId } from 'lodash-es';
 import { Duration } from 'luxon';
 
 import { parseDate } from '@waldur/core/dateUtils';
@@ -6,7 +6,7 @@ import { translate } from '@waldur/i18n';
 
 import { BookedItem, BookingProps, EventInput } from './types';
 
-export interface BookingFilterStateOption {
+interface BookingFilterStateOption {
   value: string;
   label: string;
 }
@@ -91,7 +91,7 @@ export const getTimeOptions = (
   const dayMinutes = 60 * 24;
   const count = Math.ceil(dayMinutes / timeStep) + 1;
 
-  return Array.from(new Array(count)).map((_, i) => {
+  return Array.from({ length: count }).map((_, i) => {
     const allMinutes = i * timeStep;
     const minutes = allMinutes % 60;
     const hour = Math.floor(allMinutes / 60);

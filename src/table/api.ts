@@ -63,7 +63,6 @@ export async function fetchAll(fetch: Fetcher, request: TableRequest) {
   let response = await fetch(request);
   let result = [];
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     result = result.concat(response.rows);
     if (response.nextPage) {

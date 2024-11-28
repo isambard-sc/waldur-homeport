@@ -1,3 +1,4 @@
+import { CustomerCredit } from '@waldur/customer/credits/types';
 import { BasePermission } from '@waldur/permissions/types';
 import { Quota } from '@waldur/quotas/types';
 
@@ -29,6 +30,7 @@ export interface User {
 }
 
 export interface UserDetails extends User {
+  token_lifetime?: number;
   native_name?: string;
   civil_number: string;
   phone_number: string;
@@ -138,6 +140,7 @@ export interface Customer {
   contact_details?: string;
   country_name?: string;
   country?: string;
+  credit?: CustomerCredit;
   default_tax_percent?: string;
   native_name?: string;
   phone_number?: PhoneNumber;
@@ -161,18 +164,10 @@ export interface Customer {
   users_count?: number;
 }
 
-export enum WorkspaceType {
-  ORGANIZATION = 'WORKSPACE/ORGANIZATION',
-  SUPPORT = 'WORKSPACE/SUPPORT',
-  PROJECT = 'WORKSPACE/PROJECT',
-  USER = 'WORKSPACE/USER',
-}
-
 export interface WorkspaceState {
   user: User;
   impersonatorUser: User;
   customer?: Customer;
   project?: Project;
-  workspace?: WorkspaceType;
   resource?;
 }

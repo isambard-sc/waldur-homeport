@@ -29,14 +29,16 @@ const TOOLBAR_OPTIONS = [
   'history',
 ];
 
-const loadModule = () => import('./draftjs-module');
-
 export const WysiwygEditor: FunctionComponent<any> = (props) => {
   const [editorState, setEditorState] = useState();
 
   const contentRef = useRef();
 
-  const { loading, error, value: moduleValue } = useAsync(loadModule);
+  const {
+    loading,
+    error,
+    value: moduleValue,
+  } = useAsync(() => import('./draftjs-module'));
 
   useEffect(() => {
     if (!moduleValue) {

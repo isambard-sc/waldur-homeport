@@ -1,10 +1,18 @@
+import { AzureProviderConfig } from '@waldur/azure/provider/provider';
 import { getProviderType } from '@waldur/marketplace/common/registry';
+import { OpenStackProviderConfig } from '@waldur/openstack/provider';
+import { RancherProviderConfig } from '@waldur/rancher/provider';
+import {
+  SlurmProviderConfig,
+  SlurmRemoteProviderConfig,
+} from '@waldur/slurm/provider';
+import { VMwareProviderConfig } from '@waldur/vmware/provider';
 
 import { ProviderConfig } from './types';
 
 const providers: { [key: string]: ProviderConfig } = {};
 
-export const register = (provider: ProviderConfig) => {
+const register = (provider: ProviderConfig) => {
   providers[provider.type] = provider;
 };
 
@@ -13,13 +21,7 @@ const findProvider = (type) => providers[type];
 export const getTypeDisplay = (type) =>
   providers[type] ? providers[type].name : type;
 
-export const getServiceIcon = (type) =>
-  `images/appstore/${providers[type].icon}`;
-
-export const getSerializer = (type) => {
-  const conf = findProvider(type);
-  return (conf && conf.serializer) || ((x) => x);
-};
+export const getServiceIcon = (type) => providers[type].icon;
 
 export const getServiceSettingsForm = (type) => {
   const providerType = getProviderType(type);
@@ -28,3 +30,10 @@ export const getServiceSettingsForm = (type) => {
     return providerConfig.component;
   }
 };
+
+register(AzureProviderConfig);
+register(OpenStackProviderConfig);
+register(RancherProviderConfig);
+register(SlurmProviderConfig);
+register(SlurmRemoteProviderConfig);
+register(VMwareProviderConfig);

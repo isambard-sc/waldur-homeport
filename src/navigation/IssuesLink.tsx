@@ -7,9 +7,10 @@ import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
 import { getUser } from '@waldur/workspace/selectors';
 
-const QuickIssueContainer = lazyComponent(
-  () => import('../navigation/header/quick-issue-drawer/QuickIssueContainer'),
-  'QuickIssueContainer',
+const QuickIssueContainer = lazyComponent(() =>
+  import('../navigation/header/quick-issue-drawer/QuickIssueContainer').then(
+    (module) => ({ default: module.QuickIssueContainer }),
+  ),
 );
 
 export const IssuesLink: React.FC = () => {

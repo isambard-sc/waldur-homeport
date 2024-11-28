@@ -1,3 +1,4 @@
+import { ChartPie } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -6,9 +7,10 @@ import { Resource } from '@waldur/marketplace/resources/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-const ResourceShowUsageDialog = lazyComponent(
-  () => import('@waldur/marketplace/resources/usage/ResourceShowUsageDialog'),
-  'ResourceShowUsageDialog',
+const ResourceShowUsageDialog = lazyComponent(() =>
+  import('@waldur/marketplace/resources/usage/ResourceShowUsageDialog').then(
+    (module) => ({ default: module.ResourceShowUsageDialog }),
+  ),
 );
 
 export const ShowUsageAction = ({ resource }: { resource: Resource }) => {
@@ -23,9 +25,11 @@ export const ShowUsageAction = ({ resource }: { resource: Resource }) => {
       }),
     );
   };
+  const isDisabled = !resource.is_usage_based && !resource.is_limit_based;
   return (
     <ActionItem
       title={translate('Show usage')}
+      iconNode={<ChartPie />}
       action={() =>
         callback({
           ...resource,
@@ -34,7 +38,11 @@ export const ShowUsageAction = ({ resource }: { resource: Resource }) => {
           resource_uuid: resource.marketplace_resource_uuid || resource.uuid,
         })
       }
-      disabled={!resource.is_usage_based && !resource.is_limit_based}
+      disabled={isDisabled}
+      tooltip={
+        isDisabled &&
+        translate('The resource is not based on usage or limitations.')
+      }
     />
   );
 };

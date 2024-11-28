@@ -9,7 +9,7 @@ import { makeLastTwelveMonthsFilterPeriods } from '@waldur/form/utils';
 import { translate } from '@waldur/i18n';
 import { AgreementInfo } from '@waldur/invoices/list/AgreementInfo';
 import { InvoicesStatsList } from '@waldur/invoices/list/InvoicesStatsList';
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 import { getInvoice } from './api';
 

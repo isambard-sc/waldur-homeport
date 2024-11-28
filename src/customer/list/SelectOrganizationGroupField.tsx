@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { Form } from 'react-bootstrap';
 import { components, Props as SelectProps } from 'react-select';
 import { Field } from 'redux-form';
 
@@ -7,10 +6,6 @@ import { organizationGroupAutocomplete } from '@waldur/customer/list/api';
 import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-
-interface SelectOrganizationGroupFieldProps {
-  isFilterForm?: boolean;
-}
 
 const Option: FC<any> = (props) => (
   <components.Option {...props}>
@@ -58,17 +53,4 @@ export const SelectOrganizationGroupFieldPure: FC<SelectFieldProps> = (
       />
     )}
   />
-);
-
-export const SelectOrganizationGroupField: FC<
-  SelectOrganizationGroupFieldProps
-> = (props) => (
-  <Form.Group className={props.isFilterForm ? ' col-sm-3' : ''}>
-    <Form.Label className={props.isFilterForm ? '' : 'd-none'}>
-      {translate('Organization group')}
-    </Form.Label>
-    <div className={props.isFilterForm ? '' : 'mb-7'}>
-      <SelectOrganizationGroupFieldPure />
-    </div>
-  </Form.Group>
 );

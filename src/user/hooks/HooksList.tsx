@@ -4,8 +4,9 @@ import { createSelector } from 'reselect';
 
 import { titleCase } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { HOOK_LIST_ID } from './constants';
@@ -74,10 +75,10 @@ export const HooksList: FunctionComponent = () => {
       ]}
       showPageSizeSelector={true}
       verboseName={translate('Notifications')}
-      tableActions={<HookCreateButton />}
+      tableActions={<HookCreateButton refetch={props.fetch} />}
       rowActions={({ row }) => (
         <>
-          <HookUpdateButton row={row} />
+          <HookUpdateButton hook={row} refetch={props.fetch} />
           <HookRemoveButton url={row.url} refetch={props.fetch} />
         </>
       )}

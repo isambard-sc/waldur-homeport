@@ -4,24 +4,27 @@ import {
   TENANT_TYPE,
   VOLUME_TYPE,
 } from '@waldur/openstack/constants';
-
-const OpenStackInstanceActions = lazyComponent(
-  () => import('@waldur/openstack/openstack-instance/OpenStackInstanceActions'),
-  'OpenStackInstanceActions',
-);
-
-const OpenstackVolumeActions = lazyComponent(
-  () => import('@waldur/openstack/openstack-volume/OpenStackVolumeActions'),
-  'OpenstackVolumeActions',
-);
-
-const OpenstackTenantActions = lazyComponent(
-  () => import('@waldur/openstack/openstack-tenant/OpenstackTenantActions'),
-  'OpenstackTenantActions',
-);
+import { SLURM_PLUGIN } from '@waldur/slurm/constants';
 
 export const ActionsLists = {
-  [INSTANCE_TYPE]: OpenStackInstanceActions,
-  [VOLUME_TYPE]: OpenstackVolumeActions,
-  [TENANT_TYPE]: OpenstackTenantActions,
+  [INSTANCE_TYPE]: lazyComponent(() =>
+    import(
+      '@waldur/openstack/openstack-instance/OpenStackInstanceActions'
+    ).then((module) => ({ default: module.OpenStackInstanceActions })),
+  ),
+  [VOLUME_TYPE]: lazyComponent(() =>
+    import('@waldur/openstack/openstack-volume/OpenStackVolumeActions').then(
+      (module) => ({ default: module.OpenstackVolumeActions }),
+    ),
+  ),
+  [TENANT_TYPE]: lazyComponent(() =>
+    import('@waldur/openstack/openstack-tenant/OpenstackTenantActions').then(
+      (module) => ({ default: module.OpenstackTenantActions }),
+    ),
+  ),
+  [SLURM_PLUGIN]: lazyComponent(() =>
+    import('@waldur/slurm/SlurmAllocationActions').then((module) => ({
+      default: module.SlurmAllocationActions,
+    })),
+  ),
 };

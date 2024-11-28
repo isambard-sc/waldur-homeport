@@ -1,23 +1,25 @@
 import React from 'react';
 import { Card, Tab, Tabs } from 'react-bootstrap';
-import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
-import { RootState } from '@waldur/store/reducers';
 
 import { FlavorsList } from './FlavorsList';
 import { ImagesList } from './ImagesList';
 
-export const VmTypeOverview = connect((state: RootState) =>
-  getFormValues('vmOverviewFilter')(state),
-)((formValues: { service_provider: any[] }) => {
+export const VmTypeOverview: React.FC = () => {
+  const formValues = useSelector(getFormValues('vmOverviewFilter')) as {
+    service_provider;
+  };
+
   if (
-    !Array.isArray(formValues.service_provider) ||
+    !Array.isArray(formValues?.service_provider) ||
     formValues.service_provider.length === 0
   ) {
     return null;
   }
+
   return (
     <Card>
       <Tabs defaultActiveKey={1} id="vm-overview" mountOnEnter unmountOnExit>
@@ -34,4 +36,4 @@ export const VmTypeOverview = connect((state: RootState) =>
       </Tabs>
     </Card>
   );
-}) as React.ComponentType;
+};

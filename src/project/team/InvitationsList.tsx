@@ -14,9 +14,11 @@ import { InvitationPolicyService } from '@waldur/invitations/actions/InvitationP
 import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSendButton';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { InvitationsFilter } from '@waldur/invitations/InvitationsFilter';
+import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
 import { RoleField } from '@waldur/invitations/RoleField';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 const InvitationsListComponent: FunctionComponent = () => {
@@ -54,7 +56,7 @@ const InvitationsListComponent: FunctionComponent = () => {
         {
           title: translate('Status'),
           orderField: 'state',
-          render: ({ row }) => row.state,
+          render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
         },
         {
@@ -70,7 +72,7 @@ const InvitationsListComponent: FunctionComponent = () => {
       ]}
       rowActions={({ row }) => (
         <>
-          <InvitationSendButton row={row} />
+          <InvitationSendButton row={row} refetch={props.fetch} />
           <InvitationCancelButton row={row} refetch={props.fetch} />
         </>
       )}

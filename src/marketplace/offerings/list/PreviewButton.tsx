@@ -6,9 +6,10 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const PreviewOfferingDialog = lazyComponent(
-  () => import('./PreviewOfferingDialog'),
-  'PreviewOfferingDialog',
+const PreviewOfferingDialog = lazyComponent(() =>
+  import('./PreviewOfferingDialog').then((module) => ({
+    default: module.PreviewOfferingDialog,
+  })),
 );
 
 export const PreviewButton = ({ offering }) => {
@@ -17,6 +18,7 @@ export const PreviewButton = ({ offering }) => {
     <ActionButton
       title={translate('Preview order form')}
       iconNode={<Eye weight="bold" />}
+      className="order-1 order-sm-2 w-100 w-sm-auto"
       action={() =>
         dispatch(
           openModalDialog(PreviewOfferingDialog, {

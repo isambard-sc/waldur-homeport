@@ -4,8 +4,9 @@ import { ButtonGroup } from 'react-bootstrap';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { HPA } from '@waldur/rancher/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { ViewYAMLButton } from '../ViewYAMLButton';
 
@@ -36,6 +37,7 @@ export const ClusterHPAList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Project'),

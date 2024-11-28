@@ -1,6 +1,6 @@
-import { X } from '@phosphor-icons/react';
+import { CaretDown, X } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { isEqual } from 'lodash';
+import { isEqual } from 'lodash-es';
 import React, {
   FC,
   PropsWithChildren,
@@ -26,6 +26,7 @@ interface TableFilterItem {
   ellipsis?: boolean;
   showValueBadge?: boolean;
   hideRemoveButton?: boolean;
+  onApply?({ title, name, value }): void;
 }
 
 const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
@@ -81,19 +82,19 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
         }
       />
       <span className="svg-icon svg-icon-3 rotate-90 ms-2 lh-base">
-        <i className="fa fa-chevron-down" />
+        <CaretDown size={20} />
       </span>
     </button>
   );
 };
 
-export const RemoveFilterBadgeButton = ({ onClick }) => (
+export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
   <button
     type="button"
     className="text-btn ps-2 text-hover-danger"
     onClick={onClick}
   >
-    <X weight="bold" />
+    <X weight="bold" size={size} />
   </button>
 );
 
@@ -112,7 +113,7 @@ export const TableSidebarFilterValues = ({
           className="filter-value"
           style={!ellipsis ? { maxWidth: 'unset' } : undefined}
         >
-          <Badge bg="secondary" className="text-dark">
+          <Badge bg="light" className="text-dark">
             {badgeValue(value)}
             {!hideRemoveButton && (
               <RemoveFilterBadgeButton onClick={() => remove(value, value)} />
@@ -125,7 +126,7 @@ export const TableSidebarFilterValues = ({
         {value.map((v, i) => (
           <Badge
             key={i}
-            bg="secondary"
+            bg="light"
             className="filter-value text-dark"
             style={!ellipsis ? { maxWidth: 'unset' } : undefined}
           >
@@ -138,7 +139,7 @@ export const TableSidebarFilterValues = ({
       </>
     ) : (
       <Badge
-        bg="secondary"
+        bg="light"
         className="filter-value text-dark"
         style={!ellipsis ? { maxWidth: 'unset' } : undefined}
       >
@@ -206,6 +207,8 @@ const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   );
   useEffect(() => {
     _setFilter(itemValue);
+    props.onApply &&
+      props.onApply({ title: props.title, name: props.name, value: itemValue });
   }, [itemValue, _setFilter]);
 
   return (
@@ -284,8 +287,10 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
       } else {
         newValue = null;
       }
+      apply(false);
       dispatch(change(form, props.name, newValue, true));
       _setFilter(newValue);
+      apply(true);
     },
     [dispatch, form, props.name, _setFilter],
   );
@@ -316,6 +321,8 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 
   const onApply = () => {
     _setFilter(itemValue);
+    props.onApply &&
+      props.onApply({ title: props.title, name: props.name, value: itemValue });
     apply();
   };
 

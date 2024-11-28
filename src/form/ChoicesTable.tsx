@@ -1,3 +1,4 @@
+import { Prohibit } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, useMemo, useState } from 'react';
 import { Table } from 'react-bootstrap';
@@ -24,7 +25,7 @@ interface ChoicesTableProps extends PureChoicesTableProps {
   filterOptions?: FilterOptions;
 }
 
-export const PureChoicesTable: FC<ChoicesTableProps> = ({
+const PureChoicesTable: FC<ChoicesTableProps> = ({
   enableSelect = true,
   ...props
 }) => (
@@ -60,7 +61,7 @@ export const PureChoicesTable: FC<ChoicesTableProps> = ({
               <td>
                 {choice.disabled ? (
                   <Tip id={choice.uuid} label={choice.disabledReason}>
-                    <i className="fa fa-ban" />
+                    <Prohibit />
                   </Tip>
                 ) : (
                   <input

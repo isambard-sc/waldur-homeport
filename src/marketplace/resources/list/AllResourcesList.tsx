@@ -3,10 +3,16 @@ import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
-import { PROJECT_RESOURCES_ALL_FILTER_FORM_ID } from '@waldur/marketplace/resources/list/constants';
-import { createFetcher } from '@waldur/table';
-import { TableProps } from '@waldur/table/Table';
-import { useTable } from '@waldur/table/utils';
+import { translate } from '@waldur/i18n';
+import {
+  ALL_RESOURCES_TABLE_ID,
+  PROJECT_RESOURCES_ALL_FILTER_FORM_ID,
+} from '@waldur/marketplace/resources/list/constants';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
+import { useTitle } from '@waldur/navigation/title';
+import { createFetcher } from '@waldur/table/api';
+import { TableProps } from '@waldur/table/types';
+import { useTable } from '@waldur/table/useTable';
 import { Project } from '@waldur/workspace/types';
 
 import { ResourcesAllListTable } from './ResourcesAllListTable';
@@ -45,7 +51,6 @@ const mapStateToFilter = createSelector(
     if (filters?.organization) {
       result.customer_uuid = filters.organization.uuid;
     }
-    result.field = resourcesListRequiredFields();
     return result;
   },
 );
@@ -55,12 +60,26 @@ interface AllResourcesListProps extends Partial<TableProps> {
 }
 
 export const AllResourcesList: FC<AllResourcesListProps> = (props) => {
+  useTitle(translate('All resources'));
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources('all-resources');
   const filter = useSelector(mapStateToFilter);
+
   const tableProps = useTable({
-    table: `AllResourcesList`,
+    table: ALL_RESOURCES_TABLE_ID,
     fetchData: createFetcher('marketplace-resources'),
     queryField: 'query',
     filter,
+    onApplyFilter: (filters) => {
+      const organization = filters.find((item) => item.name === 'organization');
+      const project = filters.find((item) => item.name === 'project');
+      const formValues = {
+        organization: organization?.value,
+        project: project?.value,
+      };
+      syncResourceFilters(formValues);
+    },
+    mandatoryFields: resourcesListRequiredFields(),
   });
 
   return (

@@ -1,15 +1,15 @@
-import { Card } from 'react-bootstrap';
-
 import { Link } from '@waldur/core/Link';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { OfferingCard } from '@waldur/marketplace/common/OfferingCard';
 import { getLabel } from '@waldur/marketplace/common/registry';
 import { OfferingStateField } from '@waldur/marketplace/offerings/OfferingStateField';
 import { Offering } from '@waldur/marketplace/types';
 import { PublicCallsList } from '@waldur/proposals/PublicCallsList';
-import { Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
-
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 export const ProviderOfferingsList = (props) => {
   const columns = [
     {
@@ -22,6 +22,7 @@ export const ProviderOfferingsList = (props) => {
           {row.name}
         </Link>
       ),
+      copyField: (row) => row.name,
       orderField: 'name',
     },
     {
@@ -62,25 +63,19 @@ export const ProviderOfferingsList = (props) => {
 
 export const ProviderDashboardTab = (props) => {
   return (
-    <div className="mb-10">
-      <Card>
-        <Card.Body>
-          <ProviderOfferingsList
-            items={props.data.offerings}
-            initialMode="grid"
-          />
-        </Card.Body>
-      </Card>
-      <hr />
-      <Card>
-        <Card.Body>
+    <>
+      <ProviderOfferingsList items={props.data.offerings} initialMode="grid" />
+      {isFeatureVisible(
+        MarketplaceFeatures.show_call_management_functionality,
+      ) && (
+        <div className="mt-5">
           <PublicCallsList
             provider_uuid={props.data.provider.customer_uuid}
             offering_uuid={null}
             initialMode="grid"
           />
-        </Card.Body>
-      </Card>
-    </div>
+        </div>
+      )}
+    </>
   );
 };

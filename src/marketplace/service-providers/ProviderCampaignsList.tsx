@@ -8,8 +8,9 @@ import { CampaignCreateButton } from '@waldur/marketplace/service-providers/Camp
 import { ProviderCampaignActions } from '@waldur/marketplace/service-providers/ProviderCampaignActions';
 import { ProviderCampaignFilter } from '@waldur/marketplace/service-providers/ProviderCampaignFilter';
 import { ProviderCampaignResourceExpandable } from '@waldur/marketplace/service-providers/ProviderCampaignResourceExpandable';
-import { createFetcher, Table } from '@waldur/table/index';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 
@@ -55,6 +56,7 @@ const ProviderCampaignsListComponent: FunctionComponent<{ provider }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => row.name,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Coupon'),

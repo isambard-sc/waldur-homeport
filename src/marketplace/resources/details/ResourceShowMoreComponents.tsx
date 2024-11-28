@@ -2,13 +2,14 @@ import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { Limits } from '@waldur/marketplace/common/registry';
+import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ResourceComponentsDialog = lazyComponent(
-  () => import('./ResourceComponentsDialog'),
-  'ResourceComponentsDialog',
+const ResourceComponentsDialog = lazyComponent(() =>
+  import('./ResourceComponentsDialog').then((module) => ({
+    default: module.ResourceComponentsDialog,
+  })),
 );
 
 const showResourceComponentsDialog = (resource, components) =>
@@ -29,7 +30,7 @@ export const ResourceShowMoreComponents = ({
   return (
     <button
       type="button"
-      className="text-link"
+      className="text-anchor fw-bold"
       onClick={() =>
         dispatch(showResourceComponentsDialog(resource, components))
       }

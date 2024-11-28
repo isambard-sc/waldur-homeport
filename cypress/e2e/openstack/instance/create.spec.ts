@@ -16,24 +16,24 @@ xdescribe('OpenStackInstanceCreateForm', () => {
       .intercept('GET', '/api/service-settings/', {
         fixture: 'offerings/serviceSettings.json',
       })
-      .intercept('GET', '/api/openstacktenant-images/', {
+      .intercept('GET', '/api/openstack-images/', {
         fixture: 'offerings/images.json',
       })
-      .intercept('GET', '/api/openstacktenant-flavors/', {
+      .intercept('GET', '/api/openstack-flavors/', {
         fixture: 'offerings/flavors.json',
       })
       .intercept('GET', '/api/keys/', { fixture: 'offerings/sshKeys.json' })
-      .intercept('GET', '/api/openstacktenant-security-groups/', {
+      .intercept('GET', '/api/openstack-security-groups/', {
         fixture: 'offerings/securityGroups.json',
       })
-      .intercept('GET', '/api/openstacktenant-subnets/', {
+      .intercept('GET', '/api/openstack-subnets/', {
         fixture: 'offerings/subnets.json',
       })
-      .intercept('GET', '/api/openstacktenant-floating-ips/', {
+      .intercept('GET', '/api/openstack-floating-ips/', {
         fixture: 'offerings/floatingIps.json',
       })
-      .intercept('GET', '/api/openstacktenant-instance-availability-zones/', [])
-      .intercept('GET', '/api/openstacktenant-volume-types/', [])
+      .intercept('GET', '/api/openstack-instance-availability-zones/', [])
+      .intercept('GET', '/api/openstack-volume-types/', [])
       .visit(
         '/organizations/bf6d515c9e6e445f9c339021b30fc96b/marketplace-offering/3bcdcdb0987545f0b50e6eed26bb49d6/',
       )

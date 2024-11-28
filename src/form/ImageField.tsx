@@ -1,3 +1,4 @@
+import { ArrowClockwise, PencilSimple, X } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FunctionComponent, useCallback, useEffect, useRef } from 'react';
 
@@ -63,7 +64,6 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
   // Reset input on changing initial value
   useEffect(() => {
     changeImage(initialValue);
-    // eslint-disable-next-line
   }, [initialValue]);
 
   const isChanged = Boolean(
@@ -89,7 +89,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
         </div>
 
         {/* Pick image */}
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+
         <label
           className="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
           data-kt-image-input-action="change"
@@ -99,7 +99,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             label={translate('Change avatar')}
             className="w-100"
           >
-            <i className="fa fa-pencil fs-6" />
+            <PencilSimple />
           </Tip>
 
           <input
@@ -123,7 +123,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             label={translate('Reset avatar')}
             className="w-100"
           >
-            <i className="fa fa-repeat fs-6" />
+            <ArrowClockwise />
           </Tip>
         </button>
 
@@ -139,7 +139,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             label={translate('Remove avatar')}
             className="w-100"
           >
-            <i className="fa fa-times fs-6" />
+            <X />
           </Tip>
         </button>
       </div>

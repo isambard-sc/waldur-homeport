@@ -1,4 +1,4 @@
-import { ActionRegistry } from '@waldur/resource/actions/registry';
+import { ActionConfiguration } from '@waldur/resource/actions/types';
 
 import { ConsoleAction } from './ConsoleAction';
 import { DestroyVirtualMachineAction } from './DestroyVirtualMachineAction';
@@ -14,19 +14,28 @@ import { StartAction } from './StartAction';
 import { StopAction } from './StopAction';
 import { SuspendAction } from './SuspendAction';
 
-ActionRegistry.register('VMware.VirtualMachine', [
-  PullVirtualMachineAction,
-  ConsoleAction,
-  EditAction,
-  StartAction,
-  StopAction,
-  ResetAction,
-  ShutdownAction,
-  RebootAction,
-  SuspendAction,
-  DestroyVirtualMachineAction,
-]);
+export const VMwareVirtualMachineActions: ActionConfiguration = {
+  type: 'VMware.VirtualMachine',
+  actions: [
+    PullVirtualMachineAction,
+    ConsoleAction,
+    EditAction,
+    StartAction,
+    StopAction,
+    ResetAction,
+    ShutdownAction,
+    RebootAction,
+    SuspendAction,
+    DestroyVirtualMachineAction,
+  ],
+};
 
-ActionRegistry.register('VMware.Disk', [PullDiskAction, ExtendDiskAction]);
+export const VMwareDiskActions: ActionConfiguration = {
+  type: 'VMware.Disk',
+  actions: [PullDiskAction, ExtendDiskAction],
+};
 
-ActionRegistry.register('VMware.Port', [PullPortAction]);
+export const VMwarePortActions: ActionConfiguration = {
+  type: 'VMware.Port',
+  actions: [PullPortAction],
+};

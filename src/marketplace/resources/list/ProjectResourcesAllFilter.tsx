@@ -1,7 +1,11 @@
 import { FunctionComponent } from 'react';
 import { Field, reduxForm } from 'redux-form';
 
-import { getInitialValues, syncFiltersToURL } from '@waldur/core/filters';
+import {
+  getInitialValues,
+  syncFiltersToURL,
+  useSyncInitialFiltersToURL,
+} from '@waldur/core/filters';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
@@ -19,11 +23,13 @@ interface ProjectResourcesAllFilterProps {
   hasProjectFilter?: boolean;
   hasCustomerFilter?: boolean;
   change?: any;
+  initialValues?: any;
 }
 
 const PureProjectResourcesAllFilter: FunctionComponent<
   ProjectResourcesAllFilterProps
 > = (props) => {
+  useSyncInitialFiltersToURL(props.initialValues);
   return (
     <>
       <TableFilterItem

@@ -1,3 +1,4 @@
+import { ArrowsClockwise } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
@@ -10,12 +11,12 @@ import { translate } from '@waldur/i18n';
 import { getCategoryGroups } from '@waldur/marketplace/common/api';
 import { CategoryLink } from '@waldur/marketplace/links/CategoryLink';
 import { Category } from '@waldur/marketplace/types';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CategoryCreateButton } from './CategoryCreateButton';
-import { CategoryDeleteButton } from './CategoryDeleteButton';
-import { CategoryEditButton } from './CategoryEditButton';
+import { CategoryRowActions } from './CategoryRowActions';
 
 const categoryFields = {
   fields: ['uuid', 'title', 'description', 'icon', 'offering_count', 'group'],
@@ -62,7 +63,11 @@ export const AdminCategoriesPage: FunctionComponent = () => {
           render: ({ row }) => {
             if (row.group) {
               if (loadingGroups) {
-                return <i className="fa fa-refresh fa-spin fs-4 me-2" />;
+                return (
+                  <span className="svg-icon svg-icon-4 animation-spin me-2">
+                    <ArrowsClockwise />
+                  </span>
+                );
               } else if (errorGroups) {
                 return (
                   <>
@@ -75,7 +80,9 @@ export const AdminCategoriesPage: FunctionComponent = () => {
                       className="btn-icon ms-1"
                       onClick={() => refetch()}
                     >
-                      <i className="fa fa-refresh fs-4 me-2" />
+                      <span className="svg-icon svg-icon-4 me-2">
+                        <ArrowsClockwise />
+                      </span>
                     </Button>
                   </>
                 );
@@ -110,10 +117,7 @@ export const AdminCategoriesPage: FunctionComponent = () => {
       verboseName={translate('Categories')}
       initialSorting={{ field: 'title', mode: 'desc' }}
       rowActions={({ row }) => (
-        <>
-          <CategoryEditButton row={row} refetch={tableProps.fetch} />
-          <CategoryDeleteButton row={row} refetch={tableProps.fetch} />
-        </>
+        <CategoryRowActions row={row} refetch={tableProps.fetch} />
       )}
       hasQuery={true}
       tableActions={<CategoryCreateButton refetch={tableProps.fetch} />}

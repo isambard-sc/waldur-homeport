@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import { RootState } from '@waldur/store/reducers';
+import { type RootState } from '@waldur/store/reducers';
 
 export const getComments = (state: RootState) => state.issues.comments.items;
 export const getIsDeleting = (state: RootState, props) =>
@@ -15,8 +15,6 @@ export const getPendingAttachments = (state: RootState) =>
   state.issues.comments.pendingAttachments;
 export const getIsUiDisabled = (state: RootState) =>
   state.issues.comments.uiDisabled;
-export const getCommentsGetErred = (state: RootState) =>
-  state.issues.comments.getErred;
 export const getIsFormToggleDisabled = (state: RootState, props) =>
   state.issues.comments.activeFormId !== null &&
   state.issues.comments.activeFormId !== props.comment.uuid;

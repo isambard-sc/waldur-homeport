@@ -2,9 +2,10 @@ import { FC } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Field } from 'redux-form';
 
+import { required } from '@waldur/core/validators';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { ProjectCreateButton } from '@waldur/project/ProjectCreateButton';
+import { ProjectCreateButton } from '@waldur/project/create/ProjectCreateButton';
 import { setCurrentProject } from '@waldur/workspace/actions';
 
 import { projectAutocomplete } from '../common/autocompletes';
@@ -35,6 +36,7 @@ export const ProjectField: FC<ProjectFieldProps> = ({
         <div style={{ flexGrow: 1, marginRight: 10 }}>
           <Field
             name="project"
+            validate={required}
             component={(fieldProps) => (
               <AsyncPaginate
                 placeholder={translate('Select project...')}

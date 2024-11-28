@@ -2,22 +2,23 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { Table, createFetcher } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
   const filter = useMemo(
     () => ({
-      settings_uuid: resourceScope.child_settings,
+      tenant_uuid: resourceScope.uuid,
     }),
     [resourceScope],
   );
 
   const props = useTable({
-    table: 'openstacktenant-flavors',
-    fetchData: createFetcher('openstacktenant-flavors'),
+    table: 'openstack-flavors',
+    fetchData: createFetcher('openstack-flavors'),
     filter,
     queryField: 'name',
   });
@@ -29,6 +30,7 @@ export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('Name'),
           render: ({ row }) => row.name,
+          copyField: (row) => row.name,
         },
         {
           title: translate('Cores'),

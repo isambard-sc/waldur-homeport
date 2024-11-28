@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 
@@ -10,28 +10,16 @@ interface OwnProps {
   resource: string;
 }
 
-interface DispatchProps {
-  showPlanDetailsDialog(): void;
-}
+export const PlanDetailsLink: FunctionComponent<OwnProps> = ({ resource }) => {
+  const dispatch = useDispatch();
 
-type Props = OwnProps & DispatchProps;
+  const handleClick = () => {
+    dispatch(showPlanDetailsDialog(resource));
+  };
 
-const PurePlanDetailsLink: FunctionComponent<Props> = (props) => (
-  <Button
-    variant="link"
-    className="btn-flush"
-    onClick={props.showPlanDetailsDialog}
-  >
-    {translate('Show')}
-  </Button>
-);
-
-const mapDispatchToProps = (dispatch, ownProps: OwnProps) => ({
-  showPlanDetailsDialog: () =>
-    dispatch(showPlanDetailsDialog(ownProps.resource)),
-});
-
-export const PlanDetailsLink = connect(
-  null,
-  mapDispatchToProps,
-)(PurePlanDetailsLink);
+  return (
+    <Button variant="link" className="btn-flush" onClick={handleClick}>
+      {translate('Show')}
+    </Button>
+  );
+};

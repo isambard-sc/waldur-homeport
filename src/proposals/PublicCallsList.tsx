@@ -5,8 +5,10 @@ import { getFormValues } from 'redux-form';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { createFetcher, Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { CallAllFiltersWithDefaultState } from './call-management/CallAllFilters';
 import { CallCard } from './CallCard';
@@ -33,6 +35,7 @@ const CallColumns = [
         label={row.name}
       />
     ),
+    copyField: (row) => row.name,
   },
   {
     title: translate('Organization'),

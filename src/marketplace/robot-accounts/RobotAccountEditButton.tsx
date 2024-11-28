@@ -1,17 +1,16 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
+import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { RowActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-const RobotAccountEditDialog = lazyComponent(
-  () => import('./RobotAccountEditDialog'),
-  'RobotAccountEditDialog',
+const RobotAccountEditDialog = lazyComponent(() =>
+  import('./RobotAccountEditDialog').then((module) => ({
+    default: module.RobotAccountEditDialog,
+  })),
 );
 
 export const RobotAccountEditButton = (props) => {
@@ -31,12 +30,5 @@ export const RobotAccountEditButton = (props) => {
   ) {
     return null;
   }
-  return (
-    <RowActionButton
-      title={translate('Edit')}
-      action={callback}
-      iconNode={<PencilSimple />}
-      size="sm"
-    />
-  );
+  return <EditButton onClick={callback} size="sm" />;
 };

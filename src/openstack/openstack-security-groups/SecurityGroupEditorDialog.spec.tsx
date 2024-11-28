@@ -9,9 +9,9 @@ import {
   defaultSecurityGroup,
 } from './SecurityGroupEditorDialog.fixture';
 
-jest.mock('@waldur/openstack/api');
+vi.mock('@waldur/openstack/api');
 
-const apiMock = api as jest.Mocked<typeof api>;
+const apiMock = vi.mocked(api);
 
 describe('SecurityGroupEditorDialog', () => {
   let store: Store;

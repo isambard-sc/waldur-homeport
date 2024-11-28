@@ -1,18 +1,21 @@
 const projectFixturePath = 'projects/alice_azure.json';
 
-const currentYear = new Date().getFullYear();
-const currentMonth = new Date().getMonth();
+const _date = new Date(new Date().getFullYear() + 1, 5, 20);
+const currentYear = _date.getFullYear();
+const currentMonth = _date.getMonth();
 const nextMonthISO = new Date(currentYear, (currentMonth + 1) % 12, 20)
   .toISOString()
   .split('T')[0];
-const next3Months = new Date(currentYear, (currentMonth + 3) % 12, 20);
+const next3MonthsISO = new Date(currentYear, (currentMonth + 3) % 12, 20)
+  .toISOString()
+  .split('T')[0];
 
 const editedProject = {
   uuid: 'df4193e2bee24a4c8e339474d74c5f8c',
   name: 'Test name',
   description: 'Test description',
   backend_id: '123456789',
-  end_date: next3Months.toISOString().split('T')[0],
+  end_date: next3MonthsISO,
 };
 
 const openTab = (tab: string) => {
@@ -78,7 +81,7 @@ describe('Project manage', { testIsolation: false }, () => {
           .intercept('GET', `/api/customers/${project.customer_uuid}/`, {
             fixture: 'customers/alice.json',
           })
-          .intercept('PATCH', `/api/projects/${project.uuid}/`, {})
+          .intercept('PATCH', `/api/projects/${project.uuid}/`, editedProject)
           .as('updateProject');
       });
   });
@@ -138,16 +141,12 @@ describe('Project manage', { testIsolation: false }, () => {
   });
 
   it('Assure that the date picker works fine', () => {
-    const initialDate = new Date(currentYear, (currentMonth + 3) % 12, 21)
-      .toISOString()
-      .split('T')[0];
-
     openTab('General');
     openEditDialog('End date');
 
     cy
       // Update end_date picker with the initial date
-      .selectFlatpickrDate('.modal input.flatpickr-input', initialDate)
+      .selectFlatpickrDate('.modal input.flatpickr-input', next3MonthsISO)
 
       .get('.modal button[type="submit"]')
       .should('be.visible')
@@ -155,12 +154,12 @@ describe('Project manage', { testIsolation: false }, () => {
 
       .wait('@updateProject')
       .its('request.body')
-      .should('contain', initialDate);
+      .should('contain', next3MonthsISO);
 
     openEditDialog('End date');
     cy
       // Clear and save end_date picker
-      .selectFlatpickrDate('.modal input.flatpickr-input', initialDate)
+      .selectFlatpickrDate('.modal input.flatpickr-input', next3MonthsISO)
       .selectFlatpickrDate('.modal input.flatpickr-input', null)
 
       .get('.modal button[type="submit"]')
@@ -169,7 +168,7 @@ describe('Project manage', { testIsolation: false }, () => {
 
       .wait('@updateProject')
       .its('request.body')
-      .should('not.contain', initialDate);
+      .should('not.contain', next3MonthsISO);
 
     openEditDialog('End date');
     cy

@@ -1,37 +1,12 @@
-# Editor artifacts
-/.idea
-/.project
-/.pydevproject
-/.settings
-/.sublime
-*.sw*
-/atlassian-ide-plugin.xml
-
-# OS X
+build.dev/
 .DS_Store
-
-# dev specific
-.sass-cache
-.cache-loader
+.idea/
 node_modules
-npm-debug.log
 coverage
 cypress/videos
 cypress/screenshots/
 cypress/results/
 junit.xml
-
-# config
-src/configs/config.json
-src/configs/test/config.json
-
-build/
-build.dev/
-build.dll/
-stats.json
-
-# npm
+dist/
 yarn-error.log
-package-lock.json
-
-*.stackdump
+.env

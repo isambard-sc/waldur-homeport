@@ -2,7 +2,7 @@ import { FC } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { GenericPermission } from '@waldur/permissions/types';
-import { Table } from '@waldur/table';
+import Table from '@waldur/table/Table';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 
 import { UserRemoveButton } from './UserRemoveButton';
@@ -13,6 +13,7 @@ interface UsersListProps {
   hideRole?: boolean;
   readOnly?: boolean;
   tableFooter?;
+  cardBordered?: boolean;
 }
 
 export const UsersList: FC<UsersListProps> = ({
@@ -21,6 +22,7 @@ export const UsersList: FC<UsersListProps> = ({
   hideRole,
   readOnly,
   tableFooter,
+  cardBordered,
 }) => {
   const columns = [
     {
@@ -45,6 +47,7 @@ export const UsersList: FC<UsersListProps> = ({
       columns={columns}
       title={translate('Users')}
       verboseName={translate('users')}
+      cardBordered={cardBordered}
       rowActions={
         readOnly
           ? null

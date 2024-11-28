@@ -10,7 +10,7 @@ import {
   ElementStyleUtil,
 } from '../_utils/index';
 
-export class DrawerStore {
+class DrawerStore {
   static store: Map<string, DrawerComponent> = new Map();
 
   public static set(
@@ -270,11 +270,11 @@ class DrawerComponent {
   };
 
   // Event API
-  public on = (name: string, handler: Function) => {
+  public on = (name: string, handler: (event: Event) => void) => {
     return EventHandlerUtil.on(this.element, name, handler);
   };
 
-  public one = (name: string, handler: Function) => {
+  public one = (name: string, handler: (event: Event) => void) => {
     return EventHandlerUtil.one(this.element, name, handler);
   };
 
@@ -383,4 +383,4 @@ class DrawerComponent {
   };
 }
 
-export { DrawerComponent, defaultDrawerOptions };
+export { DrawerComponent };

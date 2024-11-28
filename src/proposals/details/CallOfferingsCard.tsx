@@ -1,8 +1,9 @@
 import { FC } from 'react';
 
 import { translate } from '@waldur/i18n';
-import { Table } from '@waldur/table';
-import { renderFieldOrDash, useTable } from '@waldur/table/utils';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
+import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { CallOffering, Call } from '../types';
 

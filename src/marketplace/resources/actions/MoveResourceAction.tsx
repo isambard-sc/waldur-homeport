@@ -1,3 +1,4 @@
+import { ArrowsOutCardinal } from '@phosphor-icons/react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -7,9 +8,10 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
-const MoveResourceDialog = lazyComponent(
-  () => import('./MoveResourceDialog'),
-  'MoveResourceDialog',
+const MoveResourceDialog = lazyComponent(() =>
+  import('./MoveResourceDialog').then((module) => ({
+    default: module.MoveResourceDialog,
+  })),
 );
 
 export const MoveResourceAction: ActionItemType = ({ resource, refetch }) => {
@@ -27,6 +29,11 @@ export const MoveResourceAction: ActionItemType = ({ resource, refetch }) => {
     );
 
   return isStaff ? (
-    <ActionItem title={translate('Move')} action={callback} staff />
+    <ActionItem
+      title={translate('Move')}
+      action={callback}
+      staff
+      iconNode={<ArrowsOutCardinal />}
+    />
   ) : null;
 };

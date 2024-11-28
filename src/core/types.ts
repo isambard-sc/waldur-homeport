@@ -1,10 +1,10 @@
 import { StateDeclaration as BaseStateDeclaration } from '@uirouter/core';
-import { ComponentType } from 'react';
+import { UIView } from '@uirouter/react';
+import { ComponentType, LazyExoticComponent } from 'react';
 
 import { PluginConfiguration } from '@waldur/auth/types';
 import { FeaturesEnum } from '@waldur/FeaturesEnums';
 import { Role } from '@waldur/permissions/types';
-import { WorkspaceType } from '@waldur/workspace/types';
 
 interface DataDeclaration {
   /** State is disabled as long as its feature is disabled */
@@ -21,8 +21,6 @@ interface DataDeclaration {
   /** Page header component is concealed as long as this parameter is set to true. */
   hideHeader: boolean;
   hideHeaderMenu: boolean;
-  /** Workspace declaration is used by workspace selector. */
-  workspace: WorkspaceType;
   skipAuth: boolean;
   title?(): string;
   breadcrumb?(): string;
@@ -30,12 +28,12 @@ interface DataDeclaration {
   priority?: number;
   permissions: Array<(state) => boolean>;
   useExtraTabs?: boolean;
-  skipInitWorkspace?: boolean;
   skipHero?: boolean;
+  workspace?: string;
 }
 
 export interface StateDeclaration extends BaseStateDeclaration {
-  component: ComponentType<any>;
+  component: LazyExoticComponent<ComponentType<any>> | typeof UIView;
   data?: Partial<DataDeclaration>;
 }
 
@@ -48,22 +46,32 @@ export interface LanguageOption {
 export interface ApplicationConfigurationOptions {
   apiEndpoint: string;
   plugins?: PluginConfiguration;
-  // Language choices and default language are fetched from MasterMind
+  /** Language choices and default language are fetched from MasterMind */
   languageChoices?: LanguageOption[];
   defaultLanguage?: string;
   FEATURES?: Record<string, boolean>;
   marketplaceLandingPageTitle: string;
-  pageSizes: number[];
   pageSize: number;
-  defaultErrorMessage: string;
   buildId: string;
-  accountingMode: string;
-  defaultPullInterval: number;
-  countersTimerInterval: number;
+  accountingMode: 'billing' | 'accounting';
   roles: Role[];
-  invitationRedirectTime: number;
+  /**
+    Provide exclude file types for issue attachments uploading
+    Based on https://github.com/okonet/attr-accept
+    Reffered to https://developer.mozilla.org/en-US/docs/Web/HTML/Element/Input#Attributes
+    Available value format:
+    A file extension starting with the STOP character (U+002E). (e.g. .jpg, .png, .doc).
+    A valid MIME type with no extensions.
+    audio/* representing sound files.
+    video/* representing video files.
+    image/* representing image files.
+  */
   excludedAttachmentTypes: string[];
+
+  /** Ensure that customer, project and resource name contains only ASCII chars. */
   enforceLatinName: boolean;
+
+  /** It can be either 'localStorage' or 'sessionStorage'. */
   authStorage: string;
 }
 

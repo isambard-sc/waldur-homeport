@@ -1,4 +1,4 @@
-import { debounce } from 'lodash';
+import { debounce } from 'lodash-es';
 import { useCallback, useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,9 +13,6 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import { DataLoader } from './DataLoader';
-
-export const RECENTLY_ADDED_OFFERINGS_UUID =
-  'recently_added_offerings_category';
 
 const ADD_RESOURCE_DIALOG_FORM = 'AddResourceDialogForm';
 

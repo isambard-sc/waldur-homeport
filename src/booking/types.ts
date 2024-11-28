@@ -14,13 +14,7 @@ export interface EventInput {
   extendedProps?: any;
 }
 
-export interface BookingState {
-  schedules: BookingProps[];
-  bookings: BookingProps[];
-  config: ConfigProps;
-}
-
-interface ConfigProps {
+interface BookingConfig {
   weekends: boolean;
   businessHours: {
     startTime: string;
@@ -37,7 +31,7 @@ export interface BookingProps extends EventInput {
   extendedProps: {
     type: string;
     bookingID?: string;
-    config?: ConfigProps;
+    config?: BookingConfig;
   };
 }
 

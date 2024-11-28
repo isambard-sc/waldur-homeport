@@ -7,4 +7,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  &.disabled,
+  &:disabled {
+    color: $grey-400 !important;
+    border-color: transparent !important;
+
+    i {
+      color: $grey-400 !important;
+    }
+    .svg-icon {
+      @include svg-icon-color($grey-400, true);
+    }
+    &.dropdown-toggle:after {
+      color: $grey-400 !important;
+    }
+
+    &.btn-secondary {
+      background-color: unset;
+    }
+  }
 }

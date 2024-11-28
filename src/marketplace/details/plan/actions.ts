@@ -1,13 +1,15 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const PlanDescription = lazyComponent(
-  () => import('./PlanDescription'),
-  'PlanDescription',
+const PlanDescription = lazyComponent(() =>
+  import('./PlanDescription').then((module) => ({
+    default: module.PlanDescription,
+  })),
 );
-const PlanDetailsDialog = lazyComponent(
-  () => import('./PlanDetailsDialog'),
-  'PlanDetailsDialog',
+const PlanDetailsDialog = lazyComponent(() =>
+  import('./PlanDetailsDialog').then((module) => ({
+    default: module.PlanDetailsDialog,
+  })),
 );
 
 export const showOfferingPlanDescription = (planDescription) =>

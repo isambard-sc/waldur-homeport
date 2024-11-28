@@ -8,12 +8,13 @@ import { InvitationCancelButton } from '@waldur/invitations/actions/InvitationCa
 import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSendButton';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { RoleField } from '@waldur/invitations/RoleField';
-import { Table } from '@waldur/table';
+import Table from '@waldur/table/Table';
 
-export const InvitationsList: FunctionComponent<{ table; hideRole }> = ({
-  table,
-  hideRole,
-}) => {
+export const InvitationsList: FunctionComponent<{
+  table;
+  hideRole;
+  cardBordered?;
+}> = ({ table, hideRole, cardBordered }) => {
   return (
     <Table
       {...table}
@@ -57,12 +58,13 @@ export const InvitationsList: FunctionComponent<{ table; hideRole }> = ({
       ].filter(Boolean)}
       rowActions={({ row }) => (
         <>
-          <InvitationSendButton row={row} />
+          <InvitationSendButton row={row} refetch={table.fetch} />
           <InvitationCancelButton row={row} refetch={table.fetch} />
         </>
       )}
       title={translate('Invitations')}
       verboseName={translate('invitations')}
+      cardBordered={cardBordered}
       hasQuery={true}
       expandableRow={InvitationExpandableRow}
     />

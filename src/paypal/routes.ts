@@ -1,25 +1,16 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 
-const Layout = lazyComponent(
-  () => import('@waldur/navigation/Layout'),
-  'Layout',
-);
-const PaymentApprove = lazyComponent(
-  () => import('./PaymentApprove'),
-  'PaymentApprove',
-);
-const PaymentCancel = lazyComponent(
-  () => import('./PaymentCancel'),
-  'PaymentCancel',
-);
-
 export const states: StateDeclaration[] = [
   {
     name: 'payment',
     url: '/payment/',
     abstract: true,
-    component: Layout,
+    component: lazyComponent(() =>
+      import('@waldur/navigation/Layout').then((module) => ({
+        default: module.Layout,
+      })),
+    ),
     data: {
       auth: true,
     },
@@ -28,12 +19,20 @@ export const states: StateDeclaration[] = [
   {
     name: 'payment.approve',
     url: 'approve/',
-    component: PaymentApprove,
+    component: lazyComponent(() =>
+      import('./PaymentApprove').then((module) => ({
+        default: module.PaymentApprove,
+      })),
+    ),
   },
 
   {
     name: 'payment.cancel',
     url: 'cancel/',
-    component: PaymentCancel,
+    component: lazyComponent(() =>
+      import('./PaymentCancel').then((module) => ({
+        default: module.PaymentCancel,
+      })),
+    ),
   },
 ];

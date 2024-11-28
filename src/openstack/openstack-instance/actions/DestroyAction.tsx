@@ -1,12 +1,15 @@
+import { FileX } from '@phosphor-icons/react';
+
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
-const DestroyDialog = lazyComponent(
-  () => import('./DestroyDialog'),
-  'DestroyDialog',
+const DestroyDialog = lazyComponent(() =>
+  import('./DestroyDialog').then((module) => ({
+    default: module.DestroyDialog,
+  })),
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {
@@ -34,5 +37,7 @@ export const DestroyAction: ActionItemType = ({ resource, refetch }) => (
     resource={resource}
     modalComponent={DestroyDialog}
     extraResolve={{ refetch }}
+    iconNode={<FileX />}
+    iconColor="danger"
   />
 );

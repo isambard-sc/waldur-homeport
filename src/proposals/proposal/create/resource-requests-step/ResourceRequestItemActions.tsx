@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { EditButton } from '@waldur/form/EditButton';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { openModalDialog, waitForConfirmation } from '@waldur/modal/actions';
 import { removeProposalResource } from '@waldur/proposals/api';
@@ -10,9 +11,10 @@ import { Proposal, ProposalResource } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-const ResourceRequestFormDialog = lazyComponent(
-  () => import('./ResourceRequestFormDialog'),
-  'ResourceRequestFormDialog',
+const ResourceRequestFormDialog = lazyComponent(() =>
+  import('./ResourceRequestFormDialog').then((module) => ({
+    default: module.ResourceRequestFormDialog,
+  })),
 );
 
 interface ResourceRequestItemActionsProps {
@@ -70,11 +72,7 @@ export const ResourceRequestItemActions = ({
 
   return (
     <>
-      <RowActionButton
-        action={openEditResourceDialog}
-        title={translate('Edit')}
-        size="sm"
-      />
+      <EditButton onClick={openEditResourceDialog} size="sm" />
       <RowActionButton
         action={remove}
         title={translate('Remove')}

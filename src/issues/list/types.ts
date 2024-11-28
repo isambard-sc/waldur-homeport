@@ -1,4 +1,5 @@
 export interface Issue {
+  add_comment_is_available?: boolean;
   type: string;
   key: string;
   uuid: string;

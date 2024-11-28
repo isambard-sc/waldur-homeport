@@ -17,11 +17,6 @@ interface ValimoAuthConfiguration {
   MOBILE_PREFIX: string;
 }
 
-export interface ExternalLink {
-  label: string;
-  url: string;
-}
-
 interface CoreConfiguration {
   INVITATION_USE_WEBHOOKS: boolean;
   DEFAULT_IDP: { provider: string; auth_url: string; client_id: string };
@@ -49,11 +44,8 @@ interface CoreConfiguration {
   SHORT_PAGE_TITLE: string;
   FULL_PAGE_TITLE: string;
   USER_MANDATORY_FIELDS: string[];
-  USER_REGISTRATION_HIDDEN_FIELDS: string[];
-  EXTERNAL_LINKS: ExternalLink[];
   DOCS_URL: string;
   SUPPORT_PORTAL_URL: string;
-  GOOGLE_ANALYTICS_ID: string;
   AUTHENTICATION_METHODS: string[];
   INVITATIONS_ENABLED: boolean;
   VALIDATE_INVITATION_EMAIL: boolean;
@@ -83,9 +75,6 @@ interface MarketplaceConfiguration {
 
 interface OpenStackConfiguration {
   TENANT_CREDENTIALS_VISIBLE: boolean;
-}
-
-interface OpenStackTenantConfiguration {
   ALLOW_CUSTOMER_USERS_OPENSTACK_CONSOLE_ACCESS: boolean;
   REQUIRE_AVAILABILITY_ZONE: boolean;
 }
@@ -119,7 +108,7 @@ interface FreeIPAConfiguration {
 interface SupportConfiguration {
   ENABLED: boolean;
   DISPLAY_REQUEST_TYPE: boolean;
-  ACTIVE_BACKEND_TYPE: string;
+  ACTIVE_BACKEND_TYPE: 'atlassian' | 'zammad' | 'smax';
 }
 
 export interface PluginConfiguration {
@@ -130,7 +119,6 @@ export interface PluginConfiguration {
   WALDUR_CORE: CoreConfiguration;
   WALDUR_MARKETPLACE: MarketplaceConfiguration;
   WALDUR_OPENSTACK: Partial<OpenStackConfiguration>;
-  WALDUR_OPENSTACK_TENANT: Partial<OpenStackTenantConfiguration>;
   WALDUR_MARKETPLACE_OPENSTACK: Partial<MarketplaceOpenStackTenantConfiguration>;
   WALDUR_RANCHER: RancherConfiguration;
   WALDUR_VMWARE: Partial<VMWareConfiguration>;

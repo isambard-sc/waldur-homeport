@@ -1,12 +1,13 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { registerOfferingType } from '@waldur/marketplace/common/registry';
+import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 
 import { VMWARE_VM } from './constants';
 
-const VmwareOrderForm = lazyComponent(
-  () => import('./deploy/VmwareOrderForm'),
-  'VmwareOrderForm',
+const VmwareOrderForm = lazyComponent(() =>
+  import('./deploy/VmwareOrderForm').then((module) => ({
+    default: module.VmwareOrderForm,
+  })),
 );
 
 const serializer = ({
@@ -39,7 +40,7 @@ const limitParser = (limits) =>
     disk: limits.disk && limits.disk / 1024,
   };
 
-registerOfferingType({
+export const vmWareOffering: OfferingConfiguration = {
   type: VMWARE_VM,
   get label() {
     return translate('vSphere Virtual Machine');
@@ -50,4 +51,4 @@ registerOfferingType({
   limitSerializer,
   limitParser,
   allowToUpdateService: true,
-});
+};

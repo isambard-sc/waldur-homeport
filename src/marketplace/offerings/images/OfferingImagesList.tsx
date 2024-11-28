@@ -3,8 +3,9 @@ import { FunctionComponent, useMemo } from 'react';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { IMAGES_TABLE_NAME } from '@waldur/marketplace/offerings/store/constants';
-import { createFetcher, Table } from '@waldur/table';
-import { useTable } from '@waldur/table/utils';
+import { createFetcher } from '@waldur/table/api';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { CreateImageButton } from './CreateImageButton';
 import { DeleteImageButton } from './DeleteImageButton';
@@ -32,6 +33,7 @@ export const OfferingImagesList: FunctionComponent<{ offering }> = ({
     {
       title: translate('Name'),
       render: ({ row }) => row.name,
+      copyField: (row) => row.name,
       orderField: 'name',
       export: 'name',
     },

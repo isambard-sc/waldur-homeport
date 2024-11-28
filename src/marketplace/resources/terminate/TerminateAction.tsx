@@ -1,3 +1,4 @@
+import { XCircle } from '@phosphor-icons/react';
 import { FC } from 'react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -7,9 +8,10 @@ import { validateState } from '@waldur/resource/actions/base';
 import { useModalDialogCallback } from '@waldur/resource/actions/useModalDialogCallback';
 import { useValidators } from '@waldur/resource/actions/useValidators';
 
-const TerminateDialog = lazyComponent(
-  () => import('./TerminateDialog'),
-  'TerminateDialog',
+const TerminateDialog = lazyComponent(() =>
+  import('./TerminateDialog').then((module) => ({
+    default: module.TerminateDialog,
+  })),
 );
 
 const validators = [validateState('OK', 'Erred')];
@@ -34,5 +36,5 @@ export const TerminateAction: FC<TerminateActionProps> = ({
     disabled,
     className: 'text-danger',
   };
-  return <ActionItem {...props} />;
+  return <ActionItem {...props} iconNode={<XCircle />} />;
 };

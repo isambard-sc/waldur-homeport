@@ -194,4 +194,7 @@ export interface CallManagementStatistics {
 export interface Reviewer {
   full_name: string;
   email: string;
+  in_review_proposals: number;
+  accepted_proposals: number;
+  rejected_proposals: number;
 }

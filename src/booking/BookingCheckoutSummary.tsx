@@ -5,7 +5,7 @@ import { CheckoutPricingRow } from '@waldur/marketplace/deploy/CheckoutPricingRo
 import { OfferingPeriodsRenderer } from '@waldur/marketplace/details/OfferingPeriodsRenderer';
 import { OrderSummary } from '@waldur/marketplace/details/OrderSummary';
 
-export const BookingExtraComponent: FunctionComponent<any> = (props) => (
+const BookingExtraComponent: FunctionComponent<any> = (props) => (
   <>
     {props.formData &&
     props.formData.attributes &&
