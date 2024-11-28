@@ -3459,6 +3459,10 @@
     "description": "features/FeaturesDescription.ts",
     "message": "Enable OECD code."
   },
+  "Enable PKCE": {
+    "description": "administration/providers/ProviderForm.tsx",
+    "message": "Enable PKCE"
+  },
   "Enable SSH keys management in user workspace.": {
     "description": "features/FeaturesDescription.ts",
     "message": "Enable SSH keys management in user workspace."
