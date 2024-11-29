@@ -11,7 +11,7 @@ export const CallOfferingExpandableRow: FunctionComponent<{ row }> = ({
   <ExpandableContainer asTable>
     <Field
       label={translate('Plan')}
-      value={renderFieldOrDash(row.plan?.name)}
+      value={renderFieldOrDash(row.plan_details?.name)}
     />
     {typeof row.attributes?.limits === 'object' &&
       Object.entries(row.attributes.limits).map(
