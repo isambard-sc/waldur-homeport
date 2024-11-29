@@ -6,6 +6,7 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getNativeNameVisible } from '@waldur/store/config';
+import { getShortNameVisible } from '@waldur/store/config';
 import { formatUserStatus } from '@waldur/user/support/utils';
 import { getUser, isStaffOrSupport } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
@@ -96,8 +97,8 @@ const PhoneNumberRow = ({ user, isSelf }) => (
     requiredMsg={
       isRequired('phone_number')
         ? translate('{pronoun} phone number', {
-            pronoun: isSelf ? translate('Your') : translate("User's"),
-          })
+          pronoun: isSelf ? translate('Your') : translate("User's"),
+        })
         : null
     }
     description={
@@ -118,17 +119,17 @@ const EmailRow = ({ user, isSelf }) => (
     requiredMsg={
       isRequired('email')
         ? translate(
-            '{pronoun} email is required for account notifications and password recovery',
-            { pronoun: isSelf ? translate('Your') : translate("User's") },
-          )
+          '{pronoun} email is required for account notifications and password recovery',
+          { pronoun: isSelf ? translate('Your') : translate("User's") },
+        )
         : null
     }
     description={
       isSelf
         ? translate('Provide an email address for communication and recovery')
         : translate(
-            "Provide an email address for the user's communication and recovery",
-          )
+          "Provide an email address for the user's communication and recovery",
+        )
     }
     actions={
       !fieldIsProtected(user, 'email') ? (
@@ -189,11 +190,11 @@ const OrganizationRow = ({ user, isSelf }) => (
     description={
       isSelf
         ? translate(
-            'Specify the name of the organization you are affiliated with',
-          )
+          'Specify the name of the organization you are affiliated with',
+        )
         : translate(
-            'Specify the name of the organization the user is affiliated with',
-          )
+          'Specify the name of the organization the user is affiliated with',
+        )
     }
   />
 );
@@ -209,8 +210,8 @@ const JobTitleRow = ({ user, isSelf }) => (
       isSelf
         ? translate('Describe your role or position within the organization')
         : translate(
-            "Describe the user's role or position within the organization",
-          )
+          "Describe the user's role or position within the organization",
+        )
     }
   />
 );
@@ -246,16 +247,32 @@ const DescriptionRow = ({ user, isSelf }) => {
   ) : null;
 };
 
-const ShortnameRow = ({ user, currentUser }) =>
-  isFeatureVisible(UserFeatures.show_slug) ? (
+const ShortNameRow = ({ user, isSelf }) => {
+  return useSelector(getShortNameVisible) ? (
     <UserEditRow
       user={user}
-      label={translate('Shortname')}
-      name="slug"
-      value={user.slug}
-      protected={!currentUser.is_staff}
+      label={translate('UNIX User name')}
+      name="unix_username"
+      value={user.unix_username}
+      protected={!user.is_staff}
+      requiredMsg={
+        isRequired('short_name')
+          ? translate('{pronoun} short name', {
+            pronoun: isSelf ? translate('Your') : translate("User's"),
+          })
+          : null
+      }
+      description={
+        isSelf
+          ? translate('A short, unique name for you. It will be used to form ' +
+            'your local username on the systems. Should only ' +
+            'contain lower-case letters and digits and must start with ' +
+            'a letter. Must be between 5 - 20 characters long.')
+          : translate('Enter a short name for the user (used for Unix accounts)')
+      }
     />
   ) : null;
+};
 
 export const UserEditRows = ({ user }: { user: UserDetails }) => {
   const currentUser = useSelector(getUser);
@@ -265,6 +282,7 @@ export const UserEditRows = ({ user }: { user: UserDetails }) => {
     <>
       <FirstNameRow user={user} isSelf={isSelf} />
       <LastNameRow user={user} isSelf={isSelf} />
+      <ShortNameRow user={user} isSelf={isSelf} />
       <NativeNameRow user={user} isSelf={isSelf} />
       <PhoneNumberRow user={user} isSelf={isSelf} />
       <EmailRow user={user} isSelf={isSelf} />
@@ -275,7 +293,6 @@ export const UserEditRows = ({ user }: { user: UserDetails }) => {
       <JobTitleRow user={user} isSelf={isSelf} />
       <AffiliationsRow user={user} />
       <DescriptionRow user={user} isSelf={isSelf} />
-      <ShortnameRow user={user} currentUser={currentUser} />
     </>
   );
 };

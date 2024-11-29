@@ -34,7 +34,7 @@ export default defineConfig({
     reactDisplayNamePlugin(),
   ],
   build: {
-    sourcemap: true,
+    sourcemap: false,
   },
   test: {
     include: ['**/*.test.ts', '**/*.test.tsx'],

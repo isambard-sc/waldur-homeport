@@ -19,6 +19,7 @@ export interface User {
   is_support: boolean;
   url: string;
   uuid: string;
+  short_name: string;
   username?: string;
   full_name?: string;
   first_name?: string;

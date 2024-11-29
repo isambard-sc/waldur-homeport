@@ -41,8 +41,8 @@ export const UserEditRow = (props: RowProps) => {
       ? props.protectedMsg
       : props.user.identity_provider_label
         ? translate('Information is coming from {identityProvider}', {
-            identityProvider: props.user.identity_provider_label,
-          })
+          identityProvider: props.user.identity_provider_label,
+        })
         : translate('Information is coming from identity provider')
     : undefined;
 
