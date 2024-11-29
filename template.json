@@ -367,10 +367,6 @@
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "Add offering endpoint"
   },
-  "Add offering": {
-    "description": "proposals/update/offerings/AddOfferingButton.tsx",
-    "message": "Add offering"
-  },
   "Add option": {
     "description": "marketplace/offerings/update/options/AddOptionButton.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx",
     "message": "Add option"
