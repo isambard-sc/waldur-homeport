@@ -42,5 +42,3 @@ export const useAuthFeatures = () => {
     enableSeperator: enableSeparator,
   };
 };
-
-export type AuthFeatures = ReturnType<typeof useAuthFeatures>;
