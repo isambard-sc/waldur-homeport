@@ -96,7 +96,7 @@
     "message": "API token"
   },
   "Abbreviation": {
-    "description": "administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, customer/list/CustomerList.tsx, marketplace/offerings/expandable/OfferingCustomersList.tsx, marketplace/offerings/import/SelectOrganizationTab.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, resource/support/SharedProviderCustomers.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "administration/organizations/OrganizationGroupOrganizationsList.tsx, customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, customer/list/CustomerList.tsx, marketplace/offerings/expandable/OfferingCustomersList.tsx, marketplace/offerings/import/SelectOrganizationTab.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, reporting/quotas/CustomerQuotasList.tsx, resource/support/SharedProviderCustomers.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Abbreviation"
   },
   "About": {
@@ -1414,6 +1414,10 @@
   "Basic medicine": {
     "description": "project/OECD_FOS_2007_CODES.ts",
     "message": "Basic medicine"
+  },
+  "Basic": {
+    "description": "support/marketplace.ts",
+    "message": "Basic"
   },
   "Batch script file": {
     "description": "slurm/details/SubmitJobDialog.tsx",
@@ -8751,14 +8755,6 @@
     "description": "i18n/translate.tsx",
     "message": "Request"
   },
-  "Request-based item (without Service Desk)": {
-    "description": "support/marketplace.ts",
-    "message": "Request-based item (without Service Desk)"
-  },
-  "Request-based item": {
-    "description": "support/marketplace.ts",
-    "message": "Request-based item"
-  },
   "Requested by": {
     "description": "proposals/update/offerings/CallOfferingsSection.tsx",
     "message": "Requested by"
@@ -9922,6 +9918,10 @@
   "Server": {
     "description": "azure/sql/AzureSQLDatabaseSummary.tsx",
     "message": "Server"
+  },
+  "Service Desk": {
+    "description": "support/marketplace.ts",
+    "message": "Service Desk"
   },
   "Service Request - client’s request to modify, add, change or remove partially or completely a particular service.": {
     "description": "issues/types/constants.tsx",
