@@ -45,15 +45,20 @@ export function createFetcher(
     const url = endpoint.startsWith('http')
       ? endpoint
       : `${ENV.apiEndpoint}api/${endpoint}/`;
-    const params = {
+    const { params: optionsParams, ...restOptions } = options || {};
+    const { params: requestOptionsParams, ...restRequestOptions } =
+      request.options || {};
+    const mergedParams = {
       page: request.currentPage,
       page_size: request.pageSize,
       ...request.filter,
+      ...optionsParams,
+      ...requestOptionsParams,
     };
+    const mergedOptions = { ...restOptions, ...restRequestOptions };
     return queryClient.fetchQuery({
-      queryKey: ['table', url, params],
-      queryFn: () =>
-        parseResponse(url, params, { ...options, ...request.options }),
+      queryKey: ['table', url, mergedParams],
+      queryFn: () => parseResponse(url, mergedParams, mergedOptions),
       staleTime: request.options?.staleTime,
     });
   };
