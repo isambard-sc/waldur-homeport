@@ -42,7 +42,7 @@ export const COMMON_OPTIONS = {
 export const SupportOffering: OfferingConfiguration = {
   type: SUPPORT_OFFERING_TYPE,
   get label() {
-    return translate('Request-based item');
+    return translate('Service Desk');
   },
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
@@ -52,7 +52,7 @@ export const SupportOffering: OfferingConfiguration = {
 export const BasicOffering: OfferingConfiguration = {
   type: BASIC_OFFERING_TYPE,
   get label() {
-    return translate('Request-based item (without Service Desk)');
+    return translate('Basic');
   },
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
