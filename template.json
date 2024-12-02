@@ -2128,7 +2128,7 @@
     "message": "Confirm"
   },
   "Confirmation notification template": {
-    "description": "marketplace/ProvisioningConfigForm.tsx",
+    "description": "marketplace/ServiceDeskProvisioningConfigForm.tsx",
     "message": "Confirmation notification template"
   },
   "Confirmation": {
