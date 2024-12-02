@@ -10,12 +10,12 @@ const getDatabaseStats = () =>
   get('/database-stats/').then((response) => response.data);
 
 const DatabaseStats = ({ data }) => (
-  <Card className="card-bordered">
+  <Card className="card-bordered card-table full-width">
     <Card.Header>
       <Card.Title>{translate('Top 10 largest database tables')}</Card.Title>
     </Card.Header>
     <Card.Body>
-      <table className="table table-hover no-margins">
+      <table className="table table-hover table-row-bordered align-middle mb-0">
         <thead>
           <tr>
             <th>{translate('Table')}</th>
