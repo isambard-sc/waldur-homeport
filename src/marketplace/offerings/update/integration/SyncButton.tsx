@@ -1,4 +1,5 @@
 import { ArrowsClockwise } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { Button, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
@@ -26,6 +27,14 @@ export const SyncButton = ({ offering, refetch }) => {
       );
     }
   };
+
+  useQuery({
+    queryKey: ['SyncButton', offering.scope],
+    queryFn: refetch,
+    enabled:
+      offering.scope_state && !['OK', 'Erred'].includes(offering.scope_state),
+    refetchInterval: 5000,
+  });
 
   if (!offering.scope) {
     // Offering does not have service settings
