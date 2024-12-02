@@ -46,14 +46,10 @@ export const FormAbstractVolumeStep = (
     }
     if (data?.defaultVolumeType) {
       change(props.typeField, data.defaultVolumeType);
+    } else if (data?.volumeTypeChoices?.length === 1) {
+      change(props.typeField, data.volumeTypeChoices[0]);
     }
-  }, [
-    data?.defaultVolumeType,
-    change,
-    props.typeField,
-    hideVolumeTypeSelector,
-    volumeType,
-  ]);
+  }, [data, change, props.typeField, hideVolumeTypeSelector, volumeType]);
 
   const quotaName = volumeType ? `gigabytes_${volumeType.name}` : 'storage';
 
