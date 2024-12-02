@@ -12,6 +12,7 @@ import { Customer } from '@waldur/workspace/types';
 
 import { createProject, ProjectInput } from '../api';
 
+import { ProjectShortNameGroup } from './ProjectShortNameGroup';
 import { DescriptionGroup } from './DescriptionGroup';
 import { EndDateGroup } from './EndDateGroup';
 import { ImageGroup } from './ImageGroup';
@@ -79,6 +80,7 @@ export const ProjectCreateDialog = ({
             <div className="size-lg">
               <OrganizationGroup isDisabled={!!customer} />
               <NameGroup customer={values?.customer} />
+              <ProjectShortNameGroup isDisabled={!!customer} />
               <DescriptionGroup create />
               <IndustryGroup />
               <OecdCodeGroup />

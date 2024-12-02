@@ -20,5 +20,10 @@ const checkDuplicate = (value, props) =>
     ? translate('Name is duplicated. Choose other name.')
     : undefined;
 
+
+
 export const validateProjectName = (value, _, props) =>
+  checkDuplicate(value, props) || checkPattern(value);
+
+export const validateProjectShortName = (value, _, props) =>
   checkDuplicate(value, props) || checkPattern(value);
