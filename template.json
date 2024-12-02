@@ -2128,7 +2128,7 @@
     "message": "Confirm"
   },
   "Confirmation notification template": {
-    "description": "marketplace/ServiceDeskProvisioningConfigForm.tsx",
+    "description": "support/ServiceDeskProvisioningConfigForm.tsx",
     "message": "Confirmation notification template"
   },
   "Confirmation": {
@@ -3482,6 +3482,10 @@
   "Enable email and webhook notifications management in user workspace.": {
     "description": "features/FeaturesDescription.ts",
     "message": "Enable email and webhook notifications management in user workspace."
+  },
+  "Enable issues for membership changes": {
+    "description": "support/ServiceDeskProvisioningConfigForm.tsx",
+    "message": "Enable issues for membership changes"
   },
   "Enable limit": {
     "description": "marketplace/offerings/update/components/ComponentLimitEnableField.tsx",

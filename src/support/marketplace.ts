@@ -21,7 +21,7 @@ const UserSecretOptionsForm = lazyComponent(() =>
   })),
 );
 const ServiceDeskProvisioningConfigForm = lazyComponent(() =>
-  import('@waldur/marketplace/ServiceDeskProvisioningConfigForm').then(
+  import('@waldur/support/ServiceDeskProvisioningConfigForm').then(
     (module) => ({
       default: module.ServiceDeskProvisioningConfigForm,
     }),
