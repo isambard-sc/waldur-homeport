@@ -7,9 +7,9 @@ import { translate } from '@waldur/i18n';
 import { FieldEditButton } from './offerings/update/integration/FieldEditButton';
 import { OfferingEditPanelFormProps } from './offerings/update/integration/types';
 
-export const ProvisioningConfigForm: FC<OfferingEditPanelFormProps> = (
-  props,
-) => (
+export const ServiceDeskProvisioningConfigForm: FC<
+  OfferingEditPanelFormProps
+> = (props) => (
   <FormTable.Item
     label={translate('Confirmation notification template')}
     value={

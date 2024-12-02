@@ -20,10 +20,12 @@ const UserSecretOptionsForm = lazyComponent(() =>
     default: module.UserSecretOptionsForm,
   })),
 );
-const ProvisioningConfigForm = lazyComponent(() =>
-  import('@waldur/marketplace/ProvisioningConfigForm').then((module) => ({
-    default: module.ProvisioningConfigForm,
-  })),
+const ServiceDeskProvisioningConfigForm = lazyComponent(() =>
+  import('@waldur/marketplace/ServiceDeskProvisioningConfigForm').then(
+    (module) => ({
+      default: module.ServiceDeskProvisioningConfigForm,
+    }),
+  ),
 );
 const RequestOrderForm = lazyComponent(() =>
   import('./RequestOrderForm').then((module) => ({
@@ -46,7 +48,7 @@ export const SupportOffering: OfferingConfiguration = {
   },
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
-  provisioningConfigForm: ProvisioningConfigForm,
+  provisioningConfigForm: ServiceDeskProvisioningConfigForm,
 };
 
 export const BasicOffering: OfferingConfiguration = {
@@ -56,5 +58,4 @@ export const BasicOffering: OfferingConfiguration = {
   },
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
-  provisioningConfigForm: ProvisioningConfigForm,
 };
