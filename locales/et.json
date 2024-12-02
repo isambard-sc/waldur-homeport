@@ -1969,8 +1969,6 @@
   "Request type": "Päringu liik",
   "Request {mode} of public offering": "Taotlus{mode} avalikust pakkumisest",
   "Request {requestId} has been created.": "Taotlus {requestId} on loodud.",
-  "Request-based item": "Taotluspõhine üksus",
-  "Request-based item (without Service Desk)": "Päringupõhine üksus (ilma teeninduskeskuseta)",
   "Requested": "Taodeldud",
   "Requested by": "Taodeldud ",
   "Requested email": "Taotletud e-post",
