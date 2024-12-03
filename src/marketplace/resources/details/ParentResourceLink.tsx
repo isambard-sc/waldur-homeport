@@ -1,5 +1,4 @@
-import { UISref } from '@uirouter/react';
-
+import { Link } from '@waldur/core/Link';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import openstackIcon from '@waldur/images/appstore/icon-openstack.png';
 
@@ -14,15 +13,12 @@ export const ParentResourceLink = ({ resource }: { resource: Resource }) =>
           'Part of {resource}',
           {
             resource: (
-              <UISref
-                to="marketplace-resource-details"
-                params={{
-                  resource_uuid: resource.parent_uuid,
-                }}
+              <Link
+                state="marketplace-resource-details"
+                params={{ resource_uuid: resource.parent_uuid }}
               >
-                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                <a className="text-btn">{resource.parent_name}</a>
-              </UISref>
+                {resource.parent_name}
+              </Link>
             ),
           },
           formatJsxTemplate,

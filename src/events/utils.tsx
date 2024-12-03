@@ -1,4 +1,4 @@
-import { UISref } from '@uirouter/react';
+import { Link } from '@waldur/core/Link';
 
 import { UserDetailsLink } from './UserDetailsLink';
 
@@ -44,19 +44,17 @@ export const getAffectedUserContext = (event: AffectedUserContext) => ({
 
 export const getCustomerContext = (event: CustomerContext) => ({
   customer_link: (
-    <UISref to="organization.events" params={{ uuid: event.customer_uuid }}>
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a>{event.customer_name}</a>
-    </UISref>
+    <Link state="organization.events" params={{ uuid: event.customer_uuid }}>
+      {event.customer_name}
+    </Link>
   ),
 });
 
 export const getProjectContext = (event: ProjectContext) => ({
   project_link: (
-    <UISref to="project.dashboard" params={{ uuid: event.project_uuid }}>
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a>{event.project_name}</a>
-    </UISref>
+    <Link state="project.dashboard" params={{ uuid: event.project_uuid }}>
+      {event.project_name}
+    </Link>
   ),
 });
 

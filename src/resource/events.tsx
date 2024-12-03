@@ -1,5 +1,4 @@
-import { UISref } from '@uirouter/react';
-
+import { Link } from '@waldur/core/Link';
 import { getUserContext } from '@waldur/events/utils';
 import { translate } from '@waldur/i18n';
 
@@ -8,17 +7,16 @@ import { ResourcesEnum } from '../EventsEnums';
 const getResourceContext = (event) => ({
   ...getUserContext(event),
   resource_link: (
-    <UISref
-      to="resource-details"
+    <Link
+      state="resource-details"
       params={{
         resource_type: event.resource_type,
         resource_uuid: event.resource_uuid,
         uuid: event.project_uuid,
       }}
     >
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a>{event.resource_name}</a>
-    </UISref>
+      {event.resource_name}
+    </Link>
   ),
 });
 

@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import { UISref, UISrefActive, useRouter } from '@uirouter/react';
+import { UISrefActive, useRouter } from '@uirouter/react';
 import { useMemo } from 'react';
+
+import { Link } from '@waldur/core/Link';
 
 import { getTabs } from '../useTabs';
 
@@ -24,9 +26,9 @@ export const UserDropdownMenuItems = () => {
             data-kt-menu-flip="bottom"
           >
             {item.to ? (
-              <UISref to={item.to}>
-                <a className="menu-link px-5">{item.title}</a>
-              </UISref>
+              <Link state={item.to} className="menu-link px-5">
+                <span className="menu-title">{item.title}</span>
+              </Link>
             ) : (
               <a className="menu-link px-5">{item.title}</a>
             )}
@@ -38,9 +40,9 @@ export const UserDropdownMenuItems = () => {
                     className="menu-item px-3"
                     data-kt-menu-trigger="click"
                   >
-                    <UISref to={child.to}>
-                      <a className="menu-link px-5">{child.title}</a>
-                    </UISref>
+                    <Link state={child.to} className="menu-link px-5">
+                      <span className="menu-title">{child.title}</span>
+                    </Link>
                   </div>
                 ))}
               </div>
