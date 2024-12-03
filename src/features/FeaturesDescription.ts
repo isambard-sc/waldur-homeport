@@ -1,4 +1,3 @@
- 
 // WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_features_description.py
 // Do not edit it manually. All manual changes would be overridden.
 import { FeatureSection } from '@waldur/features/types';
