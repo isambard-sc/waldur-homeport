@@ -1,6 +1,7 @@
 import { UserGear } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -15,6 +16,7 @@ import { UserEvents } from '@waldur/user/dashboard/UserEvents';
 import { KeysList } from '@waldur/user/keys/KeysList';
 import { UserDetailsTable } from '@waldur/user/support/UserDetailsTable';
 import { UserOfferingList } from '@waldur/user/UserOfferingList';
+import { getUser } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
 
 import { UserAffiliationsList } from '../affiliations/UserAffiliationsList';
@@ -32,6 +34,7 @@ interface UserDetailsDialogProps {
 export const UserDetailsDialog: FunctionComponent<UserDetailsDialogProps> = ({
   resolve: { user, showChecklists, loading, error, refetch },
 }) => {
+  const currentUser = useSelector(getUser) as UserDetails;
   return (
     <MetronicModalDialog
       title={translate('User details of {fullName}', {
@@ -77,9 +80,13 @@ export const UserDetailsDialog: FunctionComponent<UserDetailsDialogProps> = ({
           <Tab eventKey={5} title={translate('Remote accounts')}>
             <UserOfferingList user={user} hasActionBar={false} />
           </Tab>
-          <Tab eventKey={6} title={translate('Roles and permissions')}>
-            <UserAffiliationsList user={user} hasActionBar={false} />
-          </Tab>
+          {currentUser.is_staff ||
+          currentUser.is_support ||
+          currentUser.uuid === user.uuid ? (
+            <Tab eventKey={6} title={translate('Roles and permissions')}>
+              <UserAffiliationsList user={user} hasActionBar={false} />
+            </Tab>
+          ) : null}
         </Tabs>
       ) : null}
     </MetronicModalDialog>
