@@ -8,4 +8,4 @@ const UserPopover = lazyComponent(() =>
 );
 
 export const openUserPopover = (resolve) =>
-  openModalDialog(UserPopover, { resolve });
+  openModalDialog(UserPopover, { resolve, size: 'lg' });
