@@ -1,6 +1,7 @@
-import { UISref, useCurrentStateAndParams } from '@uirouter/react';
+import { useCurrentStateAndParams } from '@uirouter/react';
 import React, { FunctionComponent } from 'react';
 
+import { Link } from '@waldur/core/Link';
 import { isDescendantOf } from '@waldur/navigation/useTabs';
 
 interface IssueLinkProps {
@@ -28,17 +29,15 @@ export const IssueLinkField: FunctionComponent<IssueLinkProps> = (props) => {
   }
 
   return (
-    <UISref to={toState} params={toParams}>
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a
-        target={props.target}
-        onClick={props.onClick}
-        className={props.className}
-        onKeyPress={(e) => e.key === 'Enter' && props.onClick(e)}
-        role={props.onClick ? 'button' : undefined}
-      >
-        {props.label || props.children}
-      </a>
-    </UISref>
+    <Link
+      state={toState}
+      params={toParams}
+      label={props.label}
+      target={props.target}
+      onClick={props.onClick}
+      className={props.className}
+    >
+      {props.children}
+    </Link>
   );
 };

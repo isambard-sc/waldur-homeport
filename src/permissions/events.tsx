@@ -1,5 +1,4 @@
-import { UISref } from '@uirouter/react';
-
+import { Link } from '@waldur/core/Link';
 import { EventGroup } from '@waldur/events/types';
 import {
   AffectedUserContext,
@@ -35,15 +34,14 @@ const UUID_MAP = {
 
 const getScopeLink = (event: RoleEvent) => ({
   scope_link: STATES_MAP[event.scope_type] ? (
-    <UISref
-      to={STATES_MAP[event.scope_type]}
+    <Link
+      state={STATES_MAP[event.scope_type]}
       params={{
         [UUID_MAP[event.scope_type]]: event.scope_uuid,
       }}
     >
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a>{event.scope_name}</a>
-    </UISref>
+      {event.scope_name}
+    </Link>
   ) : (
     event.scope_name
   ),
