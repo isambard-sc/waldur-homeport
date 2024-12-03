@@ -9,6 +9,7 @@ import {
 } from '@waldur/marketplace/common/registry';
 
 import { FieldEditButton } from './FieldEditButton';
+import { OfferingScopeState } from './OfferingScopeState';
 import { getServiceSettingsForm } from './registry';
 import { SyncButton } from './SyncButton';
 import { OfferingEditPanelProps } from './types';
@@ -31,6 +32,7 @@ export const CredentialsSection: FC<OfferingEditPanelProps> = (props) => {
       className="card-bordered mb-7"
     >
       <FormTable>
+        <OfferingScopeState offering={props.offering} />
         {allowToUpdateService(props.offering.type) && ServiceSettingsForm ? (
           <ServiceSettingsForm
             offering={props.offering}
