@@ -112,6 +112,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     hasActionBar: true,
     hasHeaders: true,
     cardBordered: true,
+    hoverShadow: true,
   };
 
   state = {
@@ -127,6 +128,15 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
   }
 
   render() {
+    const gridHover =
+      (typeof this.props.hoverShadow === 'object'
+        ? (this.props.hoverShadow.grid ?? true)
+        : this.props.hoverShadow) && Boolean(this.props.gridItem);
+    const tableHover =
+      typeof this.props.hoverShadow === 'object'
+        ? (this.props.hoverShadow.table ?? true)
+        : this.props.hoverShadow;
+
     return (
       <FilterContextProvider
         {...this.props}
@@ -256,7 +266,13 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
               className="table-responsive dataTables_wrapper"
               style={{ minHeight: this.props.minHeight || 300 }}
             >
-              <div className={classNames('table-container table-hover-shadow')}>
+              <div
+                className={classNames(
+                  'table-container',
+                  tableHover && 'table-hover-shadow',
+                  gridHover && 'grid-hover-shadow',
+                )}
+              >
                 {this.renderBody()}
               </div>
             </div>
