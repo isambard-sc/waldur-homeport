@@ -6,26 +6,17 @@ import { useSelector } from 'react-redux';
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
-import { PermissionEnum } from '@waldur/permissions/enums';
-import { hasPermission } from '@waldur/permissions/hasPermission';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 import { ProjectBreadcrumbPopover } from './ProjectBreadcrumbPopover';
 import { ProjectProfile } from './ProjectProfile';
+import { canEditProject } from './utils';
 
 const PageHero = ({ project }) => {
   const user = useSelector(getUser);
   const customer = useSelector(getCustomer);
 
-  const canEdit =
-    hasPermission(user, {
-      permission: PermissionEnum.UPDATE_PROJECT,
-      customerId: customer.uuid,
-    }) ||
-    hasPermission(user, {
-      permission: PermissionEnum.UPDATE_PROJECT,
-      projectId: project.uuid,
-    });
+  const canEdit = canEditProject(user, { customer, project });
 
   const router = useRouter();
   const { state } = useCurrentStateAndParams();

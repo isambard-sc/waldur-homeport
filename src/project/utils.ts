@@ -8,7 +8,9 @@ import {
 } from '@waldur/dashboard/chart';
 import { translate } from '@waldur/i18n';
 import { Category } from '@waldur/marketplace/types';
-import { Project } from '@waldur/workspace/types';
+import { PermissionEnum } from '@waldur/permissions/enums';
+import { hasPermission } from '@waldur/permissions/hasPermission';
+import { Project, User } from '@waldur/workspace/types';
 
 import { fetchLast12MonthProjectCosts } from './api';
 import { ProjectCounterResourceItem } from './types';
@@ -83,3 +85,13 @@ export const getProjectTeamChart = async (project: Project) => {
   }
   return null;
 };
+
+export const canEditProject = (user: User, context: { customer?; project? }) =>
+  hasPermission(user, {
+    permission: PermissionEnum.UPDATE_PROJECT,
+    customerId: context?.customer?.uuid,
+  }) ||
+  hasPermission(user, {
+    permission: PermissionEnum.UPDATE_PROJECT,
+    projectId: context?.project?.uuid,
+  });

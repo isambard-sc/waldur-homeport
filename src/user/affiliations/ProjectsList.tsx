@@ -11,6 +11,7 @@ import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation
 import { useTitle } from '@waldur/navigation/title';
 import { PROJECTS_LIST } from '@waldur/project/constants';
 import { GlobalProjectCreateButton } from '@waldur/project/create/GlobalProjectCreateButton';
+import { ProjectCard } from '@waldur/project/ProjectCard';
 import { ProjectLink } from '@waldur/project/ProjectLink';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -46,6 +47,7 @@ const mandatoryFields = [
   'uuid',
   'marketplace_resource_count',
   'description',
+  'project_credit',
 ];
 
 export const ProjectsList = () => {
@@ -62,23 +64,21 @@ export const ProjectsList = () => {
   const { syncResourceFilters } =
     useOrganizationAndProjectFiltersForResources();
 
+  const onClickDetails = (row) =>
+    syncResourceFilters({
+      organization: {
+        name: row.customer_name,
+        uuid: row.customer_uuid,
+      },
+      project: row,
+    });
+
   const columns: Column[] = [
     {
       title: translate('Name'),
       orderField: 'name',
       render: ({ row }) => (
-        <ProjectLink
-          row={row}
-          onClick={() =>
-            syncResourceFilters({
-              organization: {
-                name: row.customer_name,
-                uuid: row.customer_uuid,
-              },
-              project: row,
-            })
-          }
-        />
+        <ProjectLink row={row} onClick={() => onClickDetails(row)} />
       ),
       copyField: (row) => row.name,
       keys: ['name', 'is_industry'],
@@ -234,6 +234,11 @@ export const ProjectsList = () => {
       columns={columns}
       verboseName={translate('projects')}
       title={translate('Projects')}
+      gridSize={{ md: 6, xl: 4 }}
+      gridItem={({ row }) => (
+        <ProjectCard project={row} onClickDetails={() => onClickDetails(row)} />
+      )}
+      hoverShadow={{ grid: false }}
       hasQuery={true}
       showPageSizeSelector={true}
       enableExport={true}

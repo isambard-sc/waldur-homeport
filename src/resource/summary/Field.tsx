@@ -18,13 +18,15 @@ interface FieldProps {
   valueClass?: string;
   hasCopy?: boolean;
   isStuck?: boolean;
+  labelCol?: number;
+  valueCol?: number;
 }
 
 export const Field: FunctionComponent<FieldProps> = (props) =>
   props.value || props.children ? (
     <Row className={classNames('field-row g-0 mb-1', props.className)}>
       <Col
-        sm={props.isStuck ? 'auto' : 3}
+        sm={props.isStuck ? 'auto' : props.labelCol || 3}
         className="field-label text-gray-700 fw-bold"
       >
         {props.label.length > 20 ? (
@@ -36,7 +38,7 @@ export const Field: FunctionComponent<FieldProps> = (props) =>
         )}
       </Col>
       <Col
-        sm={props.isStuck ? undefined : 9}
+        sm={props.isStuck ? undefined : props.valueCol || 9}
         className={classNames('text-grey-500', props.valueClass)}
       >
         {props.value || props.children || DASH_ESCAPE_CODE}

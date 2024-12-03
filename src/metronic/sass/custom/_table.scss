@@ -2,9 +2,15 @@
 
 /* TABLE */
 .table {
-  th,
-  td {
-    height: 44px;
+  &:not(.h-auto) {
+    th,
+    td {
+      height: 44px;
+    }
+  }
+
+  th {
+    font-weight: 600;
   }
 
   thead > tr {
@@ -149,8 +155,8 @@
 }
 
 // Shadow hover
-.table-container.table-hover-shadow {
-  tbody > tr:not(.expanded + tr):hover {
+.table-container {
+  &.table-hover-shadow > table > tbody > tr:not(.expanded + tr):hover {
     border-top: 1px solid $border-color;
     border-bottom: 1px solid $border-color;
     border-radius: $border-radius-lg;
@@ -163,7 +169,7 @@
   }
 
   // On grid view
-  .card:not(.card-table):hover {
+  &.grid-hover-shadow .card:not(.card-table):hover {
     box-shadow: if(
       isDarkMode(),
       0 0.1rem 1rem 0.25rem rgba($white, 0.05),
