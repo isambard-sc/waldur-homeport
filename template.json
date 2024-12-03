@@ -1856,7 +1856,7 @@
     "message": "Check name"
   },
   "Checklists": {
-    "description": "customer/routes.ts, marketplace-checklist/ChecklistCustomer.tsx, user/UserPopover.tsx",
+    "description": "customer/routes.ts, marketplace-checklist/ChecklistCustomer.tsx, user/support/UserDetailsDialog.tsx",
     "message": "Checklists"
   },
   "Chemical engineering": {
@@ -1928,7 +1928,7 @@
     "message": "Clone"
   },
   "Close": {
-    "description": "administration/TelemetryExampleDialog.tsx, booking/components/BookingResourceDetailsDialog.tsx, broadcasts/RecipientsListDialog.tsx, marketplace/aggregate-limits/AllComponentsDialog.tsx, marketplace/details/plan/EstimateUsageComponentDialog.tsx, marketplace/offerings/images/ImageDetailsDialog.tsx, marketplace/offerings/update/integration/GLAuthConfigDialog.tsx, marketplace/referral/OfferingReferralsDialog.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/ProviderProjectResourcesDialog.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, resource/summary/ResourceMetadataDialog.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserPopover.tsx, user/support/UserDetailsDialog.tsx, user/support/UserRemovalMessageDialog.tsx",
+    "description": "administration/TelemetryExampleDialog.tsx, booking/components/BookingResourceDetailsDialog.tsx, broadcasts/RecipientsListDialog.tsx, marketplace/aggregate-limits/AllComponentsDialog.tsx, marketplace/details/plan/EstimateUsageComponentDialog.tsx, marketplace/offerings/images/ImageDetailsDialog.tsx, marketplace/offerings/update/integration/GLAuthConfigDialog.tsx, marketplace/referral/OfferingReferralsDialog.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/ProviderProjectResourcesDialog.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, resource/summary/ResourceMetadataDialog.tsx, resource/summary/ResourceSummaryModal.tsx, user/support/UserDetailsDialog.tsx, user/support/UserRemovalMessageDialog.tsx",
     "message": "Close"
   },
   "Closed issues (this month)": {
@@ -3032,7 +3032,7 @@
     "message": "Details for {provider}"
   },
   "Details": {
-    "description": "administration/organizations/OrganizationGroupDetailsButton.tsx, administration/providers/ProviderCard.tsx, customer/details/CustomerBillingPanel.tsx, customer/details/CustomerDetailsPanel.tsx, invoices/list/MonthOverview.tsx, marketplace/aggregate-limits/AggregateLimitWidget.tsx, marketplace/details/plan/PlanDescriptionButton.tsx, marketplace/referral/ReferralDetailsButton.tsx, marketplace/resources/details/fetchData.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, marketplace/resources/details/popup/ResourceDetailsDialog.tsx, project/manage/ProjectGeneral.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, rancher/cluster/apps/ApplicationDetailsButton.tsx, resource/summary/ResourceSummaryButton.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserDetailsButton.tsx, user/UserPopover.tsx, user/support/UserDetailsButton.tsx, user/support/UserDetailsDialog.tsx, vmware/tabs.ts",
+    "description": "administration/organizations/OrganizationGroupDetailsButton.tsx, administration/providers/ProviderCard.tsx, customer/details/CustomerBillingPanel.tsx, customer/details/CustomerDetailsPanel.tsx, invoices/list/MonthOverview.tsx, marketplace/aggregate-limits/AggregateLimitWidget.tsx, marketplace/details/plan/PlanDescriptionButton.tsx, marketplace/referral/ReferralDetailsButton.tsx, marketplace/resources/details/fetchData.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, marketplace/resources/details/popup/ResourceDetailsDialog.tsx, project/manage/ProjectGeneral.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, rancher/cluster/apps/ApplicationDetailsButton.tsx, resource/summary/ResourceSummaryButton.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserDetailsButton.tsx, user/support/UserDetailsButton.tsx, user/support/UserDetailsDialog.tsx, vmware/tabs.ts",
     "message": "Details"
   },
   "Device ID": {
@@ -5192,7 +5192,7 @@
     "message": "Key"
   },
   "Keys": {
-    "description": "user/UserPopover.tsx, user/support/UserDetailsDialog.tsx",
+    "description": "user/support/UserDetailsDialog.tsx",
     "message": "Keys"
   },
   "Keystone auth URL (e.g. http://keystone.example.com:5000/v3)": {
@@ -8508,7 +8508,7 @@
     "message": "Remote Waldur API URL"
   },
   "Remote accounts": {
-    "description": "user/UserPopover.tsx, user/routes.ts, user/support/UserDetailsDialog.tsx",
+    "description": "user/routes.ts, user/support/UserDetailsDialog.tsx",
     "message": "Remote accounts"
   },
   "Remote category": {
@@ -11495,10 +11495,6 @@
     "description": "invoices/details/ResourceLimitPeriodsTable.tsx",
     "message": "Tracked using UTC timezone, displayed with your browser’s timezone."
   },
-  "Try again": {
-    "description": "user/UserPopover.tsx",
-    "message": "Try again"
-  },
   "Turn off": {
     "description": "marketplace/resources/usage/utils.ts",
     "message": "Turn off"
@@ -12148,7 +12144,7 @@
     "message": "Unable to load statistics data"
   },
   "Unable to load user.": {
-    "description": "user/UserPopover.tsx",
+    "description": "user/support/UserDetailsDialog.tsx",
     "message": "Unable to load user."
   },
   "Unable to load users": {
@@ -13138,10 +13134,6 @@
   "User data": {
     "description": "openstack/openstack-instance/OpenstackInstanceDetails.tsx",
     "message": "User data"
-  },
-  "User details for {fullName}": {
-    "description": "user/UserPopover.tsx",
-    "message": "User details for {fullName}"
   },
   "User details of {fullName}": {
     "description": "user/support/UserDetailsDialog.tsx",
