@@ -1,5 +1,4 @@
 import { Code } from '@phosphor-icons/react';
-import { useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -7,7 +6,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 const SetBackendIdDialog = lazyComponent(() =>
   import('./SetBackendIdDialog').then((module) => ({
@@ -16,7 +15,7 @@ const SetBackendIdDialog = lazyComponent(() =>
 );
 
 export const SetBackendIdAction: ActionItemType = ({ resource, refetch }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   if (
     !hasPermission(user, {
       permission: PermissionEnum.SET_RESOURCE_BACKEND_ID,

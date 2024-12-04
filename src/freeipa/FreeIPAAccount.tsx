@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useAsyncFn, useEffectOnce } from 'react-use';
 
 import { ENV } from '@waldur/configs/default';
@@ -8,7 +8,7 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { router } from '@waldur/router';
 import { showError } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { getProfile } from './api';
 import { FreeIPAAccountCreate } from './FreeIPAAccountCreate';
@@ -16,7 +16,7 @@ import { FreeIPAAccountEdit } from './FreeIPAAccountEdit';
 import { SyncProfile } from './SyncProfile';
 
 export const FreeIpaAccount = () => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const dispatch = useDispatch();
 
   if (!ENV.plugins.WALDUR_FREEIPA?.ENABLED) {

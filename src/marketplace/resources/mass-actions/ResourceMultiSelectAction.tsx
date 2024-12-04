@@ -1,8 +1,7 @@
 import { DropdownButton, DropdownDivider } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { Resource } from '../types';
 
@@ -22,7 +21,7 @@ export const ResourceMultiSelectAction = ({
   rows: Resource[];
   refetch(): void;
 }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   return (
     <DropdownButton variant="primary" title={translate('All actions')}>
       <MultiStopAction rows={rows} refetch={refetch} />

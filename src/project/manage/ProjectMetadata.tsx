@@ -1,11 +1,10 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 import { Project } from '@waldur/workspace/types';
 
 import { FieldEditButton } from './FieldEditButton';
@@ -17,7 +16,7 @@ interface ProjectMetadataProps {
 export const ProjectMetadata: React.FC<ProjectMetadataProps> = ({
   project,
 }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   return (
     <FormTable.Card className="card-bordered">
       <FormTable>

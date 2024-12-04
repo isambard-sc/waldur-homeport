@@ -20,7 +20,8 @@ import { RoleField } from '@waldur/invitations/RoleField';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 const InvitationsListComponent: FunctionComponent = () => {
   const filter = useSelector(mapStateToFilter);
@@ -105,7 +106,7 @@ const mapStateToFilter = createSelector(
 );
 
 export const InvitationsList: FunctionComponent = () => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const project = useSelector(getProject);
   const customer = useSelector(getCustomer);
   const router = useRouter();

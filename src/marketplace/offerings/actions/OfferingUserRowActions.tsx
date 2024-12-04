@@ -8,7 +8,8 @@ import { ServiceProvider } from '@waldur/marketplace/types';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 type OfferingUserRowActionsProps = {
   row: OfferingUser;
@@ -23,7 +24,7 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
   provider,
   offering,
 }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const customer = useSelector(getCustomer);
   const canUpdateRestrictedStatus = hasPermission(user, {
     permission: PermissionEnum.UPDATE_OFFERING_USER_RESTRICTION,

@@ -6,7 +6,8 @@ import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 const UpdateOfferingPermissionExpirationTimeDialog = lazyComponent(() =>
   import('./UpdateOfferingPermissionExpirationTimeDialog').then((module) => ({
@@ -18,7 +19,7 @@ export const UpdateOfferingPermissionExpirationTimeButton: FunctionComponent<{
   permission;
   fetch;
 }> = ({ permission, fetch }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const customer = useSelector(getCustomer);
   const canUpdatePermission = hasPermission(user, {
     permission: PermissionEnum.UPDATE_OFFERING_PERMISSION,

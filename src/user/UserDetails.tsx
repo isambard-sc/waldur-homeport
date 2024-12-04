@@ -1,12 +1,12 @@
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 import { useEffectOnce } from 'react-use';
 
 import { usePageHero } from '@waldur/navigation/context';
 import { router } from '@waldur/router';
 import store from '@waldur/store/store';
 import { setCurrentUser } from '@waldur/workspace/actions';
+import { useUser } from '@waldur/workspace/hooks';
 import { getUser } from '@waldur/workspace/selectors';
 import { UserDetails as IUserDetails } from '@waldur/workspace/types';
 
@@ -35,7 +35,7 @@ async function loadUser() {
 }
 
 export const UserDetails: FunctionComponent = () => {
-  const user = useSelector(getUser) as IUserDetails;
+  const user = useUser() as IUserDetails;
   const { state } = useCurrentStateAndParams();
 
   useEffectOnce(() => {

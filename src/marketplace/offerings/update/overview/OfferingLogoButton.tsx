@@ -6,7 +6,9 @@ import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer } from '@waldur/workspace/selectors';
+import { User } from '@waldur/workspace/types';
 
 import { ACTIVE, DRAFT, PAUSED } from '../../store/constants';
 
@@ -17,7 +19,7 @@ const UpdateOfferingLogoDialog = lazyComponent(() =>
 );
 
 export const OfferingLogoButton: FC<{ offering; refetch }> = (props) => {
-  const user = useSelector(getUser);
+  const user = useUser() as User;
   const customer = useSelector(getCustomer);
 
   const dispatch = useDispatch();

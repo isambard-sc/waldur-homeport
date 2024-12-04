@@ -8,7 +8,8 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 const OfferingPermissionCreateDialog = lazyComponent(() =>
   import('./OfferingPermissionCreateDialog').then((module) => ({
@@ -19,7 +20,7 @@ const OfferingPermissionCreateDialog = lazyComponent(() =>
 export const OfferingPermissionCreateButton: React.FC<{ fetch }> = ({
   fetch,
 }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const customer = useSelector(getCustomer);
   const canCreatePermission = hasPermission(user, {
     permission: PermissionEnum.CREATE_OFFERING_PERMISSION,

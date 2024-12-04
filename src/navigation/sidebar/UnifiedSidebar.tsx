@@ -1,12 +1,11 @@
 import { ShoppingCart } from '@phosphor-icons/react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 import { CallPublicMenu } from '@waldur/navigation/sidebar/CallPublicMenu';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { MarketplaceTrigger } from './marketplace-popup/MarketplaceTrigger';
 import { MenuItem } from './MenuItem';
@@ -17,7 +16,7 @@ import { ResourcesMenu } from './ResourcesMenu';
 import { Sidebar } from './Sidebar';
 
 export const UnifiedSidebar = () => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const router = useRouter();
   const { state, params } = useCurrentStateAndParams();
   useEffect(() => {

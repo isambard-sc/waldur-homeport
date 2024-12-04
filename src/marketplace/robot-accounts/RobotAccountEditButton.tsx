@@ -1,11 +1,11 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 const RobotAccountEditDialog = lazyComponent(() =>
   import('./RobotAccountEditDialog').then((module) => ({
@@ -21,7 +21,7 @@ export const RobotAccountEditButton = (props) => {
         resolve: { resource: props.row, refetch: props.refetch },
       }),
     );
-  const user = useSelector(getUser);
+  const user = useUser();
   if (
     !hasPermission(user, {
       permission: PermissionEnum.UPDATE_RESOURCE_ROBOT_ACCOUNT,

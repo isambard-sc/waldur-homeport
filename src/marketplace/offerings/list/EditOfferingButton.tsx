@@ -1,17 +1,16 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { Dropdown } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { DropdownLink } from './DropdownLink';
 
 export const EditOfferingButton = ({ row }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
 
   const canUpdateOffering = hasPermission(user, {
     permission: PermissionEnum.UPDATE_OFFERING,

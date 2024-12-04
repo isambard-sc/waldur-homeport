@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -10,7 +10,7 @@ import {
   showErrorResponse,
   showSuccess,
 } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { createOfferingUser } from '../common/api';
 import {
@@ -64,7 +64,7 @@ const handleSubmit =
 
 export const CreateProviderOfferingUserDialog = ({ resolve: { refetch } }) => {
   const dispatch = useDispatch();
-  const curretUser = useSelector(getUser);
+  const curretUser = useUser();
 
   const fields = [
     {

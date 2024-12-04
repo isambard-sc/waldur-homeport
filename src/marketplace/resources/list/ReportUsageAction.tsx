@@ -1,5 +1,5 @@
 import { FileText } from '@phosphor-icons/react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -11,7 +11,7 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { validateState } from '@waldur/resource/actions/base';
 import { useValidators } from '@waldur/resource/actions/useValidators';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 const ResourceCreateUsageDialog = lazyComponent(() =>
   import('@waldur/marketplace/resources/usage/ResourceCreateUsageDialog').then(
@@ -32,7 +32,7 @@ export const ReportUsageAction = ({ resource }: { resource: Resource }) => {
     );
   };
 
-  const user = useSelector(getUser);
+  const user = useUser();
   const canSetUsage = hasPermission(user, {
     permission: PermissionEnum.SET_RESOURCE_USAGE,
     customerId: resource.customer_uuid,

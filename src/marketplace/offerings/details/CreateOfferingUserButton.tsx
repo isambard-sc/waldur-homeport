@@ -1,5 +1,5 @@
 import { PlusCircle } from '@phosphor-icons/react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -7,7 +7,7 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 const CreateOfferingUserDialog = lazyComponent(() =>
   import('./CreateOfferingUserDialog').then((module) => ({
@@ -17,7 +17,7 @@ const CreateOfferingUserDialog = lazyComponent(() =>
 
 export const CreateOfferingUserButton = ({ offering, onSuccess }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const user = useUser();
   if (!offering.secret_options.service_provider_can_create_offering_user) {
     return null;
   }

@@ -16,7 +16,8 @@ import { useCreateInvitation } from '@waldur/invitations/actions/useCreateInvita
 import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/AggregateLimitWidget';
 import { getProjectStats } from '@waldur/marketplace/aggregate-limits/api';
 import { fetchSelectProjectUsers } from '@waldur/permissions/api';
-import { getProject, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getProject } from '@waldur/workspace/selectors';
 
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { getProjectTeamChart, loadChart } from './utils';
@@ -26,7 +27,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     MarketplaceFeatures.conceal_prices,
   );
 
-  const user = useSelector(getUser);
+  const user = useUser();
   const project = useSelector(getProject);
 
   const router = useRouter();

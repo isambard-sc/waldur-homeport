@@ -1,12 +1,12 @@
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { updateOfferingState as updateOfferingStateApi } from '@waldur/marketplace/common/api';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { ACTIVE, ARCHIVED, DRAFT, PAUSED } from '../store/constants';
 
@@ -28,7 +28,7 @@ export const OfferingStateActions = ({
   className = undefined,
 }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const user = useUser();
   const updateOfferingState = async (target, reason = null) => {
     try {
       await updateOfferingStateApi(offering.uuid, target, reason);

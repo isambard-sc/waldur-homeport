@@ -1,14 +1,12 @@
-import { useSelector } from 'react-redux';
-
 import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { InvitationCancelButton } from './actions/InvitationCancelButton';
 import { InvitationSendButton } from './actions/InvitationSendButton';
 import { InvitationDeleteButton } from './InvitationDeleteButton';
 
 export const InvitationActions = ({ invitation, refetch }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   return (
     <ActionsDropdown
       row={invitation}

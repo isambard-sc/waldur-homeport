@@ -1,6 +1,6 @@
 import { Trash } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
@@ -8,7 +8,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { deleteOfferingUser } from '../common/api';
 import { ServiceProvider } from '../types';
@@ -22,7 +22,7 @@ export const ProviderOfferingUserDeleteButton: FC<{
   refetch;
 }> = (props) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const user = useUser();
   const canDeleteOfferingUser = hasPermission(user, {
     permission: PermissionEnum.DELETE_OFFERING_USER,
     customerId: props.provider

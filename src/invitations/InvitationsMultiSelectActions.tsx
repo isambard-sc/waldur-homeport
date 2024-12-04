@@ -1,8 +1,7 @@
 import { DropdownButton } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { MultiCancelAction } from './MultiCancelAction';
 import { MultiDeleteAction } from './MultiDeleteAction';
@@ -16,7 +15,7 @@ export const InvitationsMultiSelectActions = ({
   rows: Invitation[];
   refetch(): void;
 }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   return (
     <DropdownButton variant="primary" title={translate('All actions')}>
       <MultiResendAction rows={rows} refetch={refetch} />

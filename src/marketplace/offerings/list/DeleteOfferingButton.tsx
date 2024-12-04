@@ -1,18 +1,18 @@
 import { Trash } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { deleteProviderOffering } from '../../common/api';
 
 export const DeleteOfferingButton = ({ row, refetch }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const dispatch = useDispatch();
 
   const canDeleteOffering = hasPermission(user, {
