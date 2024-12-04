@@ -1307,6 +1307,10 @@
     "description": "marketplace/offerings/update/integration/LifecyclePolicySection.tsx",
     "message": "Auto approve in service provider projects"
   },
+  "Auto-approved": {
+    "description": "marketplace/resources/resource-pending/OrderInProgressView.tsx",
+    "message": "Auto-approved"
+  },
   "Auto-assign floating IP": {
     "description": "openstack/openstack-backup/actions/utils.tsx, openstack/openstack-instance/actions/update-floating-ips/utils.tsx, openstack/openstack-instance/utils.ts",
     "message": "Auto-assign floating IP"
