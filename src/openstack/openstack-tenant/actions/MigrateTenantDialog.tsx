@@ -131,7 +131,11 @@ export const MigrateTenantDialog = connect<
               <AsyncSelectField
                 loadOptions={(query, prevOptions, currentPage) =>
                   offeringsAutocomplete(
-                    { name: query, type: TENANT_TYPE },
+                    {
+                      name: query,
+                      type: TENANT_TYPE,
+                      allowed_customer_uuid: resource.customer_uuid,
+                    },
                     prevOptions,
                     currentPage,
                     false,
