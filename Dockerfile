@@ -5,7 +5,7 @@ ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json yarn.lock /app/
 # Git is needed to refer with yarn to unrealised versions of libraries from github
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
-RUN apk add --no-cache git && yarn install --frozen-lockfile
+RUN apk add --no-cache git && yarn install
 
 COPY . /app
 
