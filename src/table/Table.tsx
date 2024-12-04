@@ -9,6 +9,7 @@ import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
+import { ErrorView } from '@waldur/ErrorView';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
 import { FilterContextProvider } from './FilterContextProvider';
@@ -302,8 +303,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     }
 
     if (this.props.error) {
-      // @ts-ignore
-      return <ErrorMessage error={this.props.error} />;
+      return <ErrorView error={this.props.error} />;
     }
 
     if (!this.props.loading && !this.hasRows()) {
