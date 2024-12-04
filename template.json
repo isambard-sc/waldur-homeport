@@ -711,6 +711,10 @@
     "description": "proposals/update/documents/RemoveDocumentButton.tsx",
     "message": "An error occurred while removing documents. Please try again."
   },
+  "An error occurred.": {
+    "description": "ErrorView.tsx",
+    "message": "An error occurred."
+  },
   "Animal and dairy science": {
     "description": "project/OECD_FOS_2007_CODES.ts",
     "message": "Animal and dairy science"
@@ -3676,7 +3680,7 @@
     "message": "Error message"
   },
   "Error trace": {
-    "description": "marketplace/orders/details/ErrorDetailsTab.tsx",
+    "description": "ErrorTraceDialog.tsx, marketplace/orders/details/ErrorDetailsTab.tsx",
     "message": "Error trace"
   },
   "Error traceback": {
@@ -8488,7 +8492,7 @@
     "message": "Reload issue data"
   },
   "Reload": {
-    "description": "ErrorMessage.tsx, LoadingScreen.tsx, core/LoadingErred.tsx",
+    "description": "ErrorMessage.tsx, ErrorView.tsx, LoadingScreen.tsx, core/LoadingErred.tsx",
     "message": "Reload"
   },
   "Remaining amount": {
@@ -10203,6 +10207,10 @@
     "description": "features/FeaturesDescription.ts",
     "message": "Show end date field in project create dialog."
   },
+  "Show error trace": {
+    "description": "ErrorView.tsx",
+    "message": "Show error trace"
+  },
   "Show error": {
     "description": "marketplace/resources/resource-pending/OrderErredView.tsx",
     "message": "Show error"
@@ -10416,7 +10424,7 @@
     "message": "Some functionality may not be accessible."
   },
   "Something went wrong": {
-    "description": "customer/list/ExportAsEmailDialog.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/proposal/create-review/ProposalReviewCreatePage.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx",
+    "description": "ErrorView.tsx, customer/list/ExportAsEmailDialog.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/proposal/create-review/ProposalReviewCreatePage.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx",
     "message": "Something went wrong"
   },
   "Source": {
@@ -11502,6 +11510,10 @@
   "Tracked using UTC timezone, displayed with your browser’s timezone.": {
     "description": "invoices/details/ResourceLimitPeriodsTable.tsx",
     "message": "Tracked using UTC timezone, displayed with your browser’s timezone."
+  },
+  "Try reloading or go back to the previous page": {
+    "description": "ErrorView.tsx",
+    "message": "Try reloading or go back to the previous page"
   },
   "Turn off": {
     "description": "marketplace/resources/usage/utils.ts",

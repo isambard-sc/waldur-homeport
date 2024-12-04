@@ -42,7 +42,7 @@ export const NoResult: FC<NoResultProps> = ({
       <Bg className="background" />
       <div className="text-center d-flex flex-column align-items-center gap-6 pb-10 position-relative z-index-1">
         <div className="search-icon">
-          <MagnifyingGlass size={25} />
+          <MagnifyingGlass weight="bold" size={24} />
         </div>
 
         <div>
