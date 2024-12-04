@@ -40,14 +40,18 @@ export const OrderDetailsApprovalsTab = ({ order, offering }) => {
               value={formatDateTime(order.provider_reviewed_at)}
             />
           ) : null}
-          <Field
-            label={translate('Reviewed by consumer')}
-            value={order.consumer_reviewed_by_full_name}
-          />
-          <Field
-            label={translate('Reviewed by consumer at')}
-            value={formatDateTime(order.consumer_reviewed_at)}
-          />
+          {order.consumer_reviewed_by_full_name ? (
+            <Field
+              label={translate('Reviewed by consumer')}
+              value={order.consumer_reviewed_by_full_name}
+            />
+          ) : null}
+          {order.consumer_reviewed_at ? (
+            <Field
+              label={translate('Reviewed by consumer at')}
+              value={formatDateTime(order.consumer_reviewed_at)}
+            />
+          ) : null}
         </div>
       </Card.Body>
     </Card>
