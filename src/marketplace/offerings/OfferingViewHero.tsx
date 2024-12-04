@@ -152,7 +152,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
         logoTooltip={offering.category_title}
         title={
           <>
-            <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
               <h3 className="mb-0">{offering.name}</h3>
               <CopyToClipboardButton
                 value={offering.name}
@@ -165,7 +165,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
                 hasBullet
               />
             </div>
-            <p className="text-muted mb-0">
+            <p className="text-muted fs-7 mb-0">
               {translate('By {organization}', {
                 organization: offering.customer_name,
               })}
@@ -210,12 +210,12 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
           </>
         }
       >
-        <Table className="mb-0 px-0">
+        <Table className="mb-0 px-0 h-auto fs-7 w-auto">
           <tr>
             <th className="fw-bold w-sm-175px">
               {translate('Shared/Billing enabled')}:
             </th>
-            <td>
+            <td className="text-muted">
               {(offering.shared ? translate('Yes') : translate('No')) +
                 '/' +
                 (offering.billable ? translate('Yes') : translate('No'))}
@@ -223,7 +223,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
           </tr>
           <tr>
             <th className="fw-bold w-sm-175px">{translate('Type')}:</th>
-            <td>{getLabel(offering.type)}</td>
+            <td className="text-muted">{getLabel(offering.type)}</td>
           </tr>
         </Table>
       </PublicDashboardHero2>
