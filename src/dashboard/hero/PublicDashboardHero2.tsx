@@ -60,7 +60,7 @@ export const PublicDashboardHero2: FC<
                   size={props.logoSize || 48}
                 />
               </Tip>
-              <div className="d-flex flex-column flex-grow-1 gap-3">
+              <div className="d-flex flex-column flex-grow-1 gap-2">
                 <div className="d-flex flex-sm-row flex-column-reverse">
                   {/* Title */}
                   <div className="flex-grow-1">{props.title}</div>
