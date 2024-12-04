@@ -1802,7 +1802,6 @@
   "Total resources": "Жалпы ресурстар",
   "Total storage": "Жалпы сактагыч",
   "Tracked using UTC timezone, displayed with your browser’s timezone.": "Серепчиңиздин убакыт алкагы менен көрсөтүлгөн, UTC убакыт алкагынын жардамы менен көзөмөлдөнөт.",
-  "Try again": "Кайра аракет кыл",
   "Unable to accept booking.": "Ээлеп коюуну кабыл алуу мүмкүн эмес.",
   "Unable to add endpoint.": "Акыркы чекит кошуу мүмкүн эмес.",
   "Unable to add identity provider.": "Идентификация берүүчүнү кошуу мүмкүн эмес.",
