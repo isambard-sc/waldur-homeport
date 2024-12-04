@@ -1,19 +1,18 @@
 import { FileCsv, FileXls, Printer } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { DropdownButton } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { showInfo } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 import exportAs from '@waldur/table/exporters';
 import { ExportData } from '@waldur/table/exporters/types';
 
 import { ComponentUsage, ComponentUserUsage } from './types';
 import { getFormattedUsages, getUsagePeriods } from './utils';
 
-interface UsageExportDropdownProps {
+export interface UsageExportDropdownProps {
   resource: {
     name: string;
   };
@@ -25,10 +24,10 @@ interface UsageExportDropdownProps {
   months: number;
 }
 
-export const UsageExportDropdown = (props: UsageExportDropdownProps) => {
-  const dispatch = useDispatch();
+export const useUsageExport = (props: UsageExportDropdownProps) => {
+  const { showError } = useNotify();
 
-  const exportUsages = useCallback(
+  return useCallback(
     (format) => {
       const usages = props.data.usages;
       const userUsages = props.data.userUsages;
@@ -64,14 +63,16 @@ export const UsageExportDropdown = (props: UsageExportDropdownProps) => {
         if (hasUsage) {
           const record: any[] = [label];
           record.push(
-            ...allFormattedUsages.map((compUsages) => compUsages[index].value),
+            ...allFormattedUsages.map(
+              (compUsages) => compUsages[index]?.value || 'N/A',
+            ),
           );
           exportData.data.push(record);
         }
       });
 
       if (!exportData.data.length) {
-        dispatch(showInfo(translate('Chart is empty')));
+        showError(translate('Chart is empty'));
         return;
       }
 
@@ -81,9 +82,12 @@ export const UsageExportDropdown = (props: UsageExportDropdownProps) => {
         exportData,
       );
     },
-    [props, dispatch],
+    [props],
   );
+};
 
+export const UsageExportDropdown = (props: UsageExportDropdownProps) => {
+  const exportUsages = useUsageExport(props);
   return (
     <DropdownButton
       variant="outline btn-outline-default"
