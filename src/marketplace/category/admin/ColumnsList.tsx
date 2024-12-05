@@ -64,7 +64,11 @@ export const ColumnsList: FC<ColumnsListProps> = ({
           <tbody>
             {fields.map((column, index) => (
               <FormSection name={column} key={index}>
-                <ColumnRow column={column} fields={fields} index={index} />
+                <ColumnRow
+                  column={CategoryColumns[index]}
+                  fields={fields}
+                  index={index}
+                />
               </FormSection>
             ))}
           </tbody>
