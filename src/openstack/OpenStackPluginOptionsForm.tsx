@@ -56,6 +56,16 @@ export const OpenStackPluginOptionsForm: FunctionComponent<
           ),
           fieldProps: { unit: 'GB' },
         },
+        {
+          label: translate('Maximum number of instances in a single tenant'),
+          key: 'plugin_options.max_instances',
+          component: NumberField,
+        },
+        {
+          label: translate('Maximum number of volumes in a single tenant'),
+          key: 'plugin_options.max_volumes',
+          component: NumberField,
+        },
       ].filter(Boolean),
     [props],
   );

@@ -5663,6 +5663,14 @@
     "description": "marketplace/offerings/update/components/ComponentLimitPeriodField.tsx",
     "message": "Maximum monthly"
   },
+  "Maximum number of instances in a single tenant": {
+    "description": "openstack/OpenStackPluginOptionsForm.tsx",
+    "message": "Maximum number of instances in a single tenant"
+  },
+  "Maximum number of volumes in a single tenant": {
+    "description": "openstack/OpenStackPluginOptionsForm.tsx",
+    "message": "Maximum number of volumes in a single tenant"
+  },
   "Maximum parallel executions of provisioning operations for instances": {
     "description": "openstack/OpenStackProvisioningConfigForm.tsx",
     "message": "Maximum parallel executions of provisioning operations for instances"
