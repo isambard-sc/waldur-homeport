@@ -1,8 +1,7 @@
 import { FunctionComponent } from 'react';
 import { Button, ButtonProps } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
-import { closeModalDialog } from '@waldur/modal/actions';
+import { useModal } from '@waldur/modal/hooks';
 
 interface CancelButtonProps extends ButtonProps {
   disabled?: boolean;
@@ -12,12 +11,12 @@ interface CancelButtonProps extends ButtonProps {
 
 export const CancelButton: FunctionComponent<CancelButtonProps> = (props) => {
   const { label, onClick, ...rest } = props;
-  const dispatch = useDispatch();
+  const { closeDialog } = useModal();
   const handleClose = () => {
     if (onClick) {
       onClick();
     } else {
-      dispatch(closeModalDialog());
+      closeDialog();
     }
   };
 
