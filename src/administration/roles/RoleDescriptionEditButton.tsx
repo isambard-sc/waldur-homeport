@@ -2,17 +2,14 @@ import { PencilSimple } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n/translate';
-import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
+import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-import { editRole, getRoles } from './api';
-
-const RoleEditDialog = lazyComponent(() =>
-  import('./RoleEditDialog').then((module) => ({
-    default: module.RoleEditDialog,
+const RoleDescriptionEditDialog = lazyComponent(() =>
+  import('./RoleDescriptionEditDialog').then((module) => ({
+    default: module.RoleDescriptionEditDialog,
   })),
 );
 
@@ -21,19 +18,10 @@ export const RoleDescriptionEditButton = ({ row, refetch }) => {
   const openRoleEditDialog = useCallback(
     () =>
       dispatch(
-        openModalDialog(RoleEditDialog, {
+        openModalDialog(RoleDescriptionEditDialog, {
           resolve: {
             row,
-            isDescriptionForm: true,
-          },
-          onSubmit: async (formData) => {
-            await editRole(row.uuid, formData);
-            ENV.roles = await getRoles();
-            dispatch(closeModalDialog());
-            refetch();
-          },
-          onCancel: () => {
-            dispatch(closeModalDialog());
+            refetch,
           },
         }),
       ),
