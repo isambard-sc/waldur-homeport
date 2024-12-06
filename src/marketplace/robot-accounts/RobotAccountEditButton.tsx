@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -30,5 +30,5 @@ export const RobotAccountEditButton = (props) => {
   ) {
     return null;
   }
-  return <EditButton onClick={callback} size="sm" />;
+  return <EditAction action={callback} size="sm" />;
 };

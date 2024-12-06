@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
@@ -29,9 +29,9 @@ export const HookUpdateButton: FunctionComponent<HookUpdateButtonProps> = ({
 }) => {
   const dispatch = useDispatch();
   return (
-    <EditButton
+    <EditAction
       label={translate('Update')}
-      onClick={() => dispatch(showHookUpdateDialog(row))}
+      action={() => dispatch(showHookUpdateDialog(row))}
       size="sm"
     />
   );

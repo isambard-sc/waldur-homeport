@@ -3,20 +3,20 @@ import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
 import { disableNotification, enableNotification } from './api';
 
 export const NotificationToggleButton: FunctionComponent<{
-  notification;
+  row;
   refetch;
-}> = ({ notification, refetch }) => {
+}> = ({ row, refetch }) => {
   const dispatch = useDispatch();
   const callback = async () => {
-    if (notification.enabled) {
+    if (row.enabled) {
       try {
-        await disableNotification(notification.url);
+        await disableNotification(row.url);
         dispatch(showSuccess(translate('The notification has been disabled')));
       } catch (error) {
         dispatch(
@@ -28,7 +28,7 @@ export const NotificationToggleButton: FunctionComponent<{
       }
     } else {
       try {
-        await enableNotification(notification.url);
+        await enableNotification(row.url);
         dispatch(showSuccess(translate('The notification has been enabled')));
       } catch (error) {
         dispatch(
@@ -42,12 +42,13 @@ export const NotificationToggleButton: FunctionComponent<{
     refetch();
   };
   return (
-    <RowActionButton
+    <ActionItem
       action={callback}
-      title={notification.enabled ? translate('Disable') : translate('Enable')}
-      iconNode={notification.enabled ? <BellSimple /> : <BellSimpleSlash />}
-      variant={notification.enabled ? 'outline-danger' : 'outline-success'}
+      title={row.enabled ? translate('Disable') : translate('Enable')}
+      iconNode={row.enabled ? <BellSimple /> : <BellSimpleSlash />}
       size="sm"
+      className={row.enabled ? 'text-warning' : 'text-success'}
+      iconColor={row.enabled ? 'warning' : 'success'}
     />
   );
 };

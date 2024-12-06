@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 
 const UserAgreementsEditDialog = lazyComponent(() =>
@@ -26,5 +26,5 @@ export const UserAgreementsEditButton = ({ row, refetch }) => {
         size: 'lg',
       }),
     );
-  return <EditButton onClick={callback} size="sm" />;
+  return <EditAction action={callback} size="sm" />;
 };

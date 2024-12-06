@@ -4,8 +4,8 @@ import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
 import { removeHook } from './api';
 interface HookRemoveButtonProps {
@@ -40,12 +40,14 @@ export const HookRemoveButton: FC<HookRemoveButtonProps> = (props) => {
   };
 
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={action}
-      pending={removing}
+      disabled={removing}
       iconNode={<Trash />}
       size="sm"
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

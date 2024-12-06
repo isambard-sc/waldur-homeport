@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 
 const GroupEditDialog = lazyComponent(() =>
@@ -24,5 +24,5 @@ export const GroupEditButton = ({ row, refetch }) => {
     [dispatch],
   );
 
-  return <EditButton onClick={openFormDialog} size="sm" />;
+  return <EditAction action={openFormDialog} size="sm" />;
 };

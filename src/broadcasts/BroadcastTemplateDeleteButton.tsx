@@ -4,9 +4,9 @@ import { useDispatch } from 'react-redux';
 import { deleteBroadcastTemplate } from '@waldur/broadcasts/api';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-export const BroadcastTemplateDeleteButton = ({ template, refetch }) => {
+export const BroadcastTemplateDeleteButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
   const openDialog = async () => {
     try {
@@ -16,7 +16,7 @@ export const BroadcastTemplateDeleteButton = ({ template, refetch }) => {
         translate(
           'Are you sure you want to delete the template {template_name}?',
           {
-            template_name: <strong>{template.name}</strong>,
+            template_name: <strong>{row.name}</strong>,
           },
           formatJsxTemplate,
         ),
@@ -25,16 +25,17 @@ export const BroadcastTemplateDeleteButton = ({ template, refetch }) => {
     } catch {
       return;
     }
-    await deleteBroadcastTemplate(template.uuid);
+    await deleteBroadcastTemplate(row.uuid);
     await refetch();
   };
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      variant="outline-danger"
       iconNode={<Trash />}
       size="sm"
+      iconColor="danger"
+      className="text-danger"
     />
   );
 };

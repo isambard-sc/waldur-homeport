@@ -2,17 +2,17 @@ import { Share } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
 import { sendBroadcast } from './api';
 
-export const BroadcastSendButton = ({ broadcast, refetch }) => {
+export const BroadcastSendButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
 
   const callback = async () => {
     try {
-      await sendBroadcast(broadcast.uuid);
+      await sendBroadcast(row.uuid);
       await refetch();
       dispatch(showSuccess(translate('Broadcast has been sent.')));
     } catch (e) {
@@ -20,7 +20,7 @@ export const BroadcastSendButton = ({ broadcast, refetch }) => {
     }
   };
   return (
-    <RowActionButton
+    <ActionItem
       action={callback}
       title={translate('Send')}
       iconNode={<Share />}

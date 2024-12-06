@@ -6,7 +6,8 @@ import { useAsyncFn } from 'react-use';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
+
+import { ActionItem } from './ActionItem';
 
 export const ResourceDeleteButton: FunctionComponent<{
   apiFunction;
@@ -48,13 +49,14 @@ export const ResourceDeleteButton: FunctionComponent<{
   };
   const [{ loading }, callback] = useAsyncFn(deleteApp);
   return (
-    <RowActionButton
-      variant="light-danger"
+    <ActionItem
       title={translate('Delete')}
-      pending={loading}
+      disabled={loading}
       action={callback}
       iconNode={<Trash />}
       size="sm"
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -10,6 +11,16 @@ import { UserAgreementCreateButton } from './UserAgreementCreateButton';
 import { UserAgreementDeleteButton } from './UserAgreementDeleteButton';
 import { UserAgreementsEditButton } from './UserAgreementsEditButton';
 import { UserAgreementsExpandableRow } from './UserAgreementsExpandableRow';
+
+const UserAggrementsRowActions = ({ row, fetch }) => (
+  <ActionsDropdown
+    row={row}
+    refetch={fetch}
+    actions={[UserAgreementsEditButton, UserAgreementDeleteButton].filter(
+      Boolean,
+    )}
+  />
+);
 
 export const UserAgreementsList: FunctionComponent<{}> = () => {
   const props = useTable({
@@ -30,15 +41,7 @@ export const UserAgreementsList: FunctionComponent<{}> = () => {
         },
       ]}
       verboseName={translate('user agreements')}
-      rowActions={({ row }) => (
-        <>
-          <UserAgreementsEditButton row={row} refetch={props.fetch} />
-          <UserAgreementDeleteButton
-            userAgreement={row}
-            refetch={props.fetch}
-          />
-        </>
-      )}
+      rowActions={UserAggrementsRowActions}
       expandableRow={UserAgreementsExpandableRow}
       expandableRowClassName="bg-gray-200"
       tableActions={<UserAgreementCreateButton refetch={props.fetch} />}
