@@ -8,9 +8,7 @@ import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
 import { OrganizationGroupCreateButton } from './OrganizationGroupCreateButton';
-import { OrganizationGroupDeleteButton } from './OrganizationGroupDeleteButton';
-import { OrganizationGroupDetailsButton } from './OrganizationGroupDetailsButton';
-import { OrganizationGroupEditButton } from './OrganizationGroupEditButton';
+import { OrganizationGroupRowActions } from './OrganizationGroupRowActions';
 
 export const OrganizationGroupsList: FunctionComponent = () => {
   const tableProps = useTable({
@@ -47,13 +45,7 @@ export const OrganizationGroupsList: FunctionComponent = () => {
         },
       ]}
       verboseName={translate('Organization groups')}
-      rowActions={({ row }) => (
-        <>
-          <OrganizationGroupDetailsButton organizationGroup={row} />
-          <OrganizationGroupEditButton row={row} refetch={tableProps.fetch} />
-          <OrganizationGroupDeleteButton row={row} refetch={tableProps.fetch} />
-        </>
-      )}
+      rowActions={OrganizationGroupRowActions}
       tableActions={
         <OrganizationGroupCreateButton refetch={tableProps.fetch} />
       }

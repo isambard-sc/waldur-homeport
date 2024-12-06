@@ -5,8 +5,8 @@ import { useDispatch } from 'react-redux';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { OrganizationGroup } from '@waldur/marketplace/types';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
 import { removeOrganizationGroup } from './api';
 
@@ -47,13 +47,14 @@ export const OrganizationGroupDeleteButton = (
     setRemoving(false);
   }, [dispatch, setRemoving, props]);
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      variant="danger"
       iconNode={<Trash />}
-      pending={removing}
+      disabled={removing}
       size="sm"
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

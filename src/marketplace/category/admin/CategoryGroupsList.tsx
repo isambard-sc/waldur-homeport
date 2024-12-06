@@ -10,9 +10,8 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
+import { CategoryGroupsRowActions } from './CategoryGroupsRowActions';
 import { GroupCreateButton } from './GroupCreateButton';
-import { GroupDeleteButton } from './GroupDeleteButton';
-import { GroupEditButton } from './GroupEditButton';
 
 export const CategoryGroupsList: FunctionComponent = () => {
   const tableProps = useTable({
@@ -53,10 +52,7 @@ export const CategoryGroupsList: FunctionComponent = () => {
       verboseName={translate('Category groups')}
       initialSorting={{ field: 'title', mode: 'desc' }}
       rowActions={({ row }) => (
-        <>
-          <GroupEditButton row={row} refetch={tableProps.fetch} />
-          <GroupDeleteButton row={row} refetch={tableProps.fetch} />
-        </>
+        <CategoryGroupsRowActions row={row} refetch={tableProps.fetch} />
       )}
       hasQuery={true}
       tableActions={<GroupCreateButton refetch={tableProps.fetch} />}

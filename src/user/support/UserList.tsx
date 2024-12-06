@@ -13,6 +13,7 @@ import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { formatRole } from '@waldur/permissions/utils';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -118,10 +119,10 @@ const renderListOrDash = (list) => {
 };
 const RowActions = ({ row }) => {
   return (
-    <>
-      <UserImpersonateButton row={row} />
-      <UserDetailsButton row={row} />
-    </>
+    <ActionsDropdown
+      row={row}
+      actions={[UserImpersonateButton, UserDetailsButton]}
+    />
   );
 };
 

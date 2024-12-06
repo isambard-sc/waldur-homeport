@@ -1,10 +1,11 @@
+import { Eye } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 const UserDetailsDialog = lazyComponent(() =>
   import('./UserDetailsDialog').then((module) => ({
@@ -15,9 +16,10 @@ const UserDetailsDialog = lazyComponent(() =>
 export const UserDetailsButton: FunctionComponent<{ row }> = ({ row }) => {
   const dispatch = useDispatch();
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Details')}
       size="sm"
+      iconNode={<Eye />}
       action={() =>
         dispatch(
           openModalDialog(UserDetailsDialog, {

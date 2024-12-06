@@ -5,11 +5,11 @@ import { useDispatch } from 'react-redux';
 import { remove } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
-export const UserAgreementDeleteButton: FC<{ userAgreement; refetch }> = ({
-  userAgreement,
+export const UserAgreementDeleteButton: FC<{ row; refetch }> = ({
+  row,
   refetch,
 }) => {
   const [removing, setRemoving] = useState(false);
@@ -28,7 +28,7 @@ export const UserAgreementDeleteButton: FC<{ userAgreement; refetch }> = ({
     }
     try {
       setRemoving(true);
-      await remove(userAgreement.url);
+      await remove(row.url);
       await refetch();
       dispatch(showSuccess(translate('User agreement has been deleted.')));
     } catch (e) {
@@ -40,12 +40,14 @@ export const UserAgreementDeleteButton: FC<{ userAgreement; refetch }> = ({
   };
 
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Delete')}
       action={action}
       iconNode={<Trash />}
       size="sm"
-      pending={removing}
+      disabled={removing}
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

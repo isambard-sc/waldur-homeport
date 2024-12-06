@@ -1,5 +1,6 @@
 import { TokenDeleteButton } from '@waldur/administration/TokenDeleteButton';
 import { translate } from '@waldur/i18n';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import Table from '@waldur/table/Table';
@@ -10,6 +11,14 @@ export const TokensList = () => {
     table: `TokensList`,
     fetchData: createFetcher('auth-tokens'),
   });
+
+  const TokenRowActions = ({ row, fetch }) => (
+    <ActionsDropdown
+      row={row}
+      refetch={fetch}
+      actions={[TokenDeleteButton].filter(Boolean)}
+    />
+  );
 
   return (
     <Table
@@ -43,9 +52,7 @@ export const TokensList = () => {
       ]}
       verboseName={translate('tokens')}
       showPageSizeSelector={true}
-      rowActions={({ row }) => (
-        <TokenDeleteButton row={row} refetch={tableProps.fetch} />
-      )}
+      rowActions={TokenRowActions}
     />
   );
 };
