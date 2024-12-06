@@ -218,6 +218,61 @@ Lint dockerfile:
         - DL3018 # "versions for `apk add`" warning
   before_script: []
 
+Generate Image SBOM:
+  stage: build
+  interruptible: true
+  image: registry.hpc.ut.ee/iljatest/docker:24.0.6
+  services:
+    - name: "docker:20.10.16-dind"
+      command: ["--mtu=1400"]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_REGISTRY: registry.hpc.ut.ee/mirror/
+  cache: []
+  before_script: []
+  script:
+    # Build image locally and generate SBOM
+    - docker build --build-arg DOCKER_REGISTRY=$DOCKER_REGISTRY -t waldur-homeport-sbom:local .
+    - docker images
+    - apk add --no-cache curl
+    - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+    - syft waldur-homeport-sbom:local -v -o cyclonedx-json >> waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.json
+    - echo "Image SBOM generated. Size:"
+    - du -h waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.json
+    - tar -czf waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.tar.gz waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.json
+    - echo "Image SBOM archived. Size:"
+    - du -h waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.tar.gz
+  artifacts:
+    paths:
+      - waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.tar.gz
+    expire_in: 1 day
+
+Generate Codebase SBOM:
+  stage: build
+  image: registry.hpc.ut.ee/mirror/library/node:lts-alpine
+  interruptible: true
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  cache: []
+  before_script: []
+  script:
+    - apk add git || echo "Non-Alpine image, skipping"
+    - yarn set version berry
+    - yarn install --no-immutable
+    - yarn dlx -q @cyclonedx/yarn-plugin-cyclonedx --spec-version 1.6 --output-file waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.json -v
+    - echo "SBOM generated. Size:"
+    - du -h waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.json
+    - tar -czf waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.json
+    - echo "SBOM archived. Size:"
+    - du -h waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
+  artifacts:
+    paths:
+      - waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
+
 Upload translatable strings:
   stage: build
   interruptible: true
@@ -363,6 +418,36 @@ Test k8s deployment:
     - kubectl wait --timeout=180s --for=condition=Ready=true $POD_NAME
     - kubectl get pods -l app=waldur-homeport-test-${CI_MERGE_REQUEST_ID}
   allow_failure: true
+
+Upload SBOMs to Docs:
+  stage: deploy
+  needs:
+    - "Generate Image SBOM"
+    - "Generate Codebase SBOM"
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  image:
+    name: registry.hpc.ut.ee/mirror/alpine/git:latest
+    entrypoint: [""]
+  script:
+    - cd /tmp/
+    - git clone "https://homeport-token:$DOCS_TOKEN@$CI_SERVER_HOST/waldur/waldur-docs.git"
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+    - cd waldur-docs
+    - echo "Checking for SBOM archives files..."
+    - ls -la $CI_PROJECT_DIR/waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.tar.gz || { echo "Image SBOM not found!"; exit 1; }
+    - ls -la $CI_PROJECT_DIR/waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz || { echo "Codebase SBOM not found!"; exit 1; }
+    - mkdir -p assets/sboms/images assets/sboms/source
+    - cp -v $CI_PROJECT_DIR/waldur-homeport-${CI_COMMIT_TAG}-image.cyclonedx.tar.gz assets/sboms/images/
+    - cp -v $CI_PROJECT_DIR/waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz assets/sboms/source/
+    - ls -l assets/sboms/images/
+    - ls -l assets/sboms/source/
+    - git add assets/sboms/images assets/sboms/source
+    - git commit -m "Add SBOM for homeport ${CI_COMMIT_TAG}" || exit 0
+    - git branch new-sbom
+    - git push --set-upstream origin new-sbom:master
+  before_script: []
 
 Cleanup test k8s deployment:
   stage: deploy
