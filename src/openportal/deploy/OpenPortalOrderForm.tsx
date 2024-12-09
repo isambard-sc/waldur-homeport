@@ -2,6 +2,6 @@ import { BaseDeployPage } from '@waldur/marketplace/deploy/DeployPage';
 
 import { deployOfferingSteps } from './steps';
 
-export const SlurmOrderForm = (props) => (
+export const OpenPortalOrderForm = (props) => (
     <BaseDeployPage inputFormSteps={deployOfferingSteps} {...props} />
 );
