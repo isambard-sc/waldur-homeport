@@ -1,5 +1,6 @@
 import { AzureProviderConfig } from '@waldur/azure/provider/provider';
 import { getProviderType } from '@waldur/marketplace/common/registry';
+import { OpenPortalProviderConfig } from '@waldur/openportal/provider';
 import { OpenStackProviderConfig } from '@waldur/openstack/provider';
 import { RancherProviderConfig } from '@waldur/rancher/provider';
 import {
@@ -32,6 +33,7 @@ export const getServiceSettingsForm = (type) => {
 };
 
 register(AzureProviderConfig);
+register(OpenPortalProviderConfig);
 register(OpenStackProviderConfig);
 register(RancherProviderConfig);
 register(SlurmProviderConfig);
