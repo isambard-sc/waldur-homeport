@@ -21,10 +21,15 @@ export interface CostPolicyFormData {
   project_credit?: number;
   scope: string;
   actions: string;
+  period: PolicyPeriod;
 }
 
 export interface CostPolicy extends BasePolicy, CostPolicyFormData {
   billing_price_estimate: object;
+}
+
+export interface CostsForPeriod {
+  total_price: string;
 }
 
 export type CostPolicyType = 'project' | 'organization';

@@ -15,7 +15,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 import { CostPolicyCreateButton } from './CostPolicyCreateButton';
 import { CostPolicyDeleteButton } from './CostPolicyDeleteButton';
 import { CostPolicyEditButton } from './CostPolicyEditButton';
-import { getCostPolicyActionOptions } from './utils';
+import { getCostPolicyActionOptions, policyPeriodOptions } from './utils';
 
 const filtersSelector = createSelector(getCustomer, (customer) => {
   const result: Record<string, any> = {};
@@ -84,6 +84,16 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
           title: translate('Project credit'),
           render: ({ row }) =>
             row.project_credit ? defaultCurrency(row.project_credit) : 'N/A',
+        },
+        {
+          title: translate('Period'),
+          render: ({ row }) => (
+            <>
+              {Object.values(policyPeriodOptions).find(
+                (option) => option.value === row.period,
+              )?.label || row.period_name}
+            </>
+          ),
         },
         {
           title: translate('Cost threshold'),
