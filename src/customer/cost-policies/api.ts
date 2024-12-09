@@ -1,11 +1,18 @@
 import { ENV } from '@waldur/configs/default';
-import { deleteById, getList, post, put, sendForm } from '@waldur/core/api';
+import {
+  deleteById,
+  get,
+  getList,
+  post,
+  put,
+  sendForm,
+} from '@waldur/core/api';
 import {
   OfferingCostPolicyFormData,
   OfferingUsagePolicyFormData,
 } from '@waldur/marketplace/offerings/details/policies/types';
 
-import { CostPolicy, CostPolicyFormData } from './types';
+import { CostPolicy, CostPolicyFormData, CostsForPeriod } from './types';
 
 export const getProjectCostPolicies = (params?: {}) =>
   getList<CostPolicy>('/marketplace-project-estimated-cost-policies/', params);
@@ -62,3 +69,25 @@ export const createOfferingUsagePolicy = (
 
 export const deleteOfferingUsagePolicy = (uuid: string) =>
   deleteById('/marketplace-offering-usage-policies/', uuid);
+
+export const fetchProjectCostsForPeriod = (
+  projectUuid: string,
+  period: number,
+) =>
+  get('/invoice-items/project_costs_for_period/', {
+    params: {
+      project_uuid: projectUuid,
+      period,
+    },
+  }).then((response) => response.data as CostsForPeriod);
+
+export const fetchCustomerCostsForPeriod = (
+  customerUuid: string,
+  period: number,
+) =>
+  get('/invoice-items/customer_costs_for_period/', {
+    params: {
+      customer_uuid: customerUuid,
+      period,
+    },
+  }).then((response) => response.data as CostsForPeriod);

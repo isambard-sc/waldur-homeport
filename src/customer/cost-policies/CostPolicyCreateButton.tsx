@@ -7,7 +7,7 @@ import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import { createOrganizationCostPolicy, createProjectCostPolicy } from './api';
-import { CostPolicyFormData, CostPolicyType } from './types';
+import { CostPolicyFormData, CostPolicyType, PolicyPeriod } from './types';
 
 const CostPolicyFormDialog = lazyComponent(() =>
   import('./CostPolicyFormDialog').then((module) => ({
@@ -19,6 +19,7 @@ interface SubmitedFormData {
   scope: (Project | Customer)[];
   actions: { value; label };
   limit_cost: number;
+  period: PolicyPeriod;
 }
 
 const submit = (formData: SubmitedFormData, type: CostPolicyType) => {
@@ -27,6 +28,7 @@ const submit = (formData: SubmitedFormData, type: CostPolicyType) => {
       scope: scope.url,
       actions: formData.actions.value,
       limit_cost: formData.limit_cost,
+      period: formData.period,
     };
     if (type === 'project') {
       return createProjectCostPolicy(data);

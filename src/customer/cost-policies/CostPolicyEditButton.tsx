@@ -9,7 +9,7 @@ import { RowActionButton } from '@waldur/table/ActionButton';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import { updateOrganizationCostPolicy, updateProjectCostPolicy } from './api';
-import { CostPolicyFormData, CostPolicyType } from './types';
+import { CostPolicyFormData, CostPolicyType, PolicyPeriod } from './types';
 import { getCostPolicyActionOptions } from './utils';
 
 const CostPolicyFormDialog = lazyComponent(() =>
@@ -22,6 +22,7 @@ interface SubmitedFormData {
   scope: (Project | Customer)[];
   actions: { value; label };
   limit_cost: number;
+  period: PolicyPeriod;
 }
 
 const submit = (
@@ -34,6 +35,7 @@ const submit = (
       scope: scope.url,
       actions: formData.actions.value,
       limit_cost: formData.limit_cost,
+      period: formData.period,
     };
     if (type === 'project') {
       return updateProjectCostPolicy(uuid, data);
@@ -79,13 +81,17 @@ export const CostPolicyEditButton = ({
                       billing_price_estimate: row.billing_price_estimate,
                       project_credit: row.project_credit,
                     }
-                  : { customer_credit: row.customer_credit }),
+                  : {
+                      billing_price_estimate: row.billing_price_estimate,
+                      customer_credit: row.customer_credit,
+                    }),
               },
             ],
             actions: getCostPolicyActionOptions(type).find(
               (option) => option.value === row.actions,
             ),
             limit_cost: row.limit_cost,
+            period: row.period,
           },
         }),
       ),
