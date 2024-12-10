@@ -107,23 +107,6 @@ $asides: (
       if(isDarkMode(), $dark-sub-accordion-active, $grey-200),
     footer-separator: if(isDarkMode(), $dark-footer-separator, $grey-200),
   ),
-  accent: (
-    title: if(isDarkMode(), $dark-title, $primary-800),
-    icon: if(isDarkMode(), $dark-icon, $primary-400),
-    arrow: if(isDarkMode(), $dark-arrow, $primary-400),
-    arrow-state: if(isDarkMode(), $dark-arrow-state, $primary-500),
-    bg-hover: if(isDarkMode(), $dark-bg-hover, $primary-25),
-    bg-active: if(isDarkMode(), $dark-bg-active, $primary-50),
-    bg-subitem: if(isDarkMode(), $dark-bg-subitem, $primary-100),
-    bg-subitem-2: if(isDarkMode(), $dark-bg-subitem-2, $primary-200),
-    badge-color: if(isDarkMode(), $dark-badge-color, $primary-200),
-    badge-bg: if(isDarkMode(), $dark-badge-bg, $primary-800),
-    badge-border: if(isDarkMode(), $dark-badge-border, $primary-200),
-    accordion-active: if(isDarkMode(), $dark-accordion-active, $primary-50),
-    sub-accordion-active:
-      if(isDarkMode(), $dark-sub-accordion-active, $primary-100),
-    footer-separator: if(isDarkMode(), $dark-footer-separator, $primary-200),
-  ),
 );
 
 @each $name, $value in $asides {
@@ -246,6 +229,61 @@ $asides: (
 
       &:hover {
         color: get($value, arrow-state);
+      }
+    }
+  }
+}
+
+.aside-accent .menu .menu-item {
+  .menu-link {
+    color: white;
+    .menu-title,
+    .menu-icon {
+      color: white;
+      .svg-icon {
+        @include svg-icon-color(white);
+      }
+    }
+    .menu-badge {
+      .text-btn {
+        color: white;
+      }
+    }
+  }
+  &.here > .menu-link,
+  :hover {
+    transition: none;
+    color: var(--waldur-aside-bg-color) !important;
+    background-color: white;
+
+    .menu-title,
+    .menu-icon {
+      transition: none;
+      color: var(--waldur-aside-bg-color) !important;
+      .svg-icon {
+        @include svg-icon-color(var(--waldur-aside-bg-color), true);
+      }
+    }
+
+    .menu-badge {
+      .text-btn {
+        color: var(--waldur-aside-bg-color) !important;
+      }
+    }
+  }
+
+  &.menu-accordion.hover {
+    background: white;
+    .menu-title,
+    .menu-icon {
+      color: var(--waldur-aside-bg-color) !important;
+      .svg-icon {
+        @include svg-icon-color(var(--waldur-aside-bg-color), true);
+      }
+    }
+    .menu-badge {
+      .badge {
+        color: var(--waldur-aside-bg-color) !important;
       }
     }
   }
