@@ -1,6 +1,8 @@
 import { get } from 'lodash-es';
 import { FunctionComponent } from 'react';
 
+import { ENV } from '@waldur/configs/default';
+import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { required } from '@waldur/core/validators';
 import { StringField } from '@waldur/form';
 import FormTable from '@waldur/form/FormTable';
@@ -9,33 +11,63 @@ import { FieldEditButton } from '@waldur/marketplace/offerings/update/integratio
 import { OfferingEditPanelFormProps } from '@waldur/marketplace/offerings/update/integration/types';
 
 const fields = [
-    {
-        label: translate('Instance Name'),
-        key: 'service_attributes.instance_name',
-        description: translate('Name of the instance in the OpenPortal network'),
-        component: StringField,
-        fieldProps: { required: true, validate: required },
-    },
+  {
+    label: translate('Hostname'),
+    key: 'service_attributes.hostname',
+    description: translate('Hostname or IP address of master node'),
+    component: StringField,
+    fieldProps: { required: true, validate: required },
+  },
+  {
+    label: translate('Username'),
+    key: 'service_attributes.username',
+    component: StringField,
+    fieldProps: { required: true, validate: required },
+  },
+  {
+    label: translate('Port'),
+    key: 'service_attributes.port',
+    component: StringField,
+  },
+  {
+    label: translate('Gateway'),
+    key: 'service_attributes.gateway',
+    description: translate('Hostname or IP address of gateway node'),
+    component: StringField,
+  },
+  {
+    label: translate('Use sudo'),
+    key: 'service_attributes.use_sudo',
+    description: translate('Set to true to activate privilege escalation'),
+    component: StringField,
+  },
+  {
+    label: translate('Default account'),
+    key: 'service_attributes.default_account',
+    description: translate('Default OpenPortal account for user'),
+    component: StringField,
+    fieldProps: { required: true, validate: required },
+  },
 ];
 
 export const OpenPortalForm: FunctionComponent<OfferingEditPanelFormProps> = (
-    props,
+  props,
 ) =>
-    fields.map((field) => (
-        <FormTable.Item
-            key={field.key}
-            label={field.label}
-            description={field.description}
-            value={get(props.offering, field.key, 'N/A')}
-            actions={
-                <FieldEditButton
-                    title={props.title}
-                    scope={props.offering}
-                    name={field.key}
-                    callback={props.callback}
-                    fieldComponent={field.component}
-                    fieldProps={field.fieldProps}
-                />
-            }
+  fields.map((field) => (
+    <FormTable.Item
+      key={field.key}
+      label={field.label}
+      description={field.description}
+      value={get(props.offering, field.key, 'N/A')}
+      actions={
+        <FieldEditButton
+          title={props.title}
+          scope={props.offering}
+          name={field.key}
+          callback={props.callback}
+          fieldComponent={field.component}
+          fieldProps={field.fieldProps}
         />
-    ));
+      }
+    />
+  ));

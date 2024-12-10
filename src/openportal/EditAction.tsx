@@ -7,18 +7,18 @@ import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
 const EditDialog = lazyComponent(() =>
-    import('./EditDialog').then((module) => ({ default: module.EditDialog })),
+  import('./EditDialog').then((module) => ({ default: module.EditDialog })),
 );
 
 const validators = [validateState('OK')];
 
 export const EditAction: ActionItemType = ({ resource, refetch }) => (
-    <DialogActionItem
-        validators={validators}
-        title={translate('Edit')}
-        modalComponent={EditDialog}
-        resource={resource}
-        extraResolve={{ refetch }}
-        iconNode={<PencilSimple />}
-    />
+  <DialogActionItem
+    validators={validators}
+    title={translate('Edit')}
+    modalComponent={EditDialog}
+    resource={resource}
+    extraResolve={{ refetch }}
+    iconNode={<PencilSimple />}
+  />
 );

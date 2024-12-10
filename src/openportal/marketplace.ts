@@ -27,9 +27,6 @@ export const OpenPortalOffering: OfferingConfiguration = {
     return translate('OpenPortal allocation');
   },
   orderFormComponent: OpenPortalOrderForm,
-  pluginOptionsForm: UserPluginOptionsForm,
-  secretOptionsForm: UserSecretOptionsForm,
   providerType: 'OpenPortal',
   allowToUpdateService: true,
-  showComponents: true,
 };

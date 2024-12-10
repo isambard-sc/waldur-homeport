@@ -44,13 +44,13 @@ const fields = [
   {
     label: translate('Default account'),
     key: 'service_attributes.default_account',
-    description: translate('Default SLURM account for user'),
+    description: translate('Default OpenPortal account for user'),
     component: StringField,
     fieldProps: { required: true, validate: required },
   },
 ];
 
-export const SlurmForm: FunctionComponent<OfferingEditPanelFormProps> = (
+export const OpenPortalForm: FunctionComponent<OfferingEditPanelFormProps> = (
   props,
 ) =>
   fields.map((field) => (
@@ -72,7 +72,7 @@ export const SlurmForm: FunctionComponent<OfferingEditPanelFormProps> = (
     />
   ));
 
-export const SlurmRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
+export const OpenPortalRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
   props,
 ) => (
   <>

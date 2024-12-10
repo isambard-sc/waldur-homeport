@@ -20,11 +20,11 @@ export const RequestLimitsChangeDialog: FunctionComponent<{
         openIssueCreateDialog({
           issue: {
             type: ISSUE_IDS.CHANGE_REQUEST,
-            summary: translate('Request change of limits of an OpenPortal allocation'),
+            summary: translate('Request change of limits of OpenPortal allocation'),
             resource,
           },
           options: {
-            title: translate('Request change of limits of an OpenPortal allocation'),
+            title: translate('Request change of limits of OpenPortal allocation'),
             descriptionPlaceholder: translate(
               'Please provide requested limits and a reason.',
             ),
