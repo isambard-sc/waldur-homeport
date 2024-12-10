@@ -91,7 +91,7 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
   <button
     type="button"
-    className="text-btn text-grey-400 text-hover-grey-500 ps-2"
+    className="text-btn text-grey-400 text-hover-grey-500 lh-0 ps-2"
     onClick={onClick}
   >
     <X weight="bold" size={size} />
@@ -363,22 +363,6 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     setShown(isShown);
   }, [isShown]);
 
-  const handleClickOutside = useCallback(
-    (e) => {
-      if (!menuEl?.current || !menuEl?.current.contains(e.target)) {
-        setShown(false);
-      }
-    },
-    [menuEl?.current, setShown],
-  );
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [handleClickOutside]);
-
   return (
     <div
       id={`filter-item-${props.name}`}
@@ -390,7 +374,10 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
         {props.title}
       </span>
 
-      <div ref={menuEl} className="menu-sub menu-sub-dropdown w-375px py-3">
+      <div
+        ref={menuEl}
+        className="menu-sub menu-sub-dropdown w-375px py-3 shadow-sm"
+      >
         <div className="menu-item">
           <div
             className="menu-content filter-field"

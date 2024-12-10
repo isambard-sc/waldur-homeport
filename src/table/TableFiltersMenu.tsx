@@ -124,7 +124,7 @@ const SaveFilterItems = ({ table, formId, apply }) => {
             <CaretRight size={18} className="ms-auto" weight="bold" />
           </span>
 
-          <div className="menu-sub menu-sub-dropdown w-250px py-3">
+          <div className="menu-sub menu-sub-dropdown w-250px py-3 shadow-sm">
             <span
               className="menu-link"
               aria-hidden="true"
@@ -158,7 +158,7 @@ const SaveFilterItems = ({ table, formId, apply }) => {
           <CaretRight size={18} className="ms-auto" weight="bold" />
         </span>
 
-        <div className="menu-sub menu-sub-dropdown w-250px py-3">
+        <div className="menu-sub menu-sub-dropdown w-250px py-3 shadow-sm">
           <div className="menu-item">
             <div
               className="menu-content filter-field"
@@ -298,7 +298,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
           </button>
           <div
             ref={menuEl}
-            className="table-filters-menu column-filter menu menu-sub menu-sub-dropdown menu-column menu-gray-600 menu-state-bg-light menu-state-primary fw-bold fs-6"
+            className="table-filters-menu column-filter menu menu-sub menu-sub-dropdown menu-column menu-gray-600 menu-state-bg-gray fw-bold fs-6"
             data-kt-menu="true"
             data-cy={`${props.openName}-add-filter-menu`}
           >
@@ -319,7 +319,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
           </Button>
           <div
             ref={menuEl}
-            className="table-filters-menu menu menu-sub menu-sub-dropdown menu-column menu-gray-700 menu-state-bg-light menu-state-primary fw-bold py-1 fs-6 w-250px"
+            className="table-filters-menu menu menu-sub menu-sub-dropdown menu-column menu-gray-700 menu-state-bg-gray fw-bold py-1 fs-6 w-250px"
             data-kt-menu="true"
             data-cy="table-add-filter-menu"
           >

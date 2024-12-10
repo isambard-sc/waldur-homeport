@@ -6,7 +6,10 @@ import { Field, InjectedFormProps, reduxForm } from 'redux-form';
 import { OrganizationRoleSelectField } from '@waldur/customer/team/OrganizationRoleSelectField';
 import { ProjectRoleSelectField } from '@waldur/customer/team/ProjectRoleSelectField';
 import { SelectField } from '@waldur/form';
-import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
+import {
+  REACT_MULTI_SELECT_TABLE_FILTER,
+  REACT_SELECT_TABLE_FILTER,
+} from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { getNativeNameVisible } from '@waldur/store/config';
@@ -56,10 +59,9 @@ const PureUserFilter: FunctionComponent<UserFilterProps> = () => {
               className="Select"
               placeholder={translate('Select role')}
               options={getRoleFilterOptions()}
-              isMulti={true}
               noUpdateOnBlur={true}
               isClearable={true}
-              {...REACT_SELECT_TABLE_FILTER}
+              {...REACT_MULTI_SELECT_TABLE_FILTER}
             />
           )}
         />

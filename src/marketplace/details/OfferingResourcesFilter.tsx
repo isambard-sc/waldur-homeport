@@ -10,7 +10,7 @@ import { TableFilterItem } from '@waldur/table/TableFilterItem';
 const PureOfferingResourcesFilter: FunctionComponent = () => (
   <>
     <TableFilterItem title={translate('State')} name="state" ellipsis={false}>
-      <ResourceStateFilter reactSelectProps={{ isMulti: true }} />
+      <ResourceStateFilter />
     </TableFilterItem>
     <TableFilterItem
       title={translate('Include terminated')}

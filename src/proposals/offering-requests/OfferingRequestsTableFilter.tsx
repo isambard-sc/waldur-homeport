@@ -1,7 +1,11 @@
 import { FunctionComponent } from 'react';
 import { Field, reduxForm } from 'redux-form';
 
-import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
+import {
+  REACT_MULTI_SELECT_TABLE_FILTER,
+  REACT_SELECT_TABLE_FILTER,
+  Select,
+} from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
@@ -36,9 +40,8 @@ const PureOfferingRequestsTableFilter: FunctionComponent<{}> = () => (
             options={getCallOfferingStateOptions()}
             value={fieldProps.input.value}
             onChange={(item) => fieldProps.input.onChange(item)}
-            isMulti={true}
             isClearable={true}
-            {...REACT_SELECT_TABLE_FILTER}
+            {...REACT_MULTI_SELECT_TABLE_FILTER}
           />
         )}
       />
