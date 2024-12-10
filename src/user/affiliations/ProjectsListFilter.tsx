@@ -1,7 +1,7 @@
 import React from 'react';
 import { reduxForm } from 'redux-form';
 
-import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
+import { REACT_MULTI_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
@@ -13,7 +13,7 @@ const PureProjectsListFilter = () => (
     getValueLabel={(option) => option.name}
   >
     <OrganizationAutocomplete
-      reactSelectProps={{ ...REACT_SELECT_TABLE_FILTER, isMulti: true }}
+      reactSelectProps={{ ...REACT_MULTI_SELECT_TABLE_FILTER }}
     />
   </TableFilterItem>
 );

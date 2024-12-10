@@ -24,6 +24,10 @@
 }
 
 /* SVG ICON */
+.svg-icon.svg-icon-transparent {
+  @include svg-icon-color(transparent);
+}
+
 .collapsible:not(.collapsed),
 .show,
 .active {

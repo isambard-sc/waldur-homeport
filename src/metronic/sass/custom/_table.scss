@@ -365,6 +365,12 @@
     padding-top: 0;
   }
 
+  .menu-item .menu-link {
+    min-height: 40px;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
   // Select
   .metronic-select-container {
     margin: 0 -1rem -0.65rem;
@@ -393,7 +399,7 @@
     .metronic-select__option {
       padding-top: 2px;
       padding-bottom: 2px;
-      height: 50px;
+      height: 40px;
 
       > * {
         text-overflow: ellipsis;
