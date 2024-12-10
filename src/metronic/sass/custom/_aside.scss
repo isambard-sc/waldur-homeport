@@ -163,16 +163,10 @@ $custom-aside: (
     filter-badge-border: if(isDarkMode(), $dark-badge-border, $grey-300),
   ),
   accent: (
-    add-resource-border:
-      if(isDarkMode(), $dark-add-resource-border, var(--waldur-aside-bg-color)),
-    add-resource-color:
-      if(isDarkMode(), $dark-add-resource-color, var(--waldur-aside-bg-color)),
+    add-resource-border: if(isDarkMode(), $dark-add-resource-border, white),
+    add-resource-color: if(isDarkMode(), $dark-add-resource-color, white),
     add-resource-state-color:
-      if(
-        isDarkMode(),
-        $dark-add-resource-state-color,
-        var(--waldur-aside-bg-color)
-      ),
+      if(isDarkMode(), $dark-add-resource-state-color, white),
     show-more-color: if(isDarkMode(), $dark-show-more-color, $primary-400),
     show-more-active-icon:
       if(isDarkMode(), $dark-show-more-active-icon, $primary-600),
