@@ -113,10 +113,10 @@ export const getFormattedUsages = (
   const result = [];
   for (let i = 0; i < periods.length; i++) {
     for (let j = 0; j < usages.length; j++) {
-      const usageDate = parseDate(usages[j].date).toFormat('yyyy-MM');
+      const usageDate = parseDate(usages[j].billing_period).toFormat('yyyy-MM');
       if (periods[i].toFormat('yyyy-MM') === usageDate) {
         const details = userUsages.filter(
-          (u) => parseDate(u.date).toFormat('yyyy-MM') === usageDate,
+          (u) => parseDate(u.billing_period).toFormat('yyyy-MM') === usageDate,
         );
         result.push({
           value: usages[j].usage,
