@@ -1,17 +1,17 @@
 import { Plus, Question, Trash } from '@phosphor-icons/react';
-import { Fragment, useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
 import { Tip } from '@waldur/core/Tooltip';
+import { usePagination } from '@waldur/core/usePagination';
 import { email, required } from '@waldur/core/validators';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { InvitationsFeatures } from '@waldur/FeaturesEnums';
 import { EmailField } from '@waldur/form/EmailField';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
-import { MIN_PAGE_SIZE } from '@waldur/table/constants';
 import { TablePagination } from '@waldur/table/TablePagination';
 
 import { LoadUserDetailsButton } from '../LoadUserDetailsButton';
@@ -31,13 +31,16 @@ export const EmailsListGroup = ({
 }) => {
   const [warn, setWarn] = useState(false);
 
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(MIN_PAGE_SIZE);
-
-  const changePageSize = (newSize) => {
-    setPage(1);
-    setPageSize(newSize);
-  };
+  const {
+    page,
+    setPage,
+    pageSize,
+    changePageSize,
+    visibleItems,
+    refreshPageOnAdd,
+    refreshPageOnRemove,
+    hasPages,
+  } = usePagination(fields);
 
   const addRow = useCallback(() => {
     let emptyEmails = 0;
@@ -49,23 +52,16 @@ export const EmailsListGroup = ({
     if (emptyEmails < 5) {
       if (project) fields.push({ project });
       else fields.push({});
-      // We have to give pagination a timeout to create the new page, otherwise we will get an error.
-      setTimeout(() => {
-        setPage(Math.ceil((fields.length + 1) / pageSize));
-      }, 250);
+      refreshPageOnAdd();
     } else {
       setWarn(true);
       setTimeout(() => setWarn(false), 2000);
     }
-  }, [fields, project, setPage, pageSize]);
+  }, [fields, project, refreshPageOnAdd]);
 
   const removeRow = (index) => {
-    const isLastOne = visibleFields.filter(Boolean).length === 1;
-    const lastPage = Math.ceil((fields.length + 1) / pageSize);
     fields._isFieldArray && fields.remove(index);
-    if (isLastOne && page === lastPage && page !== 1) {
-      setPage((prev) => prev - 1);
-    }
+    refreshPageOnRemove();
   };
 
   const getUserDetails = useCallback(
@@ -80,14 +76,6 @@ export const EmailsListGroup = ({
       !userDetails,
     [],
   );
-
-  // Visible fields for each page without lossing indexes
-  const visibleFields = useMemo(() => {
-    const end = page * pageSize;
-    const start = (page - 1) * pageSize;
-
-    return fields.map((field, i) => (i >= start && i < end ? field : null));
-  }, [fields, page, pageSize]);
 
   return (
     <div className="mb-3">
@@ -126,7 +114,7 @@ export const EmailsListGroup = ({
                 </tr>
               </thead>
               <tbody>
-                {visibleFields.map((user, i) => {
+                {visibleItems.map((user, i) => {
                   if (!user) return null;
                   const userDetails = getUserDetails(fields.get(i));
                   return (
@@ -253,7 +241,7 @@ export const EmailsListGroup = ({
         currentPage={page}
         pageSize={pageSize}
         resultCount={fields.length}
-        hasRows={fields.length > MIN_PAGE_SIZE}
+        hasRows={hasPages}
         showPageSizeSelector
         updatePageSize={changePageSize}
         gotoPage={setPage}

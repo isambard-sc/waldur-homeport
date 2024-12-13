@@ -164,7 +164,7 @@ export interface TableProps<RowType = any> extends TableState {
   rowClass?: (({ row }) => string) | string;
   hoverable?: boolean;
   hoverShadow?: { table?: boolean; grid?: boolean } | boolean;
-  minHeight?: number;
+  minHeight?: number | 'auto';
   cardBordered?: boolean;
   showPageSizeSelector?: boolean;
   updatePageSize?: (size: number) => void;
