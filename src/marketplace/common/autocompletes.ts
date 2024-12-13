@@ -78,7 +78,7 @@ export const providerAutocomplete = async (
 ) => {
   const params = {
     name: query,
-    field: ['customer_name', 'customer_uuid'],
+    field: ['customer_name', 'customer_uuid', 'url'],
     o: 'customer_name',
     page: page,
     page_size: ENV.pageSize,
@@ -94,7 +94,7 @@ export const categoryAutocomplete = async (
 ) => {
   const params = {
     title: query,
-    field: ['title', 'uuid'],
+    field: ['title', 'uuid', 'url'],
     o: 'title',
     page: page,
     page_size: ENV.pageSize,

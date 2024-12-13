@@ -12,13 +12,14 @@ import './SecretField.scss';
 interface SecretFieldProps extends FormField {
   placeholder?: string;
   maxLength?: number;
+  solid?: boolean;
 }
 
 export const SecretField: React.FC<SecretFieldProps> = (props) => {
   const [showSecret, onToggle] = useToggle(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { input, label, validate, ...rest } = props;
+  const { input, label, validate, solid, ...rest } = props;
 
   return (
     <div className="has-password">
@@ -27,7 +28,7 @@ export const SecretField: React.FC<SecretFieldProps> = (props) => {
         type={showSecret ? 'text' : 'password'}
         autoComplete="new-password"
         placeholder={props.placeholder}
-        className="form-control-solid"
+        className={solid ? 'form-control-solid' : undefined}
         {...rest}
       />
       <button

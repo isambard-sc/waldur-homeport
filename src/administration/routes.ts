@@ -315,6 +315,21 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Categories'),
     },
   },
+
+  {
+    name: 'admin-marketplace-remote-sync',
+    url: 'remote-offering-sync/',
+    parent: 'admin-marketplace',
+    component: lazyComponent(() =>
+      import('./remote-offering-sync/RemoteOfferingSyncList').then(
+        (module) => ({ default: module.RemoteOfferingSyncList }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Remote offering sync'),
+    },
+  },
+
   {
     name: 'admin-organizations',
     parent: 'admin',
