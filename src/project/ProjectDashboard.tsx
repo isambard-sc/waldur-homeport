@@ -121,7 +121,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
                   ...project,
                   billing_price_estimate: {
                     ...(project?.billing_price_estimate || ({} as any)),
-                    total: data.chart.data[data.chart.data.length - 1].value,
+                    total: data?.chart.data[data.chart.data.length - 1].value,
                   },
                 }}
                 isLoading={isCreditLoading}
