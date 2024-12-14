@@ -536,7 +536,6 @@
   "Deployment ID": "Bereitstellungs-ID",
   "Deployment type": "Bereitstellungstyp",
   "Description": "Beschreibung",
-  "Description ({language})": "Beschreibung ({language} )",
   "Desired replicas": "Gewünschte Replikate",
   "Destination": "Ziel",
   "Destination (CIDR)": "Ziel (CIDR)",

@@ -662,7 +662,6 @@
   "Describe your role or position within the organization": "Kirjeldage oma rolli või positsiooni organisatsioonis",
   "Describe your user account type": "Kirjeldage oma kasutajakonto tüüpi",
   "Description": "Kirjeldus",
-  "Description ({language})": "Kirjeldus ({language})",
   "Description of the Waldur deployment.": "Walduri installatsiooni kirjeldus.",
   "Desired replicas": "Soovitud koopiad",
   "Destination": "Sihtkoht",
