@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { translate } from '@waldur/i18n';
@@ -27,6 +27,10 @@ export const RemoteSyncExpandableRow: FC<{
         rows: remoteSync.remotelocalcategory_set,
       }),
   });
+
+  useEffect(() => {
+    tableProps.fetch();
+  }, [remoteSync.remotelocalcategory_set]);
 
   return (
     <ExpandableContainer>
