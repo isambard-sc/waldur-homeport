@@ -12,6 +12,7 @@ import { SelectField, SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { createProposalReview, getAllCallUsers } from '@waldur/proposals/api';
@@ -60,6 +61,7 @@ export const CreateReviewDialog = reduxForm<
           dispatch(
             showSuccess(translate('Proposal review created successfully')),
           );
+          dispatch(closeModalDialog());
           router.stateService.go('call-management.review-list');
         })
         .catch((error) => {
