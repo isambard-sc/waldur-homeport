@@ -10848,8 +10848,12 @@
     "message": "Sync with Google Calendar"
   },
   "Synchronisation has been scheduled.": {
-    "description": "administration/remote-offering-sync/RemoteSyncSynchroniseAction.tsx, resource/actions/PullActionItem.tsx",
+    "description": "resource/actions/PullActionItem.tsx",
     "message": "Synchronisation has been scheduled."
+  },
+  "Synchronisation has been successful.": {
+    "description": "administration/remote-offering-sync/RemoteSyncSynchroniseAction.tsx",
+    "message": "Synchronisation has been successful."
   },
   "Synchronise": {
     "description": "administration/remote-offering-sync/RemoteSyncSynchroniseAction.tsx, marketplace/resources/actions/SyncResourceAction.tsx, openstack/openstack-tenant/actions/PullFloatingIpsAction.tsx, openstack/openstack-tenant/actions/PullSecurityGroupsAction.tsx, openstack/openstack-tenant/actions/PullServerGroupsAction.tsx, resource/actions/PullActionItem.tsx",
