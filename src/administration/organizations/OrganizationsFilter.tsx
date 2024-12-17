@@ -1,10 +1,13 @@
 import { FunctionComponent } from 'react';
-import { reduxForm } from 'redux-form';
+import { Field, reduxForm } from 'redux-form';
 
 import { OrganizationGroupFilter } from '@waldur/administration/organizations/OrganizationGroupFilter';
 import { AccountingRunningField } from '@waldur/customer/list/AccountingRunningField';
 import { SelectOrganizationGroupFieldPure } from '@waldur/customer/list/SelectOrganizationGroupField';
 import { ServiceProviderFilter } from '@waldur/customer/list/ServiceProviderFilter';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
@@ -26,6 +29,23 @@ const PureSupportCustomerFilter: FunctionComponent = () => (
     >
       <ServiceProviderFilter />
     </TableFilterItem>
+    {isFeatureVisible(
+      MarketplaceFeatures.show_call_management_functionality,
+    ) && (
+      <TableFilterItem
+        title={translate('Call managing organization')}
+        name="is_call_managing_organization"
+        badgeValue={(value) => (value ? translate('Yes') : translate('All'))}
+        ellipsis={false}
+      >
+        <Field
+          name="is_call_managing_organization"
+          component={AwesomeCheckboxField}
+          label={translate('Show only call managing organizations')}
+          parse={(v) => v || undefined}
+        />
+      </TableFilterItem>
+    )}
     <TableFilterItem
       title={translate('Organization group')}
       name="organization_group"
