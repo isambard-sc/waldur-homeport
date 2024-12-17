@@ -1,4 +1,4 @@
-import { Attachment } from './types';
+import { Attachment, IssueAttachmentUploading } from './types';
 
 export const attachment: Attachment = {
   created: '2018-01-11T19:41:50.451396Z',
@@ -14,3 +14,18 @@ export const attachment: Attachment = {
   url: 'https://example.com/api/support-attachments/30a44649ee2d4a67ba1f17938a8a5f6e/',
   uuid: '30a44649ee2d4a67ba1f17938a8a5f6e',
 };
+
+export const attachmentUploading: IssueAttachmentUploading[] = [
+  {
+    file: new File([], 'file1.pdf'),
+    key: 'file1.pdf',
+    progress: 0,
+    error: null,
+  },
+  {
+    file: new File([], 'file2.png'),
+    key: 'file2.png',
+    progress: 0,
+    error: null,
+  },
+];

@@ -22,7 +22,7 @@ export const IssueCommentsList: FunctionComponent<
     return <div>{translate('There are no comments yet.')}</div>;
   }
   return (
-    <div className="vertical-container dark-timeline">
+    <div className="timeline">
       {comments.map((comment) => (
         <IssueCommentItem key={comment.uuid} comment={comment} />
       ))}

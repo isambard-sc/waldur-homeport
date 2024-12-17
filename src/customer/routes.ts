@@ -124,19 +124,6 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'organization.issue-details',
-    url: 'issue/:issue_uuid/',
-    component: lazyComponent(() =>
-      import('../issues/IssueDetails').then((module) => ({
-        default: module.IssueDetails,
-      })),
-    ),
-    data: {
-      permissions: [hasSupport],
-    },
-  },
-
-  {
     name: 'organization.projects',
     url: 'projects/',
     component: lazyComponent(() =>

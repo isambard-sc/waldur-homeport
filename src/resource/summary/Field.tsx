@@ -15,6 +15,7 @@ interface FieldProps {
   value?: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
+  labelClass?: string;
   valueClass?: string;
   hasCopy?: boolean;
   isStuck?: boolean;
@@ -27,7 +28,10 @@ export const Field: FunctionComponent<FieldProps> = (props) =>
     <Row className={classNames('field-row g-0 mb-1', props.className)}>
       <Col
         sm={props.isStuck ? 'auto' : props.labelCol || 3}
-        className="field-label text-gray-700 fw-bold"
+        className={classNames(
+          'field-label text-gray-700 fw-bold',
+          props.labelClass,
+        )}
       >
         {props.label.length > 20 ? (
           <Tip label={props.label} id="fieldLabel">

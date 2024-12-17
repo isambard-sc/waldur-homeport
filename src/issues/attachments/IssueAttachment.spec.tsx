@@ -38,15 +38,13 @@ describe('IssueAttachment', () => {
 
   it('renders description', () => {
     const wrapper = renderWrapper();
-    const anchor = wrapper.find('.attachment-item__description-name a');
+    const anchor = wrapper.find('.attachment-item__body-name a');
     expect(anchor.text()).toBe('panda.jpg');
     expect(anchor.prop('href')).toBe(attachment.file);
-    expect(wrapper.find('.attachment-item__description-date').text()).toBe(
+    expect(wrapper.find('.attachment-item__body-date').text()).toBe(
       formatDateTime(attachment.created),
     );
-    expect(wrapper.find('.attachment-item__description-size').text()).toBe(
-      '62.6 KB',
-    );
+    expect(wrapper.find('.attachment-item__body-size').text()).toBe('62.6 KB');
   });
 
   it('renders deleting overlay', () => {

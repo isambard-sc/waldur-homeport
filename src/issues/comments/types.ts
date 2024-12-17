@@ -1,5 +1,3 @@
-import { Attachment } from '@waldur/issues/attachments/types';
-
 import { Issue } from '../list/types';
 
 export interface Comment {
@@ -24,8 +22,6 @@ export interface IssueCommentState {
   errors: any[];
   items: Comment[];
   deleting: { [key: string]: boolean };
-  activeFormId: string;
-  pendingAttachments: Attachment[];
   issue: Issue;
   uiDisabled: boolean;
   getErred: boolean;

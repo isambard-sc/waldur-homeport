@@ -1,16 +1,17 @@
+import { PencilSimple, Trash } from '@phosphor-icons/react';
+import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { type RootState } from '@waldur/store/reducers';
+import { openModalDialog, waitForConfirmation } from '@waldur/modal/actions';
 
-import { issueCommentsFormToggle } from './actions';
-import { getIsFormToggleDisabled, getIsUiDisabled, getUser } from './selectors';
+import { issueCommentsDelete } from './actions';
+import { getIsUiDisabled, getUser } from './selectors';
 
-const IssueCommentDeleteDialog = lazyComponent(() =>
-  import('./IssueCommentDeleteDialog').then((module) => ({
-    default: module.IssueCommentDeleteDialog,
+const CommentFormDialog = lazyComponent(() =>
+  import('./CommentFormDialog').then((module) => ({
+    default: module.CommentFormDialog,
   })),
 );
 
@@ -19,42 +20,57 @@ export const CommentActions = ({ comment }) => {
 
   const user = useSelector(getUser);
   const uiDisabled = useSelector(getIsUiDisabled);
-  const formToggleDisabled = useSelector((state: RootState) =>
-    getIsFormToggleDisabled(state, { comment }),
-  );
 
-  const toggleForm = () => {
-    dispatch(issueCommentsFormToggle(comment.uuid));
-  };
-
-  const openDeleteDialog = () => {
+  const openEditCommentDialog = () => {
     dispatch(
-      openModalDialog(IssueCommentDeleteDialog, {
-        resolve: { uuid: comment.uuid },
-      }),
+      openModalDialog(CommentFormDialog, { resolve: { comment }, size: 'sm' }),
     );
   };
 
+  const openDeleteDialog = async () => {
+    try {
+      await waitForConfirmation(
+        dispatch,
+        translate('Delete comment'),
+        translate(
+          'Are you sure you want to delete this comment? This action cannot be undone.',
+        ),
+        true,
+      );
+    } catch {
+      return;
+    }
+    dispatch(issueCommentsDelete(comment.uuid));
+  };
+
   return (
-    <div className="m-0">
+    <div className="flex-shrink-0 mt-5">
       {(user.is_staff || user.uuid === comment.author_uuid) && (
         <>
-          <button
-            className="btn btn-color-gray-400 btn-active-color-primary p-0 fw-bold me-3"
-            disabled={
-              uiDisabled || formToggleDisabled || !comment.update_is_available
-            }
-            onClick={toggleForm}
+          <Button
+            variant="outline btn-outline-default"
+            size="sm"
+            className="btn-icon-right me-3"
+            disabled={uiDisabled || !comment.update_is_available}
+            onClick={openEditCommentDialog}
           >
-            {translate('Edit')}
-          </button>
-          <button
-            className="btn btn-color-gray-400 btn-active-color-primary p-0 fw-bold"
+            {translate('Change')}
+            <span className="svg-icon svg-icon-5">
+              <PencilSimple weight="bold" />
+            </span>
+          </Button>
+          <Button
+            variant="outline btn-outline-default"
+            size="sm"
+            className="btn-icon-right"
             disabled={uiDisabled || !comment.destroy_is_available}
             onClick={openDeleteDialog}
           >
-            {translate('Delete')}
-          </button>
+            {translate('Remove')}
+            <span className="svg-icon svg-icon-5">
+              <Trash weight="bold" />
+            </span>
+          </Button>
         </>
       )}
     </div>

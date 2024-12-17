@@ -28,6 +28,7 @@ export interface FormField {
   spaceless?: boolean;
   space?: number;
   'data-testid'?: string;
+  autoFocus?: boolean;
 }
 
 export interface CustomComponentInputProps<T> {

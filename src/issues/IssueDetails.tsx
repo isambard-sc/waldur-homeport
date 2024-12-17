@@ -1,20 +1,29 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
 
 import { ENV } from '@waldur/configs/default';
 import { getById } from '@waldur/core/api';
+import { formatDateTime, formatRelative } from '@waldur/core/dateUtils';
+import { ExternalLink } from '@waldur/core/ExternalLink';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { FormattedJira } from '@waldur/core/FormattedJira';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
 import { translate } from '@waldur/i18n';
+import { useBreadcrumbs } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
+import { Field } from '@waldur/resource/summary';
 import { injectReducer, injectSaga } from '@waldur/store/store';
+import { isStaffOrSupport } from '@waldur/workspace/selectors';
 
 import { IssueAttachmentsContainer } from './attachments/IssueAttachmentsContainer';
 import { IssueCommentsContainer } from './comments/IssueCommentsContainer';
-import { IssueSummary } from './IssueSummary';
+import { IssueInfoButton } from './IssueInfo';
+import { IssueStatus } from './IssueStatus';
+import { getIssueBreadcrumbItems } from './utils';
 
 const linkify = (s) =>
   s.replace(
@@ -50,6 +59,8 @@ export const IssueDetails: FunctionComponent = () => {
   } = useCurrentStateAndParams();
   const router = useRouter();
 
+  const staffOrSupport = useSelector(isStaffOrSupport);
+
   if (!issue_uuid) {
     router.stateService.go('errorPage.notFound');
   }
@@ -60,6 +71,12 @@ export const IssueDetails: FunctionComponent = () => {
     value: issue,
   } = useAsync(() => loadDependencies(issue_uuid));
 
+  const breadcrumbItems = useMemo(
+    () => getIssueBreadcrumbItems(issue),
+    [issue],
+  );
+  useBreadcrumbs(breadcrumbItems);
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -68,36 +85,90 @@ export const IssueDetails: FunctionComponent = () => {
   }
 
   return (
-    <Row>
-      <Col sm={8}>
-        <Card className="card-bordered mb-6">
-          <Card.Header>
-            <Card.Title>
+    <>
+      <PublicDashboardHero2
+        containerClassName="mb-5"
+        cardBordered
+        hideQuickSection
+        title={
+          <div className="d-flex flex-wrap align-items-center gap-3">
+            <h3 className="mb-0">
               {issue.key ? `${issue.key}: ${issue.summary}` : issue.summary}
-            </Card.Title>
-          </Card.Header>
-          <Card.Body>
-            {ENV.plugins.WALDUR_SUPPORT.ACTIVE_BACKEND_TYPE === 'atlassian' ? (
-              <FormattedJira text={linkify(issue?.description)} />
-            ) : (
-              <FormattedHtml html={linkify(issue?.description)} />
+            </h3>
+            <IssueStatus status={issue.status} />
+          </div>
+        }
+        actions={<IssueInfoButton issue={issue} />}
+      >
+        <Row>
+          <Col className="mw-450px">
+            <Field
+              label={translate('Caller')}
+              value={issue.caller_full_name}
+              isStuck
+              labelClass="min-w-100px"
+              className="fs-7"
+            />
+          </Col>
+          <Col>
+            <Field
+              label={translate('Request type')}
+              value={issue.type}
+              isStuck
+              labelClass="min-w-100px"
+              className="fs-7"
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col className="mw-450px">
+            <Field
+              label={translate('Created')}
+              value={translate('{relative} ago, {date}', {
+                relative: formatRelative(issue.created),
+                date: formatDateTime(issue.created),
+              })}
+              isStuck
+              labelClass="min-w-100px"
+              className="fs-7"
+            />
+          </Col>
+          <Col>
+            {issue.link && staffOrSupport && (
+              <Field
+                label={translate('Link')}
+                value={
+                  <ExternalLink
+                    label={translate('Open in Service Desk')}
+                    url={issue.link}
+                    iconless
+                    className="text-anchor"
+                  />
+                }
+                isStuck
+                labelClass="min-w-100px"
+                className="fs-7"
+              />
             )}
-          </Card.Body>
-        </Card>
-        <IssueCommentsContainer issue={issue} />
-      </Col>
-      <Col sm={4}>
-        <Card className="card-bordered mb-6">
-          <Card.Header>
-            <Card.Title>{translate('Summary')}</Card.Title>
-          </Card.Header>
-          <Card.Body>
-            <IssueSummary issue={issue} />
-          </Card.Body>
-        </Card>
+          </Col>
+        </Row>
+      </PublicDashboardHero2>
 
-        <IssueAttachmentsContainer issue={issue} />
-      </Col>
-    </Row>
+      <Card className="card-bordered mb-5">
+        <Card.Header>
+          <Card.Title>{translate('Description')}</Card.Title>
+        </Card.Header>
+        <Card.Body>
+          {ENV.plugins.WALDUR_SUPPORT.ACTIVE_BACKEND_TYPE === 'atlassian' ? (
+            <FormattedJira text={linkify(issue?.description)} />
+          ) : (
+            <FormattedHtml html={linkify(issue?.description)} />
+          )}
+        </Card.Body>
+      </Card>
+
+      <IssueCommentsContainer issue={issue} />
+      <IssueAttachmentsContainer issue={issue} />
+    </>
   );
 };

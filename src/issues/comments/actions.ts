@@ -31,24 +31,10 @@ export const issueCommentsCreateSuccess = (item: Comment) => ({
   },
 });
 
-export const issueCommentsCreateError = (error: Response) => ({
-  type: constants.ISSUE_COMMENTS_CREATE_ERROR,
-  payload: {
-    error,
-  },
-});
-
 export const issueCommentsUpdateSuccess = (item: any) => ({
   type: constants.ISSUE_COMMENTS_UPDATE_SUCCESS,
   payload: {
     item,
-  },
-});
-
-export const issueCommentsUpdateError = (error: Response) => ({
-  type: constants.ISSUE_COMMENTS_UPDATE_ERROR,
-  payload: {
-    error,
   },
 });
 
@@ -77,50 +63,9 @@ export const issueCommentsDeleteError = (
   },
 });
 
-export const issueCommentsFormSubmit = (message: string, formId: string) => ({
-  type: constants.ISSUE_COMMENTS_FORM_SUBMIT,
-  payload: {
-    message,
-    formId,
-  },
-});
-
-export const issueCommentsFormSubmitReject = (formId: string) => ({
-  type: constants.ISSUE_COMMENTS_FORM_SUBMIT_REJECT,
-  payload: {
-    formId,
-  },
-});
-
-export const issueCommentsFormSubmitCancel = () => ({
-  type: constants.ISSUE_COMMENTS_FORM_SUBMIT_CANCEL,
-});
-
-export const issueCommentsFormToggle = (formId: string) => ({
-  type: constants.ISSUE_COMMENTS_FORM_TOGGLE,
-  payload: {
-    formId,
-  },
-});
-
 export const issueCommentsIssueSet = (issue: Issue) => ({
   type: constants.ISSUE_COMMENTS_ISSUE_SET,
   payload: {
     issue,
   },
-});
-
-export const issueCommentsUiDisable = (uiDisabled: boolean) => ({
-  type: constants.ISSUE_COMMENTS_UI_DISABLE,
-  payload: {
-    uiDisabled,
-  },
-});
-
-export const issueCommentsPendingAttachmentsDelete = () => ({
-  type: constants.ISSUE_COMMENTS_PENDING_ATTACHMENTS_DELETE,
-});
-
-export const issueCommentsPendingAttachmentsReset = () => ({
-  type: constants.ISSUE_COMMENTS_PENDING_ATTACHMENTS_RESET,
 });

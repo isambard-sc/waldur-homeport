@@ -7,8 +7,8 @@
 
 .dropzone {
   border: 3px dashed $gray-300;
-  padding: 20px 30px;
-  border-radius: 10px;
+  padding: 16px 24px;
+  border-radius: 12px;
 }
 
 .dropzone-message {
@@ -44,6 +44,7 @@
   padding: 20px;
   background: transparentize($white, 0.5);
   border: 3px dashed $yellow;
+  border-radius: 12px;
   text-align: center;
   z-index: 2;
 }

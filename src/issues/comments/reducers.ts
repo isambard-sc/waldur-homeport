@@ -1,9 +1,5 @@
 import { Action } from '@waldur/core/reducerActions';
 import { omit } from '@waldur/core/utils';
-import {
-  ISSUE_ATTACHMENTS_DELETE_SUCCESS,
-  ISSUE_ATTACHMENTS_PUT_SUCCESS,
-} from '@waldur/issues/attachments/constants';
 
 import * as constants from './constants';
 import { Payload, IssueCommentState } from './types';
@@ -13,8 +9,6 @@ const INITIAL_STATE: IssueCommentState = {
   errors: [],
   items: [],
   deleting: {},
-  activeFormId: null,
-  pendingAttachments: [],
   issue: null,
   uiDisabled: false,
   getErred: false,
@@ -50,22 +44,12 @@ export const reducer = (
         ...state,
         items: [payload.item, ...state.items],
       };
-    case constants.ISSUE_COMMENTS_CREATE_ERROR:
-      return {
-        ...state,
-        errors: [...state.errors, payload.error],
-      };
     case constants.ISSUE_COMMENTS_UPDATE_SUCCESS:
       return {
         ...state,
         items: state.items.map((item) =>
           item.uuid === payload.item.uuid ? payload.item : item,
         ),
-      };
-    case constants.ISSUE_COMMENTS_UPDATE_ERROR:
-      return {
-        ...state,
-        errors: [...state.errors, payload.error],
       };
     case constants.ISSUE_COMMENTS_DELETE:
       return {
@@ -86,34 +70,6 @@ export const reducer = (
         ...state,
         deleting: omit(state.deleting, payload.commentId),
         errors: [...state.errors, payload.error],
-      };
-    case ISSUE_ATTACHMENTS_PUT_SUCCESS:
-      return {
-        ...state,
-        pendingAttachments: [...state.pendingAttachments, payload.item as any],
-      };
-    case ISSUE_ATTACHMENTS_DELETE_SUCCESS:
-      return {
-        ...state,
-        pendingAttachments: state.pendingAttachments.filter(
-          (attachment) => attachment.uuid !== payload.uuid,
-        ),
-      };
-    case constants.ISSUE_COMMENTS_PENDING_ATTACHMENTS_RESET:
-      return {
-        ...state,
-        pendingAttachments: [],
-      };
-    case constants.ISSUE_COMMENTS_FORM_TOGGLE:
-      return {
-        ...state,
-        activeFormId:
-          state.activeFormId !== payload.formId ? payload.formId : null,
-      };
-    case constants.ISSUE_COMMENTS_UI_DISABLE:
-      return {
-        ...state,
-        uiDisabled: payload.uiDisabled,
       };
     case constants.ISSUE_COMMENTS_ISSUE_SET:
       return {

@@ -1,18 +1,8 @@
-import {
-  call,
-  put,
-  race,
-  select,
-  spawn,
-  take,
-  takeEvery,
-} from 'redux-saga/effects';
+import { call, put, race, select, spawn, takeEvery } from 'redux-saga/effects';
 
 import { ENV } from '@waldur/configs/default';
-import { format } from '@waldur/core/ErrorMessageFormatter';
 import { translate } from '@waldur/i18n';
-import { ISSUE_COMMENTS_FORM_SUBMIT_CANCEL } from '@waldur/issues/comments/constants';
-import { showError } from '@waldur/store/notify';
+import { showError, showErrorResponse } from '@waldur/store/notify';
 
 import * as actions from './actions';
 import * as api from './api';
@@ -24,35 +14,40 @@ function* issueAttachmentsGet(action) {
   const { issueUrl } = action.payload;
   try {
     const response = yield call(api.getAttachments, issueUrl);
-    yield put(actions.issueAttachmentsGetSuccess(response.data));
+    const data = response.data.sort((a, b) => (a.created > b.created ? -1 : 1));
+    yield put(actions.issueAttachmentsGetSuccess(data));
   } catch (error) {
     yield put(actions.issueAttachmentsGetError(error));
-    const message = `${translate('Unable to fetch attachment.')} ${format(
-      error,
-    )}`;
-    yield put(showError(message));
+    yield put(
+      showErrorResponse(error, translate('Unable to fetch attachment.')),
+    );
   }
 }
 
 function* issueAttachmentUpload(action) {
-  const { issueUrl, file } = action;
+  const { issueUrl, file } = action.payload;
   const { cancel } = yield race({
     sync: call(function* () {
       try {
-        const response = yield call(api.putAttachment, issueUrl, file);
+        const response = yield call(
+          api.putAttachment,
+          issueUrl,
+          file,
+          (progress) => {
+            put(actions.issueAttachmentsProgressUpdate(file.size, progress));
+          },
+        );
         yield put(actions.issueAttachmentsPutSuccess(response.data));
       } catch (error) {
-        yield put(actions.issueAttachmentsPutError(error));
-        const message = `${translate('Unable to upload attachment.')} ${format(
-          error,
-        )}`;
-        yield put(showError(message));
+        yield put(actions.issueAttachmentsPutError(file, error));
+        yield put(
+          showErrorResponse(error, translate('Unable to upload attachment.')),
+        );
       }
     }),
-    cancel: take(ISSUE_COMMENTS_FORM_SUBMIT_CANCEL),
   });
   if (cancel) {
-    yield put(actions.issueAttachmentsPutReject());
+    yield put(actions.issueAttachmentsPutReject(file));
   }
 }
 
@@ -68,9 +63,9 @@ function* issueAttachmentsPut(action) {
     const message = utils.getErrorMessage(rejected);
     yield put(showError(message));
   }
-  yield put(actions.issueAttachmentsPutStart(accepted.length));
+  yield put(actions.issueAttachmentsPutStart(accepted));
   for (const file of accepted) {
-    yield spawn(issueAttachmentUpload, { issueUrl, file });
+    yield spawn(issueAttachmentUpload, { payload: { issueUrl, file } });
   }
 }
 
@@ -86,15 +81,15 @@ function* issueAttachmentsDelete(action) {
     yield put(actions.issueAttachmentsDeleteSuccess(uuid));
   } catch (error) {
     yield put(actions.issueAttachmentsDeleteError(error, uuid));
-    const message = `${translate('Unable to delete attachment.')} ${format(
-      error,
-    )}`;
-    yield put(showError(message));
+    yield put(
+      showErrorResponse(error, translate('Unable to delete attachment.')),
+    );
   }
 }
 
 export default function* () {
   yield takeEvery(constants.ISSUE_ATTACHMENTS_GET, issueAttachmentsGet);
   yield takeEvery(constants.ISSUE_ATTACHMENTS_PUT, issueAttachmentsPut);
+  yield takeEvery(constants.ISSUE_ATTACHMENTS_PUT_RETRY, issueAttachmentUpload);
   yield takeEvery(constants.ISSUE_ATTACHMENTS_DELETE, issueAttachmentsDelete);
 }

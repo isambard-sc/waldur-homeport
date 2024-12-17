@@ -13,7 +13,8 @@ interface TextFieldProps extends FormField {
 
 export const TextField: FunctionComponent<TextFieldProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { input, label, rows, hideLabel, validate, solid, ...rest } = props;
+  const { input, label, rows, hideLabel, validate, spaceless, solid, ...rest } =
+    props;
 
   const storeScroll = useCallback((e) => {
     const target = (e.target || e.currentTarget) as HTMLTextAreaElement;
