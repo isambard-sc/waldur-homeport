@@ -7,6 +7,8 @@ import { OrganizationsFilter } from '@waldur/administration/organizations/Organi
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
 import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
@@ -38,6 +40,10 @@ const mapStateToFilter = createSelector(
     }
     if (filterValues?.organization_group) {
       filter.organization_group_uuid = filterValues.organization_group.uuid;
+    }
+    if (filterValues?.is_call_managing_organization) {
+      filter.is_call_managing_organization =
+        filterValues.is_call_managing_organization;
     }
     return filter;
   },
@@ -252,6 +258,25 @@ export const OrganizationsList: FunctionComponent = () => {
     },
     SLUG_COLUMN,
   ];
+
+  if (
+    isFeatureVisible(MarketplaceFeatures.show_call_management_functionality)
+  ) {
+    columns.push({
+      title: translate('Is call managing organization'),
+      render: ({ row }) => (
+        <>
+          {row.call_managing_organization_uuid
+            ? translate('Yes')
+            : translate('No')}
+        </>
+      ),
+      keys: ['call_managing_organization_uuid'],
+      optional: true,
+      filter: 'is_call_managing_organization',
+      id: 'call_managing_organization_uuid',
+    });
+  }
 
   return (
     <Table
