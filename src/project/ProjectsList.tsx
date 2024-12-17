@@ -24,6 +24,7 @@ const mandatoryFields = [
   'uuid',
   'name', // Actions
   'customer_name', // DeleteAction
+  'customer_uuid', // DeleteAction
   'marketplace_resource_count', // Expandable view
   'backend_id', // Expandable view
 ];
