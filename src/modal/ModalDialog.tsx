@@ -45,7 +45,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
           iconNode && 'has-icon',
         )}
       >
-        <div>
+        <div className="flex-grow-1">
           {Boolean(iconNode) && (
             <>
               <Bg className="icon-background" />

@@ -1,8 +1,6 @@
-import { useCurrentStateAndParams } from '@uirouter/react';
 import React, { FunctionComponent } from 'react';
 
 import { Link } from '@waldur/core/Link';
-import { isDescendantOf } from '@waldur/navigation/useTabs';
 
 interface IssueLinkProps {
   label?: React.ReactNode;
@@ -14,23 +12,11 @@ interface IssueLinkProps {
 }
 
 export const IssueLinkField: FunctionComponent<IssueLinkProps> = (props) => {
-  let toState: string;
   const toParams = { issue_uuid: props.row.uuid };
-  const { state: currentState } = useCurrentStateAndParams();
-
-  if (isDescendantOf('support', currentState)) {
-    toState = 'support.detail';
-  } else if (isDescendantOf('project', currentState)) {
-    toState = 'project.issue-details';
-  } else if (isDescendantOf('organization', currentState)) {
-    toState = 'organization.issue-details';
-  } else {
-    toState = 'profile.issue-details';
-  }
 
   return (
     <Link
-      state={toState}
+      state="support.detail"
       params={toParams}
       label={props.label}
       target={props.target}

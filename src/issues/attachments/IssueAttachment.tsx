@@ -1,26 +1,11 @@
-import { Trash, Warning } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { formatDateTime } from '@waldur/core/dateUtils';
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { formatFilesize } from '@waldur/core/utils';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { AttachmentItem } from '@waldur/form/upload/AttachmentItem';
 
 import * as actions from './actions';
-import './IssueAttachment.scss';
-import { FileDownloader } from './FileDownloader';
-import { ImageFetcher } from './ImageFetcher';
 import { getIsDeleting } from './selectors';
 import { Attachment } from './types';
-
-const IssueAttachmentModal = lazyComponent(() =>
-  import('./IssueAttachmentModal').then((module) => ({
-    default: module.IssueAttachmentModal,
-  })),
-);
 
 interface IssueAttachmentProps {
   attachment: Attachment;
@@ -36,72 +21,11 @@ export const IssueAttachment: FunctionComponent<IssueAttachmentProps> = ({
   const deleteAttachment = () =>
     dispatch(actions.issueAttachmentsDelete(attachment.uuid));
 
-  const openModal = () =>
-    dispatch(
-      openModalDialog(IssueAttachmentModal, {
-        resolve: { url: attachment.file, name: attachment.file_name },
-      }),
-    );
-
   return (
-    <div className="attachment-item">
-      {isDeleting && (
-        <div className="attachment-item__overlay">
-          <LoadingSpinner />
-        </div>
-      )}
-      {attachment.file ? (
-        <>
-          <div className="attachment-item__thumb">
-            {attachment.mime_type.startsWith('image') ? (
-              <button onClick={openModal}>
-                <ImageFetcher
-                  url={attachment.file}
-                  name={attachment.file_name}
-                />
-              </button>
-            ) : (
-              <FileDownloader
-                url={attachment.file}
-                name={attachment.file_name}
-              />
-            )}
-          </div>
-          <div className="attachment-item__description">
-            <div className="attachment-item__description-name">
-              {attachment.file_name}
-              <button
-                className="attachment-item__delete text-btn"
-                type="button"
-                onClick={deleteAttachment}
-              >
-                <span className="svg-icon svg-icon-2">
-                  <Trash />
-                </span>
-              </button>
-            </div>
-            <div className="attachment-item__description-info">
-              <div className="attachment-item__description-date">
-                {formatDateTime(attachment.created)}
-              </div>
-              <div className="attachment-item__description-size">
-                {formatFilesize(attachment.file_size, 'B')}
-              </div>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="attachment-item__thumb">
-            <Warning />
-          </div>
-          <div className="attachment-item__description">
-            <div className="attachment-item__description-name">
-              {translate('Attachment is broken.')}
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+    <AttachmentItem
+      attachment={attachment}
+      onDelete={deleteAttachment}
+      isDeleting={isDeleting}
+    />
   );
 };

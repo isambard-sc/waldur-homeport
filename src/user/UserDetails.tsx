@@ -34,15 +34,24 @@ async function loadUser() {
   }
 }
 
-export const UserDetails: FunctionComponent = () => {
+const WithHero = () => {
   const user = useUser() as IUserDetails;
+  const { state } = useCurrentStateAndParams();
+
+  usePageHero(<UserProfileHero user={user} isLoading={!user} />, [user, state]);
+
+  return <UIView />;
+};
+
+export const UserDetails: FunctionComponent = () => {
   const { state } = useCurrentStateAndParams();
 
   useEffectOnce(() => {
     loadUser();
   });
 
-  usePageHero(<UserProfileHero user={user} isLoading={!user} />, [user, state]);
-
-  return <UIView />;
+  if (state.data?.skipHero) {
+    return <UIView />;
+  }
+  return <WithHero />;
 };

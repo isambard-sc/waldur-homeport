@@ -1,0 +1,16 @@
+@import '@waldur/sass/variables';
+
+.attachment-list {
+  padding: 0;
+  margin-bottom: 0;
+  list-style: none;
+  margin-top: 8px;
+
+  li {
+    display: block;
+
+    &:not(:first-child) {
+      margin-top: 8px;
+    }
+  }
+}

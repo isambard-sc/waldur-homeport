@@ -45,7 +45,8 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      permissions: [isStaffOrSupport, hasSupport],
+      permissions: [hasSupport],
+      hideHeaderMenu: true,
     },
   },
 

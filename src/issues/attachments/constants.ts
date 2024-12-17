@@ -9,6 +9,11 @@ export const ISSUE_ATTACHMENTS_PUT_REJECT =
 export const ISSUE_ATTACHMENTS_PUT_SUCCESS =
   'waldur/issue/attachments/PUT_SUCCESS';
 export const ISSUE_ATTACHMENTS_PUT_ERROR = 'waldur/issue/attachments/PUT_ERROR';
+export const ISSUE_ATTACHMENTS_PUT_CANCEL =
+  'waldur/issue/attachments/PUT_CANCEL';
+export const ISSUE_ATTACHMENTS_PUT_RETRY = 'waldur/issue/attachments/PUT_RETRY';
+export const ISSUE_ATTACHMENTS_PROGRESS_UPDATE =
+  'waldur/issue/attachments/PROGRESS_UPDATE';
 export const ISSUE_ATTACHMENTS_DELETE = 'waldur/issue/attachments/DELETE';
 export const ISSUE_ATTACHMENTS_DELETE_START =
   'waldur/issue/attachments/DELETE_START';

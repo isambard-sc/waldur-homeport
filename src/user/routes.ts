@@ -76,18 +76,6 @@ export const states: StateDeclaration[] = [
       permissions: [hasSupport],
     },
   },
-  {
-    name: 'profile.issue-details',
-    url: 'issues/:issue_uuid',
-    component: lazyComponent(() =>
-      import('../issues/IssueDetails').then((module) => ({
-        default: module.IssueDetails,
-      })),
-    ),
-    data: {
-      permissions: [hasSupport],
-    },
-  },
 
   {
     name: 'profile-keys',

@@ -87,6 +87,7 @@ export function sendForm<T = {}>(
   method: Method,
   url: string,
   options,
+  onUploadProgress?: (progress: number) => void,
 ): AxiosPromise<T> {
   const data = new FormData();
   for (const name of Object.keys(options)) {
@@ -100,7 +101,16 @@ export function sendForm<T = {}>(
     url,
     data,
     transformRequest: (x) => x,
-    headers: { 'Content-Type': undefined },
+    headers: onUploadProgress
+      ? { 'Content-Type': 'multipart/form-data' }
+      : { 'Content-Type': undefined },
+    onUploadProgress: (progressEvent) => {
+      if (!onUploadProgress) return;
+      const progress = Math.round(
+        (progressEvent.loaded * 100) / (progressEvent.total || 1),
+      );
+      onUploadProgress(progress);
+    },
   });
 }
 

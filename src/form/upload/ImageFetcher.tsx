@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 
 import { get } from '@waldur/core/api';
+import { Image } from '@waldur/core/Image';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { translate } from '@waldur/i18n';
 
-export const ImageFetcher = ({ url, name }) => {
+export const ImageFetcher = ({ url, name, thumb = false }) => {
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,7 +24,7 @@ export const ImageFetcher = ({ url, name }) => {
 
         setImageUrl(imageUrl);
       } catch {
-        setError('Failed to load image');
+        setError(translate('Failed to load image'));
       } finally {
         setLoading(false);
       }
@@ -32,15 +34,25 @@ export const ImageFetcher = ({ url, name }) => {
   }, []);
 
   return (
-    <div>
-      {loading && <LoadingSpinner />}
-      {error && <p>{error}</p>}
-      {imageUrl && (
-        <img
-          src={imageUrl}
-          alt={name}
-          style={{ maxWidth: '100%', height: 'auto' }}
-        />
+    <div
+      className={!thumb && imageUrl ? 'text-center bg-dark-always' : undefined}
+    >
+      {loading ? (
+        <LoadingSpinner />
+      ) : error ? (
+        <p>{error}</p>
+      ) : imageUrl ? (
+        thumb ? (
+          <Image size={40} src={imageUrl} />
+        ) : (
+          <img
+            src={imageUrl}
+            alt={name}
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+        )
+      ) : (
+        translate('Failed to load image')
       )}
     </div>
   );

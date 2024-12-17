@@ -111,18 +111,6 @@ export const states: StateDeclaration[] = [
       priority: 140,
     },
   },
-  {
-    name: 'project.issue-details',
-    url: 'issue/:issue_uuid/',
-    component: lazyComponent(() =>
-      import('../issues/IssueDetails').then((module) => ({
-        default: module.IssueDetails,
-      })),
-    ),
-    data: {
-      permissions: [hasSupport],
-    },
-  },
 
   {
     name: 'project.events',

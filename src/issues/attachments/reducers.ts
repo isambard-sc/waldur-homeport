@@ -1,13 +1,17 @@
 import { Action } from '@waldur/core/reducerActions';
 
 import * as constants from './constants';
-import { Payload, IssueAttachmentState } from './types';
+import {
+  Payload,
+  IssueAttachmentState,
+  IssueAttachmentUploading,
+} from './types';
 
 const INITIAL_STATE: IssueAttachmentState = {
   loading: false,
   errors: [],
   items: [],
-  uploading: 0,
+  uploading: [],
   deleting: {},
   filter: constants.ISSUE_ATTACHMENTS_FILTER_NAMES.name,
 };
@@ -38,25 +42,65 @@ export const reducer = (
     case constants.ISSUE_ATTACHMENTS_PUT_START:
       return {
         ...state,
-        uploading: state.uploading + payload.uploading,
+        uploading: payload.files
+          .map<IssueAttachmentUploading>((file) => ({
+            // In order to locate the file, we use the file size as a key, because the file name will change on the backend.
+            key: file.size,
+            file,
+            progress: 0,
+          }))
+          .concat(state.uploading),
       };
     case constants.ISSUE_ATTACHMENTS_PUT_SUCCESS:
       return {
         ...state,
-        items: [...state.items, payload.item],
-        uploading: state.uploading > 0 ? state.uploading - 1 : 0,
+        items: [payload.item, ...state.items],
+        uploading: state.uploading.filter(
+          (item) => payload.item.file_size !== item.key,
+        ),
       };
     case constants.ISSUE_ATTACHMENTS_PUT_ERROR:
       return {
         ...state,
         errors: [...state.errors, payload.error],
-        uploading: state.uploading > 0 ? state.uploading - 1 : 0,
+        uploading: state.uploading.map((item) =>
+          item.key === payload.file.size
+            ? { ...item, error: payload.error, progress: 0 }
+            : item,
+        ),
       };
     case constants.ISSUE_ATTACHMENTS_PUT_REJECT:
       return {
         ...state,
-        uploading: state.uploading > 0 ? state.uploading - 1 : 0,
+        uploading: state.uploading.filter(
+          (item) => item.key !== payload.file.size,
+        ),
       };
+    case constants.ISSUE_ATTACHMENTS_PUT_CANCEL:
+      return {
+        ...state,
+        uploading: state.uploading.filter(
+          (item) => item.key !== payload.file.size,
+        ),
+      };
+    case constants.ISSUE_ATTACHMENTS_PUT_RETRY:
+      return {
+        ...state,
+        uploading: state.uploading.map((item) =>
+          item.key === payload.file.size
+            ? { ...item, error: null, progress: 0 }
+            : item,
+        ),
+      };
+    case constants.ISSUE_ATTACHMENTS_PROGRESS_UPDATE: {
+      const { key, progress } = payload;
+      return {
+        ...state,
+        uploading: state.uploading.map((item) =>
+          item.key === key ? { ...item, progress } : item,
+        ),
+      };
+    }
     case constants.ISSUE_ATTACHMENTS_DELETE_START:
       return {
         ...state,

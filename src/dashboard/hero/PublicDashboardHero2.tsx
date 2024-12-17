@@ -9,7 +9,7 @@ import './PublicDashboardHero2.scss';
 
 interface PublicDashboardHero2Props {
   backgroundImage?: string;
-  logo: string;
+  logo?: string;
   logoAlt?: string;
   logoSize?: number;
   logoCircle?: boolean;
@@ -49,19 +49,21 @@ export const PublicDashboardHero2: FC<
             )}
           >
             <Card.Body className="d-flex flex-column flex-sm-row align-items-stretch flex-grow-1">
-              <Tip
-                label={props.logoTooltip}
-                id={`tip-header-${props.logoTooltip}`}
-              >
-                <DashboardHeroLogo2
-                  logo={props.logo}
-                  logoAlt={props.logoAlt}
-                  circle={props.logoCircle}
-                  size={props.logoSize || 48}
-                />
-              </Tip>
+              {props.logo || props.logoAlt ? (
+                <Tip
+                  label={props.logoTooltip}
+                  id={`tip-header-${props.logoTooltip}`}
+                >
+                  <DashboardHeroLogo2
+                    logo={props.logo}
+                    logoAlt={props.logoAlt}
+                    circle={props.logoCircle}
+                    size={props.logoSize || 48}
+                  />
+                </Tip>
+              ) : null}
               <div className="d-flex flex-column flex-grow-1 gap-2">
-                <div className="d-flex flex-sm-row flex-column-reverse">
+                <div className="d-flex flex-sm-row flex-column-reverse align-items-sm-center gap-3">
                   {/* Title */}
                   <div className="flex-grow-1">{props.title}</div>
                   {/* Actions */}
@@ -70,7 +72,7 @@ export const PublicDashboardHero2: FC<
                       className={
                         (props.mobileBottomActions
                           ? 'd-none d-sm-flex '
-                          : 'd-flex') +
+                          : 'd-flex ') +
                         'flex-wrap align-self-stretch align-self-sm-start justify-content-sm-end gap-3'
                       }
                     >

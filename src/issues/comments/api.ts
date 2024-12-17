@@ -3,6 +3,8 @@ import Axios from 'axios';
 import { ENV } from '@waldur/configs/default';
 import { sendForm } from '@waldur/core/api';
 
+import { Comment } from './types';
+
 export const getComments = (issue: string) => {
   return Axios.get(`${ENV.apiEndpoint}api/support-comments/`, {
     params: {
@@ -11,22 +13,20 @@ export const getComments = (issue: string) => {
   });
 };
 
-export const createComment = (description: string, uuid: string) => {
-  return sendForm(
+export const createComment = (description: string, issueUuid: string) => {
+  return sendForm<Comment>(
     'POST',
-    `${ENV.apiEndpoint}api/support-issues/${uuid}/comment/`,
-    {
-      is_public: true,
-      description,
-    },
+    `${ENV.apiEndpoint}api/support-issues/${issueUuid}/comment/`,
+    { is_public: true, description },
   );
 };
 
 export const updateComment = (description: string, uuid: string) => {
-  return sendForm('PUT', `${ENV.apiEndpoint}api/support-comments/${uuid}/`, {
-    is_public: true,
-    description,
-  });
+  return sendForm<Comment>(
+    'PUT',
+    `${ENV.apiEndpoint}api/support-comments/${uuid}/`,
+    { is_public: true, description },
+  );
 };
 
 export const deleteComment = (uuid: string) => {
