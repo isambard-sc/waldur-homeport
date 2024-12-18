@@ -9,6 +9,7 @@ import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 interface ComponentAccountingTypeFieldProps {
   removeOfferingQuotas?(): void;
   disabled?: boolean;
+  readOnly?: boolean;
 }
 
 export const getAccountingTypeOptions = () => [
@@ -37,15 +38,19 @@ export const ComponentAccountingTypeField: React.FC<
           props.removeOfferingQuotas();
         }
       }}
-      component={(fieldProps) => (
-        <Select
-          value={fieldProps.input.value}
-          onChange={(value) => fieldProps.input.onChange(value)}
-          options={getAccountingTypeOptions()}
-          isClearable={false}
-          isDisabled={props.disabled}
-        />
-      )}
+      component={(fieldProps) =>
+        props.readOnly ? (
+          fieldProps.input.value.label
+        ) : (
+          <Select
+            value={fieldProps.input.value}
+            onChange={(value) => fieldProps.input.onChange(value)}
+            options={getAccountingTypeOptions()}
+            isClearable={false}
+            isDisabled={props.disabled}
+          />
+        )
+      }
     />
   </FormGroup>
 );

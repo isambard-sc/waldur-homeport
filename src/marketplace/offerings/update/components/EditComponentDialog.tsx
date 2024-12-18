@@ -8,6 +8,7 @@ import { translate } from '@waldur/i18n';
 import { updateOfferingComponent } from '@waldur/marketplace/common/api';
 import { formatComponent } from '@waldur/marketplace/offerings/store/utils';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { TENANT_TYPE } from '@waldur/openstack/constants';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { parseComponent } from '../utils';
@@ -55,7 +56,9 @@ export const EditComponentDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
           <Modal.Title>{translate('Edit component')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ComponentForm />
+          <ComponentForm
+            readOnly={props.resolve.offering.type === TENANT_TYPE}
+          />
         </Modal.Body>
         <Modal.Footer>
           <SubmitButton
