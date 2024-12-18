@@ -1,8 +1,8 @@
 import { reducer as notificationsReducer } from 'reapop';
 import { combineReducers } from 'redux';
-import { reducer as formReducer } from 'redux-form';
 
 import { reducer as drawer } from '@waldur/drawer/reducer';
+import { reducer as form } from '@waldur/form/reducer';
 import { type IssueAttachmentState } from '@waldur/issues/attachments/types';
 import { type IssueCommentState } from '@waldur/issues/comments/types';
 import { reducer as marketplace } from '@waldur/marketplace/store/reducers';
@@ -12,7 +12,7 @@ import { type TableState } from '@waldur/table/types';
 import { reducer as workspace } from '@waldur/workspace/reducers';
 
 export const staticReducers = {
-  form: formReducer,
+  form,
   notifications: notificationsReducer(),
   modal,
   drawer,

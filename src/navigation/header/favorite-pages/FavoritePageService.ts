@@ -90,6 +90,7 @@ const getDataForFavoritePage = async (
   let title = store.getState().title?.title;
   let subtitle = store.getState().title?.subtitle;
   let image;
+  const newParams = params ? { ...params } : {};
   if (state.name.startsWith('marketplace-offering') && params.offering_uuid) {
     const offering = await getProviderOffering(params.offering_uuid, {
       params: { field: ['name', 'customer_name', 'thumbnail'] },
@@ -150,10 +151,15 @@ const getDataForFavoritePage = async (
     title = context.resource?.name;
     image = context.resource?.offering_thumbnail;
     subtitle = `${context.resource?.customer_name} / ${context.resource?.project_name}`;
+    // Add project info, to set the prject filter on click
+    Object.assign(newParams, {
+      project_uuid: context.resource?.project_uuid,
+      project_name: context.resource?.project_name,
+    });
   } else {
     image = '';
   }
-  return { title, subtitle, image };
+  return { title, subtitle, image, params: newParams };
 };
 
 export const useFavoritePages = () => {
@@ -220,7 +226,7 @@ export const useFavoritePages = () => {
         title: data.title || altTitle,
         subtitle: data.subtitle || altSubtitle,
         state: state.name,
-        params,
+        params: data.params,
         image: data.image,
       };
       addFavoritePage(newPage);
