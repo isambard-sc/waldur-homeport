@@ -6315,10 +6315,6 @@
     "description": "customer/list/CustomerExpandableRow.tsx",
     "message": "No invoice data available."
   },
-  "No issues found": {
-    "description": "marketplace/resources/details/ResourceIssues.tsx",
-    "message": "No issues found"
-  },
   "No items found": {
     "description": "administration/remote-offering-sync/RemoteSyncExpandableRow.tsx",
     "message": "No items found"
@@ -9083,6 +9079,10 @@
     "description": "i18n/translate.tsx",
     "message": "Resource is not connected to the service catalog yet."
   },
+  "Resource issues": {
+    "description": "marketplace/resources/details/ResourceIssuesCard.tsx",
+    "message": "Resource issues"
+  },
   "Resource limits change request has been submitted.": {
     "description": "marketplace/resources/change-limits/ChangeLimitsBody.tsx",
     "message": "Resource limits change request has been submitted."
@@ -9676,7 +9676,7 @@
     "message": "Script language: {language}"
   },
   "Search again": {
-    "description": "marketplace/offerings/update/endpoints/OfferingEndpointsSection.tsx, marketplace/offerings/update/options/OfferingOptionsSectionPure.tsx, marketplace/offerings/update/roles/RolesSection.tsx, marketplace/resources/details/ResourceIssues.tsx, table/TablePlaceholder.tsx",
+    "description": "marketplace/offerings/update/endpoints/OfferingEndpointsSection.tsx, marketplace/offerings/update/options/OfferingOptionsSectionPure.tsx, marketplace/offerings/update/roles/RolesSection.tsx, table/TablePlaceholder.tsx",
     "message": "Search again"
   },
   "Search an offering": {
@@ -11418,10 +11418,6 @@
   "There are no projects.": {
     "description": "invitations/actions/useInvitationCreateDialog.ts, project/ProjectBreadcrumbPopover.tsx",
     "message": "There are no projects."
-  },
-  "There are no resource issues.": {
-    "description": "marketplace/resources/details/ResourceIssues.tsx",
-    "message": "There are no resource issues."
   },
   "There are no resource options defined in the offering.": {
     "description": "marketplace/resources/options/UpdateResourceOptionDialog.tsx",
