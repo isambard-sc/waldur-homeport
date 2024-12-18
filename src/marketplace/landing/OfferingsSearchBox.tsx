@@ -20,8 +20,8 @@ const OfferingListItem: FC<{ row: Offering }> = ({ row }) => {
   return (
     <OfferingLink offering_uuid={row.uuid}>
       <div className="d-flex text-dark text-hover-primary align-items-center mb-5">
-        {row.image ? (
-          <Image src={row.image} size={40} classes="me-4" />
+        {row.thumbnail ? (
+          <Image src={row.thumbnail} size={40} classes="me-4" />
         ) : (
           <div className="symbol me-4">
             <ImagePlaceholder
