@@ -19,14 +19,13 @@ export const RoleDescriptionEditDialog = ({ resolve: { row, refetch } }) => {
   };
 
   const initialValues = useMemo(
-    () => ({
-      ...Object.fromEntries(
+    () =>
+      Object.fromEntries(
         ENV.languageChoices.map(({ code }) => [
           `description_${code}`,
           row[`description_${code}`],
         ]),
       ),
-    }),
     [ENV.languageChoices, row],
   );
 

@@ -6,7 +6,7 @@ import { ComponentAccountingTypeField } from './ComponentAccountingTypeField';
 import { ComponentLimit } from './ComponentLimit';
 import { ComponentMeasuredUnitField } from './ComponentMeasuredUnitField';
 
-export const ComponentForm = ({ readOnly }) => (
+export const ComponentForm = ({ readOnly }: { readOnly?: boolean }) => (
   <>
     <InternalNameField name="type" readOnly={readOnly} />
     <DisplayNameField name="name" readOnly={readOnly} />
