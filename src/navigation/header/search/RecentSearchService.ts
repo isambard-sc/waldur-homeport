@@ -10,7 +10,7 @@ interface RecentSearchItem {
   id: string;
   title: string;
   type: 'organization' | 'project' | 'resource';
-  state: string;
+  to: string;
   params?: { [key: string]: string };
 }
 
@@ -59,11 +59,10 @@ export const useRecentSearch = () => {
   );
 
   const findRecentSearchItem = useCallback(
-    (state, params) =>
+    (to, params) =>
       recentSearchItems.find(
         (x) =>
-          x.state === state &&
-          ((!x.params && !params) || isMatch(params, x.params)),
+          x.to === to && ((!x.params && !params) || isMatch(params, x.params)),
       ),
     [recentSearchItems],
   );
@@ -72,13 +71,13 @@ export const useRecentSearch = () => {
     (item: SearchItemProps, type: RecentSearchItem['type']) => {
       const recentItem: Omit<RecentSearchItem, 'id'> = {
         title: item.title,
-        state: item.to,
+        to: item.to,
         params: item.params,
         type,
       };
       event && event.preventDefault();
       recentItem.params = pickBy(recentItem.params, (x) => x !== null);
-      if (findRecentSearchItem(recentItem.state, recentItem.params)) return;
+      if (findRecentSearchItem(recentItem.to, recentItem.params)) return;
       RecentSearchService.add(recentItem);
       setRecentSearchItems(getRecentSearchList());
       event && event.stopPropagation();

@@ -135,7 +135,7 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
       'Counters',
       user?.uuid,
       filtersObj?.customer_uuid,
-      filtersObj?.customer_uuid,
+      filtersObj?.project_uuid,
     ],
     () => getGlobalCounters(filtersObj),
     { refetchOnWindowFocus: false },

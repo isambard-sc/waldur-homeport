@@ -2,9 +2,12 @@ import { Star } from '@phosphor-icons/react';
 import { ReactNode } from 'react';
 
 import { Link } from '@waldur/core/Link';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { ItemIcon } from '@waldur/navigation/workspace/context-selector/ItemIcon';
 
 import { useFavoritePages } from '../favorite-pages/FavoritePageService';
+
+import { getResourceFilterFromSearchItem } from './utils';
 
 import './SearchItem.scss';
 
@@ -25,14 +28,19 @@ export const SearchItem = (props: SearchItemProps) => {
   const isFav = props.isFavorite
     ? props.isFavorite(props.to, props.params)
     : false;
+
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources();
+
   return (
     <Link
       state={props.to}
       params={props.params}
       className="search-result-item d-flex text-dark text-hover-primary align-items-center py-2 px-5 bg-hover-primary-50"
-      onClick={(e) =>
-        props.onClick ? props.onClick(props) : e.stopPropagation()
-      }
+      onClick={(e) => {
+        props.onClick ? props.onClick(props) : e.stopPropagation();
+        syncResourceFilters(getResourceFilterFromSearchItem(props));
+      }}
       aria-hidden={true}
     >
       <ItemIcon

@@ -1,20 +1,14 @@
-import {
-  ArrowClockwise,
-  Buildings,
-  ClipboardText,
-  Plus,
-  SquaresFour,
-} from '@phosphor-icons/react';
+import { Plus } from '@phosphor-icons/react';
 import { groupBy, isEmpty } from 'lodash-es';
 import { Fragment, useCallback, useEffect, useRef } from 'react';
 import { Badge, Button, Col, Nav, Row, Tab } from 'react-bootstrap';
 
-import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 
 import { useFavoritePages } from '../favorite-pages/FavoritePageService';
 
 import { NoResult } from './NoResult';
+import { RecentSearchItem } from './RecentSearchItem';
 import { useRecentSearch } from './RecentSearchService';
 import { SearchInput } from './SearchInput';
 import { SearchItem } from './SearchItem';
@@ -70,37 +64,7 @@ const AllResultsTabContent = ({
           <div className="mb-3">
             <SectionTitle title={translate('Recent')} />
             {recentSearchItems.map((item) => (
-              <Link
-                key={item.id}
-                className="d-flex text-dark text-hover-primary align-items-center py-2 px-5 bg-hover-primary-50"
-                state={item.state}
-                params={item.params}
-                onClick={close}
-              >
-                {item.type === 'organization' ? (
-                  <Buildings
-                    size={22}
-                    weight="bold"
-                    className="text-gray-700 me-4"
-                  />
-                ) : item.type === 'project' ? (
-                  <ClipboardText
-                    size={22}
-                    weight="bold"
-                    className="text-gray-700 me-4"
-                  />
-                ) : (
-                  <SquaresFour
-                    size={22}
-                    weight="bold"
-                    className="text-gray-700 me-4"
-                  />
-                )}
-                <span className="fs-6 fw-semibold flex-grow-1">
-                  {item.title}
-                </span>
-                <ArrowClockwise size={20} className="text-dark" />
-              </Link>
+              <RecentSearchItem key={item.id} item={item} />
             ))}
           </div>
         )}
@@ -198,6 +162,8 @@ const AllResultsTabContent = ({
                       to="marketplace-resource-details"
                       params={{
                         resource_uuid: resource.uuid,
+                        project_uuid: resource.project_uuid, // only for the resources filter
+                        project_name: resource.project_name, // only for the resources filter
                       }}
                       image={resource.offering_thumbnail}
                       title={resource.name}
@@ -334,6 +300,8 @@ const ResourcesTabContent = ({
                   to="marketplace-resource-details"
                   params={{
                     resource_uuid: resource.uuid,
+                    project_uuid: resource.project_uuid, // only for the resources filter
+                    project_name: resource.project_name, // only for the resources filter
                   }}
                   image={resource.offering_thumbnail}
                   title={resource.name}
