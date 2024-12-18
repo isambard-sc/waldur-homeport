@@ -164,7 +164,6 @@ export const IssuesList: FC<OwnProps & Partial<TableProps>> = (props) => {
   return (
     <Table
       {...tableProps}
-      {...props}
       filters={props.filter ? undefined : <IssuesFilter />}
       columns={columns}
       title={translate('Issues')}
@@ -180,6 +179,7 @@ export const IssuesList: FC<OwnProps & Partial<TableProps>> = (props) => {
       expandableRow={({ row }) => (
         <IssuesListExpandableRow row={row} supportOrStaff={supportOrStaff} />
       )}
+      {...props}
     />
   );
 };
