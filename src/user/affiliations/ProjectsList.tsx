@@ -51,7 +51,7 @@ const mandatoryFields = [
 ];
 
 export const ProjectsList = () => {
-  useTitle(translate('Projects'));
+  useTitle(translate('Projects'), '', 'browser');
   const filter = useSelector(mapStateToFilter);
   const props = useTable({
     table: PROJECTS_LIST,

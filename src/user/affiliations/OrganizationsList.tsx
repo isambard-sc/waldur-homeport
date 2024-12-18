@@ -50,7 +50,7 @@ const mapStateToFilter = createSelector(
 );
 
 export const OrganizationsList: FunctionComponent = () => {
-  useTitle(translate('Organizations'));
+  useTitle(translate('Organizations'), '', 'browser');
 
   const filter = useSelector(mapStateToFilter);
 
