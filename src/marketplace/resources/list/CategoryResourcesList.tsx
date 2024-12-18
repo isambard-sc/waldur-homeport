@@ -45,6 +45,8 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
 ) => {
   useTitle(
     translate('{category} resources', { category: ownProps.category_title }),
+    '',
+    'browser',
   );
   const filterValues: any = useSelector(
     getFormValues(CATEGORY_RESOURCES_ALL_FILTER_FORM_ID),
