@@ -44,8 +44,8 @@ export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
             {
               STORAGE_MODE_OPTIONS.find(
                 (op) =>
-                  op.value === props.offering.plugin_options?.storage_mode ||
-                  'fixed',
+                  op.value ===
+                  (props.offering.plugin_options?.storage_mode || 'fixed'),
               )?.label
             }
           </p>
