@@ -823,10 +823,6 @@
     "description": "administration/roles/PermissionOptions.tsx",
     "message": "Approve order"
   },
-  "Approve payment": {
-    "description": "paypal/PaymentApprove.tsx",
-    "message": "Approve payment"
-  },
   "Approve permission request by {name}": {
     "description": "invitations/UserPermissionRequestApproveButton.tsx",
     "message": "Approve permission request by {name}"
@@ -1743,10 +1739,6 @@
     "description": "administration/roles/PermissionOptions.tsx, booking/components/RejectBookingButton.tsx",
     "message": "Cancel order"
   },
-  "Cancel payment": {
-    "description": "paypal/PaymentCancel.tsx",
-    "message": "Cancel payment"
-  },
   "Cancel request": {
     "description": "user/support/UserEmailChangeDialog.tsx",
     "message": "Cancel request"
@@ -2490,10 +2482,6 @@
   "Create": {
     "description": "administration/organizations/OrganizationGroupForm.tsx, administration/remote-offering-sync/RemoteSyncFormDialog.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateDialog.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
     "message": "Create"
-  },
-  "Created a new payment for {customer_link}.": {
-    "description": "paypal/events.ts",
-    "message": "Created a new payment for {customer_link}."
   },
   "Created at": {
     "description": "administration/InvitationList.tsx, administration/agreements/UserAgreementsList.tsx, administration/notifications/NotificationList.tsx, broadcasts/BroadcastList.tsx, invitations/GroupInvitationsList.tsx, invitations/InvitationsList.tsx, invitations/UserPermissionRequestsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/details/OfferingResourcesList.tsx, marketplace/offerings/details/OfferingUsersTable.tsx, marketplace/offerings/details/permissions/OfferingPermissionsList.tsx, marketplace/orders/details/OrderDetailsApprovalsTab.tsx, marketplace/orders/list/OrdersTableComponent.tsx, marketplace/orders/list/ResourceOrders.tsx, marketplace/resources/list/CategoryResourcesList.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/list/ResourcesAllListTable.tsx, marketplace/service-providers/OfferingPermissionsList.tsx, marketplace/service-providers/ProviderCampaignResourceExpandable.tsx, marketplace/service-providers/ProviderProjectResourcesList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, navigation/header/confirmation-drawer/OrderExpandableRow.tsx, project/team/InvitationsList.tsx, proposals/team/InvitationsList.tsx, resource/support/SharedProviderResources.tsx, user/UserOfferingList.tsx, user/UserPermissionRequestsList.tsx",
@@ -4971,10 +4959,6 @@
     "description": "issues/comments/IssueCommentItem.tsx",
     "message": "Internal"
   },
-  "Invalid URL. Unable to parse payment details.": {
-    "description": "paypal/PaymentApprove.tsx, paypal/PaymentCancel.tsx",
-    "message": "Invalid URL. Unable to parse payment details."
-  },
   "Invitation approval": {
     "description": "invitations/InvitationApprove.tsx",
     "message": "Invitation approval"
@@ -7255,21 +7239,9 @@
     "description": "invoices/details/InvoicePayButton.tsx",
     "message": "Pay"
   },
-  "Payment events": {
-    "description": "paypal/events.ts",
-    "message": "Payment events"
-  },
   "Payment failed.": {
     "description": "invoices/details/BillingDetails.tsx",
     "message": "Payment failed."
-  },
-  "Payment for {customer_link} has been approved.": {
-    "description": "paypal/events.ts",
-    "message": "Payment for {customer_link} has been approved."
-  },
-  "Payment for {customer_link} has been cancelled.": {
-    "description": "paypal/events.ts",
-    "message": "Payment for {customer_link} has been cancelled."
   },
   "Payment gateways (monthly)": {
     "description": "customer/payment-profiles/utils.ts",
@@ -7287,17 +7259,9 @@
     "description": "customer/payments/DeletePaymentButton.tsx",
     "message": "Payment has been deleted."
   },
-  "Payment has been processed successfully.": {
-    "description": "paypal/PaymentApprove.tsx, paypal/PaymentCancel.tsx",
-    "message": "Payment has been processed successfully."
-  },
   "Payment has been updated.": {
     "description": "customer/payments/PaymentUpdateDialog.tsx",
     "message": "Payment has been updated."
-  },
-  "Payment is being processed, please wait.": {
-    "description": "paypal/PaymentApprove.tsx, paypal/PaymentCancel.tsx",
-    "message": "Payment is being processed, please wait."
   },
   "Payment profile has been created and enabled.": {
     "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx",
@@ -12414,10 +12378,6 @@
   "Unable to prepare the form.": {
     "description": "proposals/call-management/CallFormDialog.tsx",
     "message": "Unable to prepare the form."
-  },
-  "Unable to process payment.": {
-    "description": "paypal/PaymentApprove.tsx, paypal/PaymentCancel.tsx",
-    "message": "Unable to process payment."
   },
   "Unable to publish Google Calendar.": {
     "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
