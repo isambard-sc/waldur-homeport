@@ -247,6 +247,10 @@ const DescriptionRow = ({ user, isSelf }) => {
   ) : null;
 };
 
+const unixUserNameAlreadySet = (user) => {
+  return !(user.unix_username === "" || !user.unix_username || user.unix_username.length == 0);
+};
+
 const ShortNameRow = ({ user, isSelf }) => {
   return useSelector(getShortNameVisible) ? (
     <UserEditRow
@@ -254,7 +258,7 @@ const ShortNameRow = ({ user, isSelf }) => {
       label={translate('UNIX User name')}
       name="unix_username"
       value={user.unix_username}
-      protected={!user.is_staff}
+      protected={unixUserNameAlreadySet(user)}
       requiredMsg={
         isRequired('short_name')
           ? translate('{pronoun} short name', {
@@ -267,7 +271,8 @@ const ShortNameRow = ({ user, isSelf }) => {
           ? translate('A short, unique name for you. It will be used to form ' +
             'your local username on the systems. Should only ' +
             'contain lower-case letters and digits and must start with ' +
-            'a letter. Must be between 5 - 20 characters long.')
+            'a letter. Must be between 5 - 20 characters long. Once set, ' +
+            'it cannot be changed.')
           : translate('Enter a short name for the user (used for Unix accounts)')
       }
     />
