@@ -3,7 +3,6 @@ import { OrganizationEvents } from '@waldur/customer/events';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { InvoiceEvents } from '@waldur/invoices/events';
 import { IssueEvents } from '@waldur/issues/events';
-import { PaymentEvents } from '@waldur/paypal/events';
 import { RoleEvents } from '@waldur/permissions/events';
 import { ProjectEvents } from '@waldur/project/events';
 import { ResourceEvents } from '@waldur/resource/events';
@@ -54,6 +53,5 @@ registry.registerGroup(ProjectEvents);
 registry.registerGroup(ResourceEvents);
 registry.registerGroup(UserEvents);
 registry.registerGroup(SshEvents);
-registry.registerGroup(PaymentEvents);
 
 export default registry;

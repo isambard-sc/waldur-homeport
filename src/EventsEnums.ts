@@ -65,12 +65,6 @@ export const InvoicesEnum = {
   update_of_credit_by_staff: 'update_of_credit_by_staff',
 };
 
-export const PaymentsEnum = {
-  payment_approval_succeeded: 'payment_approval_succeeded',
-  payment_cancel_succeeded: 'payment_cancel_succeeded',
-  payment_creation_succeeded: 'payment_creation_succeeded',
-};
-
 export const PermissionsEnum = {
   role_granted: 'role_granted',
   role_revoked: 'role_revoked',
