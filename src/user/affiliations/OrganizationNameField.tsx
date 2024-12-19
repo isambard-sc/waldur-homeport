@@ -4,7 +4,13 @@ import { useSelector } from 'react-redux';
 import { Link } from '@waldur/core/Link';
 import { getUser } from '@waldur/workspace/selectors';
 
-export const OrganizationNameField = ({ row, onClick = undefined }) => {
+export const OrganizationNameField = ({
+  row,
+  label = null,
+  onClick = undefined,
+  className = undefined,
+  asButton = false,
+}) => {
   const user = useSelector(getUser);
   const hasOrganizationPermission = useMemo(
     () =>
@@ -28,17 +34,23 @@ export const OrganizationNameField = ({ row, onClick = undefined }) => {
     <Link
       state="organization.dashboard"
       params={{ uuid: row.uuid }}
-      label={row.name}
+      label={label || row.name}
       onClick={onClick}
+      className={className}
     />
   ) : hasProjectPermission ? (
     <Link
       state="marketplace-projects"
       params={{ uuid: row.uuid }}
-      label={row.name}
+      label={label || row.name}
       onClick={onClick}
+      className={className}
     />
+  ) : asButton ? (
+    <button type="button" className={className} disabled>
+      {label || row.name}
+    </button>
   ) : (
-    <>{row.name}</>
+    <>{label || row.name}</>
   );
 };

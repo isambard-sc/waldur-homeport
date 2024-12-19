@@ -6,6 +6,7 @@ import { createSelector } from 'reselect';
 import { OrganizationsFilter } from '@waldur/administration/organizations/OrganizationsFilter';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
+import { OrganizationCard } from '@waldur/customer/list/OrganizationCard';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -49,6 +50,18 @@ const mapStateToFilter = createSelector(
   },
 );
 
+const mandatoryFields = [
+  // Grid view
+  'uuid',
+  'name',
+  'email',
+  'image',
+  'created',
+  'resource_count',
+  'customer_credit',
+  'billing_price_estimate',
+];
+
 export const OrganizationsList: FunctionComponent = () => {
   useTitle(translate('Organizations'), '', 'browser');
 
@@ -59,22 +72,21 @@ export const OrganizationsList: FunctionComponent = () => {
     fetchData: createFetcher('customers'),
     queryField: 'query',
     filter,
+    mandatoryFields,
   });
 
   const { syncResourceFilters } =
     useOrganizationAndProjectFiltersForResources();
+
+  const onClickDetails = (row) =>
+    syncResourceFilters({ organization: row, project: null });
 
   const columns = [
     {
       title: translate('Organization'),
       orderField: 'name',
       render: ({ row }) => (
-        <OrganizationNameField
-          row={row}
-          onClick={() =>
-            syncResourceFilters({ organization: row, project: null })
-          }
-        />
+        <OrganizationNameField row={row} onClick={() => onClickDetails(row)} />
       ),
       keys: ['name'],
       id: 'organization',
@@ -284,6 +296,14 @@ export const OrganizationsList: FunctionComponent = () => {
       columns={columns}
       verboseName={translate('organizations')}
       title={translate('Organizations')}
+      gridSize={{ md: 6, xl: 4 }}
+      gridItem={({ row }) => (
+        <OrganizationCard
+          organization={row}
+          onClickDetails={() => onClickDetails(row)}
+        />
+      )}
+      hoverShadow={{ grid: false }}
       hasQuery={true}
       showPageSizeSelector={true}
       enableExport={true}

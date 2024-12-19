@@ -158,6 +158,7 @@ export interface Customer {
   organization_group_parent_name?: string;
   latitude?: number;
   longitude?: number;
+  customer_credit?: number;
   billing_price_estimate?: BillingPriceEstimate;
   projects?: Project[];
   payment_profiles?: PaymentProfile[];
