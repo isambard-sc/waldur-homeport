@@ -4627,6 +4627,10 @@
     "description": "customer/details/CustomerDetailsPanel.tsx",
     "message": "Identifiers"
   },
+  "Identity claim": {
+    "description": "marketplace/UserPluginOptionsForm.tsx",
+    "message": "Identity claim"
+  },
   "Identity provided has been selected via SAML2 discovery service. You will be redirected to the login page soon.": {
     "description": "auth/callbacks/SAML2DiscoveryCompleted.tsx",
     "message": "Identity provided has been selected via SAML2 discovery service. You will be redirected to the login page soon."
@@ -5067,13 +5071,13 @@
     "description": "invoices/events.ts",
     "message": "Invoice for organization {customer_link} for the period of {period} has been created."
   },
-  "Invoice for organization {customer_link} for the period of {period} has been updated.": {
+  "Invoice for organization {customer_link} for the period of {period} has been paid.": {
     "description": "invoices/events.ts",
-    "message": "Invoice for organization {customer_link} for the period of {period} has been updated."
+    "message": "Invoice for organization {customer_link} for the period of {period} has been paid."
   },
-  "Invoice for organization {customer_name} for the period of {period} has been deleted.": {
+  "Invoice for organization {customer_name} for the period of {period} has been canceled.": {
     "description": "invoices/events.ts",
-    "message": "Invoice for organization {customer_name} for the period of {period} has been deleted."
+    "message": "Invoice for organization {customer_name} for the period of {period} has been canceled."
   },
   "Invoice from": {
     "description": "invoices/details/InvoiceDetails.tsx",

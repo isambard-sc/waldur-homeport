@@ -14,21 +14,21 @@ export const InvoiceEvents: EventGroup = {
   context: getInvoiceContext,
   events: [
     {
-      key: InvoicesEnum.invoice_creation_succeeded,
+      key: InvoicesEnum.invoice_created,
       title: translate(
         'Invoice for organization {customer_link} for the period of {period} has been created.',
       ),
     },
     {
-      key: InvoicesEnum.invoice_deletion_succeeded,
+      key: InvoicesEnum.invoice_canceled,
       title: translate(
-        'Invoice for organization {customer_name} for the period of {period} has been deleted.',
+        'Invoice for organization {customer_name} for the period of {period} has been canceled.',
       ),
     },
     {
-      key: InvoicesEnum.invoice_update_succeeded,
+      key: InvoicesEnum.invoice_paid,
       title: translate(
-        'Invoice for organization {customer_link} for the period of {period} has been updated.',
+        'Invoice for organization {customer_link} for the period of {period} has been paid.',
       ),
     },
   ],
