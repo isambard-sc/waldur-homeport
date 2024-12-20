@@ -1,3 +1,4 @@
+import { omit } from 'lodash-es';
 import { useCallback } from 'react';
 import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
@@ -29,7 +30,12 @@ export const EditComponentDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
       async (formData) => {
         try {
           const data = formatComponent(formData);
-          await updateOfferingComponent(props.resolve.offering.uuid, data);
+          const { offering } = props.resolve;
+          const payload =
+            offering.type === TENANT_TYPE
+              ? omit(data, ['billing_type', 'name', 'measured_unit', 'type'])
+              : data;
+          await updateOfferingComponent(offering.uuid, payload);
           dispatch(
             showSuccess(
               translate('Billing component has been updated successfully.'),
