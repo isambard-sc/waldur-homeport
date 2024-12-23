@@ -21,7 +21,7 @@ export const OfferingFilter: React.FC<{ category_uuid }> = ({
       )
     }
     getOptionLabel={({ name }) => name}
-    getOptionValue={({ url }) => url}
+    getOptionValue={({ uuid }) => uuid}
     required={true}
     {...REACT_SELECT_TABLE_FILTER}
   />
