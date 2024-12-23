@@ -5,15 +5,18 @@ import { Variant } from 'react-bootstrap/esm/types';
 
 import './ProgressSteps.scss';
 
+export interface ProgressStep {
+  key?: string;
+  label: any;
+  description?: any;
+  completed: any;
+  icon?: ReactNode;
+  labelClass?: string;
+  variant?: Variant;
+}
+
 interface ProgressStepsProps {
-  steps: Array<{
-    label: any;
-    description?: any;
-    completed: any;
-    icon?: ReactNode;
-    labelClass?: string;
-    variant?: Variant;
-  }>;
+  steps: ProgressStep[];
   bgClass?: string;
   className?: string;
 }
@@ -36,7 +39,7 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
                 (steps[i - 1] && steps[i - 1].completed && !step.completed);
               return (
                 <div
-                  key={i}
+                  key={step.key ?? i}
                   className={
                     'stepper-item' +
                     (step.completed ? ' completed' : current ? ' current' : '')

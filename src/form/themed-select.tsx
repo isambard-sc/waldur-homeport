@@ -57,7 +57,7 @@ export const FilterSelectControl = ({ children, ...props }: ControlProps) => (
   </components.Control>
 );
 
-const MultiSelectOption = (props) => {
+export const MultiSelectOption = (props) => {
   return (
     <components.Option {...props}>
       <span className="svg-icon svg-icon-4 svg-icon-transparent">
@@ -139,6 +139,21 @@ export const REACT_MULTI_SELECT_TABLE_FILTER: Partial<SelectProps> = {
   },
 };
 
+const REACT_MULTI_SELECT: Partial<SelectProps> = {
+  className: 'metronic-select-container',
+  classNamePrefix: 'metronic-select',
+  isMulti: true,
+  hideSelectedOptions: false,
+  closeMenuOnSelect: false,
+  components: {
+    Option: MultiSelectOption,
+    MultiValue: MultiSelectValue,
+    ValueContainer: MultiSelectLimitedValueContainer,
+    ClearIndicator: FilterSelectClearIndicator,
+  },
+  ...REACT_SELECT_MENU_PORTALING,
+};
+
 const DARK_COLORS = {
   neutral0: '#1A261D',
   neutral10: '#4C6351',
@@ -166,13 +181,17 @@ const useSelectTheme = (): ThemeConfig => {
   };
 };
 
-export const Select = (props) => {
+export const Select = ({ components = undefined, ...props }) => {
   const theme = useSelectTheme();
+  const composedComponents = props.isMulti
+    ? { ...REACT_MULTI_SELECT.components, ...components }
+    : components;
   return (
     <BaseSelect
       theme={theme}
       placeholder={translate('Select') + '...'}
-      {...REACT_SELECT_MENU_PORTALING}
+      {...(props.isMulti ? REACT_MULTI_SELECT : REACT_SELECT_MENU_PORTALING)}
+      components={composedComponents}
       {...props}
     />
   );

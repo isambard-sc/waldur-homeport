@@ -1,9 +1,9 @@
-import { CaretLeft, CaretRight } from '@phosphor-icons/react';
-import classNames from 'classnames';
+import { CaretLeft } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
+import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ActionButton } from '@waldur/table/ActionButton';
 
 interface WizardButtonsProps {
@@ -11,11 +11,13 @@ interface WizardButtonsProps {
   goNext(): void;
   submitting: boolean;
   invalid: boolean;
+  isFirstStep: boolean;
   isLastStep: boolean;
   submitLabel?: string;
 }
 
 export const WizardButtons: FunctionComponent<WizardButtonsProps> = ({
+  isFirstStep,
   isLastStep,
   goBack,
   goNext,
@@ -23,30 +25,32 @@ export const WizardButtons: FunctionComponent<WizardButtonsProps> = ({
   invalid,
   submitLabel,
 }) => (
-  <div className="d-flex justify-content-between mt-3">
-    <ActionButton
-      title={translate('Back')}
-      action={goBack}
-      iconNode={<CaretLeft />}
-      className={classNames(
-        { disabled: submitting },
-        'btn btn-outline btn-secondary',
-      )}
-    />
-    {!isLastStep && (
+  <>
+    {!isFirstStep && (
       <ActionButton
-        title={translate('Next')}
-        action={goNext}
-        iconNode={<CaretRight />}
-        className="btn btn-primary"
+        title={translate('Back')}
+        action={goBack}
+        iconNode={<CaretLeft />}
+        disabled={submitting}
+        className="min-w-125px"
       />
     )}
-    {isLastStep && (
+    <CloseDialogButton className="ms-auto min-w-125px" disabled={submitting} />
+    {isLastStep ? (
       <SubmitButton
         disabled={invalid}
         submitting={submitting}
-        label={submitLabel || translate('Submit')}
+        label={submitLabel || translate('Confirm')}
+        className="btn btn-primary min-w-125px"
+      />
+    ) : (
+      <ActionButton
+        title={translate('Next')}
+        action={goNext}
+        variant="primary"
+        className="min-w-125px"
+        disabled={invalid}
       />
     )}
-  </div>
+  </>
 );

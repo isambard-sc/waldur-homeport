@@ -10,13 +10,15 @@ import { TableDropdownItem } from '@waldur/table/types';
 import { useUser } from '@waldur/workspace/hooks';
 import { getCustomer } from '@waldur/workspace/selectors';
 
+import { OFFERING_IMPORT_FORM_ID } from './import/constants';
+
 const OfferingImportDialog = lazyComponent(() =>
   import('./import/OfferingImportDialog').then((module) => ({
     default: module.OfferingImportDialog,
   })),
 );
 
-export const useOfferingDropdownActions = (): TableDropdownItem[] => {
+export const useOfferingDropdownActions = (refetch?): TableDropdownItem[] => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
   const user = useUser();
@@ -36,7 +38,13 @@ export const useOfferingDropdownActions = (): TableDropdownItem[] => {
       label: translate('Import offerings'),
       iconNode: <Plus />,
       action: () => {
-        dispatch(openModalDialog(OfferingImportDialog, { size: 'lg' }));
+        dispatch(
+          openModalDialog(OfferingImportDialog, {
+            refetch,
+            size: 'lg',
+            formId: OFFERING_IMPORT_FORM_ID,
+          }),
+        );
       },
     },
   ];

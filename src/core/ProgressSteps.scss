@@ -54,11 +54,11 @@
 
         &.completed .stepper-wrapper {
           .stepper-icon {
-            background: var(--bs-green);
+            background: var(--bs-primary);
           }
 
           .stepper-line-area .stepper-line {
-            background: var(--bs-green);
+            background: var(--bs-primary);
           }
         }
 

@@ -38,11 +38,11 @@ export const DeleteOfferingButton = ({ row, refetch }) => {
     try {
       await deleteProviderOffering(row.uuid);
       dispatch(showSuccess(translate('Offering deleted successfully.')));
+      refetch();
     } catch (error) {
       dispatch(
         showErrorResponse(error, translate('Error while deleting offering.')),
       );
-      refetch();
     }
   };
 
