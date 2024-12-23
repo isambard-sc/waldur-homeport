@@ -10,17 +10,24 @@ interface OwnProps {
   label?: string;
   variant?: ButtonVariant;
   className?: string;
+  disabled?: boolean;
 }
 
 export const CloseDialogButton: React.FC<OwnProps> = ({
   label,
   variant = 'outline btn-outline-default',
   className,
+  disabled,
 }) => {
   const { closeDialog } = useModal();
 
   return (
-    <Button className={className} onClick={closeDialog} variant={variant}>
+    <Button
+      className={className}
+      onClick={closeDialog}
+      variant={variant}
+      disabled={disabled}
+    >
       {label || translate('Cancel')}
     </Button>
   );

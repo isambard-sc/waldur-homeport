@@ -108,7 +108,7 @@ export const BaseOfferingsList: FunctionComponent<{
     SLUG_COLUMN,
   ];
 
-  const dropdownActions = useOfferingDropdownActions();
+  const dropdownActions = useOfferingDropdownActions(props.fetch);
 
   return (
     <Table

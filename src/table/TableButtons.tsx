@@ -41,7 +41,9 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
   useEffect(() => {
     setDropdownActions(
       (props.dropdownActions && props.dropdownActions instanceof Array
-        ? props.dropdownActions.filter((x) => x.isMobileAction && isSm)
+        ? props.dropdownActions.filter(
+            (x) => !x.isMobileAction || (x.isMobileAction && isSm),
+          )
         : []
       ).concat(
         showExportInDropdown

@@ -1,38 +1,26 @@
-import classNames from 'classnames';
-import { FunctionComponent } from 'react';
+import { FC, useMemo } from 'react';
 
-import { Step } from './Step';
+import { ProgressStep, ProgressSteps } from '@waldur/core/ProgressSteps';
 
 interface StepsListProps {
-  choices: string[];
-  value: string;
-  onClick?(step: string): void;
+  steps: ProgressStep[];
+  value: ProgressStep;
+  onClick?(step: ProgressStep): void;
   disabled?: boolean;
-  getTabLabel?(tab: string): string;
 }
 
-export const StepsList: FunctionComponent<StepsListProps> = ({
-  getTabLabel = (s) => s,
-  ...props
-}) => {
-  const stepIndex = props.choices.indexOf(props.value);
+export const StepsList: FC<StepsListProps> = (props) => {
+  const steps = useMemo<ProgressStep[]>(() => {
+    const currentIndex = props.steps.findIndex(
+      (step) => step.label === props.value.label,
+    );
+    return props.steps.map((step, i) => ({
+      ...step,
+      completed: currentIndex > i ? true : false,
+    }));
+  }, [props.steps, props.value]);
 
   return (
-    <div
-      className={classNames(
-        { disabled: props.disabled },
-        'shopping-cart-steps',
-      )}
-    >
-      {props.choices.map((stepId, index) => (
-        <Step
-          key={index}
-          title={`${index + 1}. ${getTabLabel(stepId)}`}
-          complete={stepIndex > index}
-          active={stepIndex === index}
-          onClick={() => props.onClick && props.onClick(stepId)}
-        />
-      ))}
-    </div>
+    <ProgressSteps steps={steps} bgClass="bg-body" className="mt-3 mb-10" />
   );
 };

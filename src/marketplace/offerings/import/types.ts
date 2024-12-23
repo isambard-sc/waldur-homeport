@@ -5,6 +5,6 @@ export interface OfferingImportFormData {
   api_url: string;
   token: string;
   customer: Customer;
-  offering: Offering;
-  category: Category;
+  offerings: Offering[];
+  categories_set: Array<{ remote_category: string; local_category: Category }>;
 }

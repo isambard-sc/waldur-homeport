@@ -69,7 +69,7 @@ const ProviderOfferingsComponent: FC<ProviderOfferingsComponentProps> = ({
     queryField: 'name',
     mandatoryFields,
   });
-  const dropdownActions = useOfferingDropdownActions();
+  const dropdownActions = useOfferingDropdownActions(tableProps.fetch);
 
   return (
     <Table
