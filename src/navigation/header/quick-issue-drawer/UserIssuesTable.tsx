@@ -11,9 +11,9 @@ export const UserIssuesTable: FC = () => {
     <IssuesList
       scope={user}
       filter={filter}
-      hiddenColumns={['caller', 'time_in_progress']}
+      hiddenColumns={['caller', 'time_in_progress', 'customer', 'project']}
       title={translate('User issues')}
-      initialPageSize={5}
+      initialPageSize={10}
     />
   );
 };
