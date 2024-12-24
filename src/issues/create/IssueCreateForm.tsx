@@ -61,6 +61,8 @@ const enhance = compose(
   connect<{}, {}, OwnProps>(mapStateToProps),
   reduxForm<IssueFormData, OwnProps>({
     form: ISSUE_CREATION_FORM_ID,
+    enableReinitialize: true,
+    destroyOnUnmount: true,
   }),
 );
 
