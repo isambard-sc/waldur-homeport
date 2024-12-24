@@ -13,6 +13,7 @@ import { FormattedJira } from '@waldur/core/FormattedJira';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
 import { translate } from '@waldur/i18n';
+import { linkify } from '@waldur/issues/utils';
 import { useBreadcrumbs } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { Field } from '@waldur/resource/summary';
@@ -24,12 +25,6 @@ import { IssueCommentsContainer } from './comments/IssueCommentsContainer';
 import { IssueInfoButton } from './IssueInfo';
 import { IssueStatus } from './IssueStatus';
 import { getIssueBreadcrumbItems } from './utils';
-
-const linkify = (s) =>
-  s.replace(
-    /\[(.+?)\|(.+)\]/g,
-    (_, name, href) => `<a href="${href}">${name}</a>`,
-  );
 
 const loadIssue = (id) => getById<any>('/support-issues/', id);
 

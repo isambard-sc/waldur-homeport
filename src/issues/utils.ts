@@ -70,3 +70,9 @@ export const getIssueBreadcrumbItems = (issue: Issue): IBreadcrumbItem[] => {
     },
   ].filter(Boolean) as IBreadcrumbItem[];
 };
+
+export const linkify = (s) =>
+  s.replace(
+    /\[(.+?)\|(.+)\]/g,
+    (_, name, href) => `<a href="${href}">${name}</a>`,
+  );
