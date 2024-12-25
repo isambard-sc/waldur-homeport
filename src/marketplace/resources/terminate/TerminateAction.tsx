@@ -26,7 +26,7 @@ export const TerminateAction: FC<TerminateActionProps> = ({
   refetch,
 }) => {
   const { tooltip, disabled } = useValidators(validators, resource);
-  const action = useModalDialogCallback(TerminateDialog, null, resource, null, {
+  const action = useModalDialogCallback(TerminateDialog, resource, {
     refetch,
   });
   const props = {

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { ModalProps } from 'react-bootstrap';
 
 import { createDeferred } from '@waldur/core/utils';
 
@@ -7,13 +8,14 @@ import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
 
 export type DialogSizeType = 'sm' | 'lg' | 'xl';
 
+export interface AppModalProps extends ModalProps {
+  size?: DialogSizeType;
+  formId?: string;
+}
+
 export const openModalDialog = <P = any>(
   modalComponent: React.ComponentType<P>,
-  modalProps?: P & {
-    size?: DialogSizeType;
-    backdrop?: 'static' | true | false;
-    formId?: string;
-  },
+  modalProps?: P & AppModalProps,
 ) => ({
   type: 'SHOW_MODAL',
   modalComponent,

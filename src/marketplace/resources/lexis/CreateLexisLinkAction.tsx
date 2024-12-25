@@ -29,15 +29,9 @@ export const CreateLexisLinkAction: FC<CreateLexisLinkActionProps> = ({
   refetch,
 }) => {
   const { tooltip, disabled } = useValidators(validators, resource);
-  const action = useModalDialogCallback(
-    CreateLexisLinkDialog,
-    null,
-    resource,
-    null,
-    {
-      refetch,
-    },
-  );
+  const action = useModalDialogCallback(CreateLexisLinkDialog, resource, {
+    refetch,
+  });
   const props = {
     title: translate('Create LEXIS link'),
     action,

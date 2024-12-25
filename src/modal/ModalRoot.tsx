@@ -18,15 +18,13 @@ interface TState {
 }
 
 export const ModalRoot: FunctionComponent = () => {
-  const { modalComponent, modalProps } = useSelector<
-    {
-      modal: TState;
-    },
-    TState
-  >((state: RootState) => state.modal);
+  const { modalComponent, modalProps } = useSelector<{ modal: TState }, TState>(
+    (state: RootState) => state.modal,
+  );
+  const { formId, modalStyle, ...rest } = modalProps || {};
   const dispatch = useDispatch();
   const isDirtyForm = useSelector((state: RootState) =>
-    modalProps?.formId ? isDirty(modalProps.formId)(state) : false,
+    formId ? isDirty(formId)(state) : false,
   );
   const onHide = () => {
     if (
@@ -45,11 +43,9 @@ export const ModalRoot: FunctionComponent = () => {
     <Modal
       show={modalComponent ? true : false}
       onHide={onHide}
-      size={modalProps?.size}
-      backdrop={modalProps?.backdrop}
-      style={modalProps?.modalStyle}
-      dialogClassName={modalProps?.dialogClassName}
+      style={modalStyle}
       centered
+      {...rest}
     >
       <ErrorBoundary fallback={ErrorMessage}>
         {modalComponent
