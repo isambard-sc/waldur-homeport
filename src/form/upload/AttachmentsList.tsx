@@ -9,6 +9,7 @@ interface AttachmentsListProps {
   uploading: AttachmentUploading[];
   ItemComponent: ComponentType<{ attachment }>;
   ItemPendingComponent: ComponentType<{ file; progress; error }>;
+  className?: string;
 }
 
 export const AttachmentsList: FC<AttachmentsListProps> = ({
@@ -16,9 +17,10 @@ export const AttachmentsList: FC<AttachmentsListProps> = ({
   uploading,
   ItemComponent,
   ItemPendingComponent,
+  className,
 }) => {
   return attachments.length > 0 || uploading.length > 0 ? (
-    <ul className="attachment-list">
+    <ul className={'attachment-list' + (className ? ' ' + className : '')}>
       {uploading.map((item) => (
         <li key={item.key}>
           <ItemPendingComponent

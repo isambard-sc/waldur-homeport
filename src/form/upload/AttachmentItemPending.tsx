@@ -5,6 +5,7 @@ import { Button, ProgressBar } from 'react-bootstrap';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
+
 import './AttachmentItem.scss';
 
 interface AttachmentItemPendingProps {
@@ -46,13 +47,13 @@ export const AttachmentItemPending: FC<AttachmentItemPendingProps> = ({
           >
             {translate('Try again')}
           </button>
-        ) : (
+        ) : progress || progress === 0 ? (
           <ProgressBar
             animated={!progress}
             now={progress || 100}
             className="h-8px mt-2"
           />
-        )}
+        ) : null}
       </div>
       <Button
         variant="active-light-danger"
@@ -61,7 +62,7 @@ export const AttachmentItemPending: FC<AttachmentItemPendingProps> = ({
           'btn-icon attachment-item__delete',
           error && 'btn-icon-danger',
         )}
-        disabled={!error}
+        disabled={!error && progress && progress !== 0}
         onClick={() => onCancel(file)}
       >
         <span className="svg-icon svg-icon-2">
