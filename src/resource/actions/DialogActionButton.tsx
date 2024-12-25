@@ -23,10 +23,9 @@ export const DialogActionButton: <T>(
   const validationState = useValidators(validators, resource);
   const callback = useModalDialogCallback(
     modalComponent,
-    dialogSize,
     resource,
-    formId,
     extraResolve,
+    { size: dialogSize, formId },
   );
   if (rowAction) {
     return <RowActionButton {...rest} {...validationState} action={callback} />;

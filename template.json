@@ -11696,7 +11696,7 @@
     "message": "Total storage"
   },
   "Total": {
-    "description": "customer/cost-policies/CostPolicyForm.tsx, customer/cost-policies/utils.ts, customer/dashboard/CreditStatusWidget.tsx, invoices/details/ResourceLimitPeriodsTable.tsx, invoices/list/BillingRecordsList.tsx, invoices/list/InvoicesList.tsx, invoices/list/MonthOverview.tsx, marketplace/deploy/CheckoutFooter.tsx, marketplace/details/plan/OrderSummaryPlanRows.tsx, marketplace/details/plan/PlanDetailsList.tsx, marketplace/details/plan/PlanDetailsTable.tsx, marketplace/details/plan/PlanDetailsTable2.tsx, marketplace/details/plan/TotalLimitComponentsList.tsx, marketplace/details/plan/TotalLimitComponentsTable.tsx, marketplace/resources/change-limits/ChangeLimitsComponent.tsx, reporting/invoices/utils.ts",
+    "description": "customer/cost-policies/CostPolicyForm.tsx, customer/cost-policies/utils.ts, customer/dashboard/CreditStatusWidget.tsx, invoices/details/ResourceLimitPeriodsTable.tsx, invoices/list/BillingRecordsList.tsx, invoices/list/InvoicesList.tsx, invoices/list/MonthOverview.tsx, marketplace/deploy/CheckoutFooter.tsx, marketplace/details/plan/OrderSummaryPlanRows.tsx, marketplace/details/plan/PlanDetailsList.tsx, marketplace/details/plan/PlanDetailsTable.tsx, marketplace/details/plan/PlanDetailsTable2.tsx, marketplace/details/plan/TotalLimitComponentsList.tsx, marketplace/details/plan/TotalLimitComponentsTable.tsx, marketplace/resources/change-limits/ComponentTotalRow.tsx, reporting/invoices/utils.ts",
     "message": "Total"
   },
   "Tracked using UTC timezone, displayed with your browser’s timezone.": {

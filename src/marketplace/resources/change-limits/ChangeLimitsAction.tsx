@@ -20,10 +20,9 @@ const useChangeLimits = ({ resource, refetch }) => {
   const { tooltip, disabled } = useValidators(validators, resource);
   const action = useModalDialogCallback(
     ChangeLimitsDialog,
-    'xl',
     resource,
-    null,
     { refetch },
+    { size: 'xl', fullscreen: 'lg-down', contentClassName: 'overflow-auto' },
   );
   return {
     title: translate('Change limits'),
