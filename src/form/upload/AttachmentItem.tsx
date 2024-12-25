@@ -1,4 +1,4 @@
-import { Trash, Warning } from '@phosphor-icons/react';
+import { File as FileIcon, Trash, Warning } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -50,25 +50,31 @@ export const AttachmentItem: FC<AttachmentItemProps> = ({
       )}
       {attachment.file ? (
         <>
-          <div className="attachment-item__thumb">
-            {attachment.mime_type.startsWith('image') ? (
-              <button
-                className="text-btn text-hover-primary"
-                onClick={openModal}
-              >
-                <ImageFetcher
+          {attachment.file instanceof File ? (
+            <div className="attachment-item__thumb">
+              <FileIcon size={40} className="text-muted" />
+            </div>
+          ) : (
+            <div className="attachment-item__thumb">
+              {attachment.mime_type.startsWith('image') ? (
+                <button
+                  className="text-btn text-hover-primary"
+                  onClick={openModal}
+                >
+                  <ImageFetcher
+                    url={attachment.file}
+                    name={attachment.file_name}
+                    thumb
+                  />
+                </button>
+              ) : (
+                <FileDownloader
                   url={attachment.file}
                   name={attachment.file_name}
-                  thumb
                 />
-              </button>
-            ) : (
-              <FileDownloader
-                url={attachment.file}
-                name={attachment.file_name}
-              />
-            )}
-          </div>
+              )}
+            </div>
+          )}
           <div className="attachment-item__body">
             <h6 className="fw-bold text-gray-700 mb-0">
               {attachment.file_name}

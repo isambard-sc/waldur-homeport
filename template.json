@@ -7191,6 +7191,10 @@
     "description": "project/manage/ProjectGeneral.tsx",
     "message": "Owner"
   },
+  "PDF, PNG, JPG, JPEG, DOCX, DOC or ODT (max. 2 MB)": {
+    "description": "proposals/update/documents/AttachDocumentsDialog.tsx",
+    "message": "PDF, PNG, JPG, JPEG, DOCX, DOC or ODT (max. 2 MB)"
+  },
   "PDF": {
     "description": "marketplace/resources/usage/UsageExportDropdown.tsx",
     "message": "PDF"
