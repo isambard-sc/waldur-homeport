@@ -33,8 +33,6 @@ export const EditSchedulesDialog = connect(
 )(
   reduxForm<{}, { resolve: { offering; refetch } }>({
     form: EDIT_SCHEDULES_FORM_ID,
-    enableReinitialize: true,
-    destroyOnUnmount: true,
   })((props) => {
     const dispatch = useDispatch();
     const update = useCallback(

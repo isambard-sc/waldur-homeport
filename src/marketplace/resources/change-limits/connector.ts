@@ -77,8 +77,6 @@ const mapStateToProps = (state, ownProps: OwnProps): StateProps => {
 export const connector = compose(
   reduxForm<{ plan: any; limits: Limits }, OwnProps>({
     form: FORM_ID,
-    enableReinitialize: true,
-    destroyOnUnmount: true,
   }),
   connect(mapStateToProps),
 );

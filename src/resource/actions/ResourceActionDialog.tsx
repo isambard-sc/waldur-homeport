@@ -34,8 +34,6 @@ const validateJSON = (value: string) => {
 export const ResourceActionDialog = reduxForm<{}, ResourceActionDialogOwnProps>(
   {
     form: RESOURCE_ACTION_FORM,
-    enableReinitialize: true,
-    destroyOnUnmount: true,
   },
 )(({
   submitForm,
