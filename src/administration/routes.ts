@@ -82,6 +82,20 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-celery-info',
+    url: 'celery-info/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./CeleryInfoPage').then((module) => ({
+        default: module.CeleryInfoPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Celery info'),
+    },
+  },
+
+  {
     name: 'admin-branding',
     url: 'branding/',
     parent: 'admin-settings',

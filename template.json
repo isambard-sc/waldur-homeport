@@ -279,6 +279,10 @@
     "description": "administration/routes.ts",
     "message": "Active sessions"
   },
+  "Active tasks": {
+    "description": "administration/CeleryInfoPage.tsx",
+    "message": "Active tasks"
+  },
   "Active": {
     "description": "administration/roles/RolesList.tsx, administration/users/FreeIPAUsersList.tsx, invitations/GroupInvitationsList.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/offerings/update/plans/PlansSection.tsx, marketplace/service-providers/ProviderCampaignStateFilter.tsx, proposals/utils.ts, user/support/UserList.tsx, user/support/utils.ts",
     "message": "Active"
@@ -1818,6 +1822,10 @@
   "Caution! You are impersonating {impersonated}. Logged in as: {impersonator}": {
     "description": "administration/ImpersonationBar.tsx",
     "message": "Caution! You are impersonating {impersonated}. Logged in as: {impersonator}"
+  },
+  "Celery info": {
+    "description": "administration/routes.ts",
+    "message": "Celery info"
   },
   "Challenge code": {
     "description": "auth/valimo/AuthValimoDialog.tsx",
@@ -8963,6 +8971,10 @@
     "description": "booking/utils.ts",
     "message": "Reserved slot"
   },
+  "Reserved tasks": {
+    "description": "administration/CeleryInfoPage.tsx",
+    "message": "Reserved tasks"
+  },
   "Reset avatar": {
     "description": "form/ImageField.tsx",
     "message": "Reset avatar"
@@ -9375,6 +9387,10 @@
     "description": "marketplace/service-providers/OfferingPermissionRemoveButton.tsx",
     "message": "Revoke"
   },
+  "Revoked tasks": {
+    "description": "administration/CeleryInfoPage.tsx",
+    "message": "Revoked tasks"
+  },
   "Robot SSH keys": {
     "description": "marketplace/robot-accounts/RobotAccountExpandable.tsx",
     "message": "Robot SSH keys"
@@ -9610,6 +9626,10 @@
   "Schedule": {
     "description": "openstack/openstack-backup-schedule/BackupSchedulesList.tsx, openstack/openstack-backup-schedule/actions/fields.ts, openstack/openstack-snapshot-schedule/SnapshotSchedulesList.tsx, resource/summary/ScheduleSummary.tsx",
     "message": "Schedule"
+  },
+  "Scheduled tasks": {
+    "description": "administration/CeleryInfoPage.tsx",
+    "message": "Scheduled tasks"
   },
   "Scheduled": {
     "description": "proposals/utils.ts",
@@ -12240,7 +12260,7 @@
     "message": "Unable to load customer support satisfaction overall rating."
   },
   "Unable to load data": {
-    "description": "administration/SystemInfoPage.tsx, invoices/list/OverviewLastMonths.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/expandable/OfferingUsageChart.tsx, marketplace/resources/details/UsageCard.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/dashboard/ProviderWidgets.tsx",
+    "description": "administration/CeleryInfoPage.tsx, administration/SystemInfoPage.tsx, invoices/list/OverviewLastMonths.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/expandable/OfferingUsageChart.tsx, marketplace/resources/details/UsageCard.tsx, marketplace/resources/usage/ResourceShowUsageDialog.tsx, marketplace/service-providers/dashboard/ProviderWidgets.tsx",
     "message": "Unable to load data"
   },
   "Unable to load data.": {
