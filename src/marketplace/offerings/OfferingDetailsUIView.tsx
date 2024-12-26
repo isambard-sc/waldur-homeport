@@ -10,7 +10,7 @@ import {
   getOfferingPlansUsage,
   getProviderOffering,
 } from '@waldur/marketplace/common/api';
-import { Offering } from '@waldur/marketplace/types';
+import { Offering, ServiceProvider } from '@waldur/marketplace/types';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
@@ -18,8 +18,8 @@ import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitte
 import { isExperimentalUiComponentsVisible } from '../utils';
 
 import { PROVIDER_OFFERING_DATA_QUERY_KEY } from './constants';
+import { getOfferingBreadcrumbItems } from './hooks';
 import { OfferingViewHero } from './OfferingViewHero';
-import { getOfferingBreadcrumbItems } from './utils';
 
 const OfferingDetailsStatistics = lazyComponent(() =>
   import(
@@ -182,7 +182,11 @@ const getTabs = (offering: Offering): PageBarTab[] => {
   ].filter(Boolean);
 };
 
-export const OfferingDetailsUIView = () => {
+export const OfferingDetailsUIView = ({
+  provider,
+}: {
+  provider: ServiceProvider;
+}) => {
   const {
     params: { offering_uuid },
   } = useCurrentStateAndParams();
@@ -240,7 +244,8 @@ export const OfferingDetailsUIView = () => {
   );
 
   const breadcrumbItems = useMemo(
-    () => getOfferingBreadcrumbItems(offeringData?.offering),
+    () =>
+      getOfferingBreadcrumbItems(offeringData?.offering, provider, 'details'),
     [offeringData?.offering],
   );
   useBreadcrumbs(breadcrumbItems);

@@ -60,6 +60,11 @@ export const BreadcrumbDropdown: FC<BreadcrumbDropdownProps> = ({
       getNextPageParam: (lastPage) => lastPage.nextPage,
       meta: { api, params: { ...params, [queryField]: query } },
       refetchOnWindowFocus: false,
+      useErrorBoundary: false,
+      retry: false,
+      onError: () => {
+        /* Catch error to prevent showing error boundary view */
+      },
     },
   );
 

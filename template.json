@@ -5696,7 +5696,7 @@
     "message": "Marketplace offerings and resources"
   },
   "Marketplace": {
-    "description": "SettingsDescription.ts, administration/routes.ts, administration/settings/AdministrationBranding.tsx, marketplace/landing/LandingPage.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/utils.ts, navigation/sidebar/UnifiedSidebar.tsx",
+    "description": "SettingsDescription.ts, administration/routes.ts, administration/settings/AdministrationBranding.tsx, marketplace/landing/LandingPage.tsx, marketplace/offerings/hooks.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/utils.ts, navigation/sidebar/UnifiedSidebar.tsx",
     "message": "Marketplace"
   },
   "Mass import of remote offerings": {
@@ -6776,7 +6776,7 @@
     "message": "Offerings images"
   },
   "Offerings": {
-    "description": "administration/dashboard/AdminStatistics.tsx, broadcasts/BroadcastExpandableRow.tsx, broadcasts/BroadcastForm.tsx, broadcasts/RecipientsList.tsx, marketplace/category/AllOfferingsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/category/utils.ts, marketplace/landing/OfferingsGroup.tsx, marketplace/offerings/import/ImportReviewTab.tsx, marketplace/offerings/import/SelectCategoryTab.tsx, marketplace/offerings/import/SelectOfferingTab.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/service-providers/CampaignForm.tsx, marketplace/service-providers/CampaignUpdateForm.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace/utils.ts, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx, proposals/details/CallOfferingsCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/offerings/CallOfferingsSection.tsx",
+    "description": "administration/dashboard/AdminStatistics.tsx, broadcasts/BroadcastExpandableRow.tsx, broadcasts/BroadcastForm.tsx, broadcasts/RecipientsList.tsx, marketplace/category/AllOfferingsList.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/category/utils.ts, marketplace/landing/OfferingsGroup.tsx, marketplace/offerings/hooks.tsx, marketplace/offerings/import/ImportReviewTab.tsx, marketplace/offerings/import/SelectCategoryTab.tsx, marketplace/offerings/import/SelectOfferingTab.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/service-providers/CampaignForm.tsx, marketplace/service-providers/CampaignUpdateForm.tsx, marketplace/service-providers/ProviderDetailsBody.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/ServiceProvidersList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace/service-providers/details/ServiceProviderDetails.tsx, marketplace/utils.ts, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx, proposals/details/CallOfferingsCard.tsx, proposals/details/PublicCallDetailsContainer.tsx, proposals/update/CallUpdateContainer.tsx, proposals/update/offerings/CallOfferingsSection.tsx",
     "message": "Offerings"
   },
   "Ok": {
@@ -11416,7 +11416,7 @@
     "message": "There are no offerings"
   },
   "There are no offerings.": {
-    "description": "marketplace/landing/OfferingsSearchBox.tsx, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx",
+    "description": "marketplace/landing/OfferingsSearchBox.tsx, marketplace/offerings/OfferingBreadcrumbPopover.tsx, navigation/sidebar/marketplace-popup/OfferingsPanel.tsx",
     "message": "There are no offerings."
   },
   "There are no open rounds. The call is closed.": {
@@ -11722,6 +11722,10 @@
   "Type in name of offering or provider": {
     "description": "marketplace/landing/OfferingsSearchBox.tsx",
     "message": "Type in name of offering or provider"
+  },
+  "Type in name of offering": {
+    "description": "marketplace/offerings/OfferingBreadcrumbPopover.tsx",
+    "message": "Type in name of offering"
   },
   "Type in name of project": {
     "description": "project/ProjectBreadcrumbPopover.tsx",

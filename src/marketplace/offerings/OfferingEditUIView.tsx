@@ -10,7 +10,7 @@ import {
   getPlugins,
   getProviderOffering,
 } from '@waldur/marketplace/common/api';
-import { Offering } from '@waldur/marketplace/types';
+import { Offering, ServiceProvider } from '@waldur/marketplace/types';
 import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constants';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { PageBarTab } from '@waldur/navigation/types';
@@ -26,10 +26,10 @@ import {
 import { ValidationIcon } from '../common/ValidationIcon';
 
 import { PROVIDER_OFFERING_DATA_QUERY_KEY } from './constants';
+import { getOfferingBreadcrumbItems } from './hooks';
 import { OfferingViewHero } from './OfferingViewHero';
 import { getServiceSettingsForm } from './update/integration/registry';
 import { SCRIPT_ROWS } from './update/integration/utils';
-import { getOfferingBreadcrumbItems } from './utils';
 
 const OverviewSection = lazyComponent(() =>
   import('./update/overview/OverviewSection').then((module) => ({
@@ -242,7 +242,11 @@ const getTabs = (offering: Offering): PageBarTab[] => {
   return tabs;
 };
 
-export const OfferingEditUIView = () => {
+export const OfferingEditUIView = ({
+  provider,
+}: {
+  provider: ServiceProvider;
+}) => {
   const {
     params: { offering_uuid },
   } = useCurrentStateAndParams();
@@ -285,7 +289,7 @@ export const OfferingEditUIView = () => {
   );
 
   const breadcrumbItems = useMemo(
-    () => getOfferingBreadcrumbItems(data?.offering),
+    () => getOfferingBreadcrumbItems(data?.offering, provider, 'edit'),
     [data?.offering],
   );
   useBreadcrumbs(breadcrumbItems);
