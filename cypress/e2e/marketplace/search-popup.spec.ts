@@ -199,49 +199,44 @@ describe('Search Popup', () => {
         },
       ])
       .intercept(
-        'GET',
-        'api/marketplace-resources/?query=ccc&state=Creating&state=OK&state=Erred&state=Updating&state=Terminating&field=name&field=uuid&field=category_title&field=offering_thumbnail&field=customer_name&field=project_name&field=project_uuid&field=state',
-        (req) => {
-          req.reply({
-            body: [],
-            headers: {
-              'x-result-count': '0',
-            },
-          });
+        {
+          method: 'GET',
+          pathname: '/api/marketplace-resources/',
+          query: { query: 'ccc' },
         },
+        { body: [], headers: { 'x-result-count': '0' } },
       )
       .intercept(
-        'GET',
-        'api/marketplace-resources/?query=admin&state=Creating&state=OK&state=Erred&state=Updating&state=Terminating&field=name&field=uuid&field=category_title&field=offering_thumbnail&field=customer_name&field=project_name&field=project_uuid&field=state',
-        (req) => {
-          req.reply({
-            headers: {
-              'x-result-count': '2',
+        {
+          method: 'GET',
+          pathname: '/api/marketplace-resources/',
+          query: { query: 'admin' },
+        },
+        {
+          headers: { 'x-result-count': '2' },
+          body: [
+            {
+              offering_thumbnail: null,
+              category_title: 'Private clouds',
+              uuid: 'bfd8892313df41dea830c3bb1add09a3',
+              state: 'OK',
+              project_uuid: '635e9c2d57ae48f28973f5d455fda3fd',
+              project_name: 'First project',
+              customer_name: 'test',
+              name: 'admin',
             },
-            body: [
-              {
-                offering_thumbnail: null,
-                category_title: 'Private clouds',
-                uuid: 'bfd8892313df41dea830c3bb1add09a3',
-                state: 'OK',
-                project_uuid: '635e9c2d57ae48f28973f5d455fda3fd',
-                project_name: 'First project',
-                customer_name: 'test',
-                name: 'admin',
-              },
-              {
-                offering_thumbnail:
-                  'https://demo-next.waldur.com/media/files/marketplace_service_offering_thumbnails/Desktop_Ubuntu_20.04.png',
-                category_title: 'VMs',
-                uuid: '88041d6695c34d53ae512cedd14fb14b',
-                state: 'OK',
-                project_uuid: '559cee11d35a444395522b63e95e670d',
-                project_name: 'First project',
-                customer_name: 'Demo Org',
-                name: 'admin',
-              },
-            ],
-          });
+            {
+              offering_thumbnail:
+                'https://demo-next.waldur.com/media/files/marketplace_service_offering_thumbnails/Desktop_Ubuntu_20.04.png',
+              category_title: 'VMs',
+              uuid: '88041d6695c34d53ae512cedd14fb14b',
+              state: 'OK',
+              project_uuid: '559cee11d35a444395522b63e95e670d',
+              project_name: 'First project',
+              customer_name: 'Demo Org',
+              name: 'admin',
+            },
+          ],
         },
       )
       .setToken()
