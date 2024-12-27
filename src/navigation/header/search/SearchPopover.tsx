@@ -134,7 +134,11 @@ const AllResultsTabContent = ({
                   <SearchItem
                     key={item.uuid}
                     to="project.dashboard"
-                    params={{ uuid: item.uuid }}
+                    params={{
+                      uuid: item.uuid,
+                      customer_uuid: item.customer_uuid, // only for the resources filter
+                      customer_name: item.customer_name, // only for the resources filter
+                    }}
                     title={item.name}
                     subtitle={item.customer_name}
                     image={item.image}
@@ -164,6 +168,8 @@ const AllResultsTabContent = ({
                         resource_uuid: resource.uuid,
                         project_uuid: resource.project_uuid, // only for the resources filter
                         project_name: resource.project_name, // only for the resources filter
+                        customer_uuid: resource.customer_uuid, // only for the resources filter
+                        customer_name: resource.customer_name, // only for the resources filter
                       }}
                       image={resource.offering_thumbnail}
                       title={resource.name}
@@ -250,7 +256,11 @@ const ProjectsTabContent = ({
             <SearchItem
               key={item.uuid}
               to="project.dashboard"
-              params={{ uuid: item.uuid }}
+              params={{
+                uuid: item.uuid,
+                customer_uuid: item.customer_uuid, // only for the resources filter
+                customer_name: item.customer_name, // only for the resources filter
+              }}
               title={item.name}
               subtitle={item.customer_name}
               image={item.image}
@@ -302,6 +312,8 @@ const ResourcesTabContent = ({
                     resource_uuid: resource.uuid,
                     project_uuid: resource.project_uuid, // only for the resources filter
                     project_name: resource.project_name, // only for the resources filter
+                    customer_uuid: resource.customer_uuid, // only for the resources filter
+                    customer_name: resource.customer_name, // only for the resources filter
                   }}
                   image={resource.offering_thumbnail}
                   title={resource.name}

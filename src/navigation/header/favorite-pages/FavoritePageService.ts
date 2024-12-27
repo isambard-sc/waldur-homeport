@@ -145,16 +145,23 @@ const getDataForFavoritePage = async (
     title = context.project?.name;
     image = context.project?.image;
     subtitle = titleFromState;
+    // Add organization info, to set the resources filter on click
+    Object.assign(newParams, {
+      customer_uuid: context.resource?.customer_uuid,
+      customer_name: context.resource?.customer_name,
+    });
   } else if (state.name === 'all-resources') {
     title = translate('List of all resources');
   } else if (state.name === 'marketplace-resource-details') {
     title = context.resource?.name;
     image = context.resource?.offering_thumbnail;
     subtitle = `${context.resource?.customer_name} / ${context.resource?.project_name}`;
-    // Add project info, to set the prject filter on click
+    // Add project and organization info, to set the resources filter on click
     Object.assign(newParams, {
       project_uuid: context.resource?.project_uuid,
       project_name: context.resource?.project_name,
+      customer_uuid: context.resource?.customer_uuid,
+      customer_name: context.resource?.customer_name,
     });
   } else {
     image = '';
