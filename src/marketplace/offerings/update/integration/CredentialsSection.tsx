@@ -32,7 +32,7 @@ export const CredentialsSection: FC<OfferingEditPanelProps> = (props) => {
       className="card-bordered mb-7"
     >
       <FormTable>
-        <OfferingScopeState offering={props.offering} />
+        <OfferingScopeState state={props.offering.scope_state} />
         {allowToUpdateService(props.offering.type) && ServiceSettingsForm ? (
           <ServiceSettingsForm
             offering={props.offering}
