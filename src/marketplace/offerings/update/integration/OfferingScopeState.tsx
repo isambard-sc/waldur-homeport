@@ -10,7 +10,7 @@ const variant = {
   Deleting: 'warning',
 };
 
-export const OfferingScopeState = ({ state = 'missing' }) => (
+export const OfferingScopeState = ({ state }) => (
   <FormTable.Item
     label={translate('State')}
     value={
