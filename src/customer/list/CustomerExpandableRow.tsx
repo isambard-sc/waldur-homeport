@@ -46,6 +46,7 @@ export const CustomerExpandableRow = memo((props: any) => {
           <InvoicesStatsList
             organization={props.row}
             invoiceUuid={value.uuid}
+            providerUUID={props.providerUUID}
           />
         ) : (
           <p className="text-center">
