@@ -132,11 +132,15 @@ const FormSummaryStep: React.FC<FormSummaryStepProps> = (props) => {
         </FloatingButton>
       </Panel>
 
-      <SubmitButton
-        submitting={props.submitting}
-        label={translate('Submit review')}
-      />
-      <TosNotification className="text-center text-grey-500 mb-0" />
+      {!disabled && (
+        <>
+          <SubmitButton
+            submitting={props.submitting}
+            label={translate('Submit review')}
+          />
+          <TosNotification className="text-center text-grey-500 mb-0" />
+        </>
+      )}
     </div>
   );
 };
