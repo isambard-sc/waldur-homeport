@@ -18,7 +18,11 @@ const CostField = ({ invoiceStats, organization }) =>
 export const InvoicesStatsList = (props: any) => {
   const tableProps = useTable({
     table: [INVOICES_STATS_TABLE, props.invoiceUuid].join('-'),
-    fetchData: createFetcher(`invoices/${props.invoiceUuid}/stats`),
+    fetchData: createFetcher(`invoices/${props.invoiceUuid}/stats`, {
+      params: {
+        provider_uuid: props.providerUUID,
+      },
+    }),
   });
   const columns = [
     {
