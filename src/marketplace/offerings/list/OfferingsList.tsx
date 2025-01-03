@@ -7,6 +7,7 @@ import {
   getOfferingTypes,
 } from '@waldur/marketplace/common/registry';
 import { createFetcher } from '@waldur/table/api';
+import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -104,6 +105,14 @@ export const BaseOfferingsList: FunctionComponent<{
       exportKeys: ['type'],
       keys: ['type'],
       id: 'type',
+    },
+    {
+      title: translate('Shared'),
+      render: ({ row }) => <BooleanField value={row.shared} />,
+      id: 'shared',
+      filter: 'shared',
+      keys: ['shared'],
+      optional: true,
     },
     SLUG_COLUMN,
   ];

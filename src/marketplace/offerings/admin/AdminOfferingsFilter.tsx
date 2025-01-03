@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react';
-import { reduxForm } from 'redux-form';
+import { Field, reduxForm } from 'redux-form';
 
+import { SelectField } from '@waldur/form';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OfferingTypeAutocomplete } from '@waldur/marketplace/offerings/details/OfferingTypeAutocomplete';
@@ -15,6 +16,17 @@ interface AdminOfferingsFilterOwnProps {
   showCategory?;
   showOrganization?;
 }
+
+const sharedOptions = [
+  {
+    label: translate('No'),
+    value: false,
+  },
+  {
+    label: translate('Yes'),
+    value: true,
+  },
+];
 
 const PureAdminOfferingsFilter: FunctionComponent<
   AdminOfferingsFilterOwnProps
@@ -50,6 +62,28 @@ const PureAdminOfferingsFilter: FunctionComponent<
         <CategoryFilter />
       </TableFilterItem>
     ) : null}
+    <TableFilterItem
+      name="shared"
+      title={translate('Shared')}
+      getValueLabel={(value) =>
+        sharedOptions.find((op) => op.value === value).label
+      }
+    >
+      <Field
+        name="shared"
+        component={(fieldProps) => (
+          <SelectField
+            {...fieldProps}
+            placeholder={translate('Select status')}
+            options={sharedOptions}
+            noUpdateOnBlur={true}
+            simpleValue={true}
+            isClearable={true}
+            {...REACT_SELECT_TABLE_FILTER}
+          />
+        )}
+      />
+    </TableFilterItem>
   </>
 );
 
