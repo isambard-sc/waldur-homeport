@@ -1671,6 +1671,14 @@
     "description": "administration/organizations/OrganizationsFilter.tsx",
     "message": "Call managing organization"
   },
+  "Call must have a round to be activated.": {
+    "description": "proposals/update/CallActions.tsx",
+    "message": "Call must have a round to be activated."
+  },
+  "Call must have reviewers to be activated.": {
+    "description": "proposals/update/CallActions.tsx",
+    "message": "Call must have reviewers to be activated."
+  },
   "Call round": {
     "description": "proposals/round/RoundUIView.tsx",
     "message": "Call round"
@@ -10336,7 +10344,7 @@
     "message": "Shared user password"
   },
   "Shared": {
-    "description": "marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/list/OfferingsList.tsx, openstack/openstack-instance/deploy/FormFlavorStep.tsx",
+    "description": "marketplace/category/PublicOfferingsList.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/list/OfferingsList.tsx, openstack/openstack-instance/deploy/FormFlavorStep.tsx",
     "message": "Shared"
   },
   "Shared/Billing enabled": {
@@ -14195,13 +14203,13 @@
     "description": "vmware/DisksList.tsx",
     "message": "disks"
   },
-  "e.g. 123456789": {
-    "description": "invitations/actions/create/EmailsListGroup.tsx",
-    "message": "e.g. 123456789"
-  },
   "e.g. Community Health Outreach": {
     "description": "project/create/NameGroup.tsx",
     "message": "e.g. Community Health Outreach"
+  },
+  "e.g. EE123456789": {
+    "description": "invitations/actions/create/EmailsListGroup.tsx",
+    "message": "e.g. EE123456789"
   },
   "e.g. MyApp": {
     "description": "rancher/template/NamespaceField.tsx",
