@@ -35,7 +35,7 @@ export type Fetcher = <RowType = any>(
 
 export interface TableOptionsType<RowType = any> {
   table: string;
-  fetchData: any;
+  fetchData: (request: TableRequest) => any;
   onFetch?: (rows: RowType[], totalCount: number, firstFetch: boolean) => void;
   onApplyFilter?: (filters: FilterItem[]) => void;
   staleTime?: number;
@@ -63,10 +63,13 @@ export interface Column<RowType = any> {
   keys?: string[];
   optional?: boolean;
   filter?: string;
+  /** Enable it so that a filter icon appears on the row when hovering. By clicking on it, the filter defined here will be added. */
+  inlineFilter?: (row: RowType) => any;
   export?: string | boolean | ((row: RowType) => string | number);
   exportTitle?: string;
   exportKeys?: string[];
   disabledClick?: boolean;
+  ellipsis?: boolean;
 }
 
 export type DisplayMode = 'table' | 'grid';
@@ -160,7 +163,8 @@ export interface TableProps<RowType = any> extends TableState {
   id?: string;
   rowClass?: (({ row }) => string) | string;
   hoverable?: boolean;
-  minHeight?: number;
+  hoverShadow?: { table?: boolean; grid?: boolean } | boolean;
+  minHeight?: number | 'auto';
   cardBordered?: boolean;
   showPageSizeSelector?: boolean;
   updatePageSize?: (size: number) => void;

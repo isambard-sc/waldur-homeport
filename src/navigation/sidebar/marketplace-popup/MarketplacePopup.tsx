@@ -8,8 +8,10 @@ import { FilterBox } from '@waldur/form/FilterBox';
 import { translate } from '@waldur/i18n';
 import { setMarketplaceFilter } from '@waldur/marketplace/landing/filter/store/actions';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
+import { ALL_RESOURCES_TABLE_ID } from '@waldur/marketplace/resources/list/constants';
 import { ProjectFilter } from '@waldur/marketplace/resources/list/ProjectFilter';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { selectFiltersStorage } from '@waldur/table/selectors';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import { DataLoader } from './DataLoader';
@@ -38,21 +40,32 @@ export const MarketplacePopup = reduxForm<FormData, MarketplacePopupProps>({
   const dispatch = useDispatch<any>();
   const formValues = useSelector(getFormValues(props.form)) as FormData;
 
+  // Apply active sidebar resources filters
+  const sidebarResourcesFilters = useSelector((state: any) => {
+    const filters = selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID);
+    if (!filters?.length) return null;
+    const project = filters.find((item) => item.name === 'project');
+    const organization = filters.find((item) => item.name === 'organization');
+    return { project: project?.value, organization: organization?.value };
+  });
+
   // Init filters (if exists)
+  // props.resolve filter is preferred over sidebar resources filter
   const [ready, setReady] = useState(false); // To avoid unnecessary fetching of categories data
   useEffect(() => {
-    dispatch(props.change('organization', props.resolve?.organization));
-    dispatch(props.change('project', props.resolve?.project));
+    const preferredFilter =
+      props.resolve?.organization || props.resolve?.project
+        ? props.resolve
+        : sidebarResourcesFilters;
+    dispatch(props.change('organization', preferredFilter?.organization));
+    dispatch(props.change('project', preferredFilter?.project));
     setReady(true);
   }, []);
 
   // Clear project filter if organization is cleared
   useEffect(() => {
-    if (!formValues?.project) return;
-    if (
-      !formValues?.organization ||
-      formValues.organization.uuid !== formValues.project.customer_uuid
-    ) {
+    if (!formValues?.project || !formValues?.organization) return;
+    if (formValues.organization?.uuid !== formValues.project.customer_uuid) {
       dispatch(props.change('project', undefined));
     }
   }, [formValues, props.change]);

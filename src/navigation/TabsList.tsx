@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {
-  UISref,
   UISrefActive,
   UISrefProps,
   useOnStateChanged,
@@ -9,20 +8,25 @@ import {
 import classNames from 'classnames';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 
+import { Link } from '@waldur/core/Link';
+
 import { useTabs } from './useTabs';
 
-const MenuLink: FunctionComponent<UISrefProps & { disabled?: boolean }> = ({
-  to,
-  params,
-  disabled,
-  children,
-}) =>
+const MenuLink: FunctionComponent<
+  UISrefProps & { className?: string; disabled?: boolean }
+> = ({ to, params, disabled, children, className }) =>
   to && !disabled ? (
-    <UISref to={to} params={params}>
+    <Link
+      state={to}
+      params={params}
+      className={classNames('menu-link', className)}
+    >
       {children}
-    </UISref>
+    </Link>
   ) : (
-    children
+    <a className={classNames('menu-link', disabled && 'disabled', className)}>
+      {children}
+    </a>
   );
 
 const findActiveTab = (tabs, router) =>
@@ -59,21 +63,22 @@ export const TabsList: FunctionComponent = () => {
             key={parentIndex}
           >
             <MenuLink to={parentTab.to}>
-              <a className="menu-link">
-                <span className="menu-title">{parentTab.title}</span>
-                <span className="menu-arrow" />
-              </a>
+              <span className="menu-title">{parentTab.title}</span>
+              <span className="menu-arrow" />
             </MenuLink>
             <div className="menu-sub menu-sub-down-accordion menu-sub-dropdown px-2 py-4 w-200px">
               {parentTab.children.map((childTab, childIndex) => (
                 <UISrefActive class="showing" key={childIndex}>
-                  <UISref to={childTab.to} params={childTab.params}>
-                    <a className="menu-item" data-kt-menu-trigger="click">
-                      <span className="menu-link">
-                        <span className="menu-title">{childTab.title}</span>
-                      </span>
-                    </a>
-                  </UISref>
+                  <Link
+                    state={childTab.to}
+                    params={childTab.params}
+                    className="menu-item"
+                    data-kt-menu-trigger="click"
+                  >
+                    <span className="menu-link">
+                      <span className="menu-title">{childTab.title}</span>
+                    </span>
+                  </Link>
                 </UISrefActive>
               ))}
             </div>
@@ -91,14 +96,7 @@ export const TabsList: FunctionComponent = () => {
               params={parentTab.params}
               disabled={parentTab.disabled}
             >
-              <a
-                className={classNames(
-                  'menu-link py-3',
-                  parentTab.disabled && 'disabled',
-                )}
-              >
-                <span className="menu-title">{parentTab.title}</span>
-              </a>
+              <span className="menu-title">{parentTab.title}</span>
             </MenuLink>
           </span>
         ) : null,

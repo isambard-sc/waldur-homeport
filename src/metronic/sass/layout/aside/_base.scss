@@ -85,7 +85,7 @@
   }
 
   &.aside-accent {
-    background-color: if(isDarkMode(), get($aside-config, bg-color), $white);
+    background-color: var(--waldur-aside-bg-color);
 
     .aside-logo {
       h3 {

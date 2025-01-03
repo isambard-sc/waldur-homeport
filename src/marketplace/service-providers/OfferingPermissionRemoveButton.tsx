@@ -9,7 +9,8 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer } from '@waldur/workspace/selectors';
 
 interface OfferingPermissionRemoveButtonProps {
   permission: any;
@@ -19,7 +20,7 @@ interface OfferingPermissionRemoveButtonProps {
 export const OfferingPermissionRemoveButton: React.FC<
   OfferingPermissionRemoveButtonProps
 > = (props) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const customer = useSelector(getCustomer);
   const canDeletePermission = hasPermission(user, {
     permission: PermissionEnum.DELETE_OFFERING_PERMISSION,

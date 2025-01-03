@@ -3,7 +3,7 @@ import { Field } from 'redux-form';
 
 import {
   AsyncPaginate,
-  REACT_SELECT_TABLE_FILTER,
+  REACT_MULTI_SELECT_TABLE_FILTER,
 } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
@@ -22,9 +22,8 @@ export const OrganizationGroupFilter: FunctionComponent = () => (
         value={fieldProps.input.value}
         onChange={(value) => fieldProps.input.onChange(value)}
         noOptionsMessage={() => translate('No organization group types')}
-        isMulti={true}
         isClearable={true}
-        {...REACT_SELECT_TABLE_FILTER}
+        {...REACT_MULTI_SELECT_TABLE_FILTER}
       />
     )}
   />

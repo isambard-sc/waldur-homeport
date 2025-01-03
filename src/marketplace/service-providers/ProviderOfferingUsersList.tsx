@@ -44,6 +44,10 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
           title: translate('Organization'),
           render: ({ row }) => row.customer_name,
           filter: 'provider',
+          inlineFilter: (row) => ({
+            customer_name: row.customer_name,
+            customer_uuid: row.customer_uuid,
+          }),
         },
       ]
     : [];
@@ -58,6 +62,10 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
         />
       ),
       filter: 'offering',
+      inlineFilter: (row) => ({
+        name: row.offering_name,
+        uuid: row.offering_uuid,
+      }),
     },
     ...organizationColumn,
     {

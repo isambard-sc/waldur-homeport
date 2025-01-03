@@ -5,7 +5,7 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
 import { hasSupport } from '@waldur/issues/hooks';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 const QuickIssueContainer = lazyComponent(() =>
   import('../navigation/header/quick-issue-drawer/QuickIssueContainer').then(
@@ -15,7 +15,7 @@ const QuickIssueContainer = lazyComponent(() =>
 
 export const IssuesLink: React.FC = () => {
   const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const user = useUser();
   const showIssues = useSelector(hasSupport);
 
   const openDrawer = () => {

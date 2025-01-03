@@ -9,6 +9,7 @@ import { LandingHeroSection } from '@waldur/dashboard/hero/LandingHeroSection';
 import { translate } from '@waldur/i18n';
 import { OfferingsFilter } from '@waldur/marketplace/offerings/list/OfferingsFilter';
 import { OfferingStateCell } from '@waldur/marketplace/offerings/list/OfferingStateCell';
+import { getStates } from '@waldur/marketplace/offerings/list/OfferingStateFilter';
 import { PUBLIC_OFFERINGS_FILTER_FORM_ID } from '@waldur/marketplace/offerings/store/constants';
 import { useFullPage } from '@waldur/navigation/context';
 import { AvailableOfferingCard } from '@waldur/proposals/AvailableOfferingCard';
@@ -81,6 +82,8 @@ export const CallsAvailableOfferingsPage: FunctionComponent = () => {
               title: translate('State'),
               render: OfferingStateCell,
               filter: 'state',
+              inlineFilter: (row) =>
+                getStates().filter((s) => s.value === row.state),
             },
           ]}
           gridItem={({ row }) => (

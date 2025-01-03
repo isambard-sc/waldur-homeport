@@ -2,7 +2,7 @@ import italics from '@fontsource/open-sans/files/open-sans-all-400-italic.woff';
 import normal from '@fontsource/open-sans/files/open-sans-all-400-normal.woff';
 import bolditalics from '@fontsource/open-sans/files/open-sans-all-800-italic.woff';
 import bold from '@fontsource/open-sans/files/open-sans-all-800-normal.woff';
-import pdfmake from 'pdfmake/build/pdfmake';
+import pdfmake from 'pdfmake/build/pdfmake.min';
 
 import { saveFile } from './saveFile';
 
@@ -13,7 +13,7 @@ function saveAsPdf(table, data) {
 
 const getAbsolutePath = (path) => new URL(path, document.baseURI).href;
 
-const getFonts = () => ({
+export const getFonts = () => ({
   OpenSans: {
     normal: getAbsolutePath(normal),
     bold: getAbsolutePath(bold),

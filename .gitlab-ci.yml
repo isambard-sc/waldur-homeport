@@ -13,7 +13,10 @@ include:
     file: "/templates/test/lint-md-files.yml"
   - project: "waldur/waldur-pipelines"
     file: "/templates/deploy/dev-env-update.yml"
-
+  - project: "waldur/waldur-pipelines"
+    file: "/templates/sbom/upload-sboms-to-docs.yml"
+  - project: "waldur/waldur-pipelines"
+    file: "/templates/sbom/generate-image-sbom.yml"
 variables:
   COMPONENT_VERSION: "latest"
 
@@ -218,6 +221,33 @@ Lint dockerfile:
         - DL3018 # "versions for `apk add`" warning
   before_script: []
 
+Generate Image SBOM:
+  extends: .Generate Image SBOM template
+  variables:
+    PROJECT_NAME: "waldur-homeport"
+
+Generate Codebase SBOM:
+  stage: build
+  image: registry.hpc.ut.ee/mirror/library/node:lts-alpine
+  interruptible: true
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+$/'
+  cache: []
+  before_script: []
+  script:
+    - apk add git || echo "Non-Alpine image, skipping"
+    - yarn set version berry
+    - yarn install --no-immutable
+    - yarn dlx -q @cyclonedx/yarn-plugin-cyclonedx --spec-version 1.6 --output-file waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.json -v
+    - echo "SBOM generated. Size:"
+    - du -h waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.json
+    - tar -czf waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.json
+    - echo "SBOM archived. Size:"
+    - du -h waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
+  artifacts:
+    paths:
+      - waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
+
 Upload translatable strings:
   stage: build
   interruptible: true
@@ -363,6 +393,24 @@ Test k8s deployment:
     - kubectl wait --timeout=180s --for=condition=Ready=true $POD_NAME
     - kubectl get pods -l app=waldur-homeport-test-${CI_MERGE_REQUEST_ID}
   allow_failure: true
+
+Upload Image SBOM:
+  extends: .Upload SBOM template
+  needs:
+    - Generate Image SBOM
+  variables:
+    PROJECT_NAME: "waldur-homeport"
+    SBOM_TYPE: "image"
+    SBOM_DIR: "images"
+
+Upload Source SBOM:
+  extends: .Upload SBOM template
+  needs:
+    - Generate Codebase SBOM
+  variables:
+    PROJECT_NAME: "waldur-homeport"
+    SBOM_TYPE: "source"
+    SBOM_DIR: "source"
 
 Cleanup test k8s deployment:
   stage: deploy

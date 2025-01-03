@@ -7,6 +7,9 @@ export const deleteRole = (uuid: string) => deleteById('/roles/', uuid);
 
 export const editRole = (uuid, formData) => put(`/roles/${uuid}/`, formData);
 
+export const updateRoleDescriptions = (uuid, formData) =>
+  put(`/roles/${uuid}/update_descriptions/`, formData);
+
 export const getRoles = () => getAll<Role>('/roles/');
 
 export const enableRole = (uuid) => post(`/roles/${uuid}/enable/`);

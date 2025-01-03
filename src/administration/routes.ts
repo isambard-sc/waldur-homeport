@@ -82,6 +82,20 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-celery-info',
+    url: 'celery-info/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./CeleryInfoPage').then((module) => ({
+        default: module.CeleryInfoPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Celery info'),
+    },
+  },
+
+  {
     name: 'admin-branding',
     url: 'branding/',
     parent: 'admin-settings',
@@ -315,6 +329,21 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Categories'),
     },
   },
+
+  {
+    name: 'admin-marketplace-remote-sync',
+    url: 'remote-offering-sync/',
+    parent: 'admin-marketplace',
+    component: lazyComponent(() =>
+      import('./remote-offering-sync/RemoteOfferingSyncList').then(
+        (module) => ({ default: module.RemoteOfferingSyncList }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Remote offering sync'),
+    },
+  },
+
   {
     name: 'admin-organizations',
     parent: 'admin',

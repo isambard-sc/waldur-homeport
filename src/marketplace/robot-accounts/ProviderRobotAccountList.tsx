@@ -51,11 +51,19 @@ export const ProviderRobotAccountList: FC<{ provider }> = ({ provider }) => {
       title: translate('Organization'),
       render: ({ row }) => row.customer_name,
       filter: 'customer',
+      inlineFilter: (row) => ({
+        name: row.customer_name,
+        uuid: row.customer_uuid,
+      }),
     },
     {
       title: translate('Project'),
       render: ({ row }) => row.project_name,
       filter: 'project',
+      inlineFilter: (row) => ({
+        name: row.project_name,
+        uuid: row.project_uuid,
+      }),
     },
     {
       title: translate('Resource'),

@@ -60,10 +60,13 @@ const getSteps = (resource: Resource) => {
       : translate('Pending approval'),
     description: isStep3Completed
       ? [
-          [
-            order.provider_reviewed_by_full_name || translate('By provider'),
-            formatDateTime(order.provider_reviewed_at),
-          ].join(', '),
+          order.provider_reviewed_at
+            ? [
+                order.provider_reviewed_by_full_name ||
+                  translate('By provider'),
+                formatDateTime(order.provider_reviewed_at),
+              ].join(', ')
+            : translate('Auto-approved'),
         ]
       : [translate('Pending provider approval')],
     completed: isStep3Completed,

@@ -2,6 +2,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { isEqual } from 'lodash-es';
 import { Reducer } from 'redux';
 
+import { ALL_RESOURCES_TABLE_ID } from '@waldur/marketplace/resources/list/constants';
 import { createByKey } from '@waldur/store/utils';
 
 import * as actions from './actions';
@@ -282,3 +283,16 @@ export const reducer = createByKey(
   (action) => action.payload && action.payload.table,
   (action) => action.payload.table,
 )(pagination) as Reducer<Record<string, TableState>>;
+
+const initialTableState = {
+  // We need this to be created first because we use this for sidebar resource filters
+  [ALL_RESOURCES_TABLE_ID]: INITIAL_STATE,
+};
+
+export const tableInitialReducer = (state = initialTableState, action) => {
+  const tableState = reducer(state, action);
+  return {
+    ...state,
+    ...tableState,
+  };
+};

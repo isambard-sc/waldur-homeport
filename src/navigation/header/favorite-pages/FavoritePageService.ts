@@ -90,6 +90,7 @@ const getDataForFavoritePage = async (
   let title = store.getState().title?.title;
   let subtitle = store.getState().title?.subtitle;
   let image;
+  const newParams = params ? { ...params } : {};
   if (state.name.startsWith('marketplace-offering') && params.offering_uuid) {
     const offering = await getProviderOffering(params.offering_uuid, {
       params: { field: ['name', 'customer_name', 'thumbnail'] },
@@ -144,16 +145,28 @@ const getDataForFavoritePage = async (
     title = context.project?.name;
     image = context.project?.image;
     subtitle = titleFromState;
+    // Add organization info, to set the resources filter on click
+    Object.assign(newParams, {
+      customer_uuid: context.resource?.customer_uuid,
+      customer_name: context.resource?.customer_name,
+    });
   } else if (state.name === 'all-resources') {
     title = translate('List of all resources');
   } else if (state.name === 'marketplace-resource-details') {
     title = context.resource?.name;
     image = context.resource?.offering_thumbnail;
     subtitle = `${context.resource?.customer_name} / ${context.resource?.project_name}`;
+    // Add project and organization info, to set the resources filter on click
+    Object.assign(newParams, {
+      project_uuid: context.resource?.project_uuid,
+      project_name: context.resource?.project_name,
+      customer_uuid: context.resource?.customer_uuid,
+      customer_name: context.resource?.customer_name,
+    });
   } else {
     image = '';
   }
-  return { title, subtitle, image };
+  return { title, subtitle, image, params: newParams };
 };
 
 export const useFavoritePages = () => {
@@ -220,7 +233,7 @@ export const useFavoritePages = () => {
         title: data.title || altTitle,
         subtitle: data.subtitle || altSubtitle,
         state: state.name,
-        params,
+        params: data.params,
         image: data.image,
       };
       addFavoritePage(newPage);

@@ -2,7 +2,10 @@ import { FunctionComponent } from 'react';
 import { Props as SelectProps } from 'react-select';
 import { Field } from 'redux-form';
 
-import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
+import {
+  REACT_MULTI_SELECT_TABLE_FILTER,
+  Select,
+} from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
 export const getStates = () => [
@@ -29,7 +32,7 @@ export const ResourceStateFilter: FunctionComponent<{
         value={fieldProps.input.value}
         onChange={(value) => fieldProps.input.onChange(value)}
         isClearable={true}
-        {...REACT_SELECT_TABLE_FILTER}
+        {...REACT_MULTI_SELECT_TABLE_FILTER}
         {...props.reactSelectProps}
       />
     )}

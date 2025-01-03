@@ -44,7 +44,7 @@ export const useSearch = () => {
         signal,
         params: {
           query: query,
-          field: ['name', 'uuid', 'image', 'customer_name'],
+          field: ['name', 'uuid', 'image', 'customer_name', 'customer_uuid'],
         },
       });
       const resourcesPromise = get<Resource[]>('/marketplace-resources/', {
@@ -58,6 +58,7 @@ export const useSearch = () => {
             'category_title',
             'offering_thumbnail',
             'customer_name',
+            'customer_uuid',
             'project_name',
             'project_uuid',
             'state',

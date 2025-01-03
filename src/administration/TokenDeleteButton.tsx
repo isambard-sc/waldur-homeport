@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 import { deleteToken } from './api';
 
@@ -32,11 +32,13 @@ export const TokenDeleteButton = ({ row, refetch }) => {
     });
   };
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
       iconNode={<Trash />}
       size="sm"
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

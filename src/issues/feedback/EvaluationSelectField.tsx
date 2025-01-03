@@ -4,12 +4,6 @@ import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { feedbackOptions } from '@waldur/issues/feedback/utils';
 
-const getOptions = () =>
-  feedbackOptions().map(({ label }) => ({
-    label,
-    value: label,
-  }));
-
 export const EvaluationSelectField = () => (
   <Field
     name="evaluation"
@@ -19,7 +13,7 @@ export const EvaluationSelectField = () => (
         value={prop.input.value}
         onChange={prop.input.onChange}
         onBlur={(e) => e.preventDefault()}
-        options={getOptions()}
+        options={feedbackOptions()}
         isClearable={true}
         {...REACT_SELECT_TABLE_FILTER}
       />

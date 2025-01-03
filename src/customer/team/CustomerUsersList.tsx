@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
+import { ENV } from '@waldur/configs/default';
 import Avatar from '@waldur/core/Avatar';
 import { formatDate } from '@waldur/core/dateUtils';
 import { CUSTOMER_USERS_LIST_FILTER_FORM_ID } from '@waldur/customer/team/constants';
@@ -117,7 +118,10 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
         {
           title: translate('Role in organization'),
           render: RoleField,
+          className: 'w-25',
           filter: 'organization_role',
+          inlineFilter: (row) =>
+            ENV.roles.filter((role) => role.name === row.role_name),
           export: exportRoleField,
           id: 'role_name',
           keys: ['role_name'],
@@ -125,6 +129,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
         {
           title: translate('Role expiration'),
           render: ({ row }) => renderRoleExpirationDate(row),
+          className: 'w-45px',
           export: (row) => renderRoleExpirationDate(row),
           id: 'expiration_time',
           keys: ['expiration_time'],
@@ -139,6 +144,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
       expandableRow={({ row }) => (
         <CustomerUsersListExpandableRow row={row} refetch={props.fetch} />
       )}
+      expandableRowClassName="p-0 ps-12"
       tableActions={<UserAddButton refetch={props.fetch} />}
       hasOptionalColumns
     />

@@ -1,5 +1,4 @@
 import { Question } from '@phosphor-icons/react';
-import { cloneDeep } from 'lodash-es';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
@@ -14,6 +13,7 @@ import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { formatRole } from '@waldur/permissions/utils';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -119,24 +119,33 @@ const renderListOrDash = (list) => {
 };
 const RowActions = ({ row }) => {
   return (
-    <>
-      <UserImpersonateButton row={row} />
-      <UserDetailsButton row={row} />
-    </>
+    <ActionsDropdown
+      row={row}
+      actions={[UserImpersonateButton, UserDetailsButton]}
+    />
   );
 };
 
 const mapStateToFilter = createSelector(
   getFormValues('userFilter'),
   (filters: any) => {
-    const params = cloneDeep(formatRoleFilter(filters));
+    const roleFilter = formatRoleFilter(filters?.role) || {};
+    const filter: Record<string, string | boolean | string[]> = {};
+
     if (filters?.organization?.uuid) {
-      params.customer_uuid = filters.organization.uuid;
+      filter.customer_uuid = filters.organization.uuid;
     }
-    if (params?.organization) {
-      delete params.organization;
+    if (filters?.project_role) {
+      filter.project_roles = filters.project_role.map(({ name }) => name);
     }
-    return params;
+    if (filters?.organization_role) {
+      filter.organization_roles = filters.organization_role.map(
+        ({ name }) => name,
+      );
+    }
+    filter.is_active = filters?.is_active;
+
+    return { ...filter, ...roleFilter };
   },
 );
 
@@ -219,6 +228,7 @@ export const UserList: FunctionComponent = () => {
       render: OrganizationRolesField,
       keys: ['permissions'],
       id: 'organization_roles',
+      filter: 'organization_role',
       exportTitle: translate('Organizations owner'),
       export: (row) => getOrganizationsWhereOwner(row),
     },
@@ -227,6 +237,7 @@ export const UserList: FunctionComponent = () => {
       render: ProjectRolesField,
       keys: ['permissions'],
       id: 'project_roles',
+      filter: 'project_role',
       export: (row) => getProjectRole(row),
     },
     {
@@ -374,20 +385,15 @@ export const UserList: FunctionComponent = () => {
   );
 };
 
-export const formatRoleFilter = (filter) => {
-  if (filter && filter.role) {
+export const formatRoleFilter = (roles) => {
+  if (roles) {
     const formattedRole = {};
-    filter.role.map((item) => {
+    roles.map((item) => {
       formattedRole[item.value] = true;
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { role, ...rest } = filter;
-    return {
-      ...rest,
-      ...formattedRole,
-    };
+    return formattedRole;
   }
-  return filter;
+  return roles;
 };
 
 export const getOrganizationsWhereOwner = (user: Partial<User>) =>

@@ -1,7 +1,10 @@
 export interface UsageReport {
   customer_name: string;
+  customer_uuid: string;
   project_name: string;
+  project_uuid: string;
   offering_name: string;
+  offering_uuid: string;
   resource_name: string;
   name: string;
   created: string;

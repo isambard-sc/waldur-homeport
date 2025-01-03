@@ -12,6 +12,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 
 import { OFFERING_REQUESTS_FILTER_FORM_ID } from '../constants';
 import { CallOfferingStateField } from '../details/CallOfferingStateField';
+import { getCallOfferingStateOptions } from '../utils';
 
 import { OfferingRequestItemActions } from './OfferingRequestItemActions';
 import { OfferingRequestsListExpandableRow } from './OfferingRequestsListExpandableRow';
@@ -63,6 +64,7 @@ export const OfferingRequestsList: FC<OfferingRequestsListProps> = () => {
           title: translate('Call'),
           render: ({ row }) => <b>{row.call_name}</b>,
           filter: 'call',
+          inlineFilter: (row) => ({ name: row.call_name, url: row.call }),
         },
         {
           title: translate('Call manager'),
@@ -73,6 +75,10 @@ export const OfferingRequestsList: FC<OfferingRequestsListProps> = () => {
           title: translate('Offering'),
           render: ({ row }) => <>{row.offering_name}</>,
           filter: 'offering',
+          inlineFilter: (row) => ({
+            name: row.offering_name,
+            url: row.offering,
+          }),
         },
         {
           title: translate('Plan'),
@@ -84,6 +90,8 @@ export const OfferingRequestsList: FC<OfferingRequestsListProps> = () => {
           title: translate('State'),
           render: CallOfferingStateField,
           filter: 'state',
+          inlineFilter: (row) =>
+            getCallOfferingStateOptions().filter((s) => s.value === row.state),
         },
       ]}
       title={translate('Requests for offerings')}

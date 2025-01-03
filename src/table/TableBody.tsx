@@ -1,12 +1,25 @@
-import { CaretDown, WarningCircle } from '@phosphor-icons/react';
+import {
+  CaretDown,
+  FunnelSimple,
+  SquareLogo,
+  WarningCircle,
+} from '@phosphor-icons/react';
 import classNames from 'classnames';
-import React, { FunctionComponent, useCallback, useMemo } from 'react';
+import React, {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import { FormCheck } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { Tip } from '@waldur/core/Tooltip';
+import { translate } from '@waldur/i18n';
+import { MenuComponent } from '@waldur/metronic/components';
 
+import { TableFilterContext } from './FilterContextProvider';
 import { TableProps } from './types';
 import { getId } from './utils';
 
@@ -32,13 +45,74 @@ type TableBodyProps = Pick<
   | 'hasOptionalColumns'
 >;
 
+interface TableCellsProps {
+  row;
+  columns: TableProps['columns'];
+  columnsMap;
+  columnPositions: TableProps['columnPositions'];
+  hasOptionalColumns: TableProps['hasOptionalColumns'];
+}
+
+const InlineFilterButton = ({ column, row }) => {
+  const { filterComponents, apply, changeFormField } =
+    React.useContext(TableFilterContext);
+
+  const callback = () => {
+    const filterConfig = filterComponents.find(
+      (comp) => comp.name === column.filter,
+    );
+    const value = column.inlineFilter(row);
+    filterConfig.setFilter(value);
+    changeFormField(column.filter, value);
+    apply();
+  };
+
+  return (
+    <>
+      <button
+        className="inline-filter text-btn"
+        data-kt-menu-trigger="click"
+        data-kt-menu-placement="bottom"
+      >
+        <FunnelSimple weight="bold" size={16} />
+      </button>
+      <div
+        className="menu menu-sub menu-sub-dropdown menu-column menu-gray-700 menu-state-bg-light-primary w-auto min-w-150px py-1 fw-bold"
+        data-kt-menu="true"
+      >
+        <div className="menu-item">
+          <span
+            className="menu-link px-5"
+            aria-hidden="true"
+            onClick={callback}
+          >
+            <span className="menu-icon">
+              <span className="svg-icon svg-icon-2">
+                <SquareLogo weight="bold" />
+              </span>
+            </span>
+            <span className="menu-title">{translate('Filter by')}</span>
+          </span>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const hasFilterMenu = (key) => {
+  const item = document.querySelector(
+    '#kt_content_container .table-filters-menu #filter-item-' + key,
+  );
+  return Boolean(item);
+};
+
 const TableCells = ({
   row,
   columns,
   columnsMap,
   columnPositions,
   hasOptionalColumns,
-}) => (
+}: TableCellsProps) => (
   <>
     {hasOptionalColumns
       ? columnPositions
@@ -48,7 +122,10 @@ const TableCells = ({
               (columnsMap[id].visible ?? true) && (
                 <td
                   key={id}
-                  className={columnsMap[id].className}
+                  className={classNames(
+                    columnsMap[id].className,
+                    columnsMap[id].inlineFilter && 'has-filter',
+                  )}
                   onClick={
                     columnsMap[id].disabledClick
                       ? (e) => e.stopPropagation()
@@ -73,6 +150,10 @@ const TableCells = ({
                     }
                     return renderedContent;
                   })()}
+                  {columnsMap[id].inlineFilter &&
+                    hasFilterMenu(columnsMap[id].filter) && (
+                      <InlineFilterButton column={columnsMap[id]} row={row} />
+                    )}
                 </td>
               ),
           )
@@ -81,7 +162,11 @@ const TableCells = ({
             (column.visible ?? true) && (
               <td
                 key={colIndex}
-                className={column.className}
+                className={classNames(
+                  column.className,
+                  column.inlineFilter && 'has-filter',
+                  column.ellipsis && 'ellipsis',
+                )}
                 onClick={
                   column.disabledClick ? (e) => e.stopPropagation() : undefined
                 }
@@ -103,6 +188,9 @@ const TableCells = ({
                   }
                   return renderedContent;
                 })()}
+                {column.inlineFilter && hasFilterMenu(column.filter) && (
+                  <InlineFilterButton column={column} row={row} />
+                )}
               </td>
             ),
         )}
@@ -178,6 +266,11 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
     },
     [fieldType],
   );
+
+  // Re-initialize menu popups when the rows are changed, so that the cell-filter popups works properly.
+  useEffect(() => {
+    MenuComponent.reinitialization();
+  }, [rows?.length]);
 
   const TR = (row, rowIndex, fieldProps = null) => {
     let isChecked = false;
@@ -283,7 +376,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
             TR(row, rowIndex)
           )}
           {expandableRow && toggled[getId(row, rowIndex)] && (
-            <tr className={expandableRowClassName}>
+            <tr>
               <td
                 colSpan={
                   columns.length +
@@ -291,6 +384,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
                   (rowActions ? 1 : 0) +
                   (enableMultiSelect || fieldType ? 1 : 0)
                 }
+                className={expandableRowClassName}
               >
                 {React.createElement(expandableRow, { row })}
               </td>

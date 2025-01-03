@@ -1,6 +1,5 @@
 .progress-steps-view {
   background-color: var(--bs-gray-100);
-  border-bottom: 1px solid var(--bs-border-color);
 
   .stepper {
     position: relative;
@@ -55,11 +54,11 @@
 
         &.completed .stepper-wrapper {
           .stepper-icon {
-            background: var(--bs-green);
+            background: var(--bs-primary);
           }
 
           .stepper-line-area .stepper-line {
-            background: var(--bs-green);
+            background: var(--bs-primary);
           }
         }
 

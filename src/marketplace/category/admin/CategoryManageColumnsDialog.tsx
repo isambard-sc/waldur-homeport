@@ -1,12 +1,14 @@
 import { FC } from 'react';
 
+import { Category } from '@waldur/marketplace/types';
+
 import { useCategoryColumnsEditor } from '../utils';
 
 import { CategoryColumnsForm } from './CategoryColumnsForm';
 
 interface CategoryManageColumnsDialogProps {
   resolve: {
-    category: any;
+    category: Category;
   };
 }
 
@@ -20,7 +22,6 @@ export const CategoryManageColumnsDialog: FC<
       submitRequest={formState.submitRequest}
       category={formState.category}
       initialValues={formState.initialValues}
-      dispatch={formState.dispatch}
     />
   );
 };

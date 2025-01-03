@@ -20,14 +20,14 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { type RootState } from '@waldur/store/reducers';
 import { getCurrentUser } from '@waldur/user/UsersService';
 import { setCurrentUser } from '@waldur/workspace/actions';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
-import { Project } from '@waldur/workspace/types';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
+import { Project, User } from '@waldur/workspace/types';
 
 import { customerUsersAutocomplete } from './api';
 import { ExpirationTimeGroup } from './ExpirationTimeGroup';
 import { RoleGroup } from './RoleGroup';
 import { UserListOptionInline } from './UserListOptionInline';
-
 const FORM_ID = 'AddUserDialog';
 const FIELD_ID = 'showAllUsers';
 
@@ -58,7 +58,7 @@ export const AddUserDialog = reduxForm<
 })(({ submitting, handleSubmit, refetch, invalid, level, title }) => {
   const dispatch = useDispatch();
 
-  const currentUser = useSelector(getUser);
+  const currentUser = useUser() as User;
   const currentProject = useSelector(getProject);
   const currentCustomer = useSelector(getCustomer);
 

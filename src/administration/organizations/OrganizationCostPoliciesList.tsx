@@ -50,6 +50,10 @@ export const OrganizationCostPoliciesList: FC = () => {
             />
           ),
           filter: 'organization',
+          inlineFilter: (row) => ({
+            name: row.scope_name,
+            uuid: row.scope_uuid,
+          }),
         },
         {
           title: translate('Action'),

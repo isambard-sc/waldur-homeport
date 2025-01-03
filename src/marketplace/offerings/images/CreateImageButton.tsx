@@ -1,5 +1,5 @@
 import { PlusCircle } from '@phosphor-icons/react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -8,7 +8,8 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import type { User } from '@waldur/workspace/types';
 
 const CreateImageDialog = lazyComponent(() =>
   import('./CreateImageDialog').then((module) => ({
@@ -21,7 +22,7 @@ interface CreateImageButtonProps {
 }
 
 export const CreateImageButton = (props: CreateImageButtonProps) => {
-  const user = useSelector(getUser);
+  const user = useUser() as User;
   const dispatch = useDispatch();
   const callback = () =>
     dispatch(

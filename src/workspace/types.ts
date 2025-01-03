@@ -102,6 +102,7 @@ export interface Project {
   start_date?: string;
   end_date?: string;
   billing_price_estimate?: BillingPriceEstimate;
+  project_credit?: number;
   customer_uuid?: string;
   customer_name?: string;
   customer_abbreviation?: string;
@@ -111,6 +112,7 @@ export interface Project {
   oecd_fos_2007_label?: string;
   type?: string;
   marketplace_resource_count?: object;
+  resources_count?: number;
   is_industry?: boolean;
 }
 
@@ -159,6 +161,7 @@ export interface Customer {
   organization_group_parent_name?: string;
   latitude?: number;
   longitude?: number;
+  customer_credit?: number;
   billing_price_estimate?: BillingPriceEstimate;
   projects?: Project[];
   payment_profiles?: PaymentProfile[];

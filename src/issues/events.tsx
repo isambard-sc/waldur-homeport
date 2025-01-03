@@ -1,5 +1,4 @@
-import { UISref } from '@uirouter/react';
-
+import { Link } from '@waldur/core/Link';
 import { EventGroup } from '@waldur/events/types';
 import { getCallerContext } from '@waldur/events/utils';
 import { translate } from '@waldur/i18n';
@@ -9,10 +8,9 @@ import { SupportEnum } from '../EventsEnums';
 const getIssueContext = (event) => ({
   ...getCallerContext(event),
   issue_link: (
-    <UISref to="support.detail" params={{ uuid: event.issue_uuid }}>
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a>{event.issue_key}</a>
-    </UISref>
+    <Link state="support.detail" params={{ uuid: event.issue_uuid }}>
+      {event.issue_key}
+    </Link>
   ),
 });
 

@@ -2,9 +2,13 @@ import './IssuesListExpandableRow.scss';
 
 import { FunctionComponent } from 'react';
 
+import { ENV } from '@waldur/configs/default';
 import { formatDate } from '@waldur/core/dateUtils';
+import { FormattedHtml } from '@waldur/core/FormattedHtml';
+import { FormattedJira } from '@waldur/core/FormattedJira';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
+import { linkify } from '@waldur/issues/utils';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
 export const IssuesListExpandableRow: FunctionComponent<{
@@ -19,14 +23,12 @@ export const IssuesListExpandableRow: FunctionComponent<{
       </div>
 
       <div className="mb-1">
-        <dt>{translate('Description')}:</dt>
-        <dd>
-          <Tip id="description-tooltip" label={row.description}>
-            <span className="ellipsis d-inline-block" style={{ width: 260 }}>
-              {row.description}
-            </span>
-          </Tip>
-        </dd>
+        <dt>{translate('Organization')}:</dt>
+        <dd>{row.customer_name || 'N/A'}</dd>
+      </div>
+      <div className="mb-1">
+        <dt>{translate('Project')}:</dt>
+        <dd>{row.project_name || 'N/A'}</dd>
       </div>
 
       <div className="mb-1">
@@ -45,6 +47,20 @@ export const IssuesListExpandableRow: FunctionComponent<{
           <dd>{row.assignee_name || 'N/A'}</dd>
         </div>
       )}
+    </div>
+    <div>
+      <dt>{translate('Description')}:</dt>
+      <dd>
+        <Tip id="description-tooltip" label={row.description}>
+          <span className="d-inline-block">
+            {ENV.plugins.WALDUR_SUPPORT.ACTIVE_BACKEND_TYPE === 'atlassian' ? (
+              <FormattedJira text={linkify(row.description)} />
+            ) : (
+              <FormattedHtml html={linkify(row.description)} />
+            )}
+          </span>
+        </Tip>
+      </dd>
     </div>
   </ExpandableContainer>
 );

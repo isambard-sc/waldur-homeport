@@ -5,3 +5,8 @@ export interface ExportConfig {
   withFilters?: boolean;
   allPages?: boolean;
 }
+
+export interface ExportData {
+  fields: (string | number)[];
+  data: (string | number | boolean)[][];
+}

@@ -1,23 +1,21 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { openModalDialog } from '@waldur/modal/actions';
+import { AppModalProps, openModalDialog } from '@waldur/modal/actions';
 
 export const useModalDialogCallback = (
   modalComponent,
-  dialogSize,
   resource,
-  formId?,
   extraResolve?,
+  modalProps?: AppModalProps,
 ) => {
   const dispatch = useDispatch();
   return useCallback(() => {
     dispatch(
       openModalDialog(modalComponent, {
-        size: dialogSize,
+        ...modalProps,
         resolve: { resource, ...extraResolve },
-        formId,
       }),
     );
-  }, [dispatch, modalComponent, dialogSize, resource, formId, extraResolve]);
+  }, [dispatch, modalComponent, resource, extraResolve, modalProps]);
 };

@@ -39,30 +39,31 @@ describe('Issue details view', { testIsolation: false }, () => {
   });
 
   it('renders list of comments', () => {
-    cy.get('h4').contains('Comments').should('exist');
-    cy.get('.fw-normal').should('exist').should('have.length', 1);
+    cy.get('.card-title').contains('Comments').should('exist');
+    cy.get('.issue-comment').should('exist').should('have.length', 1);
   });
 
   it('submits new comment', () => {
-    cy.intercept(
-      'POST',
-      '/api/support-issues/c675f0e7738249f5a859037da28fbd2e/comment/',
-      {},
-    )
-      .as('createComment')
-      .get('h4')
+    cy.fixture('support/comments.json').then((comments) => {
+      const comment = comments[0];
+      comment.uuid = 'c2';
+      cy.intercept(
+        'POST',
+        '/api/support-issues/c675f0e7738249f5a859037da28fbd2e/comment/',
+        comment,
+      ).as('createComment');
+    });
+    cy.get('.card-title')
       .contains('Comments')
       .parents('.card')
       .within(() => {
-        cy.get('button')
-          .contains('Add comment')
-          .click()
-          .get('textarea')
-          .type('Pick issue beyond role often account offer.')
-          .get('button')
-          .contains('Add')
-          .click()
-          .wait('@createComment');
+        cy.get('button').contains('Add comment').click();
       });
+    cy.get('.modal textarea')
+      .type('Pick issue beyond role often account offer.')
+      .get('.modal button')
+      .contains('Confirm')
+      .click()
+      .wait('@createComment');
   });
 });

@@ -55,6 +55,11 @@ export function redirectOnSuccess() {
   const redirect = getRedirect();
   if (redirect) {
     resetRedirect();
+    // If redirect is not possible, go to default state
+    const href = router.stateService.href(redirect.toState, redirect.toParams);
+    if (!href) {
+      return router.stateService.go('profile.details', { reload: true });
+    }
     return router.stateService.go(redirect.toState, redirect.toParams, {
       reload: true,
       custom: {

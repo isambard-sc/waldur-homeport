@@ -15,11 +15,13 @@ import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSend
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { InvitationsFilter } from '@waldur/invitations/InvitationsFilter';
 import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
+import { choices } from '@waldur/invitations/InvitationStateFilter';
 import { RoleField } from '@waldur/invitations/RoleField';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 const InvitationsListComponent: FunctionComponent = () => {
   const filter = useSelector(mapStateToFilter);
@@ -58,6 +60,7 @@ const InvitationsListComponent: FunctionComponent = () => {
           orderField: 'state',
           render: ({ row }) => formatInvitationState(row.state),
           filter: 'state',
+          inlineFilter: (row) => choices.filter((s) => s.value === row.state),
         },
         {
           title: translate('Created at'),
@@ -103,7 +106,7 @@ const mapStateToFilter = createSelector(
 );
 
 export const InvitationsList: FunctionComponent = () => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const project = useSelector(getProject);
   const customer = useSelector(getCustomer);
   const router = useRouter();

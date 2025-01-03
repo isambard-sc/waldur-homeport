@@ -3,10 +3,11 @@ import { StringField, FormContainer, SecretField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 
 export const CredentialsTab = () => (
-  <FormContainer submitting={false} clearOnUnmount={false}>
+  <FormContainer submitting={false} clearOnUnmount={false} className="size-lg">
     <StringField
       name="api_url"
-      label={translate('Remote Waldur API URL')}
+      label={translate('API URL')}
+      placeholder={translate('e.g.') + ' waldur.example.com'}
       required={true}
       validate={required}
       maxLength={150}
@@ -14,6 +15,7 @@ export const CredentialsTab = () => (
     <SecretField
       name="token"
       label={translate('Authentication token')}
+      placeholder={translate('e.g.') + ' SECRET_TOKEN'}
       required={true}
       validate={required}
     />

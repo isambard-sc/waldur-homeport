@@ -112,6 +112,10 @@ export const PermissionOptions = [
     label: translate('Order'),
     options: [
       {
+        label: translate('List orders'),
+        value: 'ORDER.LIST',
+      },
+      {
         label: translate('Approve order'),
         value: 'ORDER.APPROVE',
       },
@@ -134,31 +138,11 @@ export const PermissionOptions = [
     ],
   },
   {
-    label: translate('Resource'),
+    label: translate('Provider actions'),
     options: [
-      {
-        label: translate('Terminate resource'),
-        value: 'RESOURCE.TERMINATE',
-      },
-      {
-        label: translate('List importable resources'),
-        value: 'RESOURCE.LIST_IMPORTABLE',
-      },
-      {
-        label: translate('Set resource end date'),
-        value: 'RESOURCE.SET_END_DATE',
-      },
       {
         label: translate('Set resource usage'),
         value: 'RESOURCE.SET_USAGE',
-      },
-      {
-        label: translate('Switch resource plan'),
-        value: 'RESOURCE.SET_PLAN',
-      },
-      {
-        label: translate('Update resource limits'),
-        value: 'RESOURCE.SET_LIMITS',
       },
       {
         label: translate('Set resource backend id'),
@@ -169,20 +153,16 @@ export const PermissionOptions = [
         value: 'RESOURCE.SUBMIT_REPORT',
       },
       {
-        label: translate('List resource users'),
-        value: 'RESOURCE.LIST_USERS',
+        label: translate('Set resource end date'),
+        value: 'RESOURCE.SET_END_DATE',
       },
       {
-        label: translate('Complete resource downscaling'),
-        value: 'RESOURCE.COMPLETE_DOWNSCALING',
+        label: translate('Set resource state'),
+        value: 'RESOURCE.SET_STATE',
       },
       {
-        label: translate('Accept booking request'),
-        value: 'RESOURCE.ACCEPT_BOOKING_REQUEST',
-      },
-      {
-        label: translate('Reject booking request'),
-        value: 'RESOURCE.REJECT_BOOKING_REQUEST',
+        label: translate('Set resource backend metadata'),
+        value: 'RESOURCE.SET_BACKEND_METADATA',
       },
       {
         label: translate('Create robot account'),
@@ -196,11 +176,120 @@ export const PermissionOptions = [
         label: translate('Delete robot account'),
         value: 'RESOURCE.DELETE_ROBOT_ACCOUNT',
       },
+      {
+        label: translate('Manage resource users'),
+        value: 'RESOURCE.MANAGE_USERS',
+      },
+      {
+        label: translate('Get API secret code'),
+        value: 'SERVICE_PROVIDER.GET_API_SECRET_CODE',
+      },
+      {
+        label: translate('Generate API secret code'),
+        value: 'SERVICE_PROVIDER.GENERATE_API_SECRET_CODE',
+      },
+      {
+        label: translate('List service provider customers'),
+        value: 'SERVICE_PROVIDER.LIST_CUSTOMERS',
+      },
+      {
+        label: translate('List service provider customer projects'),
+        value: 'SERVICE_PROVIDER.LIST_CUSTOMER_PROJECTS',
+      },
+      {
+        label: translate('List service provider projects'),
+        value: 'SERVICE_PROVIDER.LIST_PROJECTS',
+      },
+      {
+        label: translate('List service provider project permissions'),
+        value: 'SERVICE_PROVIDER.LIST_PROJECT_PERMISSIONS',
+      },
+      {
+        label: translate('List service provider keys'),
+        value: 'SERVICE_PROVIDER.LIST_KEYS',
+      },
+      {
+        label: translate('List service provider users'),
+        value: 'SERVICE_PROVIDER.LIST_USERS',
+      },
+      {
+        label: translate('List service provider user customers'),
+        value: 'SERVICE_PROVIDER.LIST_USER_CUSTOMERS',
+      },
+      {
+        label: translate('Set offerings username'),
+        value: 'SERVICE_PROVIDER.SET_OFFERINGS_USERNAME',
+      },
+      {
+        label: translate('Get service provider statistics'),
+        value: 'SERVICE_PROVIDER.GET_STATISTICS',
+      },
+      {
+        label: translate('Get service provider revenue'),
+        value: 'SERVICE_PROVIDER.GET_REVENUE',
+      },
+      {
+        label: translate('Get service provider robot account customers'),
+        value: 'SERVICE_PROVIDER.GET_ROBOT_ACCOUNT_CUSTOMERS',
+      },
+      {
+        label: translate('Get service provider robot account projects'),
+        value: 'SERVICE_PROVIDER.GET_ROBOT_ACCOUNT_PROJECTS',
+      },
+    ],
+  },
+  {
+    label: translate('Customer actions for resources'),
+    options: [
+      {
+        label: translate('List resources'),
+        value: 'RESOURCE.LIST',
+      },
+      {
+        label: translate('Set resource end date'),
+        value: 'RESOURCE.SET_END_DATE',
+      },
+      {
+        label: translate('Terminate resource'),
+        value: 'RESOURCE.TERMINATE',
+      },
+      {
+        label: translate('List importable resources'),
+        value: 'RESOURCE.LIST_IMPORTABLE',
+      },
+      {
+        label: translate('Switch resource plan'),
+        value: 'RESOURCE.SET_PLAN',
+      },
+      {
+        label: translate('Update resource limits'),
+        value: 'RESOURCE.SET_LIMITS',
+      },
+      {
+        label: translate('Accept booking request'),
+        value: 'RESOURCE.ACCEPT_BOOKING_REQUEST',
+      },
+      {
+        label: translate('Reject booking request'),
+        value: 'RESOURCE.REJECT_BOOKING_REQUEST',
+      },
+      {
+        label: translate('Update resource options'),
+        value: 'RESOURCE.UPDATE_OPTIONS',
+      },
+      {
+        label: translate('Set resource consumption limitation'),
+        value: 'RESOURCE.CONSUMPTION_LIMITATION',
+      },
     ],
   },
   {
     label: translate('Team members'),
     options: [
+      {
+        label: translate('List invitations'),
+        value: 'INVITATION.LIST',
+      },
       {
         label: translate('Create project permission'),
         value: 'PROJECT.CREATE_PERMISSION',
@@ -242,6 +331,10 @@ export const PermissionOptions = [
   {
     label: translate('Project'),
     options: [
+      {
+        label: translate('List projects'),
+        value: 'PROJECT.LIST',
+      },
       {
         label: translate('Create project'),
         value: 'PROJECT.CREATE',

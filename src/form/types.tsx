@@ -24,9 +24,11 @@ export interface FormField {
   parse?: Parser;
   // See also: https://github.com/erikras/redux-form/issues/2768#issuecomment-292770517
   noUpdateOnBlur?: boolean;
+  onBlur?(e): void;
   spaceless?: boolean;
   space?: number;
   'data-testid'?: string;
+  autoFocus?: boolean;
 }
 
 export interface CustomComponentInputProps<T> {

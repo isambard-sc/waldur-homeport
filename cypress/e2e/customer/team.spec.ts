@@ -1,3 +1,21 @@
+import { recurse } from 'cypress-recurse';
+
+const tryOpenDropdown = () => {
+  // Maybe a cypress bug: Normally clicking the toggle opens, but closes the dropdown immediately. So we need to use recurse here.
+  recurse(
+    () =>
+      cy
+        .get('.card-table .row-actions button')
+        .first()
+        .click()
+        .then(() => Cypress.$('body > .dropdown-menu').length > 0),
+    (isVisible) => isVisible,
+    { delay: 200 },
+  ).then(() => {
+    cy.get('body > .dropdown-menu').should('be.visible');
+  });
+};
+
 describe('Team', () => {
   beforeEach(() => {
     cy.mockUser()
@@ -52,19 +70,22 @@ describe('Team', () => {
   });
 
   it('Allows to view permission details', () => {
-    cy.get('.row-actions button').contains('Details').click({ force: true });
+    tryOpenDropdown();
+    cy.get('body > .dropdown-menu .dropdown-item')
+      .contains('Details')
+      .click({ force: true });
     cy.get('.modal-title').contains('User details');
     cy.get('.modal-content').get('table').should('be.visible');
     cy.wait('@getUserDetails');
   });
 
   it('Allows to remove team member', () => {
-    cy.get('.row-actions button')
+    tryOpenDropdown();
+    cy.get('body > .dropdown-menu .dropdown-item')
       .contains('Remove')
-      .click({ force: true })
-      .get('button')
-      .contains('Yes')
-      .click();
+      .click({ force: true });
+
+    cy.get('.modal button').contains('Yes').click();
 
     // Notification should be shown
     cy.get("[data-testid='notification']")
@@ -73,20 +94,23 @@ describe('Team', () => {
   });
 
   it('Allows to edit permission', () => {
-    cy.get('.row-actions button').contains('Edit').click({ force: true });
+    tryOpenDropdown();
+    cy.get('body > .dropdown-menu .dropdown-item')
+      .contains('Edit')
+      .click({ force: true });
     cy.get('.modal-title')
       .contains('Edit organization member')
       .get('.modal-content')
 
       // Open Role dropdown
-      .get('label')
+      .get('.modal label')
       .contains('Role')
       .next()
-      .get('[class*="-control"]')
+      .get('.modal [class*="-control"]')
       .first()
       .click(0, 0, { force: true })
 
-      .get('button')
+      .get('.modal button')
       .contains('Save')
       .click()
 

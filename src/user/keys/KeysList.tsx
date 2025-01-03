@@ -1,5 +1,4 @@
 import { FunctionComponent, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
@@ -8,7 +7,7 @@ import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { KeysListExpandableRow } from '@waldur/user/keys/KeysListExpandableRow';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { KeyCreateButton } from './KeyCreateButton';
 import { KeyRemoveButton } from './KeyRemoveButton';
@@ -17,7 +16,7 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
   user,
   hasActionBar = true,
 }) => {
-  const currentUser = useSelector(getUser);
+  const currentUser = useUser();
   const isSelf = user.uuid === currentUser.uuid;
   const filter = useMemo(
     () => ({

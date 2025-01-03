@@ -5,6 +5,7 @@ interface MenuAccordionProps {
   itemId?: string;
   icon?: ReactNode;
   badge?: ReactNode;
+  child?: ReactNode;
 }
 
 export const MenuAccordion: FC<PropsWithChildren<MenuAccordionProps>> = (
@@ -20,6 +21,11 @@ export const MenuAccordion: FC<PropsWithChildren<MenuAccordionProps>> = (
       {props.icon && (
         <span className="menu-icon">
           <span className="svg-icon svg-icon-2">{props.icon}</span>
+        </span>
+      )}
+      {props.child && (
+        <span className="menu-bullet">
+          <span className="bullet bullet-dot" />
         </span>
       )}
       <span className="menu-title">{props.title}</span>

@@ -19,10 +19,9 @@ export const DialogActionItem: <T>(
   const validationState = useValidators(validators, resource);
   const callback = useModalDialogCallback(
     modalComponent,
-    dialogSize,
     resource,
-    formId,
     extraResolve,
+    { size: dialogSize, formId },
   );
   return <ActionItem {...rest} {...validationState} action={callback} />;
 };

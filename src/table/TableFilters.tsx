@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback } from 'react';
-import { Badge, Button, Col, Row } from 'react-bootstrap';
+import { Button, Col, Row, Stack } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'react-responsive';
 import { change, getFormValues } from 'redux-form';
@@ -62,7 +62,7 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
               : 'd-flex flex-wrap gap-4 w-100'
           }
         >
-          {props.filtersStorage.map((item) => (
+          {/* {props.filtersStorage.map((item) => (
             <Badge
               key={item.name}
               bg="light"
@@ -74,6 +74,17 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
               <span className="text-gray-700 fw-bold">{item.label}:</span>
               <item.component />
             </Badge>
+          ))} */}
+          {props.filtersStorage.map((item) => (
+            <Stack
+              key={item.name}
+              direction="horizontal"
+              gap={2}
+              className="flex-nowrap fw-bolder text-dark fs-7"
+            >
+              {item.label}
+              <item.component />
+            </Stack>
           ))}
           {props.filterPosition === 'menu' && (
             <TableFiltersMenu

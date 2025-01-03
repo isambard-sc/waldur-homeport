@@ -20,10 +20,12 @@ const UserSecretOptionsForm = lazyComponent(() =>
     default: module.UserSecretOptionsForm,
   })),
 );
-const ProvisioningConfigForm = lazyComponent(() =>
-  import('@waldur/marketplace/ProvisioningConfigForm').then((module) => ({
-    default: module.ProvisioningConfigForm,
-  })),
+const ServiceDeskProvisioningConfigForm = lazyComponent(() =>
+  import('@waldur/support/ServiceDeskProvisioningConfigForm').then(
+    (module) => ({
+      default: module.ServiceDeskProvisioningConfigForm,
+    }),
+  ),
 );
 const RequestOrderForm = lazyComponent(() =>
   import('./RequestOrderForm').then((module) => ({
@@ -42,19 +44,18 @@ export const COMMON_OPTIONS = {
 export const SupportOffering: OfferingConfiguration = {
   type: SUPPORT_OFFERING_TYPE,
   get label() {
-    return translate('Request-based item');
+    return translate('Service Desk');
   },
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
-  provisioningConfigForm: ProvisioningConfigForm,
+  provisioningConfigForm: ServiceDeskProvisioningConfigForm,
 };
 
 export const BasicOffering: OfferingConfiguration = {
   type: BASIC_OFFERING_TYPE,
   get label() {
-    return translate('Request-based item (without Service Desk)');
+    return translate('Basic');
   },
   ...COMMON_OPTIONS,
   secretOptionsForm: UserSecretOptionsForm,
-  provisioningConfigForm: ProvisioningConfigForm,
 };

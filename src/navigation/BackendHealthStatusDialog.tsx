@@ -1,11 +1,10 @@
-import { ArrowsClockwise } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { Button } from 'react-bootstrap';
 import { useAsyncFn, useEffectOnce } from 'react-use';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
+import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { getBackendHealthStatus } from '@waldur/navigation/BackendHealthStatusIndicator';
@@ -19,45 +18,43 @@ export const BackendHealthStatusDialog: FunctionComponent = () => {
 
   return (
     <ModalDialog
-      title={translate('Backend health status')}
+      title={
+        <>
+          <span className="me-2">{translate('Backend health status')}</span>
+          <RefreshButton refetch={reFetch} loading={loading} />
+        </>
+      }
+      className="card card-table full-width"
+      bodyClassName="card-body pb-0 min-h-275px"
+      footerClassName="border-0"
       footer={<CloseDialogButton label={translate('Done')} />}
     >
       {loading ? (
         <LoadingSpinner />
       ) : value ? (
-        <>
-          <div className="pull-right">
-            <Button size="sm" onClick={reFetch}>
-              <span className="svg-icon svg-icon-2">
-                <ArrowsClockwise />
-              </span>{' '}
-              {translate('Refresh')}
-            </Button>
-          </div>
-          <table className="table table-hover no-margins">
-            <thead>
-              <tr>
-                <th>{translate('Check name')}</th>
-                <th>{translate('Status')}</th>
+        <table className="table table-hover no-margins table-row-bordered mb-0">
+          <thead>
+            <tr>
+              <th>{translate('Check name')}</th>
+              <th>{translate('Status')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(value).map(([key, value]: any, index: number) => (
+              <tr key={index}>
+                <td>{key}</td>
+                <td>
+                  <StateIndicator
+                    label={value}
+                    variant={value === 'working' ? 'primary' : 'danger'}
+                    outline
+                    pill
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {Object.entries(value).map(([key, value]: any, index: number) => (
-                <tr key={index}>
-                  <td>{key}</td>
-                  <td>
-                    <StateIndicator
-                      label={value}
-                      variant={value === 'working' ? 'primary' : 'danger'}
-                      outline
-                      pill
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
+            ))}
+          </tbody>
+        </table>
       ) : null}
     </ModalDialog>
   );

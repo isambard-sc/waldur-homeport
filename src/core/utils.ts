@@ -134,9 +134,9 @@ export const truncate = (fullStr: string, strLen = 30, separator = '...') => {
     backChars = Math.floor(charsToShow / 2);
 
   return (
-    fullStr.substr(0, frontChars) +
+    fullStr.substring(0, frontChars) +
     separator +
-    fullStr.substr(fullStr.length - backChars)
+    fullStr.substring(fullStr.length - backChars)
   );
 };
 

@@ -1,8 +1,10 @@
 import { FunctionComponent } from 'react';
-import { Form } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
-import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
+import {
+  REACT_MULTI_SELECT_TABLE_FILTER,
+  Select,
+} from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
 interface Option {
@@ -17,21 +19,17 @@ export const getStates = (): Option[] => [
 ];
 
 export const UserPermissionRequestsStateFilter: FunctionComponent = () => (
-  <Form.Group>
-    <Form.Label>{translate('State')}</Form.Label>
-    <Field
-      name="state"
-      component={(fieldProps) => (
-        <Select
-          placeholder={translate('Select state...')}
-          options={getStates()}
-          value={fieldProps.input.value}
-          onChange={(value) => fieldProps.input.onChange(value)}
-          isMulti={true}
-          isClearable={true}
-          {...REACT_SELECT_TABLE_FILTER}
-        />
-      )}
-    />
-  </Form.Group>
+  <Field
+    name="state"
+    component={(fieldProps) => (
+      <Select
+        placeholder={translate('Select state...')}
+        options={getStates()}
+        value={fieldProps.input.value}
+        onChange={(value) => fieldProps.input.onChange(value)}
+        isClearable={true}
+        {...REACT_MULTI_SELECT_TABLE_FILTER}
+      />
+    )}
+  />
 );

@@ -64,7 +64,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
       .first()
       .find('button.dropdown-toggle')
       .click()
-      .get('#kt_content_container table .dropdown-item')
+      .get('body > .dropdown-menu .dropdown-item')
       .contains('Edit')
       .click({ force: true });
 
@@ -81,7 +81,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
       .first()
       .find('button.dropdown-toggle')
       .click()
-      .get('#kt_content_container table .dropdown-item')
+      .get('body > .dropdown-menu .dropdown-item')
       .contains('Preview order form')
       .click({ force: true });
 
@@ -106,7 +106,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
       .first()
       .find('button.dropdown-toggle')
       .click()
-      .get('#kt_content_container table .dropdown-item')
+      .get('body > .dropdown-menu .dropdown-item')
       .contains('Open public page')
       .click({ force: true })
       .waitForPage();

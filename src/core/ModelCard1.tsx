@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { FC, ReactNode } from 'react';
 import { Card } from 'react-bootstrap';
 
@@ -7,7 +8,9 @@ import { getAbbreviation } from './utils';
 
 interface ModelCard1Props {
   title: string;
+  titleNode?: ReactNode;
   subtitle?: string;
+  ellipsisLines?: 1 | 2 | 3;
   logo?: string;
   body?: ReactNode;
   image?: string;
@@ -15,7 +18,10 @@ interface ModelCard1Props {
   footer?: ReactNode;
 }
 
-export const ModelCard1: FC<ModelCard1Props> = (props) => (
+export const ModelCard1: FC<ModelCard1Props> = ({
+  ellipsisLines = 1,
+  ...props
+}) => (
   <Card className="model-card-1 card-bordered h-100">
     {(props.image || props.placeholder) && (
       <div className="h-90px d-flex flex-center border-bottom">
@@ -33,9 +39,10 @@ export const ModelCard1: FC<ModelCard1Props> = (props) => (
     )}
     <Card.Body className="p-7 d-flex flex-column">
       <div
-        className={
-          'd-flex align-items-center gap-2' + (props.body ? ' mb-7' : '')
-        }
+        className={classNames(
+          'd-flex align-items-center gap-2',
+          props.body && 'mb-7',
+        )}
       >
         {props.logo ? (
           <Image src={props.logo} size={50} isContain />
@@ -44,9 +51,15 @@ export const ModelCard1: FC<ModelCard1Props> = (props) => (
             {getAbbreviation(props.title, 3)}
           </ImagePlaceholder>
         )}
-        <div className="ellipsis">
-          <Card.Title className="fs-4 fw-bold ellipsis">
-            {props.title}
+        <div className={'ellipsis-lines-' + ellipsisLines}>
+          <Card.Title
+            className={classNames(
+              'fs-4 fw-bold',
+              'ellipsis-lines-' + ellipsisLines,
+              !props.subtitle && 'mb-0',
+            )}
+          >
+            {props.titleNode || props.title}
           </Card.Title>
           {props.subtitle && (
             <Card.Subtitle className="text-gray-600 fw-normal ellipsis">

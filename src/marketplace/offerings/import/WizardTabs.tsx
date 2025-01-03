@@ -1,13 +1,15 @@
-import { ComponentType, createElement, FunctionComponent } from 'react';
+import { ComponentType, createElement, FC } from 'react';
+
+import { ProgressStep } from '@waldur/core/ProgressSteps';
 
 interface WizardTabsProps {
-  steps: string[];
-  currentStep: string;
+  steps: ProgressStep[];
+  currentStep: ProgressStep;
   tabs: Record<string, ComponentType<any>>;
   mountOnEnter?: boolean;
 }
 
-export const WizardTabs: FunctionComponent<WizardTabsProps> = ({
+export const WizardTabs: FC<WizardTabsProps> = ({
   steps,
   currentStep,
   tabs,
@@ -15,12 +17,15 @@ export const WizardTabs: FunctionComponent<WizardTabsProps> = ({
 }) => (
   <>
     {steps.map((step) => (
-      <div key={step} className={step === currentStep ? undefined : 'hidden'}>
+      <div
+        key={step.key}
+        className={step.key === currentStep.key ? undefined : 'hidden'}
+      >
         {mountOnEnter
           ? step === currentStep
-            ? createElement(tabs[step])
+            ? createElement(tabs[step.key])
             : null
-          : createElement(tabs[step], {
+          : createElement(tabs[step.key], {
               isVisible: step === currentStep,
             })}
       </div>

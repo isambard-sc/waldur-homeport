@@ -3,6 +3,7 @@ import { InjectedFormProps } from 'redux-form';
 import { GeolocationPoint } from '@waldur/map/types';
 import { OrderDetailsType } from '@waldur/marketplace/orders/types';
 import { Quota } from '@waldur/quotas/types';
+import { ResourceState } from '@waldur/resource/types';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import { FieldType } from './offerings/update/options/types';
@@ -96,6 +97,7 @@ export interface OrganizationGroup {
 }
 
 export interface Offering extends GeolocationPoint {
+  scope_state?: ResourceState;
   quotas?: Quota[];
   uuid?: string;
   url?: string;
@@ -207,6 +209,7 @@ export interface CategoryGroup {
   /** generated on frontend side */
   categories?: Category[];
   offering_count: number;
+  resource_count?: number;
 }
 
 export interface Category {
@@ -220,6 +223,8 @@ export interface Category {
   components?: BaseComponent[];
   description?: string;
   group?: string;
+  /** generated on frontend side */
+  resource_count?: number;
 }
 
 export interface OfferingsListType {

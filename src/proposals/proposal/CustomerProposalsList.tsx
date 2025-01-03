@@ -5,7 +5,10 @@ import { createSelector } from 'reselect';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { getNonCanceledProposalStates } from '@waldur/proposals/utils';
+import {
+  getNonCanceledProposalStates,
+  getProposalStateOptions,
+} from '@waldur/proposals/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -69,6 +72,7 @@ export const CustomerProposalsList: FC<{}> = () => {
             />
           ),
           filter: 'call',
+          inlineFilter: (row) => ({ name: row.call_name, uuid: row.call_uuid }),
         },
         {
           title: translate('Round'),
@@ -83,6 +87,8 @@ export const CustomerProposalsList: FC<{}> = () => {
           title: translate('State'),
           render: ({ row }) => <ProposalBadge state={row.state} />,
           filter: 'state',
+          inlineFilter: (row) =>
+            getProposalStateOptions().filter((s) => s.value === row.state),
         },
       ]}
       title={translate('Proposals')}

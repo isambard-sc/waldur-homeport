@@ -60,7 +60,7 @@ const PureProjectResourcesFilter = ({ category_uuid, initialValues }) => {
         <RuntimeStateFilter />
       </TableFilterItem>
       <TableFilterItem title={translate('State')} name="state">
-        <ResourceStateFilter reactSelectProps={{ isMulti: true }} />
+        <ResourceStateFilter />
       </TableFilterItem>
       <TableFilterItem
         title={translate('Include terminated')}

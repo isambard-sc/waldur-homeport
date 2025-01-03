@@ -1,7 +1,7 @@
 import Axios from 'axios';
 
 import { ENV } from '@waldur/configs/default';
-import { sendForm } from '@waldur/core/api';
+import { deleteById, sendForm } from '@waldur/core/api';
 
 export const getAttachments = (issue: string) => {
   return Axios.get(`${ENV.apiEndpoint}api/support-attachments/`, {
@@ -11,13 +11,19 @@ export const getAttachments = (issue: string) => {
   });
 };
 
-export const putAttachment = (issueUrl: string, file: File) => {
-  return sendForm('POST', `${ENV.apiEndpoint}api/support-attachments/`, {
-    issue: issueUrl,
-    file,
-  });
+export const putAttachment = (
+  issueUrl: string,
+  file: File,
+  onUploadProgress?: (progress: number) => void,
+) => {
+  return sendForm(
+    'POST',
+    `${ENV.apiEndpoint}api/support-attachments/`,
+    { issue: issueUrl, file },
+    onUploadProgress,
+  );
 };
 
 export const deleteAttachment = (uuid: string) => {
-  return Axios.delete(`${ENV.apiEndpoint}api/support-attachments/{${uuid}}/`);
+  return deleteById('/support-attachments/', uuid);
 };

@@ -7,9 +7,11 @@ import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { PROJECTS_LIST } from '@waldur/project/constants';
 import { GlobalProjectCreateButton } from '@waldur/project/create/GlobalProjectCreateButton';
+import { ProjectCard } from '@waldur/project/ProjectCard';
 import { ProjectLink } from '@waldur/project/ProjectLink';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -45,10 +47,11 @@ const mandatoryFields = [
   'uuid',
   'marketplace_resource_count',
   'description',
+  'project_credit',
 ];
 
 export const ProjectsList = () => {
-  useTitle(translate('Projects'));
+  useTitle(translate('Projects'), '', 'browser');
   const filter = useSelector(mapStateToFilter);
   const props = useTable({
     table: PROJECTS_LIST,
@@ -57,11 +60,26 @@ export const ProjectsList = () => {
     filter,
     mandatoryFields,
   });
+
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources();
+
+  const onClickDetails = (row) =>
+    syncResourceFilters({
+      organization: {
+        name: row.customer_name,
+        uuid: row.customer_uuid,
+      },
+      project: row,
+    });
+
   const columns: Column[] = [
     {
       title: translate('Name'),
       orderField: 'name',
-      render: ProjectLink,
+      render: ({ row }) => (
+        <ProjectLink row={row} onClick={() => onClickDetails(row)} />
+      ),
       copyField: (row) => row.name,
       keys: ['name', 'is_industry'],
       id: 'name',
@@ -73,10 +91,22 @@ export const ProjectsList = () => {
       render: ({ row }) => (
         <OrganizationNameField
           row={{ uuid: row.customer_uuid, name: row.customer_name }}
+          onClick={() =>
+            syncResourceFilters({
+              organization: {
+                uuid: row.customer_uuid,
+                name: row.customer_name,
+              },
+              project: null,
+            })
+          }
         />
       ),
       keys: ['customer_uuid', 'customer_name'],
       filter: 'organization',
+      inlineFilter: (row) => [
+        { name: row.customer_name, uuid: row.customer_uuid },
+      ],
       id: 'organization',
       export: 'customer_name',
     },
@@ -204,6 +234,11 @@ export const ProjectsList = () => {
       columns={columns}
       verboseName={translate('projects')}
       title={translate('Projects')}
+      gridSize={{ md: 6, xl: 4 }}
+      gridItem={({ row }) => (
+        <ProjectCard project={row} onClickDetails={() => onClickDetails(row)} />
+      )}
+      hoverShadow={{ grid: false }}
       hasQuery={true}
       showPageSizeSelector={true}
       enableExport={true}

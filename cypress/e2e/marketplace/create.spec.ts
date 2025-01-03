@@ -51,7 +51,7 @@ xdescribe('Offering creation', () => {
       .log('Select management type')
       .openDropdownByLabel('Type')
       .get('*div[id^="react-select"]')
-      .contains('Request-based item')
+      .contains('Service Desk')
       .click()
 
       .log('Add user input field')
@@ -125,7 +125,7 @@ xdescribe('Offering creation', () => {
       .contains('My offering')
 
       .get('p')
-      .contains('Request-based item')
+      .contains('Basic')
 
       .get('p')
       .contains('HPC')

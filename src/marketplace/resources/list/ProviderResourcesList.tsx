@@ -1,7 +1,7 @@
 import { Check, X } from '@phosphor-icons/react';
 import React, { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
@@ -17,12 +17,7 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import {
-  getCustomer,
-  getUser,
-  isOwnerOrStaff,
-  isServiceManagerSelector,
-} from '@waldur/workspace/selectors';
+import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer, Project } from '@waldur/workspace/types';
 
 import {
@@ -34,7 +29,7 @@ import { ProviderResourceActions } from './ProviderResourceActions';
 import { ProviderResourcesFilter } from './ProviderResourcesFilter';
 import { PublicResourcesLimits } from './PublicResourcesLimits';
 import { ResourceStateField } from './ResourceStateField';
-import { NON_TERMINATED_STATES } from './ResourceStateFilter';
+import { getStates, NON_TERMINATED_STATES } from './ResourceStateFilter';
 
 interface ResourceFilter {
   state?: any;
@@ -104,6 +99,10 @@ const TableComponent: FunctionComponent<any> = (props) => {
       title: translate('Client organization'),
       render: ({ row }) => <>{row.customer_name}</>,
       filter: 'organization',
+      inlineFilter: (row) => ({
+        name: row.customer_name,
+        uuid: row.customer_uuid,
+      }),
       keys: ['customer_name'],
       export: 'customer_name',
       id: 'customer_name',
@@ -113,6 +112,10 @@ const TableComponent: FunctionComponent<any> = (props) => {
       render: ({ row }) => <>{row.project_name}</>,
       keys: ['project_name'],
       filter: 'project_name',
+      inlineFilter: (row) => ({
+        name: row.project_name,
+        uuid: row.project_uuid,
+      }),
       export: 'project_name',
       id: 'project_name',
     },
@@ -120,7 +123,11 @@ const TableComponent: FunctionComponent<any> = (props) => {
       title: translate('Category'),
       render: ({ row }) => <>{row.category_title}</>,
       filter: 'category',
-      keys: ['category_title'],
+      inlineFilter: (row) => ({
+        title: row.category_title,
+        uuid: row.category_uuid,
+      }),
+      keys: ['category_title', 'category_uuid'],
       export: 'category_title',
       id: 'category_title',
     },
@@ -230,6 +237,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
       title: translate('State'),
       render: ({ row }) => <ResourceStateField resource={row} outline pill />,
       filter: 'state',
+      inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       id: 'state',
       keys: ['state', 'backend_metadata'],
       export: (row) =>
@@ -268,11 +276,8 @@ const TableOptions = {
 
 const mapStateToFilter = createSelector(
   getCustomer,
-  getUser,
-  isServiceManagerSelector,
-  isOwnerOrStaff,
   (state, formId) => getFormValues(formId)(state),
-  (customer, user, isServiceManager, ownerOrStaff, filters: ResourceFilter) => {
+  (customer, filters: ResourceFilter) => {
     const filter: Record<string, string | string[] | boolean> = {};
 
     // Public resources should only contain resources from billable offerings.
@@ -302,9 +307,6 @@ const mapStateToFilter = createSelector(
     }
     if (filters?.category) {
       filter.category_uuid = filters.category.uuid;
-    }
-    if (isServiceManager && !ownerOrStaff) {
-      filter.service_manager_uuid = user.uuid;
     }
     return filter;
   },

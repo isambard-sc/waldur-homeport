@@ -1,4 +1,4 @@
-@import '~sass/mediaqueries';
+@use '@waldur/sass/mediaqueries';
 
 .dashboard-small-label {
   display: block;
@@ -12,7 +12,7 @@
   width: 150px;
   padding: 2rem 0;
 
-  @include bp(xs) {
+  @include mediaqueries.bp(xs) {
     width: 95px;
   }
 
@@ -36,7 +36,7 @@
 .health-title {
   font-size: 12px;
 
-  @include bp(xs) {
+  @include mediaqueries.bp(xs) {
     font-size: 11px;
   }
 }

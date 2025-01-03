@@ -2,7 +2,10 @@ import { FunctionComponent } from 'react';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { getLabel } from '@waldur/marketplace/common/registry';
+import {
+  getLabel,
+  getOfferingTypes,
+} from '@waldur/marketplace/common/registry';
 import { createFetcher } from '@waldur/table/api';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
@@ -15,6 +18,7 @@ import { CreateOfferingButton } from './CreateOfferingButton';
 import { OfferingActions } from './OfferingActions';
 import { OfferingNameColumn } from './OfferingNameColumn';
 import { OfferingStateCell } from './OfferingStateCell';
+import { getStates } from './OfferingStateFilter';
 
 const mandatoryFields = ['customer_uuid', 'components', 'plans'];
 
@@ -39,6 +43,10 @@ export const BaseOfferingsList: FunctionComponent<{
           title: translate('Organization'),
           render: ({ row }) => renderFieldOrDash(row.customer_name),
           filter: 'organization',
+          inlineFilter: (row) => ({
+            name: row.customer_name,
+            uuid: row.customer_uuid,
+          }),
           export: 'customer_name',
           keys: ['customer_name'],
           id: 'organization',
@@ -60,6 +68,10 @@ export const BaseOfferingsList: FunctionComponent<{
       title: translate('Category'),
       render: ({ row }) => <>{row.category_title}</>,
       filter: 'category',
+      inlineFilter: (row) => ({
+        uuid: row.category_uuid,
+        title: row.category_title,
+      }),
       export: 'category_title',
       keys: ['category_title'],
       id: 'category',
@@ -77,6 +89,7 @@ export const BaseOfferingsList: FunctionComponent<{
       title: translate('State'),
       render: OfferingStateCell,
       filter: 'state',
+      inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       export: 'state',
       keys: ['state'],
       id: 'state',
@@ -85,6 +98,8 @@ export const BaseOfferingsList: FunctionComponent<{
       title: translate('Type'),
       render: ({ row }) => <>{getLabel(row.type)}</>,
       filter: 'offering_type',
+      inlineFilter: (row) =>
+        getOfferingTypes().find((op) => op.value === row.type),
       export: (row) => getLabel(row.type),
       exportKeys: ['type'],
       keys: ['type'],
@@ -93,7 +108,7 @@ export const BaseOfferingsList: FunctionComponent<{
     SLUG_COLUMN,
   ];
 
-  const dropdownActions = useOfferingDropdownActions();
+  const dropdownActions = useOfferingDropdownActions(props.fetch);
 
   return (
     <Table

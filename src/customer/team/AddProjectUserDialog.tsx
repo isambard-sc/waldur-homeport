@@ -74,7 +74,7 @@ export const AddProjectUserDialog = reduxForm<
   return (
     <form onSubmit={handleSubmit(saveUser)}>
       <Modal.Header>
-        <Modal.Title>{translate('Edit project member')}</Modal.Title>
+        <Modal.Title>{translate('Add project role')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <FormContainer submitting={submitting}>

@@ -2,8 +2,6 @@ import { escapeHtml } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { Attachment } from '@waldur/issues/attachments/types';
 
-import { Comment } from './types';
-
 const urlPattern =
   '(?:(?:https?)://|www.)(?:([-A-Z0-9+&@#/%=~_|$?!:,.]*)|[-A-Z0-9+&@#/%=~_|$?!:,.])*(?:([-A-Z0-9+&@#/%=~_|$?!:,.]*)|[A-Z0-9+&@#/%=~_|$])';
 
@@ -14,39 +12,6 @@ const standaloneLinkRegex = /\s+(https?:\/\/[^\s]+)\s*/gim;
 export const getUrl = (str: string): string => {
   const result = str.match(urlRegex);
   return result ? result[0] : null;
-};
-
-export const createJiraComment = (
-  message: string,
-  attachments: Attachment[] = [],
-): string => {
-  let comment = message || '';
-
-  if (!attachments.length) {
-    return comment;
-  }
-
-  for (const attachment of attachments) {
-    const jiraMarkup = attachment.mime_type.startsWith('image')
-      ? `!${attachment.file_name}|thumbnail!`
-      : `[^${attachment.file_name}]`;
-
-    comment += comment.length ? `\n${jiraMarkup}` : jiraMarkup;
-  }
-
-  return comment;
-};
-
-export const commentExist = (
-  comments: Comment[],
-  commentId: string,
-): boolean => {
-  for (const comment of comments) {
-    if (comment.uuid === commentId) {
-      return true;
-    }
-  }
-  return false;
 };
 
 const getAttachmentByFileName = (

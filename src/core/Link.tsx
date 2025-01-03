@@ -1,4 +1,4 @@
-import { UISref } from '@uirouter/react';
+import { useSref } from '@uirouter/react';
 import classNames from 'classnames';
 import React, { FunctionComponent } from 'react';
 
@@ -12,22 +12,37 @@ interface LinkProps {
   onClick?: (e?) => void;
 }
 
-export const Link: FunctionComponent<LinkProps> = (props) => (
-  <UISref to={props.state} params={props.params}>
-    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+export const Link: FunctionComponent<LinkProps> = ({
+  state,
+  params,
+  children,
+  label,
+  onClick,
+  target,
+  className,
+  ...rest
+}) => {
+  const sref = useSref(state, params);
+  return (
     <a
-      target={props.target}
-      onClick={props.onClick}
+      {...sref}
+      target={target}
+      onClick={(e) => {
+        sref.onClick?.(e);
+        onClick?.(e);
+        e.preventDefault();
+      }}
       className={classNames(
-        props.className,
-        typeof (props.label || props.children) === 'string' &&
-          !(props.className || '').includes('btn') &&
+        className,
+        typeof (label || children) === 'string' &&
+          !(className || '').includes('btn') &&
           'text-anchor',
       )}
-      onKeyPress={(e) => e.key === 'Enter' && props.onClick(e)}
-      role={props.onClick ? 'button' : undefined}
+      onKeyPress={(e) => e.key === 'Enter' && onClick(e)}
+      role={onClick ? 'button' : undefined}
+      {...rest}
     >
-      {props.label || props.children}
+      {label || children}
     </a>
-  </UISref>
-);
+  );
+};

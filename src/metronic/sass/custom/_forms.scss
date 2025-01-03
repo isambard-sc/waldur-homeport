@@ -4,7 +4,7 @@
 .form-label {
   font-size: 1.075rem; // fs-6
   font-weight: 500; // fw-bold
-  color: $gray-800;
+  color: $gray-700;
 }
 
 .form-text {
@@ -79,4 +79,11 @@
   &-label {
     font-size: 0.95rem;
   }
+}
+
+/* INPUT GROUP */
+.input-group .input-group-text {
+  background-color: transparent;
+  color: $gray-500;
+  font-size: 1.24rem;
 }

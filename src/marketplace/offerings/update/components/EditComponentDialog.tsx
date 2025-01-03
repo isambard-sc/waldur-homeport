@@ -1,3 +1,4 @@
+import { omit } from 'lodash-es';
 import { useCallback } from 'react';
 import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
@@ -8,6 +9,7 @@ import { translate } from '@waldur/i18n';
 import { updateOfferingComponent } from '@waldur/marketplace/common/api';
 import { formatComponent } from '@waldur/marketplace/offerings/store/utils';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { TENANT_TYPE } from '@waldur/openstack/constants';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { parseComponent } from '../utils';
@@ -28,7 +30,12 @@ export const EditComponentDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
       async (formData) => {
         try {
           const data = formatComponent(formData);
-          await updateOfferingComponent(props.resolve.offering.uuid, data);
+          const { offering } = props.resolve;
+          const payload =
+            offering.type === TENANT_TYPE
+              ? omit(data, ['billing_type', 'name', 'measured_unit', 'type'])
+              : data;
+          await updateOfferingComponent(offering.uuid, payload);
           dispatch(
             showSuccess(
               translate('Billing component has been updated successfully.'),
@@ -55,7 +62,9 @@ export const EditComponentDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
           <Modal.Title>{translate('Edit component')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ComponentForm />
+          <ComponentForm
+            readOnly={props.resolve.offering.type === TENANT_TYPE}
+          />
         </Modal.Body>
         <Modal.Footer>
           <SubmitButton

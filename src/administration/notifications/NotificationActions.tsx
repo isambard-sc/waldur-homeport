@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
 
 import { NotificationToggleButton } from './NotificationToggleButton';
@@ -9,10 +10,11 @@ export const NotificationActions = ({ row, refetch }) => {
   const isStaff = useSelector(isStaffSelector);
   if (isStaff) {
     return (
-      <>
-        <NotificationUpdateButton notification={row} refetch={refetch} />
-        <NotificationToggleButton notification={row} refetch={refetch} />
-      </>
+      <ActionsDropdown
+        row={row}
+        refetch={refetch}
+        actions={[NotificationUpdateButton, NotificationToggleButton]}
+      />
     );
   } else {
     return null;

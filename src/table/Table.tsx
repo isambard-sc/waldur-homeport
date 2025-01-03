@@ -9,8 +9,10 @@ import { GRID_BREAKPOINTS } from '@waldur/core/constants';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
+import { ErrorView } from '@waldur/ErrorView';
 
 import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
+import { FilterContextProvider } from './FilterContextProvider';
 import { GridBody } from './GridBody';
 import { HiddenActionsMessage } from './HiddenActionsMessage';
 import { TableBody } from './TableBody';
@@ -49,7 +51,7 @@ const TableComponent = (
   return (
     <table
       className={classNames(
-        'table align-middle table-row-bordered fs-6 gy-4 no-footer',
+        'table align-middle table-row-bordered fs-6 gy-0 no-footer',
         {
           'table-expandable': Boolean(props.expandableRow),
           'table-hover': props.hoverable,
@@ -111,6 +113,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     hasActionBar: true,
     hasHeaders: true,
     cardBordered: true,
+    hoverShadow: true,
   };
 
   state = {
@@ -126,8 +129,20 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
   }
 
   render() {
+    const gridHover =
+      (typeof this.props.hoverShadow === 'object'
+        ? (this.props.hoverShadow.grid ?? true)
+        : this.props.hoverShadow) && Boolean(this.props.gridItem);
+    const tableHover =
+      typeof this.props.hoverShadow === 'object'
+        ? (this.props.hoverShadow.table ?? true)
+        : this.props.hoverShadow;
+
     return (
-      <>
+      <FilterContextProvider
+        {...this.props}
+        toggleFilterMenu={this.toggleFilterMenu}
+      >
         {this.props.standalone && (
           <div className="d-flex justify-content-between gap-4 mb-6">
             <Stack direction="horizontal" gap={2}>
@@ -252,7 +267,13 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
               className="table-responsive dataTables_wrapper"
               style={{ minHeight: this.props.minHeight || 300 }}
             >
-              <div className={classNames('table-container table-hover-shadow')}>
+              <div
+                className={classNames(
+                  'table-container',
+                  tableHover && 'table-hover-shadow',
+                  gridHover && 'grid-hover-shadow',
+                )}
+              >
                 {this.renderBody()}
               </div>
             </div>
@@ -268,7 +289,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
             {this.props.footer}
           </Card.Body>
         </Card>
-      </>
+      </FilterContextProvider>
     );
   }
 
@@ -282,8 +303,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     }
 
     if (this.props.error) {
-      // @ts-ignore
-      return <ErrorMessage error={this.props.error} />;
+      return <ErrorView error={this.props.error} />;
     }
 
     if (!this.props.loading && !this.hasRows()) {

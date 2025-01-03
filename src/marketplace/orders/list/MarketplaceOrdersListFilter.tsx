@@ -18,7 +18,7 @@ import { OrderState } from '../types';
 import { OrderStateFilter } from './OrderStateFilter';
 import { OrderTypeFilter } from './OrderTypeFilter';
 
-const getOrderStateFilterOptions = (): {
+export const getOrderStateFilterOptions = (): {
   value: OrderState;
   label: string;
 }[] => [

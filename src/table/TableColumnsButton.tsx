@@ -47,7 +47,7 @@ const SortableItem = (props) => {
       </span>{' '}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <span
-        className="svg-icon svg-icon-2 svg-icon-white me-3"
+        className="svg-icon svg-icon-2 svg-icon-transparent me-3"
         onClick={props.onClick}
       >
         {props.isActive ? <CheckboxIcon /> : <CheckboxEmptyIcon />}
@@ -141,7 +141,7 @@ const ColumnsPopover = ({
           <Dropdown.Item
             onClick={() => toggleColumn(OPTIONAL_COLUMN_ACTIONS_KEY)}
           >
-            <span className="svg-icon svg-icon-2 svg-icon-white me-3">
+            <span className="svg-icon svg-icon-2 svg-icon-transparent me-3">
               {activeColumns[OPTIONAL_COLUMN_ACTIONS_KEY] ? (
                 <CheckboxIcon />
               ) : (

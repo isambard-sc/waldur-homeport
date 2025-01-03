@@ -1,17 +1,16 @@
 import { FC } from 'react';
-import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { countChecklists } from '@waldur/marketplace-checklist/api';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 import { UserDetails } from '@waldur/workspace/types';
 
 import { UserAffiliationsList } from '../affiliations/UserAffiliationsList';
 
 export const UserDashboard: FC = () => {
-  const user = useSelector(getUser) as UserDetails;
+  const user = useUser() as UserDetails;
 
   const asyncState = useAsync(countChecklists);
 

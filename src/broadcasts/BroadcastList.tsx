@@ -9,8 +9,7 @@ import { useTable } from '@waldur/table/useTable';
 
 import { BroadcastCreateButton } from './BroadcastCreateButton';
 import { BroadcastExpandableRow } from './BroadcastExpandableRow';
-import { BroadcastSendButton } from './BroadcastSendButton';
-import { BroadcastUpdateButton } from './BroadcastUpdateButton';
+import { BroadcastsRowActions } from './BroadcastsRowActions';
 import { BroadcastResponseData } from './types';
 
 const mandatoryFields = [
@@ -78,14 +77,7 @@ export const BroadcastList: FunctionComponent<{}> = () => {
       initialPageSize={10}
       showPageSizeSelector={true}
       expandableRowClassName="bg-gray-200"
-      rowActions={({ row }) =>
-        row.state === 'DRAFT' ? (
-          <>
-            <BroadcastUpdateButton broadcast={row} refetch={props.fetch} />
-            <BroadcastSendButton broadcast={row} refetch={props.fetch} />
-          </>
-        ) : null
-      }
+      rowActions={BroadcastsRowActions}
       hasQuery={true}
       title={translate('Broadcasts')}
       standalone

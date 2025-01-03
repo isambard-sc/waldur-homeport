@@ -10,7 +10,8 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { GenericPermission } from '@waldur/permissions/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 interface UserRemoveButtonProps {
   permission: GenericPermission;
@@ -22,7 +23,7 @@ export const UserRemoveButton: React.FC<UserRemoveButtonProps> = ({
   refetch,
 }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const user = useUser();
   const project = useSelector(getProject);
   const customer = useSelector(getCustomer);
 

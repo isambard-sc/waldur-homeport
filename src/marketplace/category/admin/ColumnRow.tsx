@@ -6,13 +6,18 @@ import { Field } from 'redux-form';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { FormField } from '@waldur/openstack/openstack-security-groups/rule-editor/FormField';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 
 import { deleteCategoryColumn } from './api';
 
 export const ColumnRow = ({ column, fields, index }) => {
   const dispatch = useDispatch();
+  const { showSuccess, showErrorResponse } = useNotify();
   const onRemove = async () => {
+    if (!column?.uuid) {
+      fields.remove(index);
+      return;
+    }
     try {
       await waitForConfirmation(
         dispatch,
@@ -32,9 +37,9 @@ export const ColumnRow = ({ column, fields, index }) => {
     try {
       await deleteCategoryColumn(column.uuid);
       fields.remove(index);
-      dispatch(showSuccess(translate('Column has been removed successfully.')));
+      showSuccess(translate('Column has been removed successfully.'));
     } catch (e) {
-      dispatch(showErrorResponse(e, translate('Unable to remove column.')));
+      showErrorResponse(e, translate('Unable to remove column.'));
     }
   };
 
@@ -73,7 +78,7 @@ export const ColumnRow = ({ column, fields, index }) => {
         tooltip={translate('Index allows to reorder columns')}
       />
       <td>
-        <Button variant="danger" onClick={onRemove}>
+        <Button variant="danger" onClick={onRemove} aria-description="Delete">
           <Trash />
         </Button>
       </td>

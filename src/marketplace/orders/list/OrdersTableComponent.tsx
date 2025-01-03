@@ -11,9 +11,11 @@ import { useTable } from '@waldur/table/useTable';
 
 import { OrderProviderActions } from '../actions/OrderProviderActions';
 
+import { getOrderStateFilterOptions } from './MarketplaceOrdersListFilter';
 import { OrdersListExpandableRow } from './OrdersListExpandableRow';
 import { OrderTablePlaceholderActions } from './OrderTablePlaceholderActions';
 import { OrderTypeCell } from './OrderTypeCell';
+import { getOrderTypeOptions } from './OrderTypeFilter';
 
 interface OrdersTableComponentProps extends Partial<TableProps> {
   table: string;
@@ -84,6 +86,8 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       orderField: 'state',
       keys: ['state'],
       filter: 'state',
+      inlineFilter: (row) =>
+        getOrderStateFilterOptions().find((op) => op.value === row.state),
       id: 'state',
     },
     {
@@ -91,6 +95,8 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       render: OrderTypeCell,
       keys: ['type'],
       filter: 'type',
+      inlineFilter: (row) =>
+        getOrderTypeOptions().find((op) => op.value === row.type),
       id: 'type',
     },
     {
@@ -98,6 +104,10 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       render: ({ row }) => row.project_name,
       keys: ['project_name'],
       filter: 'project',
+      inlineFilter: (row) => ({
+        name: row.project_name,
+        uuid: row.project_uuid,
+      }),
       id: 'project',
     },
     !hideColumns.includes('organization') && {
@@ -105,6 +115,10 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       render: ({ row }) => row.customer_name,
       keys: ['customer_name'],
       filter: 'organization',
+      inlineFilter: (row) => ({
+        name: row.customer_name,
+        uuid: row.customer_uuid,
+      }),
       id: 'client_organization',
     },
     {

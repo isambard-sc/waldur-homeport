@@ -5,7 +5,9 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
+import { getCustomer } from '@waldur/workspace/selectors';
+import { User } from '@waldur/workspace/types';
 
 const OfferingCreateDialog = lazyComponent(() =>
   import('../actions/OfferingCreateDialog').then((module) => ({
@@ -22,7 +24,7 @@ export const CreateOfferingButton = ({
 }) => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
-  const user = useSelector(getUser);
+  const user = useUser() as User;
 
   const callback = () => {
     dispatch(openModalDialog(OfferingCreateDialog, { resolve: { fetch } }));

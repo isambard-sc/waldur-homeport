@@ -11,11 +11,18 @@ export interface Attachment {
   uuid: string;
 }
 
+export type IssueAttachmentUploading = {
+  key: string | number;
+  file: File;
+  progress: number;
+  error?: any;
+};
+
 export interface IssueAttachmentState {
   loading: boolean;
   errors: any[];
   items: Attachment[];
-  uploading: number;
+  uploading: IssueAttachmentUploading[];
   deleting: { [key: string]: boolean };
   filter: string;
 }
@@ -28,5 +35,7 @@ export interface Payload {
   file?: File;
   uuid?: string;
   filter?: string;
-  uploading?: number;
+  files?: File[];
+  key?: string | number;
+  progress?: number;
 }

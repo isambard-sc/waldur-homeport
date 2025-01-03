@@ -48,13 +48,10 @@ export const InvoicesEnum = {
   create_of_credit_by_staff: 'create_of_credit_by_staff',
   invoice_canceled: 'invoice_canceled',
   invoice_created: 'invoice_created',
-  invoice_creation_succeeded: 'invoice_creation_succeeded',
-  invoice_deletion_succeeded: 'invoice_deletion_succeeded',
   invoice_item_created: 'invoice_item_created',
   invoice_item_deleted: 'invoice_item_deleted',
   invoice_item_updated: 'invoice_item_updated',
   invoice_paid: 'invoice_paid',
-  invoice_update_succeeded: 'invoice_update_succeeded',
   payment_created: 'payment_created',
   payment_removed: 'payment_removed',
   reduction_of_credit: 'reduction_of_credit',
@@ -63,12 +60,6 @@ export const InvoicesEnum = {
   roll_back_project_credit: 'roll_back_project_credit',
   set_to_zero_overdue_credit: 'set_to_zero_overdue_credit',
   update_of_credit_by_staff: 'update_of_credit_by_staff',
-};
-
-export const PaymentsEnum = {
-  payment_approval_succeeded: 'payment_approval_succeeded',
-  payment_cancel_succeeded: 'payment_cancel_succeeded',
-  payment_creation_succeeded: 'payment_creation_succeeded',
 };
 
 export const PermissionsEnum = {

@@ -1,4 +1,4 @@
-import { UISref } from '@uirouter/react';
+import { useSref } from '@uirouter/react';
 import classNames from 'classnames';
 import { uniqueId } from 'lodash-es';
 import { PropsWithChildren, forwardRef } from 'react';
@@ -18,8 +18,8 @@ interface OwnProps extends BreadcrumbItemProps {
 }
 
 export const BreadcrumbItem = forwardRef<any, PropsWithChildren<OwnProps>>(
-  (props, ref) => {
-    const {
+  (
+    {
       ellipsis = undefined,
       truncate,
       maxLength,
@@ -28,11 +28,16 @@ export const BreadcrumbItem = forwardRef<any, PropsWithChildren<OwnProps>>(
       to,
       params,
       ...rest
-    } = props;
+    },
+    ref,
+  ) => {
     const ellipsisClass = ellipsis ? 'ellipsis-' + ellipsis : '';
-    const item = (
+    const sref = useSref(to || '', params);
+
+    return (
       <Breadcrumb.Item
         {...rest}
+        {...(to ? sref : {})}
         ref={ref}
         className={classNames(className, ellipsisClass)}
       >
@@ -60,14 +65,6 @@ export const BreadcrumbItem = forwardRef<any, PropsWithChildren<OwnProps>>(
           <span>{children}</span>
         )}
       </Breadcrumb.Item>
-    );
-
-    return to ? (
-      <UISref to={to} params={params}>
-        {item}
-      </UISref>
-    ) : (
-      item
     );
   },
 );

@@ -1,15 +1,15 @@
 import { Trash } from '@phosphor-icons/react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { InvitationService } from './InvitationService';
 
 export const MultiDeleteAction = ({ rows, refetch }) => {
-  const user = useSelector(getUser);
+  const user = useUser();
   const dispatch = useDispatch();
 
   const callback = () => {

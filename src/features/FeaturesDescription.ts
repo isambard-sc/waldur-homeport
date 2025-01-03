@@ -1,4 +1,3 @@
- 
 // WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_features_description.py
 // Do not edit it manually. All manual changes would be overridden.
 import { FeatureSection } from '@waldur/features/types';
@@ -16,6 +15,10 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'show_domain',
         description: translate('Allows to hide domain field in organization detail.'),
+      },
+      {
+        key: 'show_permission_reviews',
+        description: translate('Allows to show permission reviews tab and popups.'),
       },
     ],
   },

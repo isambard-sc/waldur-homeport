@@ -1,12 +1,11 @@
 import { FunctionComponent, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 import { UserDetails } from '@waldur/workspace/types';
 
 interface OwnProps {
@@ -18,7 +17,7 @@ export const UserOfferingList: FunctionComponent<OwnProps> = ({
   hasActionBar = true,
   ...props
 }) => {
-  const currentUser = useSelector(getUser);
+  const currentUser = useUser();
   const user = props.user || currentUser;
   const filter = useMemo(
     () => ({

@@ -6,7 +6,7 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { OrganizationGroup } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 const OrganizationGroupDetailsDialog = lazyComponent(() =>
   import('./OrganizationGroupDetailsDialog').then((module) => ({
@@ -15,12 +15,12 @@ const OrganizationGroupDetailsDialog = lazyComponent(() =>
 );
 
 interface OrganizationGroupDetailsButtonProps {
-  organizationGroup: OrganizationGroup;
+  row: OrganizationGroup;
 }
 
-const openOrganizationGroupsDialog = (organizationGroup: OrganizationGroup) => {
+const openOrganizationGroupsDialog = (row: OrganizationGroup) => {
   return openModalDialog(OrganizationGroupDetailsDialog, {
-    resolve: { organizationGroup },
+    resolve: { organizationGroup: row },
     size: 'xl',
   });
 };
@@ -30,12 +30,10 @@ export const OrganizationGroupDetailsButton: FunctionComponent<
 > = (props) => {
   const dispatch = useDispatch();
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Details')}
       iconNode={<Eye />}
-      action={() =>
-        dispatch(openOrganizationGroupsDialog(props.organizationGroup))
-      }
+      action={() => dispatch(openOrganizationGroupsDialog(props.row))}
       size="sm"
     />
   );

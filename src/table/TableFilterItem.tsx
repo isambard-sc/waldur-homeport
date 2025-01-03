@@ -16,7 +16,7 @@ import { Field, change, formValueSelector } from 'redux-form';
 import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 
-import { TableFilterContext } from './TableFilterContainer';
+import { TableFilterContext } from './FilterContextProvider';
 
 interface TableFilterItem {
   title: string;
@@ -91,7 +91,7 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
   <button
     type="button"
-    className="text-btn ps-2 text-hover-danger"
+    className="text-btn text-grey-400 text-hover-grey-500 lh-0 ps-2"
     onClick={onClick}
   >
     <X weight="bold" size={size} />
@@ -113,10 +113,16 @@ export const TableSidebarFilterValues = ({
           className="filter-value"
           style={!ellipsis ? { maxWidth: 'unset' } : undefined}
         >
-          <Badge bg="light" className="text-dark">
+          <Badge
+            bg=""
+            className="badge-outline-default badge-lg fw-bold fs-7 py-2"
+          >
             {badgeValue(value)}
             {!hideRemoveButton && (
-              <RemoveFilterBadgeButton onClick={() => remove(value, value)} />
+              <RemoveFilterBadgeButton
+                size={12}
+                onClick={() => remove(value, value)}
+              />
             )}
           </Badge>
         </div>
@@ -126,26 +132,32 @@ export const TableSidebarFilterValues = ({
         {value.map((v, i) => (
           <Badge
             key={i}
-            bg="light"
-            className="filter-value text-dark"
+            bg=""
+            className="filter-value badge-outline-default badge-lg fw-bold fs-7 px-2"
             style={!ellipsis ? { maxWidth: 'unset' } : undefined}
           >
             {getValueLabel(v)}
             {!hideRemoveButton && (
-              <RemoveFilterBadgeButton onClick={() => remove(value, v)} />
+              <RemoveFilterBadgeButton
+                size={12}
+                onClick={() => remove(value, v)}
+              />
             )}
           </Badge>
         ))}
       </>
     ) : (
       <Badge
-        bg="light"
-        className="filter-value text-dark"
+        bg=""
+        className="filter-value badge-outline-default badge-lg fw-bold fs-7 py-2"
         style={!ellipsis ? { maxWidth: 'unset' } : undefined}
       >
         {getValueLabel(value)}
         {!hideRemoveButton && (
-          <RemoveFilterBadgeButton onClick={() => remove(value, value)} />
+          <RemoveFilterBadgeButton
+            size={12}
+            onClick={() => remove(value, value)}
+          />
         )}
       </Badge>
     )
@@ -254,8 +266,14 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   },
   ...props
 }) => {
-  const { setFilter, form, apply, columnFilter, selectedSavedFilter } =
-    React.useContext(TableFilterContext);
+  const {
+    setFilter,
+    form,
+    apply,
+    columnFilter,
+    selectedSavedFilter,
+    registerFilterComponent,
+  } = React.useContext(TableFilterContext);
 
   const _setFilter = useCallback(
     (value) => {
@@ -277,6 +295,14 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     },
     [props, setFilter],
   );
+
+  // Register the filter renderer to access it from outside (from table cells)
+  useEffect(() => {
+    registerFilterComponent({
+      name: props.name,
+      setFilter: _setFilter,
+    });
+  }, [props.name, _setFilter]);
 
   const dispatch = useDispatch();
   const removeValue = useCallback(
@@ -337,22 +363,6 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     setShown(isShown);
   }, [isShown]);
 
-  const handleClickOutside = useCallback(
-    (e) => {
-      if (!menuEl?.current || !menuEl?.current.contains(e.target)) {
-        setShown(false);
-      }
-    },
-    [menuEl?.current, setShown],
-  );
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [handleClickOutside]);
-
   return (
     <div
       id={`filter-item-${props.name}`}
@@ -364,7 +374,10 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
         {props.title}
       </span>
 
-      <div ref={menuEl} className="menu-sub menu-sub-dropdown w-375px py-3">
+      <div
+        ref={menuEl}
+        className="menu-sub menu-sub-dropdown w-375px py-3 shadow-sm"
+      >
         <div className="menu-item">
           <div
             className="menu-content filter-field"

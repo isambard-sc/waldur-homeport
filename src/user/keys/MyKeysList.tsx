@@ -1,10 +1,8 @@
-import { useSelector } from 'react-redux';
-
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { KeysList } from './KeysList';
 
 export const MyKeysList = () => {
-  const currentUser = useSelector(getUser);
+  const currentUser = useUser();
   return <KeysList user={currentUser} />;
 };

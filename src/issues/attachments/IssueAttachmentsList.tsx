@@ -1,35 +1,25 @@
 import { FunctionComponent } from 'react';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { AttachmentsList } from '@waldur/form/upload/AttachmentsList';
 
 import { IssueAttachment } from './IssueAttachment';
-import { Attachment } from './types';
-import './IssueAttachmentsList.scss';
+import { IssueAttachmentPending } from './IssueAttachmentPending';
+import { Attachment, IssueAttachmentUploading } from './types';
 
 interface IssueAttachmentsListProps {
   attachments: Attachment[];
-  uploading: number;
+  uploading: IssueAttachmentUploading[];
 }
 
 export const IssueAttachmentsList: FunctionComponent<
   IssueAttachmentsListProps
 > = ({ attachments, uploading }) => {
-  return attachments.length > 0 || uploading > 0 ? (
-    <ul className="attachment-list">
-      {attachments.map((attachment) => (
-        <li key={attachment.uuid}>
-          <IssueAttachment attachment={attachment} />
-        </li>
-      ))}
-      {Array.from({ length: uploading }, (_, i) => (
-        <li key={`attachment-loading-${i}`}>
-          <div className="attachment-item-loading">
-            <div className="attachment-item__overlay">
-              <LoadingSpinner />
-            </div>
-          </div>
-        </li>
-      ))}
-    </ul>
-  ) : null;
+  return (
+    <AttachmentsList
+      attachments={attachments}
+      uploading={uploading}
+      ItemComponent={IssueAttachment}
+      ItemPendingComponent={IssueAttachmentPending}
+    />
+  );
 };

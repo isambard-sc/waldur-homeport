@@ -8,6 +8,7 @@ import { useTable } from '@waldur/table/useTable';
 
 import { ProjectUpdateRequestActions } from './ProjectUpdateRequestActions';
 import { ProjectUpdateRequestExpandable } from './ProjectUpdateRequestExpandable';
+import { getStates } from './RequestStateFilter';
 
 export const BaseProjectUpdateRequestsList: FunctionComponent<{
   filter;
@@ -27,12 +28,18 @@ export const BaseProjectUpdateRequestsList: FunctionComponent<{
           title: translate('Organization'),
           render: ({ row }) => row.customer_name,
           filter: 'organization',
+          inlineFilter: (row) => ({
+            name: row.customer_name,
+            uuid: row.customer_uuid,
+          }),
         },
         { title: translate('Project'), render: ({ row }) => row.old_name },
         {
           title: translate('State'),
           render: ({ row }) => row.state,
           filter: 'state',
+          inlineFilter: (row) =>
+            getStates().filter((s) => s.value === row.state),
         },
         {
           title: translate('Created'),

@@ -6,9 +6,13 @@ import { createSelector } from 'reselect';
 import { OrganizationsFilter } from '@waldur/administration/organizations/OrganizationsFilter';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
+import { OrganizationCard } from '@waldur/customer/list/OrganizationCard';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
+import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -38,12 +42,28 @@ const mapStateToFilter = createSelector(
     if (filterValues?.organization_group) {
       filter.organization_group_uuid = filterValues.organization_group.uuid;
     }
+    if (filterValues?.is_call_managing_organization) {
+      filter.is_call_managing_organization =
+        filterValues.is_call_managing_organization;
+    }
     return filter;
   },
 );
 
+const mandatoryFields = [
+  // Grid view
+  'uuid',
+  'name',
+  'email',
+  'image',
+  'created',
+  'resource_count',
+  'customer_credit',
+  'billing_price_estimate',
+];
+
 export const OrganizationsList: FunctionComponent = () => {
-  useTitle(translate('Organizations'));
+  useTitle(translate('Organizations'), '', 'browser');
 
   const filter = useSelector(mapStateToFilter);
 
@@ -52,13 +72,22 @@ export const OrganizationsList: FunctionComponent = () => {
     fetchData: createFetcher('customers'),
     queryField: 'query',
     filter,
+    mandatoryFields,
   });
+
+  const { syncResourceFilters } =
+    useOrganizationAndProjectFiltersForResources();
+
+  const onClickDetails = (row) =>
+    syncResourceFilters({ organization: row, project: null });
 
   const columns = [
     {
       title: translate('Organization'),
       orderField: 'name',
-      render: OrganizationNameField,
+      render: ({ row }) => (
+        <OrganizationNameField row={row} onClick={() => onClickDetails(row)} />
+      ),
       keys: ['name'],
       id: 'organization',
     },
@@ -242,12 +271,39 @@ export const OrganizationsList: FunctionComponent = () => {
     SLUG_COLUMN,
   ];
 
+  if (
+    isFeatureVisible(MarketplaceFeatures.show_call_management_functionality)
+  ) {
+    columns.push({
+      title: translate('Is call managing organization'),
+      render: ({ row }) => (
+        <>
+          {row.call_managing_organization_uuid
+            ? translate('Yes')
+            : translate('No')}
+        </>
+      ),
+      keys: ['call_managing_organization_uuid'],
+      optional: true,
+      filter: 'is_call_managing_organization',
+      id: 'call_managing_organization_uuid',
+    });
+  }
+
   return (
     <Table
       {...props}
       columns={columns}
       verboseName={translate('organizations')}
       title={translate('Organizations')}
+      gridSize={{ md: 6, xl: 4 }}
+      gridItem={({ row }) => (
+        <OrganizationCard
+          organization={row}
+          onClickDetails={() => onClickDetails(row)}
+        />
+      )}
+      hoverShadow={{ grid: false }}
       hasQuery={true}
       showPageSizeSelector={true}
       enableExport={true}

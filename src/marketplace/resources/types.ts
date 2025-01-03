@@ -30,7 +30,7 @@ export type Report = ReportSection[];
 export interface Resource extends ResourceReference {
   slug?: string;
   description: any;
-  name?: string;
+  name: string;
   uuid: string;
   url?: string;
   plan?: string;

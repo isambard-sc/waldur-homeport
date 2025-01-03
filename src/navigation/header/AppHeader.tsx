@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { fixURL } from '@waldur/core/api';
 import DefaultLogo from '@waldur/images/logo.svg';
 import { hasSupport as hasSupportSelector } from '@waldur/issues/hooks';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { getTitle } from '../title';
 
@@ -34,7 +34,7 @@ export const AppHeader: FunctionComponent<AppHeaderProps> = ({
   hasBreadcrumbs,
 }) => {
   const pageTitle = useSelector(getTitle);
-  const user = useSelector(getUser);
+  const user = useUser();
   const imageUrl = fixURL('/icons/sidebar_logo_mobile/');
 
   const hasSupport = useSelector(hasSupportSelector);

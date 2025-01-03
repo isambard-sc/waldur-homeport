@@ -1,9 +1,16 @@
 import { PlusCircle } from '@phosphor-icons/react';
+import { ComponentProps } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-export const AddButton = (props) => {
+interface AddButtonProps
+  extends Omit<
+    ComponentProps<typeof ActionButton>,
+    'title' | 'iconNode' | 'variant'
+  > {}
+
+export const AddButton = (props: AddButtonProps) => {
   return (
     <ActionButton
       title={translate('Add')}

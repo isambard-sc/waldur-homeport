@@ -5,8 +5,8 @@ import { useDispatch } from 'react-redux';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { CategoryGroup } from '@waldur/marketplace/types';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 
 import { removeCategoryGroup } from './api';
 
@@ -21,7 +21,7 @@ export const GroupDeleteButton = (props: GroupDeleteButtonProps) => {
 
   const openDialog = useCallback(async () => {
     try {
-      const confirmed = await waitForConfirmation(
+      await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
         translate(
@@ -31,9 +31,10 @@ export const GroupDeleteButton = (props: GroupDeleteButtonProps) => {
         ),
         true,
       );
-
-      if (!confirmed) return;
-
+    } catch {
+      return;
+    }
+    try {
       setRemoving(true);
       await removeCategoryGroup(props.row.uuid);
       props.refetch();
@@ -46,13 +47,14 @@ export const GroupDeleteButton = (props: GroupDeleteButtonProps) => {
   }, [dispatch, setRemoving, props]);
 
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      variant="outline-danger"
       iconNode={<Trash />}
-      pending={removing}
+      disabled={removing}
       size="sm"
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

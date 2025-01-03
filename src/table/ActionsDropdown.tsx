@@ -2,6 +2,7 @@ import { DotsThreeVertical, Spinner } from '@phosphor-icons/react';
 import { FunctionComponent, PropsWithChildren } from 'react';
 import { Dropdown, DropdownProps } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';
+import { createPortal } from 'react-dom';
 
 import { translate } from '@waldur/i18n';
 
@@ -48,10 +49,15 @@ export const TableDropdownToggle = ({
       variant="active-light"
       className="btn-icon no-arrow"
       disabled={disabled}
+      size="sm"
     >
       <DotsThreeVertical size={22} weight="bold" />
     </Dropdown.Toggle>
   );
+};
+
+const PortalDropdown = ({ children }) => {
+  return createPortal(children, document.body);
 };
 
 export const ActionsDropdownComponent: FunctionComponent<
@@ -74,20 +80,22 @@ export const ActionsDropdownComponent: FunctionComponent<
       variant={variant}
       className={className}
     />
-    <Dropdown.Menu
-      popperConfig={{
-        modifiers: [
-          {
-            name: 'flip',
-            options: {
-              fallbackPlacements: ['top', 'left', 'bottom'],
+    <PortalDropdown>
+      <Dropdown.Menu
+        popperConfig={{
+          modifiers: [
+            {
+              name: 'flip',
+              options: {
+                fallbackPlacements: ['top', 'left', 'bottom'],
+              },
             },
-          },
-        ],
-      }}
-    >
-      {children}
-    </Dropdown.Menu>
+          ],
+        }}
+      >
+        {children}
+      </Dropdown.Menu>
+    </PortalDropdown>
   </Dropdown>
 );
 

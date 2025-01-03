@@ -22,45 +22,53 @@ interface Values {
   limitAmount?: number;
 }
 
-const enhance = formValues(() => ({
+const enhance = formValues<any, { readOnly?: boolean }>(() => ({
   billingType: 'billing_type',
   limitPeriod: 'limit_period',
   isBoolean: 'is_boolean',
   limitAmount: 'limit_amount',
 }));
 
-export const ComponentLimit = enhance((props: Values) => {
-  const billingType = props.billingType?.value;
-  if (billingType == 'limit') {
-    if (props.isBoolean) {
-      return (
-        <>
-          <ComponentBooleanLimitField />
-          <ComponentBooleanDefaultLimitField />
-        </>
-      );
-    } else {
-      return (
-        <>
-          <ComponentBooleanLimitField />
-          <ComponentMinValueField />
-          <ComponentMaxValueField />
-          <ComponentLimitPeriodField limitPeriod={props.limitPeriod} />
-        </>
-      );
+export const ComponentLimit = enhance(
+  (props: Values & { readOnly?: boolean }) => {
+    const billingType = props.billingType?.value;
+    if (billingType == 'limit') {
+      if (props.isBoolean) {
+        return (
+          <>
+            <ComponentBooleanLimitField />
+            <ComponentBooleanDefaultLimitField />
+          </>
+        );
+      } else {
+        return (
+          <>
+            <ComponentBooleanLimitField />
+            <ComponentMinValueField />
+            <ComponentMaxValueField />
+            <ComponentLimitPeriodField
+              limitPeriod={props.limitPeriod}
+              readOnly={props.readOnly}
+            />
+          </>
+        );
+      }
+    } else if (billingType == 'usage') {
+      if (typeof props.limitAmount === 'number') {
+        return (
+          <>
+            <ComponentLimitEnableField />
+            <ComponentLimitPeriodField
+              limitPeriod={props.limitPeriod}
+              readOnly={props.readOnly}
+            />
+            <ComponentLimitAmountField />
+          </>
+        );
+      } else {
+        return <ComponentLimitEnableField />;
+      }
     }
-  } else if (billingType == 'usage') {
-    if (typeof props.limitAmount === 'number') {
-      return (
-        <>
-          <ComponentLimitEnableField />
-          <ComponentLimitPeriodField limitPeriod={props.limitPeriod} />
-          <ComponentLimitAmountField />
-        </>
-      );
-    } else {
-      return <ComponentLimitEnableField />;
-    }
-  }
-  return null;
-});
+    return null;
+  },
+);

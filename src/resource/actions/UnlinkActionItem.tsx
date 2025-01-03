@@ -1,12 +1,12 @@
 import { LinkBreak } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { unlinkResource } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { formatResourceType } from '../utils';
 
@@ -28,7 +28,7 @@ const getConfirmationText = (resource) => {
 
 export const UnlinkActionItem: FC<{ resource }> = ({ resource }) => {
   const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const user = useUser();
   if (!user.is_staff || !resource.marketplace_resource_uuid) {
     return null;
   }

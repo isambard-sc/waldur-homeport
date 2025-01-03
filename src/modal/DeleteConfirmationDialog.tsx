@@ -40,7 +40,7 @@ export const DeleteConfirmationDialog: React.FC<
       title={title}
       iconNode={<WarningCircle weight="bold" />}
       iconColor="danger"
-      bodyClassName="text-grey-500"
+      bodyClassName="text-grey-500 pt-2"
       footer={
         <>
           <Button
@@ -51,7 +51,7 @@ export const DeleteConfirmationDialog: React.FC<
             {translate('Cancel')}
           </Button>
           <Button
-            variant="danger"
+            variant="light-danger"
             className="flex-equal"
             onClick={handleSubmit}
           >

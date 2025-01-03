@@ -3,9 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import classNames from 'classnames';
 import { useMemo, useState } from 'react';
+import { Badge } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
+import { getGroupedCategories } from '@waldur/marketplace/category/utils';
+import { getCategoryGroups } from '@waldur/marketplace/common/api';
 import { ALL_RESOURCES_TABLE_ID } from '@waldur/marketplace/resources/list/constants';
 import { selectFiltersStorage } from '@waldur/table/selectors';
 import { getResource } from '@waldur/workspace/selectors';
@@ -59,34 +62,56 @@ const CustomToggle = ({
   </div>
 );
 
-const RenderMenuItems = ({ items, counters = {} }) => {
+const RenderMenuItems = ({ items }) => {
   const { state } = useCurrentStateAndParams();
   const resource = useSelector(getResource);
   return (
     <>
-      {items.map((item) => (
-        <MenuItem
-          key={item.uuid}
-          title={item.title}
-          badge={counters[item.uuid]}
-          state="category-resources"
-          params={{
-            category_uuid: item.uuid,
-          }}
-          activeState={
-            state.name === 'marketplace-resource-details' &&
-            resource?.category_uuid === item.uuid
-              ? state.name
-              : undefined
-          }
-        />
-      ))}
+      {items.map((item) =>
+        !item.categories?.length ? (
+          <MenuItem
+            key={item.uuid}
+            title={item.title}
+            badge={item.resource_count}
+            state="category-resources"
+            params={{
+              category_uuid: item.uuid,
+            }}
+            activeState={
+              state.name === 'marketplace-resource-details' &&
+              resource?.category_uuid === item.uuid
+                ? state.name
+                : undefined
+            }
+          />
+        ) : (
+          <MenuAccordion
+            key={item.uuid}
+            title={item.title}
+            itemId={item.uuid}
+            child
+            badge={
+              <Badge bg="" pill className="badge-inverse">
+                {item.resource_count}
+              </Badge>
+            }
+          >
+            <RenderMenuItems items={item.categories} />
+          </MenuAccordion>
+        ),
+      )}
     </>
   );
 };
 
 export const ResourcesMenu = ({ anonymous = false, user }) => {
   const categories = useOfferingCategories(anonymous);
+
+  const { data: categoryGroups } = useQuery(
+    ['MarketplaceCategoryGroups'],
+    () => getCategoryGroups({ params: { field: ['uuid', 'title', 'url'] } }),
+    { staleTime: 1 * 60 * 1000 },
+  );
 
   const resourcesFilters = useSelector((state: any) =>
     selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID),
@@ -110,38 +135,44 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
       'Counters',
       user?.uuid,
       filtersObj?.customer_uuid,
-      filtersObj?.customer_uuid,
+      filtersObj?.project_uuid,
     ],
     () => getGlobalCounters(filtersObj),
     { refetchOnWindowFocus: false },
   );
   const [expanded, setExpanded] = useState(false);
 
-  const sortedCategories = useMemo(() => {
+  const sortedCategoryGroups = useMemo(() => {
     if (!categories) return [];
-    if (!counters) {
-      return categories;
-    }
-    return categories.sort((a, b) => {
+    const _categories = categories.map((category) => {
+      category.resource_count = counters[category.uuid] || 0;
+      return category;
+    });
+
+    const groupedCategories = getGroupedCategories(_categories, categoryGroups);
+
+    if (!counters) return groupedCategories;
+
+    return groupedCategories.sort((a, b) => {
       const aCount = counters[a.uuid] || 0;
       const bCount = counters[b.uuid] || 0;
       return bCount - aCount;
     });
-  }, [categories, counters]);
+  }, [categories, categoryGroups, counters]);
 
   const [allResourcesCount, collapsedResourcesCount] = useMemo(() => {
     if (!counters) return [0, 0];
-    const all = sortedCategories.reduce(
-      (acc, category) => (acc += counters[category.uuid] || 0),
+    const all = sortedCategoryGroups.reduce(
+      (acc, category) => (acc += category.resource_count || 0),
       0,
     );
-    const collapsed = sortedCategories
+    const collapsed = sortedCategoryGroups
       .slice(MAX_COLLAPSE_MENU_COUNT)
-      .reduce((acc, category) => (acc += counters[category.uuid] || 0), 0);
+      .reduce((acc, category) => (acc += category.resource_count || 0), 0);
     return [all, collapsed];
-  }, [sortedCategories, counters]);
+  }, [sortedCategoryGroups, counters]);
 
-  return sortedCategories ? (
+  return sortedCategoryGroups ? (
     <MenuAccordion
       title={translate('Resources')}
       itemId="resources-menu"
@@ -156,19 +187,19 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
       />
 
       <RenderMenuItems
-        items={sortedCategories.slice(0, MAX_COLLAPSE_MENU_COUNT)}
-        counters={counters}
+        items={sortedCategoryGroups.slice(0, MAX_COLLAPSE_MENU_COUNT)}
       />
-      {sortedCategories.length > MAX_COLLAPSE_MENU_COUNT ? (
+      {sortedCategoryGroups.length > MAX_COLLAPSE_MENU_COUNT ? (
         <>
           {expanded && (
             <RenderMenuItems
-              items={sortedCategories.slice(MAX_COLLAPSE_MENU_COUNT)}
-              counters={counters}
+              items={sortedCategoryGroups.slice(MAX_COLLAPSE_MENU_COUNT)}
             />
           )}
           <CustomToggle
-            itemsCount={sortedCategories.slice(MAX_COLLAPSE_MENU_COUNT).length}
+            itemsCount={
+              sortedCategoryGroups.slice(MAX_COLLAPSE_MENU_COUNT).length
+            }
             moreResourcesCount={collapsedResourcesCount}
             onClick={() => setExpanded(!expanded)}
             expanded={expanded}

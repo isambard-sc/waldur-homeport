@@ -72,6 +72,17 @@
       top: 50%;
     }
   }
+  &.has-right-icon {
+    position: relative;
+    padding-right: 1.6em;
+
+    .left-icon {
+      position: absolute;
+      transform: translateY(50%);
+      right: 5px;
+      top: 50%;
+    }
+  }
 }
 
 @each $name, $value in $theme-colors {
@@ -83,7 +94,8 @@
     &.has-bullet::before {
       background-color: theme-inverse-color($name);
     }
-    .left-icon {
+    .left-icon,
+    .right-icon {
       @include svg-icon-color(theme-inverse-color($name));
     }
   }
@@ -96,7 +108,8 @@
     &.has-bullet::before {
       background-color: $value;
     }
-    .left-icon {
+    .left-icon,
+    .right-icon {
       @include svg-icon-color($value);
     }
   }
@@ -109,7 +122,8 @@
     &.has-bullet::before {
       background-color: theme-active-color($name);
     }
-    .left-icon {
+    .left-icon,
+    .right-icon {
       @include svg-icon-color(theme-active-color($name));
     }
   }
@@ -123,7 +137,8 @@
   &.has-bullet::before {
     background-color: $gray-700;
   }
-  .left-icon {
+  .left-icon,
+  .right-icon {
     @include svg-icon-color($gray-700);
   }
 }

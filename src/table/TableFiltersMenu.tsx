@@ -6,10 +6,18 @@ import {
   Star,
 } from '@phosphor-icons/react';
 import { debounce, isEqual, throttle } from 'lodash-es';
-import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFormValues, change } from 'redux-form';
+import { getFormValues } from 'redux-form';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -20,15 +28,15 @@ import { openModalDialog } from '@waldur/modal/actions';
 
 import { selectSavedFilter, setSavedFilters } from './actions';
 import { COLUMN_FILTER_TOGGLE_CLASS } from './constants';
+import { TableFilterContext } from './FilterContextProvider';
 import { SavedFilterSelect } from './SavedFilterSelect';
 import {
   selectSelectedSavedFilter,
   selectTableSavedFilters,
 } from './selectors';
-import { TableFilterContext } from './TableFilterContainer';
 import { TableFilterService } from './TableFilterService';
 import { TableProps } from './types';
-import { getFiltersFormId, getSavedFiltersKey } from './utils';
+import { getSavedFiltersKey } from './utils';
 
 const SaveFilterDialog = lazyComponent(() =>
   import('./SaveFilterDialog').then((module) => ({
@@ -116,7 +124,7 @@ const SaveFilterItems = ({ table, formId, apply }) => {
             <CaretRight size={18} className="ms-auto" weight="bold" />
           </span>
 
-          <div className="menu-sub menu-sub-dropdown w-250px py-3">
+          <div className="menu-sub menu-sub-dropdown w-250px py-3 shadow-sm">
             <span
               className="menu-link"
               aria-hidden="true"
@@ -150,7 +158,7 @@ const SaveFilterItems = ({ table, formId, apply }) => {
           <CaretRight size={18} className="ms-auto" weight="bold" />
         </span>
 
-        <div className="menu-sub menu-sub-dropdown w-250px py-3">
+        <div className="menu-sub menu-sub-dropdown w-250px py-3 shadow-sm">
           <div className="menu-item">
             <div
               className="menu-content filter-field"
@@ -193,7 +201,7 @@ interface TableFiltersMenuProps
 }
 
 export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
-  const filtersFormId = getFiltersFormId(props.filters);
+  const context = useContext(TableFilterContext);
 
   const menuEl = useRef<HTMLDivElement>(null);
   const menuInstance = useRef(null);
@@ -220,8 +228,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
     }
   }, [menuEl?.current]);
 
-  const dispatch = useDispatch();
-  const formValues = useSelector(getFormValues(filtersFormId));
+  const formValues = useSelector(getFormValues(context.form));
   // Add hide event listener on menu (cancel/reset the filter changes if they are not applied yet)
   useEffect(() => {
     if (menuEl?.current) {
@@ -235,7 +242,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
           keys.forEach((name) => {
             const filter = props.filtersStorage.find((fs) => fs.name === name);
             if (!isEqual(formValues?.[name], filter?.value)) {
-              dispatch(change(filtersFormId, name, filter?.value || null));
+              context.changeFormField(name, filter?.value || null);
             }
           });
         }, 100);
@@ -248,16 +255,19 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
     }
   }, [menuEl?.current, props.filtersStorage, formValues]);
 
-  const apply = (hideMenu = true) => {
-    props.applyFiltersFn(true);
-    if (hideMenu) {
-      // A small delay is needed for the popup listener to be updated with new filters data and then fired
-      setTimeout(() => {
-        MenuComponent.hideDropdowns(null);
-      }, 100);
-    }
-    props.toggleFilterMenu && props.toggleFilterMenu(true);
-  };
+  const apply = useCallback(
+    (hideMenu = true) => {
+      props.applyFiltersFn(true);
+      if (hideMenu) {
+        // A small delay is needed for the popup listener to be updated with new filters data and then fired
+        setTimeout(() => {
+          MenuComponent.hideDropdowns(null);
+        }, 100);
+      }
+      props.toggleFilterMenu && props.toggleFilterMenu(true);
+    },
+    [props.applyFiltersFn, props.toggleFilterMenu, menuInstance?.current],
+  );
 
   const [existed, setExisted] = useState(true);
   useEffect(() => {
@@ -272,15 +282,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
   if (!existed) return null;
 
   return (
-    <TableFilterContext.Provider
-      value={{
-        selectedSavedFilter: props.selectedSavedFilter,
-        filterPosition: props.filterPosition,
-        form: filtersFormId,
-        setFilter: props.setFilter,
-        apply,
-      }}
-    >
+    <TableFilterContext.Provider value={{ ...context, apply }}>
       {props.openName ? (
         <>
           <button
@@ -296,7 +298,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
           </button>
           <div
             ref={menuEl}
-            className="table-filters-menu column-filter menu menu-sub menu-sub-dropdown menu-column menu-gray-600 menu-state-bg-light menu-state-primary fw-bold fs-6"
+            className="table-filters-menu column-filter menu menu-sub menu-sub-dropdown menu-column menu-gray-600 menu-state-bg-gray fw-bold fs-6"
             data-kt-menu="true"
             data-cy={`${props.openName}-add-filter-menu`}
           >
@@ -317,13 +319,13 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
           </Button>
           <div
             ref={menuEl}
-            className="table-filters-menu menu menu-sub menu-sub-dropdown menu-column menu-gray-700 menu-state-bg-light menu-state-primary fw-bold py-1 fs-6 w-250px"
+            className="table-filters-menu menu menu-sub menu-sub-dropdown menu-column menu-gray-700 menu-state-bg-gray fw-bold py-1 fs-6 w-250px"
             data-kt-menu="true"
             data-cy="table-add-filter-menu"
           >
             <SaveFilterItems
               table={props.table}
-              formId={filtersFormId}
+              formId={context.form}
               apply={() => props.applyFiltersFn(true)}
             />
             <div className="separator" />

@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -7,7 +7,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
-import { getUser } from '@waldur/workspace/selectors';
+import { useUser } from '@waldur/workspace/hooks';
 
 const CreateRobotAccountDialog = lazyComponent(() =>
   import('./CreateRobotAccountDialog').then((module) => ({
@@ -26,7 +26,7 @@ export const CreateRobotAccountAction: ActionItemType = ({ resource }) => {
         },
       }),
     );
-  const user = useSelector(getUser);
+  const user = useUser();
   if (
     !hasPermission(user, {
       permission: PermissionEnum.CREATE_RESOURCE_ROBOT_ACCOUNT,

@@ -9,7 +9,6 @@ import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { HookRemoveButton } from '@waldur/user/hooks/HookRemoveButton';
 import { formatEventTitle } from '@waldur/user/hooks/utils';
 
 import {
@@ -17,7 +16,7 @@ import {
   ADMIN_HOOK_LIST_ID,
 } from './constants';
 import { HooksListFilter } from './HooksListFilter';
-import { HookUpdateButton } from './HookUpdateButton';
+import { HooksRowActions } from './HooksRowActions';
 
 const StateField = ({ row }) => {
   const cls = row.is_active ? 'bg-success' : 'bg-danger';
@@ -107,10 +106,7 @@ export const HooksList: FunctionComponent = () => {
       showPageSizeSelector={true}
       verboseName={translate('Notifications')}
       rowActions={({ row }) => (
-        <>
-          <HookUpdateButton row={row} />
-          <HookRemoveButton refetch={tableProps.fetch} url={row.url} />
-        </>
+        <HooksRowActions row={row} refetch={tableProps.fetch} url={row.url} />
       )}
       enableExport={true}
       hasQuery={true}

@@ -32,11 +32,13 @@ export const CustomerQuotasList = () => {
       columns={[
         {
           title: translate('Name'),
-          render: ({ row }) => (
-            <>{row.customer_abbreviation || row.customer_name}</>
-          ),
-          copyField: (row) => row.customer_abbreviation || row.customer_name,
+          render: ({ row }) => <>{row.customer_name}</>,
+          copyField: (row) => row.customer_name,
           orderField: 'name',
+        },
+        {
+          title: translate('Abbreviation'),
+          render: ({ row }) => <>{row.customer_abbreviation}</>,
         },
         {
           title: translate('Value'),

@@ -1,6 +1,3 @@
-const fieldQueryParam =
-  'field=uuid&field=full_name&field=email&field=phone_number&field=organization&field=permissions&field=is_active&field=native_name&field=civil_number&field=username&field=slug&field=preferred_language&field=identity_provider_label&field=date_joined&field=job_title&field=affiliations&field=is_staff&field=is_support&field=url';
-
 describe('Users', () => {
   beforeEach(() => {
     cy.mockChecklists()
@@ -18,58 +15,67 @@ describe('Users', () => {
       .intercept('GET', '/api/customers/**', {
         fixture: 'support/customers.json',
       })
+      .intercept({ pathname: '/api/users/' }, { fixture: 'support/users.json' })
+      .as('getUsers')
       .intercept(
-        'GET',
-        `/api/users/?page=1&page_size=10&${fieldQueryParam}&query=Tara%20Pierce`,
         {
-          fixture: 'support/user-search-by-name.json',
+          pathname: '/api/users/',
+          query: {
+            query: 'Tara Pierce',
+          },
         },
+        { fixture: 'support/user-search-by-name.json' },
       )
 
       .intercept(
-        'GET',
-        `/api/users/?page=1&page_size=10&${fieldQueryParam}&query=0024c6a7885940bbb156e82073bc0244`,
         {
-          fixture: 'support/user-search-by-name.json',
+          pathname: '/api/users/',
+          query: {
+            query: '0024c6a7885940bbb156e82073bc0244',
+          },
         },
+        { fixture: 'support/user-search-by-name.json' },
       )
 
       .intercept(
-        'GET',
-        `/api/users/?page=1&page_size=10&customer_uuid=895e38d197e748459189f19285119edf&${fieldQueryParam}`,
         {
-          fixture: 'support/user-search-by-name.json',
+          pathname: '/api/users/',
+          query: {
+            customer_uuid: '895e38d197e748459189f19285119edf',
+          },
         },
+        { fixture: 'support/user-search-by-name.json' },
       )
 
       .intercept(
-        'GET',
-        `/api/users/?page=1&page_size=10&${fieldQueryParam}&is_staff=true`,
         {
-          fixture: 'support/users.json',
+          pathname: '/api/users/',
+          query: {
+            is_staff: 'true',
+          },
         },
+        { fixture: 'support/users.json' },
       )
 
       .intercept(
-        'GET',
-        `/api/users/?page=1&page_size=10&${fieldQueryParam}&role=&status=true`,
         {
-          fixture: 'support/users.json',
+          pathname: '/api/users/',
+          query: {
+            is_active: 'true',
+          },
         },
+        { fixture: 'support/users.json' },
       )
 
       .intercept(
-        'GET',
-        `/api/users/?page=1&page_size=10&${fieldQueryParam}&query=TaraPierce%40example.com`,
         {
-          fixture: 'support/user-search-by-name.json',
+          pathname: '/api/users/',
+          query: {
+            query: 'TaraPierce@example.com',
+          },
         },
-      )
-
-      .intercept('GET', `/api/users/?page=1&page_size=10&${fieldQueryParam}`, {
-        fixture: 'support/users.json',
-      })
-      .as('getUsers');
+        { fixture: 'support/user-search-by-name.json' },
+      );
 
     cy.fixture('support/user-search-by-name.json')
       .then((users) => {

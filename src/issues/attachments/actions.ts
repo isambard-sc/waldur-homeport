@@ -42,16 +42,19 @@ export const issueAttachmentsPut = (
 });
 
 export const issueAttachmentsPutStart = (
-  uploading: number,
-): Action<{ uploading: number }> => ({
+  files: File[],
+): Action<{ files: File[] }> => ({
   type: constants.ISSUE_ATTACHMENTS_PUT_START,
   payload: {
-    uploading,
+    files,
   },
 });
 
-export const issueAttachmentsPutReject = (): Action => ({
+export const issueAttachmentsPutReject = (
+  file: File,
+): Action<{ file: File }> => ({
   type: constants.ISSUE_ATTACHMENTS_PUT_REJECT,
+  payload: { file },
 });
 
 export const issueAttachmentsPutSuccess = (
@@ -64,12 +67,34 @@ export const issueAttachmentsPutSuccess = (
 });
 
 export const issueAttachmentsPutError = (
+  file: File,
   error: Response,
-): Action<{ error: Response }> => ({
+): Action<{ file: File; error: Response }> => ({
   type: constants.ISSUE_ATTACHMENTS_PUT_ERROR,
   payload: {
+    file,
     error,
   },
+});
+
+export const issueAttachmentsPutRetry = (
+  issueUrl: string,
+  file: File,
+): Action<{ issueUrl: string; file: File }> => ({
+  type: constants.ISSUE_ATTACHMENTS_PUT_RETRY,
+  payload: { issueUrl, file },
+});
+
+export const issueAttachmentsPutCancel = (
+  file: File,
+): Action<{ file: File }> => ({
+  type: constants.ISSUE_ATTACHMENTS_PUT_CANCEL,
+  payload: { file },
+});
+
+export const issueAttachmentsProgressUpdate = (key, progress) => ({
+  type: constants.ISSUE_ATTACHMENTS_PROGRESS_UPDATE,
+  payload: { key, progress },
 });
 
 export const issueAttachmentsDelete = (

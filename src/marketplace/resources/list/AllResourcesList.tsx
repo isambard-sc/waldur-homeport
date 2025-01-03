@@ -60,7 +60,7 @@ interface AllResourcesListProps extends Partial<TableProps> {
 }
 
 export const AllResourcesList: FC<AllResourcesListProps> = (props) => {
-  useTitle(translate('All resources'));
+  useTitle(translate('All resources'), '', 'browser');
   const { syncResourceFilters } =
     useOrganizationAndProjectFiltersForResources('all-resources');
   const filter = useSelector(mapStateToFilter);

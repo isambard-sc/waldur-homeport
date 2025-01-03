@@ -40,7 +40,7 @@ export const CallCard: FC<{ call }> = ({ call }) => {
               call={call}
               title={translate('Apply')}
               variant="flush"
-              className="text-btn"
+              className="btn btn-flush text-anchor"
             />
             <Link
               state="public-call.details"

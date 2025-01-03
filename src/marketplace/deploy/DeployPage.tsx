@@ -104,9 +104,24 @@ export const BaseDeployPage = ({
         uuid: selectedOffering.project_uuid,
         url: selectedOffering.project,
       };
+    } else {
+      const projectFilter = marketplaceFilters?.find(
+        (item) => item.name === 'project',
+      );
+      if (projectFilter?.value) {
+        initialValues.project = projectFilter.value;
+      }
     }
 
-    if (!selectedOffering.shared) {
+    if (selectedOffering.shared) {
+      const customerFilter = marketplaceFilters?.find(
+        (item) => item.name === 'organization',
+      );
+
+      if (customerFilter?.value) {
+        initialValues.customer = customerFilter.value;
+      }
+    } else {
       initialValues.customer = {
         name: selectedOffering.customer_name,
         uuid: selectedOffering.customer_uuid,
@@ -114,19 +129,6 @@ export const BaseDeployPage = ({
       };
     }
 
-    const customerFilter = marketplaceFilters?.find(
-      (item) => item.name === 'organization',
-    );
-    const projectFilter = marketplaceFilters?.find(
-      (item) => item.name === 'project',
-    );
-
-    if (customerFilter?.value) {
-      initialValues.customer = customerFilter.value;
-    }
-    if (projectFilter?.value) {
-      initialValues.project = projectFilter.value;
-    }
     if (hasStepWithField(formSteps, 'offering') && selectedOffering) {
       initialValues.offering = selectedOffering;
     }

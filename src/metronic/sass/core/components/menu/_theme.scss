@@ -450,6 +450,40 @@
   }
 }
 
+// Gray background states
+.menu-state-bg-gray {
+  .menu-item {
+    @include menu-link-show-state(
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-50
+    );
+    @include menu-link-here-state(
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-50
+    );
+    @include menu-link-hover-state(
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-50
+    );
+    @include menu-link-active-state(
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-700,
+      $gray-50
+    );
+  }
+}
+
 // Primary title states
 .menu-hover-title-primary {
   .menu-item {

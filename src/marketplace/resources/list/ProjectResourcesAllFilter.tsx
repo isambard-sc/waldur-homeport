@@ -37,7 +37,10 @@ const PureProjectResourcesAllFilter: FunctionComponent<
         name="offering"
         badgeValue={(value) => `${value?.category_title} / ${value?.name}`}
       >
-        <OfferingAutocomplete reactSelectProps={REACT_SELECT_TABLE_FILTER} />
+        <OfferingAutocomplete
+          providerOfferings={false}
+          reactSelectProps={REACT_SELECT_TABLE_FILTER}
+        />
       </TableFilterItem>
       <TableFilterItem
         title={translate('Category')}
@@ -74,7 +77,7 @@ const PureProjectResourcesAllFilter: FunctionComponent<
         <RuntimeStateFilter />
       </TableFilterItem>
       <TableFilterItem title={translate('State')} name="state">
-        <ResourceStateFilter reactSelectProps={{ isMulti: true }} />
+        <ResourceStateFilter />
       </TableFilterItem>
       <TableFilterItem
         title={translate('Include terminated')}

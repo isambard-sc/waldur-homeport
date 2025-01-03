@@ -25,7 +25,7 @@ export function loadTheme(theme: ThemeName) {
 
 /** Get initial theme from local storage or user preference */
 export const getInitialTheme = () => {
-  if (ENV.plugins.WALDUR_CORE.DISABLE_DARK_THEME) {
+  if (ENV.plugins?.WALDUR_CORE.DISABLE_DARK_THEME) {
     return 'light';
   }
   if (hrefs[ThemeStorage.getTheme()]) {

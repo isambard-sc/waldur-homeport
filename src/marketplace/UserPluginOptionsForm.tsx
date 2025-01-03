@@ -31,6 +31,10 @@ const USERNAME_GENERATION_POLICY_OPTIONS = [
     label: translate('FreeIPA'),
     value: 'freeipa',
   },
+  {
+    label: translate('Identity claim'),
+    value: 'identity_claim',
+  },
 ];
 const ACCOUNT_NAME_GENERATION_POLICY_OPTIONS = [
   {
