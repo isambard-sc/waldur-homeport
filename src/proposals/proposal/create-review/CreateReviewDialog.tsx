@@ -16,6 +16,7 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { createProposalReview, getAllCallUsers } from '@waldur/proposals/api';
+import { CALL_REVIEWERS_QUERY_KEY } from '@waldur/proposals/constants';
 import { Proposal } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
@@ -40,7 +41,7 @@ export const CreateReviewDialog = reduxForm<
     error,
     refetch,
   } = useQuery(
-    ['CallReviewers', props.resolve.proposal.call_uuid],
+    [CALL_REVIEWERS_QUERY_KEY, props.resolve.proposal.call_uuid],
     () =>
       getAllCallUsers(props.resolve.proposal.call_uuid, RoleEnum.CALL_REVIEWER),
     { staleTime: 3 * 60 * 1000 },
