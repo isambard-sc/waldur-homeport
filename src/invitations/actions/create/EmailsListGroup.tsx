@@ -92,6 +92,15 @@ export const EmailsListGroup = ({
                     <td className="id-column">
                       {ENV.plugins.WALDUR_CORE.INVITATION_CIVIL_NUMBER_LABEL ||
                         translate('Civil number')}
+                      <Tip
+                        label={translate(
+                          'Must start with a country prefix ie EE34501234215',
+                        )}
+                        id="idTooltip"
+                      >
+                        {' '}
+                        <Question />
+                      </Tip>
                     </td>
                   )}
                   {isFeatureVisible(InvitationsFeatures.show_tax_number) && (
@@ -135,7 +144,7 @@ export const EmailsListGroup = ({
                           <td>
                             <Field
                               name={`${user}.civil_number`}
-                              placeholder={translate('e.g. 123456789')}
+                              placeholder={translate('e.g. EE123456789')}
                               component={InputField}
                               className={null}
                               disabled={disabled}
@@ -155,7 +164,7 @@ export const EmailsListGroup = ({
                           <td>
                             <Field
                               name={`${user}.tax_number`}
-                              placeholder={translate('e.g. 123456789')}
+                              placeholder={translate('e.g. EE123456789')}
                               component={InputField}
                               className={null}
                               disabled={disabled}
