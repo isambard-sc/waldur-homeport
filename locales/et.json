@@ -826,7 +826,7 @@
   "Estimate": "Hinnang",
   "Estimate usage of {component}": "Hinnanguline komponendi {component} kasutus",
   "Estimated cost": "Hinnangulised kulud",
-  "Estimated monthly fee will change from {old_estimate} to {new_estimate}. VAT is not included.": "Hinnanguline kuutasu muutub praegusest {old_estimate} uueks {new_estimate}. Ei sisalda käibemaksu.",
+  "Estimated monthly fee will change from {old_estimate} to {new_estimate}. VAT is not included.": "Hinnanguline kuutasu muutub, praegune 1 päeva maksumus on {old_estimate} ja uueks maksumuseks on {new_estimate}. Ei sisalda käibemaksu.",
   "Estimated revenue": "Hinnanguline müügitulu",
   "Ethernet type": "Etherneti tüüp",
   "Evaluation": "Hindamine",
