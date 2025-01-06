@@ -7,7 +7,6 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-import { EventTypesButton, EventTypesDropdownItem } from './EventTypesButton';
 import { ExpandableEventDetails } from './ExpandableEventDetails';
 
 const EventDateField = ({ row }) => <>{formatDateTime(row.created)}</>;
@@ -47,10 +46,6 @@ export const BaseEventsList: FunctionComponent<{
   );
   const props = useTable(options);
 
-  const dropdownActions = useMemo(() => {
-    return actions ? [] : [EventTypesDropdownItem()];
-  }, [actions]);
-
   return (
     <Table
       columns={[
@@ -78,8 +73,7 @@ export const BaseEventsList: FunctionComponent<{
       cardBordered={cardBordered}
       title={title || translate('Events')}
       verboseName={translate('events')}
-      tableActions={actions || <EventTypesButton />}
-      dropdownActions={dropdownActions}
+      tableActions={actions}
       enableExport={true}
       expandableRow={ExpandableEventDetails}
       filters={filters}
