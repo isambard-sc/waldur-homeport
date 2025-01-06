@@ -138,6 +138,47 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-marketplace-settings',
+    url: 'marketplace/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./marketplace/AdministrationMarketplace').then((module) => ({
+        default: module.AdministrationMarketplace,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Marketplace'),
+    },
+  },
+
+  {
+    name: 'admin-telemetry-settings',
+    url: 'telemetry/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./telemetry/AdministrationTelemetry').then((module) => ({
+        default: module.AdministrationTelemetry,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Telemetry'),
+    },
+  },
+  {
+    name: 'admin-custom-scripts-settings',
+    url: 'custom-scripts/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./custom-scripts/AdministrationCustomScripts').then((module) => ({
+        default: module.AdministrationCustomScripts,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Custom Scripts'),
+    },
+  },
+
+  {
     name: 'admin-features',
     url: 'features/',
     parent: 'admin-settings',
