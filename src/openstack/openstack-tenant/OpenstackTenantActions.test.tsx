@@ -20,9 +20,9 @@ vi.mock('@waldur/configs/default', () => ({
     plugins: {
       WALDUR_CORE: {
         ONLY_STAFF_MANAGES_SERVICES: false,
+        ENABLE_RESOURCE_END_DATE: true,
       },
       WALDUR_OPENSTACK: { TENANT_CREDENTIALS_VISIBLE: true },
-      WALDUR_MARKETPLACE: { ENABLE_RESOURCE_END_DATE: true },
     },
   },
 }));

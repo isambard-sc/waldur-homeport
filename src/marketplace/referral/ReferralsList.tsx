@@ -18,7 +18,7 @@ export const ReferralsList: FunctionComponent<{ offering }> = ({
     fetchData: (request) =>
       createFetcher(
         'marketplace-offering-referrals',
-        ENV.plugins.WALDUR_MARKETPLACE.ANONYMOUS_USER_CAN_VIEW_OFFERINGS
+        ENV.plugins.WALDUR_CORE.ANONYMOUS_USER_CAN_VIEW_OFFERINGS
           ? ANONYMOUS_CONFIG
           : undefined,
       )(request),
