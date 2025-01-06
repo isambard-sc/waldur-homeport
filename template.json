@@ -3839,10 +3839,6 @@
     "description": "events/ExpandableEventDetailsTable.tsx",
     "message": "Event type"
   },
-  "Event types": {
-    "description": "events/EventTypesButton.tsx, events/EventTypesDialog.tsx",
-    "message": "Event types"
-  },
   "Events": {
     "description": "administration/hooks/HooksList.tsx, events/BaseEventsList.tsx, marketplace/offerings/OfferingDetailsUIView.tsx, marketplace/offerings/expandable/OfferingEventsList.tsx, user/hooks/HooksList.tsx",
     "message": "Events"
@@ -6832,7 +6828,7 @@
     "message": "Offerings"
   },
   "Ok": {
-    "description": "events/TypeListDialog.tsx, marketplace/details/plan/PlanDescription.tsx, marketplace/offerings/actions/RequestActionDialog.tsx, marketplace/orders/TermsOfServiceDialog.tsx, marketplace/resources/MarketplaceKeyValueDialog.tsx, marketplace/resources/report/ShowReportDialog.tsx, openstack/openstack-tenant/actions/RequestDirectAccessDialog.tsx, rancher/cluster/apps/ApplicationDetailsDialog.tsx, reporting/plan-usage/PlanUsageDialog.tsx, slurm/RequestLimitsChangeDialog.tsx",
+    "description": "marketplace/details/plan/PlanDescription.tsx, marketplace/offerings/actions/RequestActionDialog.tsx, marketplace/orders/TermsOfServiceDialog.tsx, marketplace/resources/MarketplaceKeyValueDialog.tsx, marketplace/resources/report/ShowReportDialog.tsx, openstack/openstack-tenant/actions/RequestDirectAccessDialog.tsx, rancher/cluster/apps/ApplicationDetailsDialog.tsx, reporting/plan-usage/PlanUsageDialog.tsx, slurm/RequestLimitsChangeDialog.tsx",
     "message": "Ok"
   },
   "Old value": {
