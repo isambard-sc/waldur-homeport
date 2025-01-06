@@ -42,7 +42,7 @@ export const EditResourceEndDateByProviderAction = ({
       }),
     );
 
-  if (!ENV.plugins.WALDUR_MARKETPLACE.ENABLE_RESOURCE_END_DATE) {
+  if (!ENV.plugins.WALDUR_CORE.ENABLE_RESOURCE_END_DATE) {
     return null;
   }
 

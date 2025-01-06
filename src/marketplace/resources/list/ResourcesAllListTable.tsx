@@ -162,7 +162,7 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
           keys: ['created'],
           export: (row) => formatDateTime(row.created),
         },
-        ENV.plugins.WALDUR_MARKETPLACE.ENABLE_RESOURCE_END_DATE && {
+        ENV.plugins.WALDUR_CORE.ENABLE_RESOURCE_END_DATE && {
           title: translate('Termination date'),
           render: ({ row }) => <>{row.end_date || 'N/A'}</>,
           id: 'end_date',

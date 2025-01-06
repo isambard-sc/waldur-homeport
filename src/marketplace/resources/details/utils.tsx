@@ -68,7 +68,7 @@ export const getResourceSummaryFields = ({
       label: translate('Created'),
       value: <CreatedField resource={resource} />,
     },
-    ENV.plugins.WALDUR_MARKETPLACE.ENABLE_RESOURCE_END_DATE
+    ENV.plugins.WALDUR_CORE.ENABLE_RESOURCE_END_DATE
       ? {
           name: 'end_date',
           label: translate('Termination date'),

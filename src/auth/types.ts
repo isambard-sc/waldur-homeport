@@ -19,6 +19,8 @@ interface ValimoAuthConfiguration {
 
 interface CoreConfiguration {
   INVITATION_USE_WEBHOOKS: boolean;
+  ANONYMOUS_USER_CAN_VIEW_OFFERINGS: boolean;
+  ENABLE_RESOURCE_END_DATE: boolean;
   DEFAULT_IDP: { provider: string; auth_url: string; client_id: string };
   MATOMO_URL_BASE: string;
   MATOMO_SITE_ID: number;
@@ -68,11 +70,6 @@ interface CoreConfiguration {
   USER_TABLE_COLUMNS: string;
 }
 
-interface MarketplaceConfiguration {
-  ANONYMOUS_USER_CAN_VIEW_OFFERINGS: boolean;
-  ENABLE_RESOURCE_END_DATE: boolean;
-}
-
 interface OpenStackConfiguration {
   TENANT_CREDENTIALS_VISIBLE: boolean;
   ALLOW_CUSTOMER_USERS_OPENSTACK_CONSOLE_ACCESS: boolean;
@@ -117,7 +114,6 @@ export interface PluginConfiguration {
   WALDUR_AUTH_SOCIAL: Partial<SocialAuthConfiguration>;
   WALDUR_AUTH_VALIMO: Partial<ValimoAuthConfiguration>;
   WALDUR_CORE: CoreConfiguration;
-  WALDUR_MARKETPLACE: MarketplaceConfiguration;
   WALDUR_OPENSTACK: Partial<OpenStackConfiguration>;
   WALDUR_MARKETPLACE_OPENSTACK: Partial<MarketplaceOpenStackTenantConfiguration>;
   WALDUR_RANCHER: RancherConfiguration;

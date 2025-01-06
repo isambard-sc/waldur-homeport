@@ -667,6 +667,14 @@
     "description": "proposals/round/allocation/EditRoundAllocationDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx",
     "message": "Allocation"
   },
+  "Allow anonymous users to see plans": {
+    "description": "SettingsDescription.ts",
+    "message": "Allow anonymous users to see plans"
+  },
+  "Allow anonymous users to see shared offerings in active, paused and archived states": {
+    "description": "SettingsDescription.ts",
+    "message": "Allow anonymous users to see shared offerings in active, paused and archived states"
+  },
   "Allow bookings to be scheduled at weekends": {
     "description": "booking/components/WeekendsGroup.tsx",
     "message": "Allow bookings to be scheduled at weekends"
@@ -686,6 +694,10 @@
   "Allow to select mount point for data volume when Rancher cluster is provisioned.": {
     "description": "features/FeaturesDescription.ts",
     "message": "Allow to select mount point for data volume when Rancher cluster is provisioned."
+  },
+  "Allow to view and update resource end date.": {
+    "description": "SettingsDescription.ts",
+    "message": "Allow to view and update resource end date."
   },
   "Allowed address pairs update was scheduled.": {
     "description": "openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx",
@@ -2699,6 +2711,10 @@
     "description": "openstack/openstack-volume/actions/RetypeDialog.tsx",
     "message": "Current type"
   },
+  "Custom Scripts": {
+    "description": "SettingsDescription.ts, administration/custom-scripts/AdministrationCustomScripts.tsx, administration/routes.ts",
+    "message": "Custom Scripts"
+  },
   "Custom scripts": {
     "description": "marketplace-script/marketplace.ts",
     "message": "Custom scripts"
@@ -3122,6 +3138,10 @@
   "Disable gateway IP advertising via DHCP": {
     "description": "openstack/openstack-subnet/fields.tsx",
     "message": "Disable gateway IP advertising via DHCP"
+  },
+  "Disable only resource update events.": {
+    "description": "SettingsDescription.ts",
+    "message": "Disable only resource update events."
   },
   "Disable this to export only the rows on the current page": {
     "description": "table/ExportDialog.tsx",
@@ -3562,6 +3582,10 @@
   "Enable profile after creation": {
     "description": "customer/payment-profiles/PaymentProfileCreateDialog.tsx",
     "message": "Enable profile after creation"
+  },
+  "Enable reminders to owners about resources of shared offerings that have not generated any cost for the last 3 months.": {
+    "description": "SettingsDescription.ts",
+    "message": "Enable reminders to owners about resources of shared offerings that have not generated any cost for the last 3 months."
   },
   "Enable synchronization": {
     "description": "administration/remote-offering-sync/RemoteSyncFormDialog.tsx",
@@ -4699,6 +4723,14 @@
     "description": "marketplace/UserSecretOptionsForm.tsx",
     "message": "If defined, will be set as a password for all offering users"
   },
+  "If true, notify users about resource changes from Marketplace perspective. Can generate duplicate events if plugins also log": {
+    "description": "SettingsDescription.ts",
+    "message": "If true, notify users about resource changes from Marketplace perspective. Can generate duplicate events if plugins also log"
+  },
+  "If true, users with staff role are notified when request for order approval is generated": {
+    "description": "SettingsDescription.ts",
+    "message": "If true, users with staff role are notified when request for order approval is generated"
+  },
   "If you want user to be able to modify resource options after creation, please configure options for user below": {
     "description": "marketplace/offerings/update/options/OfferingResourceOptionsSection.tsx",
     "message": "If you want user to be able to modify resource options after creation, please configure options for user below"
@@ -5267,6 +5299,10 @@
     "description": "marketplace/resources/details/popup/ResourceDetailsDialog.tsx",
     "message": "Key information about the resource."
   },
+  "Key is command to execute script, value is a dictionary of image name and command.": {
+    "description": "SettingsDescription.ts",
+    "message": "Key is command to execute script, value is a dictionary of image name and command."
+  },
   "Key name": {
     "description": "marketplace/robot-accounts/RobotAccountExpandable.tsx, openstack/openstack-instance/deploy/FormSSHPublicKeysStep.tsx, user/keys/KeyCreateDialog.tsx",
     "message": "Key name"
@@ -5290,6 +5326,10 @@
   "Kubeconfig file": {
     "description": "rancher/cluster/actions/RancherClusterKubeconfigDialog.tsx",
     "message": "Kubeconfig file"
+  },
+  "Kubernetes namespace where jobs will be executed": {
+    "description": "SettingsDescription.ts",
+    "message": "Kubernetes namespace where jobs will be executed"
   },
   "Kubernetes nodes": {
     "description": "rancher/node/ClusterNodesList.tsx",
@@ -5691,6 +5731,10 @@
     "description": "SettingsDescription.ts",
     "message": "Marker for comment. Used for separating comments made via Waldur from natively added comments."
   },
+  "Marketplace Branding": {
+    "description": "SettingsDescription.ts, administration/settings/AdministrationBranding.tsx",
+    "message": "Marketplace Branding"
+  },
   "Marketplace UUID": {
     "description": "resource/summary/ResourceMetadataDialog.tsx",
     "message": "Marketplace UUID"
@@ -5704,7 +5748,7 @@
     "message": "Marketplace offerings and resources"
   },
   "Marketplace": {
-    "description": "SettingsDescription.ts, administration/routes.ts, administration/settings/AdministrationBranding.tsx, marketplace/landing/LandingPage.tsx, marketplace/offerings/hooks.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/utils.ts, navigation/sidebar/UnifiedSidebar.tsx",
+    "description": "SettingsDescription.ts, administration/marketplace/AdministrationMarketplace.tsx, administration/routes.ts, marketplace/landing/LandingPage.tsx, marketplace/offerings/hooks.tsx, marketplace/offerings/utils.ts, marketplace/routes.ts, marketplace/utils.ts, navigation/sidebar/UnifiedSidebar.tsx",
     "message": "Marketplace"
   },
   "Mass import of remote offerings": {
@@ -6963,6 +7007,14 @@
     "description": "rancher/cluster/create/FormOptionalServicesStep.tsx, rancher/cluster/create/steps.ts",
     "message": "Optional"
   },
+  "Options for docker client. See also: <https://docker-py.readthedocs.io/en/stable/client.html#docker.client.DockerClient>": {
+    "description": "SettingsDescription.ts",
+    "message": "Options for docker client. See also: <https://docker-py.readthedocs.io/en/stable/client.html#docker.client.DockerClient>"
+  },
+  "Options for docker runtime. See also: <https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run>": {
+    "description": "SettingsDescription.ts",
+    "message": "Options for docker runtime. See also: <https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run>"
+  },
   "Options have been updated": {
     "description": "marketplace/resources/options/UpdateResourceOptionDialog.tsx",
     "message": "Options have been updated"
@@ -7262,6 +7314,14 @@
   "Password": {
     "description": "auth/SigninForm.tsx, azure/sql/AzureSQLServerSummary.tsx, openstack/OpenStackForm.tsx, openstack/openstack-tenant/OpenStackTenantSummary.tsx, rancher/catalog/CatalogCreateDialog.tsx, vmware/VMwareForm.tsx",
     "message": "Password"
+  },
+  "Path to Kubernetes configuration file": {
+    "description": "SettingsDescription.ts",
+    "message": "Path to Kubernetes configuration file"
+  },
+  "Path to folder on executor machine where to create temporary submission scripts. If None, uses OS-dependent location. OS X users, see <https://github.com/docker/for-mac/issues/1532>": {
+    "description": "SettingsDescription.ts",
+    "message": "Path to folder on executor machine where to create temporary submission scripts. If None, uses OS-dependent location. OS X users, see <https://github.com/docker/for-mac/issues/1532>"
   },
   "Pause offering": {
     "description": "administration/roles/PermissionOptions.tsx, marketplace/offerings/actions/PauseOfferingDialog.tsx",
@@ -8686,6 +8746,10 @@
   "Remote user ID": {
     "description": "user/support/AddRemoteUserDialog.tsx",
     "message": "Remote user ID"
+  },
+  "Remove Docker container after script execution": {
+    "description": "SettingsDescription.ts",
+    "message": "Remove Docker container after script execution"
   },
   "Remove avatar": {
     "description": "form/ImageField.tsx",
@@ -10567,6 +10631,10 @@
     "description": "administration/providers/IdentityProvidersList.tsx",
     "message": "Single sign-on using SAML2-based identity federation."
   },
+  "Size of the thumbnail to generate when screenshot is uploaded for an offering.": {
+    "description": "SettingsDescription.ts",
+    "message": "Size of the thumbnail to generate when screenshot is uploaded for an offering."
+  },
   "Size": {
     "description": "azure/vm/AzureVirtualMachineForm.tsx, azure/vm/AzureVirtualMachineSummary.tsx, openstack/openstack-instance/OpenStackInstanceVolumeBadge.tsx, openstack/openstack-snapshot/OpenStackSnapshotSummary.tsx, openstack/openstack-snapshot/TenantSnapshotsList.tsx, openstack/openstack-volume/InstanceVolumesList.tsx, openstack/openstack-volume/OpenStackVolumeSummary.tsx, openstack/openstack-volume/OpenstackVolumeDetails.tsx, openstack/openstack-volume/TenantVolumesList.tsx, openstack/openstack-volume/VolumeSnapshotsList.tsx, vmware/DisksList.tsx, vmware/VMwareDiskSummary.tsx, vmware/actions/CreateDiskDialog.tsx, vmware/actions/ExtendDiskDialog.tsx",
     "message": "Size"
@@ -11063,9 +11131,17 @@
     "description": "marketplace/offerings/InternalNameField.tsx",
     "message": "Technical name intended for integration and automated reporting. Please use Latin letters without spaces only."
   },
+  "Telemetry service version.": {
+    "description": "SettingsDescription.ts",
+    "message": "Telemetry service version."
+  },
   "Telemetry settings": {
     "description": "features/FeaturesDescription.ts",
     "message": "Telemetry settings"
+  },
+  "Telemetry": {
+    "description": "SettingsDescription.ts, administration/routes.ts, administration/telemetry/AdministrationTelemetry.tsx",
+    "message": "Telemetry"
   },
   "Template details": {
     "description": "rancher/template/TemplateDetail.tsx",
@@ -11551,6 +11627,10 @@
     "description": "user/api-key/AuthenticationEvents.tsx",
     "message": "Time"
   },
+  "Timeout for execution of one Kubernetes job in seconds": {
+    "description": "SettingsDescription.ts",
+    "message": "Timeout for execution of one Kubernetes job in seconds"
+  },
   "Timestamp": {
     "description": "events/BaseEventsList.tsx",
     "message": "Timestamp"
@@ -11751,6 +11831,10 @@
     "description": "openstack/OpenStackProvisioningConfigForm.tsx",
     "message": "Type of console access protocol used by Openstack (novnc, xvpvnc, spice-html5, rdp-html5, serial)"
   },
+  "Type of jobs deployment. Valid values: \"docker\" for simple docker deployment, \"k8s\" for Kubernetes-based one": {
+    "description": "SettingsDescription.ts",
+    "message": "Type of jobs deployment. Valid values: \"docker\" for simple docker deployment, \"k8s\" for Kubernetes-based one"
+  },
   "Type of linked issue field name": {
     "description": "SettingsDescription.ts",
     "message": "Type of linked issue field name"
@@ -11766,6 +11850,10 @@
   "Types of offering": {
     "description": "administration/TelemetryExampleDialog.tsx",
     "message": "Types of offering"
+  },
+  "URL for sending telemetry data.": {
+    "description": "SettingsDescription.ts",
+    "message": "URL for sending telemetry data."
   },
   "URL": {
     "description": "marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, rancher/catalog/ClusterCatalogList.tsx",
@@ -12271,6 +12359,10 @@
     "description": "marketplace-checklist/ChecklistOverview.tsx, marketplace-checklist/useChecklist.tsx",
     "message": "Unable to load compliance overview."
   },
+  "Unable to load custom scripts configuration.": {
+    "description": "administration/custom-scripts/AdministrationCustomScripts.tsx",
+    "message": "Unable to load custom scripts configuration."
+  },
   "Unable to load customer support satisfaction overall rating.": {
     "description": "issues/CustomerSupportRating.tsx",
     "message": "Unable to load customer support satisfaction overall rating."
@@ -12318,6 +12410,10 @@
   "Unable to load invoices": {
     "description": "customer/payments/InvoicesDropdown.tsx",
     "message": "Unable to load invoices"
+  },
+  "Unable to load marketplace configuration.": {
+    "description": "administration/marketplace/AdministrationMarketplace.tsx",
+    "message": "Unable to load marketplace configuration."
   },
   "Unable to load offering cost chart.": {
     "description": "marketplace/offerings/expandable/OfferingCostsChart.tsx",
@@ -12390,6 +12486,10 @@
   "Unable to load statistics data": {
     "description": "administration/dashboard/AdminStatistics.tsx, proposals/call-management/CallManagementStatistics.tsx, support/dashboard/SupportStatistics.tsx",
     "message": "Unable to load statistics data"
+  },
+  "Unable to load telemetry configuration.": {
+    "description": "administration/telemetry/AdministrationTelemetry.tsx",
+    "message": "Unable to load telemetry configuration."
   },
   "Unable to load user.": {
     "description": "user/support/UserDetailsDialog.tsx",
