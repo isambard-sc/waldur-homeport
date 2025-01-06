@@ -3703,6 +3703,10 @@
     "description": "invitations/actions/create/EmailsListGroup.tsx",
     "message": "Enter email address"
   },
+  "Enter email addresses separated by commas (e.g., user1@example.com, user2@example.com)": {
+    "description": "customer/cost-policies/CostPolicyForm.tsx",
+    "message": "Enter email addresses separated by commas (e.g., user1@example.com, user2@example.com)"
+  },
   "Enter private IPv4 CIDR.": {
     "description": "openstack/utils.ts",
     "message": "Enter private IPv4 CIDR."
@@ -4010,6 +4014,10 @@
   "External size": {
     "description": "administration/SystemInfoPage.tsx",
     "message": "External size"
+  },
+  "External user emails": {
+    "description": "customer/cost-policies/CostPolicyForm.tsx",
+    "message": "External user emails"
   },
   "External username": {
     "description": "marketplace/service-providers/ProviderOfferingUserUpdateDialog.tsx, marketplace/service-providers/ProviderOfferingUsersList.tsx",
@@ -5014,6 +5022,10 @@
   "Internal": {
     "description": "issues/comments/IssueCommentItem.tsx",
     "message": "Internal"
+  },
+  "Invalid email: {email}": {
+    "description": "customer/cost-policies/CostPolicyForm.tsx",
+    "message": "Invalid email: {email}"
   },
   "Invitation approval": {
     "description": "invitations/InvitationApprove.tsx",
@@ -6582,6 +6594,10 @@
   "Notifications": {
     "description": "SettingsDescription.ts, administration/hooks/HooksList.tsx, administration/routes.ts, administration/settings/AdministrationBranding.tsx, user/hooks/HooksList.tsx, user/routes.ts",
     "message": "Notifications"
+  },
+  "Notify external user": {
+    "description": "customer/cost-policies/utils.ts",
+    "message": "Notify external user"
   },
   "Notify organization owners": {
     "description": "customer/cost-policies/utils.ts, marketplace/offerings/details/utils.ts",
@@ -11568,7 +11584,7 @@
     "message": "This field is only editable when startup script is enabled."
   },
   "This field is required.": {
-    "description": "core/validators.ts",
+    "description": "core/validators.ts, customer/cost-policies/CostPolicyForm.tsx",
     "message": "This field is required."
   },
   "This name will be visible in accounting data.": {
