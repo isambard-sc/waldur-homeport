@@ -11,6 +11,7 @@ import {
   FieldError,
   NumberField,
   SelectField,
+  StringField,
 } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { translate } from '@waldur/i18n';
@@ -44,6 +45,18 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
     props.isEdit && typeof props.initialValues?.period === 'number'
       ? props.initialValues.period
       : null,
+  );
+
+  const [selectedAction, setSelectedAction] = useState<{
+    value: string;
+    label: string;
+  } | null>(
+    typeof props.initialValues?.actions === 'string'
+      ? {
+          value: props.initialValues.actions,
+          label: props.initialValues.actions,
+        }
+      : props.initialValues?.actions || null,
   );
 
   const [costsData, setCostsData] = useState<any[]>([]);
@@ -83,6 +96,11 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
       });
     }
   }, [selectedEntities, selectedPeriod, props.type]);
+
+  const handleActionChange = (value) => {
+    setSelectedAction(value);
+    props.change('options', {});
+  };
 
   return (
     <FormContainer submitting={props.submitting} className="size-lg">
@@ -218,11 +236,33 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
         options={getCostPolicyActionOptions(props.type)}
         getOptionValue={(option) => option.value}
         getOptionLabel={(option) => option.label}
-        spaceless
+        onChange={(value) => handleActionChange(value)}
       />
+      {selectedAction?.value === 'notify_external_user' && (
+        <StringField
+          name="options.notify_external_user"
+          label={translate('External user emails')}
+          placeholder={translate(
+            'Enter email addresses separated by commas (e.g., user1@example.com, user2@example.com)',
+          )}
+          validate={[required, validateEmails]}
+        />
+      )}
       <Form.Group>
         <FieldError error={props.error} />
       </Form.Group>
     </FormContainer>
   );
+};
+
+const validateEmails = (value: string) => {
+  if (!value) return translate('This field is required.');
+  const emailRegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
+  const emails = value.split(',').map((email) => email.trim());
+  for (const email of emails) {
+    if (email && !emailRegex.test(email)) {
+      return translate('Invalid email: {email}', { email });
+    }
+  }
+  return undefined;
 };

@@ -22,6 +22,11 @@ export interface CostPolicyFormData {
   scope: string;
   actions: string;
   period: PolicyPeriod;
+  options?:
+    | {
+        notify_external_user?: string;
+      }
+    | string;
 }
 
 export interface CostPolicy extends BasePolicy, CostPolicyFormData {

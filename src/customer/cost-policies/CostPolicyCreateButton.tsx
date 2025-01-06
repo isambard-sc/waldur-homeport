@@ -20,15 +20,27 @@ interface SubmitedFormData {
   actions: { value; label };
   limit_cost: number;
   period: PolicyPeriod;
+  options?: {
+    notify_external_user?: string;
+  };
 }
 
 const submit = (formData: SubmitedFormData, type: CostPolicyType) => {
   const promises = formData.scope.map((scope) => {
+    const options =
+      formData.actions.value === 'notify_external_user'
+        ? {
+            notify_external_user: formData.options?.notify_external_user,
+          }
+        : {};
     const data: CostPolicyFormData = {
       scope: scope.url,
       actions: formData.actions.value,
       limit_cost: formData.limit_cost,
       period: formData.period,
+      options: Object.keys(options).length
+        ? JSON.stringify(options)
+        : undefined,
     };
     if (type === 'project') {
       return createProjectCostPolicy(data);
