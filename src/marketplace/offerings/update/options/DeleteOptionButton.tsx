@@ -32,7 +32,7 @@ export const DeleteOptionButton: FC<
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

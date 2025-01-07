@@ -35,7 +35,7 @@ export const CommentActions = ({ comment }) => {
         translate(
           'Are you sure you want to delete this comment? This action cannot be undone.',
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

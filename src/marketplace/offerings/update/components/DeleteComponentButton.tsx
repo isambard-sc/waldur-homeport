@@ -25,7 +25,7 @@ export const DeleteComponentButton = ({ offering, component }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

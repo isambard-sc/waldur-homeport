@@ -44,12 +44,12 @@ describe('UserStatus', () => {
   it('renders the component with the enabled user', () => {
     render(<UserStatus user={user} />);
     expect(screen.getByText('Account status')).toBeInTheDocument();
-    expect(screen.getByLabelText('Block')).not.toBeChecked();
+    expect(screen.getByLabelText('Deactivated')).not.toBeChecked();
   });
 
   it('deactivates user successfully', async () => {
     render(<UserStatus user={user} />);
-    fireEvent.click(screen.getByLabelText('Block'));
+    fireEvent.click(screen.getByLabelText('Deactivated'));
     await waitFor(() => {
       expect(deactivateUser).toHaveBeenCalledWith('abc123');
       expect(showSuccessMock).toHaveBeenCalledWith(
@@ -61,7 +61,7 @@ describe('UserStatus', () => {
   it('handles the error when deactivating user', async () => {
     vi.mocked(deactivateUser).mockRejectedValue(new Error('Server error'));
     render(<UserStatus user={user} />);
-    fireEvent.click(screen.getByLabelText('Block'));
+    fireEvent.click(screen.getByLabelText('Deactivated'));
     await waitFor(() => {
       expect(showErrorResponseMock).toHaveBeenCalledWith(
         new Error('Server error'),
@@ -73,12 +73,12 @@ describe('UserStatus', () => {
   it('renders the component with the disabled user', () => {
     render(<UserStatus user={{ ...user, is_active: false }} />);
     expect(screen.getByText('Account status')).toBeInTheDocument();
-    expect(screen.getByLabelText('Block')).toBeChecked();
+    expect(screen.getByLabelText('Deactivated')).toBeChecked();
   });
 
   it('activates user successfully', async () => {
     render(<UserStatus user={{ ...user, is_active: false }} />);
-    fireEvent.click(screen.getByLabelText('Block'));
+    fireEvent.click(screen.getByLabelText('Deactivated'));
     await waitFor(() => {
       expect(deactivateUser).toHaveBeenCalledWith('abc123');
       expect(showSuccessMock).toHaveBeenCalledWith('User has been activated.');

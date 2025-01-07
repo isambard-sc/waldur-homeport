@@ -20,7 +20,7 @@ export const DeleteRoleButton = ({ role, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

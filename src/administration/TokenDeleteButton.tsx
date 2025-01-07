@@ -22,7 +22,7 @@ export const TokenDeleteButton = ({ row, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

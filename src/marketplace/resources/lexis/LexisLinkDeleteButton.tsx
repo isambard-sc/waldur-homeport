@@ -20,7 +20,7 @@ export const LexisLinkDeleteButton = ({ row, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

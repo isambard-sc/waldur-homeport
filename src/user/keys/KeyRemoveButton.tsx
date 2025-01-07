@@ -19,7 +19,7 @@ export const KeyRemoveButton = ({ uuid, refetch }) => {
         dispatch,
         translate('Key removal'),
         translate('Are you sure you would like to delete the key?'),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

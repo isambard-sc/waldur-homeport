@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { ButtonVariant, Variant } from 'react-bootstrap/esm/types';
 
-import { DialogSizeType } from '@waldur/modal/actions';
+import { DialogSizeType } from '@waldur/modal/types';
 import { ActionValidator } from '@waldur/resource/actions/types';
 
 type ModalComponentProps<T> = React.ComponentType<{
