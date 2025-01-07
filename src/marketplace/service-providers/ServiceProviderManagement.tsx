@@ -13,7 +13,7 @@ import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
-import { getCustomer } from '@waldur/workspace/selectors';
+import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { SecretValueField } from '../SecretValueField';
 
@@ -22,6 +22,7 @@ import { canRegisterServiceProviderForCustomer } from './selectors';
 export const ServiceProviderManagement: React.FC = () => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
+  const user = useSelector(getUser);
   const canRegisterServiceProvider = useSelector(
     canRegisterServiceProviderForCustomer,
   );
@@ -29,6 +30,7 @@ export const ServiceProviderManagement: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [registering, setRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [serviceProvider, setServiceProvider] =
     useState<ServiceProvider | null>(null);
 
@@ -89,6 +91,43 @@ export const ServiceProviderManagement: React.FC = () => {
     } catch (error) {
       setRegistering(false);
       dispatch(showErrorResponse(error, errorMessage));
+    }
+  };
+
+  const deleteServiceProvider = async () => {
+    try {
+      await waitForConfirmation(
+        dispatch,
+        translate('Disable service provider profile'),
+        translate('Are you sure you want to remove service provider profile?'),
+        true,
+      );
+    } catch {
+      return;
+    }
+
+    try {
+      setDeleting(true);
+      await api.deleteServiceProvider(serviceProvider.uuid);
+      setDeleting(false);
+      setServiceProvider(null);
+      dispatch(
+        showSuccess(translate('Service provider profile has been disabled.')),
+      );
+      dispatch(
+        setCurrentCustomer({
+          ...customer,
+          is_service_provider: false,
+        }),
+      );
+    } catch (error) {
+      setDeleting(false);
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to disable service provider profile.'),
+        ),
+      );
     }
   };
 
@@ -191,6 +230,14 @@ export const ServiceProviderManagement: React.FC = () => {
             }
           />
         </FormTable>
+        {user.is_staff && (
+          <ActionButton
+            title={translate('Disable service provider profile')}
+            action={deleteServiceProvider}
+            variant="outline btn-outline-danger"
+            pending={deleting}
+          />
+        )}
       </>
     );
   } else if (canRegisterServiceProvider) {
