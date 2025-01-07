@@ -12503,6 +12503,10 @@
     "description": "administration/telemetry/AdministrationTelemetry.tsx",
     "message": "Unable to load telemetry configuration."
   },
+  "Unable to load user settings configuration.": {
+    "description": "administration/user-settings/AdministrationUserSettings.tsx",
+    "message": "Unable to load user settings configuration."
+  },
   "Unable to load user.": {
     "description": "user/support/UserDetailsDialog.tsx",
     "message": "Unable to load user."
@@ -13572,7 +13576,7 @@
     "message": "User roles"
   },
   "User settings": {
-    "description": "SettingsDescription.ts",
+    "description": "SettingsDescription.ts, administration/routes.ts, administration/user-settings/AdministrationUserSettings.tsx",
     "message": "User settings"
   },
   "User submitted fields": {
