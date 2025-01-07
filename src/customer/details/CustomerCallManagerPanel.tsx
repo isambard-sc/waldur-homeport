@@ -102,13 +102,7 @@ export const CustomerCallManagerPanel: FunctionComponent = () => {
           label={translate('Enable call manager')}
           value={customer.call_managing_organization_uuid ? true : false}
           onChange={toggleCallManager}
-          disabled={
-            !!(
-              infoUuid ||
-              customer.call_managing_organization_uuid ||
-              loadingToggle
-            )
-          }
+          disabled={loadingToggle}
         />
       </Card.Body>
     </Card>
