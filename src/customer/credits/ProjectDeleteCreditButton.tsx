@@ -26,7 +26,7 @@ export const ProjectDeleteCreditButton = ({ row, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

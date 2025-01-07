@@ -20,7 +20,7 @@ export const BroadcastTemplateDeleteButton = ({ row, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

@@ -21,7 +21,7 @@ export const UserAgreementDeleteButton: FC<{ row; refetch }> = ({
         dispatch,
         translate('Delete user agreement'),
         translate('Are you sure you would like to delete the user agreement?'),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

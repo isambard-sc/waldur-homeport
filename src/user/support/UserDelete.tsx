@@ -32,7 +32,7 @@ export const UserDelete = ({ user }: { user: UserDetails }) => {
           { name: <strong>{user.full_name}</strong> },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       // swallow

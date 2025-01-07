@@ -37,7 +37,13 @@ export const UserStatus = ({ user }: { user: UserDetails }) => {
         dispatch,
         translate('Confirmation'),
         getConfirmationText(user.is_active, user.full_name),
-        true,
+        {
+          type: 'danger',
+          positiveButton: user.is_active
+            ? translate('Deactivate')
+            : translate('Activate'),
+          negativeButton: translate('Cancel'),
+        },
       );
     } catch {
       // swallow
@@ -69,7 +75,7 @@ export const UserStatus = ({ user }: { user: UserDetails }) => {
         <AwesomeCheckbox
           value={!isActive}
           onChange={toggleUserStatus}
-          label={translate('Block')}
+          label={translate('Deactivated')}
         />
       }
     >

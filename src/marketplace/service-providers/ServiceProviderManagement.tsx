@@ -42,7 +42,7 @@ export const ServiceProviderManagement: React.FC = () => {
         translate(
           'After secret API code has been regenerated, it will not be possible to submit usage with the old key.',
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

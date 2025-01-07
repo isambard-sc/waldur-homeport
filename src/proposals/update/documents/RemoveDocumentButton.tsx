@@ -26,7 +26,7 @@ export const RemoveDocumentButton = (props) => {
                 call: props.call.name,
               },
             ),
-            true,
+            { forDeletion: true },
           );
         } catch {
           return;

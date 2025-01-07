@@ -34,7 +34,7 @@ export const CostPolicyDeleteButton = ({
               { name: <strong>{row.scope_name}</strong> },
               formatJsxTemplate,
             ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

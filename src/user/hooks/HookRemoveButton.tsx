@@ -23,7 +23,7 @@ export const HookRemoveButton: FC<HookRemoveButtonProps> = (props) => {
         dispatch,
         translate('Hook removal'),
         translate('Are you sure you would like to delete the hook?'),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

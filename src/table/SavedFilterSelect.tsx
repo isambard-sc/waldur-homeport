@@ -129,7 +129,7 @@ export const SavedFilterSelect = ({
           translate(
             'Are you sure you want to delete this filter? This action cannot be undone.',
           ),
-          true,
+          { forDeletion: true },
         );
       } catch {
         return;

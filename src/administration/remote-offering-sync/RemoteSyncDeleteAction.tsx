@@ -23,7 +23,7 @@ export const RemoteSyncDeleteAction = (props: RemoteSyncActionProps) => {
           { connection: <strong>{props.row.api_url}</strong> },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

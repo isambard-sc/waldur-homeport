@@ -29,7 +29,7 @@ export const CategoryDeleteAction = (props: CategoryDeleteActionProps) => {
           { title: <strong>{props.row.title}</strong> },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

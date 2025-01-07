@@ -90,7 +90,6 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
             )}
           </small>
         </>,
-        false,
       );
     } catch {
       return;
