@@ -4,7 +4,7 @@ import { ExternalLink } from '@waldur/core/ExternalLink';
 import { translate } from '@waldur/i18n';
 
 interface DocumentationFilesProps {
-  files: Array<{ file: string }>;
+  files: Array<{ file: string; file_name: string }>;
 }
 
 export const DocumentationFiles = (props: DocumentationFilesProps) =>
@@ -14,7 +14,11 @@ export const DocumentationFiles = (props: DocumentationFilesProps) =>
         <li key={index}>
           <Row>
             <Col xs={8} md={6} xl={4}>
-              {item.file.substring(item.file.lastIndexOf('/') + 1)}
+              {/* Extract the file name from a given file path */}
+              {item.file_name
+                .split('/')
+                .pop()
+                .replace(/_[^_]+\./, '.')}
             </Col>
             <Col>
               <ExternalLink
