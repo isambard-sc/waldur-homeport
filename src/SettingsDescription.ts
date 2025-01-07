@@ -706,7 +706,7 @@ export const SettingsDescription = [
     items: [
       {
         key: 'AUTO_APPROVE_USER_TOS',
-        description: translate('Configure whether a user needs to approve TOS.'),
+        description: translate('Mark terms of services as approved for new users.'),
         default: false,
         type: 'boolean',
       },
