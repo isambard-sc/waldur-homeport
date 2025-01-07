@@ -100,7 +100,7 @@ export const ServiceProviderManagement: React.FC = () => {
         dispatch,
         translate('Disable service provider profile'),
         translate('Are you sure you want to remove service provider profile?'),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;
