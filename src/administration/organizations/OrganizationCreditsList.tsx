@@ -10,6 +10,7 @@ import { CreditHistoryLogButton } from '@waldur/customer/credits/CreditHistoryLo
 import { CustomerCredit } from '@waldur/customer/credits/types';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
+import { BooleanField } from '@waldur/table/BooleanField';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
@@ -59,8 +60,25 @@ export const OrganizationCreditsList: FC<{}> = () => {
         {
           title: translate('Minimal consumption'),
           render: ({ row }) => defaultCurrency(row.minimal_consumption),
-          orderField: 'minimal_consumption',
           export: (row) => defaultCurrency(row.minimal_consumption),
+        },
+        {
+          title: translate('Expected consumption'),
+          render: ({ row }) => defaultCurrency(row.expected_consumption),
+          orderField: 'expected_consumption',
+          export: (row) => defaultCurrency(row.expected_consumption),
+        },
+        {
+          title: translate('Grace coefficient'),
+          render: ({ row }) => row.grace_coefficient,
+          export: 'grace_coefficient',
+        },
+        {
+          title: translate('Apply as minimal consumption'),
+          render: ({ row }) => (
+            <BooleanField value={row.apply_as_minimal_consumption} />
+          ),
+          export: (row) => (row.apply_as_minimal_consumption ? 'Yes' : 'No'),
         },
         {
           title: translate('End date'),

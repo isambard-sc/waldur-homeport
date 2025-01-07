@@ -1,6 +1,9 @@
 import { Offering } from '@waldur/marketplace/types';
 
 export interface CustomerCredit {
+  expected_consumption: number;
+  grace_coefficient: number;
+  apply_as_minimal_consumption: boolean;
   uuid: string;
   url: string;
   customer: string;
@@ -16,11 +19,11 @@ export interface CustomerCredit {
 }
 
 export interface CustomerCreditFormData {
+  expected_consumption: string;
   value: string;
   customer: string;
   offerings: string[];
   end_date: string;
-  minimal_consumption: string;
   minimal_consumption_logic: 'fixed' | 'linear';
 }
 

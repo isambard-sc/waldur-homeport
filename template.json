@@ -811,6 +811,10 @@
     "description": "rancher/cluster/tabs.ts",
     "message": "Applications"
   },
+  "Apply as minimal consumption": {
+    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
+    "message": "Apply as minimal consumption"
+  },
   "Apply filters to table data": {
     "description": "table/useTable.ts",
     "message": "Apply filters to table data"
@@ -2575,6 +2579,14 @@
     "description": "customer/credits/DeleteCreditButton.tsx, customer/credits/ProjectDeleteCreditButton.tsx",
     "message": "Credit deleted successfully."
   },
+  "Credit has been created.": {
+    "description": "customer/credits/CreateCreditButton.tsx",
+    "message": "Credit has been created."
+  },
+  "Credit has been updated.": {
+    "description": "customer/credits/EditCreditButton.tsx",
+    "message": "Credit has been updated."
+  },
   "Credit is overallocated": {
     "description": "customer/dashboard/CreditStatusWidget.tsx",
     "message": "Credit is overallocated"
@@ -3715,9 +3727,9 @@
     "description": "customer/cost-policies/CostPolicyForm.tsx, marketplace/offerings/details/policies/PolicyCreateForm.tsx",
     "message": "Enter the cost threshold (e.g. 1000 EUR)"
   },
-  "Enter the minimum credit reduction per month": {
+  "Enter the expected credit reduction per month": {
     "description": "customer/credits/CreditFormDialog.tsx",
-    "message": "Enter the minimum credit reduction per month"
+    "message": "Enter the expected credit reduction per month"
   },
   "Enter your contact number": {
     "description": "user/support/UserEditRows.tsx",
@@ -3934,6 +3946,14 @@
   "Existing quota usage: {usage}": {
     "description": "quotas/QuotaUsageBarChart.tsx",
     "message": "Existing quota usage: {usage}"
+  },
+  "Expected consumption (per month)": {
+    "description": "customer/credits/CreditFormDialog.tsx",
+    "message": "Expected consumption (per month)"
+  },
+  "Expected consumption": {
+    "description": "administration/organizations/OrganizationCreditsList.tsx",
+    "message": "Expected consumption"
   },
   "Expected project duration in days once resources have been granted.": {
     "description": "proposals/proposal/create/ProjectDetailsStep.tsx, proposals/proposal/create/ProjectDetailsSummary.tsx",
@@ -4442,6 +4462,10 @@
   "Google Calendar has been unpublished successfully.": {
     "description": "marketplace/offerings/update/integration/GoogleCalendarActions.tsx",
     "message": "Google Calendar has been unpublished successfully."
+  },
+  "Grace coefficient": {
+    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
+    "message": "Grace coefficient"
   },
   "Grant permission": {
     "description": "marketplace/offerings/details/permissions/OfferingPermissionCreateDialog.tsx, marketplace/service-providers/OfferingPermissionCreateDialog.tsx",
@@ -5935,10 +5959,6 @@
     "description": "proposals/update/rounds/RoundExpandableRow.tsx",
     "message": "Minimal average scoring"
   },
-  "Minimal consumption (per month)": {
-    "description": "customer/credits/CreditFormDialog.tsx",
-    "message": "Minimal consumption (per month)"
-  },
   "Minimal consumption logic": {
     "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
     "message": "Minimal consumption logic"
@@ -6067,9 +6087,21 @@
     "description": "project/validators.tsx",
     "message": "Must be 500 characters or less."
   },
+  "Must be a number": {
+    "description": "customer/credits/CreditFormDialog.tsx",
+    "message": "Must be a number"
+  },
   "Must be a number.": {
     "description": "core/validators.ts",
     "message": "Must be a number."
+  },
+  "Must be greater than or equal to 0": {
+    "description": "customer/credits/CreditFormDialog.tsx",
+    "message": "Must be greater than or equal to 0"
+  },
+  "Must be less than or equal to 100": {
+    "description": "customer/credits/CreditFormDialog.tsx",
+    "message": "Must be less than or equal to 100"
   },
   "Must be {length} characters or less.": {
     "description": "core/validators.ts",
