@@ -1067,6 +1067,10 @@
     "description": "invoices/details/InvoiceItemDelete.tsx",
     "message": "Are you sure you want to remove invoice item {name}?"
   },
+  "Are you sure you want to remove service provider profile?": {
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "message": "Are you sure you want to remove service provider profile?"
+  },
   "Are you sure you want to remove the location?": {
     "description": "customer/details/CustomerLocationRow.tsx",
     "message": "Are you sure you want to remove the location?"
@@ -3150,6 +3154,10 @@
   "Disable only resource update events.": {
     "description": "SettingsDescription.ts",
     "message": "Disable only resource update events."
+  },
+  "Disable service provider profile": {
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "message": "Disable service provider profile"
   },
   "Disable this to export only the rows on the current page": {
     "description": "table/ExportDialog.tsx",
@@ -10287,6 +10295,10 @@
     "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
     "message": "Service provider has been registered."
   },
+  "Service provider profile has been disabled.": {
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "message": "Service provider profile has been disabled."
+  },
   "Service provider": {
     "description": "administration/organizations/OrganizationsFilter.tsx, customer/details/CustomerManageContainer.tsx, customer/details/CustomerMarketplacePanel.tsx, customer/list/CustomerListFilter.tsx, invoices/details/ResourceRow.tsx, invoices/list/InvoicesStatsList.tsx, map/LeafletMap.tsx, marketplace/UserPluginOptionsForm.tsx, marketplace/deploy/CheckoutFooter.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/routes.ts, marketplace/service-providers/ProviderOfferingUsersFilter.tsx, organization/OrganizationUIView.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestWizardFormFirstPage.tsx, proposals/update/offerings/WizardFormFirstPage.tsx, reporting/plan-usage/PlanUsageFilter.tsx, reporting/plan-usage/PlanUsageList.tsx",
     "message": "Service provider"
@@ -12267,6 +12279,10 @@
     "description": "administration/remote-offering-sync/RemoteSyncEnableAction.tsx",
     "message": "Unable to disable remote synchronization"
   },
+  "Unable to disable service provider profile.": {
+    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "message": "Unable to disable service provider profile."
+  },
   "Unable to edit comment.": {
     "description": "issues/comments/CommentFormDialog.tsx",
     "message": "Unable to edit comment."
@@ -12346,6 +12362,10 @@
   "Unable to link invoice to the payment.": {
     "description": "customer/payments/LinkInvoiceAction.tsx",
     "message": "Unable to link invoice to the payment."
+  },
+  "Unable to load ": {
+    "description": "administration/providers/IdentityProvidersList.tsx",
+    "message": "Unable to load "
   },
   "Unable to load actions": {
     "description": "marketplace/resources/actions/ActionsPopover.tsx, resource/actions/ResourceActionComponent.tsx, table/ActionsDropdown.tsx",
@@ -12448,7 +12468,7 @@
     "message": "Unable to load identity provider details"
   },
   "Unable to load identity providers.": {
-    "description": "administration/providers/IdentityProvidersList.tsx, auth/LoginColumn.tsx",
+    "description": "auth/LoginColumn.tsx",
     "message": "Unable to load identity providers."
   },
   "Unable to load invoices": {
@@ -12534,10 +12554,6 @@
   "Unable to load telemetry configuration.": {
     "description": "administration/telemetry/AdministrationTelemetry.tsx",
     "message": "Unable to load telemetry configuration."
-  },
-  "Unable to load user settings configuration.": {
-    "description": "administration/user-settings/AdministrationUserSettings.tsx",
-    "message": "Unable to load user settings configuration."
   },
   "Unable to load user.": {
     "description": "user/support/UserDetailsDialog.tsx",
@@ -13608,7 +13624,7 @@
     "message": "User roles"
   },
   "User settings": {
-    "description": "SettingsDescription.ts, administration/routes.ts, administration/user-settings/AdministrationUserSettings.tsx",
+    "description": "SettingsDescription.ts, administration/providers/IdentityProvidersList.tsx",
     "message": "User settings"
   },
   "User submitted fields": {
@@ -14555,6 +14571,14 @@
     "description": "marketplace/service-providers/OrganizationProjectsExpandable.tsx, project/ProjectsList.tsx, rancher/ClusterProjectList.tsx, user/affiliations/ProjectsList.tsx",
     "message": "projects"
   },
+  "providers and settings configuration": {
+    "description": "administration/providers/IdentityProvidersList.tsx",
+    "message": "providers and settings configuration"
+  },
+  "providers configuration": {
+    "description": "administration/providers/IdentityProvidersList.tsx",
+    "message": "providers configuration"
+  },
   "recepients": {
     "description": "broadcasts/RecipientsList.tsx",
     "message": "recepients"
@@ -14626,6 +14650,10 @@
   "services": {
     "description": "rancher/cluster/ClusterServicesList.tsx",
     "message": "services"
+  },
+  "settings configuration": {
+    "description": "administration/providers/IdentityProvidersList.tsx",
+    "message": "settings configuration"
   },
   "snapshot schedules": {
     "description": "openstack/openstack-snapshot-schedule/SnapshotSchedulesList.tsx",
