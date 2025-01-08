@@ -21,7 +21,10 @@ export const IssueCreateButton: FunctionComponent<IssueCreateButtonProps> = ({
 
   const handleClick = () => {
     dispatch(
-      openIssueCreateDialog({ issue: scope, refetch }, ISSUE_CREATION_FORM_ID),
+      openIssueCreateDialog(
+        { issue: { scope }, refetch },
+        ISSUE_CREATION_FORM_ID,
+      ),
     );
   };
 

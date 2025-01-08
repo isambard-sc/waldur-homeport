@@ -2179,10 +2179,6 @@
     "description": "proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx",
     "message": "Configure request"
   },
-  "Configure whether a user needs to approve TOS.": {
-    "description": "SettingsDescription.ts",
-    "message": "Configure whether a user needs to approve TOS."
-  },
   "Configure": {
     "description": "administration/service-desk/AdministrationServiceDesk.tsx, openstack/openstack-instance/actions/update-internal-ips/UpdateInternalIpsSetAction.tsx",
     "message": "Configure"
@@ -5762,6 +5758,10 @@
   "Mark invoice as paid": {
     "description": "invoices/list/MarkAsPaidDialog.tsx",
     "message": "Mark invoice as paid"
+  },
+  "Mark terms of services as approved for new users.": {
+    "description": "SettingsDescription.ts",
+    "message": "Mark terms of services as approved for new users."
   },
   "Marker for comment. Used for separating comments made via Waldur from natively added comments.": {
     "description": "SettingsDescription.ts",
