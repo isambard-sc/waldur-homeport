@@ -20,6 +20,7 @@ import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { CUSTOMERS_FILTER_FORM_ID } from '../constants';
 
@@ -27,7 +28,8 @@ import { OrganizationNameField } from './OrganizationNameField';
 
 const mapStateToFilter = createSelector(
   getFormValues(CUSTOMERS_FILTER_FORM_ID),
-  (filterValues: any) => {
+  getUser,
+  (filterValues: any, user) => {
     const filter: Record<string, string | string[]> = {};
     if (filterValues?.accounting_is_running) {
       filter.accounting_is_running = filterValues.accounting_is_running.value;
@@ -46,6 +48,7 @@ const mapStateToFilter = createSelector(
       filter.is_call_managing_organization =
         filterValues.is_call_managing_organization;
     }
+    filter.user_uuid = user.uuid;
     return filter;
   },
 );
