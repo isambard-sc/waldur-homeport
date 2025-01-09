@@ -1,4 +1,4 @@
-import { At, DeviceMobile, Hexagon } from '@phosphor-icons/react';
+import { At, DeviceMobile, Hexagon, Hash } from '@phosphor-icons/react';
 import { Col, Row, Stack } from 'react-bootstrap';
 
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
@@ -58,6 +58,13 @@ export const CustomerProfile = ({
               <span className="text-nowrap">
                 <DeviceMobile size={18} weight="duotone" className="me-1" />
                 {customer.phone_number}
+              </span>
+            )}
+          {customer.registration_code &&
+            typeof customer.registration_code === 'string' && (
+              <span className="text-nowrap">
+                <Hash size={18} weight="duotone" className="me-1" />
+                {customer.registration_code}
               </span>
             )}
         </Stack>
