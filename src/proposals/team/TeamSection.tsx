@@ -63,7 +63,7 @@ export const TeamSection: FC<
         props.change('users', rows);
       }
       // Update query data for the call reviewers
-      if (props.roles.includes(RoleEnum.CALL_REVIEWER)) {
+      if (props.roles?.includes(RoleEnum.CALL_REVIEWER)) {
         const newReviewers = rows.filter(
           (row) => row.role_name === RoleEnum.CALL_REVIEWER,
         );
