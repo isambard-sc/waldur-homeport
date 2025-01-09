@@ -7,14 +7,12 @@ import { ENV } from '@waldur/configs/default';
 import { getById } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { useToolbarActions } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { showError, showSuccess } from '@waldur/store/notify';
 
 import { Invoice } from '../types';
 
 import { BillingRecordDetails } from './BillingRecordDetails';
-import { InvoiceDetailActions } from './InvoiceDetailActions';
 import { InvoiceDetails } from './InvoiceDetails';
 
 import './BillingDetails.scss';
@@ -52,8 +50,6 @@ export const BillingDetails: FunctionComponent = () => {
       router.stateService.go('errorPage.notFound');
     }
   }, [error, router.stateService]);
-
-  useToolbarActions(<InvoiceDetailActions invoice={invoice} />, [invoice]);
 
   const dispatch = useDispatch();
   useEffect(() => {

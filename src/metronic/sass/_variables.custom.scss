@@ -34,7 +34,9 @@ $secondary-inverse: $primary-700 !default;
 $secondary-dark-inverse: $primary-800 !default;
 
 // Light/Gray
+$gray-50: if(isDarkMode(), #161b26, #f9fafb) !default; // Custom variable
 $grey-200: if(isDarkMode(), #333741, #e4e7ec) !default; // Custom variable
+$gray-700: if(isDarkMode(), #ececed, #344054) !default;
 
 // Success
 $success-50: #ecfdf3;
@@ -81,8 +83,12 @@ $warning-active: if(isDarkMode(), #ee9d01, $warning-700);
 $warning-light: if(isDarkMode(), #392f28, $warning-50);
 $warning-inverse: #ffffff;
 
-$dropdown-item-padding-x: 1.1rem;
-$dropdown-item-padding-y: 1.1rem;
+$dropdown-item-padding-x: 16px;
+$dropdown-item-padding-y: 10px;
+$dropdown-link-hover-color: $gray-700;
+$dropdown-link-hover-bg: $gray-50;
+$dropdown-link-active-color: $gray-700;
+$dropdown-link-active-bg: $grey-200;
 
 // Dark colors
 $theme-dark-colors: (

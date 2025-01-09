@@ -13,7 +13,7 @@ const InvoiceItemCompensationDialog = lazyComponent(() =>
 export const InvoiceItemCompensation = ({ item, refreshInvoiceItems }) => (
   <DialogActionItem
     title={translate('Create compensation')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={InvoiceItemCompensationDialog}
     resource={item}
     extraResolve={{ refreshInvoiceItems }}

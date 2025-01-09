@@ -173,19 +173,28 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
             <Card.Header className="border-bottom">
               <Row className="card-toolbar g-0 gap-4 w-100">
                 {!this.props.standalone && (
-                  <Col xs className="order-0 mw-sm-25">
+                  <Col xs className="order-0">
                     <Card.Title>
-                      <span className="h3 me-2">
-                        {this.props.title ||
-                          (this.props.verboseName &&
-                            titleCase(this.props.verboseName)) ||
-                          this.props.alterTitle}
-                      </span>
-                      <TableRefreshButton {...this.props} />
+                      <div className="me-2">
+                        <span className="h3">
+                          {this.props.title ||
+                            (this.props.verboseName &&
+                              titleCase(this.props.verboseName)) ||
+                            this.props.alterTitle}
+                        </span>
+                        {Boolean(this.props.subtitle) && (
+                          <small className="fs-6 fw-normal d-block mt-2">
+                            {this.props.subtitle}
+                          </small>
+                        )}
+                      </div>
+                      {!this.props.hideRefresh && (
+                        <TableRefreshButton {...this.props} />
+                      )}
                     </Card.Title>
                   </Col>
                 )}
-                <Col sm="auto" className="order-1 order-sm-2 min-w-25 ms-auto">
+                <Col sm="auto" className="order-1 order-sm-2 ms-auto">
                   {this.showActionsColumn() && (
                     <div className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-3">
                       <TableButtons
@@ -198,11 +207,10 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
                 </Col>
                 {this.props.hasQuery && (
                   <Col
-                    xs={!this.showActionsColumn()}
-                    sm={Boolean(this.showActionsColumn())}
+                    xs
                     className={classNames(
-                      'order-2 order-sm-1 mw-lg-350px',
-                      !this.props.standalone && 'mx-auto',
+                      'order-2 order-sm-1 mw-lg-325px',
+                      !this.props.standalone && 'ms-auto',
                     )}
                   >
                     {this.props.hasQuery && (

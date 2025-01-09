@@ -2,7 +2,9 @@
 
 exports[`CustomerDetails > renders all rows 1`] = `
 <div>
-  <address>
+  <address
+    class="mb-0"
+  >
     <div>
       <strong>
         OpenNode

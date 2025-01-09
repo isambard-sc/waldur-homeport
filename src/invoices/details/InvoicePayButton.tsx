@@ -1,5 +1,6 @@
 import { Money } from '@phosphor-icons/react';
 import { FC } from 'react';
+import { DropdownItem } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
@@ -9,25 +10,41 @@ import { Invoice } from '../types';
 import { hasMonthlyPaymentProfile } from './utils';
 
 interface InvoicePayButtonProps {
-  invoice: Invoice;
+  row: Invoice;
+  asButton?: boolean;
 }
 
-export const InvoicePayButton: FC<InvoicePayButtonProps> = ({ invoice }) => {
+export const InvoicePayButton: FC<InvoicePayButtonProps> = ({
+  row,
+  asButton,
+}) => {
   const showPayment = useSelector(hasMonthlyPaymentProfile);
-  if (!invoice?.payment_url || !showPayment || invoice.state !== 'created') {
+  if (!row?.payment_url || !showPayment || row.state !== 'created') {
     return null;
   }
-  return (
+
+  return asButton ? (
     <a
-      className="btn btn-outline btn-outline-warning border-warning btn-active-warning px-2',"
-      href={invoice.payment_url}
+      className="btn btn-outline btn-outline-warning btn-icon-warning btn-active-warning px-2"
+      href={row.payment_url}
       target="_self"
       rel="noopener noreferrer"
     >
       <span className="svg-icon svg-icon-2">
-        <Money />
+        <Money weight="bold" />
       </span>
       {translate('Pay')}
     </a>
+  ) : (
+    <DropdownItem
+      href={row.payment_url}
+      target="_self"
+      rel="noopener noreferrer"
+    >
+      <span className="svg-icon svg-icon-2">
+        <Money weight="bold" />
+      </span>
+      {translate('Pay')}
+    </DropdownItem>
   );
 };

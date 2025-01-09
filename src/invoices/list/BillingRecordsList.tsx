@@ -6,6 +6,7 @@ import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -17,6 +18,14 @@ import { getInvoiceStatusOptions, InvoicesFilter } from './InvoicesFilter';
 import { SendNotificationButton } from './SendNotificationButton';
 
 const RecordPeriodField = ({ row }) => formatPeriod(row);
+
+const RowActions = ({ row, fetch }) => (
+  <ActionsDropdown
+    row={row}
+    refetch={fetch}
+    actions={[SendNotificationButton]}
+  />
+);
 
 export const BillingRecordsList: FunctionComponent = () => {
   const customer = useSelector(getCustomer);
@@ -92,9 +101,9 @@ export const BillingRecordsList: FunctionComponent = () => {
           exportKeys: ['price'],
         },
       ]}
-      rowActions={SendNotificationButton}
+      rowActions={RowActions}
       verboseName={translate('records')}
-      title={translate('Accounting')}
+      title={translate('Invoices')}
       enableExport={true}
     />
   );

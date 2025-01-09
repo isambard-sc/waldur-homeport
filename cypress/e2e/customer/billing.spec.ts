@@ -19,7 +19,7 @@ describe('Billing page', () => {
   it("should show billing page table with header as 'Accounting'", () => {
     cy.get('.header-menu').contains('Accounting').should('be.visible');
 
-    cy.get('.card-title.h5').contains('Accounting').should('be.visible');
+    cy.get('.card-title.h5').contains('Invoices').should('be.visible');
   });
 
   it('should have month overview card', () => {

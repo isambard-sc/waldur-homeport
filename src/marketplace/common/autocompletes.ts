@@ -77,7 +77,7 @@ export const providerAutocomplete = async (
   { page },
 ) => {
   const params = {
-    name: query,
+    customer_keyword: query,
     field: ['customer_name', 'customer_uuid', 'url'],
     o: 'customer_name',
     page: page,

@@ -34,62 +34,13 @@ describe('groupInvoiceItems', () => {
     ];
     const grouped = groupInvoiceItems(items as any[]);
     expect(grouped).toHaveLength(1);
-    expect(grouped[0].name).toBe('Project One');
-    expect(grouped[0].resources).toHaveLength(1);
-    expect(grouped[0].resources[0].total).toBe(250);
-    expect(grouped[0].resources[0].price).toBe(125);
-  });
-
-  it('sorts items by specified sortKey in ascending order', () => {
-    const items = [
-      {
-        project_uuid: 'project-2',
-        project_name: 'Project B',
-        resource_uuid: 'resource-2',
-        resource_name: 'Resource B',
-        total: '50.00',
-        price: '25.00',
-        details: {},
-      },
-      {
-        project_uuid: 'project-1',
-        project_name: 'Project A',
-        resource_uuid: 'resource-1',
-        resource_name: 'Resource A',
-        total: '100.00',
-        price: '50.00',
-        details: {},
-      },
-    ];
-    const grouped = groupInvoiceItems(items as any[], 'name');
-    expect(grouped[0].name).toBe('Project A');
-    expect(grouped[1].name).toBe('Project B');
-  });
-
-  it('sorts items by specified sortKey in descending order when desc is true', () => {
-    const items = [
-      {
-        project_uuid: 'project-2',
-        project_name: 'Project B',
-        resource_uuid: 'resource-2',
-        resource_name: 'Resource B',
-        total: '50.00',
-        price: '25.00',
-        details: {},
-      },
-      {
-        project_uuid: 'project-1',
-        project_name: 'Project A',
-        resource_uuid: 'resource-1',
-        resource_name: 'Resource A',
-        total: '100.00',
-        price: '50.00',
-        details: {},
-      },
-    ];
-    const grouped = groupInvoiceItems(items as any[], 'name', true);
-    expect(grouped[0].name).toBe('Project B');
-    expect(grouped[1].name).toBe('Project A');
+    expect(grouped[0].project_name).toBe('Project One');
+    expect(grouped[0].total).toBe(250);
+    expect(grouped[0].items).toHaveLength(2);
+    expect(Number(grouped[0].items[0].total)).toBe(100);
+    expect(Number(grouped[0].items[0].price)).toBe(50);
+    expect(Number(grouped[0].items[1].total)).toBe(150);
+    expect(Number(grouped[0].items[1].price)).toBe(75);
   });
 
   it('groups items by resource_uuid if present, otherwise by details.resource_uuid', () => {
@@ -99,10 +50,25 @@ describe('groupInvoiceItems', () => {
         project_name: 'Project One',
         resource_uuid: 'resource-uuid-1',
         resource_name: 'Resource One',
+        total: '50.00',
+        price: '40.00',
+        details: {
+          offering_component_name: 'Storage',
+          resource_uuid: 'resource-uuid-1',
+          service_provider_name: 'Provider A',
+          offering_name: 'Offering A',
+          plan_name: 'Plan A',
+        },
+      },
+      {
+        project_uuid: 'project-1',
+        project_name: 'Project One',
+        resource_name: 'Resource One',
         total: '100.00',
         price: '50.00',
         details: {
-          resource_uuid: 'details-resource-uuid-1',
+          offering_component_name: 'CPU',
+          resource_uuid: 'resource-uuid-1',
           service_provider_name: 'Provider A',
           offering_name: 'Offering A',
           plan_name: 'Plan A',
@@ -125,23 +91,29 @@ describe('groupInvoiceItems', () => {
 
     const grouped = groupInvoiceItems(items as any[]);
 
-    // Expect one project group for "Project One"
-    expect(grouped).toHaveLength(1);
-    expect(grouped[0].name).toBe('Project One');
+    // Expect two project-resource group
+    expect(grouped).toHaveLength(2);
+    expect(grouped[0].project_name).toBe('Project One');
+    expect(grouped[1].project_name).toBe('Project One');
 
     // Verify resources are grouped by resource_uuid and details.resource_uuid
-    expect(grouped[0].resources).toHaveLength(2);
+    expect(grouped[0].items).toHaveLength(2);
+    expect(grouped[0].total).toBe(150);
 
-    // First resource uses resource_uuid
-    expect(grouped[0].resources[0].uuid).toBe('resource-uuid-1');
-    expect(grouped[0].resources[0].name).toBe('Resource One');
-    expect(grouped[0].resources[0].total).toBe(100);
-    expect(grouped[0].resources[0].price).toBe(50);
+    // First group - First resource uses resource_uuid
+    expect(grouped[0].resource_uuid).toBe('resource-uuid-1');
+    expect(grouped[0].resource_name).toBe('Resource One');
+    expect(Number(grouped[0].items[0].total)).toBe(50);
+    expect(Number(grouped[0].items[0].price)).toBe(40);
 
-    // Second resource uses details.resource_uuid
-    expect(grouped[0].resources[1].uuid).toBe('details-resource-uuid-2');
-    expect(grouped[0].resources[1].name).toBe('Resource Two');
-    expect(grouped[0].resources[1].total).toBe(150);
-    expect(grouped[0].resources[1].price).toBe(75);
+    // First group - Second resource uses details.resource_uuid
+    expect(Number(grouped[0].items[1].total)).toBe(100);
+    expect(Number(grouped[0].items[1].price)).toBe(50);
+
+    // Second group - resource uses details.resource_uuid
+    expect(grouped[1].resource_uuid).toBe('details-resource-uuid-2');
+    expect(grouped[1].resource_name).toBe('Resource Two');
+    expect(Number(grouped[1].items[0].total)).toBe(150);
+    expect(Number(grouped[1].items[0].price)).toBe(75);
   });
 });

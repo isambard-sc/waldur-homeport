@@ -1,15 +1,3 @@
-@media screen and (width >= 992px) {
-  .invoice-details {
-    display: flex;
-    justify-content: center;
-  }
-
-  .invoice-details-content {
-    max-width: 900px;
-    width: 100%;
-  }
-}
-
 @media print {
   body {
     visibility: hidden;
@@ -20,5 +8,10 @@
     position: absolute;
     left: 0;
     top: 0;
+  }
+
+  // Hide table header elements except for the title
+  .card-table .card-toolbar div:not(:first-child) {
+    display: none;
   }
 }
