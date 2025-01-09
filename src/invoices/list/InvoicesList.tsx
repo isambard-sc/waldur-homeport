@@ -9,6 +9,7 @@ import { translate } from '@waldur/i18n';
 import { INVOICES_TABLE } from '@waldur/invoices/constants';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 import { MarkAsPaidButton } from '@waldur/invoices/list/MarkAsPaidButton';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
@@ -19,6 +20,14 @@ import { InvoicePayButton } from '../details/InvoicePayButton';
 
 import { getInvoiceStatusOptions, InvoicesFilter } from './InvoicesFilter';
 import { SendNotificationButton } from './SendNotificationButton';
+
+const RowActions = ({ row, fetch }) => (
+  <ActionsDropdown
+    row={row}
+    refetch={fetch}
+    actions={[SendNotificationButton, MarkAsPaidButton, InvoicePayButton]}
+  />
+);
 
 export const InvoicesList: FunctionComponent = () => {
   const customer = useSelector(getCustomer);
@@ -94,13 +103,7 @@ export const InvoicesList: FunctionComponent = () => {
       columns={columns}
       verboseName={translate('invoices')}
       enableExport={true}
-      rowActions={({ row }) => (
-        <>
-          <SendNotificationButton row={row} />
-          <MarkAsPaidButton row={row} refetch={props.fetch} />
-          <InvoicePayButton invoice={row} />
-        </>
-      )}
+      rowActions={RowActions}
     />
   );
 };

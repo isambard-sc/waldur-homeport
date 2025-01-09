@@ -43,7 +43,7 @@ export const MonthOverview: FunctionComponent<MonthOverviewProps> = ({
 
   const projects = useMemo(() => {
     if (invoice) {
-      return groupInvoiceItems(invoice.items, 'total', true);
+      return groupInvoiceItems(invoice.items);
     }
     return [];
   }, [invoice]);
@@ -92,8 +92,8 @@ export const MonthOverview: FunctionComponent<MonthOverviewProps> = ({
               <tbody>
                 {projects.slice(0, maxProjectsShowCount).map((project) => (
                   <OverviewItemTr
-                    key={project.name}
-                    title={project.name}
+                    key={project.resource_uuid}
+                    title={project.resource_name}
                     value={defaultCurrency(project.total)}
                   />
                 ))}

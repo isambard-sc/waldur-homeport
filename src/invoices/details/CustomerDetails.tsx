@@ -12,7 +12,7 @@ interface CustomerDetailsProps {
 export const CustomerDetails: React.FC<CustomerDetailsProps> = ({
   customer,
 }) => (
-  <address>
+  <address className="mb-0">
     <div>
       <strong>{customer.name}</strong>
     </div>

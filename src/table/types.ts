@@ -185,6 +185,7 @@ export interface TableProps<RowType = any> extends TableState {
   filters?: JSX.Element;
   title?: React.ReactNode;
   alterTitle?: React.ReactNode;
+  subtitle?: React.ReactNode;
   hasActionBar?: boolean;
   hasHeaders?: boolean;
   enableMultiSelect?: boolean;
@@ -205,4 +206,5 @@ export interface TableProps<RowType = any> extends TableState {
   initialMode?: 'grid' | 'table';
   standalone?: boolean;
   hideClearFilters?: boolean;
+  hideRefresh?: boolean;
 }

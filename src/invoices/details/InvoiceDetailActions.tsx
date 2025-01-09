@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
 
 import { Invoice } from '../types';
 
@@ -13,8 +12,8 @@ interface InvoiceDetailActionsProps {
 export const InvoiceDetailActions: FC<InvoiceDetailActionsProps> = ({
   invoice,
 }) => (
-  <ButtonGroup>
+  <>
     <PrintInvoiceButton />
-    <InvoicePayButton invoice={invoice} />
-  </ButtonGroup>
+    <InvoicePayButton row={invoice} asButton />
+  </>
 );
