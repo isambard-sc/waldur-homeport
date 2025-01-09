@@ -1,5 +1,10 @@
-export interface AllocationLimits {
-  cpu_limit: number;
-  gpu_limit: number;
-  ram_limit: number;
+export interface ProjectInfo {
+  project: string;
+  shortname: string;
+  allowed_destinations: string;
+}
+
+export interface UserInfo {
+  user: string;
+  shortname: string;
 }

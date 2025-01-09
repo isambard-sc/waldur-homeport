@@ -1,16 +1,21 @@
 import { ENV } from '@waldur/configs/default';
-import { post, put, sendForm } from '@waldur/core/api';
+import { get, sendForm } from '@waldur/core/api';
+import { UserDetails, Project } from '@waldur/workspace/types';
 
-import { AllocationLimits } from './types';
+import { UserInfo, ProjectInfo } from './types';
 
-export const setLimits = (id, data: AllocationLimits) =>
-  post(`/openportal-allocations/${id}/set_limits/`, data);
+export function getUserInfo(user: UserDetails): Promise<UserInfo> {
+  return get<UserInfo>(`openportal-userinfo/?user=${user.url}/`).then((response) => response.data);
+}
 
-export const updateAllocation = (id, data) =>
-  put(`/openportal-allocations/${id}/`, data);
+export function getProjectInfo(project: Project): Promise<ProjectInfo> {
+  return get<ProjectInfo>(`openportal-projectinfo/?project=${project.url}/`).then((response) => response.data);
+}
 
-export const pullAllocation = (id: string) =>
-  post(`/openportal-allocations/${id}/pull/`);
+export function setUserInfo(userinfo: UserInfo) {
+  return sendForm('POST', 'openportal-userinfo/', userinfo);
+}
 
-export const submitJob = (payload) =>
-  sendForm('POST', `${ENV.apiEndpoint}api/openportal-jobs/`, payload);
+export function setProjectInfo(projectinfo: ProjectInfo) {
+  return sendForm('POST', 'openportal-projectinfo/', projectinfo);
+}
