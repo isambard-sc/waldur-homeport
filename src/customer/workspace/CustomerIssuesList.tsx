@@ -8,6 +8,11 @@ export const CustomerIssuesList: FC = () => {
   const customer = useSelector(getCustomer);
   const filter = useMemo(() => ({ customer: customer?.url }), [customer]);
   return (
-    <IssuesList hiddenColumns={['customer']} filter={filter} scope={customer} />
+    <IssuesList
+      hiddenColumns={['customer']}
+      filter={filter}
+      scope={customer}
+      scopeType="customer"
+    />
   );
 };

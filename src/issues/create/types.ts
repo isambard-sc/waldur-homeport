@@ -2,27 +2,6 @@ import { ReactNode } from 'react';
 
 import { Customer, Project } from '@waldur/workspace/types';
 
-export interface IssueOptions {
-  title: string;
-  hideTitle: boolean;
-  descriptionLabel: string;
-  descriptionPlaceholder: string;
-  summaryLabel: string;
-  summaryPlaceholder: string;
-  submitTitle: string;
-}
-
-export interface CreateIssueProps {
-  type: string;
-  additionalDetails?: string;
-  customer?: Customer;
-  project?: Project;
-  resource?: any;
-  summary?: string;
-  description?: string;
-  options: Partial<IssueOptions>;
-}
-
 export interface IssueFormData {
   type: any;
   summary: string;
@@ -30,6 +9,7 @@ export interface IssueFormData {
   template: any;
   files: FileList;
   issueTemplate?: any;
+  customer?: Customer;
   project?: Project;
   resource?: any;
 }

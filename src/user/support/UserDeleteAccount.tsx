@@ -7,8 +7,6 @@ import { ENV } from '@waldur/configs/default';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { Panel } from '@waldur/core/Panel';
 import { translate } from '@waldur/i18n';
-import { openIssueCreateDialog } from '@waldur/issues/create/actions';
-import { ISSUE_IDS } from '@waldur/issues/types/constants';
 import { openModalDialog } from '@waldur/modal/actions';
 import { UserDetails } from '@waldur/workspace/types';
 
@@ -21,38 +19,15 @@ const UserRemovalMessageDialog = lazyComponent(() =>
 export const UserDeleteAccount: FC<{ user: UserDetails }> = ({ user }) => {
   const dispatch = useDispatch();
   const [confirm, setConfirm] = useState(false);
-  const showUserRemoval = () => {
-    if (ENV.plugins.WALDUR_SUPPORT.ENABLED) {
-      dispatch(
-        openIssueCreateDialog({
-          issue: {
-            type: ISSUE_IDS.CHANGE_REQUEST,
-            summary: translate('Account deletion'),
-          },
-          options: {
-            title: translate('Account deletion'),
-            hideTitle: true,
-            descriptionPlaceholder: translate(
-              'Why would you want to go away? Help us become better please!',
-            ),
-            descriptionLabel: translate('Reason'),
-            submitTitle: translate('Request deletion'),
-          },
-          hideProjectAndResourceFields: true,
-          standaloneTicket: true,
-        }),
-      );
-    } else {
-      dispatch(
-        openModalDialog(UserRemovalMessageDialog, {
-          resolve: {
-            supportEmail: ENV.plugins.WALDUR_CORE.SITE_EMAIL,
-            userName: user.full_name,
-          },
-        }),
-      );
-    }
-  };
+  const showUserRemoval = () =>
+    dispatch(
+      openModalDialog(UserRemovalMessageDialog, {
+        resolve: {
+          supportEmail: ENV.plugins.WALDUR_CORE.SITE_EMAIL,
+          userName: user.full_name,
+        },
+      }),
+    );
 
   return (
     <Panel

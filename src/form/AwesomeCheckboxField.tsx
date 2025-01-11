@@ -12,6 +12,7 @@ interface AwesomeCheckboxFieldProps extends FormField {
   checked?: boolean;
   tooltip?: ReactNode;
   help_text?: ReactNode;
+  disabled?: boolean;
 }
 
 export const AwesomeCheckboxField: FunctionComponent<
@@ -27,6 +28,7 @@ export const AwesomeCheckboxField: FunctionComponent<
       checked={input.value}
       onChange={(e: React.ChangeEvent<any>) => input.onChange(e.target.checked)}
       data-testid={props['data-testid']}
+      disabled={props.disabled}
     />
     <label className="form-check-label">
       {tooltip && (
@@ -34,7 +36,7 @@ export const AwesomeCheckboxField: FunctionComponent<
           <Question />{' '}
         </Tip>
       )}
-      <span className="fw-bold">{label}</span>
+      {label}
       {help_text && <p className="text-muted">{help_text}</p>}
     </label>
   </div>
