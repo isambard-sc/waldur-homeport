@@ -2,10 +2,10 @@ import { FunctionComponent } from 'react';
 import { components } from 'react-select';
 import { Field } from 'redux-form';
 
+import { SelectField } from '@waldur/form/SelectField';
 import { translate } from '@waldur/i18n';
 
 import { IssueTypeRenderer } from './IssueTypeRenderer';
-import { SelectField } from './SelectField';
 
 const Option: FunctionComponent<any> = (props) => (
   <components.Option {...props}>

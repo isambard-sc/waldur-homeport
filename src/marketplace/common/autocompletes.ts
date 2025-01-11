@@ -175,3 +175,20 @@ export const resourceOfferingsAutocomplete = async (
     currentPage,
   );
 };
+
+export const resourceAutocomplete = async (
+  query: object,
+  prevOptions,
+  currentPage: number,
+) => {
+  const response = await getSelectData(`/marketplace-resources/`, {
+    ...query,
+    page: currentPage,
+    page_size: ENV.pageSize,
+  });
+  return returnReactSelectAsyncPaginateObject(
+    response,
+    prevOptions,
+    currentPage,
+  );
+};

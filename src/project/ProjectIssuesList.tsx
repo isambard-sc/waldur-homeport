@@ -7,7 +7,6 @@ import { getProject } from '@waldur/workspace/selectors';
 export const ProjectIssuesList: FunctionComponent = () => {
   const project = useSelector(getProject);
 
-  const scope = useMemo(() => ({ project }), [project]);
   const filter = useMemo(
     () => ({ project: project && project.url }),
     [project],
@@ -16,7 +15,8 @@ export const ProjectIssuesList: FunctionComponent = () => {
   return (
     <IssuesList
       hiddenColumns={['customer', 'project']}
-      scope={scope}
+      scope={project}
+      scopeType="project"
       filter={filter}
     />
   );

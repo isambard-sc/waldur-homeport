@@ -16,6 +16,7 @@ export const Select = ({ input, loadOptions, ...rest }) => (
     className={
       'metronic-select-container' + (rest.className ? ` ${rest.className}` : '')
     }
+    placeholder=""
   />
 );
 

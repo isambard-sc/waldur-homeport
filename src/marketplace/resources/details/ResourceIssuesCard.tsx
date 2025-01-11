@@ -1,5 +1,5 @@
 import { PlusCircle } from '@phosphor-icons/react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
@@ -10,17 +10,13 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 const CreateIssueButton = ({ resource }) => {
   const dispatch = useDispatch();
-  const callback = useCallback(() => {
+  const callback = () =>
     dispatch(
       openIssueCreateDialog({
-        issue: { resource },
-        options: {
-          descriptionLabel: translate('Description'),
-        },
-        hideProjectAndResourceFields: true,
+        scope: resource,
+        scopeType: 'resource',
       }),
     );
-  }, [dispatch, resource]);
   return (
     <ActionButton
       iconNode={<PlusCircle />}
@@ -38,6 +34,7 @@ export const ResourceIssuesCard = ({ resource }) => {
   return showIssues ? (
     <IssuesList
       scope={resource}
+      scopeType="resource"
       filter={filter}
       title={translate('Tickets')}
       verboseName={translate('Resource issues')}

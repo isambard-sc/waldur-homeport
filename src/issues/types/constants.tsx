@@ -1,9 +1,4 @@
-import {
-  CheckSquare,
-  PuzzlePiece,
-  Question,
-  Warning,
-} from '@phosphor-icons/react';
+import { ArrowsClockwise, Info, Warning, Wrench } from '@phosphor-icons/react';
 
 import { translate } from '@waldur/i18n';
 
@@ -23,10 +18,10 @@ const getIssueTypeLabel = (issueType) =>
   })[issueType];
 
 export const ISSUE_ICONS = {
-  INCIDENT: <Warning className="text-danger" />,
-  CHANGE_REQUEST: <CheckSquare className="text-warning" />,
-  SERVICE_REQUEST: <PuzzlePiece className="text-success" />,
-  INFORMATIONAL: <Question className="text-info" />,
+  INCIDENT: <Warning weight="bold" />,
+  CHANGE_REQUEST: <ArrowsClockwise weight="bold" />,
+  SERVICE_REQUEST: <Wrench weight="bold" />,
+  INFORMATIONAL: <Info weight="bold" />,
 };
 
 const getIssueDescription = (issueType) =>
