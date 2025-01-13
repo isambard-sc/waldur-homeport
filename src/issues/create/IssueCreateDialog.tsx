@@ -28,15 +28,14 @@ export const IssueCreateDialog: FunctionComponent<CreateIssueDialogProps> = ({
       project: formData.project?.url,
       resource: formData.resource?.url,
     };
-    if (formData.customer) {
-      payload.customer = formData.customer.url;
-    }
-    if (formData.project) {
-      payload.project = formData.project.url;
-    }
     if (formData.resource) {
       payload.resource = formData.resource.url;
+    } else if (formData.project) {
+      payload.project = formData.project.url;
+    } else if (formData.customer) {
+      payload.customer = formData.customer.url;
     }
+
     if (formData.summary) {
       payload.summary = formData.summary;
     }
