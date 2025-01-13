@@ -25,12 +25,13 @@ import {
   CATEGORY_RESOURCES_ALL_FILTER_FORM_ID,
   CATEGORY_RESOURCES_TABLE_ID,
 } from './constants';
+import { NON_TERMINATED_STATES } from './constants';
 import { CreateResourceButton } from './CreateResourceButton';
 import { ExpandableResourceSummary } from './ExpandableResourceSummary';
 import { ResourceActionsButton } from './ResourceActionsButton';
 import { ResourceNameField } from './ResourceNameField';
 import { ResourceStateField } from './ResourceStateField';
-import { getStates, NON_TERMINATED_STATES } from './ResourceStateFilter';
+import { getStates } from './ResourceStateFilter';
 import { resourcesListRequiredFields } from './utils';
 
 interface OwnProps {
@@ -73,7 +74,7 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       }
     } else {
       if (!filterValues?.include_terminated) {
-        filter.state = NON_TERMINATED_STATES.map((option) => option.value);
+        filter.state = NON_TERMINATED_STATES;
       }
     }
     if (filterValues?.organization) {

@@ -15,12 +15,10 @@ import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
+import { NON_TERMINATED_STATES } from '../resources/list/constants';
 import { ProviderResourceActions } from '../resources/list/ProviderResourceActions';
 import { ResourceStateField } from '../resources/list/ResourceStateField';
-import {
-  getStates,
-  NON_TERMINATED_STATES,
-} from '../resources/list/ResourceStateFilter';
+import { getStates } from '../resources/list/ResourceStateFilter';
 
 import { OfferingResourcesFilter } from './OfferingResourcesFilter';
 
@@ -43,7 +41,7 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
       }
     } else {
       if (!filterValues?.include_terminated) {
-        filter.state = NON_TERMINATED_STATES.map((option) => option.value);
+        filter.state = NON_TERMINATED_STATES;
       }
     }
     return {

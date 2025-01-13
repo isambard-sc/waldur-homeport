@@ -15,8 +15,8 @@ import { TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { Project } from '@waldur/workspace/types';
 
+import { NON_TERMINATED_STATES } from './constants';
 import { ResourcesAllListTable } from './ResourcesAllListTable';
-import { NON_TERMINATED_STATES } from './ResourceStateFilter';
 import { resourcesListRequiredFields } from './utils';
 
 const mapStateToFilter = createSelector(
@@ -45,7 +45,7 @@ const mapStateToFilter = createSelector(
       }
     } else {
       if (!filters?.include_terminated) {
-        result.state = NON_TERMINATED_STATES.map((option) => option.value);
+        result.state = NON_TERMINATED_STATES;
       }
     }
     if (filters?.organization) {

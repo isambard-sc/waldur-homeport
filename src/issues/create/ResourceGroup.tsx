@@ -7,6 +7,7 @@ import { Select as AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { resourceAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { NON_TERMINATED_STATES } from '@waldur/marketplace/resources/list/constants';
 import { formatResourceShort } from '@waldur/marketplace/utils';
 import { RootState } from '@waldur/store/reducers';
 
@@ -44,6 +45,7 @@ export const ResourceGroup = ({ disabled }) => {
                 project_uuid: project.uuid,
                 name: query,
                 field: ['name', 'url', 'uuid', 'offering_name', 'project_uuid'],
+                state: NON_TERMINATED_STATES,
               },
               prevOptions,
               page,

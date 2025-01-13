@@ -16,10 +16,6 @@ export const getStates = () => [
   { value: 'Terminating', label: translate('Terminating') },
 ];
 
-export const NON_TERMINATED_STATES = getStates().filter(
-  (state) => state.value !== 'Terminated',
-);
-
 export const ResourceStateFilter: FunctionComponent<{
   reactSelectProps?: Partial<SelectProps>;
 }> = (props) => (

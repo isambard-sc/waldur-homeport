@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { Select } from '@waldur/form/themed-select';
@@ -9,8 +9,8 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
+import { NON_TERMINATED_STATES } from '../resources/list/constants';
 import { PublicResourceLink } from '../resources/list/PublicResourceLink';
-import { NON_TERMINATED_STATES } from '../resources/list/ResourceStateFilter';
 
 import { AggregateLimitsExpandableRow } from './AggregateLimitsExpandableRow';
 import { getMarketplaceResources } from './api';
@@ -38,7 +38,7 @@ export const AggregateLimitDetailsDialog = ({
     const filter = {
       project_uuid: project?.uuid,
       customer_uuid: customer?.uuid,
-      state: NON_TERMINATED_STATES.map((option) => option.value),
+      state: NON_TERMINATED_STATES,
       field: requiredFields,
       offering_uuid: component.offering_uuid,
     };
