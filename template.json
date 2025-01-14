@@ -255,6 +255,10 @@
     "description": "marketplace/offerings/details/PlanUsageList.tsx, reporting/plan-usage/PlanUsageList.tsx",
     "message": "Active count"
   },
+  "Active from": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Active from"
+  },
   "Active notifications": {
     "description": "marketplace/service-providers/dashboard/ProviderWidgets.tsx",
     "message": "Active notifications"
@@ -283,8 +287,12 @@
     "description": "administration/CeleryInfoPage.tsx",
     "message": "Active tasks"
   },
+  "Active to": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Active to"
+  },
   "Active": {
-    "description": "administration/roles/RolesList.tsx, administration/users/FreeIPAUsersList.tsx, invitations/GroupInvitationsList.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/offerings/update/plans/PlansSection.tsx, marketplace/service-providers/ProviderCampaignStateFilter.tsx, proposals/utils.ts, user/support/UserList.tsx, user/support/utils.ts",
+    "description": "administration/announcements/AnnouncementFilter.tsx, administration/roles/RolesList.tsx, administration/users/FreeIPAUsersList.tsx, invitations/GroupInvitationsList.tsx, marketplace/offerings/list/OfferingStateCell.tsx, marketplace/offerings/list/OfferingStateFilter.tsx, marketplace/offerings/update/plans/PlansSection.tsx, marketplace/service-providers/ProviderCampaignStateFilter.tsx, proposals/utils.ts, user/support/UserList.tsx, user/support/utils.ts",
     "message": "Active"
   },
   "Add Waldur user SSH keys to the FreeIPA profile": {
@@ -758,6 +766,14 @@
   "Annotations": {
     "description": "rancher/node/RancherNodeSummary.tsx",
     "message": "Annotations"
+  },
+  "Announcement": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Announcement"
+  },
+  "Announcements": {
+    "description": "administration/routes.ts",
+    "message": "Announcements"
   },
   "Annual cost": {
     "description": "marketplace/details/plan/PlanDetailsTable2.tsx",
@@ -2427,6 +2443,10 @@
     "description": "openstack/openstack-tenant/actions/CreateNetworkDialog.tsx",
     "message": "Create network for OpenStack tenant"
   },
+  "Create new announcement": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Create new announcement"
+  },
   "Create node": {
     "description": "rancher/cluster/actions/CreateNodeAction.tsx, rancher/cluster/create/CreateNodeDialog.tsx",
     "message": "Create node"
@@ -2516,7 +2536,7 @@
     "message": "Create subnet"
   },
   "Create": {
-    "description": "administration/organizations/OrganizationGroupForm.tsx, administration/remote-offering-sync/RemoteSyncFormDialog.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateForm.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
+    "description": "administration/announcements/AnnouncementForm.tsx, administration/organizations/OrganizationGroupForm.tsx, administration/remote-offering-sync/RemoteSyncFormDialog.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateForm.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
     "message": "Create"
   },
   "Created at": {
@@ -2770,6 +2790,10 @@
   "Daily available booking time range": {
     "description": "booking/components/BusinessHoursGroup.tsx",
     "message": "Daily available booking time range"
+  },
+  "Danger": {
+    "description": "administration/utils.ts",
+    "message": "Danger"
   },
   "Dangerous actions": {
     "description": "openstack/openstack-instance/OpenStackInstanceActions.tsx, openstack/openstack-tenant/OpenstackTenantActions.tsx, openstack/openstack-volume/OpenStackVolumeActions.tsx, slurm/SlurmAllocationActions.tsx",
@@ -3491,6 +3515,10 @@
     "description": "booking/EditSchedulesButton.tsx",
     "message": "Edit schedules"
   },
+  "Edit the announcement": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Edit the announcement"
+  },
   "Edit user agreement": {
     "description": "administration/agreements/UserAgreementsEditDialog.tsx",
     "message": "Edit user agreement"
@@ -3504,7 +3532,7 @@
     "message": "Edit {title}"
   },
   "Edit": {
-    "description": "administration/organizations/OrganizationGroupForm.tsx, administration/providers/ProviderCard.tsx, customer/cost-policies/CostPolicyEditButton.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/EditCreditButton.tsx, customer/credits/ProjectCreditFormDialog.tsx, customer/credits/ProjectEditCreditButton.tsx, customer/list/OrganizationCard.tsx, customer/payments/EditPaymentButton.tsx, customer/team/EditProjectUserButton.tsx, customer/team/UserEditButton.tsx, form/EditAction.tsx, form/EditButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/deploy/DeployPage.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/list/EditOfferingButton.tsx, marketplace/offerings/list/OfferingActions.test.tsx, marketplace/offerings/update/plans/EditPlanDescriptionButton.tsx, marketplace/resources/actions/EditAction.tsx, marketplace/resources/options/UpdateResourceOptionButton.tsx, openstack/openstack-backup/actions/EditAction.tsx, openstack/openstack-backup-schedule/actions/EditAction.tsx, openstack/openstack-instance/actions/EditAction.tsx, openstack/openstack-network/actions/EditNetworkAction.tsx, openstack/openstack-security-groups/EditAction.tsx, openstack/openstack-snapshot/EditAction.tsx, openstack/openstack-snapshot-schedule/actions/EditAction.tsx, openstack/openstack-subnet/EditSubnetAction.tsx, openstack/openstack-tenant/actions/EditAction.tsx, openstack/openstack-volume/actions/EditAction.tsx, organization/OrganizationUIView.tsx, project/ProjectCard.tsx, project/ProjectContainer.tsx, project/ProjectEditAction.tsx, proposals/call-management/CallFormDialog.tsx, proposals/details/CallTabs.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/round/allocation/EditAllocationInfoButton.tsx, proposals/round/allocation/EditRoundAllocationDialog.tsx, proposals/round/review/EditReviewInfoButton.tsx, proposals/round/review/EditRoundReviewDialog.tsx, proposals/round/submission/EditRoundSubmissionDialog.tsx, proposals/round/submission/EditSubmissionInfoButton.tsx, proposals/update/general/EditGeneralInfoButton.tsx, rancher/cluster/hpas/HPAUpdateButton.tsx, slurm/EditAction.tsx, user/dashboard/UserProfileHero.tsx, vmware/actions/EditAction.tsx",
+    "description": "administration/announcements/AnnouncementForm.tsx, administration/organizations/OrganizationGroupForm.tsx, administration/providers/ProviderCard.tsx, customer/cost-policies/CostPolicyEditButton.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/EditCreditButton.tsx, customer/credits/ProjectCreditFormDialog.tsx, customer/credits/ProjectEditCreditButton.tsx, customer/list/OrganizationCard.tsx, customer/payments/EditPaymentButton.tsx, customer/team/EditProjectUserButton.tsx, customer/team/UserEditButton.tsx, form/EditAction.tsx, form/EditButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/deploy/DeployPage.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/list/EditOfferingButton.tsx, marketplace/offerings/list/OfferingActions.test.tsx, marketplace/offerings/update/plans/EditPlanDescriptionButton.tsx, marketplace/resources/actions/EditAction.tsx, marketplace/resources/options/UpdateResourceOptionButton.tsx, openstack/openstack-backup/actions/EditAction.tsx, openstack/openstack-backup-schedule/actions/EditAction.tsx, openstack/openstack-instance/actions/EditAction.tsx, openstack/openstack-network/actions/EditNetworkAction.tsx, openstack/openstack-security-groups/EditAction.tsx, openstack/openstack-snapshot/EditAction.tsx, openstack/openstack-snapshot-schedule/actions/EditAction.tsx, openstack/openstack-subnet/EditSubnetAction.tsx, openstack/openstack-tenant/actions/EditAction.tsx, openstack/openstack-volume/actions/EditAction.tsx, organization/OrganizationUIView.tsx, project/ProjectCard.tsx, project/ProjectContainer.tsx, project/ProjectEditAction.tsx, proposals/call-management/CallFormDialog.tsx, proposals/details/CallTabs.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/round/allocation/EditAllocationInfoButton.tsx, proposals/round/allocation/EditRoundAllocationDialog.tsx, proposals/round/review/EditReviewInfoButton.tsx, proposals/round/review/EditRoundReviewDialog.tsx, proposals/round/submission/EditRoundSubmissionDialog.tsx, proposals/round/submission/EditSubmissionInfoButton.tsx, proposals/update/general/EditGeneralInfoButton.tsx, rancher/cluster/hpas/HPAUpdateButton.tsx, slurm/EditAction.tsx, user/dashboard/UserProfileHero.tsx, vmware/actions/EditAction.tsx",
     "message": "Edit"
   },
   "Educational sciences": {
@@ -4872,7 +4900,7 @@
     "message": "In the format of GUID"
   },
   "Inactive": {
-    "description": "project/team/UserListOptionInline.tsx, user/support/UserList.tsx",
+    "description": "administration/announcements/AnnouncementFilter.tsx, project/team/UserListOptionInline.tsx, user/support/UserList.tsx",
     "message": "Inactive"
   },
   "Incident - client issue with service usage or availability (interruptions, degradation of quality).": {
@@ -4922,6 +4950,10 @@
   "Information is coming from {identityProvider}": {
     "description": "user/support/UserEditRow.tsx",
     "message": "Information is coming from {identityProvider}"
+  },
+  "Information": {
+    "description": "administration/utils.ts",
+    "message": "Information"
   },
   "Informational - client’s request to get or provide additional information related to a service.": {
     "description": "issues/types/constants.tsx",
@@ -6258,6 +6290,10 @@
   "Networks": {
     "description": "openstack/openstack-backup/actions/BackupRestoreDialog.tsx, openstack/openstack-instance/OpenstackInstanceDetails.tsx, openstack/openstack-tenant/tabs.ts",
     "message": "Networks"
+  },
+  "New announcement has been created.": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "New announcement has been created."
   },
   "New cloud": {
     "description": "marketplace/deploy/steps/FormCloudStep.tsx",
@@ -10828,7 +10864,7 @@
     "message": "Statistics"
   },
   "Status": {
-    "description": "administration/InvitationList.tsx, administration/notifications/NotificationFilter.tsx, administration/providers/ProviderUsersDialog.tsx, customer/payment-profiles/PaymentProfileList.tsx, invitations/InvitationsList.tsx, issues/list/IssuesFilter.tsx, issues/list/IssuesList.tsx, marketplace/offerings/details/ConnectionStatusIndicator.tsx, marketplace/offerings/update/plans/PlansSection.tsx, marketplace/resources/details/utils.tsx, marketplace/service-providers/ProviderCampaignsList.tsx, navigation/BackendHealthStatusDialog.tsx, project/team/InvitationsList.tsx, proposals/offering-requests/OfferingRequestsTableFilter.tsx, proposals/round/proposals/ProposalExpandableRow.tsx, proposals/team/InvitationsList.tsx, user/support/UserFilter.tsx, user/support/UserList.tsx",
+    "description": "administration/InvitationList.tsx, administration/announcements/AnnouncementFilter.tsx, administration/notifications/NotificationFilter.tsx, administration/providers/ProviderUsersDialog.tsx, customer/payment-profiles/PaymentProfileList.tsx, invitations/InvitationsList.tsx, issues/list/IssuesFilter.tsx, issues/list/IssuesList.tsx, marketplace/offerings/details/ConnectionStatusIndicator.tsx, marketplace/offerings/update/plans/PlansSection.tsx, marketplace/resources/details/utils.tsx, marketplace/service-providers/ProviderCampaignsList.tsx, navigation/BackendHealthStatusDialog.tsx, project/team/InvitationsList.tsx, proposals/offering-requests/OfferingRequestsTableFilter.tsx, proposals/round/proposals/ProposalExpandableRow.tsx, proposals/team/InvitationsList.tsx, user/support/UserFilter.tsx, user/support/UserList.tsx",
     "message": "Status"
   },
   "Step": {
@@ -11306,6 +11342,10 @@
   "The RAM quota is over the limit": {
     "description": "openstack/openstack-instance/deploy/FormFlavorStep.tsx",
     "message": "The RAM quota is over the limit"
+  },
+  "The announcement has been updated.": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "The announcement has been updated."
   },
   "The call has been created.": {
     "description": "proposals/call-management/CallFormDialog.tsx",
@@ -11884,7 +11924,7 @@
     "message": "Type of support backend. Possible values: atlassian, zammad, smax."
   },
   "Type": {
-    "description": "administration/agreements/UserAgreementsList.tsx, administration/organizations/OrganizationGroupsList.tsx, administration/roles/RoleForm.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payment-profiles/PaymentProfileDetails.tsx, customer/payment-profiles/PaymentProfileList.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, customer/workspace/CustomerEventsFilter.tsx, marketplace/aggregate-limits/AggregateLimitsExpandableRow.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/PublicOfferingComponentsTable.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/update/options/OptionForm.tsx, marketplace/orders/details/OrderDetailsQuickBody.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/orders/list/OrdersListExpandableRow.tsx, marketplace/orders/list/OrdersTableComponent.tsx, marketplace/orders/list/ResourceOrders.tsx, marketplace/resources/import/ResourcesList.tsx, marketplace/robot-accounts/CreateRobotAccountDialog.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, marketplace/robot-accounts/RobotAccountList.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx, openstack/openstack-instance/deploy/FormSSHPublicKeysStep.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-volume/InstanceVolumesList.tsx, openstack/openstack-volume/TenantVolumesList.tsx, project/ProjectEventsFilter.tsx, resource/support/SharedProviderResources.tsx, user/keys/KeysList.tsx, vmware/deploy/FormNetworkStep.tsx",
+    "description": "administration/agreements/UserAgreementsList.tsx, administration/announcements/AnnouncementFilter.tsx, administration/announcements/AnnouncementForm.tsx, administration/organizations/OrganizationGroupsList.tsx, administration/roles/RoleForm.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payment-profiles/PaymentProfileDetails.tsx, customer/payment-profiles/PaymentProfileList.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, customer/workspace/CustomerEventsFilter.tsx, marketplace/aggregate-limits/AggregateLimitsExpandableRow.tsx, marketplace/category/PublicOfferingsList.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/PublicOfferingComponentsTable.tsx, marketplace/offerings/list/OfferingsList.tsx, marketplace/offerings/update/options/OptionForm.tsx, marketplace/orders/details/OrderDetailsQuickBody.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/orders/list/OrdersListExpandableRow.tsx, marketplace/orders/list/OrdersTableComponent.tsx, marketplace/orders/list/ResourceOrders.tsx, marketplace/resources/import/ResourcesList.tsx, marketplace/robot-accounts/CreateRobotAccountDialog.tsx, marketplace/robot-accounts/ProviderRobotAccountList.tsx, marketplace/robot-accounts/RobotAccountList.tsx, marketplace/service-providers/ProviderOfferingsList.tsx, marketplace/service-providers/details/ProviderDashboardTab.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, navigation/header/confirmation-drawer/PendingConsumerOrders.tsx, navigation/header/confirmation-drawer/PendingProviderOrders.tsx, openstack/openstack-instance/deploy/FormSSHPublicKeysStep.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-volume/InstanceVolumesList.tsx, openstack/openstack-volume/TenantVolumesList.tsx, project/ProjectEventsFilter.tsx, resource/support/SharedProviderResources.tsx, user/keys/KeysList.tsx, vmware/deploy/FormNetworkStep.tsx",
     "message": "Type"
   },
   "Types of offering": {
@@ -12062,6 +12102,10 @@
   "Unable to create access subnet.": {
     "description": "customer/details/AccessSubnetCreateForm.tsx",
     "message": "Unable to create access subnet."
+  },
+  "Unable to create announcement.": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Unable to create announcement."
   },
   "Unable to create application.": {
     "description": "rancher/template/TemplateDetail.tsx",
@@ -12914,6 +12958,10 @@
   "Unable to update an option.": {
     "description": "marketplace/offerings/update/options/EditOptionDialog.tsx",
     "message": "Unable to update an option."
+  },
+  "Unable to update announcement.": {
+    "description": "administration/announcements/AnnouncementForm.tsx",
+    "message": "Unable to update announcement."
   },
   "Unable to update attribute": {
     "description": "marketplace/offerings/update/attributes/EditAttributeDialog.tsx",
@@ -14014,6 +14062,10 @@
   "Waldur username": {
     "description": "marketplace/UserPluginOptionsForm.tsx",
     "message": "Waldur username"
+  },
+  "Warning": {
+    "description": "administration/utils.ts",
+    "message": "Warning"
   },
   "Warning: Service provider option will clear all usernames of the existing offering users": {
     "description": "marketplace/UserPluginOptionsForm.tsx",
