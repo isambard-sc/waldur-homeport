@@ -1,7 +1,14 @@
 import Axios, { AxiosRequestConfig } from 'axios';
 
 import { ENV } from '@waldur/configs/default';
-import { get, getAll, parseResultCount, post, put } from '@waldur/core/api';
+import {
+  deleteById,
+  get,
+  getAll,
+  parseResultCount,
+  post,
+  put,
+} from '@waldur/core/api';
 
 export const getCustomersCount = () =>
   Axios.head(`${ENV.apiEndpoint}api/customers/`).then((response) =>
@@ -54,3 +61,12 @@ export const updateIdentityProvider = (provider, formData) =>
   put(`/identity-providers/${provider}/`, formData);
 
 export const deleteToken = (tokenURL: string) => Axios.delete(tokenURL);
+
+export const createAdminAnnouncement = (formData) =>
+  post('/admin-announcements/', formData);
+
+export const updateAdminAnnouncement = (formData, uuid) =>
+  put(`/admin-announcements/${uuid}/`, formData);
+
+export const deleteAdminAnnouncement = (uuid) =>
+  deleteById('/admin-announcements/', uuid);
