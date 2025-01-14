@@ -36,8 +36,8 @@ export const UserRemovalMessageDialog: FunctionComponent<
         summary: translate('Account deletion'),
         is_reported_manually: true,
       });
-      showSuccess(translate('Request for account deletion has been created.')),
-        router.stateService.go('support.detail', { uuid: issue.uuid });
+      showSuccess(translate('Request for account deletion has been created.'));
+      router.stateService.go('support.detail', { uuid: issue.uuid });
       closeDialog();
     } catch (e) {
       showErrorResponse(e, translate('Unable to create request.'));
