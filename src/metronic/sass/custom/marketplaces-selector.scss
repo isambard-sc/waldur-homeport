@@ -86,7 +86,7 @@ $dark-color: #1f2e23;
           color: $white;
         }
         .description {
-          color: if(isDarkMode(), $gray-800, $grey-100);
+          color: if(isDarkMode(), $gray-800, $gray-100);
         }
       }
       &.disabled {
