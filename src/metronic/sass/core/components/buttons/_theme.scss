@@ -21,7 +21,7 @@
     $border-color-dark: theme-dark-color($name);
     $bg-color-dark: theme-dark-color($name);
 
-    $bg-color-disabled: $grey-100;
+    $bg-color-disabled: $gray-100;
 
     @include button-custom-variant(
       $color,
@@ -53,7 +53,7 @@
       $border-color-active: $value;
       $bg-color-active: $value;
 
-      $bg-color-disabled: $grey-100;
+      $bg-color-disabled: $gray-100;
 
       @include button-custom-variant(
         $color,
@@ -371,9 +371,9 @@
     $color-dark: if(isDarkMode(), $primary-800, $gray-700);
     $icon-color-dark: if(isDarkMode(), $primary-800, $gray-700);
     $border-color-dark: if(isDarkMode(), $primary-500, $grey-500);
-    $bg-color-dark: if(isDarkMode(), $primary-100, $grey-100);
+    $bg-color-dark: if(isDarkMode(), $primary-100, $gray-100);
 
-    $bg-color-disabled: $grey-100;
+    $bg-color-disabled: $gray-100;
 
     @include button-custom-variant(
       $color,
@@ -419,7 +419,7 @@
     $color-dark: $gray-700;
     $icon-color-dark: $gray-700;
     $border-color-dark: $grey-500;
-    $bg-color-dark: $grey-100;
+    $bg-color-dark: $gray-100;
 
     @include button-custom-variant(
       $color,
