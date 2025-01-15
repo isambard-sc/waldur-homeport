@@ -26,13 +26,16 @@ type FormData = Record<string, any>;
 export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
   (_, ownProps) => ({
     initialValues: {
-      ...pick(ownProps.resolve.customer, ownProps.resolve.name),
-      country: ownProps.resolve.customer.country
+      ...(ownProps.resolve.name === 'country'
         ? {
-            value: ownProps.resolve.customer.country,
-            label: ownProps.resolve.customer.country_name,
+            country: ownProps.resolve.customer.country
+              ? {
+                  value: ownProps.resolve.customer.country,
+                  label: ownProps.resolve.customer.country_name,
+                }
+              : null,
           }
-        : null,
+        : pick(ownProps.resolve.customer, ownProps.resolve.name)),
     },
   }),
 )(
