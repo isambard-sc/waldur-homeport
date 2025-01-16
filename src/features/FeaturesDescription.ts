@@ -53,6 +53,10 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('Marketplace offerings and resources'),
     items: [
       {
+        key: 'catalogue_only',
+        description: translate('Allow marketplace to function as a catalogue only.'),
+      },
+      {
         key: 'conceal_prices',
         description: translate('Do not render prices in order details.'),
       },

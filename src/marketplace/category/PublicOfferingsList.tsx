@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import {
   getLabel,
@@ -29,6 +31,9 @@ import { Offering } from '../types';
 const RowActions = ({ row }) => {
   const user = useSelector(getUser);
   const { isAllowed } = isOfferingRestrictedToProject(row, user);
+  if (isFeatureVisible(MarketplaceFeatures.catalogue_only)) {
+    return null;
+  }
 
   return (
     <OfferingLink
