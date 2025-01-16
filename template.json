@@ -72,11 +72,11 @@
     "message": "A minimal expected configuration of worker is 4 vCPU and 4 GB RAM."
   },
   "A minimal guaranteed credit reduction per month.": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "A minimal guaranteed credit reduction per month."
   },
   "A minimum amount deducted monthly, calculated based on the end date. Updated on the start of the month.": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "A minimum amount deducted monthly, calculated based on the end date. Updated on the start of the month."
   },
   "A one-time fee applied on activation.": {
@@ -640,7 +640,7 @@
     "message": "Allocated\nto projects"
   },
   "Allocated credit": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/ProjectCreditsList.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Allocated credit"
   },
   "Allocated offerings": {
@@ -836,7 +836,7 @@
     "message": "Applications"
   },
   "Apply as minimal consumption": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Apply as minimal consumption"
   },
   "Apply filters to table data": {
@@ -970,6 +970,10 @@
   "Are you sure you want to delete the LEXIS link of {resource_name}?": {
     "description": "marketplace/resources/lexis/LexisLinkDeleteButton.tsx",
     "message": "Are you sure you want to delete the LEXIS link of {resource_name}?"
+  },
+  "Are you sure you want to delete the announcement?": {
+    "description": "administration/announcements/AnnouncementDeleteAction.tsx",
+    "message": "Are you sure you want to delete the announcement?"
   },
   "Are you sure you want to delete the cost policy for organization {name}?": {
     "description": "customer/cost-policies/CostPolicyDeleteButton.tsx",
@@ -2220,7 +2224,7 @@
     "message": "Confirmation notification template"
   },
   "Confirmation": {
-    "description": "administration/TokenDeleteButton.tsx, administration/organizations/OrganizationGroupDeleteButton.tsx, administration/roles/RoleDeleteButton.tsx, broadcasts/BroadcastTemplateDeleteButton.tsx, customer/cost-policies/CostPolicyDeleteButton.tsx, customer/details/AccessSubnetDeleteButton.tsx, customer/details/CustomerCallManagerPanel.tsx, customer/details/CustomerLocationRow.tsx, customer/payment-profiles/PaymentProfileDeleteButton.tsx, customer/payments/DeletePaymentButton.tsx, customer/team/DeleteProjectUserButton.tsx, customer/team/UserRemoveButton.tsx, invitations/GroupInvitationCancelButton.tsx, invoices/details/InvoiceItemDelete.tsx, marketplace/category/admin/CategoryDeleteAction.tsx, marketplace/category/admin/ColumnRow.tsx, marketplace/category/admin/GroupDeleteButton.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/details/policies/PolicyDeleteButton.tsx, marketplace/offerings/images/DeleteImageButton.tsx, marketplace/offerings/update/components/DeleteComponentButton.tsx, marketplace/offerings/update/endpoints/DeleteEndpointButton.tsx, marketplace/offerings/update/options/DeleteOptionButton.tsx, marketplace/offerings/update/plans/ArchivePlanButton.tsx, marketplace/offerings/update/roles/DeleteRoleButton.tsx, marketplace/orders/actions/OrderUnlinkButton.tsx, marketplace/resources/lexis/LexisLinkDeleteButton.tsx, marketplace/resources/resource-pending/OrderErredView.tsx, marketplace/resources/users/DeleteUserButton.tsx, marketplace/service-providers/OfferingPermissionRemoveButton.tsx, marketplace/service-providers/RestrictOfferingUser.tsx, openstack/openstack-tenant/DeleteMigrationAction.tsx, project/team/UserRemoveButton.tsx, proposals/details/CallOfferingDeleteButton.tsx, proposals/proposal/ProposalRowActions.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/team/UserRemoveButton.tsx, proposals/update/CallActions.tsx, proposals/update/documents/RemoveDocumentButton.tsx, rancher/cluster/create/FormNodesStep.tsx, resource/actions/AsyncActionItem.tsx, resource/actions/ResourceDeleteButton.tsx, user/support/UserDelete.tsx, user/support/UserStatus.tsx",
+    "description": "administration/TokenDeleteButton.tsx, administration/announcements/AnnouncementDeleteAction.tsx, administration/organizations/OrganizationGroupDeleteButton.tsx, administration/roles/RoleDeleteButton.tsx, broadcasts/BroadcastTemplateDeleteButton.tsx, customer/cost-policies/CostPolicyDeleteButton.tsx, customer/details/AccessSubnetDeleteButton.tsx, customer/details/CustomerCallManagerPanel.tsx, customer/details/CustomerLocationRow.tsx, customer/payment-profiles/PaymentProfileDeleteButton.tsx, customer/payments/DeletePaymentButton.tsx, customer/team/DeleteProjectUserButton.tsx, customer/team/UserRemoveButton.tsx, invitations/GroupInvitationCancelButton.tsx, invoices/details/InvoiceItemDelete.tsx, marketplace/category/admin/CategoryDeleteAction.tsx, marketplace/category/admin/ColumnRow.tsx, marketplace/category/admin/GroupDeleteButton.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/details/policies/PolicyDeleteButton.tsx, marketplace/offerings/images/DeleteImageButton.tsx, marketplace/offerings/update/components/DeleteComponentButton.tsx, marketplace/offerings/update/endpoints/DeleteEndpointButton.tsx, marketplace/offerings/update/options/DeleteOptionButton.tsx, marketplace/offerings/update/plans/ArchivePlanButton.tsx, marketplace/offerings/update/roles/DeleteRoleButton.tsx, marketplace/orders/actions/OrderUnlinkButton.tsx, marketplace/resources/lexis/LexisLinkDeleteButton.tsx, marketplace/resources/resource-pending/OrderErredView.tsx, marketplace/resources/users/DeleteUserButton.tsx, marketplace/service-providers/OfferingPermissionRemoveButton.tsx, marketplace/service-providers/RestrictOfferingUser.tsx, openstack/openstack-tenant/DeleteMigrationAction.tsx, project/team/UserRemoveButton.tsx, proposals/details/CallOfferingDeleteButton.tsx, proposals/proposal/ProposalRowActions.tsx, proposals/proposal/create/ProposalSubmissionStep.tsx, proposals/proposal/create/ProposalTeamVerificationStep.tsx, proposals/team/UserRemoveButton.tsx, proposals/update/CallActions.tsx, proposals/update/documents/RemoveDocumentButton.tsx, rancher/cluster/create/FormNodesStep.tsx, resource/actions/AsyncActionItem.tsx, resource/actions/ResourceDeleteButton.tsx, user/support/UserDelete.tsx, user/support/UserStatus.tsx",
     "message": "Confirmation"
   },
   "Confirming that data is correct": {
@@ -2600,11 +2604,11 @@
     "message": "Credit deleted successfully."
   },
   "Credit has been created.": {
-    "description": "customer/credits/CreateCreditButton.tsx",
+    "description": "customer/credits/CreateCreditButton.tsx, customer/credits/ProjectCreateCreditButton.tsx",
     "message": "Credit has been created."
   },
   "Credit has been updated.": {
-    "description": "customer/credits/EditCreditButton.tsx",
+    "description": "customer/credits/EditCreditButton.tsx, customer/credits/ProjectEditCreditButton.tsx",
     "message": "Credit has been updated."
   },
   "Credit is overallocated": {
@@ -3552,7 +3556,7 @@
     "message": "Electrical engineering, electronic engineering, information engineering"
   },
   "Eligible offerings": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/ProjectCreditsList.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Eligible offerings"
   },
   "Email address": {
@@ -3680,7 +3684,7 @@
     "message": "End date of the agreement is {date}."
   },
   "End date": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, booking/deploy/CustomRangeDatePicker.tsx, customer/credits/CreditFormDialog.tsx, customer/dashboard/CreditStatusWidget.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, marketplace/service-providers/OrganizationProjectsExpandable.tsx, marketplace/service-providers/ProviderCampaignsList.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, project/ProjectCard.tsx, project/ProjectsList.tsx, project/create/EndDateGroup.tsx, project/manage/ProjectGeneral.tsx, user/affiliations/ProjectsList.tsx",
+    "description": "booking/deploy/CustomRangeDatePicker.tsx, customer/credits/constants.tsx, customer/dashboard/CreditStatusWidget.tsx, customer/payment-profiles/PaymentProfileCreateDialog.tsx, customer/payment-profiles/PaymentProfileUpdateDialog.tsx, marketplace/service-providers/OrganizationProjectsExpandable.tsx, marketplace/service-providers/ProviderCampaignsList.tsx, marketplace-remote/ProjectUpdateRequestExpandable.tsx, project/ProjectCard.tsx, project/ProjectsList.tsx, project/create/EndDateGroup.tsx, project/manage/ProjectGeneral.tsx, user/affiliations/ProjectsList.tsx",
     "message": "End date"
   },
   "End date:": {
@@ -3768,7 +3772,7 @@
     "message": "Enter the cost threshold (e.g. 1000 EUR)"
   },
   "Enter the expected credit reduction per month": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Enter the expected credit reduction per month"
   },
   "Enter your contact number": {
@@ -3988,11 +3992,11 @@
     "message": "Existing quota usage: {usage}"
   },
   "Expected consumption (per month)": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Expected consumption (per month)"
   },
   "Expected consumption": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Expected consumption"
   },
   "Expected project duration in days once resources have been granted.": {
@@ -4244,7 +4248,7 @@
     "message": "Fixed — use common storage quota"
   },
   "Fixed": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Fixed"
   },
   "Fixed-price contract": {
@@ -4500,7 +4504,7 @@
     "message": "Google Calendar has been unpublished successfully."
   },
   "Grace coefficient": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Grace coefficient"
   },
   "Grant permission": {
@@ -4636,7 +4640,7 @@
     "message": "History and archaeology"
   },
   "History log": {
-    "description": "customer/credits/CreditHistoryLogButton.tsx, customer/credits/CreditHistoryLogDialog.tsx",
+    "description": "customer/credits/CreditHistoryLogButton.tsx, customer/credits/CreditHistoryLogDialog.tsx, customer/credits/CustomerCreditHistoryLogButton.tsx, customer/credits/CustomerCreditHistoryLogDialog.tsx",
     "message": "History log"
   },
   "Home directory prefix": {
@@ -5524,7 +5528,7 @@
     "message": "Limits"
   },
   "Linear": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Linear"
   },
   "Link OpenStack Instance": {
@@ -6008,11 +6012,11 @@
     "message": "Minimal average scoring"
   },
   "Minimal consumption logic": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx, customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Minimal consumption logic"
   },
   "Minimal consumption": {
-    "description": "administration/organizations/OrganizationCreditsList.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Minimal consumption"
   },
   "Minimal disk": {
@@ -6136,7 +6140,7 @@
     "message": "Must be 500 characters or less."
   },
   "Must be a number": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Must be a number"
   },
   "Must be a number.": {
@@ -6144,11 +6148,11 @@
     "message": "Must be a number."
   },
   "Must be greater than or equal to 0": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Must be greater than or equal to 0"
   },
   "Must be less than or equal to 100": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Must be less than or equal to 100"
   },
   "Must be {length} characters or less.": {
@@ -6940,7 +6944,7 @@
     "message": "On decision"
   },
   "On that date all credit will be set to 0": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "On that date all credit will be set to 0"
   },
   "Once start date is reached, invitations and orders are processed.": {
@@ -8852,7 +8856,7 @@
     "message": "Remove organization"
   },
   "Remove": {
-    "description": "administration/TokenDeleteButton.tsx, administration/organizations/OrganizationGroupDeleteButton.tsx, administration/roles/RoleDeleteButton.tsx, broadcasts/BroadcastTemplateDeleteButton.tsx, customer/cost-policies/CostPolicyDeleteButton.tsx, customer/details/AccessSubnetDeleteButton.tsx, customer/details/CustomerManageContainer.tsx, customer/team/DeleteProjectUserButton.tsx, customer/team/UserRemoveButton.tsx, form/DateField.tsx, form/WideImageField.tsx, invoices/details/InvoiceItemDelete.tsx, issues/comments/CommentActions.tsx, marketplace/category/admin/CategoryDeleteAction.tsx, marketplace/category/admin/GroupDeleteButton.tsx, marketplace/offerings/RemoveButton.tsx, marketplace/offerings/details/policies/PolicyDeleteButton.tsx, marketplace/offerings/update/ImageUploadField.tsx, marketplace/resources/lexis/LexisLinkDeleteButton.tsx, openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx, openstack/openstack-tenant/DeleteMigrationAction.tsx, openstack/openstack-tenant/IpAddressList.tsx, openstack/openstack-tenant/StaticRoutesTable.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/ProjectManageContainer.tsx, project/team/UserRemoveButton.tsx, proposals/details/CallOfferingDeleteButton.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestItemActions.tsx, proposals/team/UserRemoveButton.tsx, proposals/update/documents/RemoveDocumentButton.tsx, user/hooks/HookRemoveButton.tsx, user/keys/KeyRemoveButton.tsx",
+    "description": "administration/TokenDeleteButton.tsx, administration/announcements/AnnouncementDeleteAction.tsx, administration/organizations/OrganizationGroupDeleteButton.tsx, administration/roles/RoleDeleteButton.tsx, broadcasts/BroadcastTemplateDeleteButton.tsx, customer/cost-policies/CostPolicyDeleteButton.tsx, customer/details/AccessSubnetDeleteButton.tsx, customer/details/CustomerManageContainer.tsx, customer/team/DeleteProjectUserButton.tsx, customer/team/UserRemoveButton.tsx, form/DateField.tsx, form/WideImageField.tsx, invoices/details/InvoiceItemDelete.tsx, issues/comments/CommentActions.tsx, marketplace/category/admin/CategoryDeleteAction.tsx, marketplace/category/admin/GroupDeleteButton.tsx, marketplace/offerings/RemoveButton.tsx, marketplace/offerings/details/policies/PolicyDeleteButton.tsx, marketplace/offerings/update/ImageUploadField.tsx, marketplace/resources/lexis/LexisLinkDeleteButton.tsx, openstack/openstack-instance/SetAllowedAddressPairsDialog.tsx, openstack/openstack-tenant/DeleteMigrationAction.tsx, openstack/openstack-tenant/IpAddressList.tsx, openstack/openstack-tenant/StaticRoutesTable.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/ProjectManageContainer.tsx, project/team/UserRemoveButton.tsx, proposals/details/CallOfferingDeleteButton.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestItemActions.tsx, proposals/team/UserRemoveButton.tsx, proposals/update/documents/RemoveDocumentButton.tsx, user/hooks/HookRemoveButton.tsx, user/keys/KeyRemoveButton.tsx",
     "message": "Remove"
   },
   "Removed organizations cannot be restored!": {
@@ -10004,7 +10008,7 @@
     "message": "Select country..."
   },
   "Select date": {
-    "description": "customer/credits/CreditFormDialog.tsx",
+    "description": "customer/credits/constants.tsx",
     "message": "Select date"
   },
   "Select evaluation...": {

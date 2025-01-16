@@ -24,6 +24,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 import { OrganizationProjectSelectField } from '../team/OrganizationProjectSelectField';
 
 import { getCustomerCredit } from './api';
+import { useMinimalConsumptionFields } from './constants';
 import { ProjectCreditFormData } from './types';
 
 interface ProjectCreditFormDialogProps {
@@ -35,7 +36,6 @@ interface ProjectCreditFormDialogProps {
 export const ProjectCreditFormDialog = connect(
   (_, ownProps: ProjectCreditFormDialogProps) => ({
     form: ownProps.formId,
-    initialValues: ownProps.initialValues,
   }),
 )(
   reduxForm<ProjectCreditFormData, ProjectCreditFormDialogProps>({
@@ -87,6 +87,11 @@ export const ProjectCreditFormDialog = connect(
       [organizationCredit],
     );
 
+    const CONSUMPTION_FIELDS = useMinimalConsumptionFields(
+      props.formId,
+      props.initialValues,
+    );
+
     return (
       <form onSubmit={props.handleSubmit(props.onSubmit)}>
         <MetronicModalDialog
@@ -135,6 +140,7 @@ export const ProjectCreditFormDialog = connect(
               validate={[required, exceeds]}
               required
             />
+            {CONSUMPTION_FIELDS}
             {isEdit && (
               <Accordion className="mb-7">
                 <Accordion.Item eventKey="0">
