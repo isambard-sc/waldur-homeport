@@ -1,16 +1,15 @@
 import { PencilSimple } from '@phosphor-icons/react';
-import { useCallback } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import { SubmissionError } from 'redux-form';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse } from '@waldur/store/notify';
+import { useModal } from '@waldur/modal/hooks';
+import { useNotify } from '@waldur/store/hooks';
 
 import { updateProjectCredit } from './api';
 import { ProjectCreditFormData } from './types';
+import { getCreditInitialValues } from './utils';
 
 const ProjectCreditFormDialog = lazyComponent(() =>
   import('./ProjectCreditFormDialog').then((module) => ({
@@ -19,44 +18,39 @@ const ProjectCreditFormDialog = lazyComponent(() =>
 );
 
 export const ProjectEditCreditButton = ({ row, refetch }) => {
-  const dispatch = useDispatch();
-  const openCreditFormDialog = useCallback(
-    () =>
-      dispatch(
-        openModalDialog(ProjectCreditFormDialog, {
-          size: 'lg',
-          formId: 'ProjectCreditEditForm',
-          initialValues: {
-            value: row.value,
-            project: {
-              uuid: row.project_uuid,
-              name: row.project_name,
-              url: row.project,
-            },
-          },
-          onSubmit: (formData) => {
-            const payload: ProjectCreditFormData = {
-              project: formData.project.url,
-              value: formData.value,
-            };
-            return updateProjectCredit(row.uuid, payload)
-              .then(() => {
-                dispatch(closeModalDialog());
-                refetch();
-              })
-              .catch((e) => {
-                dispatch(
-                  showErrorResponse(e, translate('Unable to edit the credit')),
-                );
-                if (e.response && e.response.status === 400) {
-                  throw new SubmissionError(e.response.data);
-                }
-              });
-          },
-        }),
-      ),
-    [dispatch, row, refetch],
-  );
+  const { closeDialog, openDialog } = useModal();
+  const { showErrorResponse, showSuccess } = useNotify();
+
+  const openCreditFormDialog = () =>
+    openDialog(ProjectCreditFormDialog, {
+      size: 'lg',
+      formId: 'ProjectCreditEditForm',
+      initialValues: {
+        project: {
+          uuid: row.project_uuid,
+          name: row.project_name,
+          url: row.project,
+        },
+        ...getCreditInitialValues(row),
+      },
+      onSubmit: async (formData) => {
+        const payload: ProjectCreditFormData = {
+          ...formData,
+          project: formData.project.url,
+        };
+        try {
+          await updateProjectCredit(row.uuid, payload);
+          closeDialog();
+          refetch();
+          showSuccess(translate('Credit has been updated.'));
+        } catch (e) {
+          showErrorResponse(e, translate('Unable to edit the credit'));
+          if (e.response && e.response.status === 400) {
+            throw new SubmissionError(e.response.data);
+          }
+        }
+      },
+    });
 
   return (
     <Dropdown.Item as="button" onClick={openCreditFormDialog}>

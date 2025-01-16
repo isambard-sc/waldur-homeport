@@ -8,7 +8,7 @@ import { useModal } from '@waldur/modal/hooks';
 import { useNotify } from '@waldur/store/hooks';
 
 import { updateCustomerCredit } from './api';
-import { serializeCustomerCredit } from './utils';
+import { getCreditInitialValues, serializeCustomerCredit } from './utils';
 
 const CreditFormDialog = lazyComponent(() =>
   import('./CreditFormDialog').then((module) => ({
@@ -39,18 +39,13 @@ export const EditCreditButton = ({ row, refetch }) => {
       size: 'lg',
       form: 'CustomerCreditEditForm',
       initialValues: {
-        value: row.value,
         customer: {
           uuid: row.customer_uuid,
           name: row.customer_name,
           url: row.customer,
         },
         offerings: row.offerings,
-        end_date: row.end_date,
-        minimal_consumption_logic: row.minimal_consumption_logic,
-        expected_consumption: row.expected_consumption,
-        grace_coefficient: row.grace_coefficient,
-        apply_as_minimal_consumption: row.apply_as_minimal_consumption,
+        ...getCreditInitialValues(row),
       },
       onSubmit: callback,
     });

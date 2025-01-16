@@ -1,13 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { DateTime } from 'luxon';
-import { useEffect } from 'react';
-import { Form, Accordion } from 'react-bootstrap';
+import { Accordion, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { getFormValues, reduxForm, formValueSelector } from 'redux-form';
+import { formValueSelector, reduxForm } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
-import { CustomRadioButton } from '@waldur/core/CustomRadioButton';
-import { parseDate } from '@waldur/core/dateUtils';
 import { EChart } from '@waldur/core/EChart';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { LoadingErred } from '@waldur/core/LoadingErred';
@@ -20,8 +16,6 @@ import {
   SubmitButton,
 } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
-import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
-import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
 import {
   offeringsAutocomplete,
@@ -32,27 +26,8 @@ import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 
 import { getCustomerCostChartData } from '../dashboard/api';
 
+import { useMinimalConsumptionFields } from './constants';
 import { CustomerCreditFormData } from './types';
-
-const getStartOfNextMonth = () =>
-  DateTime.now().plus({ months: 1 }).startOf('month');
-
-const validatePercent = (value) => {
-  if (!value) {
-    return undefined;
-  }
-  const valueAsNumber = Number(value);
-  if (isNaN(valueAsNumber)) {
-    return translate('Must be a number');
-  }
-  if (valueAsNumber < 0) {
-    return translate('Must be greater than or equal to 0');
-  }
-  if (valueAsNumber > 100) {
-    return translate('Must be less than or equal to 100');
-  }
-  return undefined;
-};
 
 interface CreditFormDialogProps {
   onSubmit(formData: CustomerCreditFormData): void;
@@ -66,26 +41,6 @@ export const CreditFormDialog = reduxForm<
 })((props) => {
   const isEdit = Boolean(props.initialValues);
 
-  const formValues = (useSelector(getFormValues(props.form)) ||
-    {}) as CustomerCreditFormData;
-
-  useEffect(() => {
-    if (!props.initialValues?.minimal_consumption_logic) {
-      props.change('minimal_consumption_logic', 'fixed');
-    }
-  }, []);
-
-  useEffect(() => {
-    if (formValues.minimal_consumption_logic === 'linear') {
-      if (
-        formValues.end_date &&
-        parseDate(formValues.end_date) < getStartOfNextMonth()
-      ) {
-        props.change('end_date', null);
-      }
-    }
-  });
-
   const customer = useSelector((state) =>
     formValueSelector(props.form)(state, 'customer'),
   );
@@ -94,6 +49,10 @@ export const CreditFormDialog = reduxForm<
     () =>
       isEdit && customer ? getCustomerCostChartData(customer, true) : null,
     { staleTime: 5 * 60 * 1000 },
+  );
+  const CONSUMPTION_FIELDS = useMinimalConsumptionFields(
+    props.form,
+    props.initialValues,
   );
 
   return (
@@ -195,67 +154,7 @@ export const CreditFormDialog = reduxForm<
             required
             unit={ENV.plugins.WALDUR_CORE.CURRENCY_NAME}
           />
-          <DateField
-            name="end_date"
-            label={translate('End date')}
-            placeholder={translate('Select date') + '...'}
-            description={
-              !isEdit && translate('On that date all credit will be set to 0')
-            }
-            required={formValues.minimal_consumption_logic === 'linear'}
-            validate={
-              formValues.minimal_consumption_logic === 'linear'
-                ? [required]
-                : undefined
-            }
-            minDate={
-              formValues.minimal_consumption_logic === 'linear'
-                ? getStartOfNextMonth().toISO()
-                : undefined
-            }
-          />
-          <CustomRadioButton
-            label={translate('Minimal consumption logic')}
-            name="minimal_consumption_logic"
-            direction="horizontal"
-            choices={[
-              {
-                label: translate('Fixed'),
-                value: 'fixed',
-                description: translate(
-                  'A minimal guaranteed credit reduction per month.',
-                ),
-              },
-              {
-                label: translate('Linear'),
-                value: 'linear',
-                description: translate(
-                  'A minimum amount deducted monthly, calculated based on the end date. Updated on the start of the month.',
-                ),
-              },
-            ]}
-          />
-          <NumberField
-            label={translate('Expected consumption (per month)')}
-            name="expected_consumption"
-            placeholder="0"
-            description={translate(
-              'Enter the expected credit reduction per month',
-            )}
-            unit={ENV.plugins.WALDUR_CORE.CURRENCY_NAME}
-          />
-          <NumberField
-            label={translate('Grace coefficient')}
-            name="grace_coefficient"
-            placeholder="0"
-            unit="%"
-            validate={validatePercent}
-          />
-          <AwesomeCheckboxField
-            label={translate('Apply as minimal consumption')}
-            name="apply_as_minimal_consumption"
-            hideLabel
-          />
+          {CONSUMPTION_FIELDS}
           <Form.Group>
             <FieldError error={props.error} />
           </Form.Group>
