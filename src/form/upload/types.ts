@@ -10,6 +10,6 @@ export interface Attachment {
 export interface AttachmentUploading {
   key: string | number;
   file: File;
-  progress: number;
+  progress?: number;
   error?: any;
 }
