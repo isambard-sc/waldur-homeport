@@ -62,6 +62,9 @@ export const updateIdentityProvider = (provider, formData) =>
 
 export const deleteToken = (tokenURL: string) => Axios.delete(tokenURL);
 
+export const getAdminAnnouncements = (configs?: AxiosRequestConfig<any>) =>
+  getAll<any>('/admin-announcements/', configs);
+
 export const createAdminAnnouncement = (formData) =>
   post('/admin-announcements/', formData);
 
