@@ -710,6 +710,12 @@ export const SettingsDescription = [
         default: false,
         type: 'boolean',
       },
+      {
+        key: 'ENABLE_STRICT_CHECK_ACCEPTING_INVITATION',
+        description: translate('If this is true and user email is pre-validated then accepting invitation to only do that if user’s email and email of the invitation fully match.'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
 ];
