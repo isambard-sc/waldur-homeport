@@ -9440,7 +9440,7 @@
     "message": "Retention time"
   },
   "Retry": {
-    "description": "marketplace/resources/resource-pending/OrderErredView.tsx",
+    "description": "marketplace/resources/resource-pending/OrderErredView.tsx, navigation/header/Announcements.tsx",
     "message": "Retry"
   },
   "Retype OpenStack Volume": {
@@ -12410,6 +12410,10 @@
   "Unable to load actions": {
     "description": "marketplace/resources/actions/ActionsPopover.tsx, resource/actions/ResourceActionComponent.tsx, table/ActionsDropdown.tsx",
     "message": "Unable to load actions"
+  },
+  "Unable to load announcements": {
+    "description": "navigation/header/Announcements.tsx",
+    "message": "Unable to load announcements"
   },
   "Unable to load application template details.": {
     "description": "rancher/template/TemplateDetail.tsx",
