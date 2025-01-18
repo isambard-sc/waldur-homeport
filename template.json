@@ -4648,7 +4648,7 @@
     "message": "History and archaeology"
   },
   "History log": {
-    "description": "customer/credits/CreditHistoryLogButton.tsx, customer/credits/CreditHistoryLogDialog.tsx, customer/credits/CustomerCreditHistoryLogButton.tsx, customer/credits/CustomerCreditHistoryLogDialog.tsx",
+    "description": "customer/credits/CreditHistoryLogButton.tsx, customer/credits/CreditHistoryLogDialog.tsx, customer/credits/CustomerCreditHistoryLogButton.tsx, customer/credits/CustomerCreditHistoryLogDialog.tsx, invoices/details/InvoiceEventsButton.tsx, invoices/details/InvoiceEventsDialog.tsx",
     "message": "History log"
   },
   "Home directory prefix": {

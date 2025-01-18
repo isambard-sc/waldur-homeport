@@ -121,6 +121,7 @@ export const useMinimalConsumptionFields = (formId: string, initialValues) => {
   return [
     <DateField
       name="end_date"
+      key="end_date"
       label={translate('End date')}
       placeholder={translate('Select date') + '...'}
       description={translate('On that date all credit will be set to 0')}
@@ -139,6 +140,7 @@ export const useMinimalConsumptionFields = (formId: string, initialValues) => {
     <CustomRadioButton
       label={translate('Minimal consumption logic')}
       name="minimal_consumption_logic"
+      key="minimal_consumption_logic"
       direction="horizontal"
       choices={[
         {
@@ -160,6 +162,7 @@ export const useMinimalConsumptionFields = (formId: string, initialValues) => {
     <NumberField
       label={translate('Expected consumption (per month)')}
       name="expected_consumption"
+      key="expected_consumption"
       placeholder="0"
       description={translate('Enter the expected credit reduction per month')}
       unit={ENV.plugins.WALDUR_CORE.CURRENCY_NAME}
@@ -167,6 +170,7 @@ export const useMinimalConsumptionFields = (formId: string, initialValues) => {
     <NumberField
       label={translate('Grace coefficient')}
       name="grace_coefficient"
+      key="grace_coefficient"
       placeholder="0"
       unit="%"
       validate={validatePercent}
@@ -174,6 +178,7 @@ export const useMinimalConsumptionFields = (formId: string, initialValues) => {
     <AwesomeCheckboxField
       label={translate('Apply as minimal consumption')}
       name="apply_as_minimal_consumption"
+      key="apply_as_minimal_consumption"
       hideLabel
     />,
   ];
