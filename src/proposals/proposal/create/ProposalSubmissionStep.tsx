@@ -1,7 +1,7 @@
 import { get } from 'lodash-es';
 import { createRef, FC, useCallback, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getFormValues } from 'redux-form';
+import { change, getFormValues } from 'redux-form';
 
 import { isEmpty } from '@waldur/core/utils';
 import { Form } from '@waldur/form/Form';
@@ -22,6 +22,17 @@ import { createProposalSteps } from './steps';
 
 const formDataSelector = (state) =>
   (getFormValues(PROPOSAL_UPDATE_SUBMISSION_FORM_ID)(state) || {}) as any;
+
+const attachDocuments = async (proposal_uuid, supporting_documentation) => {
+  if (supporting_documentation) {
+    const files = Object.values(supporting_documentation);
+    if (files && files.length > 0) {
+      await Promise.all(
+        Array.from(files).map((file) => attachDocument(proposal_uuid, file)),
+      );
+    }
+  }
+};
 
 export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
   proposal,
@@ -55,17 +66,18 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
     async (formData) => {
       try {
         await updateProposalProjectDetails(formData, proposal_uuid);
-        if (formData && formData.supporting_documentation) {
-          const files = Object.values(formData.supporting_documentation);
-          if (files && files.length > 0) {
-            await Promise.all(
-              Array.from(files).map((file) =>
-                attachDocument(proposal_uuid, file),
-              ),
-            );
-          }
-        }
+        await attachDocuments(proposal_uuid, formData.supporting_documentation);
         dispatch(showSuccess(translate('Proposal updated successfully')));
+        // clear formData.supporting_documentation from redux-form store to prevent file upload on next submit/switchToTeam
+        dispatch(
+          change(
+            PROPOSAL_UPDATE_SUBMISSION_FORM_ID,
+            'supporting_documentation',
+            {},
+          ),
+        );
+
+        refetch();
       } catch (error) {
         dispatch(showErrorResponse(error, translate('Something went wrong')));
       }
@@ -96,6 +108,7 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
     }
     try {
       await updateProposalProjectDetails(formData, proposal_uuid);
+      await attachDocuments(proposal_uuid, formData.supporting_documentation);
       await switchProposalToTeamVerification(proposal_uuid);
       await refetch();
       dispatch(
