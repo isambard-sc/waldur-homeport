@@ -5,21 +5,21 @@ import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const InvoiceEventsDialog = lazyComponent(() =>
-  import('./InvoiceEventsDialog').then((module) => ({
-    default: module.InvoiceEventsDialog,
+const FilteredEventsDialog = lazyComponent(() =>
+  import('./FilteredEventsDialog').then((module) => ({
+    default: module.FilteredEventsDialog,
   })),
 );
 
-export const InvoiceEventsButton = ({ invoice }) => {
+export const FilteredEventsButton = ({ filter }) => {
   const { openDialog } = useModal();
   return (
     <ActionButton
       title={translate('History log')}
       action={() =>
-        openDialog(InvoiceEventsDialog, {
+        openDialog(FilteredEventsDialog, {
           size: 'xl',
-          resolve: { invoice },
+          filter,
         })
       }
       iconNode={<BookOpenText />}

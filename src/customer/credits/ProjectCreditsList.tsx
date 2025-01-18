@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
 
+import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -9,7 +10,6 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { COMMON_CREDIT_COLUMNS } from './constants';
-import { CustomerCreditHistoryLogButton } from './CustomerCreditHistoryLogButton';
 import { ProjectCreateCreditButton } from './ProjectCreateCreditButton';
 import { ProjectCreditActions } from './ProjectCreditActions';
 import { ProjectCredit } from './types';
@@ -43,7 +43,9 @@ export const ProjectCreditsList: FC = () => {
       rowActions={ProjectCreditActions}
       tableActions={
         <>
-          <CustomerCreditHistoryLogButton />
+          <FilteredEventsButton
+            filter={{ feature: 'credits', customer_uuid: customer.uuid }}
+          />
           <ProjectCreateCreditButton refetch={tableProps.fetch} />
         </>
       }

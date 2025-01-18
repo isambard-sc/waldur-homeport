@@ -4,8 +4,8 @@ import { Link } from '@waldur/core/Link';
 import { COMMON_CREDIT_COLUMNS } from '@waldur/customer/credits/constants';
 import { CreateCreditButton } from '@waldur/customer/credits/CreateCreditButton';
 import { CreditActions } from '@waldur/customer/credits/CreditActions';
-import { CreditHistoryLogButton } from '@waldur/customer/credits/CreditHistoryLogButton';
 import { CustomerCredit } from '@waldur/customer/credits/types';
+import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -44,7 +44,7 @@ export const OrganizationCreditsList: FC<{}> = () => {
       rowActions={CreditActions}
       tableActions={
         <>
-          <CreditHistoryLogButton />
+          <FilteredEventsButton filter={{ feature: 'credits' }} />
           <CreateCreditButton refetch={tableProps.fetch} />
         </>
       }

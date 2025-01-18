@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import { CustomerEditPanelProps } from '@waldur/customer/details/types';
+import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -17,7 +18,7 @@ export const CustomerAccessControlPanel: FunctionComponent<
   const tableProps = useTable({
     table: 'customerAccessControl',
     fetchData: createFetcher('access-subnets', {
-      params: { customer_uuid: customer_uuid },
+      params: { customer_uuid },
     }),
     queryField: 'description',
   });
@@ -40,10 +41,15 @@ export const CustomerAccessControlPanel: FunctionComponent<
       verboseName={translate('Access control')}
       hasQuery
       tableActions={
-        <AccessSubnetCreateButton
-          refetch={tableProps.fetch}
-          customer_uuid={customer_uuid}
-        />
+        <>
+          <FilteredEventsButton
+            filter={{ customer_uuid, feature: 'access_subnets' }}
+          />
+          <AccessSubnetCreateButton
+            refetch={tableProps.fetch}
+            customer_url={customer.url}
+          />
+        </>
       }
       rowActions={({ row }) => (
         <>

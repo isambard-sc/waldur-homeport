@@ -1,8 +1,9 @@
 import { FC } from 'react';
 
+import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
+
 import { Invoice } from '../types';
 
-import { InvoiceEventsButton } from './InvoiceEventsButton';
 import { InvoicePayButton } from './InvoicePayButton';
 import { PrintInvoiceButton } from './PrintInvoiceButton';
 
@@ -15,7 +16,9 @@ export const InvoiceDetailActions: FC<InvoiceDetailActionsProps> = ({
 }) => (
   <>
     <PrintInvoiceButton />
-    <InvoiceEventsButton invoice={invoice} />
+    <FilteredEventsButton
+      filter={{ scope: invoice.url, feature: 'invoices' }}
+    />
     <InvoicePayButton row={invoice} asButton />
   </>
 );
