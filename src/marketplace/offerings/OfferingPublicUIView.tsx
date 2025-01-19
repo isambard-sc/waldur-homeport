@@ -73,7 +73,9 @@ const getTabs = (offering?): PageBarTab[] => {
   }
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
   const showDescriptionTab =
-    offering?.full_description || offering?.attributes.length;
+    offering?.full_description ||
+    offering?.description ||
+    offering?.attributes.length;
 
   const showGettingStartedTab = offering?.getting_started;
 
