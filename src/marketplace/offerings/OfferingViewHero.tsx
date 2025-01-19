@@ -196,16 +196,18 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
         }
       >
         <Table className="mb-0 px-0 h-auto fs-7 w-auto">
-          <tr>
-            <th className="fw-bold w-sm-175px">
-              {translate('Shared/Billing enabled')}:
-            </th>
-            <td className="text-muted">
-              {(offering.shared ? translate('Yes') : translate('No')) +
-                '/' +
-                (offering.billable ? translate('Yes') : translate('No'))}
-            </td>
-          </tr>
+          {!props.isPublic && (
+            <tr>
+              <th className="fw-bold w-sm-175px">
+                {translate('Shared/Billing enabled')}:
+              </th>
+              <td className="text-muted">
+                {(offering.shared ? translate('Yes') : translate('No')) +
+                  '/' +
+                  (offering.billable ? translate('Yes') : translate('No'))}
+              </td>
+            </tr>
+          )}
           <tr>
             <th className="fw-bold w-sm-175px">{translate('Type')}:</th>
             <td className="text-muted">{getLabel(offering.type)}</td>
