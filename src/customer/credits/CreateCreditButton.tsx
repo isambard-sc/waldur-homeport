@@ -15,6 +15,8 @@ const CreditFormDialog = lazyComponent(() =>
   })),
 );
 
+const FORM_ID = 'CustomerCreditCreateForm';
+
 export const CreateCreditButton = ({ refetch }) => {
   const { closeDialog, openDialog } = useModal();
   const { showErrorResponse, showSuccess } = useNotify();
@@ -38,7 +40,8 @@ export const CreateCreditButton = ({ refetch }) => {
       action={() =>
         openDialog(CreditFormDialog, {
           size: 'lg',
-          form: 'CustomerCreditCreateForm',
+          form: FORM_ID,
+          formId: FORM_ID,
           onSubmit: callback,
         })
       }
