@@ -5,8 +5,8 @@ import {
   getComponentUsages,
   getComponentUserUsages,
   getProviderOffering,
-  getPublicOffering,
   getProviderResourcePlanPeriods,
+  getResourceOffering,
 } from '@waldur/marketplace/common/api';
 
 import { UsageReportContext, ResourcePlanPeriod } from './types';
@@ -63,32 +63,20 @@ const getUsageBasedOfferingComponents = (offering) => {
 
 export const getComponentsAndUsages = async (
   resource_uuid: string,
-  offering: any,
   months: number,
-  offering_uuid: string,
 ) => {
   if (!resource_uuid) {
     return { components: null, usages: null, userUsages: null };
   }
 
-  let components;
-  if (!offering) {
-    if (!offering_uuid) {
-      throw new Error('Offering or offering_uuid is missing.');
-    }
-    try {
-      offering = await getPublicOffering(offering_uuid);
-    } catch (error) {
-      throw new Error(`Error while getting offering, ${error.message}`);
-    }
-  }
+  let offering;
   try {
-    components = await getUsageBasedOfferingComponents(offering);
+    offering = await getResourceOffering(resource_uuid);
   } catch (error) {
-    throw new Error(
-      `Error while getting components for offering, ${error.message}`,
-    );
+    throw new Error(`Error while getting offering, ${error.message}`);
   }
+
+  const components = getUsageBasedOfferingComponents(offering);
 
   const date_after = months
     ? DateTime.now().startOf('month').minus({ months }).toFormat('yyyy-MM-dd')
