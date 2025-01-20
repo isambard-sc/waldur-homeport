@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { Field } from '@waldur/resource/summary';
+import { SUPPORT_OFFERING_TYPE } from '@waldur/support/constants';
 
 export const OrderDetailsQuickBody = ({ order }) => {
   const label = useMemo(() => {
@@ -24,21 +25,19 @@ export const OrderDetailsQuickBody = ({ order }) => {
   return (
     <>
       <Field label={translate('Type')} value={label} />
-      <Field
-        label={translate('Issue')}
-        value={
-          order.issue ? (
+      {order.offering_type === SUPPORT_OFFERING_TYPE && order.issue && (
+        <Field
+          label={translate('Issue')}
+          value={
             <Link
               state="support.detail"
               params={{ issue_uuid: order.issue.uuid }}
               label={order.issue.key || order.issue.uuid}
               className="text-link"
             />
-          ) : (
-            'N/A'
-          )
-        }
-      />
+          }
+        />
+      )}
     </>
   );
 };
