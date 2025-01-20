@@ -5,7 +5,6 @@ import { createSelector } from 'reselect';
 
 import { OrganizationsFilter } from '@waldur/administration/organizations/OrganizationsFilter';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
-import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { OrganizationCard } from '@waldur/customer/list/OrganizationCard';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -63,6 +62,7 @@ const mandatoryFields = [
   'resource_count',
   'customer_credit',
   'billing_price_estimate',
+  'organization_groups',
 ];
 
 export const OrganizationsList: FunctionComponent = () => {
@@ -116,18 +116,16 @@ export const OrganizationsList: FunctionComponent = () => {
       id: 'abbreviation',
     },
     {
-      title: translate('Organization group'),
-      render: ({ row }) => (
-        <>
-          {row.organization_group_parent_name && (
-            <>
-              {row.organization_group_parent_name} {RIGHT_ARROW_HTML}{' '}
-            </>
-          )}
-          {row.organization_group_name}
-        </>
-      ),
-      keys: ['organization_group_name', 'organization_group_parent_name'],
+      title: translate('Organization groups'),
+      render: ({ row }) =>
+        row.organization_groups
+          ?.map(
+            (group) =>
+              `${group.parent_name ? `${group.parent_name} ➔ ` : ''}${group.name}`,
+          )
+          .join(', '),
+
+      keys: ['organization_groups'],
       optional: true,
       filter: 'organization_group',
       id: 'organization_group',

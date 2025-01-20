@@ -8,7 +8,7 @@ import { SetAccessPolicyDialogForm } from '@waldur/marketplace/offerings/actions
 import { Offering, Plan } from '@waldur/marketplace/types';
 
 interface SetAccessPolicyDialogProps {
-  resolve: { offering?: Offering; plan?: Plan; refetch: any };
+  resolve: { offering?: Offering; plan?: Plan; refetch: any; customer: any };
 }
 
 export const SetAccessPolicyDialog: FunctionComponent<
@@ -28,6 +28,7 @@ export const SetAccessPolicyDialog: FunctionComponent<
       organizationGroups={organizationGroups}
       offering={resolve.offering}
       plan={resolve.plan}
+      customer={resolve.customer}
       refetch={resolve.refetch}
     />
   );

@@ -11,6 +11,7 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { CustomerLocationRow } from './CustomerLocationRow';
 import { CustomerMediaPanel } from './CustomerMediaPanel';
+import { CustomerOrganizationGroupsRow } from './CustomerOrganizationGroupsRow';
 import { FieldEditButton } from './FieldEditButton';
 import { CustomerEditPanelProps } from './types';
 
@@ -37,16 +38,6 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
           label: translate('Abbreviation'),
           key: 'abbreviation',
           value: props.customer.abbreviation,
-        },
-        {
-          label: translate('Organization group'),
-          key: 'organization_group',
-          value: [
-            props.customer.organization_group_parent_name,
-            props.customer.organization_group_name,
-          ]
-            .filter(Boolean)
-            .join(' ➔ '),
         },
         isFeatureVisible(CustomerFeatures.show_domain)
           ? {
@@ -125,6 +116,7 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
               }
             />
           ))}
+          <CustomerOrganizationGroupsRow customer={props.customer} />
           <CustomerLocationRow
             customer={props.customer}
             callback={props.callback}

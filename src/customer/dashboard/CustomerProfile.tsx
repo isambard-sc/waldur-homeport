@@ -41,10 +41,12 @@ export const CustomerProfile = ({
           gap={5}
           className="flex-wrap text-muted lh-1"
         >
-          {customer.organization_group_name && (
+          {customer.organization_groups.length && (
             <span className="text-nowrap">
               <Hexagon size={18} weight="duotone" className="me-1" />
-              {customer.organization_group_name}
+              {customer.organization_groups
+                .map((group) => group.name)
+                .join(', ')}
             </span>
           )}
           {customer.email && (
