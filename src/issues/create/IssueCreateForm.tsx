@@ -13,6 +13,7 @@ import { IssueCreateButtonProps } from '../list/IssueCreateButton';
 
 import { ISSUE_CREATION_FORM_ID } from './constants';
 import { IssueDescriptionTab } from './IssueDescriptionTab';
+import { IssueDetailsStepLabel } from './IssueDetailsStepLabel';
 import { IssueDetailsTab } from './IssueDetailsTab';
 import { IssueFormData } from './types';
 
@@ -24,7 +25,7 @@ interface OwnProps {
 const steps: ProgressStep[] = [
   {
     key: 'details',
-    label: translate('Issue details'),
+    label: <IssueDetailsStepLabel />,
     description: [translate('Define issue type and context')],
     variant: 'primary',
     completed: true,
