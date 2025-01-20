@@ -12,6 +12,8 @@ import { QuotaCell } from '@waldur/marketplace/resources/details/QuotaCell';
 import { openModalDialog } from '@waldur/modal/actions';
 import { Customer, Project } from '@waldur/workspace/types';
 
+import { getBillingTypeLabel } from '../resources/usage/utils';
+
 interface AggregateLimitWidgetProps {
   project?: Project;
   customer?: Customer;
@@ -36,7 +38,7 @@ export const ComponentItem = ({ component }) => {
       }
       limit={component.limit}
       title={component.name}
-      description={component.description}
+      description={getBillingTypeLabel(component.billing_type)}
     />
   );
 };
