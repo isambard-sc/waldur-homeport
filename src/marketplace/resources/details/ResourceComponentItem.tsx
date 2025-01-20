@@ -1,3 +1,5 @@
+import { getBillingTypeLabel } from '../usage/utils';
+
 import { QuotaCell } from './QuotaCell';
 
 const normalize = (value: number, factor: number) =>
@@ -12,12 +14,12 @@ export const ResourceComponentItem = ({ component, resource }) => {
           : normalize(resource.current_usages[component.type], component.factor)
       }
       limit={
-        component.billing_type !== 'usage'
+        component.billing_type === 'usage' || component.billing_type === 'limit'
           ? normalize(resource.limits[component.type], component.factor)
           : null
       }
       title={component.name}
-      description={component.description}
+      description={getBillingTypeLabel(component.billing_type)}
     />
   );
 };
