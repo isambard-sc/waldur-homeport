@@ -3,6 +3,7 @@ import { connect, useDispatch } from 'react-redux';
 import { compose } from 'redux';
 import { reduxForm } from 'redux-form';
 
+import { updateCustomerOrganizationGroups } from '@waldur/customer/details/api';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import {
@@ -25,6 +26,7 @@ import { SetAccessPolicyFormContainer } from './SetAccessPolicyFormContainer';
 interface SetAccessPolicyDialogFormOwnProps {
   offering?: Offering;
   plan?: Plan;
+  customer?: any;
   organizationGroups: OrganizationGroup[];
   refetch: any;
 }
@@ -35,8 +37,14 @@ const PureSetAccessPolicyDialogForm: FunctionComponent<any> = (props) => {
     try {
       const updateAccessPolicy = props.plan
         ? updatePlanAccessPolicy
-        : updateOfferingAccessPolicy;
-      const uuid = props.plan ? props.plan.uuid : props.offering.uuid;
+        : props.offering
+          ? updateOfferingAccessPolicy
+          : updateCustomerOrganizationGroups;
+      const uuid = props.plan
+        ? props.plan.uuid
+        : props.offering
+          ? props.offering.uuid
+          : props.customer.uuid;
 
       await updateAccessPolicy(
         uuid,
@@ -62,10 +70,13 @@ const PureSetAccessPolicyDialogForm: FunctionComponent<any> = (props) => {
         title={translate(
           props.plan
             ? 'Set access policy for {planName}'
-            : 'Set access policy for {offeringName}',
+            : props.offering
+              ? 'Set access policy for {offeringName}'
+              : 'Set organization groups for {customerName}',
           {
             planName: props.plan?.name,
             offeringName: props.offering?.name,
+            customerName: props.customer?.name,
           },
         )}
         footer={
@@ -93,7 +104,8 @@ const mapStateToProps = (
 ) => ({
   initialValues: getInitialValuesForSetAccessPolicyForm(
     ownProps.offering?.organization_groups ||
-      ownProps.plan?.organization_groups,
+      ownProps.plan?.organization_groups ||
+      ownProps.customer?.organization_groups,
   ),
 });
 

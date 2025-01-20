@@ -1,4 +1,5 @@
 import { CustomerCredit } from '@waldur/customer/credits/types';
+import { OrganizationGroup } from '@waldur/marketplace/types';
 import { BasePermission } from '@waldur/permissions/types';
 import { Quota } from '@waldur/quotas/types';
 
@@ -153,9 +154,7 @@ export interface Customer {
   call_managing_organization_uuid?: string;
   is_service_provider?: boolean;
   created?: string;
-  organization_group?: string;
-  organization_group_name?: string;
-  organization_group_parent_name?: string;
+  organization_groups?: OrganizationGroup[];
   latitude?: number;
   longitude?: number;
   customer_credit?: number;

@@ -17,6 +17,24 @@
       "resource_count": 0
     }
   ],
+  "organization_groups": [
+        {
+            "uuid": "7b118c60e0f54326afa85e975aa66c9b",
+            "url": "http://localhost:8000/api/organization-groups/7b118c60e0f54326afa85e975aa66c9b/",
+            "name": "Consortium",
+            "type": "72ecaac3ba9948f9857b75c00bd50eed",
+            "type_name": "Department",
+            "parent": null
+        },
+        {
+            "uuid": "7b118c60e0f54326afa85e975aa66c9b",
+            "url": "http://localhost:8000/api/organization-groups/7b118c60e0f54326afa85e975aa66c9b/",
+            "name": "Department of Physics",
+            "type": "72ecaac3ba9948f9857b75c00bd50eed",
+            "type_name": "Department",
+            "parent": "7b118c60e0f54326afa85e975aa66c9b"
+        }
+    ],
   "projects_count": 2,
   "is_service_provider": true,
   "is_staff": true,

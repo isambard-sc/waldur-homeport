@@ -2,13 +2,6 @@
   "url": "/api/customers/895e38d197e748459189f19285119edf/",
   "uuid": "895e38d197e748459189f19285119edf",
   "created": "2020-10-26T09:51:25.554809Z",
-  "division": "/api/divisions/5a9e75a5a5ef473eb61a44e920a1130f/",
-  "division_name": "Group of citizen-scientists",
-  "division_uuid": "5a9e75a5a5ef473eb61a44e920a1130f",
-  "division_parent_name": "Citizen-scientists",
-  "division_parent_uuid": "83f8bf94e7b148d9bce03755ab692e1f",
-  "division_type_name": "Department",
-  "division_type_uuid": "72ecaac3ba9948f9857b75c00bd50eed",
   "display_name": "All",
   "projects": [
     {
@@ -95,5 +88,23 @@
       "is_active": true
     }
   ],
+  "organization_groups": [
+        {
+            "uuid": "7b118c60e0f54326afa85e975aa66c9b",
+            "url": "http://localhost:8000/api/organization-groups/7b118c60e0f54326afa85e975aa66c9b/",
+            "name": "Consortium",
+            "type": "72ecaac3ba9948f9857b75c00bd50eed",
+            "type_name": "Department",
+            "parent": null
+        },
+        {
+            "uuid": "7b118c60e0f54326afa85e975aa66c9b",
+            "url": "http://localhost:8000/api/organization-groups/7b118c60e0f54326afa85e975aa66c9b/",
+            "name": "Department of Physics",
+            "type": "72ecaac3ba9948f9857b75c00bd50eed",
+            "type_name": "Department",
+            "parent": "7b118c60e0f54326afa85e975aa66c9b"
+        }
+    ],
   "is_service_provider": true
 }

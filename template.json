@@ -7248,11 +7248,11 @@
     "message": "Organization group types"
   },
   "Organization group": {
-    "description": "administration/organizations/OrganizationGroupOrganizationsList.tsx, administration/organizations/OrganizationsFilter.tsx, customer/details/CustomerDetailsPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "administration/organizations/OrganizationGroupOrganizationsList.tsx, administration/organizations/OrganizationsFilter.tsx, customer/details/EditFieldDialog.tsx",
     "message": "Organization group"
   },
   "Organization groups": {
-    "description": "administration/organizations/OrganizationGroupsList.tsx, administration/routes.ts, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/details/policies/PolicyCreateForm.tsx, marketplace/offerings/update/plans/PlansSection.tsx",
+    "description": "administration/organizations/OrganizationGroupsList.tsx, administration/routes.ts, customer/details/CustomerOrganizationGroupsRow.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/details/policies/PolicyCreateForm.tsx, marketplace/offerings/update/plans/PlansSection.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Organization groups"
   },
   "Organization has been created.": {
@@ -13082,6 +13082,10 @@
   "Unable to update organization group.": {
     "description": "administration/organizations/OrganizationGroupForm.tsx",
     "message": "Unable to update organization group."
+  },
+  "Unable to update organization groups.": {
+    "description": "customer/details/CustomerOrganizationGroupsRow.tsx",
+    "message": "Unable to update organization groups."
   },
   "Unable to update payment profile.": {
     "description": "customer/payment-profiles/PaymentProfileUpdateDialog.tsx",
