@@ -15,7 +15,7 @@ import { ResourceUsageTabsContainer } from '../usage/ResourceUsageTabsContainer'
 import { UsageExportDropdown } from '../usage/UsageExportDropdown';
 import { getUsageHistoryPeriodOptions } from '../usage/utils';
 
-export const UsageCard = ({ resource, offering }) => {
+export const UsageCard = ({ resource }) => {
   const [mode, setMode] = useState<'chart' | 'table'>('chart');
   const resourceRef = useMemo(
     () => ({
@@ -23,7 +23,7 @@ export const UsageCard = ({ resource, offering }) => {
       offering_uuid: resource.offering_uuid,
       resource_uuid: resource.uuid,
     }),
-    [resource, offering],
+    [resource],
   );
   const periodOptions = useMemo(
     () => getUsageHistoryPeriodOptions(resource.created),
@@ -48,13 +48,7 @@ export const UsageCard = ({ resource, offering }) => {
   );
 
   const { loading, error, value } = useAsync(
-    () =>
-      getComponentsAndUsages(
-        resourceRef.resource_uuid,
-        offering,
-        period,
-        resourceRef.offering_uuid,
-      ),
+    () => getComponentsAndUsages(resourceRef.resource_uuid, period),
     [resourceRef, period],
   );
 

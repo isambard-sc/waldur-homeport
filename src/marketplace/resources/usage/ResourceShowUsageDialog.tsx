@@ -20,13 +20,7 @@ export const ResourceShowUsageDialog: FunctionComponent<
   ResourceUsageDialogProps
 > = ({ resolve }) => {
   const { loading, error, value } = useAsync(
-    () =>
-      getComponentsAndUsages(
-        resolve.resource.uuid,
-        null,
-        null,
-        resolve.resource.offering_uuid,
-      ),
+    () => getComponentsAndUsages(resolve.resource.uuid, null),
     [resolve],
   );
 
