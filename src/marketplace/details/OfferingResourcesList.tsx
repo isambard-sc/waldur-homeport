@@ -2,23 +2,22 @@ import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
-import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import {
   FILTER_OFFERING_RESOURCE,
   TABLE_OFFERING_RESOURCE,
 } from '@waldur/marketplace/details/constants';
-import { PublicResourceLink } from '@waldur/marketplace/resources/list/PublicResourceLink';
 import { Offering } from '@waldur/marketplace/types';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
-import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { NON_TERMINATED_STATES } from '../resources/list/constants';
 import { ProviderResourceActions } from '../resources/list/ProviderResourceActions';
-import { ResourceStateField } from '../resources/list/ResourceStateField';
-import { getStates } from '../resources/list/ResourceStateFilter';
+import {
+  getResourceAllListColumns,
+  resourcesListRequiredFields,
+} from '../resources/list/utils';
 
 import { OfferingResourcesFilter } from './OfferingResourcesFilter';
 
@@ -49,61 +48,21 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
       ...filter,
     };
   }, [ownProps.offering, filterValues]);
+
   const tableProps = useTable({
     table: TABLE_OFFERING_RESOURCE,
     fetchData: createFetcher('marketplace-provider-resources'),
     filter,
     queryField: 'query',
+    mandatoryFields: resourcesListRequiredFields(false),
   });
-  const columns: Column[] = [
-    {
-      title: translate('Name'),
-      render: PublicResourceLink,
-      copyField: (row) => row.name || row.offering_name,
-      orderField: 'name',
-      export: 'name',
-    },
-    {
-      visible: false,
-      title: translate('Resource UUID'),
-      render: null,
-      export: 'uuid',
-    },
-    {
-      title: translate('Client organization'),
-      render: ({ row }) => <>{row.customer_name}</>,
-      export: 'customer_name',
-    },
-    {
-      title: translate('Project'),
-      render: ({ row }) => <>{row.project_name}</>,
-      export: 'project_name',
-    },
-    {
-      title: translate('Plan'),
-      render: ({ row }) => <>{row.plan_name || 'N/A'}</>,
-      export: 'plan_name',
-    },
-    {
-      title: translate('Created at'),
-      render: ({ row }) => <>{formatDateTime(row.created)}</>,
-      orderField: 'created',
-      export: false,
-    },
-    {
-      title: translate('State'),
-      render: ({ row }) => <ResourceStateField resource={row} outline pill />,
-      filter: 'state',
-      inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
-      export: 'state',
-    },
-  ];
 
   return (
     <Table
       {...tableProps}
       title={translate('Resources')}
-      columns={columns}
+      columns={getResourceAllListColumns(true, true)}
+      hasOptionalColumns
       verboseName={translate('offering resources')}
       enableExport={true}
       initialSorting={{ field: 'created', mode: 'desc' }}
