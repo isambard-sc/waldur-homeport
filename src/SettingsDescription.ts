@@ -59,6 +59,12 @@ export const SettingsDescription = [
         default: 'EUR',
         type: 'string',
       },
+      {
+        key: 'MARKETPLACE_LANDING_PAGE',
+        description: translate('Marketplace landing page title.'),
+        default: 'Marketplace',
+        type: 'string',
+      },
     ],
   },
   {

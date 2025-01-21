@@ -16,6 +16,7 @@ export enum InvitationsFeatures {
 }
 
 export enum MarketplaceFeatures {
+  call_only = 'marketplace.call_only',
   catalogue_only = 'marketplace.catalogue_only',
   conceal_prices = 'marketplace.conceal_prices',
   import_resources = 'marketplace.import_resources',
