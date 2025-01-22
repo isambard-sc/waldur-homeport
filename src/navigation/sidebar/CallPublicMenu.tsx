@@ -11,10 +11,19 @@ import { isDescendantOf } from '../useTabs';
 
 export const CallPublicMenu = () => {
   const { state } = useCurrentStateAndParams();
-  const visible = isFeatureVisible(
-    MarketplaceFeatures.show_call_management_functionality,
-  );
-  if (!visible) {
+  if (isFeatureVisible(MarketplaceFeatures.call_only)) {
+    return (
+      <MenuItem
+        title={translate('Calls for proposals')}
+        state="calls-for-proposals-dashboard"
+        icon={<ChatTeardropText weight="bold" />}
+        child={false}
+      />
+    );
+  }
+  if (
+    !isFeatureVisible(MarketplaceFeatures.show_call_management_functionality)
+  ) {
     return null;
   }
   return (

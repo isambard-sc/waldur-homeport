@@ -4083,6 +4083,10 @@
     "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-tenant/OpenStackRouterSummary.tsx, openstack/openstack-tenant/TenantInstancesList.tsx",
     "message": "External IPs"
   },
+  "External URL": {
+    "description": "proposals/call-management/CallFormDialog.tsx",
+    "message": "External URL"
+  },
   "External network ID": {
     "description": "openstack/OpenStackForm.tsx, resource/summary/ResourceMetadataDialog.tsx",
     "message": "External network ID"
@@ -6188,7 +6192,7 @@
     "message": "Must start with a country prefix ie EE34501234215"
   },
   "My Proposals": {
-    "description": "proposals/details/PublicCallDetailsHero.tsx, proposals/update/CallUpdateHero.tsx",
+    "description": "proposals/CallProposalsButton.tsx",
     "message": "My Proposals"
   },
   "My offerings": {

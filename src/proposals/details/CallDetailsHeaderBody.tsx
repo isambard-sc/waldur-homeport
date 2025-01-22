@@ -1,4 +1,6 @@
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { Field } from '@waldur/resource/summary';
 
@@ -10,6 +12,9 @@ interface CallDetailsHeaderBodyProps {
 }
 
 export const CallDetailsHeaderBody = (props: CallDetailsHeaderBodyProps) => {
+  if (isFeatureVisible(MarketplaceFeatures.call_only)) {
+    return null;
+  }
   const nextRound = getRoundsWithStatus(props.call.rounds)[0];
   return (
     <>
