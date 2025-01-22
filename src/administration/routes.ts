@@ -423,19 +423,6 @@ export const states: StateDeclaration[] = [
     },
   },
   {
-    name: 'admin-organization-group-types-list',
-    url: 'organization-group-types/',
-    parent: 'admin-organizations',
-    component: lazyComponent(() =>
-      import('./organizations/OrganizationGroupTypesList').then((module) => ({
-        default: module.OrganizationGroupTypesList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Organization group types'),
-    },
-  },
-  {
     name: 'admin-organization-cost-policies',
     url: 'organization-cost-policies/',
     parent: 'admin-organizations',

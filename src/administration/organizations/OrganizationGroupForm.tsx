@@ -5,21 +5,15 @@ import { useDispatch } from 'react-redux';
 import { required } from '@waldur/core/validators';
 import { FormGroup, SubmitButton } from '@waldur/form';
 import { StringField } from '@waldur/form/StringField';
-import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import {
-  createOrganizationGroup,
-  organizationGroupTypeAutocomplete,
-  updateOrganizationGroup,
-} from './api';
+import { createOrganizationGroup, updateOrganizationGroup } from './api';
 
 interface FormData {
   name: string;
-  type?: any;
 }
 
 export const OrganizationGroupForm = ({ resolve }) => {
@@ -62,10 +56,6 @@ export const OrganizationGroupForm = ({ resolve }) => {
         resolve.organizationGroup
           ? {
               name: resolve.organizationGroup.name,
-              type: {
-                name: resolve.organizationGroup.type_name,
-                uuid: resolve.organizationGroup.type,
-              },
             }
           : undefined
       }
@@ -98,27 +88,6 @@ export const OrganizationGroupForm = ({ resolve }) => {
               validate={required}
             >
               <StringField />
-            </Field>
-            <Field
-              name="type"
-              label={translate('Organization group type')}
-              component={FormGroup as any}
-            >
-              {({ input }) => (
-                <AsyncPaginate
-                  placeholder={translate('Select organization group type...')}
-                  loadOptions={organizationGroupTypeAutocomplete}
-                  defaultOptions
-                  getOptionValue={(option) => option.uuid}
-                  getOptionLabel={(option) => option.name}
-                  value={input.value}
-                  onChange={input.onChange}
-                  noOptionsMessage={() =>
-                    translate('No organization group types')
-                  }
-                  isClearable={true}
-                />
-              )}
             </Field>
           </ModalDialog>
         </form>

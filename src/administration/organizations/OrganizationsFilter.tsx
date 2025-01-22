@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Field, reduxForm } from 'redux-form';
 
-import { OrganizationGroupFilter } from '@waldur/administration/organizations/OrganizationGroupFilter';
 import { AccountingRunningField } from '@waldur/customer/list/AccountingRunningField';
 import { SelectOrganizationGroupFieldPure } from '@waldur/customer/list/SelectOrganizationGroupField';
 import { ServiceProviderFilter } from '@waldur/customer/list/ServiceProviderFilter';
@@ -54,13 +53,6 @@ const PureSupportCustomerFilter: FunctionComponent = () => (
       <SelectOrganizationGroupFieldPure
         reactSelectProps={REACT_SELECT_TABLE_FILTER}
       />
-    </TableFilterItem>
-    <TableFilterItem
-      title={translate('Organization group type')}
-      name="organization_group_type"
-      getValueLabel={(option) => option.name}
-    >
-      <OrganizationGroupFilter />
     </TableFilterItem>
   </>
 );
