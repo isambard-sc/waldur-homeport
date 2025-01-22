@@ -21,8 +21,8 @@ export function tryAcceptInvitation() {
     const token = getInvitationToken();
     if (token && !UsersService.mandatoryFieldsMissing(user)) {
       confirmInvitation(token)
-        .then((replaceEmail) => {
-          acceptInvitation(token, replaceEmail);
+        .then(() => {
+          acceptInvitation(token);
         })
         .catch(() => {
           clearInvitationToken();

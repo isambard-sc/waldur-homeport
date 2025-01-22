@@ -36,14 +36,9 @@ export const InvitationConfirmDialog: FunctionComponent<{
     close();
   }, [close, deferred]);
 
-  const closeAcceptingNewEmail = useCallback(() => {
+  const closeAcceptingInvitation = useCallback(() => {
     close();
-    deferred.resolve({ replaceEmail: true, invitation });
-  }, [close, deferred, invitation]);
-
-  const closeDecliningNewEmail = useCallback(() => {
-    close();
-    deferred.resolve({ replaceEmail: false, invitation });
+    deferred.resolve({ invitation });
   }, [close, deferred, invitation]);
 
   useEffect(() => {
@@ -85,11 +80,8 @@ export const InvitationConfirmDialog: FunctionComponent<{
       <Modal.Footer>
         {!user ? null : invitation?.state === 'pending' ? (
           <InvitationButtons
-            user={user}
-            invitation={invitation}
             dismiss={dismiss}
-            closeAcceptingNewEmail={closeAcceptingNewEmail}
-            closeDecliningNewEmail={closeDecliningNewEmail}
+            closeAcceptingInvitation={closeAcceptingInvitation}
           />
         ) : null}
       </Modal.Footer>

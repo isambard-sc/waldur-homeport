@@ -20,10 +20,8 @@ class InvitationServiceClass {
     return this.executeAction(invitation_uuid, 'check');
   }
 
-  accept(invitation_uuid, replace_email) {
-    return this.executeAction(invitation_uuid, 'accept', {
-      replace_email: replace_email,
-    });
+  accept(invitation_uuid) {
+    return this.executeAction(invitation_uuid, 'accept');
   }
 
   submitRequest(uuid) {

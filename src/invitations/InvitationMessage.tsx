@@ -14,17 +14,13 @@ export const InvitationMessage: FunctionComponent<{
     <p>{formatInvitation(invitation)}</p>
     {user.email.toLowerCase() !== invitation.email.toLowerCase() ? (
       <>
+        <b>{translate('Attention!')}</b>
         <p>
           {translate('Your current email is:')} <strong>{user.email}</strong>
         </p>
         <p>
           {translate('Invitation email is:')}{' '}
           <strong>{invitation.email}</strong>
-        </p>
-        <p>
-          {translate(
-            'Would you like to update your current email with the one from the invitation?',
-          )}
         </p>
       </>
     ) : null}
