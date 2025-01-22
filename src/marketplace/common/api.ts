@@ -297,9 +297,6 @@ export const getProjectList = (params?: {}) =>
 export const getOrganizationGroupList = (params?: {}) =>
   getSelectData('/organization-groups/', params);
 
-export const getOrganizationGroupTypesList = (params?: {}) =>
-  getSelectData('/organization-group-types/', params);
-
 export const getAllOrganizationGroups = (options?) =>
   getAll<OrganizationGroup>('/organization-groups/', options);
 

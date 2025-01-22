@@ -1,6 +1,5 @@
 import { FunctionComponent } from 'react';
 
-import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { OrganizationGroup } from '@waldur/marketplace/types';
 import { createFetcher } from '@waldur/table/api';
@@ -21,17 +20,6 @@ export const OrganizationGroupsList: FunctionComponent = () => {
     <Table<OrganizationGroup>
       {...tableProps}
       columns={[
-        {
-          title: translate('Type'),
-          render: ({ row }) => (
-            <Link
-              state="admin-organization-group-types-list"
-              params={{ group: row.uuid }}
-            >
-              {row.type_name}
-            </Link>
-          ),
-        },
         {
           title: translate('Name'),
           render: ({ row }) => <>{row.name}</>,
