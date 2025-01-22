@@ -119,6 +119,14 @@ export const EditGeneralInfoDialog = connect<
                 getOptionValue={({ uuid }) => uuid}
               />
             )}
+            {props.resolve.name === 'external_url' && (
+              <StringField
+                label={translate('External URL')}
+                name="external_url"
+                required
+                validate={required}
+              />
+            )}
           </FormContainer>
         </ModalDialog>
       </form>

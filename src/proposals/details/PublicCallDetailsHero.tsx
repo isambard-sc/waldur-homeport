@@ -1,12 +1,10 @@
 import { FC, useMemo } from 'react';
-import { Button } from 'react-bootstrap';
 
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
-import { translate } from '@waldur/i18n';
 import { getCallStatus } from '@waldur/proposals/utils';
-import { router } from '@waldur/router';
 
+import { CallProposalsButton } from '../CallProposalsButton';
 import { Call } from '../types';
 
 import { CallDetailsHeaderBody } from './CallDetailsHeaderBody';
@@ -46,16 +44,7 @@ export const PublicCallDetailsHero: FC<PublicCallDetailsHeroProps> = ({
       quickActions={
         <div className="d-flex flex-column flex-wrap gap-2">
           <PublicCallApplyButton call={call} />
-          <Button
-            onClick={() =>
-              router.stateService.go('proposals-call-proposals', {
-                call: JSON.stringify(call),
-              })
-            }
-            variant="light"
-          >
-            {translate('My Proposals')}
-          </Button>
+          <CallProposalsButton call={call} />
         </div>
       }
       quickFooterClassName="justify-content-center"

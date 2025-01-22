@@ -4,6 +4,8 @@ import { useAsyncFn, useEffectOnce } from 'react-use';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
@@ -89,7 +91,13 @@ export const PublicCallDetailsContainer: FunctionComponent = () => {
   const breadcrumbItems = useMemo(() => getCallBreadcrumbItems(value), [value]);
   useBreadcrumbs(breadcrumbItems);
 
-  const { tabSpec } = usePageTabsTransmitter(tabs);
+  const { tabSpec } = usePageTabsTransmitter(
+    tabs.filter(
+      (tab) =>
+        !isFeatureVisible(MarketplaceFeatures.call_only) ||
+        tab.key !== 'rounds',
+    ),
+  );
 
   return loading ? (
     <LoadingSpinner />

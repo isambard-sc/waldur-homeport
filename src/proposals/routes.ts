@@ -3,6 +3,7 @@ import { UIView } from '@uirouter/react';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
@@ -66,6 +67,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Proposals'),
+      permissions: [() => !isFeatureVisible(MarketplaceFeatures.call_only)],
     },
   },
   {
@@ -78,6 +80,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Reviews'),
+      permissions: [() => !isFeatureVisible(MarketplaceFeatures.call_only)],
     },
   },
   {

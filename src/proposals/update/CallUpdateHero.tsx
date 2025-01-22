@@ -1,14 +1,12 @@
 import { FC, useMemo } from 'react';
-import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
-import { translate } from '@waldur/i18n';
 import { getCallStatus } from '@waldur/proposals/utils';
-import { router } from '@waldur/router';
 import { getCustomer } from '@waldur/workspace/selectors';
 
+import { CallProposalsButton } from '../CallProposalsButton';
 import { CallDetailsHeaderBody } from '../details/CallDetailsHeaderBody';
 import { Call } from '../types';
 
@@ -44,16 +42,7 @@ export const CallUpdateHero: FC<CallUpdateHeroProps> = ({ call, refetch }) => {
       quickActions={
         <div className="d-flex flex-column flex-wrap gap-2">
           <CallActions call={call} refetch={refetch} />
-          <Button
-            onClick={() =>
-              router.stateService.go('proposals-call-proposals', {
-                call_uuid: call.uuid,
-              })
-            }
-            variant="light"
-          >
-            {translate('My Proposals')}
-          </Button>
+          <CallProposalsButton call={call} />
         </div>
       }
       quickBody={

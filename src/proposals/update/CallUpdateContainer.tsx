@@ -4,6 +4,8 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { InvalidRoutePage } from '@waldur/error/InvalidRoutePage';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
@@ -32,62 +34,63 @@ const PageHero = ({ call, refetch }) => (
 
 const Body = ({ call, refetch, loading }) => {
   const tabs = useMemo<PageBarTab[]>(
-    () => [
-      {
-        key: 'rounds',
-        title: (
-          <>
-            <ValidationIcon value={call.rounds.length > 0} />
-            {translate('Rounds')}
-          </>
-        ),
-        component: CallRoundsList,
-      },
-      {
-        key: 'general',
-        title: (
-          <>
-            <ValidationIcon value={call.description} />
-            <span>{translate('General')}</span>
-          </>
-        ),
-        component: CallGeneralSection,
-      },
-      {
-        key: 'documents',
-        title: translate('Documents'),
-        component: CallDocumentsSection,
-      },
-      {
-        key: 'reviewers',
-        title: translate('Reviewers'),
-        component: ({ call }) => (
-          <TeamSection
-            scope={call}
-            roles={[RoleEnum.CALL_REVIEWER]}
-            roleTypes={['call']}
-            title={translate('Reviewers')}
-          />
-        ),
-      },
-      {
-        key: 'managers',
-        title: translate('Managers'),
-        component: ({ call }) => (
-          <TeamSection
-            scope={call}
-            roles={[RoleEnum.CALL_MANAGER]}
-            roleTypes={['call']}
-            title={translate('Managers')}
-          />
-        ),
-      },
-      {
-        key: 'offerings',
-        title: translate('Offerings'),
-        component: CallOfferingsSection,
-      },
-    ],
+    () =>
+      [
+        {
+          key: 'rounds',
+          title: (
+            <>
+              <ValidationIcon value={call.rounds.length > 0} />
+              {translate('Rounds')}
+            </>
+          ),
+          component: CallRoundsList,
+        },
+        {
+          key: 'general',
+          title: (
+            <>
+              <ValidationIcon value={call.description} />
+              <span>{translate('General')}</span>
+            </>
+          ),
+          component: CallGeneralSection,
+        },
+        {
+          key: 'documents',
+          title: translate('Documents'),
+          component: CallDocumentsSection,
+        },
+        !isFeatureVisible(MarketplaceFeatures.call_only) && {
+          key: 'reviewers',
+          title: translate('Reviewers'),
+          component: ({ call }) => (
+            <TeamSection
+              scope={call}
+              roles={[RoleEnum.CALL_REVIEWER]}
+              roleTypes={['call']}
+              title={translate('Reviewers')}
+            />
+          ),
+        },
+        {
+          key: 'managers',
+          title: translate('Managers'),
+          component: ({ call }) => (
+            <TeamSection
+              scope={call}
+              roles={[RoleEnum.CALL_MANAGER]}
+              roleTypes={['call']}
+              title={translate('Managers')}
+            />
+          ),
+        },
+        {
+          key: 'offerings',
+          title: translate('Offerings'),
+          component: CallOfferingsSection,
+        },
+      ].filter(Boolean) as PageBarTab[],
     [call],
   );
 

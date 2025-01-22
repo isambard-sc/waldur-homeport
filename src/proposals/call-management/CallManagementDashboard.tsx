@@ -1,7 +1,152 @@
-import { FC } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Card, Col, Row } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 
-import { CallManagementStatistics } from './CallManagementStatistics';
+import { LoadingErred } from '@waldur/core/LoadingErred';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { StatisticsCard } from '@waldur/core/StatisticsCard';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
+import { translate } from '@waldur/i18n';
+import {
+  getCallStateOptions,
+  getProposalStateOptions,
+  getReviewStateOptions,
+} from '@waldur/proposals/utils';
+import { getCustomer } from '@waldur/workspace/selectors';
 
-export const CallManagementDashboard: FC = () => {
-  return <CallManagementStatistics />;
+import { getCallManagementStatistics } from '../api';
+
+const FlatStatistics = ({ count, title }) => {
+  return (
+    <Col className="text-md-center mb-4">
+      <strong className="d-block fs-2">{count}</strong>
+      <strong className="health-title">{title}</strong>
+    </Col>
+  );
+};
+
+const getCallState = (states: string[]) => ({
+  state: 'call-management.call-list',
+  params: {
+    state: JSON.stringify(
+      states.map((state) =>
+        getCallStateOptions().find((op) => op.value === state),
+      ),
+    ),
+  },
+});
+
+const getProposalState = (states: string[]) => ({
+  state: 'call-management.proposal-list',
+  params: {
+    state: JSON.stringify(
+      states.map((state) =>
+        getProposalStateOptions().find((op) => op.value === state),
+      ),
+    ),
+  },
+});
+
+const getReviewState = (states: string[]) => ({
+  state: 'call-management.review-list',
+  params: {
+    state: JSON.stringify(
+      states.map((state) =>
+        getReviewStateOptions().find((op) => op.value === state),
+      ),
+    ),
+  },
+});
+
+export const CallManagementDashboard = () => {
+  const customer = useSelector(getCustomer);
+  const { data, isLoading, error, refetch } = useQuery(
+    ['call-management-dashboard', customer.call_managing_organization_uuid],
+    () => getCallManagementStatistics(customer.call_managing_organization_uuid),
+    {
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  return (
+    <Row>
+      {error && (
+        <LoadingErred
+          message={translate('Unable to load statistics data')}
+          loadData={refetch}
+          className="mb-4"
+        />
+      )}
+      {data && (
+        <>
+          <Col md={6} lg={3}>
+            <StatisticsCard
+              title={translate('Open calls')}
+              value={data.open_calls}
+              to={getCallState(['active'])}
+            />
+          </Col>
+          {isFeatureVisible(MarketplaceFeatures.call_only) ? null : (
+            <>
+              <Col md={6} lg={3}>
+                <StatisticsCard
+                  title={translate('Accepted proposals')}
+                  value={data.accepted_proposals}
+                  to={getProposalState(['accepted'])}
+                />
+              </Col>
+              <Col md={6} lg={3}>
+                <StatisticsCard
+                  title={translate('Pending proposals')}
+                  value={data.pending_proposals}
+                  to={getProposalState([
+                    'in_review',
+                    'in_revision',
+                    'submitted',
+                  ])}
+                />
+              </Col>
+              <Col md={6} lg={3}>
+                <StatisticsCard
+                  title={translate('Pending reviews')}
+                  value={data.pending_review}
+                  to={getReviewState(['submitted'])}
+                />
+              </Col>
+            </>
+          )}
+          <Col>
+            <Card className="card-bordered mb-6">
+              <Card.Body>
+                <div className="d-flex justify-content-start justify-content-lg-between flex-wrap">
+                  <FlatStatistics
+                    title={translate('Active rounds')}
+                    count={data.active_rounds}
+                  />
+                  <FlatStatistics
+                    title={translate('Round closing soon')}
+                    count={data.rounds_closing_in_one_week}
+                  />
+                  <FlatStatistics
+                    title={translate('Calls closing soon')}
+                    count={data.calls_closing_in_one_week}
+                  />
+                  <FlatStatistics
+                    title={translate('Pending offering requests')}
+                    count={data.offering_requests_pending}
+                  />
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </>
+      )}
+      {isLoading && (
+        <Col md={6} lg={4}>
+          <LoadingSpinner />
+        </Col>
+      )}
+    </Row>
+  );
 };
