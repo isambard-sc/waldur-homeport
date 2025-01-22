@@ -48,7 +48,7 @@ const getProviderPageTabs = (data): PageBarTab[] => {
         <ProviderCallsTab provider_uuid={data.provider.customer_uuid} />
       ),
     },
-    {
+    !isFeatureVisible(MarketplaceFeatures.catalogue_only) && {
       key: 'orders',
       title: translate('Orders'),
       component: () => <ProviderOrdersTab provider={data.provider} />,

@@ -60,11 +60,11 @@ export const useMarketplacePublicTabs = () => {
         title: translate('Service providers'),
         to: 'public.marketplace-providers',
       },
-      {
+      !isFeatureVisible(MarketplaceFeatures.catalogue_only) && {
         title: translate('Orders'),
         to: 'public.marketplace-orders',
       },
-    ];
+    ].filter(Boolean);
 
     return _tabs.concat(categoryTabs, additionalTabs);
   }, [categories]);

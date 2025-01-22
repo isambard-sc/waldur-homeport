@@ -65,7 +65,10 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Orders'),
       priority: 120,
-      permissions: [userHasCustomerPermission(PermissionEnum.LIST_ORDERS)],
+      permissions: [
+        userHasCustomerPermission(PermissionEnum.LIST_ORDERS),
+        () => !isFeatureVisible(MarketplaceFeatures.catalogue_only),
+      ],
     },
   },
   {

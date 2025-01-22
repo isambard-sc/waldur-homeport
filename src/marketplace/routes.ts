@@ -4,6 +4,7 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { userHasCustomerPermission } from '@waldur/customer/utils';
 import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
@@ -83,6 +84,9 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Orders'),
+      permissions: [
+        () => !isFeatureVisible(MarketplaceFeatures.catalogue_only),
+      ],
     },
   },
 
@@ -495,6 +499,9 @@ export const states: StateDeclaration[] = [
     parent: 'provider-resources',
     data: {
       breadcrumb: () => translate('Orders'),
+      permissions: [
+        () => !isFeatureVisible(MarketplaceFeatures.catalogue_only),
+      ],
     },
   },
 
