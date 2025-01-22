@@ -7,10 +7,10 @@ import { ModelCard1 } from '@waldur/core/ModelCard1';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import Placeholder from '@waldur/images/logo_w.svg';
+import { OfferingDetailsLink } from '@waldur/marketplace/links/OfferingDetailsLink';
 import { wrapTooltip } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
-import { OfferingLink } from '../links/OfferingLink';
 import { isOfferingRestrictedToProject } from '../offerings/utils';
 import { Offering } from '../types';
 
@@ -35,7 +35,7 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
     props.offering.state === 'Paused' &&
       (props.offering.paused_reason ||
         translate('Requesting of new resources has been temporarily paused')),
-    <OfferingLink
+    <OfferingDetailsLink
       offering_uuid={props.offering.uuid}
       className={classNames(props.className, 'offering-card', {
         disabled: props.offering.state !== 'Active',
@@ -97,6 +97,6 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
           )
         }
       />
-    </OfferingLink>,
+    </OfferingDetailsLink>,
   );
 };
