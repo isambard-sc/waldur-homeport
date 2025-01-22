@@ -202,6 +202,7 @@
       "*.fixture.ts",
       "*.fixture.tsx",
       "src/EventsEnums.ts",
+      "src/FeaturesEnums.ts",
       "src/core/draftjs-module.tsx"
     ]
   },

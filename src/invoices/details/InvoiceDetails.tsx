@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
@@ -23,6 +24,8 @@ export const InvoiceDetails = ({
   const showPrice = !getActiveFixedPricePaymentProfile(
     customer.payment_profiles,
   );
+
+  const [totalFiltered, setTotalFiltered] = useState<number | null>(null);
 
   return (
     <>
@@ -62,11 +65,22 @@ export const InvoiceDetails = ({
         refreshInvoiceItems={refreshInvoiceItems}
         showPrice={showPrice}
         showVat={Boolean(invoice.issuer_details.vat_code)}
+        setTotalFiltered={setTotalFiltered}
         footer={
           showPrice && (
             <table className="table bg-gray-50 border-top border-bottom align-middle">
               <tbody>
                 <tr className="fs-6 fw-bold">
+                  {totalFiltered !== null && (
+                    <td className="text-dark">
+                      <span>{translate('Total filtered')}</span>
+                      {': '}
+                      <span className="text-end text-dark text-nowrap min-w-125px">
+                        {defaultCurrency(totalFiltered)}
+                      </span>
+                    </td>
+                  )}
+
                   <td className="text-end text-dark">
                     <span>{translate('Subtotal')}:</span>
                   </td>
@@ -78,7 +92,10 @@ export const InvoiceDetails = ({
                   </td>
                 </tr>
                 <tr className="fs-6 fw-bold">
-                  <td className="text-end text-dark">
+                  <td
+                    className="text-end text-dark"
+                    colSpan={totalFiltered === null ? 1 : 2}
+                  >
                     <span>{translate('Tax')}:</span>
                   </td>
                   <td
@@ -89,7 +106,10 @@ export const InvoiceDetails = ({
                   </td>
                 </tr>
                 <tr className="fs-6 fw-bold">
-                  <td className="text-end text-dark">
+                  <td
+                    className="text-end text-dark"
+                    colSpan={totalFiltered === null ? 1 : 2}
+                  >
                     <span>{translate('Total')}:</span>
                   </td>
                   <td
