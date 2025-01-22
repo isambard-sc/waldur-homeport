@@ -50,7 +50,6 @@ export interface ApplicationConfigurationOptions {
   languageChoices?: LanguageOption[];
   defaultLanguage?: string;
   FEATURES?: Record<string, boolean>;
-  marketplaceLandingPageTitle: string;
   pageSize: number;
   buildId: string;
   accountingMode: 'billing' | 'accounting';
