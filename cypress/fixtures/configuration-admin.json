@@ -77,6 +77,7 @@
     "SITE_PHONE": "",
     "SITE_DESCRIPTION": "Your single pane of control for managing projects, teams and resources in a self-service manner.",
     "MASTERMIND_URL": "",
+    "MARKETPLACE_LANDING_PAGE": "Marketplace",
     "ANONYMOUS_USER_CAN_VIEW_OFFERINGS": true,
     "ENABLE_RESOURCE_END_DATE": true,
     "AUTHENTICATION_METHODS": ["LOCAL_SIGNIN", "SAML2", "SOCIAL_SIGNUP"],

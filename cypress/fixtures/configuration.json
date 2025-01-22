@@ -5,6 +5,7 @@
     "NATIVE_NAME_ENABLED": false,
     "ENABLE_RESOURCE_END_DATE": true,
     "AUTHENTICATION_METHODS": ["LOCAL_SIGNIN"],
+    "MARKETPLACE_LANDING_PAGE": "Marketplace",
     "COMPANY_TYPES": [
       "Ministry",
       "Private company",

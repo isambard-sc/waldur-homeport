@@ -58,6 +58,7 @@ interface CoreConfiguration {
   SITE_PHONE: string;
   SITE_EMAIL: string;
   SITE_NAME: string;
+  MARKETPLACE_LANDING_PAGE: string;
   TRANSLATION_DOMAIN: string;
   ORGANIZATION_SUBNETS_VISIBLE: boolean;
   CURRENCY_NAME: string;
