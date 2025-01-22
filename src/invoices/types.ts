@@ -51,7 +51,9 @@ export interface InvoiceTableItem {
   service_provider_name: string;
   service_provider_uuid: string;
   plan_name: string;
-  total: 0;
+  price: number;
+  tax: number;
+  total: number;
   items: InvoiceItem[];
 }
 

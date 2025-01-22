@@ -23,10 +23,15 @@ import { groupInvoiceItems } from './utils';
 
 interface InvoiceItemsTableProps {
   invoice: Invoice;
+  /**
+   * `invoiceView` is for the user invoice view, when `ENV.accountingMode !== 'accounting'`
+   * @see `src/invoices/details/BillingDetails.tsx`
+   * */
   invoiceView?: boolean;
   refreshInvoiceItems(): void;
   showPrice?: boolean;
   showVat?: boolean;
+  setTotalFiltered?(value: number): void;
   footer?: ReactNode;
 }
 
@@ -55,6 +60,7 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
   showVat,
   footer,
   refreshInvoiceItems,
+  setTotalFiltered,
 }) => {
   const filter = useFilters();
   const customer = useSelector(getCustomer);
@@ -66,14 +72,25 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
       const providerUuid = request.filter?.provider_uuid;
       const projectUuid = request.filter?.project_uuid;
 
-      return Promise.resolve({
-        rows: groupInvoiceItems(invoice.items).filter(
-          (item) =>
-            (!query || item.resource_name.includes(query)) &&
-            (!providerUuid || item.service_provider_uuid === providerUuid) &&
-            (!projectUuid || item.project_uuid === projectUuid),
-        ),
-      });
+      const rows = groupInvoiceItems(invoice.items).filter(
+        (item) =>
+          (!query || item.resource_name.includes(query)) &&
+          (!providerUuid || item.service_provider_uuid === providerUuid) &&
+          (!projectUuid || item.project_uuid === projectUuid),
+      );
+
+      if (setTotalFiltered) {
+        if (query || providerUuid || projectUuid) {
+          const totalFiltered = invoiceView
+            ? rows.reduce((acc, item) => acc + item.total, 0)
+            : rows.reduce((acc, item) => acc + item.price, 0);
+          setTotalFiltered(totalFiltered);
+        } else {
+          setTotalFiltered(null);
+        }
+      }
+
+      return Promise.resolve({ rows });
     },
     queryField: 'query',
     filter,
@@ -115,13 +132,26 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
         {
           title: (
             <>
-              {translate('Total')}
+              {translate('Price')}
               <PriceTooltip />
             </>
           ),
-          render: ({ row }) => <>{defaultCurrency(row.total)}</>,
-          className: 'w-150px',
+          render: ({ row }) => <>{defaultCurrency(row.price)}</>,
+          className: invoiceView ? undefined : 'w-150px',
         },
+        ...(invoiceView
+          ? [
+              {
+                title: translate('Tax'),
+                render: ({ row }) => <>{defaultCurrency(row.tax)}</>,
+              },
+              {
+                title: translate('Total'),
+                render: ({ row }) => <>{defaultCurrency(row.total)}</>,
+                className: 'w-150px',
+              },
+            ]
+          : []),
       ]}
       title={
         <div className="text-nowrap">

@@ -703,6 +703,10 @@
     "description": "features/FeaturesDescription.ts",
     "message": "Allow marketplace to function as a catalogue only."
   },
+  "Allow marketplace to serve only as aggregator of call info.": {
+    "description": "features/FeaturesDescription.ts",
+    "message": "Allow marketplace to serve only as aggregator of call info."
+  },
   "Allow to enable/disable component only": {
     "description": "marketplace/offerings/update/components/ComponentBooleanLimitField.tsx",
     "message": "Allow to enable/disable component only"
@@ -5835,6 +5839,10 @@
     "description": "resource/summary/ResourceMetadataDialog.tsx",
     "message": "Marketplace UUID"
   },
+  "Marketplace landing page title.": {
+    "description": "SettingsDescription.ts",
+    "message": "Marketplace landing page title."
+  },
   "Marketplace offering": {
     "description": "marketplace/offerings/OfferingViewHero.tsx",
     "message": "Marketplace offering"
@@ -8028,7 +8036,7 @@
     "message": "Price per year"
   },
   "Price": {
-    "description": "invoices/list/InvoicesList.tsx, marketplace/offerings/PriceList.tsx, marketplace/resources/change-plan/utils.tsx",
+    "description": "invoices/details/InvoiceItemsTable.tsx, invoices/list/InvoicesList.tsx, marketplace/offerings/PriceList.tsx, marketplace/resources/change-plan/utils.tsx",
     "message": "Price"
   },
   "Pricelist": {
@@ -11192,7 +11200,7 @@
     "message": "Tax percentage"
   },
   "Tax": {
-    "description": "customer/details/CustomerBillingPanel.tsx, invoices/details/InvoiceDetails.tsx, invoices/details/InvoiceItemExpandableRow.tsx, invoices/list/InvoicesList.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, invoices/details/InvoiceDetails.tsx, invoices/details/InvoiceItemExpandableRow.tsx, invoices/details/InvoiceItemsTable.tsx, invoices/list/InvoicesList.tsx",
     "message": "Tax"
   },
   "Team invitations": {
@@ -11846,6 +11854,10 @@
   "Total cost:": {
     "description": "customer/list/TotalCostField.tsx",
     "message": "Total cost:"
+  },
+  "Total filtered": {
+    "description": "invoices/details/BillingRecordDetails.tsx, invoices/details/InvoiceDetails.tsx",
+    "message": "Total filtered"
   },
   "Total for the year": {
     "description": "customer/credits/CreditFormDialog.tsx",

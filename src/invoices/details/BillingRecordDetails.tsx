@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
@@ -16,16 +16,30 @@ export const BillingRecordDetails: FC<BillingRecordDetailsProps> = ({
   invoice,
   refreshInvoiceItems,
 }) => {
+  const [totalFiltered, setTotalFiltered] = useState<number | null>(null);
+
   return (
     <InvoiceItemsTable
       invoice={invoice}
       refreshInvoiceItems={refreshInvoiceItems}
       showPrice={true}
       showVat={false}
+      setTotalFiltered={setTotalFiltered}
       footer={
         <table className="table bg-gray-50 border-top border-bottom align-middle">
           <tbody>
             <tr className="fs-6 fw-bold">
+              {totalFiltered !== null && (
+                <td className="text-dark">
+                  <span>{translate('Total filtered')}</span>{' '}
+                  <small>{translate('(VAT is not included)')}</small>
+                  {': '}
+                  <span className="text-end text-dark text-nowrap min-w-125px">
+                    {defaultCurrency(totalFiltered)}
+                  </span>
+                </td>
+              )}
+
               <td className="text-end text-dark">
                 <span>{translate('Total')}</span>{' '}
                 <small>{translate('(VAT is not included)')}</small>:

@@ -25,11 +25,15 @@ export const groupInvoiceItems = (items: InvoiceItem[]): InvoiceTableItem[] => {
         service_provider_name: item.details.service_provider_name,
         service_provider_uuid: item.details.service_provider_uuid,
         plan_name: item.details.plan_name,
+        price: 0,
+        tax: 0,
         total: 0,
         items: [] as InvoiceItem[],
       };
     }
 
+    acc[key].price += Number(item.price);
+    acc[key].tax += Number(item.tax);
     acc[key].total += Number(item.total);
 
     acc[key].items.push(item);
