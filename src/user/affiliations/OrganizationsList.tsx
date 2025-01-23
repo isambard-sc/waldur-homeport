@@ -36,10 +36,6 @@ const mapStateToFilter = createSelector(
     if (filterValues?.is_service_provider) {
       filter.is_service_provider = filterValues.is_service_provider.value;
     }
-    if (filterValues?.organization_group_type) {
-      filter.organization_group_type_uuid =
-        filterValues.organization_group_type.map((option) => option.uuid);
-    }
     if (filterValues?.organization_group) {
       filter.organization_group_uuid = filterValues.organization_group.uuid;
     }
