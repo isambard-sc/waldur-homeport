@@ -10,6 +10,7 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 interface EditButtonProps extends ButtonProps {
   disabled?: boolean;
+  tooltip?: string;
   label?: string;
   state?: string;
   params?: any;

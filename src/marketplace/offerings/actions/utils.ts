@@ -1,18 +1,6 @@
 import { ARCHIVED, DRAFT } from '@waldur/marketplace/offerings/store/constants';
 import { OrganizationGroup } from '@waldur/marketplace/types';
 
-export const getInitialValuesForSetAccessPolicyForm = (
-  organizationGroups = [],
-) => {
-  const organizationGroupsUuids = organizationGroups.map(
-    (organizationGroup) => organizationGroup.uuid,
-  );
-  return organizationGroupsUuids.reduce(
-    (acc, curr) => ((acc[curr] = true), acc),
-    {},
-  );
-};
-
 export const formatRequestBodyForSetAccessPolicyForm = (
   formData,
   organizationGroups: OrganizationGroup[],
