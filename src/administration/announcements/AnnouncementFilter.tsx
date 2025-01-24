@@ -30,7 +30,6 @@ const PureAnnouncementFilter: FunctionComponent = () => {
               onChange={(value) => prop.input.onChange(value)}
               options={AnnouncementTypeOptions}
               isClearable={true}
-              mul
               {...REACT_SELECT_TABLE_FILTER}
             />
           )}
