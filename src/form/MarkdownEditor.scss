@@ -1,0 +1,14 @@
+.mdxeditor {
+  .mdxeditor-source-editor .cm-scroller,
+  .mdxeditor-diff-editor,
+  .editable-area {
+    min-height: 200px;
+    max-height: 400px;
+    height: calc(100vh - 325px);
+    overflow-y: auto;
+  }
+}
+
+.mdxeditor-popup-container {
+  z-index: 2000;
+}

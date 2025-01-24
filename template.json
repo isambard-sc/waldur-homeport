@@ -12495,10 +12495,6 @@
     "description": "marketplace/resources/list/ExpandableResourceSummary.tsx",
     "message": "Unable to load detail."
   },
-  "Unable to load editor": {
-    "description": "core/WysiwygEditor.tsx",
-    "message": "Unable to load editor"
-  },
   "Unable to load financial overview.": {
     "description": "customer/list/CustomerListContainer.tsx, customer/list/ExportAsEmailDialog.tsx",
     "message": "Unable to load financial overview."
