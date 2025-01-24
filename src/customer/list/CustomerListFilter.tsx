@@ -4,6 +4,7 @@ import { reduxForm } from 'redux-form';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { PeriodOption } from '@waldur/form/types';
 import { translate } from '@waldur/i18n';
+import { ProviderAutocomplete } from '@waldur/marketplace/orders/ProviderAutocomplete';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
 import { AccountingPeriodField } from './AccountingPeriodField';
@@ -17,6 +18,13 @@ const PureCustomerListFilter: FunctionComponent<CustomerListFilterProps> = (
   props,
 ) => (
   <>
+    <TableFilterItem
+      title={translate('Service provider')}
+      name="provider"
+      getValueLabel={(option) => option.customer_name}
+    >
+      <ProviderAutocomplete reactSelectProps={REACT_SELECT_TABLE_FILTER} />
+    </TableFilterItem>
     <TableFilterItem
       title={translate('Accounting period')}
       name="accounting_period"

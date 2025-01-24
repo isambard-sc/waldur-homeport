@@ -21,10 +21,7 @@ export const OrderMetadataTab = ({ order, offering }) => {
             value={order.marketplace_resource_uuid}
           />
           {order.backend_id && (
-            <Field
-              label={translate('Backend ID')}
-              value={order.created_by_full_name}
-            />
+            <Field label={translate('Backend ID')} value={order.backend_id} />
           )}
           <Field
             label={translate('Provider name')}

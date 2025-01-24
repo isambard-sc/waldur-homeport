@@ -55,7 +55,11 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
       hasQuery={true}
       rowActions={({ row }) => (
         <ProposalRowActions
-          row={{ ...row, call_uuid: props.call.uuid }}
+          row={{
+            ...row,
+            call_uuid: props.call.uuid,
+            call_manager_uuid: props.call.customer_uuid,
+          }}
           refetch={tableProps.fetch}
         />
       )}

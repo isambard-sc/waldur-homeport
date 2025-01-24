@@ -1,16 +1,14 @@
 import { PencilSimple } from '@phosphor-icons/react';
-import { useCallback } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import { SubmissionError } from 'redux-form';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse } from '@waldur/store/notify';
+import { useModal } from '@waldur/modal/hooks';
+import { useNotify } from '@waldur/store/hooks';
 
 import { updateCustomerCredit } from './api';
-import { CustomerCreditFormData } from './types';
+import { getCreditInitialValues, serializeCustomerCredit } from './utils';
 
 const CreditFormDialog = lazyComponent(() =>
   import('./CreditFormDialog').then((module) => ({
@@ -18,56 +16,42 @@ const CreditFormDialog = lazyComponent(() =>
   })),
 );
 
-export const EditCreditButton = ({ row, refetch }) => {
-  const dispatch = useDispatch();
-  const openCreditFormDialog = useCallback(
-    () =>
-      dispatch(
-        openModalDialog(CreditFormDialog, {
-          size: 'lg',
-          formId: 'CustomerCreditEditForm',
-          initialValues: {
-            value: row.value,
-            customer: {
-              uuid: row.customer_uuid,
-              name: row.customer_name,
-              url: row.customer,
-            },
-            offerings: row.offerings,
-            end_date: row.end_date,
-            minimal_consumption: row.minimal_consumption,
-            minimal_consumption_logic: row.minimal_consumption_logic,
-          },
-          onSubmit: (formData) => {
-            const payload: CustomerCreditFormData = {
-              ...formData,
-              customer: formData.customer.url,
-              offerings: formData.offerings
-                ? formData.offerings.map((offering) => offering.url)
-                : undefined,
-            };
-            if (!payload.minimal_consumption) {
-              payload.minimal_consumption = '0';
-            }
+const FORM_ID = 'CustomerCreditEditForm';
 
-            return updateCustomerCredit(row.uuid, payload)
-              .then(() => {
-                dispatch(closeModalDialog());
-                refetch();
-              })
-              .catch((e) => {
-                dispatch(
-                  showErrorResponse(e, translate('Unable to edit the credit')),
-                );
-                if (e.response && e.response.status === 400) {
-                  throw new SubmissionError(e.response.data);
-                }
-              });
-          },
-        }),
-      ),
-    [dispatch, row, refetch],
-  );
+export const EditCreditButton = ({ row, refetch }) => {
+  const { closeDialog, openDialog } = useModal();
+  const { showErrorResponse, showSuccess } = useNotify();
+
+  const callback = async (formData) => {
+    const payload = serializeCustomerCredit(formData);
+    try {
+      await updateCustomerCredit(row.uuid, payload);
+      showSuccess(translate('Credit has been updated.'));
+      closeDialog();
+      refetch();
+    } catch (e) {
+      showErrorResponse(e, translate('Unable to edit the credit'));
+      if (e.response && e.response.status === 400) {
+        throw new SubmissionError(e.response.data);
+      }
+    }
+  };
+  const openCreditFormDialog = () =>
+    openDialog(CreditFormDialog, {
+      size: 'lg',
+      form: FORM_ID,
+      formId: FORM_ID,
+      initialValues: {
+        customer: {
+          uuid: row.customer_uuid,
+          name: row.customer_name,
+          url: row.customer,
+        },
+        offerings: row.offerings,
+        ...getCreditInitialValues(row),
+      },
+      onSubmit: callback,
+    });
 
   return (
     <Dropdown.Item as="button" onClick={openCreditFormDialog}>

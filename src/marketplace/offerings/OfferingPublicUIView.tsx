@@ -4,6 +4,8 @@ import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getCategory, getPublicOffering } from '@waldur/marketplace/common/api';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
@@ -71,7 +73,9 @@ const getTabs = (offering?): PageBarTab[] => {
   }
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
   const showDescriptionTab =
-    offering?.full_description || offering?.attributes.length;
+    offering?.full_description ||
+    offering?.description ||
+    offering?.attributes.length;
 
   const showGettingStartedTab = offering?.getting_started;
 
@@ -88,16 +92,20 @@ const getTabs = (offering?): PageBarTab[] => {
           component: PublicOfferingGettingStarted,
         }
       : null,
-    {
-      title: translate('Pricing'),
-      key: 'pricing',
-      component: PublicOfferingPricing,
-    },
-    {
-      title: translate('Components'),
-      key: 'components',
-      component: PublicOfferingComponents,
-    },
+    isFeatureVisible(MarketplaceFeatures.catalogue_only)
+      ? null
+      : {
+          title: translate('Pricing'),
+          key: 'pricing',
+          component: PublicOfferingPricing,
+        },
+    isFeatureVisible(MarketplaceFeatures.catalogue_only)
+      ? null
+      : {
+          title: translate('Components'),
+          key: 'components',
+          component: PublicOfferingComponents,
+        },
     offering?.screenshots.length
       ? {
           title: translate('Images'),

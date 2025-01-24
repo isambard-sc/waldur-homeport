@@ -3,7 +3,9 @@
     "VALIDATE_INVITATION_EMAIL": false,
     "INVITATIONS_ENABLED": true,
     "NATIVE_NAME_ENABLED": false,
+    "ENABLE_RESOURCE_END_DATE": true,
     "AUTHENTICATION_METHODS": ["LOCAL_SIGNIN"],
+    "MARKETPLACE_LANDING_PAGE": "Marketplace",
     "COMPANY_TYPES": [
       "Ministry",
       "Private company",
@@ -27,9 +29,6 @@
     "ALLOW_TO_SELECT_IDENTITY_PROVIDER": true,
     "IDENTITY_PROVIDER_LABEL": null,
     "IDENTITY_PROVIDER_URL": null
-  },
-  "WALDUR_MARKETPLACE": {
-    "ENABLE_RESOURCE_END_DATE": true
   },
   "WALDUR_FREEIPA": {
     "ENABLED": true,

@@ -1,18 +1,16 @@
-import { startCase } from 'lodash-es';
 import { FC } from 'react';
 
-import { formatDate } from '@waldur/core/dateUtils';
-import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { Link } from '@waldur/core/Link';
+import { COMMON_CREDIT_COLUMNS } from '@waldur/customer/credits/constants';
 import { CreateCreditButton } from '@waldur/customer/credits/CreateCreditButton';
 import { CreditActions } from '@waldur/customer/credits/CreditActions';
-import { CreditHistoryLogButton } from '@waldur/customer/credits/CreditHistoryLogButton';
 import { CustomerCredit } from '@waldur/customer/credits/types';
+import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { renderFieldOrDash } from '@waldur/table/utils';
+
 const OrganizationField = ({ row }) => (
   <Link
     state="organization.dashboard"
@@ -37,44 +35,7 @@ export const OrganizationCreditsList: FC<{}> = () => {
           render: OrganizationField,
           export: 'customer_name',
         },
-        {
-          title: translate('Eligible offerings'),
-          render: ({ row }) => (
-            <>
-              {renderFieldOrDash(
-                row.offerings.map((offering) => offering.name).join(', '),
-              )}
-            </>
-          ),
-          export: (row) =>
-            renderFieldOrDash(
-              row.offerings.map((offering) => offering.name).join(', '),
-            ),
-        },
-        {
-          title: translate('Minimal consumption logic'),
-          render: ({ row }) => startCase(row.minimal_consumption_logic),
-          export: 'minimal_consumption_logic',
-        },
-        {
-          title: translate('Minimal consumption'),
-          render: ({ row }) => defaultCurrency(row.minimal_consumption),
-          orderField: 'minimal_consumption',
-          export: (row) => defaultCurrency(row.minimal_consumption),
-        },
-        {
-          title: translate('End date'),
-          render: ({ row }) =>
-            row.end_date ? formatDate(row.end_date) : <>&mdash;</>,
-          orderField: 'end_date',
-          export: 'end_date',
-        },
-        {
-          title: translate('Allocated credit'),
-          render: ({ row }) => defaultCurrency(row.value),
-          orderField: 'value',
-          export: (row) => defaultCurrency(row.value),
-        },
+        ...COMMON_CREDIT_COLUMNS,
       ]}
       title={translate('Credit management')}
       verboseName={translate('Credits')}
@@ -83,7 +44,7 @@ export const OrganizationCreditsList: FC<{}> = () => {
       rowActions={CreditActions}
       tableActions={
         <>
-          <CreditHistoryLogButton />
+          <FilteredEventsButton filter={{ feature: 'credits' }} />
           <CreateCreditButton refetch={tableProps.fetch} />
         </>
       }

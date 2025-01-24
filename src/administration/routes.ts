@@ -82,6 +82,20 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-announcements',
+    url: 'announcements/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./announcements/AnnouncementsList').then((module) => ({
+        default: module.AnnouncementsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Announcements'),
+    },
+  },
+
+  {
     name: 'admin-celery-info',
     url: 'celery-info/',
     parent: 'admin-settings',
@@ -134,6 +148,47 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Service desk'),
+    },
+  },
+
+  {
+    name: 'admin-marketplace-settings',
+    url: 'marketplace/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./marketplace/AdministrationMarketplace').then((module) => ({
+        default: module.AdministrationMarketplace,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Marketplace'),
+    },
+  },
+
+  {
+    name: 'admin-telemetry-settings',
+    url: 'telemetry/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./telemetry/AdministrationTelemetry').then((module) => ({
+        default: module.AdministrationTelemetry,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Telemetry'),
+    },
+  },
+  {
+    name: 'admin-custom-scripts-settings',
+    url: 'custom-scripts/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./custom-scripts/AdministrationCustomScripts').then((module) => ({
+        default: module.AdministrationCustomScripts,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Custom Scripts'),
     },
   },
 
@@ -365,19 +420,6 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Organization groups'),
-    },
-  },
-  {
-    name: 'admin-organization-group-types-list',
-    url: 'organization-group-types/',
-    parent: 'admin-organizations',
-    component: lazyComponent(() =>
-      import('./organizations/OrganizationGroupTypesList').then((module) => ({
-        default: module.OrganizationGroupTypesList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Organization group types'),
     },
   },
   {

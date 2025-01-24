@@ -12,16 +12,20 @@ exports[`InternalIpsList > renders list 1`] = `
         class="card-toolbar g-0 gap-4 w-100 row"
       >
         <div
-          class="order-0 mw-sm-25 col"
+          class="order-0 col"
         >
           <div
             class="card-title h5"
           >
-            <span
-              class="h3 me-2"
+            <div
+              class="me-2"
             >
-              Ports
-            </span>
+              <span
+                class="h3"
+              >
+                Ports
+              </span>
+            </div>
             <button
               class="btn btn-icon btn-active-light"
               type="button"
@@ -42,7 +46,7 @@ exports[`InternalIpsList > renders list 1`] = `
           </div>
         </div>
         <div
-          class="order-1 order-sm-2 min-w-25 ms-auto col-sm-auto"
+          class="order-1 order-sm-2 ms-auto col-sm-auto"
         >
           <div
             class="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-3"

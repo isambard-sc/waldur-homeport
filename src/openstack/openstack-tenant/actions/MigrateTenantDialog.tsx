@@ -84,7 +84,7 @@ export const MigrateTenantDialog = connect<
 
       useEffect(() => {
         change('plan', offering ? offering.plans[0] : null);
-        change('volume_types', []);
+        change('volumeTypes', []);
       }, [offering]);
 
       const queryResult = useQuery(

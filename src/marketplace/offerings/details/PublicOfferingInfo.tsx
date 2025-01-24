@@ -23,7 +23,9 @@ export const PublicOfferingInfo: FunctionComponent<PublicOfferingInfoProps> = ({
         <PublicOfferingCardTitle>
           {translate('Description')}
         </PublicOfferingCardTitle>
-        <FormattedHtml html={offering.full_description} />
+        <FormattedHtml
+          html={offering.full_description || offering.description}
+        />
         <PublicOfferingAttributesCard offering={offering} category={category} />
       </Card.Body>
     </Card>

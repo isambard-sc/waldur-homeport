@@ -65,7 +65,7 @@ export interface Call {
   customer_name: string;
   customer_uuid: string;
   created_by: string;
-
+  external_url?: string;
   backend_id?: string;
   offerings: CallOffering[];
   rounds: Round[];

@@ -29,7 +29,7 @@ export const ColumnRow = ({ column, fields, index }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

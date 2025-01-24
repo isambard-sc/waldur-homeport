@@ -5,8 +5,7 @@ import { createDeferred } from '@waldur/core/utils';
 
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
-
-export type DialogSizeType = 'sm' | 'lg' | 'xl';
+import { ConfirmationDialogType, DialogSizeType } from './types';
 
 export interface AppModalProps extends ModalProps {
   size?: DialogSizeType;
@@ -30,7 +29,13 @@ export const waitForConfirmation = (
   dispatch,
   title: ReactNode,
   body: ReactNode,
-  forDeletion?: boolean,
+  options: {
+    forDeletion?: boolean;
+    type?: ConfirmationDialogType;
+    positiveButton?: string;
+    negativeButton?: string;
+    size?: DialogSizeType;
+  } = {},
 ) => {
   const deferred = createDeferred();
   const params = {
@@ -38,12 +43,14 @@ export const waitForConfirmation = (
       deferred,
       title,
       body,
+      ...options,
     },
+    size: options.size,
   };
   dispatch(
     openModalDialog(
-      forDeletion ? DeleteConfirmationDialog : ConfirmationDialog,
-      forDeletion ? { ...params, size: 'sm' } : params,
+      options.forDeletion ? DeleteConfirmationDialog : ConfirmationDialog,
+      options.forDeletion ? { size: 'sm', ...params } : params,
     ),
   );
   return deferred.promise;

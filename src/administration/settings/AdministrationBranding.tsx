@@ -9,7 +9,7 @@ import { FieldRow } from './FieldRow';
 
 const BRANDING_SECTIONS = [
   translate('Branding'),
-  translate('Marketplace'),
+  translate('Marketplace Branding'),
   translate('Notifications'),
   translate('Links'),
   translate('Theme'),

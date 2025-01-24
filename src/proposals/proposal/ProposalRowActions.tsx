@@ -19,9 +19,11 @@ const CreateReviewDialog = lazyComponent(() =>
   })),
 );
 
-const linkToProposalDetails = (proposalUuid) =>
+const linkToProposalDetails = (proposalUuid, callManagerUuid) =>
   router.stateService.go('call-management.proposal-details', {
     proposal_uuid: proposalUuid,
+    // if the parent component is not in organization scope, call managing organization's customer uuid is needed for routing
+    ...(callManagerUuid !== undefined && { uuid: callManagerUuid }),
   });
 
 export const ProposalRowActions = ({ row, refetch }) => {
@@ -92,7 +94,7 @@ export const ProposalRowActions = ({ row, refetch }) => {
       )}
       <ActionItem
         title={translate('View')}
-        action={() => linkToProposalDetails(row.uuid)}
+        action={() => linkToProposalDetails(row.uuid, row.call_manager_uuid)}
         iconNode={<Eye />}
       />
       {!isRejectButtonDisabled && (

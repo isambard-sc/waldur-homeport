@@ -147,7 +147,11 @@ export const ConfigurationEditDialog = reduxForm<
           ) : item.type === 'color_field' ? (
             <ColorField name="value" label={item.description} />
           ) : item.type === 'boolean' ? (
-            <AwesomeCheckboxField name="value" label={item.description} />
+            <AwesomeCheckboxField
+              name="value"
+              label={item.description}
+              hideLabel
+            />
           ) : item.type === 'image_field' ? (
             <WideImageField name="value" label={item.description} />
           ) : (

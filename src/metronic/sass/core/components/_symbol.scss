@@ -22,7 +22,7 @@
     justify-content: center;
     font-weight: 500;
     color: $gray-800;
-    background-color: $gray-100;
+    background-color: if(isDarkMode(), $light, $gray-100);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;

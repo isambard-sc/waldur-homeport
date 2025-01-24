@@ -1,7 +1,6 @@
-import { Dropdown } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
-import { translate } from '@waldur/i18n';
+import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { InvoiceItemCompensation } from './InvoiceItemCompensation';
@@ -16,29 +15,24 @@ export const InvoiceItemActions = ({ invoice, item, refreshInvoiceItems }) => {
   }
 
   return (
-    <Dropdown id="invoice-item-actions" align="start">
-      <Dropdown.Toggle className="btn-sm">
-        {translate('Actions')}
-      </Dropdown.Toggle>
-      <Dropdown.Menu>
-        <InvoiceItemUpdate
-          item={item}
-          refreshInvoiceItems={refreshInvoiceItems}
-        />
-        <InvoiceItemMove
-          invoice={invoice}
-          item={item}
-          refreshInvoiceItems={refreshInvoiceItems}
-        />
-        <InvoiceItemCompensation
-          item={item}
-          refreshInvoiceItems={refreshInvoiceItems}
-        />
-        <InvoiceItemDelete
-          item={item}
-          refreshInvoiceItems={refreshInvoiceItems}
-        />
-      </Dropdown.Menu>
-    </Dropdown>
+    <ActionsDropdownComponent>
+      <InvoiceItemUpdate
+        item={item}
+        refreshInvoiceItems={refreshInvoiceItems}
+      />
+      <InvoiceItemMove
+        invoice={invoice}
+        item={item}
+        refreshInvoiceItems={refreshInvoiceItems}
+      />
+      <InvoiceItemCompensation
+        item={item}
+        refreshInvoiceItems={refreshInvoiceItems}
+      />
+      <InvoiceItemDelete
+        item={item}
+        refreshInvoiceItems={refreshInvoiceItems}
+      />
+    </ActionsDropdownComponent>
   );
 };

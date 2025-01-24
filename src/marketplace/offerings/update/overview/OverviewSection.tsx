@@ -53,6 +53,12 @@ const attributes: Attribute[] = [
     maxLength: 200,
   },
   {
+    key: 'access_url',
+    title: translate('Access URL'),
+    type: 'string',
+    maxLength: 200,
+  },
+  {
     key: 'slug',
     title: translate('Slug'),
     type: 'string',

@@ -4,8 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { post } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
 export const SendNotificationButton: FunctionComponent<{ row }> = ({ row }) => {
@@ -33,17 +33,16 @@ export const SendNotificationButton: FunctionComponent<{ row }> = ({ row }) => {
   };
 
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Send notification')}
+      action={onClick}
+      iconNode={<Share weight="bold" />}
       disabled={row.state !== 'created'}
-      iconNode={<Share />}
       tooltip={
         row.state !== 'created'
           ? translate('Notification can be sent only for created invoice.')
           : ''
       }
-      action={onClick}
-      size="sm"
     />
   );
 };

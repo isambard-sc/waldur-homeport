@@ -57,8 +57,8 @@ export const EditPlanPricesDialog = connect<
         await updatePlanPrices(props.resolve.plan.uuid, {
           prices: formData.new_prices,
         });
-        showSuccess(translate('Prices have been updated successfully.')),
-          await props.resolve.refetch();
+        showSuccess(translate('Prices have been updated successfully.'));
+        await props.resolve.refetch();
         closeDialog();
       } catch (error) {
         showErrorResponse(error, translate('Unable to update prices.'));

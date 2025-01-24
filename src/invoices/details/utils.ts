@@ -3,80 +3,45 @@ import { createSelector } from 'reselect';
 import { getCustomer } from '@waldur/workspace/selectors';
 import { PaymentProfile } from '@waldur/workspace/types';
 
-import { InvoiceItem } from '../types';
+import { InvoiceItem, InvoiceTableItem } from '../types';
 
 const getResourceKey = (item: InvoiceItem) =>
   item.resource_uuid || item.details?.scope_uuid || item.details.resource_uuid;
 
-export const groupInvoiceItems = (
-  items: InvoiceItem[],
-  sortKey = 'name',
-  desc = false,
-) => {
-  const projectsMap = items.reduce((map, item) => {
-    if (!item.project_uuid) {
-      return map;
-    }
-    return { ...map, [item.project_uuid]: item.project_name };
-  }, {});
-
-  const resourcesMap = items.reduce((map, item) => {
+export const groupInvoiceItems = (items: InvoiceItem[]): InvoiceTableItem[] => {
+  const groupedByProjectAndResource = items.reduce<
+    Record<string, InvoiceTableItem>
+  >((acc, item) => {
     const resourceKey = getResourceKey(item);
-    if (!resourceKey) {
-      return map;
-    }
-    return {
-      ...map,
-      [resourceKey]: {
-        name: item.resource_name || item.name,
-        uuid: resourceKey,
+    const key = `${item.project_uuid}-${resourceKey}`;
+
+    if (!acc[key]) {
+      acc[key] = {
+        resource_name:
+          item.resource_name || item.details.resource_name || item.name,
+        resource_uuid: resourceKey,
+        project_name: item.project_name,
+        project_uuid: item.project_uuid,
         service_provider_name: item.details.service_provider_name,
-        offering_name: item.details.offering_name,
+        service_provider_uuid: item.details.service_provider_uuid,
         plan_name: item.details.plan_name,
-      },
-    };
-  }, {});
-
-  const itemsMap = items.reduce((map, item) => {
-    const projectKey = item.project_uuid || 'default';
-    const project = (map[projectKey] = map[projectKey] || {});
-    const resourceKey = getResourceKey(item);
-    if (!project[resourceKey]) {
-      project[resourceKey] = [];
-    }
-    project[resourceKey].push(item);
-    return map;
-  }, {});
-
-  const invoiceItems = Object.keys(projectsMap)
-    .map((projectKey) => {
-      const resources = Object.keys(itemsMap[projectKey])
-        .map((resourceKey) => ({
-          ...resourcesMap[resourceKey],
-          items: itemsMap[projectKey][resourceKey],
-          total: itemsMap[projectKey][resourceKey].reduce(
-            (sum, item) => sum + parseFloat(item.total),
-            0,
-          ),
-          price: itemsMap[projectKey][resourceKey].reduce(
-            (sum, item) => sum + parseFloat(item.price),
-            0,
-          ),
-        }))
-        .sort((a, b) => a.name.localeCompare(b.name));
-      return {
-        name: projectsMap[projectKey],
-        resources,
-        total: resources.reduce((sum, item) => sum + item.total, 0),
-        price: resources.reduce((sum, item) => sum + item.price, 0),
+        price: 0,
+        tax: 0,
+        total: 0,
+        items: [] as InvoiceItem[],
       };
-    })
-    .sort((a, b) =>
-      String(a[sortKey]).localeCompare(String(b[sortKey]), undefined, {
-        numeric: true,
-      }),
-    );
-  return desc ? invoiceItems.reverse() : invoiceItems;
+    }
+
+    acc[key].price += Number(item.price);
+    acc[key].tax += Number(item.tax);
+    acc[key].total += Number(item.total);
+
+    acc[key].items.push(item);
+
+    return acc;
+  }, {});
+
+  return Object.values(groupedByProjectAndResource);
 };
 
 // phone numbers specification https://www.itu.int/rec/T-REC-E.164-201011-I

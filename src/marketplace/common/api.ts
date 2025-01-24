@@ -297,9 +297,6 @@ export const getProjectList = (params?: {}) =>
 export const getOrganizationGroupList = (params?: {}) =>
   getSelectData('/organization-groups/', params);
 
-export const getOrganizationGroupTypesList = (params?: {}) =>
-  getSelectData('/organization-group-types/', params);
-
 export const getAllOrganizationGroups = (options?) =>
   getAll<OrganizationGroup>('/organization-groups/', options);
 
@@ -347,6 +344,9 @@ export const createServiceProvider = (params) =>
   post<ServiceProvider>('/marketplace-service-providers/', params).then(
     (response) => response.data,
   );
+
+export const deleteServiceProvider = (uuid) =>
+  deleteById<ServiceProvider>('/marketplace-service-providers/', uuid);
 
 export const updateServiceProvider = (uuid, params) =>
   patch<ServiceProvider>(`/marketplace-service-providers/${uuid}/`, params);

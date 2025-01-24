@@ -20,7 +20,7 @@ export const DeleteEndpointButton = ({ endpoint, offering, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

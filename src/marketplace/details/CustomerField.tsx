@@ -41,12 +41,17 @@ export const CustomerField: FC<{ organizationGroups }> = ({
               try {
                 await waitForConfirmation(
                   dispatch,
-                  translate('Confirmation'),
+                  translate('Oragnization change'),
                   translate(
-                    'Are you sure you want to select the {name} organization? Please note that entered data will be lost.',
+                    "You're switching to the {name} organization. This will discard any entered data. Do you want to proceed?",
                     { name: <strong>{value.name}</strong> },
                     formatJsxTemplate,
                   ),
+                  {
+                    negativeButton: translate('Cancel'),
+                    positiveButton: translate('Confirm'),
+                    size: 'sm',
+                  },
                 );
                 fieldProps.input.onChange(value);
                 const project = await getFirst<Project>('/projects/', {

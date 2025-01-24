@@ -1,16 +1,17 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
+import { Card, Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
-import { formatPeriod } from '@waldur/invoices/utils';
+import { renderFieldOrDash } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { Invoice } from '../types';
 
 import { CustomerDetails } from './CustomerDetails';
-import { ResourceRow } from './ResourceRow';
-import { getActiveFixedPricePaymentProfile, groupInvoiceItems } from './utils';
+import { InvoiceItemsTable } from './InvoiceItemsTable';
+import { getActiveFixedPricePaymentProfile } from './utils';
 
 export const InvoiceDetails = ({
   invoice,
@@ -19,120 +20,110 @@ export const InvoiceDetails = ({
   invoice: Invoice;
   refreshInvoiceItems(): void;
 }) => {
-  const projects = useMemo(
-    () => groupInvoiceItems(invoice.items),
-    [invoice.items],
-  );
   const customer = useSelector(getCustomer);
   const showPrice = !getActiveFixedPricePaymentProfile(
     customer.payment_profiles,
   );
 
+  const [totalFiltered, setTotalFiltered] = useState<number | null>(null);
+
   return (
-    <div className="invoice-details">
-      <div className="invoice-details-content">
-        <div className="card">
-          <div className="card-body">
-            <div className="p-xs">
-              <div className="row">
-                <div className="text-end">
-                  {invoice.number && (
-                    <h4>
-                      {translate('Invoice No.')} {invoice.number}
-                    </h4>
-                  )}
-                  <div>
-                    <strong>{translate('Invoice period')}: </strong>
-                    {formatPeriod(invoice) || '-'}
-                    <br />
-                    <strong>{translate('Invoice date')}: </strong>
-                    {invoice.invoice_date || '-'}
-                    <br />
-                    <strong>{translate('Due date')}: </strong>
-                    {invoice.due_date || '-'}
-                  </div>
+    <>
+      <Card className="card-bordered mb-5">
+        <Card.Body className="d-flex">
+          <Row>
+            {invoice.customer_details && (
+              <Col>
+                <div className="fs-5 mb-3 text-uppercase">
+                  {translate('Invoice to')}
                 </div>
-              </div>
-            </div>
-
-            <div className="fs-5 mb-3 text-uppercase">
-              {translate('Invoice to')}
-            </div>
-            <CustomerDetails customer={invoice.customer_details} />
-
-            <div className="fs-5 mb-3 text-uppercase">
-              {translate('Invoice from')}
-            </div>
-            <CustomerDetails customer={invoice.issuer_details} />
-            <div className="table-responsive m-t">
-              <table className="table invoice-table">
-                <thead>
-                  <tr>
-                    <th colSpan={showPrice ? 5 : 6}>{translate('Item')}</th>
-                    <th>{translate('Price')}</th>
-                    <th />
-                  </tr>
-                </thead>
-                {projects.map((project, projectIndex) => (
-                  <tbody key={projectIndex}>
-                    {project.name ? (
-                      <tr>
-                        <td colSpan={showPrice ? 6 : 7}>
-                          <div className="fs-5 fw-bold text-dark mt-4">
-                            {project.name}
-                          </div>
-                          {showPrice && (
-                            <p className="mb-0">
-                              {translate('Project price')}
-                              {': '}
-                              {defaultCurrency(project.total)}
-                            </p>
-                          )}
-                        </td>
-                      </tr>
-                    ) : null}
-                    {project.resources.map((resource, resourceIndex) => (
-                      <ResourceRow
-                        key={resourceIndex}
-                        invoice={invoice}
-                        resource={resource}
-                        showPrice={showPrice}
-                        showVat={invoice.issuer_details.vat_code}
-                        refreshInvoiceItems={refreshInvoiceItems}
-                      />
-                    ))}
-                  </tbody>
-                ))}
-              </table>
-            </div>
-
-            {showPrice && (
-              <table className="table invoice-total">
-                <tbody>
-                  <tr>
-                    <td>
-                      <strong>{translate('Subtotal')}</strong>{' '}
-                    </td>
-                    <td>{defaultCurrency(invoice.price)}</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>{translate('TAX')}</strong>{' '}
-                    </td>
-                    <td>{defaultCurrency(invoice.tax)}</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>{translate('TOTAL')}</strong>{' '}
-                    </td>
-                    <td>{defaultCurrency(invoice.total)}</td>
-                  </tr>
-                </tbody>
-              </table>
+                <CustomerDetails customer={invoice.customer_details} />
+              </Col>
             )}
+            {invoice.issuer_details && (
+              <Col>
+                <div className="fs-5 mb-3 text-uppercase">
+                  {translate('Invoice from')}
+                </div>
+                <CustomerDetails customer={invoice.issuer_details} />
+              </Col>
+            )}
+          </Row>
+
+          <div className="ms-auto">
+            <strong>{translate('Invoice date')}: </strong>
+            {renderFieldOrDash(invoice.invoice_date)}
+            <br />
+            <strong>{translate('Due date')}: </strong>
+            {renderFieldOrDash(invoice.due_date)}
           </div>
-        </div>
-      </div>
-    </div>
+        </Card.Body>
+      </Card>
+      <InvoiceItemsTable
+        invoice={invoice}
+        invoiceView
+        refreshInvoiceItems={refreshInvoiceItems}
+        showPrice={showPrice}
+        showVat={Boolean(invoice.issuer_details.vat_code)}
+        setTotalFiltered={setTotalFiltered}
+        footer={
+          showPrice && (
+            <table className="table bg-gray-50 border-top border-bottom align-middle">
+              <tbody>
+                <tr className="fs-6 fw-bold">
+                  {totalFiltered !== null && (
+                    <td className="text-dark">
+                      <span>{translate('Total filtered')}</span>
+                      {': '}
+                      <span className="text-end text-dark text-nowrap min-w-125px">
+                        {defaultCurrency(totalFiltered)}
+                      </span>
+                    </td>
+                  )}
+
+                  <td className="text-end text-dark">
+                    <span>{translate('Subtotal')}:</span>
+                  </td>
+                  <td
+                    width="12%"
+                    className="text-end text-dark text-nowrap min-w-150px border-bottom"
+                  >
+                    {defaultCurrency(invoice.price)}
+                  </td>
+                </tr>
+                <tr className="fs-6 fw-bold">
+                  <td
+                    className="text-end text-dark"
+                    colSpan={totalFiltered === null ? 1 : 2}
+                  >
+                    <span>{translate('Tax')}:</span>
+                  </td>
+                  <td
+                    width="12%"
+                    className="text-end text-dark text-nowrap min-w-150px border-bottom"
+                  >
+                    {defaultCurrency(invoice.tax)}
+                  </td>
+                </tr>
+                <tr className="fs-6 fw-bold">
+                  <td
+                    className="text-end text-dark"
+                    colSpan={totalFiltered === null ? 1 : 2}
+                  >
+                    <span>{translate('Total')}:</span>
+                  </td>
+                  <td
+                    width="12%"
+                    className="text-end text-dark text-nowrap min-w-150px"
+                  >
+                    {defaultCurrency(invoice.total)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          )
+        }
+      />
+    </>
   );
 };

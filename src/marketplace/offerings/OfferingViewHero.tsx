@@ -1,4 +1,4 @@
-import { Question, RocketLaunch } from '@phosphor-icons/react';
+import { Question } from '@phosphor-icons/react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { FC, useMemo } from 'react';
 import { Nav, Tab, Table } from 'react-bootstrap';
@@ -6,7 +6,6 @@ import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
-import { Link } from '@waldur/core/Link';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
@@ -24,7 +23,9 @@ import { getLabel } from '../common/registry';
 import { Offering } from '../types';
 
 import { OfferingStateActions } from './actions/OfferingStateActions';
+import { DeployButton } from './DeployButton';
 import { PreviewButton } from './list/PreviewButton';
+import { OfferingAccessButton } from './OfferingAccessButton';
 import { OfferingStateField } from './OfferingStateField';
 
 interface OfferingViewHeroProps {
@@ -175,25 +176,9 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
         actions={
           <>
             {props.isPublic && (
-              <Tip
-                id="tip-deploy"
-                label={
-                  offering.state === 'Paused' ? offering.paused_reason : null
-                }
-                className="order-2 order-sm-1 flex-sm-column-auto flex-root"
-              >
-                <Link
-                  state={canDeploy ? 'marketplace-offering-public' : ''}
-                  params={{ offering_uuid: offering.uuid }}
-                  className={`btn btn-primary w-100 ${canDeploy ? '' : 'disabled'}`}
-                >
-                  <span className="svg-icon svg-icon-2">
-                    <RocketLaunch weight="bold" />
-                  </span>
-                  {translate('Deploy')}
-                </Link>
-              </Tip>
+              <DeployButton offering={offering} disabled={!canDeploy} />
             )}
+            <OfferingAccessButton offering={offering} />
             <PreviewButton offering={offering} />
             {isEditPage && (
               <OfferingStateActions
@@ -211,16 +196,18 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
         }
       >
         <Table className="mb-0 px-0 h-auto fs-7 w-auto">
-          <tr>
-            <th className="fw-bold w-sm-175px">
-              {translate('Shared/Billing enabled')}:
-            </th>
-            <td className="text-muted">
-              {(offering.shared ? translate('Yes') : translate('No')) +
-                '/' +
-                (offering.billable ? translate('Yes') : translate('No'))}
-            </td>
-          </tr>
+          {!props.isPublic && (
+            <tr>
+              <th className="fw-bold w-sm-175px">
+                {translate('Shared/Billing enabled')}:
+              </th>
+              <td className="text-muted">
+                {(offering.shared ? translate('Yes') : translate('No')) +
+                  '/' +
+                  (offering.billable ? translate('Yes') : translate('No'))}
+              </td>
+            </tr>
+          )}
           <tr>
             <th className="fw-bold w-sm-175px">{translate('Type')}:</th>
             <td className="text-muted">{getLabel(offering.type)}</td>

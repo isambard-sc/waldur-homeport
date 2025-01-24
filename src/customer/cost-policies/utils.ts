@@ -38,6 +38,10 @@ export const getCostPolicyActionOptions = (type: CostPolicyType = 'project') =>
         'Request restriction of project member access to resources',
       ),
     },
+    {
+      value: 'notify_external_user',
+      label: translate('Notify external user'),
+    },
   ].filter(Boolean);
 
 export const policyPeriodOptions = {

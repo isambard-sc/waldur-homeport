@@ -6,23 +6,20 @@ import { translate } from '@waldur/i18n';
 import { ActionButton } from '@waldur/table/ActionButton';
 
 import { openIssueCreateDialog } from '../create/actions';
-import { ISSUE_CREATION_FORM_ID } from '../create/constants';
 
-interface IssueCreateButtonProps {
+export interface IssueCreateButtonProps {
   scope: any;
+  scopeType: string;
   refetch: () => void;
 }
 
-export const IssueCreateButton: FunctionComponent<IssueCreateButtonProps> = ({
-  scope,
-  refetch,
-}) => {
+export const IssueCreateButton: FunctionComponent<IssueCreateButtonProps> = (
+  resolve,
+) => {
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(
-      openIssueCreateDialog({ issue: scope, refetch }, ISSUE_CREATION_FORM_ID),
-    );
+    dispatch(openIssueCreateDialog(resolve));
   };
 
   return (

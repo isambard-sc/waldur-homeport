@@ -30,7 +30,7 @@ export const ModelCard1: FC<ModelCard1Props> = ({
             alt="model-card"
             src={props.image}
             height={90}
-            style={{ margin: 'auto' }}
+            style={{ margin: 'auto', padding: '10px' }}
           />
         ) : (
           props.placeholder

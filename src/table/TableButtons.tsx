@@ -123,7 +123,6 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
           })}
         </div>
       )}
-      {(!props.standalone || isSm) && props.tableActions}
       {showDefaultActions && (
         <div className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-3 flex-grow-1 flex-sm-grow-0">
           {/* Filter */}
@@ -158,6 +157,7 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
           )}
         </div>
       )}
+      {(!props.standalone || isSm) && props.tableActions}
     </>
   );
 };

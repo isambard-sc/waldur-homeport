@@ -73,6 +73,7 @@
     "SITE_NAME": "Waldur",
     "SITE_EMAIL": "",
     "SITE_ADDRESS": "",
+    "MARKETPLACE_LANDING_PAGE": "Marketplace",
     "LANGUAGE_CHOICES": "en,it,de,es,et,fr,ar",
     "SITE_PHONE": "",
     "SITE_DESCRIPTION": "Your single pane of control for managing projects, teams and resources in a self-service manner.",
@@ -82,6 +83,8 @@
     "VALIDATE_INVITATION_EMAIL": false,
     "NATIVE_NAME_ENABLED": false,
     "ONLY_STAFF_MANAGES_SERVICES": false,
+    "ANONYMOUS_USER_CAN_VIEW_OFFERINGS": true,
+    "ENABLE_RESOURCE_END_DATE": true,
     "PROTECT_USER_DETAILS_FOR_REGISTRATION_METHODS": [],
     "TRANSLATION_DOMAIN": "",
     "SUPPORT_PORTAL_URL": "",
@@ -115,10 +118,6 @@
     "TENANT_CREDENTIALS_VISIBLE": false,
     "ALLOW_CUSTOMER_USERS_OPENSTACK_CONSOLE_ACCESS": true,
     "REQUIRE_AVAILABILITY_ZONE": false
-  },
-  "WALDUR_MARKETPLACE": {
-    "ANONYMOUS_USER_CAN_VIEW_OFFERINGS": true,
-    "ENABLE_RESOURCE_END_DATE": true
   },
   "WALDUR_AUTH_SAML2": {
     "ENABLE_SINGLE_LOGOUT": false,

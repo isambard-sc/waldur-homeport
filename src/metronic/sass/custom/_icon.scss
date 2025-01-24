@@ -1,0 +1,64 @@
+.radar-icon {
+  width: 38px;
+  height: 38px;
+  border-color: rgba($success-700, 0.1);
+
+  &,
+  > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border-width: 2px;
+    border-style: solid;
+  }
+
+  > div {
+    width: 28px;
+    height: 28px;
+    border-color: rgba($success-700, 0.3);
+
+    @include svg-icon-color($success-600);
+  }
+
+  &.radar-icon-sm {
+    width: 32px;
+    height: 32px;
+
+    > div {
+      width: 23px;
+      height: 23px;
+    }
+  }
+
+  &.icon-danger {
+    border-color: rgba($danger-600, 0.1);
+
+    > div {
+      border-color: rgba($danger-600, 0.3);
+
+      @include svg-icon-color($danger-600);
+    }
+  }
+
+  &.icon-warning {
+    border-color: rgba($warning, 0.1);
+
+    > div {
+      border-color: rgba($warning, 0.3);
+
+      @include svg-icon-color($warning);
+    }
+  }
+
+  &.icon-dark {
+    border-color: rgba($dark, 0.1);
+
+    > div {
+      border-color: rgba($dark, 0.3);
+
+      @include svg-icon-color($dark);
+    }
+  }
+}

@@ -19,19 +19,19 @@ const CellDescription = ({
   description,
 }: QuotaCellProps) => (
   <span className="fw-bolder fs-7 text-dark text-nowrap ellipsis">
+    {description && (
+      <>
+        <Tip id="quota" label={description} className="aligned-tip">
+          <Question />
+        </Tip>{' '}
+      </>
+    )}
     {limit
       ? `${usage.toLocaleString()}/${limit.toLocaleString()}`
       : usage.toLocaleString()}
     {units && ` ${units}`}
+
     {title && ` ${title}`}
-    {description && (
-      <>
-        {' '}
-        <Tip id="quota" label={description}>
-          <Question />
-        </Tip>
-      </>
-    )}
   </span>
 );
 

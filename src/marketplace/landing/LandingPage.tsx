@@ -26,7 +26,10 @@ import { OfferingsSearchBox } from './OfferingsSearchBox';
 import './LandingPage.scss';
 
 export const LandingPage: FC<{}> = () => {
-  useTitle(ENV.marketplaceLandingPageTitle || translate('Marketplace'));
+  useTitle(
+    ENV.plugins.WALDUR_CORE.MARKETPLACE_LANDING_PAGE ||
+      translate('Marketplace'),
+  );
   useFullPage();
 
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
@@ -49,7 +52,10 @@ export const LandingPage: FC<{}> = () => {
       )}
       <LandingHeroSection
         header={translate('Welcome to')}
-        title={ENV.marketplaceLandingPageTitle || translate('Marketplace')}
+        title={
+          ENV.plugins.WALDUR_CORE.MARKETPLACE_LANDING_PAGE ||
+          translate('Marketplace')
+        }
       >
         <div className="d-flex justify-content-center">
           <OfferingsSearchBox />

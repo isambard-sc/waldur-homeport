@@ -1,15 +1,13 @@
-import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { SubmissionError } from 'redux-form';
 
 import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse } from '@waldur/store/notify';
+import { useModal } from '@waldur/modal/hooks';
+import { useNotify } from '@waldur/store/hooks';
 
 import { createCustomerCredit } from './api';
-import { CustomerCreditFormData } from './types';
+import { serializeCustomerCredit } from './utils';
 
 const CreditFormDialog = lazyComponent(() =>
   import('./CreditFormDialog').then((module) => ({
@@ -17,46 +15,36 @@ const CreditFormDialog = lazyComponent(() =>
   })),
 );
 
-export const CreateCreditButton = ({ refetch }) => {
-  const dispatch = useDispatch();
-  const openFormDialog = useCallback(
-    () =>
-      dispatch(
-        openModalDialog(CreditFormDialog, {
-          size: 'lg',
-          formId: 'CustomerCreditCreateForm',
-          onSubmit: (formData) => {
-            const payload: CustomerCreditFormData = {
-              ...formData,
-              customer: formData.customer.url,
-              offerings: formData.offerings
-                ? formData.offerings.map((offering) => offering.url)
-                : undefined,
-            };
-            if (
-              !payload.minimal_consumption ||
-              payload.minimal_consumption !== '0'
-            ) {
-              delete payload.minimal_consumption;
-            }
+const FORM_ID = 'CustomerCreditCreateForm';
 
-            return createCustomerCredit(payload)
-              .then(() => {
-                dispatch(closeModalDialog());
-                refetch();
-              })
-              .catch((e) => {
-                dispatch(
-                  showErrorResponse(e, translate('Unable to create a credit')),
-                );
-                if (e.response && e.response.status === 400) {
-                  throw new SubmissionError(e.response.data);
-                }
-              });
-          },
-        }),
-      ),
-    [dispatch, refetch],
+export const CreateCreditButton = ({ refetch }) => {
+  const { closeDialog, openDialog } = useModal();
+  const { showErrorResponse, showSuccess } = useNotify();
+  const callback = async (formData) => {
+    const payload = serializeCustomerCredit(formData);
+    try {
+      await createCustomerCredit(payload);
+      showSuccess(translate('Credit has been created.'));
+      closeDialog();
+      refetch();
+    } catch (e) {
+      showErrorResponse(e, translate('Unable to create a credit'));
+      if (e.response && e.response.status === 400) {
+        throw new SubmissionError(e.response.data);
+      }
+    }
+  };
+
+  return (
+    <AddButton
+      action={() =>
+        openDialog(CreditFormDialog, {
+          size: 'lg',
+          form: FORM_ID,
+          formId: FORM_ID,
+          onSubmit: callback,
+        })
+      }
+    />
   );
-  return <AddButton action={openFormDialog} />;
 };

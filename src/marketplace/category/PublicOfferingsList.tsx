@@ -3,12 +3,15 @@ import { useSelector } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import {
   getLabel,
   getOfferingTypes,
 } from '@waldur/marketplace/common/registry';
 import { createFetcher } from '@waldur/table/api';
+import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
@@ -28,6 +31,9 @@ import { Offering } from '../types';
 const RowActions = ({ row }) => {
   const user = useSelector(getUser);
   const { isAllowed } = isOfferingRestrictedToProject(row, user);
+  if (isFeatureVisible(MarketplaceFeatures.catalogue_only)) {
+    return null;
+  }
 
   return (
     <OfferingLink
@@ -120,6 +126,14 @@ export const PublicOfferingsList: FunctionComponent<{
       inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       id: 'state',
       keys: ['state'],
+    },
+    {
+      title: translate('Shared'),
+      render: ({ row }) => <BooleanField value={row.shared} />,
+      id: 'shared',
+      filter: 'shared',
+      keys: ['shared'],
+      optional: true,
     },
     SLUG_COLUMN,
   ];

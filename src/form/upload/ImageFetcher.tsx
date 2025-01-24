@@ -19,9 +19,8 @@ export const ImageFetcher = ({ url, name, thumb = false }) => {
         const response = await get<Blob>(url, { responseType: 'blob' });
 
         // Convert blob to a URL and set it to state
-        const imageBlob = new Blob([response.data]);
-        const imageUrl = URL.createObjectURL(imageBlob);
-
+        const blob = await response.data;
+        const imageUrl = URL.createObjectURL(blob);
         setImageUrl(imageUrl);
       } catch {
         setError(translate('Failed to load image'));
@@ -31,12 +30,17 @@ export const ImageFetcher = ({ url, name, thumb = false }) => {
     };
 
     fetchImage();
+
+    // Release resources
+    return () => {
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+    };
   }, []);
 
   return (
-    <div
-      className={!thumb && imageUrl ? 'text-center bg-dark-always' : undefined}
-    >
+    <div className={!thumb && imageUrl ? 'text-center bg-light' : undefined}>
       {loading ? (
         <LoadingSpinner />
       ) : error ? (

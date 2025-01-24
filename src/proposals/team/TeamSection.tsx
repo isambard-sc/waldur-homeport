@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { FC, useMemo, useState } from 'react';
 import { Card } from 'react-bootstrap';
 
@@ -9,9 +10,11 @@ import {
   StepCardTabs,
   TabSpec,
 } from '@waldur/marketplace/deploy/steps/StepCardTabs';
+import { RoleEnum } from '@waldur/permissions/enums';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 
+import { CALL_REVIEWERS_QUERY_KEY } from '../constants';
 import { FieldReviewComments } from '../proposal/create-review/FieldReviewComments';
 import { ProposalReview } from '../types';
 
@@ -41,6 +44,7 @@ export const TeamSection: FC<
     reviews?: ProposalReview[];
   }
 > = (props) => {
+  const queryClient = useQueryClient();
   const hideRole = props.roles && props.roles.length === 1;
 
   const [tab, setTab] = useState<TabSpec<GenericInvitationContext>>(tabs[0]);
@@ -57,6 +61,16 @@ export const TeamSection: FC<
     onFetch(rows) {
       if (props.change) {
         props.change('users', rows);
+      }
+      // Update query data for the call reviewers
+      if (props.roles?.includes(RoleEnum.CALL_REVIEWER)) {
+        const newReviewers = rows.filter(
+          (row) => row.role_name === RoleEnum.CALL_REVIEWER,
+        );
+        queryClient.setQueryData(
+          [CALL_REVIEWERS_QUERY_KEY, props.scope.uuid],
+          newReviewers,
+        );
       }
     },
   });

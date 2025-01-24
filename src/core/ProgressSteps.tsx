@@ -94,12 +94,7 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
                         {step.label}
                       </div>
                       {step.description && (
-                        <div
-                          className={classNames(
-                            'stepper-desc',
-                            current && `text-${step.variant || 'warning'}`,
-                          )}
-                        >
+                        <div className="stepper-desc">
                           {step.description.map((line, i) => (
                             <div key={i}>{line}</div>
                           ))}

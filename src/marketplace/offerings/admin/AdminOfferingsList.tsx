@@ -19,14 +19,19 @@ export const mapStateToFilter = createSelector(
     if (filterValues?.organization) {
       filter.customer_uuid = filterValues.organization.uuid;
     }
-    if (filterValues?.state) {
-      filter.state = filterValues.state.map((option) => option.value);
-    }
-    if (filterValues?.offering_type) {
-      filter.type = filterValues.offering_type.value;
-    }
-    if (filterValues?.category) {
-      filter.category_uuid = filterValues.category.uuid;
+    if (filterValues) {
+      if (filterValues.state) {
+        filter.state = filterValues.state.map((option) => option.value);
+      }
+      if (filterValues.offering_type) {
+        filter.type = filterValues.offering_type.value;
+      }
+      if (filterValues.category) {
+        filter.category_uuid = filterValues.category.uuid;
+      }
+      if (filterValues.shared) {
+        filter.shared = filterValues.shared;
+      }
     }
     return filter;
   },
@@ -37,6 +42,7 @@ export const AdminOfferingsList = () => {
   const initialValues = useMemo(
     () => ({
       state: [getStates()[1], getStates()[2]],
+      shared: true,
     }),
     [],
   );

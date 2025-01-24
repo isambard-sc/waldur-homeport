@@ -5,7 +5,6 @@ import { createSelector } from 'reselect';
 
 import { OrganizationsFilter } from '@waldur/administration/organizations/OrganizationsFilter';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
-import { RIGHT_ARROW_HTML } from '@waldur/customer/list/constants';
 import { OrganizationCard } from '@waldur/customer/list/OrganizationCard';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -20,6 +19,7 @@ import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { CUSTOMERS_FILTER_FORM_ID } from '../constants';
 
@@ -27,7 +27,8 @@ import { OrganizationNameField } from './OrganizationNameField';
 
 const mapStateToFilter = createSelector(
   getFormValues(CUSTOMERS_FILTER_FORM_ID),
-  (filterValues: any) => {
+  getUser,
+  (filterValues: any, user) => {
     const filter: Record<string, string | string[]> = {};
     if (filterValues?.accounting_is_running) {
       filter.accounting_is_running = filterValues.accounting_is_running.value;
@@ -46,6 +47,7 @@ const mapStateToFilter = createSelector(
       filter.is_call_managing_organization =
         filterValues.is_call_managing_organization;
     }
+    filter.user_uuid = user.uuid;
     return filter;
   },
 );
@@ -60,6 +62,7 @@ const mandatoryFields = [
   'resource_count',
   'customer_credit',
   'billing_price_estimate',
+  'organization_groups',
 ];
 
 export const OrganizationsList: FunctionComponent = () => {
@@ -113,18 +116,16 @@ export const OrganizationsList: FunctionComponent = () => {
       id: 'abbreviation',
     },
     {
-      title: translate('Organization group'),
-      render: ({ row }) => (
-        <>
-          {row.organization_group_parent_name && (
-            <>
-              {row.organization_group_parent_name} {RIGHT_ARROW_HTML}{' '}
-            </>
-          )}
-          {row.organization_group_name}
-        </>
-      ),
-      keys: ['organization_group_name', 'organization_group_parent_name'],
+      title: translate('Organization groups'),
+      render: ({ row }) =>
+        row.organization_groups
+          ?.map(
+            (group) =>
+              `${group.parent_name ? `${group.parent_name} ➔ ` : ''}${group.name}`,
+          )
+          .join(', '),
+
+      keys: ['organization_groups'],
       optional: true,
       filter: 'organization_group',
       id: 'organization_group',

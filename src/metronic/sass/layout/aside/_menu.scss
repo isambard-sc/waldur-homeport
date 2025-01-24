@@ -62,13 +62,13 @@ $dark-icon: $grey-600;
 $dark-arrow: $gray-600;
 $dark-arrow-state: $gray-800;
 $dark-bg-hover: $gray-50;
-$dark-bg-active: $grey-100;
+$dark-bg-active: $gray-100;
 $dark-bg-subitem: $grey-200;
 $dark-bg-subitem-2: $grey-300;
 $dark-badge-color: $gray-300;
 $dark-badge-bg: $gray-800;
 $dark-badge-border: $grey-400;
-$dark-accordion-active: $grey-100;
+$dark-accordion-active: $gray-100;
 $dark-sub-accordion-active: $grey-200;
 $dark-footer-separator: $grey-300;
 
@@ -96,13 +96,13 @@ $asides: (
     arrow: if(isDarkMode(), $dark-arrow, $grey-400),
     arrow-state: if(isDarkMode(), $dark-arrow-state, $grey-500),
     bg-hover: if(isDarkMode(), $dark-bg-hover, $gray-50),
-    bg-active: if(isDarkMode(), $dark-bg-active, $grey-100),
+    bg-active: if(isDarkMode(), $dark-bg-active, $gray-100),
     bg-subitem: if(isDarkMode(), $dark-bg-subitem, $grey-200),
     bg-subitem-2: if(isDarkMode(), $dark-bg-subitem-2, $grey-300),
     badge-color: if(isDarkMode(), $dark-badge-color, $gray-200),
     badge-bg: if(isDarkMode(), $dark-badge-bg, $gray-700),
     badge-border: if(isDarkMode(), $dark-badge-border, $grey-300),
-    accordion-active: if(isDarkMode(), $dark-accordion-active, $grey-100),
+    accordion-active: if(isDarkMode(), $dark-accordion-active, $gray-100),
     sub-accordion-active:
       if(isDarkMode(), $dark-sub-accordion-active, $grey-200),
     footer-separator: if(isDarkMode(), $dark-footer-separator, $grey-200),

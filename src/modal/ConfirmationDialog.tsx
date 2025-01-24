@@ -1,10 +1,13 @@
+import { WarningCircle } from '@phosphor-icons/react';
 import React, { ReactNode } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
+
+import { MetronicModalDialog } from './MetronicModalDialog';
+import { ConfirmationDialogType } from './types';
 
 interface ConfirmationDialogProps {
   resolve: {
@@ -15,11 +18,21 @@ interface ConfirmationDialogProps {
     title: ReactNode;
     body: ReactNode;
     nb?: ReactNode;
+    type?: ConfirmationDialogType;
+    positiveButton?: string;
+    negativeButton?: string;
   };
 }
 
 export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
-  resolve: { title, body, deferred },
+  resolve: {
+    title,
+    body,
+    deferred,
+    type = 'warning',
+    positiveButton = translate('Yes'),
+    negativeButton = translate('No'),
+  },
 }) => {
   const dispatch = useDispatch();
   const closeDialog = () => dispatch(closeModalDialog());
@@ -35,18 +48,27 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   };
 
   return (
-    <ModalDialog
+    <MetronicModalDialog
       title={title}
+      iconNode={<WarningCircle weight="bold" />}
+      iconColor={type}
+      bodyClassName="text-grey-500 pt-2"
       footer={
         <>
-          <Button onClick={handleSubmit}>{translate('Yes')}</Button>
-          <Button variant="danger" onClick={handleCancel}>
-            {translate('No')}
+          <Button
+            variant="outline btn-outline-default"
+            className="flex-equal"
+            onClick={handleCancel}
+          >
+            {negativeButton}
+          </Button>
+          <Button className="flex-equal" onClick={handleSubmit}>
+            {positiveButton}
           </Button>
         </>
       }
     >
       {body}
-    </ModalDialog>
+    </MetronicModalDialog>
   );
 };

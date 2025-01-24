@@ -36,7 +36,9 @@ export const InvoiceItemDelete = ({ item, refreshInvoiceItems }) => {
     <ActionItem
       action={callback}
       title={translate('Remove')}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

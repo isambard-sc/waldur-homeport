@@ -53,7 +53,7 @@ export const useProjectDelete = ({
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

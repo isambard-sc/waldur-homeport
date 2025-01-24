@@ -27,7 +27,7 @@ export const CatalogDeleteButton: FunctionComponent<{ catalog; refetch }> = ({
           { catalog: <strong>{catalog.name}</strong> },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

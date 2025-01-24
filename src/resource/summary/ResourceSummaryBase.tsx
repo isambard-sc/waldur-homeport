@@ -52,7 +52,7 @@ export function ResourceSummaryBase<T extends Resource = Resource>(
         label={translate('Created')}
         value={<CreatedField resource={props.resource} />}
       />
-      {ENV.plugins.WALDUR_MARKETPLACE.ENABLE_RESOURCE_END_DATE ? (
+      {ENV.plugins.WALDUR_CORE.ENABLE_RESOURCE_END_DATE ? (
         <Field
           label={translate('Termination date')}
           value={resource.end_date}

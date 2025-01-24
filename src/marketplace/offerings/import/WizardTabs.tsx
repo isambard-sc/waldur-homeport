@@ -7,6 +7,7 @@ interface WizardTabsProps {
   currentStep: ProgressStep;
   tabs: Record<string, ComponentType<any>>;
   mountOnEnter?: boolean;
+  context?: any;
 }
 
 export const WizardTabs: FC<WizardTabsProps> = ({
@@ -14,6 +15,7 @@ export const WizardTabs: FC<WizardTabsProps> = ({
   currentStep,
   tabs,
   mountOnEnter,
+  context,
 }) => (
   <>
     {steps.map((step) => (
@@ -23,10 +25,11 @@ export const WizardTabs: FC<WizardTabsProps> = ({
       >
         {mountOnEnter
           ? step === currentStep
-            ? createElement(tabs[step.key])
+            ? createElement(tabs[step.key], { context })
             : null
           : createElement(tabs[step.key], {
               isVisible: step === currentStep,
+              context,
             })}
       </div>
     ))}

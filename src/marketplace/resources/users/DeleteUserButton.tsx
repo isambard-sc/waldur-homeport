@@ -20,7 +20,7 @@ export const DeleteUserButton = ({ user, refetch }) => {
           },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

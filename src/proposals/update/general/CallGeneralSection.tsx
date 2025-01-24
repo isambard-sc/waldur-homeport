@@ -2,6 +2,8 @@ import Markdown from 'markdown-to-jsx';
 import { FC } from 'react';
 import { Card, Table } from 'react-bootstrap';
 
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
@@ -99,6 +101,22 @@ export const CallGeneralSection: FC<CallGeneralSectionProps> = (props) => {
                 </div>
               </td>
             </tr>
+            {isFeatureVisible(MarketplaceFeatures.call_only) && (
+              <tr>
+                <td className="col-md-3">{translate('External URL')}</td>
+                <td className="col-md-9">{props.call.external_url || 'N/A'}</td>
+                <td className="row-actions">
+                  <div>
+                    <EditGeneralInfoButton
+                      call={props.call}
+                      name="external_url"
+                      title={translate('Edit external URL')}
+                      refetch={props.refetch}
+                    />
+                  </div>
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </Card.Body>

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -10,16 +9,12 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { createAccessSubnet } from './api';
 
-const getCustomerUrl = (customer_uuid) => {
-  return `${ENV.apiEndpoint}api/customers/${customer_uuid}/`;
-};
-
-export const AccessSubnetCreateForm = ({ refetch, customer_uuid }) => {
+export const AccessSubnetCreateForm = ({ refetch, customer_url }) => {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     inet: '',
     description: '',
-    customer: getCustomerUrl(customer_uuid),
+    customer: customer_url,
   });
 
   const handleInputChange = (e) => {
@@ -46,7 +41,7 @@ export const AccessSubnetCreateForm = ({ refetch, customer_uuid }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <ModalDialog
-        title={translate('Create Access Subnet')}
+        title={translate('Create access subnet')}
         closeButton
         footer={
           <Button type="submit" variant="primary" size="sm">

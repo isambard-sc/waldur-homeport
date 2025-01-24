@@ -20,7 +20,7 @@ export const RoleDeleteButton = ({ row, refetch }) => {
           { name: <strong>{row.name}</strong> },
           formatJsxTemplate,
         ),
-        true,
+        { forDeletion: true },
       );
     } catch {
       return;

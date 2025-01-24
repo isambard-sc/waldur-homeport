@@ -23,6 +23,9 @@ interface SubmitedFormData {
   actions: { value; label };
   limit_cost: number;
   period: PolicyPeriod;
+  options?: {
+    notify_external_user?: string;
+  };
 }
 
 const submit = (
@@ -31,11 +34,18 @@ const submit = (
   type: CostPolicyType,
 ) => {
   const promises = formData.scope.map((scope) => {
+    const options =
+      formData.actions.value === 'notify_external_user'
+        ? {
+            notify_external_user: formData.options?.notify_external_user,
+          }
+        : {};
     const data: CostPolicyFormData = {
       scope: scope.url,
       actions: formData.actions.value,
       limit_cost: formData.limit_cost,
       period: formData.period,
+      options,
     };
     if (type === 'project') {
       return updateProjectCostPolicy(uuid, data);
@@ -92,6 +102,7 @@ export const CostPolicyEditButton = ({
             ),
             limit_cost: row.limit_cost,
             period: row.period,
+            options: row.options,
           },
         }),
       ),

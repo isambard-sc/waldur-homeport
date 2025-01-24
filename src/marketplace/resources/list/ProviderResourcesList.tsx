@@ -24,12 +24,13 @@ import {
   PROVIDER_RESOURCES_LIST_FILTER_FORM_ID,
   TABLE_PUBLIC_RESOURCE,
 } from './constants';
+import { NON_TERMINATED_STATES } from './constants';
 import { EndDateTooltip } from './EndDateTooltip';
 import { ProviderResourceActions } from './ProviderResourceActions';
 import { ProviderResourcesFilter } from './ProviderResourcesFilter';
 import { PublicResourcesLimits } from './PublicResourcesLimits';
 import { ResourceStateField } from './ResourceStateField';
-import { getStates, NON_TERMINATED_STATES } from './ResourceStateFilter';
+import { getStates } from './ResourceStateFilter';
 
 interface ResourceFilter {
   state?: any;
@@ -296,7 +297,7 @@ const mapStateToFilter = createSelector(
       }
     } else {
       if (!filters?.include_terminated) {
-        filter.state = NON_TERMINATED_STATES.map((option) => option.value);
+        filter.state = NON_TERMINATED_STATES;
       }
     }
     if (filters?.organization) {

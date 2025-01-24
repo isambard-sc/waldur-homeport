@@ -13,7 +13,7 @@ const InvoiceItemUpdateDialog = lazyComponent(() =>
 export const InvoiceItemUpdate = ({ item, refreshInvoiceItems }) => (
   <DialogActionItem
     title={translate('Edit item')}
-    iconNode={<PencilSimple />}
+    iconNode={<PencilSimple weight="bold" />}
     modalComponent={InvoiceItemUpdateDialog}
     resource={item}
     extraResolve={{ refreshInvoiceItems }}

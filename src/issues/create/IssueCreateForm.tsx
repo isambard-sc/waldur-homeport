@@ -1,175 +1,90 @@
-import { Form, Modal } from 'react-bootstrap';
-import { connect, useSelector } from 'react-redux';
-import { AsyncState } from 'react-use/lib/useAsync';
-import { compose } from 'redux';
-import { Field, formValueSelector, reduxForm } from 'redux-form';
+import { Warning } from '@phosphor-icons/react';
+import { reduxForm } from 'redux-form';
 
-import { SubmitButton } from '@waldur/auth/SubmitButton';
-import { ENV } from '@waldur/configs/default';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { InputGroup } from '@waldur/customer/create/InputGroup';
-import { TextField } from '@waldur/form';
-import { InputField } from '@waldur/form/InputField';
+import { ProgressStep } from '@waldur/core/ProgressSteps';
 import { translate } from '@waldur/i18n';
-import {
-  ISSUE_QUICK_CREATE_FORM_ID,
-  ProjectGroup,
-  ResourceGroup,
-} from '@waldur/issues/create/IssueQuickCreate';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { type RootState } from '@waldur/store/reducers';
-import { getCustomer } from '@waldur/workspace/selectors';
+import { StepsList } from '@waldur/marketplace/common/StepsList';
+import { useWizard } from '@waldur/marketplace/offerings/import/useWizard';
+import { WizardButtons } from '@waldur/marketplace/offerings/import/WizardButtons';
+import { WizardTabs } from '@waldur/marketplace/offerings/import/WizardTabs';
+import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 
-import { IssueTemplate, IssueTemplateAttachment } from '../api';
+import { IssueCreateButtonProps } from '../list/IssueCreateButton';
 
-import { AttachmentsList } from './AttachmentsList';
 import { ISSUE_CREATION_FORM_ID } from './constants';
-import { FileField } from './FileField';
-import { IssueHeader } from './IssueHeader';
-import { SelectField } from './SelectField';
-import { TypeField } from './TypeField';
-import { IssueFormData, CreateIssueProps, IssueOptions } from './types';
+import { IssueDescriptionTab } from './IssueDescriptionTab';
+import { IssueDetailsStepLabel } from './IssueDetailsStepLabel';
+import { IssueDetailsTab } from './IssueDetailsTab';
+import { IssueFormData } from './types';
 
 interface OwnProps {
-  issue: CreateIssueProps;
-  issueTypes: any;
-  options: IssueOptions;
   onCreateIssue(formData: IssueFormData): void;
-  templateState: AsyncState<IssueTemplate[]>;
-  filteredTemplates: IssueTemplate[];
-  attachments: IssueTemplateAttachment[];
-  initialValues: any;
-  hideProjectAndResourceFields?: boolean;
+  resolve: IssueCreateButtonProps;
 }
 
-const issueCreateProjectSelector = (state: RootState) =>
-  formValueSelector(ISSUE_CREATION_FORM_ID)(state, 'project');
-
-const mapStateToProps = (_, ownProps: OwnProps) => {
-  if (ownProps.issue.description) {
-    return {
-      initialValues: {
-        description: ownProps.issue.description,
-        type: ownProps.issue.type,
-      },
-    };
-  }
-  return {};
+const steps: ProgressStep[] = [
+  {
+    key: 'details',
+    label: <IssueDetailsStepLabel />,
+    description: [translate('Define issue type and context')],
+    variant: 'primary',
+    completed: true,
+  },
+  {
+    key: 'description',
+    label: translate('Description'),
+    description: [translate('Add title, description, and attachments')],
+    variant: 'primary',
+    completed: false,
+  },
+];
+const tabs = {
+  details: IssueDetailsTab,
+  description: IssueDescriptionTab,
 };
 
-const enhance = compose(
-  connect<{}, {}, OwnProps>(mapStateToProps),
-  reduxForm<IssueFormData, OwnProps>({
-    form: ISSUE_CREATION_FORM_ID,
-  }),
-);
+export const IssueCreateForm = reduxForm<IssueFormData, OwnProps>({
+  form: ISSUE_CREATION_FORM_ID,
+})(({ onCreateIssue, handleSubmit, submitting, invalid, resolve }) => {
+  const { step, setStep, goBack, goNext, isFirstStep, isLastStep } =
+    useWizard(steps);
 
-export const IssueCreateForm = enhance(
-  ({
-    issue,
-    issueTypes,
-    options,
-    onCreateIssue,
-    templateState,
-    filteredTemplates,
-    attachments,
-    hideProjectAndResourceFields,
-    handleSubmit,
-    submitting,
-  }) => (
+  return (
     <form onSubmit={handleSubmit(onCreateIssue)}>
-      <Modal.Header>
-        <Modal.Title>{options.title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body className="scroll-y mx-5 mx-xl-15 my-7">
-        {templateState.loading ? (
-          <LoadingSpinner />
-        ) : templateState.error ? (
-          <>{translate('Unable to load data.')}</>
-        ) : (
-          <>
-            <IssueHeader issue={issue} />
-            {ENV.plugins.WALDUR_SUPPORT?.DISPLAY_REQUEST_TYPE && (
-              <>
-                {!issue.type && (
-                  <Form.Group className="mb-5">
-                    <Form.Label>{translate('Request type')}</Form.Label>
-                    <TypeField
-                      issueTypes={issueTypes}
-                      isDisabled={submitting}
-                    />
-                  </Form.Group>
-                )}
-              </>
-            )}
-            {filteredTemplates.length > 0 && (
-              <Form.Group className="mb-5">
-                <Form.Label>{translate('Template')}</Form.Label>
-                <Field
-                  name="template"
-                  component={SelectField}
-                  placeholder={translate('Select issue template...')}
-                  options={filteredTemplates}
-                  isDisabled={submitting}
-                  getOptionValue={(option) => option.uuid}
-                  getOptionLabel={(option) => option.name}
-                  isClearable={true}
-                />
-              </Form.Group>
-            )}
-            {!options.hideTitle && (
-              <Form.Group className="mb-5">
-                <InputGroup
-                  name="summary"
-                  type="text"
-                  component={InputField}
-                  required={true}
-                  label={options.summaryLabel}
-                  disabled={submitting}
-                />
-              </Form.Group>
-            )}
-            <Form.Group className="mb-5">
-              <InputGroup
-                name="description"
-                component={TextField}
-                required={true}
-                label={options.descriptionLabel}
-                rows={3}
-                disabled={submitting}
-              />
-            </Form.Group>
-            {!hideProjectAndResourceFields && (
-              <>
-                <ProjectGroup
-                  disabled={submitting}
-                  customer={useSelector(getCustomer)}
-                  formId={ISSUE_QUICK_CREATE_FORM_ID}
-                />
-                <ResourceGroup
-                  disabled={submitting}
-                  project={useSelector(issueCreateProjectSelector)}
-                  formId={ISSUE_QUICK_CREATE_FORM_ID}
-                />
-              </>
-            )}
-            {attachments.length > 0 && (
-              <Form.Group className="mb-5">
-                <Form.Label>{translate('Template files')}</Form.Label>
-                <AttachmentsList attachments={attachments} />
-              </Form.Group>
-            )}
-            <Form.Group className="mb-5">
-              <Form.Label>{translate('Attachments')}</Form.Label>
-              <Field name="files" component={FileField} disabled={submitting} />
-            </Form.Group>
-          </>
+      <MetronicModalDialog
+        title={translate('Create request')}
+        subtitle={translate(
+          'Use this modal to describe your problem or request, so our support team can assist you.',
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <SubmitButton submitting={submitting} label={options.submitTitle} />
-        <CloseDialogButton />
-      </Modal.Footer>
+        iconNode={<Warning weight="bold" />}
+        iconColor="warning"
+        footer={
+          <WizardButtons
+            isLastStep={isLastStep}
+            isFirstStep={isFirstStep}
+            goBack={goBack}
+            goNext={goNext}
+            submitting={submitting}
+            invalid={invalid}
+            submitLabel={translate('Create')}
+          />
+        }
+        className="overflow-hidden"
+      >
+        <StepsList
+          steps={steps}
+          value={step}
+          onClick={setStep}
+          disabled={submitting}
+        />
+        <WizardTabs
+          steps={steps}
+          currentStep={step}
+          tabs={tabs}
+          mountOnEnter={true}
+          context={resolve}
+        />
+      </MetronicModalDialog>
     </form>
-  ),
-);
+  );
+});

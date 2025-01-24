@@ -24,15 +24,14 @@ import {
 } from '@waldur/workspace/selectors';
 
 import { CategoryFilter } from './CategoryFilter';
-import {
-  NON_TERMINATED_STATES,
-  ResourceStateFilter,
-} from './ResourceStateFilter';
+import { getStates, ResourceStateFilter } from './ResourceStateFilter';
 
 type StateProps = ReturnType<typeof mapStateToProps> & InjectedFormProps;
 
 const PureProviderResourcesFilter: FunctionComponent<StateProps> = (props) => {
-  useReinitializeFilterFromUrl(props.form, { state: NON_TERMINATED_STATES });
+  useReinitializeFilterFromUrl(props.form, {
+    state: getStates().filter((state) => state.value !== 'Terminated'),
+  });
   return (
     <>
       <TableFilterItem

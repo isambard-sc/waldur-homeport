@@ -7,6 +7,8 @@ import { SubmissionError, reduxForm } from 'redux-form';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { required } from '@waldur/core/validators';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
 import { MarkdownField } from '@waldur/form/MarkdownField';
@@ -139,6 +141,14 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
                 name="description"
                 required={false}
                 verticalLayout
+              />
+            )}
+            {isEdit && isFeatureVisible(MarketplaceFeatures.call_only) && (
+              <StringField
+                label={translate('External URL')}
+                name="external_url"
+                required
+                validate={required}
               />
             )}
           </FormContainer>

@@ -77,7 +77,7 @@ export const providerAutocomplete = async (
   { page },
 ) => {
   const params = {
-    name: query,
+    customer_keyword: query,
     field: ['customer_name', 'customer_uuid', 'url'],
     o: 'customer_name',
     page: page,
@@ -169,6 +169,23 @@ export const resourceOfferingsAutocomplete = async (
       page_size: ENV.pageSize,
     },
   );
+  return returnReactSelectAsyncPaginateObject(
+    response,
+    prevOptions,
+    currentPage,
+  );
+};
+
+export const resourceAutocomplete = async (
+  query: object,
+  prevOptions,
+  currentPage: number,
+) => {
+  const response = await getSelectData(`/marketplace-resources/`, {
+    ...query,
+    page: currentPage,
+    page_size: ENV.pageSize,
+  });
   return returnReactSelectAsyncPaginateObject(
     response,
     prevOptions,

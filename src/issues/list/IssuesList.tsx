@@ -27,6 +27,7 @@ interface OwnProps {
     | 'resource_type'
   )[];
   scope?: Record<string, any>;
+  scopeType?: string;
   filter?: Record<string, any>;
 }
 
@@ -173,7 +174,11 @@ export const IssuesList: FC<OwnProps & Partial<TableProps>> = (props) => {
       enableExport={true}
       tableActions={
         props.scope && (
-          <IssueCreateButton scope={props.scope} refetch={tableProps.fetch} />
+          <IssueCreateButton
+            scope={props.scope}
+            scopeType={props.scopeType}
+            refetch={tableProps.fetch}
+          />
         )
       }
       expandableRow={({ row }) => (

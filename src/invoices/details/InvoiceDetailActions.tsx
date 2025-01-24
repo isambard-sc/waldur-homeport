@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
+
+import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
 
 import { Invoice } from '../types';
 
@@ -13,8 +14,11 @@ interface InvoiceDetailActionsProps {
 export const InvoiceDetailActions: FC<InvoiceDetailActionsProps> = ({
   invoice,
 }) => (
-  <ButtonGroup>
+  <>
     <PrintInvoiceButton />
-    <InvoicePayButton invoice={invoice} />
-  </ButtonGroup>
+    <FilteredEventsButton
+      filter={{ scope: invoice.url, feature: 'invoices' }}
+    />
+    <InvoicePayButton row={invoice} asButton />
+  </>
 );

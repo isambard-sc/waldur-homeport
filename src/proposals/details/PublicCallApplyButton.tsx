@@ -4,6 +4,8 @@ import { Variant } from 'react-bootstrap/types';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
@@ -44,17 +46,21 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
     }, [call]);
 
   const dispatch = useDispatch();
-  const openAddProposalDialog = useCallback(
-    () =>
-      activeRound &&
+  const openAddProposalDialog = useCallback(() => {
+    if (isFeatureVisible(MarketplaceFeatures.call_only) && call.external_url) {
+      document.location.href = call.external_url;
+    } else if (activeRound) {
       dispatch(
         openModalDialog(ProposalCreateDialog, {
           resolve: { call, round: activeRound },
           size: 'md',
         }),
-      ),
-    [dispatch, activeRound],
-  );
+      );
+    }
+  }, [dispatch, activeRound]);
+  if (isFeatureVisible(MarketplaceFeatures.call_only) && !call.external_url) {
+    return null;
+  }
 
   return activeRound ? (
     <Button

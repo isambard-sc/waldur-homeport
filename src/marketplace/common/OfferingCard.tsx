@@ -3,60 +3,21 @@ import classNames from 'classnames';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
-import { Link } from '@waldur/core/Link';
 import { ModelCard1 } from '@waldur/core/ModelCard1';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
-import azureIcon from '@waldur/images/appstore/icon-azure.png';
-import openstackIcon from '@waldur/images/appstore/icon-openstack.png';
-import rancherIcon from '@waldur/images/appstore/icon-rancher.png';
-import slurmIcon from '@waldur/images/appstore/icon-slurm.png';
-import vmwareIcon from '@waldur/images/appstore/icon-vmware.png';
 import Placeholder from '@waldur/images/logo_w.svg';
-import {
-  INSTANCE_TYPE,
-  TENANT_TYPE,
-  VOLUME_TYPE,
-} from '@waldur/openstack/constants';
-import { MARKETPLACE_RANCHER } from '@waldur/rancher/cluster/create/constants';
-import { SLURM_PLUGIN, SLURM_REMOTE_PLUGIN } from '@waldur/slurm/constants';
+import { OfferingDetailsLink } from '@waldur/marketplace/links/OfferingDetailsLink';
 import { wrapTooltip } from '@waldur/table/ActionButton';
-import { VMWARE_VM } from '@waldur/vmware/constants';
 import { getUser } from '@waldur/workspace/selectors';
 
-import { OfferingLink } from '../links/OfferingLink';
 import { isOfferingRestrictedToProject } from '../offerings/utils';
 import { Offering } from '../types';
 
 import './OfferingCard.scss';
-
-const getOfferingImage = (offering: Offering) => {
-  if (offering.image) return offering.image;
-  if (offering.thumbnail) return offering.thumbnail;
-  switch (offering.type) {
-    case INSTANCE_TYPE:
-    case VOLUME_TYPE:
-    case TENANT_TYPE:
-      return openstackIcon;
-
-    case 'Azure.SQLServer':
-    case 'Azure.VirtualMachine':
-      return azureIcon;
-
-    case MARKETPLACE_RANCHER:
-      return rancherIcon;
-
-    case SLURM_PLUGIN:
-    case SLURM_REMOTE_PLUGIN:
-      return slurmIcon;
-
-    case VMWARE_VM:
-      return vmwareIcon;
-
-    default:
-      return null;
-  }
-};
+import { DeployButton } from './DeployButton';
+import { getOfferingImage } from './getOfferingImage';
+import { ViewOfferingButton } from './ViewOfferingButton';
 
 interface OfferingCardProps {
   offering: Offering;
@@ -74,7 +35,7 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
     props.offering.state === 'Paused' &&
       (props.offering.paused_reason ||
         translate('Requesting of new resources has been temporarily paused')),
-    <OfferingLink
+    <OfferingDetailsLink
       offering_uuid={props.offering.uuid}
       className={classNames(props.className, 'offering-card', {
         disabled: props.offering.state !== 'Active',
@@ -100,21 +61,8 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
         footer={
           !isRestricted ? (
             <div className="d-flex justify-content-end align-items-center gap-2 my-n3 me-n3">
-              <OfferingLink
-                offering_uuid={props.offering.uuid}
-                className="btn btn-text-primary btn-active-secondary"
-              >
-                {translate('Deploy')}
-              </OfferingLink>
-              <Link
-                state="public-offering.marketplace-public-offering"
-                params={{
-                  uuid: props.offering.uuid,
-                }}
-                className="btn text-gray-700 btn-active-light"
-              >
-                {translate('View offering')}
-              </Link>
+              <DeployButton offering={props.offering} />
+              <ViewOfferingButton offering={props.offering} />
             </div>
           ) : (
             <div className="d-flex justify-content-between align-items-center gap-4 my-n3 me-n3">
@@ -139,36 +87,16 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
                 </Tip>
               )}
               <div className="flex-grow-1 d-flex justify-content-end gap-2">
-                <OfferingLink
-                  offering_uuid={props.offering.uuid}
-                  className="btn btn-text-primary btn-active-secondary"
+                <DeployButton offering={props.offering} disabled={!isAllowed} />
+                <ViewOfferingButton
+                  offering={props.offering}
                   disabled={!isAllowed}
-                >
-                  {translate('Deploy')}
-                </OfferingLink>
-                {isAllowed ? (
-                  <Link
-                    state="public-offering.marketplace-public-offering"
-                    params={{
-                      uuid: props.offering.uuid,
-                    }}
-                    className="btn text-gray-700 btn-active-light"
-                  >
-                    {translate('View offering')}
-                  </Link>
-                ) : (
-                  <button
-                    className="btn text-gray-700 btn-active-light"
-                    disabled
-                  >
-                    {translate('View offering')}
-                  </button>
-                )}
+                />
               </div>
             </div>
           )
         }
       />
-    </OfferingLink>,
+    </OfferingDetailsLink>,
   );
 };

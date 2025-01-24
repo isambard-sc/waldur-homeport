@@ -36,8 +36,8 @@ export function checkAndAccept(token) {
      */
   if (AuthService.isAuthenticated()) {
     return confirmInvitation(token)
-      .then(({ replaceEmail, invitation }) => {
-        acceptInvitation(token, replaceEmail).then(() => {
+      .then(({ invitation }) => {
+        acceptInvitation(token).then(() => {
           // Refetch the user data to update the permissions for the new org or project
           UsersService.getCurrentUser(true).then(() => {
             if (invitation?.project_uuid) {
@@ -87,9 +87,9 @@ export function submitPermissionRequest(token) {
     });
 }
 
-export async function acceptInvitation(token, replaceEmail) {
+export async function acceptInvitation(token) {
   try {
-    await InvitationService.accept(token, replaceEmail);
+    await InvitationService.accept(token);
     store.dispatch(showSuccess(translate('Your invitation was accepted.')));
     clearInvitationToken();
     const newUser = await getCurrentUser();

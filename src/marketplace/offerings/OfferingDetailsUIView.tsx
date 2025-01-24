@@ -4,6 +4,8 @@ import { useCallback, useMemo } from 'react';
 
 import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import {
   getCategory,
@@ -123,7 +125,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
       key: 'resources',
       component: OfferingResourcesList,
     },
-    {
+    !isFeatureVisible(MarketplaceFeatures.catalogue_only) && {
       title: translate('Orders'),
       key: 'orders',
       component: OfferingOrdersList,

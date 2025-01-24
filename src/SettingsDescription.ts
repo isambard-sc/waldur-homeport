@@ -33,7 +33,7 @@ export const SettingsDescription = [
     ],
   },
   {
-    description: translate('Marketplace'),
+    description: translate('Marketplace Branding'),
     items: [
       {
         key: 'SITE_ADDRESS',
@@ -58,6 +58,141 @@ export const SettingsDescription = [
         description: translate('It is used in marketplace order details and invoices for currency formatting.'),
         default: 'EUR',
         type: 'string',
+      },
+      {
+        key: 'MARKETPLACE_LANDING_PAGE',
+        description: translate('Marketplace landing page title.'),
+        default: 'Marketplace',
+        type: 'string',
+      },
+    ],
+  },
+  {
+    description: translate('Marketplace'),
+    items: [
+      {
+        key: 'THUMBNAIL_SIZE',
+        description: translate('Size of the thumbnail to generate when screenshot is uploaded for an offering.'),
+        default: '120x120',
+        type: 'string',
+      },
+      {
+        key: 'ANONYMOUS_USER_CAN_VIEW_OFFERINGS',
+        description: translate('Allow anonymous users to see shared offerings in active, paused and archived states'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'ANONYMOUS_USER_CAN_VIEW_PLANS',
+        description: translate('Allow anonymous users to see plans'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'NOTIFY_STAFF_ABOUT_APPROVALS',
+        description: translate('If true, users with staff role are notified when request for order approval is generated'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'NOTIFY_ABOUT_RESOURCE_CHANGE',
+        description: translate('If true, notify users about resource changes from Marketplace perspective. Can generate duplicate events if plugins also log'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'DISABLE_SENDING_NOTIFICATIONS_ABOUT_RESOURCE_UPDATE',
+        description: translate('Disable only resource update events.'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'ENABLE_STALE_RESOURCE_NOTIFICATIONS',
+        description: translate('Enable reminders to owners about resources of shared offerings that have not generated any cost for the last 3 months.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'ENABLE_RESOURCE_END_DATE',
+        description: translate('Allow to view and update resource end date.'),
+        default: true,
+        type: 'boolean',
+      },
+    ],
+  },
+  {
+    description: translate('Telemetry'),
+    items: [
+      {
+        key: 'TELEMETRY_URL',
+        description: translate('URL for sending telemetry data.'),
+        default: 'https://telemetry.waldur.com/',
+        type: 'string',
+      },
+      {
+        key: 'TELEMETRY_VERSION',
+        description: translate('Telemetry service version.'),
+        default: 1,
+        type: 'integer',
+      },
+    ],
+  },
+  {
+    description: translate('Custom Scripts'),
+    items: [
+      {
+        key: 'SCRIPT_RUN_MODE',
+        description: translate('Type of jobs deployment. Valid values: "docker" for simple docker deployment, "k8s" for Kubernetes-based one'),
+        default: 'docker',
+        type: 'string',
+      },
+      {
+        key: 'DOCKER_CLIENT',
+        description: translate('Options for docker client. See also: <https://docker-py.readthedocs.io/en/stable/client.html#docker.client.DockerClient>'),
+        default: {'base_url': 'unix://var/run/docker.sock'},
+        type: 'dict_field',
+      },
+      {
+        key: 'DOCKER_RUN_OPTIONS',
+        description: translate('Options for docker runtime. See also: <https://docker-py.readthedocs.io/en/stable/containers.html#docker.models.containers.ContainerCollection.run>'),
+        default: {'mem_limit': '512m'},
+        type: 'dict_field',
+      },
+      {
+        key: 'DOCKER_SCRIPT_DIR',
+        description: translate('Path to folder on executor machine where to create temporary submission scripts. If None, uses OS-dependent location. OS X users, see <https://github.com/docker/for-mac/issues/1532>'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'DOCKER_REMOVE_CONTAINER',
+        description: translate('Remove Docker container after script execution'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'DOCKER_IMAGES',
+        description: translate('Key is command to execute script, value is a dictionary of image name and command.'),
+        default: {'python': {'image': 'python:3.11-alpine', 'command': 'python'}, 'shell': {'image': 'alpine:3', 'command': 'sh'}},
+        type: 'dict_field',
+      },
+      {
+        key: 'K8S_NAMESPACE',
+        description: translate('Kubernetes namespace where jobs will be executed'),
+        default: 'default',
+        type: 'string',
+      },
+      {
+        key: 'K8S_CONFIG_PATH',
+        description: translate('Path to Kubernetes configuration file'),
+        default: '~/.kube/config',
+        type: 'string',
+      },
+      {
+        key: 'K8S_JOB_TIMEOUT',
+        description: translate('Timeout for execution of one Kubernetes job in seconds'),
+        default: 1800,
+        type: 'integer',
       },
     ],
   },
@@ -577,7 +712,13 @@ export const SettingsDescription = [
     items: [
       {
         key: 'AUTO_APPROVE_USER_TOS',
-        description: translate('Configure whether a user needs to approve TOS.'),
+        description: translate('Mark terms of services as approved for new users.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'ENABLE_STRICT_CHECK_ACCEPTING_INVITATION',
+        description: translate('If this is true and user email is pre-validated then accepting invitation to only do that if user’s email and email of the invitation fully match.'),
         default: false,
         type: 'boolean',
       },

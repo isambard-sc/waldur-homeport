@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
@@ -134,6 +134,13 @@ export const CustomerList: FunctionComponent<{
     filter,
   });
 
+  const expandableRow = useCallback(
+    ({ row }) => (
+      <CustomerExpandableRow row={row} providerUUID={filter?.provider_uuid} />
+    ),
+    [filter],
+  );
+
   return (
     <Table
       {...props}
@@ -142,7 +149,7 @@ export const CustomerList: FunctionComponent<{
       hasQuery={true}
       showPageSizeSelector={true}
       enableExport={true}
-      expandableRow={CustomerExpandableRow}
+      expandableRow={expandableRow}
       tableActions={<FinancialReportSendButton />}
       filters={
         <CustomerListFilter
@@ -156,15 +163,18 @@ export const CustomerList: FunctionComponent<{
 
 const formatFilter = (filter) => {
   if (filter) {
-    if (filter.accounting_period) {
-      return {
+    const formattedFilter: any = {
+      ...(filter.accounting_period && {
         accounting_is_running: filter.accounting_is_running
           ? filter.accounting_is_running.value
           : undefined,
         year: filter.accounting_period.value.year,
         month: filter.accounting_period.value.month,
-      };
-    }
-    return filter;
+      }),
+      ...(filter.provider && {
+        provider_uuid: filter.provider.customer_uuid,
+      }),
+    };
+    return formattedFilter;
   }
 };
