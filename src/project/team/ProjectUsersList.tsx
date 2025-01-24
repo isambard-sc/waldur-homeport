@@ -108,7 +108,9 @@ export const ProjectUsersList = () => {
         },
       ]}
       hasQuery={true}
-      tableActions={<AddUserButton refetch={tableProps.fetch} />}
+      tableActions={
+        <AddUserButton project={project} refetch={tableProps.fetch} />
+      }
       title={translate('Team members')}
       verboseName={translate('Team members')}
       rowActions={ProjectPermisionActions}
