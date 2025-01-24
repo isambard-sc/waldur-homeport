@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { getAllOrganizationGroups } from './api';
 
@@ -78,16 +80,27 @@ export function getBillingPeriods(unit: string): BillingPeriodDescription {
   }
 }
 
-export const useOrganizationGroups = () =>
-  useQuery(
+export const useOrganizationGroups = () => {
+  const user = useSelector(getUser);
+
+  const query = useQuery(
     ['organizationGroups'],
     () =>
       getAllOrganizationGroups().then((items) => {
         return items.map((item) => ({
           ...item,
-          name: [item.parent_name, item.name].filter(Boolean).join(' ➔ '),
           value: item.url,
         }));
       }),
     { staleTime: 5 * 60 * 1000 },
   );
+
+  const disabled = query.data?.length === 0 && !user.is_staff;
+  const tooltip = disabled
+    ? translate(
+        'Access policies cannot be configured because no organization groups are defined.',
+      )
+    : undefined;
+
+  return { ...query, disabled, tooltip };
+};

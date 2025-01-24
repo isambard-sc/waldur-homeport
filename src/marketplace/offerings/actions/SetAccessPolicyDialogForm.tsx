@@ -11,10 +11,7 @@ import {
   updatePlanAccessPolicy,
 } from '@waldur/marketplace/common/api';
 import { SET_ACCESS_POLICY_FORM_ID } from '@waldur/marketplace/offerings/actions/constants';
-import {
-  formatRequestBodyForSetAccessPolicyForm,
-  getInitialValuesForSetAccessPolicyForm,
-} from '@waldur/marketplace/offerings/actions/utils';
+import { formatRequestBodyForSetAccessPolicyForm } from '@waldur/marketplace/offerings/actions/utils';
 import { Offering, OrganizationGroup, Plan } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
@@ -101,13 +98,22 @@ const PureSetAccessPolicyDialogForm: FunctionComponent<any> = (props) => {
 const mapStateToProps = (
   _state,
   ownProps: SetAccessPolicyDialogFormOwnProps,
-) => ({
-  initialValues: getInitialValuesForSetAccessPolicyForm(
-    ownProps.offering?.organization_groups ||
-      ownProps.plan?.organization_groups ||
-      ownProps.customer?.organization_groups,
-  ),
-});
+) => {
+  const initialValues = {};
+  ownProps.organizationGroups.forEach((group) => {
+    initialValues[group.uuid] =
+      ownProps.offering?.organization_groups?.some(
+        (selectedGroup) => selectedGroup.uuid === group.uuid,
+      ) ||
+      ownProps.plan?.organization_groups?.some(
+        (selectedGroup) => selectedGroup.uuid === group.uuid,
+      ) ||
+      ownProps.customer?.organization_groups?.some(
+        (selectedGroup) => selectedGroup.uuid === group.uuid,
+      );
+  });
+  return { initialValues };
+};
 
 const connector = connect(mapStateToProps);
 
@@ -115,6 +121,7 @@ const enhance = compose(
   connector,
   reduxForm<SetAccessPolicyDialogFormOwnProps>({
     form: SET_ACCESS_POLICY_FORM_ID,
+    enableReinitialize: true,
   }),
 );
 
