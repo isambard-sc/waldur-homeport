@@ -33,7 +33,7 @@ export const InfiniteList = ({
           </Fragment>
         ))}
       </div>
-      <p className="text-center">
+      <div className="text-center">
         {context.hasNextPage && (
           <div>
             <button
@@ -52,6 +52,6 @@ export const InfiniteList = ({
             ? translate('Fetching...')
             : null}
         </div>
-      </p>
+      </div>
     </>
   );

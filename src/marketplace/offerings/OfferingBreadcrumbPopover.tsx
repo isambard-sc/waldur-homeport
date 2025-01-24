@@ -6,6 +6,8 @@ import { SearchItem } from '@waldur/navigation/header/search/SearchItem';
 
 import { ServiceProvider } from '../types';
 
+import { getStates } from './list/OfferingStateFilter';
+
 const OfferingRow = ({
   row,
   addFavoritePage,
@@ -51,6 +53,13 @@ export const OfferingBreadcrumbPopover = ({
       params={{
         field: ['name', 'uuid', 'category_title', 'thumbnail'],
       }}
+      filters={[
+        {
+          field: 'state',
+          label: translate('Status'),
+          options: getStates(),
+        },
+      ]}
       RowComponent={({ row }) => (
         <OfferingRow
           row={row}
@@ -61,7 +70,6 @@ export const OfferingBreadcrumbPopover = ({
           close={close}
         />
       )}
-      placeholder={translate('Type in name of offering') + '...'}
       emptyMessage={translate('There are no offerings.')}
     />
   );

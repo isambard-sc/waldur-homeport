@@ -14,7 +14,7 @@ export const RuntimeStateFilter: React.FC<{}> = () => {
   const { params } = useCurrentStateAndParams();
   const project = useSelector(getProject);
 
-  const { data, isLoading } = useQuery(
+  const { data, isLoading } = useQuery<any>(
     ['runtime-states', project?.uuid, params.category_uuid],
     () =>
       project
