@@ -380,7 +380,7 @@
     "message": "Add key"
   },
   "Add member": {
-    "description": "customer/team/UserAddButton.tsx",
+    "description": "customer/team/UserAddButton.tsx, proposals/call-management/UserAddButton.tsx",
     "message": "Add member"
   },
   "Add new": {
@@ -472,7 +472,7 @@
     "message": "Add {category}"
   },
   "Add": {
-    "description": "administration/providers/CreateProviderDialog.tsx, core/AddButton.tsx, customer/list/OrganizationCreateButton.tsx, customer/team/AddProjectUserButton.tsx, customer/team/UserAddButton.tsx, marketplace/deploy/DeployPage.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-backup/actions/NetworksList.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpsList.tsx, openstack/openstack-instance/deploy/FormNetworkStep.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/create/GlobalProjectCreateButton.tsx, project/create/ProjectCreateButton.tsx, rancher/cluster/create/FormNodesStep.tsx",
+    "description": "administration/providers/CreateProviderDialog.tsx, core/AddButton.tsx, customer/list/OrganizationCreateButton.tsx, customer/team/AddProjectUserButton.tsx, customer/team/UserAddButton.tsx, marketplace/deploy/DeployPage.tsx, openstack/OpenStackExternalIpsField.tsx, openstack/openstack-backup/actions/NetworksList.tsx, openstack/openstack-instance/actions/update-floating-ips/FloatingIpsList.tsx, openstack/openstack-instance/deploy/FormNetworkStep.tsx, openstack/openstack-tenant/actions/SubnetsTable.tsx, openstack/openstack-tenant/actions/VolumeTypesTable.tsx, project/create/GlobalProjectCreateButton.tsx, project/create/ProjectCreateButton.tsx, proposals/call-management/UserAddButton.tsx, rancher/cluster/create/FormNodesStep.tsx",
     "message": "Add"
   },
   "Additional account description invisible to user": {
@@ -9624,7 +9624,7 @@
     "message": "Role details: {roleName}"
   },
   "Role expiration": {
-    "description": "customer/team/CustomerUsersList.tsx, project/team/ProjectUsersList.tsx",
+    "description": "customer/team/CustomerUsersList.tsx, project/team/ProjectUsersList.tsx, proposals/call-management/CallManagementTeamPage.tsx",
     "message": "Role expiration"
   },
   "Role expires on": {
