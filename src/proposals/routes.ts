@@ -46,6 +46,18 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'call-management.team',
+    url: 'team/',
+    component: lazyComponent(() =>
+      import('./call-management/CallManagementTeamPage').then((module) => ({
+        default: module.CallManagementTeamPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Team'),
+    },
+  },
+  {
     name: 'call-management.call-list',
     url: 'calls/?{state}',
     component: lazyComponent(() =>
