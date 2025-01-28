@@ -66,11 +66,16 @@ export const FooterLinks = () => {
               </Link>
             </li>
           )}
-          <li className="menu-item" data-kt-menu-trigger="click">
-            <Link className="menu-link px-2" state="public.marketplace-landing">
-              {translate('Explore marketplace')}
-            </Link>
-          </li>
+          {ENV.plugins.WALDUR_CORE.ANONYMOUS_USER_CAN_VIEW_OFFERINGS && (
+            <li className="menu-item" data-kt-menu-trigger="click">
+              <Link
+                className="menu-link px-2"
+                state="public.marketplace-landing"
+              >
+                {translate('Explore marketplace')}
+              </Link>
+            </li>
+          )}
         </>
       )}
       <li className="menu-item" data-kt-menu-trigger="click">
