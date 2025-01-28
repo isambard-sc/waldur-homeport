@@ -81,7 +81,7 @@ const ColorField = (props) => (
 );
 
 export const ConfigurationEditDialog = reduxForm<
-  FormData,
+  any,
   { resolve: { item: { key; description; type } } }
 >({
   form: 'ConfigurationEditDialog',
@@ -153,7 +153,11 @@ export const ConfigurationEditDialog = reduxForm<
               hideLabel
             />
           ) : item.type === 'image_field' ? (
-            <WideImageField name="value" label={item.description} />
+            <WideImageField
+              name="value"
+              label={item.description}
+              initialValue={props.initialValues.value}
+            />
           ) : (
             <StringField name="value" label={item.description} />
           )}
