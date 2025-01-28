@@ -145,7 +145,7 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
             variant="outline"
             size="sm"
             className="btn-outline-default btn-icon-right"
-            onClick={() => changeImage('')}
+            onClick={() => changeImage(null)}
             data-image-input-action="remove"
           >
             {translate('Remove')}

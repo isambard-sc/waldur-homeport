@@ -20,7 +20,10 @@ export const UserSecretOptionsForm: FunctionComponent<
   return (
     <>
       <FormTable.Item
-        label={translate('Service provider can create offering user')}
+        label={translate('Enable automatic creation of offering users')}
+        description={translate(
+          'If true, offering users are created automatically when a user is added to the project with active offering resources or when a new offering resource is created.',
+        )}
         value={formatYesNo(
           props.offering.secret_options
             ?.service_provider_can_create_offering_user,

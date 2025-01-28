@@ -26,6 +26,10 @@ export const formatFilesize = (
     return input;
   }
 
+  if (input < 0) {
+    input *= -1;
+  }
+
   let startUnit = FILESIZE_UNITS.indexOf(fromUnit);
   let endUnit = FILESIZE_UNITS.indexOf(toUnit);
   if (startUnit === -1) {
