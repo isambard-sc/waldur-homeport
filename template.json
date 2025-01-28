@@ -6556,7 +6556,7 @@
     "message": "No organization groups found"
   },
   "No organization groups": {
-    "description": "customer/list/SelectOrganizationGroupField.tsx",
+    "description": "administration/organizations/SelectOrganizationGroupFieldHelpers.tsx",
     "message": "No organization groups"
   },
   "No organizations found": {
@@ -7418,6 +7418,10 @@
   "Paid": {
     "description": "invoices/list/InvoicesFilter.tsx, reporting/invoices/utils.ts",
     "message": "Paid"
+  },
+  "Parent group": {
+    "description": "administration/organizations/OrganizationGroupForm.tsx, administration/organizations/OrganizationGroupsList.tsx",
+    "message": "Parent group"
   },
   "Parent offering description:": {
     "description": "marketplace/offerings/details/OfferingDetailsDialog.tsx",
@@ -10088,7 +10092,7 @@
     "message": "Select offerings..."
   },
   "Select organization group...": {
-    "description": "customer/list/SelectOrganizationGroupField.tsx",
+    "description": "administration/organizations/SelectOrganizationGroupFieldHelpers.tsx",
     "message": "Select organization group..."
   },
   "Select organization roles": {

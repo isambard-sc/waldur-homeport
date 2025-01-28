@@ -11,6 +11,7 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { createOrganizationGroup, updateOrganizationGroup } from './api';
+import { SelectOrganizationGroupField } from './SelectOrganizationGroupField';
 
 interface FormData {
   name: string;
@@ -21,7 +22,7 @@ export const OrganizationGroupForm = ({ resolve }) => {
   const dispatch = useDispatch();
 
   const onSubmit = async (values: FormData) => {
-    values['type'] = values['type']?.uuid;
+    values['parent'] = values['parent']?.url;
     try {
       if (isEdit) {
         await updateOrganizationGroup(resolve.organizationGroup.uuid, values);
@@ -56,6 +57,7 @@ export const OrganizationGroupForm = ({ resolve }) => {
         resolve.organizationGroup
           ? {
               name: resolve.organizationGroup.name,
+              parent: resolve.organizationGroup.parent,
             }
           : undefined
       }
@@ -88,6 +90,15 @@ export const OrganizationGroupForm = ({ resolve }) => {
               validate={required}
             >
               <StringField />
+            </Field>
+            <Field
+              name="parent"
+              component={FormGroup as any}
+              label={translate('Parent group')}
+            >
+              <SelectOrganizationGroupField
+                currentOrganizationGroup={resolve.organizationGroup}
+              />
             </Field>
           </ModalDialog>
         </form>
