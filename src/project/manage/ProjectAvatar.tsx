@@ -50,27 +50,31 @@ export const ProjectAvatar = ({ project }: ProjectAvatarProps) => {
           <Card.Body>
             <Field
               name="image"
-              component={WideImageField as any}
-              alt={abbreviation}
-              initialValue={project.image}
-              max={2 * 1024 * 1024} // 2MB
-              size={65}
-              extraActions={({ isChanged, isTooLarge }) =>
-                isChanged || submitting ? (
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="sm"
-                    className="btn-icon-right"
-                    disabled={submitting || isTooLarge}
-                  >
-                    {translate('Save')}
-                    <span className="svg-icon svg-icon-5">
-                      <UploadSimple weight="bold" />
-                    </span>
-                  </Button>
-                ) : null
-              }
+              component={(fieldProps) => (
+                <WideImageField
+                  alt={abbreviation}
+                  initialValue={project.image}
+                  max={2 * 1024 * 1024} // 2MB
+                  size={65}
+                  extraActions={({ isChanged, isTooLarge }) =>
+                    isChanged || submitting ? (
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        size="sm"
+                        className="btn-icon-right"
+                        disabled={submitting || isTooLarge}
+                      >
+                        {translate('Save')}
+                        <span className="svg-icon svg-icon-5">
+                          <UploadSimple weight="bold" />
+                        </span>
+                      </Button>
+                    ) : null
+                  }
+                  {...(fieldProps as any)}
+                />
+              )}
             />
           </Card.Body>
         </Card>
