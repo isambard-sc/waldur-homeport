@@ -102,7 +102,7 @@ export const AsyncSearchBox: FC<AsyncSearchBoxProps> = ({
       </div>
       <div
         ref={refPopup}
-        className="search-results-dropdown menu menu-sub menu-sub-dropdown menu-column border mw-400px mh-300px p-5"
+        className="search-results-dropdown menu menu-sub menu-sub-dropdown menu-column border mw-400px mh-300px py-2"
         data-kt-menu="true"
       >
         <div className="overflow-auto">
