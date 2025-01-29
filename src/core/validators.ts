@@ -2,6 +2,14 @@ import { ENV } from '@waldur/configs/default';
 import { LATIN_NAME_PATTERN } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 
+export const composeValidators =
+  (...validators) =>
+  (value) =>
+    validators.reduce(
+      (error, validator) => error || validator(value),
+      undefined,
+    );
+
 const GUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

@@ -43,7 +43,7 @@ export async function getFirst<T = {}>(
   options?: AxiosRequestConfig,
 ) {
   const data = await getList<T>(endpoint, params, options);
-  return data[0];
+  return data[0] ?? null;
 }
 
 export function getById<T = {}>(
