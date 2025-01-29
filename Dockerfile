@@ -30,8 +30,18 @@ ENV API_URL="http://localhost:8080"
 ENV TITLE="Waldur | Cloud Service Management"
 
 # replace default configuration
+RUN chgrp -R 0 /etc/nginx && \
+    chmod -R g=u /etc/nginx && \
+    chgrp -R 0 /var/cache/nginx && \
+    chmod -R g=u /var/cache/nginx && \
+    chgrp -R 0 /var/log/nginx && \
+    chmod -R g=u /var/log/nginx && \
+    chgrp -R 0 /usr/share/nginx && \
+    chmod -R g=u /usr/share/nginx
+
 COPY docker/nginx-tpl.conf /etc/nginx/nginx-tpl.conf
 COPY docker/entrypoint.sh /
+RUN chmod g+x /entrypoint.sh
 
 EXPOSE 80
 CMD [ "/entrypoint.sh" ]
