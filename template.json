@@ -11084,11 +11084,11 @@
     "message": "Supporting documentation"
   },
   "Supports downscaling": {
-    "description": "marketplace/offerings/actions/OfferingCreateDialog.tsx",
+    "description": "marketplace/offerings/update/integration/LifecyclePolicySection.tsx",
     "message": "Supports downscaling"
   },
   "Supports pausing": {
-    "description": "marketplace/offerings/actions/OfferingCreateDialog.tsx",
+    "description": "marketplace/offerings/update/integration/LifecyclePolicySection.tsx",
     "message": "Supports pausing"
   },
   "Suspend": {
