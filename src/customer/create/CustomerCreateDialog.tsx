@@ -1,12 +1,16 @@
+import { PlusCircle } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
-import React from 'react';
-import { Modal } from 'react-bootstrap';
+import { FC, useCallback } from 'react';
+import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { reset, SubmissionError } from 'redux-form';
 
 import { ENV } from '@waldur/configs/default';
 import { sendForm } from '@waldur/core/api';
+import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
+import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 import { addCustomerUser } from '@waldur/permissions/api';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -17,6 +21,7 @@ import { Customer } from '@waldur/workspace/types';
 
 import * as constants from './constants';
 import { CustomerCreateForm } from './CustomerCreateForm';
+import { CustomerCreateFormData } from './types';
 
 const CUSTOMER_FIELDS = ['name', 'email'];
 
@@ -24,13 +29,13 @@ interface OwnProps {
   resolve: { role: string };
 }
 
-export const CustomerCreateDialog: React.FC<OwnProps> = ({ resolve }) => {
+export const CustomerCreateDialog: FC<OwnProps> = ({ resolve }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const router = useRouter();
 
-  const createOrganization = React.useCallback(
-    async (formData) => {
+  const createOrganization = useCallback(
+    async (formData: CustomerCreateFormData) => {
       const payload: Record<string, string | boolean> = {};
       CUSTOMER_FIELDS.forEach((field) => {
         if (formData[field]) {
@@ -70,13 +75,33 @@ export const CustomerCreateDialog: React.FC<OwnProps> = ({ resolve }) => {
     [dispatch, router, user, resolve.role],
   );
   return (
-    <>
-      <Modal.Header>
-        <Modal.Title>{translate('Create organization')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <CustomerCreateForm onSubmit={createOrganization} />
-      </Modal.Body>
-    </>
+    <Form
+      onSubmit={createOrganization}
+      render={({ handleSubmit, submitting, invalid }) => (
+        <form onSubmit={handleSubmit}>
+          <MetronicModalDialog
+            title={translate('Create an organization')}
+            subtitle={translate(
+              'Provide the required information to create a new organization.',
+            )}
+            iconNode={<PlusCircle weight="bold" />}
+            iconColor="success"
+            footer={
+              <>
+                <CloseDialogButton className="min-w-125px" />
+                <SubmitButton
+                  submitting={submitting}
+                  disabled={invalid}
+                  label={translate('Create')}
+                  className="btn btn-primary min-w-125px"
+                />
+              </>
+            }
+          >
+            <CustomerCreateForm />
+          </MetronicModalDialog>
+        </form>
+      )}
+    />
   );
 };

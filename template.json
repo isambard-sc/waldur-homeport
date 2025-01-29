@@ -91,9 +91,9 @@
     "description": "marketplace/offerings/import/CredentialsTab.tsx, marketplace/offerings/import/SelectOfferingTab.tsx, marketplace-remote/RemoteOfferingSecretOptions.tsx, openstack/OpenStackForm.tsx",
     "message": "API URL"
   },
-  "API secret code:": {
+  "API secret code": {
     "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
-    "message": "API secret code:"
+    "message": "API secret code"
   },
   "API token": {
     "description": "navigation/header/UserToken.tsx, user/api-key/UserTokenLifetime.tsx, user/routes.ts",
@@ -212,7 +212,7 @@
     "message": "Accounting running"
   },
   "Accounting start date": {
-    "description": "customer/details/CustomerBillingPanel.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Accounting start date"
   },
   "Accounting type": {
@@ -1112,7 +1112,7 @@
     "message": "Are you sure you want to remove invoice item {name}?"
   },
   "Are you sure you want to remove service provider profile?": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Are you sure you want to remove service provider profile?"
   },
   "Are you sure you want to remove the location?": {
@@ -1484,11 +1484,11 @@
     "message": "Backing up"
   },
   "Bank account": {
-    "description": "customer/details/CustomerBillingPanel.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Bank account"
   },
   "Bank name": {
-    "description": "customer/details/CustomerBillingPanel.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "Bank name"
   },
   "Base image name": {
@@ -1552,7 +1552,7 @@
     "message": "Billing type"
   },
   "Billing": {
-    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/CustomerManageContainer.tsx, customer/details/CustomerManagePageBar.tsx",
+    "description": "customer/details/CustomerManageContainer.tsx, customer/details/CustomerManagePageBar.tsx",
     "message": "Billing"
   },
   "Biological sciences": {
@@ -1816,7 +1816,7 @@
     "message": "Cancel request"
   },
   "Cancel": {
-    "description": "administration/roles/RoleDescriptionEditDialog.tsx, administration/roles/RoleForm.tsx, form/WideImageField.tsx, invitations/GroupInvitationCancelButton.tsx, invitations/GroupinvitationButtons.tsx, invitations/MultiCancelAction.tsx, invitations/actions/InvitationCancelButton.tsx, marketplace/details/CustomerField.tsx, marketplace/landing/MarketplaceLandingFilter.tsx, marketplace/offerings/update/components/ChangeStorageModeDialog.tsx, marketplace/orders/actions/CancelTerminationOrderButton.tsx, marketplace/orders/details/CancelOrderButton.tsx, modal/CloseDialogButton.tsx, modal/DeleteConfirmationDialog.tsx, table/TableFilterActions.tsx, table/TableFilterItem.tsx, user/support/UserRemovalMessageDialog.tsx, user/support/UserStatus.tsx",
+    "description": "administration/roles/RoleDescriptionEditDialog.tsx, administration/roles/RoleForm.tsx, form/WideImageField.tsx, invitations/GroupInvitationCancelButton.tsx, invitations/GroupinvitationButtons.tsx, invitations/MultiCancelAction.tsx, invitations/actions/InvitationCancelButton.tsx, marketplace/details/CustomerField.tsx, marketplace/landing/MarketplaceLandingFilter.tsx, marketplace/offerings/update/components/ChangeStorageModeDialog.tsx, marketplace/orders/actions/CancelTerminationOrderButton.tsx, marketplace/orders/details/CancelOrderButton.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, modal/CloseDialogButton.tsx, modal/DeleteConfirmationDialog.tsx, table/TableFilterActions.tsx, table/TableFilterItem.tsx, user/support/UserRemovalMessageDialog.tsx, user/support/UserStatus.tsx",
     "message": "Cancel"
   },
   "Canceled": {
@@ -2415,6 +2415,10 @@
     "description": "customer/details/AccessSubnetCreateForm.tsx",
     "message": "Create access subnet"
   },
+  "Create an organization": {
+    "description": "customer/create/CustomerCreateDialog.tsx",
+    "message": "Create an organization"
+  },
   "Create application": {
     "description": "rancher/template/TemplateQuestions.tsx",
     "message": "Create application"
@@ -2503,10 +2507,6 @@
     "description": "administration/organizations/OrganizationGroupForm.tsx",
     "message": "Create organization group"
   },
-  "Create organization": {
-    "description": "customer/create/CustomerCreateDialog.tsx, customer/create/CustomerCreateForm.tsx",
-    "message": "Create organization"
-  },
   "Create port": {
     "description": "vmware/actions/CreatePortDialog.tsx",
     "message": "Create port"
@@ -2560,7 +2560,7 @@
     "message": "Create subnet"
   },
   "Create": {
-    "description": "administration/announcements/AnnouncementForm.tsx, administration/organizations/OrganizationGroupForm.tsx, administration/remote-offering-sync/RemoteSyncFormDialog.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateForm.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
+    "description": "administration/announcements/AnnouncementForm.tsx, administration/organizations/OrganizationGroupForm.tsx, administration/remote-offering-sync/RemoteSyncFormDialog.tsx, customer/cost-policies/CostPolicyFormDialog.tsx, customer/create/CustomerCreateDialog.tsx, customer/credits/CreditFormDialog.tsx, customer/details/AccessSubnetCreateForm.tsx, freeipa/FreeIPAAccountCreate.tsx, issues/create/IssueCreateForm.tsx, issues/list/IssueCreateButton.tsx, marketplace/category/admin/CategoryEditDialog.tsx, marketplace/category/admin/GroupFromDialog.tsx, marketplace/details/OrderSubmitButton.tsx, marketplace/offerings/actions/OfferingCreateDialog.tsx, marketplace/offerings/details/CreateOfferingUserButton.tsx, marketplace/offerings/details/policies/PolicyCreateDialog.tsx, marketplace/offerings/update/components/AddComponentDialog.tsx, marketplace/offerings/update/endpoints/AddEndpointDialog.tsx, marketplace/offerings/update/options/AddOptionDialog.tsx, marketplace/offerings/update/plans/AddPlanDialog.tsx, marketplace/offerings/update/roles/AddRoleDialog.tsx, marketplace/orders/list/OrderTypeCell.tsx, marketplace/orders/list/OrderTypeFilter.tsx, marketplace/resources/details/ResourceIssuesCard.tsx, marketplace/resources/users/AddUserDialog.tsx, marketplace/service-providers/CampaignCreateButton.tsx, marketplace/service-providers/CreateProviderOfferingUserButton.tsx, openstack/openstack-instance/actions/CreateBackupAction.tsx, openstack/openstack-instance/actions/CreateBackupScheduleAction.tsx, openstack/openstack-tenant/CreateMigrationButton.tsx, openstack/openstack-tenant/actions/CreateFloatingIpAction.tsx, openstack/openstack-tenant/actions/CreateNetworkAction.tsx, openstack/openstack-tenant/actions/CreateSecurityGroupAction.tsx, openstack/openstack-tenant/actions/CreateServerGroupAction.tsx, openstack/openstack-volume/actions/CreateSnapshotAction.tsx, openstack/openstack-volume/actions/CreateSnapshotScheduleAction.tsx, project/create/ProjectCreateDialog.tsx, proposals/call-management/CallFormDialog.tsx, proposals/proposal/create/AddProposalDialog.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx, proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/update/offerings/CallOfferingCreateDialog.tsx, proposals/update/rounds/CallRoundCreateDialog.tsx, rancher/catalog/CatalogCreateButton.tsx, rancher/cluster/hpas/HPACreateButton.tsx, user/hooks/HookDetailsDialog.tsx",
     "message": "Create"
   },
   "Created at": {
@@ -3180,7 +3180,7 @@
     "message": "Details for {provider}"
   },
   "Details": {
-    "description": "administration/organizations/OrganizationGroupDetailsButton.tsx, administration/providers/ProviderCard.tsx, customer/details/CustomerBillingPanel.tsx, customer/details/CustomerDetailsPanel.tsx, invoices/list/MonthOverview.tsx, marketplace/aggregate-limits/AggregateLimitWidget.tsx, marketplace/details/plan/PlanDescriptionButton.tsx, marketplace/referral/ReferralDetailsButton.tsx, marketplace/resources/details/fetchData.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, marketplace/resources/details/popup/ResourceDetailsDialog.tsx, marketplace/resources/usage/utils.ts, project/manage/ProjectGeneral.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, rancher/cluster/apps/ApplicationDetailsButton.tsx, resource/summary/ResourceSummaryButton.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserDetailsButton.tsx, user/support/UserDetailsButton.tsx, user/support/UserDetailsDialog.tsx, vmware/tabs.ts",
+    "description": "administration/organizations/OrganizationGroupDetailsButton.tsx, administration/providers/ProviderCard.tsx, customer/details/CustomerBillingPanel.tsx, customer/details/CustomerDetailsPanel.tsx, customer/details/CustomerMarketplacePanel.tsx, invoices/list/MonthOverview.tsx, marketplace/aggregate-limits/AggregateLimitWidget.tsx, marketplace/details/plan/PlanDescriptionButton.tsx, marketplace/referral/ReferralDetailsButton.tsx, marketplace/resources/details/fetchData.tsx, marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, marketplace/resources/details/popup/ResourceDetailsDialog.tsx, marketplace/resources/usage/utils.ts, project/manage/ProjectGeneral.tsx, proposals/round/proposals/ProposalReviewsDetailButton.tsx, rancher/cluster/apps/ApplicationDetailsButton.tsx, resource/summary/ResourceSummaryButton.tsx, resource/summary/ResourceSummaryModal.tsx, user/UserDetailsButton.tsx, user/support/UserDetailsButton.tsx, user/support/UserDetailsDialog.tsx, vmware/tabs.ts",
     "message": "Details"
   },
   "Device ID": {
@@ -3212,7 +3212,7 @@
     "message": "Disable only resource update events."
   },
   "Disable service provider profile": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Disable service provider profile"
   },
   "Disable this to export only the rows on the current page": {
@@ -3230,10 +3230,6 @@
   "Disabled": {
     "description": "administration/hooks/HooksList.tsx, administration/providers/ProviderCard.tsx, customer/payment-profiles/PaymentProfileList.tsx, user/hooks/HooksList.tsx, user/support/utils.ts",
     "message": "Disabled"
-  },
-  "Discard": {
-    "description": "customer/details/CustomerBillingPanel.tsx",
-    "message": "Discard"
   },
   "Disconnect subnet": {
     "description": "openstack/openstack-subnet/DisconnectSubnetAction.tsx",
@@ -6271,10 +6267,6 @@
     "description": "rancher/cluster/create/utils.ts",
     "message": "Name must consist of lower case alphanumeric characters."
   },
-  "Name of your organization.": {
-    "description": "customer/create/CustomerCreateForm.tsx",
-    "message": "Name of your organization."
-  },
   "Name should consist of latin symbols and numbers.": {
     "description": "core/validators.ts",
     "message": "Name should consist of latin symbols and numbers."
@@ -8364,7 +8356,7 @@
     "message": "Proposals"
   },
   "Propose changes": {
-    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/CustomerErrorDialog.tsx",
+    "description": "customer/details/CustomerErrorDialog.tsx",
     "message": "Propose changes"
   },
   "Proposed VAT code: {value}.": {
@@ -8446,6 +8438,10 @@
   "Provide an email address for the user's communication and recovery": {
     "description": "user/support/UserEditRows.tsx",
     "message": "Provide an email address for the user's communication and recovery"
+  },
+  "Provide the required information to create a new organization.": {
+    "description": "customer/create/CustomerCreateDialog.tsx",
+    "message": "Provide the required information to create a new organization."
   },
   "Provide the required information to set up a new project.": {
     "description": "project/create/ProjectCreateDialog.tsx",
@@ -8736,7 +8732,7 @@
     "message": "Register as a customer of our portal and provide your cloud services through the service catalog."
   },
   "Register as service provider": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Register as service provider"
   },
   "Registered at:": {
@@ -9808,7 +9804,7 @@
     "message": "Save as"
   },
   "Save changes": {
-    "description": "customer/details/CustomerBillingPanel.tsx, user/api-key/UserTokenLifetime.tsx",
+    "description": "user/api-key/UserTokenLifetime.tsx",
     "message": "Save changes"
   },
   "Save draft": {
@@ -10364,15 +10360,15 @@
     "message": "Service provider details"
   },
   "Service provider has been registered.": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Service provider has been registered."
   },
   "Service provider profile has been disabled.": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Service provider profile has been disabled."
   },
   "Service provider": {
-    "description": "administration/organizations/OrganizationsFilter.tsx, customer/details/CustomerManageContainer.tsx, customer/details/CustomerMarketplacePanel.tsx, customer/list/CustomerListFilter.tsx, invoices/details/InvoiceItemsFilter.tsx, invoices/details/InvoiceItemsTable.tsx, invoices/list/InvoicesStatsList.tsx, map/LeafletMap.tsx, marketplace/UserPluginOptionsForm.tsx, marketplace/deploy/CheckoutFooter.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/routes.ts, marketplace/service-providers/ProviderOfferingUsersFilter.tsx, organization/OrganizationUIView.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestWizardFormFirstPage.tsx, proposals/update/offerings/WizardFormFirstPage.tsx, reporting/plan-usage/PlanUsageFilter.tsx, reporting/plan-usage/PlanUsageList.tsx",
+    "description": "administration/organizations/OrganizationsFilter.tsx, customer/details/CustomerManageContainer.tsx, customer/list/CustomerListFilter.tsx, invoices/details/InvoiceItemsFilter.tsx, invoices/details/InvoiceItemsTable.tsx, invoices/list/InvoicesStatsList.tsx, map/LeafletMap.tsx, marketplace/UserPluginOptionsForm.tsx, marketplace/deploy/CheckoutFooter.tsx, marketplace/orders/list/MarketplaceOrdersListFilter.tsx, marketplace/routes.ts, marketplace/service-providers/ProviderOfferingUsersFilter.tsx, organization/OrganizationUIView.tsx, proposals/proposal/create/resource-requests-step/ResourceRequestWizardFormFirstPage.tsx, proposals/update/offerings/WizardFormFirstPage.tsx, reporting/plan-usage/PlanUsageFilter.tsx, reporting/plan-usage/PlanUsageList.tsx",
     "message": "Service provider"
   },
   "Service provider:": {
@@ -11220,7 +11216,7 @@
     "message": "Tax number"
   },
   "Tax percentage": {
-    "description": "customer/details/CustomerBillingPanel.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/EditFieldDialog.tsx",
     "message": "Tax percentage"
   },
   "Tax": {
@@ -12356,7 +12352,7 @@
     "message": "Unable to disable remote synchronization"
   },
   "Unable to disable service provider profile.": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Unable to disable service provider profile."
   },
   "Unable to edit comment.": {
@@ -12616,7 +12612,7 @@
     "message": "Unable to load service desk configuration."
   },
   "Unable to load service provider.": {
-    "description": "marketplace/service-providers/CampaignFooter.tsx, marketplace/service-providers/ProviderDetails.tsx, marketplace/service-providers/ServiceProviderManagement.tsx, marketplace/service-providers/details/ProviderDetailsContainer.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx, marketplace/service-providers/CampaignFooter.tsx, marketplace/service-providers/ProviderDetails.tsx, marketplace/service-providers/details/ProviderDetailsContainer.tsx",
     "message": "Unable to load service provider."
   },
   "Unable to load service providers.": {
@@ -12688,7 +12684,7 @@
     "message": "Unable to publish Google Calendar."
   },
   "Unable to register service provider.": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "Unable to register service provider."
   },
   "Unable to reject all orders.": {
@@ -13848,7 +13844,7 @@
     "message": "Users"
   },
   "VAT code": {
-    "description": "customer/details/CustomerBillingPanel.tsx, user/affiliations/OrganizationsList.tsx",
+    "description": "customer/details/CustomerBillingPanel.tsx, customer/details/EditFieldDialog.tsx, user/affiliations/OrganizationsList.tsx",
     "message": "VAT code"
   },
   "VAT is included": {
@@ -14227,8 +14223,12 @@
     "description": "invitations/actions/GroupInvitationCreateButton.tsx",
     "message": "You can not create group invitations."
   },
+  "You can not register organization as a service provider": {
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
+    "message": "You can not register organization as a service provider"
+  },
   "You can register organization as a service provider by pressing the button": {
-    "description": "marketplace/service-providers/ServiceProviderManagement.tsx",
+    "description": "customer/details/CustomerMarketplacePanel.tsx",
     "message": "You can register organization as a service provider by pressing the button"
   },
   "You can remove this organization by pressing the button": {
@@ -14459,6 +14459,10 @@
     "description": "invitations/actions/create/EmailsListGroup.tsx",
     "message": "e.g. EE123456789"
   },
+  "e.g. My Organization": {
+    "description": "customer/create/CustomerCreateForm.tsx",
+    "message": "e.g. My Organization"
+  },
   "e.g. MyApp": {
     "description": "rancher/template/NamespaceField.tsx",
     "message": "e.g. MyApp"
@@ -14468,7 +14472,7 @@
     "message": "e.g. This organization is irrelevant"
   },
   "e.g.": {
-    "description": "administration/remote-offering-sync/RemoteSyncFormDialog.tsx, marketplace/offerings/import/CredentialsTab.tsx, table/SaveFilterDialog.tsx",
+    "description": "administration/remote-offering-sync/RemoteSyncFormDialog.tsx, customer/create/CustomerCreateForm.tsx, marketplace/offerings/import/CredentialsTab.tsx, table/SaveFilterDialog.tsx",
     "message": "e.g."
   },
   "error message: {errorMessage}": {

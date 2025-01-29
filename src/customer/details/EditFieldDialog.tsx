@@ -6,7 +6,13 @@ import { SubmissionError, reduxForm } from 'redux-form';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { SelectField, SubmitButton, TextField } from '@waldur/form';
+import {
+  NumberField,
+  SelectField,
+  SubmitButton,
+  TextField,
+} from '@waldur/form';
+import { DateField } from '@waldur/form/DateField';
 import { EmailField } from '@waldur/form/EmailField';
 import { FormContainer } from '@waldur/form/FormContainer';
 import { StringField } from '@waldur/form/StringField';
@@ -181,6 +187,30 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
             ) : // Service provider
             props.resolve.name === 'description' ? (
               <TextField name="description" label={translate('Description')} />
+            ) : // Billing details
+            props.resolve.name === 'accounting_start_date' ? (
+              <DateField
+                name="accounting_start_date"
+                label={translate('Accounting start date')}
+              />
+            ) : props.resolve.name === 'bank_name' ? (
+              <StringField name="bank_name" label={translate('Bank name')} />
+            ) : props.resolve.name === 'bank_account' ? (
+              <StringField
+                name="bank_account"
+                label={translate('Bank account')}
+              />
+            ) : // Billing tax
+            props.resolve.name === 'vat_code' ? (
+              <StringField name="vat_code" label={translate('VAT code')} />
+            ) : props.resolve.name === 'default_tax_percent' ? (
+              <NumberField
+                name="default_tax_percent"
+                label={translate('Tax percentage')}
+                unit="%"
+                min={0}
+                max={200}
+              />
             ) : null}
           </FormContainer>
         </ModalDialog>

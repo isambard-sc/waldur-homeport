@@ -146,7 +146,6 @@ export const EmailsListGroup = ({
                               name={`${user}.civil_number`}
                               placeholder={translate('e.g. EE123456789')}
                               component={InputField}
-                              className={null}
                               disabled={disabled}
                               validate={
                                 isFeatureVisible(
@@ -166,7 +165,6 @@ export const EmailsListGroup = ({
                               name={`${user}.tax_number`}
                               placeholder={translate('e.g. EE123456789')}
                               component={InputField}
-                              className={null}
                               disabled={disabled}
                               validate={
                                 isFeatureVisible(
