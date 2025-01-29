@@ -43,6 +43,8 @@ export const FieldRow = ({ item, value }) => {
           ) : (
             translate('No')
           )
+        ) : typeof value === 'object' ? (
+          <pre>{JSON.stringify(value, null, 2)}</pre>
         ) : (
           value
         )}
