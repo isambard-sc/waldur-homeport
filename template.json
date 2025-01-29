@@ -4092,11 +4092,11 @@
     "message": "Extending"
   },
   "External IP": {
-    "description": "azure/vm/AzureVirtualMachineSummary.tsx, openstack/OpenStackExternalIpsField.tsx, resource/summary/VirtualMachineSummary.tsx",
+    "description": "azure/vm/AzureVirtualMachineSummary.tsx, openstack/OpenStackExternalIpsField.tsx",
     "message": "External IP"
   },
   "External IPs": {
-    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-tenant/OpenStackRouterSummary.tsx, openstack/openstack-tenant/TenantInstancesList.tsx",
+    "description": "marketplace/resources/details/openstack-instance/InstanceMainComponent.tsx, openstack/openstack-tenant/OpenStackRouterSummary.tsx, openstack/openstack-tenant/TenantInstancesList.tsx, resource/summary/VirtualMachineSummary.tsx",
     "message": "External IPs"
   },
   "External URL": {
@@ -4324,7 +4324,7 @@
     "message": "Floating IP count"
   },
   "Floating IP": {
-    "description": "openstack/OpenStackExternalIpsField.tsx, openstack/openstack-floating-ips/FloatingIpsList.tsx",
+    "description": "openstack/OpenStackExternalIpsField.tsx, openstack/openstack-floating-ips/FloatingIpsList.tsx, resource/summary/VirtualMachineSummary.tsx",
     "message": "Floating IP"
   },
   "Floating IPs update has been scheduled.": {
@@ -11082,6 +11082,14 @@
   "Supporting documentation": {
     "description": "proposals/proposal/create/ProjectDetailsSummary.tsx",
     "message": "Supporting documentation"
+  },
+  "Supports downscaling": {
+    "description": "marketplace/offerings/actions/OfferingCreateDialog.tsx",
+    "message": "Supports downscaling"
+  },
+  "Supports pausing": {
+    "description": "marketplace/offerings/actions/OfferingCreateDialog.tsx",
+    "message": "Supports pausing"
   },
   "Suspend": {
     "description": "vmware/actions/SuspendAction.tsx",
