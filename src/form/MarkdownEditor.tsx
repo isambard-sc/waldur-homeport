@@ -29,6 +29,7 @@ import {
 } from '@mdxeditor/editor';
 import { FC, useRef } from 'react';
 
+import InsertLinkPopover from './InsertLinkPopover';
 import { FormField } from './types';
 
 import '@mdxeditor/editor/style.css';
@@ -101,7 +102,9 @@ const MarkdownEditor: FC<MarkdownEditorProps> = (props) => {
         quotePlugin(),
         headingsPlugin(),
         linkPlugin(),
-        linkDialogPlugin(),
+        linkDialogPlugin({
+          LinkDialog: () => <InsertLinkPopover />,
+        }),
         tablePlugin(),
         thematicBreakPlugin(),
         codeBlockPlugin({ defaultCodeBlockLanguage: '' }),
