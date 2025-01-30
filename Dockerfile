@@ -29,6 +29,10 @@ COPY --from=build /app/build-info/ /build-info/
 ENV API_URL="http://localhost:8080"
 ENV TITLE="Waldur | Cloud Service Management"
 
+RUN mkdir -p /tmp/nginx && \
+    chgrp -R 0 /tmp/nginx && \
+    chmod -R g=u /tmp/nginx \
+
 # replace default configuration
 RUN chgrp -R 0 /etc/nginx && \
     chmod -R g=u /etc/nginx && \
