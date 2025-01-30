@@ -43,5 +43,5 @@ COPY docker/nginx-tpl.conf /etc/nginx/nginx-tpl.conf
 COPY docker/entrypoint.sh /
 RUN chmod g+x /entrypoint.sh
 
-EXPOSE 80
+EXPOSE 8080
 CMD [ "/entrypoint.sh" ]
