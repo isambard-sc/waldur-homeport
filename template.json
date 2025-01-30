@@ -79,6 +79,10 @@
     "description": "customer/credits/constants.tsx",
     "message": "A minimum amount deducted monthly, calculated based on the end date. Updated on the start of the month."
   },
+  "A name of the shared volume to store scripts": {
+    "description": "SettingsDescription.ts",
+    "message": "A name of the shared volume to store scripts"
+  },
   "A one-time fee applied on activation.": {
     "description": "marketplace/details/plan/PlanDetailsList.tsx, marketplace/details/plan/PlanDetailsTable.tsx",
     "message": "A one-time fee applied on activation."
@@ -3278,6 +3282,10 @@
   "Display your last name on your profile": {
     "description": "user/support/UserEditRows.tsx",
     "message": "Display your last name on your profile"
+  },
+  "Do not allow user to grant multiple roles in the same project or organization using invitation.": {
+    "description": "SettingsDescription.ts",
+    "message": "Do not allow user to grant multiple roles in the same project or organization using invitation."
   },
   "Do not configure a gateway for this subnet": {
     "description": "openstack/openstack-network/actions/CreateSubnetDialog.tsx",

@@ -52,6 +52,16 @@ export const UsageCard = ({ resource }) => {
     [resourceRef, period],
   );
 
+  const usersFilterOptions = useMemo(() => {
+    if (!team?.length || !value?.userUsages?.length) return [];
+    return team.filter((user) =>
+      value.userUsages.some(
+        (record) =>
+          record.username === user.offering_user_username && record.usage > 0,
+      ),
+    );
+  }, [team, value]);
+
   return resource.is_usage_based || resource.is_limit_based ? (
     <Card className="card-bordered">
       <Card.Header>
@@ -61,7 +71,7 @@ export const UsageCard = ({ resource }) => {
         <div className="card-toolbar gap-4">
           {teamError ? (
             <LoadingErred message={translate('Error')} loadData={refetchTeam} />
-          ) : (
+          ) : usersFilterOptions.length > 0 ? (
             <Select
               getOptionValue={(option) => option.uuid}
               getOptionLabel={(option) => option.full_name}
@@ -69,12 +79,12 @@ export const UsageCard = ({ resource }) => {
               isMulti
               placeholder={translate('All users')}
               onChange={(value) => setUsers(value)}
-              options={team || []}
+              options={usersFilterOptions}
               isLoading={teamIsLoading}
               className="metronic-select-container min-w-150px min-w-lg-200px"
               classNamePrefix="metronic-select"
             />
-          )}
+          ) : null}
           {periodOptions.length > 1 && (
             <ToggleButtonGroup
               type="radio"
