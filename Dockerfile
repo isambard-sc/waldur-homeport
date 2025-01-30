@@ -31,7 +31,7 @@ ENV TITLE="Waldur | Cloud Service Management"
 
 RUN mkdir -p /tmp/nginx && \
     chgrp -R 0 /tmp/nginx && \
-    chmod -R g=u /tmp/nginx \
+    chmod -R g=u /tmp/nginx
 
 # replace default configuration
 RUN chgrp -R 0 /etc/nginx && \
