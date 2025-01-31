@@ -8,11 +8,11 @@ import { FilterBox } from '@waldur/form/FilterBox';
 import { translate } from '@waldur/i18n';
 import { setMarketplaceFilter } from '@waldur/marketplace/landing/filter/store/actions';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
-import { ALL_RESOURCES_TABLE_ID } from '@waldur/marketplace/resources/list/constants';
 import { ProjectFilter } from '@waldur/marketplace/resources/list/ProjectFilter';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { selectFiltersStorage } from '@waldur/table/selectors';
 import { Customer, Project } from '@waldur/workspace/types';
+
+import { sidebarResourcesFilterSelector } from '../resources-filter/utils';
 
 import { DataLoader } from './DataLoader';
 
@@ -41,13 +41,7 @@ export const MarketplacePopup = reduxForm<FormData, MarketplacePopupProps>({
   const formValues = useSelector(getFormValues(props.form)) as FormData;
 
   // Apply active sidebar resources filters
-  const sidebarResourcesFilters = useSelector((state: any) => {
-    const filters = selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID);
-    if (!filters?.length) return null;
-    const project = filters.find((item) => item.name === 'project');
-    const organization = filters.find((item) => item.name === 'organization');
-    return { project: project?.value, organization: organization?.value };
-  });
+  const sidebarResourcesFilters = useSelector(sidebarResourcesFilterSelector);
 
   // Init filters (if exists)
   // props.resolve filter is preferred over sidebar resources filter
