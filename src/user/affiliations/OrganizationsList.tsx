@@ -23,6 +23,7 @@ import { getUser } from '@waldur/workspace/selectors';
 
 import { CUSTOMERS_FILTER_FORM_ID } from '../constants';
 
+import { OrganizationExpandableRow } from './OrganizationExpandableRow';
 import { OrganizationNameField } from './OrganizationNameField';
 
 const mapStateToFilter = createSelector(
@@ -59,6 +60,7 @@ const mandatoryFields = [
   'customer_credit',
   'billing_price_estimate',
   'organization_groups',
+  'url', // Expand view - to create project
 ];
 
 export const OrganizationsList: FunctionComponent = () => {
@@ -308,6 +310,8 @@ export const OrganizationsList: FunctionComponent = () => {
       tableActions={<OrganizationCreateButton />}
       filters={<OrganizationsFilter />}
       hasOptionalColumns
+      expandableRowClassName="py-2 pe-2"
+      expandableRow={OrganizationExpandableRow}
     />
   );
 };

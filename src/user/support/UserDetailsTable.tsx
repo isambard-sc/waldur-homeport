@@ -1,10 +1,11 @@
 import { FunctionComponent } from 'react';
-import { Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { FieldWithCopy } from '@waldur/core/FieldWithCopy';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { UserFeatures } from '@waldur/FeaturesEnums';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { getNativeNameVisible } from '@waldur/store/config';
 import { type RootState } from '@waldur/store/reducers';
@@ -14,8 +15,6 @@ import {
 } from '@waldur/user/support/utils';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
 import { UserDetails } from '@waldur/workspace/types';
-
-import { Row } from './Row';
 
 interface OwnProps {
   user: UserDetails;
@@ -27,66 +26,86 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
   const isVisible = useSelector((state: RootState) => isStaffOrSupport(state));
 
   return (
-    <Table responsive={true} bordered={true} className="text-gray-700 px-0">
-      <tbody>
-        <Row label={translate('Full name')} value={props.user.full_name} />
-        {getNativeNameVisible() && (
-          <Row
-            label={translate('Native name')}
-            value={props.user.native_name}
-          />
-        )}
-        <Row label={translate('ID code')} value={props.user.civil_number} />
-        <Row
-          label={translate('Phone numbers')}
-          value={props.user.phone_number}
+    <FormTable hideActions alignTop detailsMode className="gy-5">
+      <FormTable.Item
+        label={translate('Full name')}
+        value={<FieldWithCopy value={props.user.full_name} />}
+      />
+      {getNativeNameVisible() && (
+        <FormTable.Item
+          label={translate('Native name')}
+          value={<FieldWithCopy value={props.user.native_name} />}
         />
-        <Row label={translate('Username')} value={props.user.username} />
-        <Row label={translate('Email')} value={props.user.email} />
-        {isFeatureVisible(UserFeatures.show_slug) && (
-          <Row label={translate('Shortname')} value={props.user.slug} />
-        )}
-        <Row
+      )}
+      <FormTable.Item
+        label={translate('ID code')}
+        value={<FieldWithCopy value={props.user.civil_number} />}
+      />
+      <FormTable.Item
+        label={translate('Phone numbers')}
+        value={<FieldWithCopy value={props.user.phone_number} />}
+      />
+      <FormTable.Item
+        label={translate('Username')}
+        value={<FieldWithCopy value={props.user.username} />}
+      />
+      <FormTable.Item
+        label={translate('Email')}
+        value={<FieldWithCopy value={props.user.email} />}
+      />
+      {isFeatureVisible(UserFeatures.show_slug) && (
+        <FormTable.Item
+          label={translate('Shortname')}
+          value={<FieldWithCopy value={props.user.slug} />}
+        />
+      )}
+      {isFeatureVisible(UserFeatures.preferred_language) && (
+        <FormTable.Item
           label={translate('Preferred language')}
           value={props.user.preferred_language}
-          isVisible={isFeatureVisible(UserFeatures.preferred_language)}
         />
-        <Row
-          label={translate('Registration method')}
-          value={props.user.identity_provider_label}
+      )}
+      <FormTable.Item
+        label={translate('Registration method')}
+        value={<FieldWithCopy value={props.user.identity_provider_label} />}
+      />
+      <FormTable.Item
+        label={translate('Date joined')}
+        value={<FieldWithCopy value={formatDateTime(props.user.date_joined)} />}
+      />
+      <FormTable.Item
+        label={translate('Organization')}
+        value={<FieldWithCopy value={props.user.organization} />}
+      />
+      <FormTable.Item
+        label={translate('Job position')}
+        value={<FieldWithCopy value={props.user.job_title} />}
+      />
+      {Array.isArray(props.user.affiliations) &&
+      props.user.affiliations.length > 0 ? (
+        <FormTable.Item
+          label={translate('Affiliations')}
+          value={<FieldWithCopy value={props.user.affiliations.join(', ')} />}
         />
-        <Row
-          label={translate('Date joined')}
-          value={formatDateTime(props.user.date_joined)}
-        />
-        <Row
-          label={translate('Organization')}
-          value={props.user.organization}
-        />
-        <Row label={translate('Job position')} value={props.user.job_title} />
-        {Array.isArray(props.user.affiliations) &&
-        props.user.affiliations.length > 0 ? (
-          <Row
-            label={translate('Affiliations')}
-            value={props.user.affiliations.join(', ')}
-          />
-        ) : null}
-        <Row
+      ) : null}
+      {isVisible && (
+        <FormTable.Item
           label={translate('User type')}
           value={formatUserStatus(props.user)}
-          isVisible={isVisible}
         />
-        <Row
+      )}
+      {isVisible && (
+        <FormTable.Item
           label={translate('Account status')}
           value={formatUserIsActive(props.user)}
-          isVisible={isVisible}
         />
-        <Row
+      )}
+      {props.profile?.is_active && (
+        <FormTable.Item
           label={translate('FreeIPA')}
-          value={props.profile?.username}
-          isVisible={props.profile?.is_active}
+          value={<FieldWithCopy value={props.profile?.username} />}
         />
-      </tbody>
-    </Table>
+      )}
+    </FormTable>
   );
 };

@@ -1,8 +1,9 @@
 import { Plus } from '@phosphor-icons/react';
 import { groupBy, isEmpty } from 'lodash-es';
 import { Fragment, useCallback, useEffect, useRef } from 'react';
-import { Badge, Button, Col, Nav, Row, Tab } from 'react-bootstrap';
+import { Button, Col, Nav, Row, Tab } from 'react-bootstrap';
 
+import { Badge } from '@waldur/core/Badge';
 import { translate } from '@waldur/i18n';
 
 import { useFavoritePages } from '../favorite-pages/FavoritePageService';
@@ -383,7 +384,7 @@ export const SearchPopover = ({
               <Nav.Link eventKey="all">
                 {translate('All results')}
                 {Boolean(result.data) && (
-                  <Badge bg={null} className="badge-pill ms-2">
+                  <Badge variant="default" outline pill className="ms-2">
                     {result.data.resultsCount}
                   </Badge>
                 )}
@@ -393,7 +394,7 @@ export const SearchPopover = ({
               <Nav.Link eventKey="organizations">
                 {translate('Organizations')}
                 {Boolean(result.data) && (
-                  <Badge bg={null} className="badge-pill ms-2">
+                  <Badge variant="default" outline pill className="ms-2">
                     {result.data.customersCount}
                   </Badge>
                 )}
@@ -403,7 +404,7 @@ export const SearchPopover = ({
               <Nav.Link eventKey="projects">
                 {translate('Projects')}
                 {Boolean(result.data) && (
-                  <Badge bg={null} className="badge-pill ms-2">
+                  <Badge variant="default" outline pill className="ms-2">
                     {result.data.projectsCount}
                   </Badge>
                 )}
@@ -413,7 +414,7 @@ export const SearchPopover = ({
               <Nav.Link eventKey="resources">
                 {translate('Resources')}
                 {Boolean(result.data) && (
-                  <Badge bg={null} className="badge-pill ms-2">
+                  <Badge variant="default" outline pill className="ms-2">
                     {result.data.resourcesCount}
                   </Badge>
                 )}

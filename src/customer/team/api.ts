@@ -1,5 +1,12 @@
+import Axios from 'axios';
+
 import { ENV } from '@waldur/configs/default';
-import { getSelectData, post } from '@waldur/core/api';
+import {
+  fixURL,
+  getSelectData,
+  parseResultCount,
+  post,
+} from '@waldur/core/api';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 
 export const closeReview = (reviewId: string) =>
@@ -32,3 +39,8 @@ export const usersAutocomplete = async (
     currentPage,
   );
 };
+
+export const getCustomerUsersCount = (customerUuid) =>
+  Axios.head(fixURL(`/customers/${customerUuid}/users/`)).then(
+    parseResultCount,
+  );
