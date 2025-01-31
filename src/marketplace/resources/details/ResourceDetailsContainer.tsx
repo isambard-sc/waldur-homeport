@@ -12,6 +12,7 @@ import {
   usePageHero,
   useToolbarActions,
 } from '@waldur/navigation/context';
+import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
@@ -45,6 +46,9 @@ export const ResourceDetailsContainer: FunctionComponent<{}> = () => {
 
   useTitle(data?.resource.name);
 
+  const { getOrganizationBreadcrumbItem, getProjectBreadcrumbItem } =
+    usePresetBreadcrumbItems();
+
   const breadcrumbItems = useMemo<IBreadcrumbItem[]>(() => {
     if (!data?.resource) return [];
     return [
@@ -53,14 +57,10 @@ export const ResourceDetailsContainer: FunctionComponent<{}> = () => {
         text: translate('Organizations'),
         to: 'organizations',
       },
-      {
-        key: 'organization.dashboard',
-        text: data.resource.customer_name,
-        to: 'organization.dashboard',
-        params: { uuid: data.resource.customer_uuid },
-        ellipsis: 'xl',
-        maxLength: 11,
-      },
+      getOrganizationBreadcrumbItem({
+        uuid: data.resource.customer_uuid,
+        name: data.resource.customer_name,
+      }),
       {
         key: 'organization.projects',
         text: translate('Projects'),
@@ -68,14 +68,12 @@ export const ResourceDetailsContainer: FunctionComponent<{}> = () => {
         params: { uuid: data.resource.customer_uuid },
         ellipsis: 'md',
       },
-      {
-        key: 'project.dashboard',
-        text: data.resource.project_name,
-        to: 'project.dashboard',
-        params: { uuid: data.resource.project_uuid },
-        ellipsis: 'xl',
-        maxLength: 11,
-      },
+      getProjectBreadcrumbItem({
+        uuid: data.resource.project_uuid,
+        name: data.resource.project_name,
+        customer_uuid: data.resource.customer_uuid,
+        customer_name: data.resource.customer_name,
+      }),
       {
         key: 'project.resources',
         text: data.resource.category_title,

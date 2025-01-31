@@ -17,7 +17,7 @@ import { RoleEnum } from '@waldur/permissions/enums';
 import { getProtectedCall } from '../api';
 import { CallTabs } from '../details/CallTabs';
 import { TeamSection } from '../team/TeamSection';
-import { getCallBreadcrumbItems } from '../utils';
+import { useCallBreadcrumbItems } from '../utils';
 
 import { CallUpdateHero } from './CallUpdateHero';
 import { CallDocumentsSection } from './documents/CallDocumentsSection';
@@ -96,7 +96,7 @@ const Body = ({ call, refetch, loading }) => {
 
   usePageHero(<PageHero call={call} refetch={refetch} />);
 
-  const breadcrumbItems = useMemo(() => getCallBreadcrumbItems(call), [call]);
+  const breadcrumbItems = useCallBreadcrumbItems(call);
   useBreadcrumbs(breadcrumbItems);
 
   const {
