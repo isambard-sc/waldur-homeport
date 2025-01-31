@@ -48,6 +48,9 @@ const useFilters = () => {
       if (filterValues.project) {
         filter.project_uuid = filterValues.project.uuid;
       }
+      if (filterValues.offering) {
+        filter.offering_uuid = filterValues.offering.uuid;
+      }
     }
     return filter;
   }, [filterValues]);
@@ -71,16 +74,18 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
       const query = String(request.filter.query || '').trim();
       const providerUuid = request.filter?.provider_uuid;
       const projectUuid = request.filter?.project_uuid;
+      const offeringUuid = request.filter?.offering_uuid;
 
       const rows = groupInvoiceItems(invoice.items).filter(
         (item) =>
           (!query || item.resource_name.includes(query)) &&
           (!providerUuid || item.service_provider_uuid === providerUuid) &&
-          (!projectUuid || item.project_uuid === projectUuid),
+          (!projectUuid || item.project_uuid === projectUuid) &&
+          (!offeringUuid || item.offering_uuid === offeringUuid),
       );
 
       if (setTotalFiltered) {
-        if (query || providerUuid || projectUuid) {
+        if (query || providerUuid || projectUuid || offeringUuid) {
           const totalFiltered = invoiceView
             ? rows.reduce((acc, item) => acc + item.total, 0)
             : rows.reduce((acc, item) => acc + item.price, 0);
@@ -106,6 +111,11 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
           render: ({ row }) => (
             <ResourceLink uuid={row.resource_uuid} label={row.resource_name} />
           ),
+        },
+        {
+          title: translate('Offering'),
+          render: ({ row }) => <>{row.offering_name}</>,
+          filter: 'offering',
         },
         {
           title: translate('Project name'),

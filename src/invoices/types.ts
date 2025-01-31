@@ -1,4 +1,4 @@
-import { ServiceProvider } from '@waldur/marketplace/types';
+import { Offering, ServiceProvider } from '@waldur/marketplace/types';
 import { Customer, Project } from '@waldur/workspace/types';
 
 export interface InvoiceItem {
@@ -46,6 +46,8 @@ export interface Invoice {
 export interface InvoiceTableItem {
   resource_name: string;
   resource_uuid: string;
+  offering_name: string;
+  offering_uuid: string;
   project_name: string;
   project_uuid: string;
   service_provider_name: string;
@@ -60,4 +62,5 @@ export interface InvoiceTableItem {
 export interface InvoiceItemsFilterData {
   provider: ServiceProvider;
   project: Project;
+  offering: Offering;
 }
