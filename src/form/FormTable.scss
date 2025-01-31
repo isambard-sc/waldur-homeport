@@ -12,13 +12,14 @@
 
   tr:not(:last-child) {
     border-bottom: 1px solid var(--bs-border-color);
+    td {
+      border-bottom: 1px solid var(--bs-border-color);
+    }
   }
 
   th,
   td {
     font-size: 1.075rem;
-    padding-top: 1.6rem;
-    padding-bottom: 1.6rem;
     vertical-align: middle;
   }
 
@@ -43,18 +44,32 @@
     padding-top: 1rem;
     padding-bottom: 1rem;
   }
-}
 
-.table.form-table.details-table {
-  th,
-  td {
-    font-size: 1.075rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    vertical-align: middle;
-    width: auto;
+  &.hide-actions {
+    .col-actions {
+      display: none;
+    }
+    th,
+    td {
+      width: auto;
+    }
   }
-  .col-actions {
-    display: none;
+
+  &.align-top {
+    th,
+    td {
+      vertical-align: top !important;
+    }
+  }
+
+  &.details-mode {
+    .title {
+      color: var(--bs-gray-700);
+      font-weight: 600;
+    }
+    .value {
+      color: var(--bs-grey-500);
+      font-weight: 400;
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
@@ -10,10 +10,11 @@ import { ProjectsListActions } from '@waldur/project/ProjectsListActions';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
-import { Column } from '@waldur/table/types';
+import { Column, TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { formatLongText } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
+import { Customer } from '@waldur/workspace/types';
 
 import { ProjectCreateButton } from './create/ProjectCreateButton';
 import { ProjectCostField } from './ProjectCostField';
@@ -29,17 +30,26 @@ const mandatoryFields = [
   'backend_id', // Expandable view
 ];
 
-export const ProjectsList: FunctionComponent<{}> = () => {
-  const customer = useSelector(getCustomer);
+interface ProjectsListProps extends Partial<TableProps> {
+  customer?: Customer;
+  optionalColumns?: ('description' | 'created')[];
+}
+
+export const ProjectsList: FC<ProjectsListProps> = ({
+  customer,
+  optionalColumns = [],
+  ...props
+}) => {
+  const currentCustomer = useSelector(getCustomer);
   const filter = useMemo(
     () => ({
-      customer: customer.uuid,
+      customer: customer ? customer.uuid : currentCustomer.uuid,
       o: 'name',
     }),
-    [customer],
+    [currentCustomer, customer],
   );
-  const props = useTable({
-    table: PROJECTS_LIST,
+  const tableProps = useTable({
+    table: props.table || PROJECTS_LIST,
     fetchData: createFetcher('projects'),
     queryField: 'query',
     filter,
@@ -61,6 +71,7 @@ export const ProjectsList: FunctionComponent<{}> = () => {
       export: 'description',
       id: 'description',
       keys: ['description'],
+      optional: optionalColumns.includes('description'),
     },
     {
       title: translate('Created'),
@@ -70,6 +81,7 @@ export const ProjectsList: FunctionComponent<{}> = () => {
       exportKeys: ['created'],
       id: 'created',
       keys: ['created'],
+      optional: optionalColumns.includes('created'),
     },
     {
       title: translate('Start date'),
@@ -105,20 +117,21 @@ export const ProjectsList: FunctionComponent<{}> = () => {
 
   return (
     <Table
-      {...props}
+      {...tableProps}
       title={translate('Projects')}
       columns={columns}
       verboseName={translate('projects')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       hasQuery={true}
       showPageSizeSelector={true}
-      tableActions={<ProjectCreateButton refetch={props.fetch} />}
+      tableActions={<ProjectCreateButton refetch={tableProps.fetch} />}
       rowActions={({ row }) => (
-        <ProjectsListActions project={row} refetch={props.fetch} />
+        <ProjectsListActions project={row} refetch={tableProps.fetch} />
       )}
       expandableRow={ProjectExpandableRowContainer}
       enableExport={true}
       hasOptionalColumns
+      {...props}
     />
   );
 };

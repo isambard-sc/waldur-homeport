@@ -15,8 +15,8 @@ export const getCustomersCount = () =>
     parseResultCount(response),
   );
 
-export const getProjectsCount = () =>
-  Axios.head(`${ENV.apiEndpoint}api/projects/`).then((response) =>
+export const getProjectsCount = (configs?: AxiosRequestConfig<any>) =>
+  Axios.head(`${ENV.apiEndpoint}api/projects/`, configs).then((response) =>
     parseResultCount(response),
   );
 

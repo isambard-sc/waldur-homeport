@@ -28,7 +28,7 @@ const FormTableItem: FC<FormTableItemProps> = ({ actions, ...props }) => {
     <tr className={classNames(props.disabled && 'opacity-50')}>
       {props.description ? (
         <th className="col-md-4">
-          <div className="fw-bolder">
+          <div className="title fw-bolder">
             {props.label}
             {Boolean(props.warnTooltip) &&
               wrapTooltip(
@@ -40,10 +40,10 @@ const FormTableItem: FC<FormTableItemProps> = ({ actions, ...props }) => {
                 />,
               )}
           </div>
-          <div className="fw-normal">{props.description}</div>
+          <div className="description fw-normal">{props.description}</div>
         </th>
       ) : props.label ? (
-        <th className="col-md-3">
+        <th className="title col-md-3">
           {props.label}:{' '}
           {Boolean(props.warnTooltip) &&
             wrapTooltip(
@@ -52,7 +52,7 @@ const FormTableItem: FC<FormTableItemProps> = ({ actions, ...props }) => {
             )}
         </th>
       ) : null}
-      <td className="col-md" colSpan={props.label ? undefined : 2}>
+      <td className="value col-md" colSpan={props.label ? undefined : 2}>
         {props.value}
       </td>
       <td className="col-md-auto col-actions">
@@ -93,7 +93,17 @@ const FormTableCard: FormTableCardProps = (props) => {
   );
 };
 
-const FormTable: FC<PropsWithChildren<{ detailsTable?: boolean }>> & {
+interface FormTableProps {
+  hideActions?: boolean;
+  /** Bold titles and muted values */
+  detailsMode?: boolean;
+  alignTop?: boolean;
+  className?: string;
+}
+
+const TABLE_GY_SPACE_REGEX = /(?<=\s|^)(g[y]?-([1-9]\d*))( ?)(?=\s|$)/;
+
+const FormTable: FC<PropsWithChildren<FormTableProps>> & {
   Item: FC<FormTableItemProps>;
   Card: FormTableCardProps;
 } = (props) => {
@@ -103,7 +113,11 @@ const FormTable: FC<PropsWithChildren<{ detailsTable?: boolean }>> & {
       responsive={true}
       className={classNames(
         'form-table',
-        props.detailsTable && 'details-table',
+        props.hideActions && 'hide-actions',
+        props.detailsMode && 'details-mode',
+        props.alignTop && 'align-top',
+        !TABLE_GY_SPACE_REGEX.test(props.className) && 'gy-6',
+        props.className,
       )}
     >
       <tbody>{props.children}</tbody>
