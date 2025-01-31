@@ -2,6 +2,7 @@ import { reduxForm } from 'redux-form';
 
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
+import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
 import { ProviderAutocomplete } from '@waldur/marketplace/orders/ProviderAutocomplete';
 import { ProjectFilter } from '@waldur/marketplace/resources/list/ProjectFilter';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
@@ -31,6 +32,13 @@ export const InvoiceItemsFilter = reduxForm<any, { customerUuid? }>({
           reactSelectProps={REACT_SELECT_TABLE_FILTER}
           customer_uuid={props.customerUuid}
         />
+      </TableFilterItem>
+      <TableFilterItem
+        title={translate('Offering')}
+        name="offering"
+        badgeValue={(value) => value?.name}
+      >
+        <OfferingAutocomplete reactSelectProps={REACT_SELECT_TABLE_FILTER} />
       </TableFilterItem>
     </>
   );
