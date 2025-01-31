@@ -1,5 +1,5 @@
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 import { useAsyncFn, useEffectOnce } from 'react-use';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -13,7 +13,7 @@ import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
 import { getPublicCall } from '../api';
-import { getCallBreadcrumbItems } from '../utils';
+import { useCallBreadcrumbItems } from '../utils';
 
 import { CallTabs } from './CallTabs';
 import { PublicCallDetailsHero } from './PublicCallDetailsHero';
@@ -88,7 +88,7 @@ export const PublicCallDetailsContainer: FunctionComponent = () => {
 
   usePageHero(<PageHero call={value} />);
 
-  const breadcrumbItems = useMemo(() => getCallBreadcrumbItems(value), [value]);
+  const breadcrumbItems = useCallBreadcrumbItems(value);
   useBreadcrumbs(breadcrumbItems);
 
   const { tabSpec } = usePageTabsTransmitter(
