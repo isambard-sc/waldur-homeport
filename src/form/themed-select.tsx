@@ -120,6 +120,7 @@ const MultiSelectLimitedValueContainer = (props) => {
 export const REACT_SELECT_TABLE_FILTER: Partial<SelectProps> = {
   className: 'metronic-select-container',
   classNamePrefix: 'metronic-select',
+  autoFocus: true,
   menuIsOpen: true,
   components: {
     Control: FilterSelectControl,
