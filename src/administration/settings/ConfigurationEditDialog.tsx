@@ -128,6 +128,14 @@ export const ConfigurationEditDialog = reduxForm<
               height={100}
               label={item.description}
             />
+          ) : item.type === 'dict_field' ? (
+            <MonacoField
+              name="value"
+              language="json"
+              format={(value) => (value ? JSON.stringify(value, null, 2) : '')}
+              height={100}
+              label={item.description}
+            />
           ) : item.type === 'text_field' ? (
             <TextField name="value" label={item.description} />
           ) : item.key === 'SIDEBAR_STYLE' ? (
