@@ -107,7 +107,6 @@ export interface Offering extends GeolocationPoint {
   terms_of_service_link?: string;
   privacy_policy_link?: string;
   access_url?: string;
-  rating: number;
   roles?: any[];
   order_count: number;
   reviews: number;

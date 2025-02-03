@@ -45,11 +45,6 @@ const PublicOfferingFAQ = lazyComponent(() =>
     default: module.PublicOfferingFAQ,
   })),
 );
-const PublicOfferingReviews = lazyComponent(() =>
-  import('./details/PublicOfferingReviews').then((module) => ({
-    default: module.PublicOfferingReviews,
-  })),
-);
 const PublicOfferingPricing = lazyComponent(() =>
   import('./details/PublicOfferingPricing').then((module) => ({
     default: module.PublicOfferingPricing,
@@ -118,13 +113,6 @@ const getTabs = (offering?): PageBarTab[] => {
           title: translate('FAQ'),
           key: 'faq',
           component: PublicOfferingFAQ,
-        }
-      : null,
-    showExperimentalUiComponents
-      ? {
-          title: translate('Reviews'),
-          key: 'reviews',
-          component: PublicOfferingReviews,
         }
       : null,
     offering.latitude && offering.longitude
