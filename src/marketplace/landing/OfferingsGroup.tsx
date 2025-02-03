@@ -21,7 +21,6 @@ const field = [
   'description',
   'thumbnail',
   'image',
-  'rating',
   'order_count',
   'category_uuid',
   'attributes',
