@@ -1,96 +1,92 @@
-import { Button, Card } from 'react-bootstrap';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { InjectedFormProps, reduxForm } from 'redux-form';
+import { FC, useMemo } from 'react';
 
-import { NumberField, StringField, SubmitButton } from '@waldur/form';
-import { DateField } from '@waldur/form/DateField';
-import { FormSectionContainer } from '@waldur/form/FormSectionContainer';
+import { formatDate } from '@waldur/core/dateUtils';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { type RootState } from '@waldur/store/reducers';
 
+import { FieldEditButton } from './FieldEditButton';
 import { CustomerEditPanelProps } from './types';
 
-const enhance = compose(
-  connect((_: RootState, ownProps: CustomerEditPanelProps) => {
-    const customer = ownProps.customer;
-    const initialValues = {
-      accounting_start_date: customer.accounting_start_date,
-      bank_name: customer.bank_name,
-      bank_account: customer.bank_account,
-      vat_code: customer.vat_code,
-      default_tax_percent: customer.default_tax_percent,
-    };
-    return { initialValues };
-  }),
-  reduxForm({
-    form: 'organizationBillingEdit',
-  }),
-);
-
-type OwnProps = CustomerEditPanelProps & InjectedFormProps;
-
-export const CustomerBillingPanel = enhance((props: OwnProps) => {
-  return (
-    <Card id="billing" className="card-bordered">
-      <Card.Header>
-        <Card.Title>
-          <h3>{translate('Billing')}</h3>
-        </Card.Title>
-      </Card.Header>
-      <Card.Body>
-        <form onSubmit={props.handleSubmit(props.callback)}>
-          <FormSectionContainer
-            label={translate('Details') + ':'}
-            submitting={props.submitting}
-          >
-            <DateField
-              name="accounting_start_date"
-              label={translate('Accounting start date')}
-            />
-            <StringField name="bank_name" label={translate('Bank name')} />
-            <StringField
-              name="bank_account"
-              label={translate('Bank account')}
-            />
-          </FormSectionContainer>
-          <FormSectionContainer
-            label={translate('Tax') + ':'}
-            submitting={props.submitting}
-          >
-            <StringField name="vat_code" label={translate('VAT code')} />
-            <NumberField
-              name="default_tax_percent"
-              label={translate('Tax percentage')}
-              unit="%"
-              min={0}
-              max={200}
-            />
-          </FormSectionContainer>
-
-          {props.dirty && (
-            <div className="pull-right">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="me-2"
-                onClick={props.reset}
-              >
-                {translate('Discard')}
-              </Button>
-              <SubmitButton
-                className="btn btn-primary btn-sm me-2"
-                submitting={props.submitting}
-                label={
-                  props.canUpdate
-                    ? translate('Save changes')
-                    : translate('Propose changes')
-                }
-              />
-            </div>
-          )}
-        </form>
-      </Card.Body>
-    </Card>
+export const CustomerBillingPanel: FC<CustomerEditPanelProps> = (props) => {
+  const detailsRows = useMemo(
+    () => [
+      {
+        label: translate('Accounting start date'),
+        key: 'accounting_start_date',
+        value: formatDate(props.customer.accounting_start_date),
+      },
+      {
+        label: translate('Bank name'),
+        key: 'bank_name',
+        value: props.customer.bank_name,
+      },
+      {
+        label: translate('Bank account'),
+        key: 'bank_account',
+        value: props.customer.bank_account,
+      },
+    ],
+    [props.customer],
   );
-});
+
+  const taxRows = useMemo(
+    () => [
+      {
+        label: translate('VAT code'),
+        key: 'vat_code',
+        value: props.customer.vat_code,
+      },
+      {
+        label: translate('Tax percentage'),
+        key: 'default_tax_percent',
+        value: props.customer.default_tax_percent,
+      },
+    ],
+    [props.customer],
+  );
+
+  return (
+    <>
+      <FormTable.Card
+        title={translate('Details')}
+        className="card-bordered mb-5"
+      >
+        <FormTable>
+          {detailsRows.map((row) => (
+            <FormTable.Item
+              key={row.key}
+              label={row.label}
+              value={row.value || 'N/A'}
+              actions={
+                <FieldEditButton
+                  customer={props.customer}
+                  name={row.key}
+                  callback={props.callback}
+                />
+              }
+            />
+          ))}
+        </FormTable>
+      </FormTable.Card>
+
+      <FormTable.Card title={translate('Tax')} className="card-bordered">
+        <FormTable>
+          {taxRows.map((row) => (
+            <FormTable.Item
+              key={row.key}
+              label={row.label}
+              value={row.value || 'N/A'}
+              actions={
+                <FieldEditButton
+                  customer={props.customer}
+                  name={row.key}
+                  callback={props.callback}
+                />
+              }
+            />
+          ))}
+        </FormTable>
+      </FormTable.Card>
+    </>
+  );
+};

@@ -20,6 +20,8 @@ export const groupInvoiceItems = (items: InvoiceItem[]): InvoiceTableItem[] => {
         resource_name:
           item.resource_name || item.details.resource_name || item.name,
         resource_uuid: resourceKey,
+        offering_name: item.details.offering_name,
+        offering_uuid: item.details.offering_uuid,
         project_name: item.project_name,
         project_uuid: item.project_uuid,
         service_provider_name: item.details.service_provider_name,

@@ -70,6 +70,9 @@
         padding-top: 16px;
         padding-bottom: 16px;
       }
+      .table-pagination {
+        padding-top: 0.5rem;
+      }
     }
   }
   thead > tr > th.header-actions {
@@ -190,6 +193,10 @@
 
 /* TABLE IN CARD */
 .card.card-table {
+  table {
+    margin-bottom: 0;
+  }
+
   &:not(.card-bordered) {
     border: unset;
   }
@@ -300,7 +307,10 @@
     }
 
     .table-pagination {
-      padding: 0 $card-px !important;
+      padding-left: $card-px !important;
+      padding-right: $card-px !important;
+      padding-top: $card-py;
+      border-top: 1px solid $border-color;
 
       .page-item {
         .page-link {
@@ -312,7 +322,7 @@
         .page-link:hover,
         &.active .page-link {
           color: $primary;
-          background-color: $primary-50;
+          background-color: $primary-100;
         }
       }
 

@@ -1,8 +1,8 @@
 import { Field } from 'redux-form';
 
 import { required } from '@waldur/core/validators';
-import { WysiwygEditor } from '@waldur/core/WysiwygEditor';
 import { InputField } from '@waldur/form/InputField';
+import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { translate } from '@waldur/i18n';
 
 import { ArticleCodeField } from '../../ArticleCodeField';
@@ -24,7 +24,7 @@ export const PlanForm = () => (
       <PlanBillingPeriodField />
     </FormGroup>
     <FormGroup label={translate('Description')}>
-      <Field name="description" component={WysiwygEditor} />
+      <Field name="description" component={MarkdownEditor} />
     </FormGroup>
     <ArticleCodeField />
   </>

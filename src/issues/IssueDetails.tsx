@@ -1,5 +1,5 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
@@ -24,7 +24,7 @@ import { IssueAttachmentsContainer } from './attachments/IssueAttachmentsContain
 import { IssueCommentsContainer } from './comments/IssueCommentsContainer';
 import { IssueInfoButton } from './IssueInfo';
 import { IssueStatus } from './IssueStatus';
-import { getIssueBreadcrumbItems } from './utils';
+import { useIssueBreadcrumbItems } from './utils';
 
 const loadIssue = (id) => getById<any>('/support-issues/', id);
 
@@ -66,10 +66,8 @@ export const IssueDetails: FunctionComponent = () => {
     value: issue,
   } = useAsync(() => loadDependencies(issue_uuid));
 
-  const breadcrumbItems = useMemo(
-    () => getIssueBreadcrumbItems(issue),
-    [issue],
-  );
+  const breadcrumbItems = useIssueBreadcrumbItems(issue);
+
   useBreadcrumbs(breadcrumbItems);
 
   if (loading) {

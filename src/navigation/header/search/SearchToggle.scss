@@ -8,20 +8,6 @@
     padding-right: 0.54rem;
   }
 
-  .nav.nav-tabs {
-    .nav-item .nav-link {
-      .badge {
-        background-color: var(--bs-gray-200);
-        color: var(--bs-gray-800);
-        font-weight: 500;
-      }
-      &.active .badge {
-        color: var(--bs-active-primary);
-        background-color: var(--bs-primary-100);
-      }
-    }
-  }
-
   .popover-arrow {
     display: none;
   }

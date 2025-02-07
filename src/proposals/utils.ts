@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon';
+import { useMemo } from 'react';
 
 import { translate } from '@waldur/i18n';
+import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { RoleEnum } from '@waldur/permissions/enums';
 import {
@@ -185,31 +187,39 @@ export const checkIsCallManager = (call: Call, user: User): boolean =>
       permission.role_name === RoleEnum.CALL_MANAGER,
   );
 
-export const getCallBreadcrumbItems = (call: Call): IBreadcrumbItem[] => [
-  {
-    key: 'organizations',
-    text: translate('Organizations'),
-    to: 'organizations',
-  },
-  {
-    key: 'organization.dashboard',
-    text: call?.customer_name || '...',
-    to: 'organization.dashboard',
-    params: call ? { uuid: call.customer_uuid } : undefined,
-    ellipsis: 'xl',
-    maxLength: 11,
-  },
-  {
-    key: 'call-list',
-    text: translate('Calls for proposals'),
-    to: 'call-management.call-list',
-    params: call ? { uuid: call.customer_uuid } : undefined,
-    ellipsis: 'xl',
-  },
-  {
-    key: 'call',
-    text: call?.name || '...',
-    truncate: true,
-    active: true,
-  },
-];
+export const useCallBreadcrumbItems = (call: Call): IBreadcrumbItem[] => {
+  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
+
+  return useMemo(
+    () => [
+      {
+        key: 'organizations',
+        text: translate('Organizations'),
+        to: 'organizations',
+      },
+      call?.customer_uuid
+        ? getOrganizationBreadcrumbItem({
+            uuid: call.customer_uuid,
+            name: call?.customer_name || '...',
+          })
+        : {
+            key: 'organization.dashboard',
+            text: '...',
+          },
+      {
+        key: 'call-list',
+        text: translate('Calls for proposals'),
+        to: 'call-management.call-list',
+        params: call ? { uuid: call.customer_uuid } : undefined,
+        ellipsis: 'xl',
+      },
+      {
+        key: 'call',
+        text: call?.name || '...',
+        truncate: true,
+        active: true,
+      },
+    ],
+    [call],
+  );
+};

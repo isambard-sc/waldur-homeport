@@ -9,7 +9,6 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { UserChecklist } from '@waldur/marketplace-checklist/UserChecklist';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { UserEvents } from '@waldur/user/dashboard/UserEvents';
@@ -45,8 +44,8 @@ export const UserDetailsDialog: FunctionComponent<UserDetailsDialogProps> = ({
       )}
       iconNode={<UserGear weight="bold" />}
       iconColor="success"
-      bodyClassName="min-h-350px"
-      footer={<CloseDialogButton label={translate('Close')} />}
+      bodyClassName="min-h-425px"
+      closeButton
     >
       {loading ? (
         <LoadingSpinner />

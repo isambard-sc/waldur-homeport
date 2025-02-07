@@ -1,0 +1,15 @@
+.table-tabs-container {
+  .nav-tabs {
+    padding-top: 0.93rem;
+    padding-left: 0.93rem;
+    border: 1px solid var(--bs-border-color);
+    border-top-left-radius: 0.475rem;
+    border-top-right-radius: 0.475rem;
+  }
+
+  .tab-pane .card-table {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+}

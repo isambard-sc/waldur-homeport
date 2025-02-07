@@ -1,0 +1,16 @@
+.nav.nav-tabs {
+  .nav-item {
+    // Badge in tab header
+    .nav-link .badge {
+      background-color: $gray-100;
+      border-color: $grey-200;
+      color: $gray-700;
+    }
+    &:hover .nav-link .badge,
+    .nav-link.active .badge {
+      background-color: $primary-50;
+      border-color: $primary-200;
+      color: $primary-700;
+    }
+  }
+}

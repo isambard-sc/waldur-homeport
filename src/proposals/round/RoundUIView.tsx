@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
+import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { IBreadcrumbItem, PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
@@ -105,7 +106,7 @@ export const RoundUIView = () => {
     round && call ? <RoundPageHero call={call} round={round} /> : null,
     [round, call],
   );
-
+  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
   const breadcrumbItems = useMemo<IBreadcrumbItem[]>(
     () =>
       !(round && call)
@@ -116,14 +117,10 @@ export const RoundUIView = () => {
               text: translate('Organizations'),
               to: 'organizations',
             },
-            {
-              key: 'organization.dashboard',
-              text: call.customer_name,
-              to: 'organization.dashboard',
-              params: { uuid: call.customer_uuid },
-              ellipsis: 'xl',
-              maxLength: 11,
-            },
+            getOrganizationBreadcrumbItem({
+              uuid: call.customer_uuid,
+              name: call.customer_name,
+            }),
             {
               key: 'call-list',
               text: translate('Calls for proposals'),

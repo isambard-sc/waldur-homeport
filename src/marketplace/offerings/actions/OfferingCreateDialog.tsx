@@ -46,12 +46,19 @@ export const OfferingCreateDialog = reduxForm<
   const dispatch = useDispatch();
   const router = useRouter();
   const saveOffering = async (formData: OfferingCreateFormData) => {
+    // create a default plan while creating offering [WAL-7969]
+    const plan_payload = {
+      name: 'Default',
+      unit: 'month',
+    };
+
     try {
       const response = await createProviderOffering({
         name: formData.name,
         customer: customer.url,
         category: formData.category.url,
         type: formData.type.value,
+        plans: [plan_payload],
       });
       dispatch(showSuccess(translate('Offering has been created.')));
       if (fetch) {

@@ -1,49 +1,40 @@
-import { FunctionComponent } from 'react';
-import { InjectedFormProps, reduxForm } from 'redux-form';
+import { Field } from 'react-final-form';
 
-import { getNameFieldValidators } from '@waldur/core/validators';
-import { InputGroup } from '@waldur/customer/create/InputGroup';
-import { SubmitButton } from '@waldur/form';
+import {
+  composeValidators,
+  email,
+  getNameFieldValidators,
+  required,
+} from '@waldur/core/validators';
+import { FormGroup } from '@waldur/form';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
 
-import { CustomerCreateFormData } from './types';
-
-interface CustomerCreateFormProps extends InjectedFormProps {
-  onSubmit(formData: CustomerCreateFormData): void;
-}
-
-const PureCustomerCreateForm: FunctionComponent<CustomerCreateFormProps> = (
-  props,
-) => {
+export const CustomerCreateForm = () => {
   return (
-    <form onSubmit={props.handleSubmit(props.onSubmit)}>
-      <InputGroup
+    <>
+      <Field
         name="name"
-        component={InputField}
-        required={true}
+        component={FormGroup as any}
         label={translate('Name')}
+        placeholder={translate('e.g. My Organization')}
+        required
         maxLength={150}
-        helpText={translate('Name of your organization.')}
-        validate={getNameFieldValidators()}
-      />
-      <InputGroup
+        validate={composeValidators(...getNameFieldValidators())}
+      >
+        <InputField />
+      </Field>
+      <Field
         name="email"
-        component={InputField}
-        type="email"
+        component={FormGroup as any}
         label={translate('Contact email')}
-        required={true}
-      />
-      <SubmitButton
-        submitting={props.submitting}
-        disabled={props.invalid}
-        label={translate('Create organization')}
-        className="btn btn-primary ms-4 pull-right"
-      />
-    </form>
+        placeholder={translate('e.g.') + ' someone@example.com'}
+        type="email"
+        required
+        validate={composeValidators(required, email)}
+      >
+        <InputField />
+      </Field>
+    </>
   );
 };
-
-export const CustomerCreateForm = reduxForm({ form: 'customerCreate' })(
-  PureCustomerCreateForm,
-);

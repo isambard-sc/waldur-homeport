@@ -30,6 +30,7 @@
     "@fontsource/inter": "^4.5.14",
     "@fontsource/open-sans": "^4.5.14",
     "@jonkoops/matomo-tracker": "^0.7.0",
+    "@mdxeditor/editor": "^3.20.0",
     "@phosphor-icons/react": "^2.1.5",
     "@popperjs/core": "~2.10.1",
     "@sentry/react": "^8.38.0",
@@ -42,14 +43,11 @@
     "classnames": "^2.2.5",
     "d3-scale-chromatic": "^2.0.0",
     "dompurify": "^3.1.7",
-    "draft-js": "^0.11.7",
-    "draftjs-to-html": "^0.9.1",
     "echarts": "^5.5.1",
     "eslint-import-resolver-typescript": "^3.6.3",
     "final-form": "^4.20.10",
     "final-form-arrays": "^3.1.0",
     "flatpickr": "^4.6.13",
-    "html-to-draftjs": "^1.5.0",
     "immutable": "^3.8.2",
     "ip-regex": "^4.2.0",
     "jszip": "3.8.0",
@@ -66,7 +64,6 @@
     "react": "^18.3.0",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.3.0",
-    "react-draft-wysiwyg": "^1.15.0",
     "react-dropzone": "^14.2.3",
     "react-final-form": "^6.5.9",
     "react-final-form-arrays": "^3.1.4",
@@ -202,8 +199,7 @@
       "*.fixture.ts",
       "*.fixture.tsx",
       "src/EventsEnums.ts",
-      "src/FeaturesEnums.ts",
-      "src/core/draftjs-module.tsx"
+      "src/FeaturesEnums.ts"
     ]
   },
   "stylelint": {

@@ -3,13 +3,13 @@ import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
-import { WysiwygEditor } from '@waldur/core/WysiwygEditor';
 import {
   StringField,
   FormContainer,
   SubmitButton,
   TextField,
 } from '@waldur/form';
+import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { translate } from '@waldur/i18n';
 import { updateOfferingOverview } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -57,15 +57,22 @@ export const EditOverviewDialog = connect(
           <Modal.Title>{props.resolve.attribute.title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <FormContainer {...props}>
+          <FormContainer
+            {...props}
+            className={
+              props.resolve.attribute.type === 'html' ? 'size-lg' : undefined
+            }
+          >
             {props.resolve.attribute.type === 'html' ? (
-              <WysiwygEditor name="value" />
+              <MarkdownEditor name="value" autoFocus hideLabel spaceless />
             ) : props.resolve.attribute.type === 'text' ? (
-              <TextField name="value" />
+              <TextField name="value" hideLabel spaceless />
             ) : (
               <StringField
                 name="value"
                 maxLength={props.resolve.attribute.maxLength}
+                hideLabel
+                spaceless
               />
             )}
           </FormContainer>

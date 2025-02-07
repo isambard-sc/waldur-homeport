@@ -1,5 +1,7 @@
+import Axios from 'axios';
+
 import { ENV } from '@waldur/configs/default';
-import { getSelectData } from '@waldur/core/api';
+import { fixURL, getSelectData, parseResultCount } from '@waldur/core/api';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { User } from '@waldur/workspace/types';
 
@@ -25,3 +27,8 @@ export const customerUsersAutocomplete = async (
     currentPage,
   );
 };
+
+export const getProjectUsersCount = (projectUuid) =>
+  Axios.head(fixURL(`/projects/${projectUuid}/list_users/`)).then(
+    parseResultCount,
+  );

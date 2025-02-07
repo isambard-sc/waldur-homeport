@@ -2,7 +2,6 @@ import { useSelector } from 'react-redux';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
-import { RatingStars } from '@waldur/marketplace/common/RatingStars';
 import { ProviderLink } from '@waldur/marketplace/links/ProviderLink';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
 
@@ -60,12 +59,6 @@ export const CheckoutFooter = ({ dailyPrice, totalPrice, offering }) => {
           </ProviderLink>
         }
       />
-      {offering.rating && (
-        <CheckoutPricingRow
-          label={translate('Rating')}
-          value={<RatingStars rating={offering.rating} size="medium" />}
-        />
-      )}
       <div className="d-flex justify-content-between fs-4">
         <p className="mb-0">{translate('Total')}</p>
         <p className="mb-0">{defaultCurrency(totalPrice)}</p>

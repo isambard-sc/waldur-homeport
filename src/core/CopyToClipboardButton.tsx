@@ -10,12 +10,14 @@ import { showSuccess } from '@waldur/store/notify';
 interface OwnProps {
   value;
   size?: number;
-  className?;
+  className?: string;
+  buttonClassName?: string;
 }
 
 export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
   value,
   className,
+  buttonClassName,
   size,
 }) => {
   const dispatch = useDispatch();
@@ -32,7 +34,11 @@ export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
 
   return (
     <p className={classNames('my-1', className)}>
-      <button className="text-btn" type="button" onClick={(e) => onClick(e)}>
+      <button
+        className={classNames('text-btn', buttonClassName)}
+        type="button"
+        onClick={(e) => onClick(e)}
+      >
         <Tip label={translate('Copy to clipboard')} id="copyToClipboard">
           <Copy size={size} />
         </Tip>

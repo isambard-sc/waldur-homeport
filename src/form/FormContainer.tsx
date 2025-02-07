@@ -4,7 +4,7 @@ import { Field } from 'redux-form';
 
 import { FormGroup } from './FormGroup';
 
-export interface FormContainerProps {
+interface FormContainerProps {
   className?: string;
   submitting: boolean;
   clearOnUnmount?: boolean;

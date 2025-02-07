@@ -19,6 +19,7 @@ interface MonacoFieldProps {
   original?: string;
   options?: any;
   readOnly?: boolean;
+  format?: (value: any) => any;
 }
 
 const getTheme = (): string => {

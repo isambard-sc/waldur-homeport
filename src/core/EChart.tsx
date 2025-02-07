@@ -46,7 +46,7 @@ export const EChart: React.FC<ChartProps> = ({
     } else if (!chartRef.current && !loading) {
       drawChart();
     }
-  }, [options, theme]);
+  }, [options, theme, loading]);
 
   const drawChart = () => {
     setLoading(true);

@@ -61,9 +61,12 @@ const formatChart = (
         `${
           description ? `<br/>${translate('Description')}: ${description}` : ''
         }`;
-      details.forEach((d) => {
-        tooltip += `<br/>${d.username} - ${d.usage} ${d.measured_unit}`;
-      });
+      if (details?.length) {
+        tooltip += `<br/><b>${translate('Details')}:</b>`;
+        details.forEach((d) => {
+          tooltip += `<br/>${d.username} - ${d.usage} ${d.measured_unit}`;
+        });
+      }
       return `<span>${tooltip}</span>`;
     },
   },
@@ -110,31 +113,32 @@ export const getFormattedUsages = (
   usages: ComponentUsage[],
   userUsages: ComponentUserUsage[] = [],
 ): RowData[] => {
-  const result = [];
-  for (let i = 0; i < periods.length; i++) {
-    for (let j = 0; j < usages.length; j++) {
-      const usageDate = parseDate(usages[j].billing_period).toFormat('yyyy-MM');
-      if (periods[i].toFormat('yyyy-MM') === usageDate) {
-        const details = userUsages.filter(
-          (u) => parseDate(u.billing_period).toFormat('yyyy-MM') === usageDate,
-        );
-        result.push({
-          value: usages[j].usage,
-          description: usages[j].description,
-          details,
-        });
-        break;
-      }
-      if (j === usages.length - 1) {
-        result.push({
-          value: 0,
-          description: '',
-          details: [],
-        });
-      }
+  return periods.map((period) => {
+    const matchingUsage = usages.find(
+      (usage) =>
+        parseDate(usage.billing_period).toFormat('yyyy-MM') ===
+        period.toFormat('yyyy-MM'),
+    );
+
+    if (matchingUsage) {
+      const details = userUsages.filter(
+        (u) =>
+          parseDate(u.date).toFormat('yyyy-MM') === period.toFormat('yyyy-MM'),
+      );
+
+      return {
+        value: matchingUsage.usage,
+        description: matchingUsage.description,
+        details,
+      };
     }
-  }
-  return result;
+
+    return {
+      value: 0,
+      description: '',
+      details: [],
+    };
+  });
 };
 
 export const getUsagePeriods = (usages: ComponentUsage[], months: number) => {

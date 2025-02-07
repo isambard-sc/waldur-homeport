@@ -177,6 +177,12 @@ export const SettingsDescription = [
         type: 'dict_field',
       },
       {
+        key: 'DOCKER_VOLUME_NAME',
+        description: translate('A name of the shared volume to store scripts'),
+        default: 'waldur-docker-compose_waldur_script_launchzone',
+        type: 'string',
+      },
+      {
         key: 'K8S_NAMESPACE',
         description: translate('Kubernetes namespace where jobs will be executed'),
         default: 'default',
@@ -719,6 +725,12 @@ export const SettingsDescription = [
       {
         key: 'ENABLE_STRICT_CHECK_ACCEPTING_INVITATION',
         description: translate('If this is true and user email is pre-validated then accepting invitation to only do that if user’s email and email of the invitation fully match.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'INVITATION_DISABLE_MULTIPLE_ROLES',
+        description: translate('Do not allow user to grant multiple roles in the same project or organization using invitation.'),
         default: false,
         type: 'boolean',
       },

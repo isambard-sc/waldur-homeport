@@ -48,7 +48,7 @@ export const GLAuthConfigButton: FC<{
       tooltip={
         !enabled &&
         translate(
-          '"Service provider can create offering user" must be enabled for GLAuth generation',
+          '"Enable automatic creation of offering users" must be enabled for GLAuth generation',
         )
       }
     />

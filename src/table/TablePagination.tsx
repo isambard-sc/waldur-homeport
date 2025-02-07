@@ -33,72 +33,74 @@ export const TablePagination: FunctionComponent<TablePaginationProps> = (
 
   return props.resultCount > MIN_PAGE_SIZE ? (
     <>
-      <Row className="table-pagination d-none d-md-flex px-0 align-items-center mt-6">
-        <Col
-          sm="auto"
-          lg={6}
-          xl={3}
-          className="d-flex align-items-start justify-content-start order-lg-2 order-xl-1"
-        >
-          {props.showPageSizeSelector && (
-            <TablePageSize
-              currentPage={props.currentPage}
-              pageSize={props.pageSize}
-              resultCount={props.resultCount}
-              updatePageSize={props.updatePageSize}
-            />
-          )}
-        </Col>
-        <Col sm lg={12} xl={6} className="order-lg-1 order-xl-2">
-          {props.hasRows && props.resultCount > props.pageSize && (
-            <Pagination
-              totalPages={totalPages}
-              currentPage={props.currentPage}
-              onChange={props.gotoPage}
-              hideFirstAndLastPageLinks
-              hidePreviousAndNextPageLinks
-            />
-          )}
-        </Col>
-        <Col sm="auto" lg={6} xl={3} className="order-3">
-          <div className="d-flex align-items-center justify-content-end">
-            {props.hasRows && (
-              <div className="text-dark text-nowrap fs-6 me-4">
-                {translate('{from}-{to} of {all} items', {
-                  from,
-                  to,
-                  all: props.resultCount,
-                })}
-              </div>
+      <div className="table-pagination d-none d-md-block">
+        <Row className="d-flex px-0 align-items-center">
+          <Col
+            sm="auto"
+            lg={6}
+            xl={3}
+            className="d-flex align-items-start justify-content-start order-lg-2 order-xl-1"
+          >
+            {props.showPageSizeSelector && (
+              <TablePageSize
+                currentPage={props.currentPage}
+                pageSize={props.pageSize}
+                resultCount={props.resultCount}
+                updatePageSize={props.updatePageSize}
+              />
             )}
-            <div
-              className={'page-item me-1' + (prevDisabled ? ' disabled' : '')}
-            >
-              <button
-                type="button"
-                className="page-link px-1"
-                disabled={prevDisabled}
-                onClick={() => props.gotoPage(props.currentPage - 1)}
+          </Col>
+          <Col sm lg={12} xl={6} className="order-lg-1 order-xl-2">
+            {props.hasRows && props.resultCount > props.pageSize && (
+              <Pagination
+                totalPages={totalPages}
+                currentPage={props.currentPage}
+                onChange={props.gotoPage}
+                hideFirstAndLastPageLinks
+                hidePreviousAndNextPageLinks
+              />
+            )}
+          </Col>
+          <Col sm="auto" lg={6} xl={3} className="order-3">
+            <div className="d-flex align-items-center justify-content-end">
+              {props.hasRows && (
+                <div className="text-dark text-nowrap fs-6 me-4">
+                  {translate('{from}-{to} of {all} items', {
+                    from,
+                    to,
+                    all: props.resultCount,
+                  })}
+                </div>
+              )}
+              <div
+                className={'page-item me-1' + (prevDisabled ? ' disabled' : '')}
               >
-                <CaretLeft size={20} weight="bold" />
-              </button>
+                <button
+                  type="button"
+                  className="page-link px-1"
+                  disabled={prevDisabled}
+                  onClick={() => props.gotoPage(props.currentPage - 1)}
+                >
+                  <CaretLeft size={20} weight="bold" />
+                </button>
+              </div>
+              <div className={'page-item' + (nextDisabled ? ' disabled' : '')}>
+                <button
+                  type="button"
+                  className="page-link px-1"
+                  disabled={nextDisabled}
+                  onClick={() => props.gotoPage(props.currentPage + 1)}
+                >
+                  <CaretRight size={20} weight="bold" />
+                </button>
+              </div>
             </div>
-            <div className={'page-item' + (nextDisabled ? ' disabled' : '')}>
-              <button
-                type="button"
-                className="page-link px-1"
-                disabled={nextDisabled}
-                onClick={() => props.gotoPage(props.currentPage + 1)}
-              >
-                <CaretRight size={20} weight="bold" />
-              </button>
-            </div>
-          </div>
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+      </div>
 
       {/* Mobile view */}
-      <div className="table-pagination d-flex d-md-none align-items-center justify-content-between mt-6">
+      <div className="table-pagination d-flex d-md-none align-items-center justify-content-between">
         <div className={'page-item me-1' + (prevDisabled ? ' disabled' : '')}>
           <Button
             variant="outline"

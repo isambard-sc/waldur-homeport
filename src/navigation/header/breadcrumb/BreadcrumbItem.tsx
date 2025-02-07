@@ -27,17 +27,22 @@ export const BreadcrumbItem = forwardRef<any, PropsWithChildren<OwnProps>>(
       className,
       to,
       params,
+      onClick,
       ...rest
     },
     ref,
   ) => {
     const ellipsisClass = ellipsis ? 'ellipsis-' + ellipsis : '';
-    const sref = useSref(to || '', params);
+    const sref = useSref(to || '404', params);
 
     return (
       <Breadcrumb.Item
         {...rest}
         {...(to ? sref : {})}
+        onClick={(event) => {
+          sref?.onClick && sref.onClick(event);
+          onClick && onClick(event);
+        }}
         ref={ref}
         className={classNames(className, ellipsisClass)}
       >

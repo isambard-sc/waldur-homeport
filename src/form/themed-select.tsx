@@ -1,4 +1,5 @@
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import classNames from 'classnames';
 import { uniqueId } from 'lodash-es';
 import { FC } from 'react';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
@@ -12,6 +13,7 @@ import BaseSelect, {
 } from 'react-select';
 import { AsyncPaginate as BaseAsyncPaginate } from 'react-select-async-paginate';
 import BaseWindowedSelect from 'react-windowed-select';
+import { BaseFieldProps } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import CheckboxIcon from '@waldur/table/Checkbox.svg';
@@ -118,6 +120,7 @@ const MultiSelectLimitedValueContainer = (props) => {
 export const REACT_SELECT_TABLE_FILTER: Partial<SelectProps> = {
   className: 'metronic-select-container',
   classNamePrefix: 'metronic-select',
+  autoFocus: true,
   menuIsOpen: true,
   components: {
     Control: FilterSelectControl,
@@ -181,11 +184,25 @@ const useSelectTheme = (): ThemeConfig => {
   };
 };
 
-export const Select = ({ components = undefined, ...props }) => {
+type CustomSelectProps = {
+  size?: 'sm';
+} & SelectProps<any> &
+  Partial<Omit<BaseFieldProps, 'onChange'>>;
+
+export const Select: FC<CustomSelectProps> = ({
+  components = undefined,
+  size = undefined,
+  ...props
+}) => {
   const theme = useSelectTheme();
   const composedComponents = props.isMulti
     ? { ...REACT_MULTI_SELECT.components, ...components }
     : components;
+  const className = classNames(
+    props.isMulti && REACT_MULTI_SELECT.className,
+    size === 'sm' && 'select-sm',
+    props.className,
+  );
   return (
     <BaseSelect
       theme={theme}
@@ -193,6 +210,7 @@ export const Select = ({ components = undefined, ...props }) => {
       {...(props.isMulti ? REACT_MULTI_SELECT : REACT_SELECT_MENU_PORTALING)}
       components={composedComponents}
       {...props}
+      className={className}
     />
   );
 };

@@ -131,7 +131,6 @@ export const ResourcesEnum = {
   marketplace_resource_create_succeeded: 'marketplace_resource_create_succeeded',
   marketplace_resource_downscaled: 'marketplace_resource_downscaled',
   marketplace_resource_erred_on_backend: 'marketplace_resource_erred_on_backend',
-  marketplace_resource_has_been_changed: 'marketplace_resource_has_been_changed',
   marketplace_resource_paused: 'marketplace_resource_paused',
   marketplace_resource_terminate_canceled: 'marketplace_resource_terminate_canceled',
   marketplace_resource_terminate_failed: 'marketplace_resource_terminate_failed',

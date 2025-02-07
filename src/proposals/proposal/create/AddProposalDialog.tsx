@@ -11,6 +11,7 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { createProposal } from '@waldur/proposals/api';
 import { Call, Round } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { UsersService } from '@waldur/user/UsersService';
 
 interface FormData {
   name: string;
@@ -33,6 +34,7 @@ export const AddProposalDialog = reduxForm<
         .then((res) => {
           dispatch(showSuccess(translate('Proposal created successfully')));
           const proposal = res.data;
+          UsersService.getCurrentUser(true);
           router.stateService.go('proposals.manage-proposal', {
             proposal_uuid: proposal.uuid,
           });

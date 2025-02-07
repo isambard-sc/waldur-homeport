@@ -1,0 +1,115 @@
+.mdxeditor {
+  .mdxeditor-source-editor .cm-scroller,
+  .mdxeditor-diff-editor,
+  .editable-area {
+    min-height: 200px;
+    max-height: 400px;
+    height: calc(100vh - 325px);
+    overflow-y: auto;
+  }
+}
+
+.mdxeditor-popup-container {
+  z-index: 2000;
+}
+
+.linkDialogAnchor {
+  position: fixed;
+  background-color: highlight;
+  z-index: -1;
+
+  &[data-visible='true'] {
+    visibility: visible;
+  }
+
+  &[data-visible='false'] {
+    visibility: hidden;
+  }
+}
+
+.linkDialogPopoverContent {
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.2));
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-0_5);
+  border-radius: var(--radius-medium);
+  border: 1px solid var(--baseBg);
+  background-color: var(--basePageBg);
+  padding: var(--spacing-1) var(--spacing-1);
+  font-size: var(--text-sm);
+}
+
+.linkDialogPreviewAnchor {
+  margin-right: var(--spacing-1);
+  display: flex;
+  align-items: center;
+  color: var(--accentText);
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--accentSolidHover);
+    }
+  }
+
+  border: 1px solid transparent;
+
+  & span {
+    max-width: 14rem;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.popoverArrow {
+  fill: var(--basePageBg);
+}
+
+.tooltipContent {
+  z-index: 2;
+  position: relative;
+  border-radius: var(--radius-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--text-xs);
+  background-color: var(--baseText);
+  color: var(--baseBase);
+
+  & svg {
+    fill: var(--baseText);
+  }
+}
+
+.actionButton {
+  border: 0;
+  background-color: transparent;
+  font-size: inherit;
+  appearance: none;
+  all: unset;
+  box-sizing: border-box;
+  cursor: default;
+
+  & svg {
+    display: block;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--baseBg);
+    }
+  }
+
+  &:active svg {
+    transform: translate(1px, 1px);
+  }
+
+  &[data-state='on'],
+  &:active {
+    background-color: var(--baseBg);
+    color: var(--baseTextContrast);
+  }
+
+  padding: var(--spacing-1) var(--spacing-1);
+  border-radius: var(--radius-medium);
+  color: var(--baseTextContrast);
+}
