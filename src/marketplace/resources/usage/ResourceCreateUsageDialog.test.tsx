@@ -7,19 +7,16 @@ import {
 } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { marketplaceComponentUsagesSetUsage } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { submitUsageReport } from '@waldur/marketplace/common/api';
 import { createActionStore } from '@waldur/resource/actions/testUtils';
 
-import * as api from './api';
+import { getProviderUsageComponents } from './api';
 import { ResourceCreateUsageDialog } from './ResourceCreateUsageDialog';
 
-vi.mock('@waldur/marketplace/common/api', () => ({
-  submitUsageReport: vi.fn(),
-}));
-
-const loader = vi.spyOn(api, 'getProviderUsageComponents');
+vi.mock('waldur-js-client');
+vi.mock('./api');
 
 const props = {
   resolve: {
@@ -64,13 +61,15 @@ describe('ResourceCreateUsageDialog', () => {
   });
 
   it('renders loading spinner when data is being fetched', () => {
-    loader.mockImplementation(() => new Promise(() => {}));
+    vi.mocked(getProviderUsageComponents).mockImplementation(
+      () => new Promise(() => {}),
+    );
     renderDialog(props);
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
   it('renders error message when API call fails', async () => {
-    loader.mockRejectedValue('error');
+    vi.mocked(getProviderUsageComponents).mockRejectedValue('error');
     await act(() => {
       renderDialog(props);
     });
@@ -80,7 +79,10 @@ describe('ResourceCreateUsageDialog', () => {
   });
 
   it('renders message when there are no components', async () => {
-    loader.mockResolvedValue({ components: [], periods: [] });
+    vi.mocked(getProviderUsageComponents).mockResolvedValue({
+      components: [],
+      periods: [],
+    });
     await act(() => {
       renderDialog(props);
     });
@@ -90,7 +92,10 @@ describe('ResourceCreateUsageDialog', () => {
   });
 
   it('displays dialog title with resource name', async () => {
-    loader.mockResolvedValue({ components: [], periods: [] });
+    vi.mocked(getProviderUsageComponents).mockResolvedValue({
+      components: [],
+      periods: [],
+    });
     await act(() => {
       renderDialog(props);
     });
@@ -100,7 +105,7 @@ describe('ResourceCreateUsageDialog', () => {
   });
 
   it('displays client organization name', async () => {
-    loader.mockResolvedValue(mockData);
+    vi.mocked(getProviderUsageComponents).mockResolvedValue(mockData);
     await act(() => {
       renderDialog(props);
     });
@@ -111,9 +116,9 @@ describe('ResourceCreateUsageDialog', () => {
   });
 
   it('submits form with usage values', async () => {
-    loader.mockResolvedValue(mockData);
-    const submitSpy = vi.mocked(submitUsageReport);
-    submitSpy.mockResolvedValue({});
+    vi.mocked(getProviderUsageComponents).mockResolvedValue(mockData);
+    const submitSpy = vi.mocked(marketplaceComponentUsagesSetUsage);
+    submitSpy.mockResolvedValue({} as any);
 
     await act(() => {
       renderDialog(props);
@@ -132,14 +137,16 @@ describe('ResourceCreateUsageDialog', () => {
 
     await waitFor(() => {
       expect(submitSpy).toHaveBeenCalledWith({
-        plan_period: 'period-1',
-        usages: [
-          {
-            type: 'comp1',
-            amount: '10',
-            description: 'Test usage',
-          },
-        ],
+        body: {
+          plan_period: 'period-1',
+          usages: [
+            {
+              type: 'comp1',
+              amount: '10',
+              description: 'Test usage',
+            },
+          ],
+        },
       });
     });
   });

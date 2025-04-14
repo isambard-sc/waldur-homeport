@@ -1,11 +1,12 @@
 import { Trash } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceOrdersUnlink } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { unlinkOrder } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 export const OrderUnlinkButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
@@ -19,16 +20,22 @@ export const OrderUnlinkButton = ({ row, refetch }) => {
     } catch {
       return;
     }
-    return unlinkOrder(row.uuid).then(() => {
+    try {
+      await marketplaceOrdersUnlink({ path: { uuid: row.uuid } });
+      dispatch(showSuccess(translate('Order has been unlinked.')));
+      await refetch();
       refetch();
-    });
+    } catch (error) {
+      dispatch(showErrorResponse(error, translate('Unable to unlink order.')));
+    }
   }, [row, refetch]);
   return (
     <ActionItem
       title={translate('Unlink')}
       className="text-danger"
       action={callback}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
+      iconColor="danger"
     />
   );
 };

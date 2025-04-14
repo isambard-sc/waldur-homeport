@@ -1,13 +1,19 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { rolesUpdateDescriptionsUpdate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
-import * as api from './api';
 import { RoleDescriptionEditDialog } from './RoleDescriptionEditDialog';
+import { getRoles } from './utils';
 
 // Mock dependencies
+
+vi.mock('./utils');
+
+vi.mock('waldur-js-client');
+
 vi.mock('@waldur/modal/hooks', () => ({
   useModal: () => ({
     closeDialog: vi.fn(),
@@ -53,9 +59,9 @@ describe('RoleDescriptionEditDialog', () => {
   it('handles form submission', async () => {
     const user = userEvent.setup();
     const updateRoleDescriptionsSpy = vi
-      .spyOn(api, 'updateRoleDescriptions')
+      .mocked(rolesUpdateDescriptionsUpdate)
       .mockResolvedValue(undefined);
-    const getRolesSpy = vi.spyOn(api, 'getRoles').mockResolvedValue([]);
+    const getRolesSpy = vi.mocked(getRoles).mockResolvedValue([]);
 
     render(
       <RoleDescriptionEditDialog
@@ -70,9 +76,12 @@ describe('RoleDescriptionEditDialog', () => {
     const submitButton = screen.getByText('Save');
     await user.click(submitButton);
 
-    expect(updateRoleDescriptionsSpy).toHaveBeenCalledWith('test-uuid', {
-      description_en: 'Updated English description',
-      description_et: 'Estonian description',
+    expect(updateRoleDescriptionsSpy).toHaveBeenCalledWith({
+      path: { uuid: 'test-uuid' },
+      body: {
+        description_en: 'Updated English description',
+        description_et: 'Estonian description',
+      },
     });
     expect(getRolesSpy).toHaveBeenCalled();
     expect(mockRefetch).toHaveBeenCalled();

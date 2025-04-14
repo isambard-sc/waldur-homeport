@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent, useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { customersStatsRetrieve } from 'waldur-js-client';
 
 import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
 import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/AggregateLimitWidget';
-import { getCustomerStats } from '@waldur/marketplace/aggregate-limits/api';
 import { ProjectsList } from '@waldur/project/ProjectsList';
 import {
   checkIsServiceManager,
@@ -14,8 +14,8 @@ import {
   isOwnerOrStaff,
 } from '@waldur/workspace/selectors';
 
-import { CreditStatusWidget } from './CreditStatusWidget';
 import { CustomerDashboardChart } from './CustomerDashboardChart';
+import { CustomerDashboardCredit } from './CustomerDashboardCredit';
 import { CustomerProfile } from './CustomerProfile';
 
 export const CustomerDashboard: FunctionComponent = () => {
@@ -33,12 +33,15 @@ export const CustomerDashboard: FunctionComponent = () => {
     error: aggregateLimitError,
   } = useQuery(
     ['customer-stats', customer?.uuid],
-    () => getCustomerStats(customer?.uuid),
+    () =>
+      customersStatsRetrieve({ path: { uuid: customer?.uuid } }).then(
+        (r) => r.data,
+      ),
     { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
   );
 
   const shouldShowAggregateLimitWidget =
-    aggregateLimitData?.data.components?.length > 0;
+    aggregateLimitData?.components?.length > 0;
 
   if (!customer) return null;
 
@@ -62,17 +65,7 @@ export const CustomerDashboard: FunctionComponent = () => {
                 />
               </Col>
               {Boolean(customer.credit) && (
-                <Col
-                  md={6}
-                  sm={12}
-                  className="mb-5"
-                  style={COMMON_WIDGET_HEIGHT}
-                >
-                  <CreditStatusWidget
-                    credit={customer.credit}
-                    type="organization"
-                  />
-                </Col>
+                <CustomerDashboardCredit customer={customer} className="mb-5" />
               )}
             </Row>
           )}

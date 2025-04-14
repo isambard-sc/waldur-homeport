@@ -34,18 +34,6 @@ export const FeaturesDescription: FeatureSection[] = [
         key: 'conceal_civil_number',
         description: translate('Conceal civil number in invitation creation dialog.'),
       },
-      {
-        key: 'require_user_details',
-        description: translate('Render "Show user details" button in invitation creation form.'),
-      },
-      {
-        key: 'show_tax_number',
-        description: translate('Show tax number field in invitation creation form.'),
-      },
-      {
-        key: 'tax_number_required',
-        description: translate('Make tax number field mandatory in invitation creation form.'),
-      },
     ],
   },
   {
@@ -165,10 +153,6 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'pricelist',
         description: translate('Render marketplace plan components pricelist in support workspace.'),
-      },
-      {
-        key: 'shared_providers',
-        description: translate('Render overview of shared marketplace service providers in support workspace.'),
       },
       {
         key: 'users',

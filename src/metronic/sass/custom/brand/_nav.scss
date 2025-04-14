@@ -1,0 +1,10 @@
+// Line tabs
+.nav-line-tabs {
+  // Active & Hover States
+  .nav-item .nav-link.active,
+  .nav-item.show .nav-link,
+  .nav-item .nav-link:hover:not(.disabled) {
+    border-bottom-color: $brand;
+    color: $brand;
+  }
+}

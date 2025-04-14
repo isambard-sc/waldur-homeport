@@ -1,8 +1,12 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
+import {
+  vmwareNetworksList,
+  vmwareVirtualMachineCreatePort,
+} from 'waldur-js-client';
 
-import { getAll } from '@waldur/core/api';
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { createNameField } from '@waldur/resource/actions/base';
@@ -10,19 +14,21 @@ import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDia
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
-import { createPort } from '../api';
-
 export const CreatePortDialog: FC<ActionDialogProps> = ({
   resolve: { resource, refetch },
 }) => {
   const dispatch = useDispatch();
 
   const asyncState = useAsync(async () => {
-    const params = {
-      customer_pair_uuid: resource.customer_uuid,
-      settings_uuid: resource.settings_uuid,
-    };
-    const networks = await getAll<any>('/vmware-networks/', { params });
+    const networks = await getAllPages((page) =>
+      vmwareNetworksList({
+        query: {
+          page,
+          customer_pair_uuid: resource.customer_uuid,
+          settings_uuid: resource.settings_uuid,
+        },
+      }),
+    );
     return {
       networks: networks.map((network) => ({
         value: network.url,
@@ -50,9 +56,12 @@ export const CreatePortDialog: FC<ActionDialogProps> = ({
       formFields={fields}
       submitForm={async (formData) => {
         try {
-          await createPort(resource.uuid, {
-            name: formData.name,
-            network: formData.network.value,
+          await vmwareVirtualMachineCreatePort({
+            path: { uuid: resource.uuid },
+            body: {
+              description: formData.name,
+              network: formData.network.value,
+            },
           });
           dispatch(showSuccess(translate('Port has been created.')));
           dispatch(closeModalDialog());

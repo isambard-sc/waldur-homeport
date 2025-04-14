@@ -1,13 +1,13 @@
 import { DateTime } from 'luxon';
 import { FunctionComponent, useMemo } from 'react';
+import { OrderDetails } from 'waldur-js-client';
 
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { translate } from '@waldur/i18n';
-import { OrderDetailsType } from '@waldur/marketplace/orders/types';
 import { Offering, OfferingComponent } from '@waldur/marketplace/types';
 
 interface OrderSummaryProps {
-  order: OrderDetailsType;
+  order: OrderDetails;
   offering: Offering;
 }
 
@@ -17,7 +17,7 @@ type Limits = Record<string, number>;
 
 interface Context {
   order: Pick<
-    OrderDetailsType,
+    OrderDetails,
     | 'attributes'
     | 'limits'
     | 'resource_name'
@@ -36,7 +36,7 @@ const getCreateSummary = (ctx: Context): string => {
     '{user} has requested provisioning of "{resource_name}" with plan "{plan_name}".',
     {
       user: ctx.user,
-      resource_name: ctx.order.attributes.name,
+      resource_name: ctx.order.attributes['name'],
       plan_name: ctx.order.new_plan_name || 'Default',
     },
   );
@@ -66,18 +66,26 @@ const formatLimits = (limits: Limits, componentMap: ComponentMap) =>
     .map((key) => formatComponent(limits, componentMap, key))
     .join(', ');
 
-const getComponentMap = (components: OfferingComponent[]): ComponentMap =>
-  components.reduce((r, c) => ({ ...r, [c.type]: c }), {});
+const getComponentMap = (components: OfferingComponent[]): ComponentMap => {
+  const result: ComponentMap = {};
+  for (const c of components) {
+    result[c.type] = c;
+  }
+  return result;
+};
 
 export const getUpdateSummary = (ctx: Context) => {
   let msg;
   const componentMap = getComponentMap(ctx.components);
-  if (ctx.order.attributes.old_limits) {
+  if (ctx.order.attributes['old_limits']) {
     msg = translate(
       '{user} has requested changing of limits from "{old_limits}" to "{new_limits}".',
       {
         user: ctx.user,
-        old_limits: formatLimits(ctx.order.attributes.old_limits, componentMap),
+        old_limits: formatLimits(
+          ctx.order.attributes['old_limits'],
+          componentMap,
+        ),
         new_limits: formatLimits(ctx.order.limits, componentMap),
       },
     );
@@ -124,7 +132,7 @@ const getTerminateSummary = (ctx: Context) => {
   }
 };
 
-const getContext = (order: OrderDetailsType, offering: Offering): Context => {
+const getContext = (order: OrderDetails, offering: Offering): Context => {
   let user = order.created_by_full_name;
   if (order.created_by_civil_number) {
     user += ` (ID: ${order.created_by_civil_number})`;
@@ -140,7 +148,7 @@ const getContext = (order: OrderDetailsType, offering: Offering): Context => {
   return { user, approved, order, components: offering.components };
 };
 
-const getMessage = (order: OrderDetailsType, offering: Offering): string => {
+const getMessage = (order: OrderDetails, offering: Offering): string => {
   const ctx = getContext(order, offering);
   if (order.type === 'Create') {
     return getCreateSummary(ctx);

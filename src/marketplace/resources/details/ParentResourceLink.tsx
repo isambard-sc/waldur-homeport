@@ -1,8 +1,8 @@
+import { Resource } from 'waldur-js-client';
+
 import { Link } from '@waldur/core/Link';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import openstackIcon from '@waldur/images/appstore/icon-openstack.png';
-
-import { Resource } from '../types';
 
 export const ParentResourceLink = ({ resource }: { resource: Resource }) =>
   resource.parent_uuid && resource.parent_name ? (

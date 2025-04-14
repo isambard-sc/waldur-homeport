@@ -2,6 +2,10 @@ import { useState, FunctionComponent } from 'react';
 import { Table, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAsync, useAsyncFn } from 'react-use';
+import {
+  marketplaceChecklistsCustomerRetrieve,
+  marketplaceChecklistsCustomerUpdate,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -12,13 +16,8 @@ import { formatRole } from '@waldur/permissions/utils';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import {
-  getCategories,
-  getChecklists,
-  getCustomerChecklists,
-  updateCustomerChecklists,
-} from './api';
 import { Category } from './types';
+import { getCategories, getChecklists } from './utils';
 
 const formatRolesList = (roles) =>
   roles.length === 0 ? 'N/A' : roles.map((role) => formatRole(role)).join(', ');
@@ -34,7 +33,9 @@ export const ChecklistCustomer: FunctionComponent = () => {
   const checklistsState = useAsync(async () => {
     if (category) {
       const checklists = await getChecklists(category.uuid);
-      const customerChecklists = await getCustomerChecklists(customer.uuid);
+      const customerChecklists = await marketplaceChecklistsCustomerRetrieve({
+        path: { customer_uuid: customer.uuid },
+      });
       setEnabled(
         customerChecklists.data.reduce(
           (res, checklist) => ({ ...res, [checklist]: true }),
@@ -50,10 +51,12 @@ export const ChecklistCustomer: FunctionComponent = () => {
 
   const [submitState, submitCallback] = useAsyncFn(async () => {
     try {
-      await updateCustomerChecklists(
-        customer.uuid,
-        Object.keys(enabled).filter((checklistId) => enabled[checklistId]),
-      );
+      await marketplaceChecklistsCustomerUpdate({
+        path: { customer_uuid: customer.uuid },
+        body: Object.keys(enabled).filter(
+          (checklistId) => enabled[checklistId],
+        ),
+      });
       dispatch(showSuccess(translate('Enabled checklists have been updated.')));
     } catch (e) {
       dispatch(
@@ -149,8 +152,8 @@ export const ChecklistCustomer: FunctionComponent = () => {
                       </ToggleButton>
                     </ToggleButtonGroup>
                   </td>
-                  <td>{formatRolesList(checklist.customer_roles)}</td>
-                  <td>{formatRolesList(checklist.project_roles)}</td>
+                  <td>{formatRolesList(checklist.roles)}</td>
+                  <td>{formatRolesList(checklist.roles)}</td>
                 </tr>
               ))}
             </tbody>

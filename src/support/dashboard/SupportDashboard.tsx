@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { AdministrationProfile } from '@waldur/administration/dashboard/AdministrationProfile';
 import { HealthChecks } from '@waldur/administration/dashboard/HealthChecks';
 import { BroadcastList } from '@waldur/broadcasts/BroadcastList';
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';

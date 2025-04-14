@@ -1,8 +1,11 @@
 import { FunctionComponent } from 'react';
 import ReactStars from 'react-rating-stars-component';
 import { useAsync } from 'react-use';
+import {
+  supportFeedbackAverageReportRetrieve,
+  supportFeedbackReportRetrieve,
+} from 'waldur-js-client';
 
-import { get } from '@waldur/core/api';
 import { RATING_STAR_ACTIVE_COLOR } from '@waldur/core/constants';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Panel } from '@waldur/core/Panel';
@@ -10,10 +13,10 @@ import { translate } from '@waldur/i18n';
 import './CustomerSupportRating.scss';
 
 const loadData = async () => {
-  const feedbackReport = await get(`/support-feedback-report/`).then(
+  const feedbackReport = await supportFeedbackReportRetrieve().then(
     (response) => response.data,
   );
-  const averageFeedback = await get(`/support-feedback-average-report/`).then(
+  const averageFeedback = await supportFeedbackAverageReportRetrieve().then(
     (response) => response.data,
   );
   return { feedbackReport, averageFeedback };

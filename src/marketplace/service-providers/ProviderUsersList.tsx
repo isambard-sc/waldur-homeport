@@ -6,13 +6,14 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
-import { UserDetailsButton } from '@waldur/user/support/UserDetailsButton';
 
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 
 import { CustomerContactColumn } from './CustomerContactColumn';
 import { ProjectsCountColumn } from './ProjectsCountColumn';
 import { ProviderUserCustomersList } from './ProviderUserCustomersList';
+import { ProviderUsersRowActions } from './ProviderUsersRowActions';
+import { PROVIDER_CUSTOMERS_TABLE_TABS } from './utils';
 
 const UserNameColumn = ({ row }) => (
   <>
@@ -60,8 +61,9 @@ const ProviderUsersListComponent = ({ provider }) => {
           ellipsis: true,
         },
       ]}
-      rowActions={UserDetailsButton}
+      rowActions={ProviderUsersRowActions}
       showPageSizeSelector={true}
+      tabs={PROVIDER_CUSTOMERS_TABLE_TABS}
       verboseName={translate('users')}
       expandableRow={ExpandableRow}
       hasQuery={true}

@@ -1,19 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
-import { Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { change, Field, reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateDescription } from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { required } from '@waldur/core/validators';
 import { SelectField, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import {
-  getCategories,
-  updateOfferingDescription as updateOfferingCategory,
-} from '@waldur/marketplace/common/api';
+import { getCategories } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { CATEGORY_FORM_ID } from './constants';
@@ -33,8 +31,11 @@ export const EditCategoryDialog = reduxForm<FormData, OwnProps>({
 
   const submitRequest = async (formData: FormData) => {
     try {
-      await updateOfferingCategory(resolve.offering.uuid, {
-        category: formData.category.url,
+      await marketplaceProviderOfferingsUpdateDescription({
+        path: { uuid: resolve.offering.uuid },
+        body: {
+          category: formData.category.url,
+        },
       });
       dispatch(showSuccess(translate('Category has been updated.')));
       dispatch(closeModalDialog());
@@ -62,10 +63,19 @@ export const EditCategoryDialog = reduxForm<FormData, OwnProps>({
 
   return (
     <form onSubmit={handleSubmit(submitRequest)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Edit category')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Edit category')}
+        footer={
+          <>
+            <CloseDialogButton />
+            <SubmitButton
+              disabled={invalid}
+              submitting={submitting}
+              label={translate('Save')}
+            />
+          </>
+        }
+      >
         {queryData.isLoading ? (
           <LoadingSpinner />
         ) : queryData.isError ? (
@@ -82,15 +92,7 @@ export const EditCategoryDialog = reduxForm<FormData, OwnProps>({
             validate={required}
           />
         )}
-      </Modal.Body>
-      <Modal.Footer>
-        <CloseDialogButton />
-        <SubmitButton
-          disabled={invalid}
-          submitting={submitting}
-          label={translate('Save')}
-        />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

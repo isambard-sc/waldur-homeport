@@ -8,9 +8,14 @@ $headerAndToolbarHeight: calc(65px + var(--kt-toolbar-height));
   flex-shrink: 0;
   height: calc(100vh - $headerAndToolbarHeight);
 
-  &:not(.drawer) {
-    top: calc($headerAndToolbarHeight + 20px);
-    height: fit-content;
+  &.transparent {
+    background-color: transparent;
+    box-shadow: none;
+
+    .toolbar-fixed & {
+      top: calc($headerAndToolbarHeight + 20px);
+      height: fit-content;
+    }
   }
 
   .stepper {
@@ -70,16 +75,15 @@ $headerAndToolbarHeight: calc(65px + var(--kt-toolbar-height));
       }
     }
   }
-
-  .block-summary {
-    margin: 0 -2.25rem;
-    padding: 1.25rem 2.25rem;
-  }
 }
 
 body:not(.toolbar-fixed) .v-stepper-form-sidebar {
   top: 65px;
-  height: calc(100vh - 65px);
+  height: calc(100vh - 65px - 10px);
+
+  &.transparent {
+    top: 75px;
+  }
 }
 
 @media (width <= 1650px) {
@@ -92,11 +96,12 @@ body:not(.toolbar-fixed) .v-stepper-form-sidebar {
 @media (width <= 1200px) {
   .v-stepper-form-sidebar {
     width: 100%;
-    height: auto;
+    height: auto !important;
   }
 }
-@media (min-width: 1200px) {
-  .v-stepper-form .container-xxl {
-    padding-right: 0;
-  }
+
+.v-stepper-form-header {
+  display: flex;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }

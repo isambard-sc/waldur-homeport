@@ -17,7 +17,7 @@ export const QuickIssueDrawerToggle: React.FC = () => {
   const openDrawer = () => {
     dispatch(
       openDrawerDialog(QuickIssueContainer, {
-        title: translate('Issues'),
+        title: translate('Requests'),
       }),
     );
   };
@@ -27,10 +27,10 @@ export const QuickIssueDrawerToggle: React.FC = () => {
       <button
         id="quick-issue-toggle"
         type="button"
-        className="btn btn-icon btn-icon-grey-500 btn-active-secondary w-35px h-35px w-md-40px h-md-40px"
+        className="btn btn-icon btn-icon-gray-500 btn-active-secondary w-35px h-35px w-md-40px h-md-40px"
         onClick={openDrawer}
       >
-        <span className="svg-icon" title={translate('Issues')}>
+        <span className="svg-icon" title={translate('Requests')}>
           <ChatsCircle className="w-20px h-20px" weight="bold" />
         </span>
       </button>

@@ -86,7 +86,7 @@ export const OpenStackProvisioningConfigForm: FC<OfferingEditPanelFormProps> = (
         description={field.description}
         actions={
           <FieldEditButton
-            title={props.title}
+            title={field.label}
             scope={props.offering}
             name={field.key}
             callback={props.callback}

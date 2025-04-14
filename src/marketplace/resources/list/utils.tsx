@@ -1,12 +1,12 @@
-import { ENV } from '@waldur/configs/default';
+import { Resource } from 'waldur-js-client';
+
+import { ENV } from '@waldur/core/config';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import { Column } from '@waldur/table/types';
 import { renderFieldOrDash } from '@waldur/table/utils';
-
-import { Resource } from '../types';
 
 import { ResourceNameField } from './ResourceNameField';
 import { ResourceStateField } from './ResourceStateField';
@@ -94,6 +94,14 @@ export const getResourceAllListColumns = (
         export: (row) => row.offering_name,
       },
       {
+        title: translate('Parent offering'),
+        render: ({ row }) => <>{row.parent_offering_name || 'N/A'}</>,
+        id: 'parent_offering',
+        keys: ['parent_offering_name'],
+        optional: true,
+        filter: 'parent_offering',
+      },
+      {
         title: translate('Plan'),
         render: ({ row }) => <>{row.plan_name || 'N/A'}</>,
         id: 'plan',
@@ -159,6 +167,7 @@ export const getResourceAllListColumns = (
         title: translate('State'),
         render: ({ row }) => <ResourceStateField resource={row} outline pill />,
         filter: 'state',
+        orderField: 'state',
         inlineFilter: (row) =>
           getStates().filter((op) => op.value === row.state),
         id: 'state',

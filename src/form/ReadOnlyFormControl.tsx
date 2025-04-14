@@ -18,8 +18,8 @@ interface ReadOnlyFormControlProps {
   className?: string;
   plaintext?: boolean;
   disabled?: boolean;
-  floating?: boolean;
   inline?: boolean;
+  spaceless?: boolean;
   actions?: ReactNode;
   tooltip?: string;
 }
@@ -34,8 +34,8 @@ export const ReadOnlyFormControl: FunctionComponent<
     plaintext,
     disabled,
     className,
-    floating,
     inline,
+    spaceless,
     addon,
     children,
     actions,
@@ -57,7 +57,7 @@ export const ReadOnlyFormControl: FunctionComponent<
         label={tooltip}
         placement="left"
       >
-        <Question size={20} weight="bold" className="text-grey-500" />
+        <Question size={20} weight="bold" className="text-gray-500" />
       </Tip>
     </div>
   ) : (
@@ -67,15 +67,14 @@ export const ReadOnlyFormControl: FunctionComponent<
   const main = (
     <div
       className={classNames(
-        'mb-7',
+        !spaceless && 'mb-7',
         className,
-        floating && 'form-floating',
         addon && 'form-addon',
         Boolean(actions) && 'flex-grow-1',
         inline && 'd-flex align-items-center',
       )}
     >
-      {!floating && labelNode}
+      {labelNode}
       {children ? (
         cloneElement(children as any, childProps)
       ) : (
@@ -92,14 +91,13 @@ export const ReadOnlyFormControl: FunctionComponent<
           {description}
         </Form.Text>
       )}
-      {floating && labelNode}
       {addon && <span className="form-control-addon">{addon}</span>}
     </div>
   );
 
   if (actions) {
     return (
-      <div className="d-flex align-items-start gap-4">
+      <div className="d-flex align-items-start gap-2">
         {main}
         {actions}
       </div>

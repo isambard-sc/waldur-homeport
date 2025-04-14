@@ -1,13 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Col, Row } from 'react-bootstrap';
+import { supportStatisticsRetrieve } from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { StatisticsCard } from '@waldur/core/StatisticsCard';
 import { translate } from '@waldur/i18n';
 import { getIssueStatuses } from '@waldur/issues/list/IssuesFilter';
-
-import { getSupportStatistics } from '../api';
 
 const getIssueState = (states: string[]) => ({
   state: 'support.list',
@@ -23,7 +22,7 @@ const getIssueState = (states: string[]) => ({
 export const SupportStatistics = () => {
   const { data, isLoading, error, refetch } = useQuery(
     ['support-statistics'],
-    getSupportStatistics,
+    () => supportStatisticsRetrieve().then((r) => r.data),
     {
       staleTime: 5 * 60 * 1000,
     },

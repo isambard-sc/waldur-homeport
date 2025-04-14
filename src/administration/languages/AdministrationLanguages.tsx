@@ -1,17 +1,19 @@
-import { FunctionComponent, useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { FunctionComponent, useMemo, useState } from 'react';
+import { Button, Col, Row } from 'react-bootstrap';
+import { overrideSettings } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
+import { Panel } from '@waldur/core/Panel';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
 import { useLanguageSelector } from '@waldur/i18n/useLanguageSelector';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
 import { LanguageCountry } from '@waldur/navigation/header/LanguageSelectorDropdown';
 import { useNotify } from '@waldur/store/hooks';
-
-import { saveConfig } from '../settings/api';
+import { TableQuery } from '@waldur/table/TableQuery';
 
 export const AdministrationLanguages: FunctionComponent = () => {
+  const [query, setQuery] = useState('');
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(
     ENV.plugins.WALDUR_CORE.LANGUAGE_CHOICES,
   );
@@ -55,8 +57,10 @@ export const AdministrationLanguages: FunctionComponent = () => {
     } else {
       try {
         const selectedLanguageCodes = selectedLanguages.join(',');
-        await saveConfig({
-          LANGUAGE_CHOICES: selectedLanguageCodes,
+        await overrideSettings({
+          body: {
+            LANGUAGE_CHOICES: selectedLanguageCodes,
+          },
         });
         showSuccess(
           translate(
@@ -73,51 +77,62 @@ export const AdministrationLanguages: FunctionComponent = () => {
     }
   };
 
-  return (
-    <Card className="card-bordered">
-      <Card.Header>
-        <Card.Title>{translate('Language options')}</Card.Title>
-      </Card.Header>
+  const filteredLanguages = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return !q
+      ? ENV.languageChoices
+      : ENV.languageChoices.filter((item) =>
+          item.label.toLowerCase().includes(q),
+        );
+  }, [query]);
 
-      <Card.Body>
-        <div>
-          <div className="row" style={{ columnCount: 2, display: 'flow' }}>
-            <div className="col-md-6">
-              {ENV.languageChoices.map(
-                (language: { code: string; label: string }) => (
-                  <div key={language.code} className="mb-3">
-                    <AwesomeCheckboxField
-                      data-testid={`language_${language.code}`}
-                      name={`language_${language.code}`}
-                      input={
-                        {
-                          value: selectedLanguages.includes(language.code),
-                          onChange: () => handleLanguageChange(language.code),
-                        } as any
-                      }
-                      label={
-                        <div className="d-flex align-items-center">
-                          <div className="symbol symbol-20px me-2">
-                            <CountryFlag
-                              countryCode={LanguageCountry[language.code]}
-                            />
-                          </div>
-                          {language.label}
-                        </div>
-                      }
-                    />
+  return (
+    <Panel
+      title={translate('Language options')}
+      cardBordered
+      className="pb-1"
+      bodyClassName="py-0 overflow-hidden"
+      actions={
+        <>
+          <TableQuery query={query} setQuery={setQuery} />
+          <Button className="min-w-80px ms-4" onClick={saveLanguageOptions}>
+            {translate('Save')}
+          </Button>
+        </>
+      }
+    >
+      <Row className="mb-n1">
+        {filteredLanguages.map((language: { code: string; label: string }) => (
+          <Col key={language.code} sm={6} md={4}>
+            <div className="border-bottom py-5">
+              <AwesomeCheckboxField
+                data-testid={`language_${language.code}`}
+                name={`language_${language.code}`}
+                alignMiddle
+                className="justify-content-between flex-row-reverse"
+                size="sm"
+                input={
+                  {
+                    value: selectedLanguages.includes(language.code),
+                    onChange: () => handleLanguageChange(language.code),
+                  } as any
+                }
+                label={
+                  <div className="d-flex align-items-center">
+                    <div className="symbol symbol-20px me-2">
+                      <CountryFlag
+                        countryCode={LanguageCountry[language.code]}
+                        className="lh-1"
+                      />
+                    </div>
+                    {language.label}
                   </div>
-                ),
-              )}
+                }
+              />
             </div>
-          </div>
-          <div className="row">
-            <div className="col-md-12 text-end">
-              <Button onClick={saveLanguageOptions}>{translate('Save')}</Button>
-            </div>
-          </div>
-        </div>
-      </Card.Body>
-    </Card>
+          </Col>
+        ))}
+      </Row>
+    </Panel>
   );
 };

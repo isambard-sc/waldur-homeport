@@ -1,10 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
+import { marketplaceCategoriesList } from 'waldur-js-client';
 
-import {
-  getCategories,
-  getCategoryGroups,
-} from '@waldur/marketplace/common/api';
+import { getAllPages } from '@waldur/core/api';
+import { getCategoryGroups } from '@waldur/marketplace/common/api';
 import { CategoryGroup } from '@waldur/marketplace/types';
 
 import {
@@ -23,12 +22,15 @@ export const useCategories = () => {
     () =>
       Promise.all([
         getCategoryGroups(),
-        getCategories({
-          params: {
-            field: ['uuid', 'icon', 'title', 'offering_count', 'group'],
-            ...contextFilter,
-          },
-        }),
+        getAllPages((page) =>
+          marketplaceCategoriesList({
+            query: {
+              page,
+              field: ['uuid', 'icon', 'title', 'offering_count', 'group'],
+              ...contextFilter,
+            },
+          }),
+        ),
       ]).then(([categoryGroups, categories]) =>
         getGroupedCategories(categories, categoryGroups),
       ),

@@ -1,9 +1,12 @@
+import { DiscountTypeEnum } from 'waldur-js-client';
+
+import { translate } from '@waldur/i18n';
 import { CampaignFormData } from '@waldur/marketplace/service-providers/types';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 
 export const serializeCampaign = (formData: CampaignFormData) => ({
   name: formData.name,
-  discount_type: formData.discount_type,
+  discount_type: formData.discount_type as DiscountTypeEnum,
   discount: formData.discount,
   start_date: formData.start_date,
   end_date: formData.end_date,
@@ -28,5 +31,18 @@ export const getProviderBreadcrumbItems = (provider): IBreadcrumbItem[] => [
     key: 'provider',
     text: provider.customer_name,
     active: true,
+  },
+];
+
+export const PROVIDER_CUSTOMERS_TABLE_TABS = [
+  {
+    key: 'marketplace-provider-organizations',
+    title: translate('Organizations'),
+    state: 'marketplace-provider-organizations',
+  },
+  {
+    key: 'marketplace-provider-users',
+    title: translate('Users'),
+    state: 'marketplace-provider-users',
   },
 ];

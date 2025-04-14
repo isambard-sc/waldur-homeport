@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { OpenStackFlavor, PublicOfferingDetails } from 'waldur-js-client';
 
-import { Offering } from '@waldur/marketplace/types';
 import { orderFormAttributesSelector } from '@waldur/marketplace/utils';
 import { loadVolumeTypes } from '@waldur/openstack/api';
 import {
@@ -13,15 +13,13 @@ import {
 import { parseQuotas, parseQuotasUsage } from '@waldur/openstack/utils';
 import { type RootState } from '@waldur/store/reducers';
 
-import { Flavor } from '../types';
-
 export const formFlavorSelector = (state: RootState) => {
   const formAttrs = orderFormAttributesSelector(state);
-  return formAttrs.flavor as Flavor;
+  return formAttrs.flavor as OpenStackFlavor;
 };
 
 export const getOfferingLimit = (
-  offering: Offering,
+  offering: PublicOfferingDetails,
   quotaName: string,
   defaultLimit = Infinity,
 ) => {
@@ -31,7 +29,7 @@ export const getOfferingLimit = (
   return quota.limit;
 };
 
-export const useQuotasData = (offering: Offering) => {
+export const useQuotasData = (offering: PublicOfferingDetails) => {
   const formData = useSelector(orderFormAttributesSelector);
   const usages = useMemo(
     () => parseQuotasUsage(offering.quotas || []),
@@ -48,7 +46,7 @@ export const useQuotasData = (offering: Offering) => {
   }, [formData, usages, limits]);
 };
 
-export const useVolumeDataLoader = (offering: Offering) => {
+export const useVolumeDataLoader = (offering: PublicOfferingDetails) => {
   return useQuery(
     ['volumeTypes', offering.uuid],
     async () => {

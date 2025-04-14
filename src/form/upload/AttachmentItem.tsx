@@ -56,7 +56,8 @@ export const AttachmentItem: FC<AttachmentItemProps> = ({
             </div>
           ) : (
             <div className="attachment-item__thumb">
-              {attachment.mime_type.startsWith('image') ? (
+              {attachment.mime_type &&
+              attachment.mime_type.startsWith('image') ? (
                 <button
                   className="text-btn text-hover-primary"
                   onClick={openModal}
@@ -80,9 +81,14 @@ export const AttachmentItem: FC<AttachmentItemProps> = ({
               {attachment.file_name}
             </h6>
             <p className="fs-6 text-muted mb-0">
-              {formatFilesize(attachment.file_size, 'B')}
-              {' - '}
-              {formatDateTime(attachment.created)}
+              {[
+                attachment.file_size
+                  ? formatFilesize(attachment.file_size, 'B')
+                  : '',
+                attachment.created ? formatDateTime(attachment.created) : '',
+              ]
+                .filter(Boolean)
+                .join(' - ')}
             </p>
           </div>
         </>

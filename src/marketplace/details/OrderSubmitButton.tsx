@@ -1,23 +1,15 @@
 import { ShoppingCart } from '@phosphor-icons/react';
-import { useMutation } from '@tanstack/react-query';
-import { useRouter } from '@uirouter/react';
 import { useMemo } from 'react';
 import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
 import { parseDate } from '@waldur/core/dateUtils';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
-import { FieldError } from '@waldur/form';
+import { FieldErrorMessage } from '@waldur/form/FieldError';
 import { FloatingButton } from '@waldur/form/FloatingButton';
 import { translate } from '@waldur/i18n';
-import { waitForConfirmation } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import { createOrder } from '../common/api';
 
 import { OrderSummaryProps } from './types';
-import { formatOrderForCreate } from './utils';
 
 export const OrderSubmitButton = (props: OrderSummaryProps) => {
   const projectError = useMemo(() => {
@@ -32,36 +24,19 @@ export const OrderSubmitButton = (props: OrderSummaryProps) => {
   }, [props.formData?.project]);
 
   const errorsExist =
-    projectError || props.errors?.attributes || props.errors?.limits;
-
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const { mutate, isLoading } = useMutation(async () => {
-    await waitForConfirmation(
-      dispatch,
-      translate('Confirmation'),
-      translate('Are you sure you want to submit the order?'),
-    );
-    try {
-      const order: any = await createOrder(formatOrderForCreate(props));
-      dispatch(showSuccess(translate('Order has been submitted.')));
-      router.stateService.go('marketplace-resource-details', {
-        resource_uuid: order.data.marketplace_resource_uuid,
-      });
-    } catch (error) {
-      dispatch(showErrorResponse(error, translate('Unable to submit order.')));
-    }
-  });
+    projectError ||
+    props.errors?.attributes ||
+    props.errors?.limits ||
+    props.errors?.plan_entries;
 
   const Btn = (
     <Button
-      size="sm"
       variant="primary"
-      disabled={Boolean(errorsExist) || !props.formValid || isLoading}
-      onClick={() => mutate()}
+      disabled={Boolean(errorsExist) || !props.formValid || props.isSubmitting}
+      type="submit"
       className="w-100"
     >
-      {isLoading && <LoadingSpinnerIcon className="me-1" />}
+      {props.isSubmitting && <LoadingSpinnerIcon className="me-1" />}
       <span className="svg-icon svg-icon-2">
         <ShoppingCart />
       </span>
@@ -73,7 +48,7 @@ export const OrderSubmitButton = (props: OrderSummaryProps) => {
     <FloatingButton>
       {errorsExist ? (
         <Tip
-          label={<FieldError error={projectError || props.errors} />}
+          label={<FieldErrorMessage error={projectError || props.errors} />}
           id="offering-button-errors"
           autoWidth
           className="w-100"

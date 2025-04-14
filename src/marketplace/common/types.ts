@@ -1,8 +1,18 @@
 import { ComponentType, LazyExoticComponent } from 'react';
+import {
+  Project,
+  Customer,
+  ProviderPlanDetails as Plan,
+} from 'waldur-js-client';
 
 import { CheckoutSummaryProps } from '../deploy/types';
 import { OfferingEditPanelFormProps } from '../offerings/update/integration/types';
-import { Offering, OfferingComponent, OrderDetailsProps } from '../types';
+import {
+  AttributesType,
+  Offering,
+  OfferingComponent,
+  OrderDetailsProps,
+} from '../types';
 
 export type Limits = Record<string, number>;
 
@@ -45,4 +55,12 @@ export interface OfferingConfiguration<
     formData: any,
     components: OfferingComponent[],
   ) => OfferingComponent[];
+}
+export interface DeployFormData {
+  project?: Pick<Project, 'uuid' | 'name' | 'end_date' | 'url'>;
+  customer?: Pick<Customer, 'uuid' | 'name' | 'url' | 'payment_profiles'>;
+  offering?;
+  attributes?: AttributesType;
+  limits?: Limits;
+  plan?: Plan;
 }

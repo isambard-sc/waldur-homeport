@@ -1,14 +1,14 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { FieldArray, reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateAttributes } from 'waldur-js-client';
 
 import { pick } from '@waldur/core/utils';
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { updateOfferingAttributes } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { EDIT_SCHEDULES_FORM_ID } from './constants';
@@ -38,9 +38,12 @@ export const EditSchedulesDialog = connect(
     const update = useCallback(
       async (formData) => {
         try {
-          await updateOfferingAttributes(props.resolve.offering.uuid, {
-            ...props.resolve.offering.attributes,
-            schedules: formatSchedules(formData.schedules),
+          await marketplaceProviderOfferingsUpdateAttributes({
+            path: { uuid: props.resolve.offering.uuid },
+            body: {
+              ...props.resolve.offering.attributes,
+              schedules: formatSchedules(formData.schedules),
+            },
           });
           dispatch(
             showSuccess(translate('Schedules have been updated successfully.')),
@@ -58,10 +61,18 @@ export const EditSchedulesDialog = connect(
 
     return (
       <form onSubmit={props.handleSubmit(update)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Update schedule')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Update schedule')}
+          footer={
+            <>
+              <CloseDialogButton />
+              <SubmitButton
+                submitting={props.submitting}
+                label={translate('Update')}
+              />
+            </>
+          }
+        >
           <FormContainer {...props} className="size-xl">
             <FieldArray
               name="schedules"
@@ -69,14 +80,7 @@ export const EditSchedulesDialog = connect(
               component={OfferingScheduler}
             />
           </FormContainer>
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton
-            submitting={props.submitting}
-            label={translate('Update')}
-          />
-          <CloseDialogButton />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

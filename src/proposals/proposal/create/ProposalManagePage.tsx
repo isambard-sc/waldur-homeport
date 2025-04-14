@@ -1,22 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import { useSelector } from 'react-redux';
+import {
+  proposalProposalsRetrieve,
+  proposalReviewsList,
+} from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { SidebarLayout } from '@waldur/form/SidebarLayout';
 import { translate } from '@waldur/i18n';
-import { useFullPage } from '@waldur/navigation/context';
+import { PageBarProvider } from '@waldur/marketplace/context';
 import { useTitle } from '@waldur/navigation/title';
-import { getAllProposalReviews, getProposal } from '@waldur/proposals/api';
+import { Proposal } from '@waldur/proposals/types';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { ProposalDetails } from '../ProposalDetails';
 
 import { ProgressSteps } from './ProgressSteps';
-import { ProposalRejectionStep } from './ProposalRejectionStep';
+import { ProposalHeader } from './ProposalHeader';
 import { ProposalSubmissionStep } from './ProposalSubmissionStep';
-import { ProposalTeamVerificationStep } from './ProposalTeamVerificationStep';
 
 export const ProposalManagePage = () => {
-  useFullPage();
   useTitle(translate('Update proposal'));
 
   const {
@@ -28,13 +34,29 @@ export const ProposalManagePage = () => {
     isLoading,
     error,
     refetch,
-  } = useQuery(['Proposal', proposal_uuid], () => getProposal(proposal_uuid), {
-    refetchOnWindowFocus: false,
-  });
+  } = useQuery(
+    ['Proposal', proposal_uuid],
+    () =>
+      proposalProposalsRetrieve({
+        path: { uuid: proposal_uuid },
+      }).then((response) => response.data as any as Proposal),
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
+  const user = useSelector(getUser);
+
+  const hasPermissionToSubmit =
+    user.is_staff || (proposal && user.uuid === proposal.created_by_uuid);
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery(
     ['ProposalReviews', proposal_uuid],
-    () => getAllProposalReviews(proposal_uuid),
+    () =>
+      getAllPages((page) =>
+        proposalReviewsList({
+          query: { page, proposal_uuid },
+        }),
+      ),
     { refetchOnWindowFocus: false },
   );
 
@@ -44,36 +66,23 @@ export const ProposalManagePage = () => {
     return <LoadingErred loadData={refetch} />;
   }
 
-  return !['team_verification', 'draft', 'rejected'].includes(
-    proposal.state,
-  ) ? (
-    <ProposalDetails proposal={proposal} reviews={reviews} />
-  ) : (
-    <>
-      <ProgressSteps
-        proposal={proposal}
-        bgClass="bg-body"
-        className="border-bottom mb-10 pt-8 pb-6"
-      />
-      {proposal.state === 'team_verification' ? (
-        <ProposalTeamVerificationStep
-          proposal={proposal}
-          refetch={refetch}
-          reviews={reviews}
-        />
-      ) : proposal.state === 'rejected' ? (
-        <ProposalRejectionStep
-          proposal={proposal}
-          refetch={refetch}
-          reviews={reviews}
-        />
-      ) : (
+  return (
+    <PageBarProvider scrollOffset={100}>
+      <SidebarLayout.Header className="pb-5">
+        <div className="w-100">
+          <ProposalHeader proposal={proposal} className="mb-7" />
+          <ProgressSteps proposal={proposal} bgClass="bg-body" />
+        </div>
+      </SidebarLayout.Header>
+      {proposal.state === 'draft' && hasPermissionToSubmit ? (
         <ProposalSubmissionStep
           proposal={proposal}
           refetch={refetch}
           reviews={reviews}
         />
+      ) : (
+        <ProposalDetails proposal={proposal} reviews={reviews} />
       )}
-    </>
+    </PageBarProvider>
   );
 };

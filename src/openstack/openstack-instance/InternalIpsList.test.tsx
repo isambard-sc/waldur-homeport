@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
+import { OpenStackNestedPort } from 'waldur-js-client';
 
-import { Port } from '@waldur/resource/types';
 import { renderTable } from '@waldur/table/testUtils';
 
 import { InternalIpsList } from './InternalIpsList';
@@ -10,7 +10,7 @@ vi.mock('@waldur/table/useTableLoader', () => ({
 }));
 
 const renderList = () => {
-  const item: Port = {
+  const item: Partial<OpenStackNestedPort> = {
     fixed_ips: [{ ip_address: '192.168.42.14', subnet_id: '' }],
     mac_address: 'fa:16:3e:93:f0:7d',
     subnet: 'api/openstack-subnets/7350f289a6d14e4bbd780ee59b2899e6/',

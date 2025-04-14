@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { proposalPublicCallsRetrieve } from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { VStepperFormStepProps } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
-import { getPublicCall } from '@waldur/proposals/api';
 import {
   Proposal,
   ProposalResource,
@@ -36,6 +36,7 @@ const mapStateToFilter = createSelector(
     return result;
   },
 );
+
 export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
   const proposal: Proposal = props.params.proposal;
   const change = props.params?.change;
@@ -49,7 +50,10 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
     refetch: refetchCall,
   } = useQuery(
     ['publicCall', proposal.call_uuid],
-    () => getPublicCall(proposal.call_uuid),
+    () =>
+      proposalPublicCallsRetrieve({ path: { uuid: proposal.call_uuid } }).then(
+        (r) => r.data,
+      ),
     {
       refetchOnWindowFocus: false,
       staleTime: 60 * 1000,
@@ -70,10 +74,9 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
   });
 
   return (
-    <>
+    <div id={props.id}>
       <Table<ProposalResource>
         {...tableProps}
-        id={props.id}
         columns={[
           {
             title: translate('Offering'),
@@ -96,7 +99,11 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
           },
         ]}
         title={props.title}
-        verboseName={props.title}
+        verboseName={translate('Resources')}
+        emptyMessage={translate(
+          'No resources available in the current project. Start by adding or managing resources to get started.',
+        )}
+        minHeight="auto"
         filters={
           readOnlyMode ? null : isLoading ? (
             <LoadingSpinner />
@@ -115,7 +122,12 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
           ) : onAddCommentClick ? (
             <AddCommentButton
               review={reviews?.[0]}
-              onClick={() => onAddCommentClick('comment_resource_requests')}
+              onClick={() =>
+                onAddCommentClick({
+                  commentField: 'comment_resource_requests',
+                  label: props.title,
+                })
+              }
             />
           ) : null
         }
@@ -129,11 +141,15 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
             />
           ) : null
         }
+        footer={
+          <FieldReviewComments
+            reviews={reviews}
+            fieldName="comment_resource_requests"
+            space={0}
+            className="mt-5"
+          />
+        }
       />
-      <FieldReviewComments
-        reviews={reviews}
-        fieldName="comment_resource_requests"
-      />
-    </>
+    </div>
   );
 };

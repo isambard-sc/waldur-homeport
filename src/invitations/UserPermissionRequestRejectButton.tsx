@@ -1,10 +1,10 @@
 import { Prohibit } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { userPermissionRequestsReject } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { rejectPermissionRequest } from '@waldur/invitations/api';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ActionButton } from '@waldur/table/ActionButton';
@@ -33,7 +33,10 @@ export const UserPermissionRequestRejectButton: FunctionComponent<
 
   const submitRequest = async (comment: string) => {
     try {
-      await rejectPermissionRequest(permissionRequest.uuid, comment);
+      await userPermissionRequestsReject({
+        path: { uuid: permissionRequest.uuid },
+        body: { comment },
+      });
       dispatch(showSuccess(translate('Permission request has been rejected.')));
       dispatch(closeModalDialog());
       refetch();

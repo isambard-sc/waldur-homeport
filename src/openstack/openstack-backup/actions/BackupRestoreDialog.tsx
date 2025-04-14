@@ -4,16 +4,14 @@ import { FormGroup, FormLabel } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
 import { FieldArray } from 'react-final-form-arrays';
 import { useAsync } from 'react-use';
+import { OpenStackBackup, openstackBackupsRestore } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
-import { restoreBackup } from '@waldur/openstack/api';
 import { AsyncActionDialog } from '@waldur/resource/actions/AsyncActionDialog';
 import { useNotify } from '@waldur/store/hooks';
-
-import { OpenStackBackup } from '../types';
 
 import { NetworksList } from './NetworksList';
 import {
@@ -32,10 +30,10 @@ export const BackupRestoreDialog: FC<{
 
   const submitRequest = async (formData: BackupRestoreFormData) => {
     try {
-      await restoreBackup(
-        resource.uuid,
-        serializeBackupRestoreFormData(formData),
-      );
+      await openstackBackupsRestore({
+        path: { uuid: resource.uuid },
+        body: serializeBackupRestoreFormData(formData),
+      });
       showSuccess(translate('VM snapshot restoration has been scheduled.'));
       closeDialog();
       if (refetch) {

@@ -2,7 +2,7 @@ import { Link } from '@waldur/core/Link';
 import { formatJsx, translate } from '@waldur/i18n';
 
 export const TosNotification = ({
-  className = 'text-center fs-9 mt-2 mb-0',
+  className = 'text-center text-gray-400 fs-6 mt-2 mb-0',
 }) => (
   <p className={className}>
     {translate(

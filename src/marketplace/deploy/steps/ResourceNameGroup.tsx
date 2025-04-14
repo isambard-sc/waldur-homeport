@@ -1,9 +1,10 @@
+import { LightbulbFilament } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Field } from 'redux-form';
+import { marketplaceResourcesSuggestName } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { Tip } from '@waldur/core/Tooltip';
 import { getNameFieldValidators } from '@waldur/core/validators';
 import { FormGroup, StringField } from '@waldur/form';
@@ -13,9 +14,11 @@ import { orderProjectSelector } from '@waldur/marketplace/details/utils';
 const ResourceNameField = (props) => {
   const project = useSelector(orderProjectSelector);
   const { mutate: suggestName, isLoading } = useMutation(async () => {
-    const response = await post('/marketplace-resources/suggest_name/', {
-      project: project.uuid,
-      offering: props.offering.uuid,
+    const response = await marketplaceResourcesSuggestName({
+      body: {
+        project: project.uuid,
+        offering: props.offering.uuid,
+      },
     });
     props.input.onChange(response.data['name']);
   });
@@ -27,10 +30,14 @@ const ResourceNameField = (props) => {
       </div>
       {project ? (
         <Button
-          variant="primary"
+          variant="outline"
+          className="btn-outline-default"
           onClick={() => suggestName()}
           disabled={isLoading}
         >
+          <span className="svg-icon svg-icon-2">
+            <LightbulbFilament weight="bold" />
+          </span>
           {translate('Suggest name')}
         </Button>
       ) : (
@@ -38,7 +45,10 @@ const ResourceNameField = (props) => {
           id="ResourceNameField"
           label={translate('Organization and project need to be selected.')}
         >
-          <Button variant="primary" disabled>
+          <Button variant="outline" className="btn-outline-default" disabled>
+            <span className="svg-icon svg-icon-2">
+              <LightbulbFilament weight="bold" />
+            </span>
             {translate('Suggest name')}
           </Button>
         </Tip>

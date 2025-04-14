@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent, useMemo } from 'react';
+import { proposalProtectedCallsRetrieve } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { InvalidRoutePage } from '@waldur/error/InvalidRoutePage';
@@ -14,10 +15,10 @@ import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { RoleEnum } from '@waldur/permissions/enums';
 
-import { getProtectedCall } from '../api';
 import { CallTabs } from '../details/CallTabs';
 import { TeamSection } from '../team/TeamSection';
-import { getCallBreadcrumbItems } from '../utils';
+import { Call } from '../types';
+import { useCallBreadcrumbItems } from '../utils';
 
 import { CallUpdateHero } from './CallUpdateHero';
 import { CallDocumentsSection } from './documents/CallDocumentsSection';
@@ -61,29 +62,42 @@ const Body = ({ call, refetch, loading }) => {
           title: translate('Documents'),
           component: CallDocumentsSection,
         },
-        !isFeatureVisible(MarketplaceFeatures.call_only) && {
-          key: 'reviewers',
-          title: translate('Reviewers'),
-          component: ({ call }) => (
-            <TeamSection
-              scope={call}
-              roles={[RoleEnum.CALL_REVIEWER]}
-              roleTypes={['call']}
-              title={translate('Reviewers')}
-            />
-          ),
-        },
         {
-          key: 'managers',
-          title: translate('Managers'),
-          component: ({ call }) => (
-            <TeamSection
-              scope={call}
-              roles={[RoleEnum.CALL_MANAGER]}
-              roleTypes={['call']}
-              title={translate('Managers')}
-            />
-          ),
+          key: 'team',
+          title: translate('Team'),
+          defaultKey: !isFeatureVisible(MarketplaceFeatures.call_only)
+            ? 'reviewers'
+            : 'managers',
+          children: [
+            !isFeatureVisible(MarketplaceFeatures.call_only) && {
+              key: 'reviewers',
+              title: translate('Reviewers'),
+              component: ({ call }) => (
+                <TeamSection
+                  scope={call}
+                  roles={[RoleEnum.CALL_REVIEWER]}
+                  roleTypes={['call']}
+                  title={translate('Reviewers')}
+                  hasTeamTabs
+                />
+              ),
+              visible: false,
+            },
+            {
+              key: 'managers',
+              title: translate('Managers'),
+              component: ({ call }) => (
+                <TeamSection
+                  scope={call}
+                  roles={[RoleEnum.CALL_MANAGER]}
+                  roleTypes={['call']}
+                  title={translate('Managers')}
+                  hasTeamTabs
+                />
+              ),
+              visible: false,
+            },
+          ].filter(Boolean),
         },
         {
           key: 'offerings',
@@ -96,7 +110,7 @@ const Body = ({ call, refetch, loading }) => {
 
   usePageHero(<PageHero call={call} refetch={refetch} />);
 
-  const breadcrumbItems = useMemo(() => getCallBreadcrumbItems(call), [call]);
+  const breadcrumbItems = useCallBreadcrumbItems(call);
   useBreadcrumbs(breadcrumbItems);
 
   const {
@@ -119,7 +133,10 @@ export const CallUpdateContainer: FunctionComponent = () => {
     isRefetching,
   } = useQuery(
     ['CallUpdateContainer', call_uuid],
-    () => getProtectedCall(call_uuid),
+    () =>
+      proposalProtectedCallsRetrieve({ path: { uuid: call_uuid } }).then(
+        (r) => r.data as any as Call,
+      ),
     {
       refetchOnWindowFocus: false,
     },

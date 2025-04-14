@@ -1,14 +1,18 @@
+import {
+  BasePublicPlan,
+  marketplacePublicOfferingsRetrieve,
+  marketplaceResourcesRetrieve,
+  PublicOfferingDetails,
+  Resource,
+} from 'waldur-js-client';
+
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import {
   SelectDialogFieldColumn,
   SelectDialogFieldChoice,
 } from '@waldur/form/types';
 import { translate } from '@waldur/i18n';
-import { getPublicOffering, getResource } from '@waldur/marketplace/common/api';
 import { filterOfferingComponents } from '@waldur/marketplace/common/registry';
-import { Offering, Plan } from '@waldur/marketplace/types';
-
-import { Resource } from '../types';
 
 export interface FetchedData {
   resource: Resource;
@@ -19,7 +23,9 @@ export interface FetchedData {
   };
 }
 
-const getColumns = (offering: Offering): SelectDialogFieldColumn[] => [
+const getColumns = (
+  offering: PublicOfferingDetails,
+): SelectDialogFieldColumn[] => [
   {
     name: 'name',
     label: translate('Name'),
@@ -36,7 +42,7 @@ const getColumns = (offering: Offering): SelectDialogFieldColumn[] => [
   },
 ];
 
-const sortPlans = (plans: Plan[]) =>
+const sortPlans = (plans: BasePublicPlan[]) =>
   plans
     .map((plan) => ({
       ...plan,
@@ -47,7 +53,7 @@ const sortPlans = (plans: Plan[]) =>
     }))
     .sort((a, b) => a.unit_price - b.unit_price);
 
-const getPlanSwitchPrice = (plan: Plan) => {
+const getPlanSwitchPrice = (plan: BasePublicPlan) => {
   const fixedPart =
     typeof plan.unit_price === 'string'
       ? parseFloat(plan.unit_price)
@@ -60,7 +66,7 @@ const getPlanSwitchPrice = (plan: Plan) => {
 };
 
 const getChoices = (
-  offering: Offering,
+  offering: PublicOfferingDetails,
   resource: Resource,
 ): SelectDialogFieldChoice[] =>
   sortPlans(offering.plans).map((plan) => ({
@@ -69,6 +75,7 @@ const getChoices = (
     name: plan.name,
     ...plan.quotas,
     archived: plan.archived,
+    // @ts-ignore
     price: getPlanSwitchPrice(plan),
     disabled: plan.url === resource.plan || !plan.is_active,
     disabledReason: !plan.is_active
@@ -79,8 +86,12 @@ const getChoices = (
   }));
 
 export async function loadData(resource_uuid): Promise<FetchedData> {
-  const resource = await getResource(resource_uuid);
-  const offering = await getPublicOffering(resource.offering_uuid);
+  const resource = await marketplaceResourcesRetrieve({
+    path: { uuid: resource_uuid },
+  }).then((r) => r.data);
+  const offering = await marketplacePublicOfferingsRetrieve({
+    path: { uuid: resource.offering_uuid },
+  }).then((response) => response.data);
   const columns = getColumns(offering);
   const choices = getChoices(offering, resource);
   const validPlan = choices.find((choice) => !choice.disabled);

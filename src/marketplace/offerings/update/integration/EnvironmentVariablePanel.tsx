@@ -23,7 +23,6 @@ export const EnvironmentVariablePanel: FunctionComponent<OwnProps> = (
             name="name"
             component={InputField}
             placeholder={translate('Key')}
-            className=""
           />
         </td>
         <td>
@@ -31,7 +30,6 @@ export const EnvironmentVariablePanel: FunctionComponent<OwnProps> = (
             name="value"
             component={InputField}
             placeholder={translate('Value')}
-            className=""
           />
         </td>
         <td>

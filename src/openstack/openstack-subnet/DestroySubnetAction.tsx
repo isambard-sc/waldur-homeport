@@ -1,15 +1,16 @@
-import { destroySubnet } from '@waldur/openstack/api';
+import { openstackSubnetsDestroy } from 'waldur-js-client';
+
 import { validateState } from '@waldur/resource/actions/base';
 import { DestroyActionItem } from '@waldur/resource/actions/DestroyActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const validators = [validateState('OK', 'Erred')];
+const validators = [validateState('OK', 'ERRED')];
 
 export const DestroySubnetAction: ActionItemType = ({ resource, refetch }) => (
   <DestroyActionItem
     validators={validators}
     resource={resource}
-    apiMethod={destroySubnet}
+    apiMethod={(id) => openstackSubnetsDestroy({ path: { uuid: id } })}
     refetch={refetch}
   />
 );

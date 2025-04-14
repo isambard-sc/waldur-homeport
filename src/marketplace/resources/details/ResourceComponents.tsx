@@ -1,7 +1,7 @@
 import { Col, Row } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
+import { Resource } from 'waldur-js-client';
 
-import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 
 import { ResourceComponentItem } from './ResourceComponentItem';
@@ -11,7 +11,7 @@ export const ResourceComponents = ({
   resource,
   components,
 }: {
-  resource: { current_usages: Limits; limits: Limits; limit_usage: Limits };
+  resource: Pick<Resource, 'current_usages' | 'limits' | 'limit_usage'>;
   components: OfferingComponent[];
 }) => {
   const isSmallScreen = useMediaQuery({ maxWidth: 320 });

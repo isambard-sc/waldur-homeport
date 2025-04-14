@@ -3,25 +3,29 @@ import { Button } from 'react-bootstrap';
 
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
-import { getReviewStateOptions } from '@waldur/proposals/utils';
+import { isReviewInFinalState } from '@waldur/proposals/utils';
 
 export const AddCommentButton = ({
   review,
   onClick,
   className = undefined,
 }) => {
-  const disabled =
-    review?.state !== getReviewStateOptions()[0].value &&
-    review?.state !== getReviewStateOptions()[1].value;
+  const disabled = isReviewInFinalState(review?.state);
+
   return (
     <Tip
       id="form-add-comment-tooltip"
       label={translate('Add comment')}
       className={className}
     >
-      <Button variant="flush" onClick={onClick} disabled={disabled}>
-        <span className="svg-icon svg-icon-2x">
-          <ChatDots weight="bold" className="text-primary" />
+      <Button
+        variant="active-secondary"
+        className="btn-icon btn-icon-primary"
+        onClick={onClick}
+        disabled={disabled}
+      >
+        <span className="svg-icon svg-icon-1x me-0">
+          <ChatDots weight="bold" />
         </span>
       </Button>
     </Tip>

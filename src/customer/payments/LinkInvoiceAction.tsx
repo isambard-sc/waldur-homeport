@@ -1,12 +1,11 @@
 import { FunctionComponent, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAsyncFn, useBoolean } from 'react-use';
+import { Invoice, invoicesList, paymentsLinkToInvoice } from 'waldur-js-client';
 
-import { getAll } from '@waldur/core/api';
-import * as api from '@waldur/customer/payments/api';
+import { getAllPages } from '@waldur/core/api';
 import { InvoicesDropdown } from '@waldur/customer/payments/InvoicesDropdown';
 import { translate } from '@waldur/i18n';
-import { Invoice } from '@waldur/invoices/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
@@ -14,12 +13,14 @@ import { Customer } from '@waldur/workspace/types';
 import { updatePaymentsList } from './utils';
 
 const loadInvoices = (customer: Customer) =>
-  getAll<Invoice[]>('/invoices/', {
-    params: { customer: customer.url, state: 'paid' },
-  });
+  getAllPages((page) =>
+    invoicesList({
+      query: { customer: customer.url, state: ['paid'], page },
+    }),
+  );
 
-export const LinkInvoiceAction: FunctionComponent<{ payment }> = ({
-  payment,
+export const LinkInvoiceAction: FunctionComponent<{ row }> = ({
+  row: payment,
 }) => {
   const customer = useSelector(getCustomer);
   const dispatch = useDispatch();
@@ -40,9 +41,11 @@ export const LinkInvoiceAction: FunctionComponent<{ payment }> = ({
 
   const triggerAction = async (selectedInvoice: Invoice) => {
     try {
-      await api.linkInvoice({
-        paymentUuid: payment.uuid,
-        invoiceUrl: selectedInvoice.url,
+      await paymentsLinkToInvoice({
+        path: { uuid: payment.uuid },
+        body: {
+          invoice: selectedInvoice.url,
+        },
       });
       dispatch(
         showSuccess(
@@ -69,6 +72,7 @@ export const LinkInvoiceAction: FunctionComponent<{ payment }> = ({
       invoices={value}
       onToggle={onToggle}
       onSelect={triggerAction}
+      variant="outline"
     />
   );
 };

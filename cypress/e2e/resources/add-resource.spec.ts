@@ -5,8 +5,8 @@ describe('Add resource button', () => {
       .intercept('GET', '/api/configuration/', {
         fixture: 'support/configuration.json',
       })
-      .intercept('GET', '/api/events/', [])
-      .intercept('GET', '/api/roles/', { fixture: 'roles.json' })
+      .intercept('GET', '/api/events/**', [])
+      .intercept('GET', '/api/roles/**', { fixture: 'roles.json' })
 
       .intercept('GET', '/api/users/me/', {
         fixture: 'users/nonstaff.json',

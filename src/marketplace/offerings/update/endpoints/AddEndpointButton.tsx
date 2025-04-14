@@ -30,7 +30,7 @@ export const AddEndpointButton: FunctionComponent<{
   };
   return (
     <ActionButton
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       title={translate('Add endpoint')}
       action={callback}
     />

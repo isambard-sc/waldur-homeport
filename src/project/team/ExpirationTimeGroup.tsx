@@ -18,6 +18,7 @@ export const ExpirationTimeGroup: FunctionComponent<{ disabled?: boolean }> = ({
       component={DateField}
       disabled={disabled}
       minDate={DateTime.now().plus({ days: 1 }).toISO()}
+      placeholder="YYYY-MM-DD"
     />
   </Form.Group>
 );

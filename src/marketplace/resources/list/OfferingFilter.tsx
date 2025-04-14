@@ -5,11 +5,12 @@ import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { resourceOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
-export const OfferingFilter: React.FC<{ category_uuid }> = ({
+export const OfferingFilter: React.FC<{ category_uuid; name? }> = ({
   category_uuid,
+  name = 'offering',
 }) => (
   <AsyncSelectField
-    name="offering"
+    name={name}
     label={translate('Offering')}
     placeholder={translate('Select offering...')}
     loadOptions={(query, prevOptions, page) =>

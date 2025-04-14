@@ -1,9 +1,11 @@
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Project } from 'waldur-js-client';
 
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
+import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
@@ -21,7 +23,6 @@ import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { getUser } from '@waldur/workspace/selectors';
 
-import { OrganizationNameField } from './OrganizationNameField';
 import { ProjectExpandableRow } from './ProjectExpandableRow';
 import { ProjectsListFilter } from './ProjectsListFilter';
 
@@ -37,18 +38,13 @@ const mapStateToFilter = createSelector(
     ) {
       filter.customer = stateFilter.organization.map((x) => x.uuid).join(',');
     }
+    if (stateFilter && stateFilter.conceal_finished_projects) {
+      filter.conceal_finished_projects = stateFilter.conceal_finished_projects;
+    }
     filter.user_uuid = user.uuid;
     return filter;
   },
 );
-
-const mandatoryFields = [
-  // Expandable view
-  'uuid',
-  'marketplace_resource_count',
-  'description',
-  'project_credit',
-];
 
 export const ProjectsList = () => {
   useTitle(translate('Projects'), '', 'browser');
@@ -58,7 +54,6 @@ export const ProjectsList = () => {
     fetchData: createFetcher('projects'),
     queryField: 'name',
     filter,
-    mandatoryFields,
   });
 
   const { syncResourceFilters } =
@@ -73,7 +68,7 @@ export const ProjectsList = () => {
       project: row,
     });
 
-  const columns: Column[] = [
+  const columns: Column<Project>[] = [
     {
       title: translate('Name'),
       orderField: 'name',
@@ -89,8 +84,8 @@ export const ProjectsList = () => {
       title: translate('Organization'),
       orderField: 'customer_name',
       render: ({ row }) => (
-        <OrganizationNameField
-          row={{ uuid: row.customer_uuid, name: row.customer_name }}
+        <OrganizationLink
+          uuid={row.customer_uuid}
           onClick={() =>
             syncResourceFilters({
               organization: {
@@ -100,7 +95,9 @@ export const ProjectsList = () => {
               project: null,
             })
           }
-        />
+        >
+          {row.customer_name}
+        </OrganizationLink>
       ),
       keys: ['customer_uuid', 'customer_name'],
       filter: 'organization',
@@ -133,7 +130,7 @@ export const ProjectsList = () => {
       keys: ['start_date'],
       id: 'start_date',
       export: (row) =>
-        row.start_date ? formatDate(row.start__date) : DASH_ESCAPE_CODE,
+        row.start_date ? formatDate(row.start_date) : DASH_ESCAPE_CODE,
       optional: true,
     },
 
@@ -172,7 +169,7 @@ export const ProjectsList = () => {
       keys: ['uuid'],
       id: 'uuid',
     },
-    SLUG_COLUMN,
+    SLUG_COLUMN as Column<Project>,
   ];
 
   if (isFeatureVisible(ProjectFeatures.estimated_cost)) {

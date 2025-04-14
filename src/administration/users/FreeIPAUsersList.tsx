@@ -1,3 +1,5 @@
+import { FreeipaProfile } from 'waldur-js-client';
+
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
@@ -13,7 +15,7 @@ export const FreeIPAUsersList = () => {
   });
 
   return (
-    <Table
+    <Table<FreeipaProfile>
       {...tableProps}
       columns={[
         {

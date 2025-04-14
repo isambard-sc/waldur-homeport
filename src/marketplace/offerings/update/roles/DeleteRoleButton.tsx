@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
+import { marketplaceOfferingUserRolesDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { deleteOfferingRole } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
@@ -26,7 +26,7 @@ export const DeleteRoleButton = ({ role, refetch }) => {
       return;
     }
     try {
-      await deleteOfferingRole(role.uuid);
+      await marketplaceOfferingUserRolesDestroy({ path: { uuid: role.uuid } });
       dispatch(showSuccess(translate('Role has been removed.')));
       await refetch();
     } catch (error) {

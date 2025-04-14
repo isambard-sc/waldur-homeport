@@ -20,7 +20,7 @@ export const formatQuotaValue = (value, name) => {
   if (filter) {
     switch (filter) {
       case 'filesize':
-        return formatFilesize(value);
+        return formatFilesize(value, 'MB', 'GB');
       case 'defaultCurrency':
         return defaultCurrency(value);
     }

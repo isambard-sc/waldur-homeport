@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 import { getIdentityProviders } from '@waldur/administration/api';
-import { ENV } from '@waldur/configs/default';
-import { fixURL } from '@waldur/core/api';
+import { getIconUrl } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { getQueryParams } from '@waldur/core/filters';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -23,7 +23,7 @@ import './LoginColumn.scss';
 
 export const LoginColumn = () => {
   const features = useAuthFeatures();
-  const imageUrl = fixURL('/icons/login_logo/');
+  const imageUrl = getIconUrl('login_logo');
   const { data, isLoading, error, refetch } = useQuery(
     ['IdentityProvidersConfigurations'],
     () => getIdentityProviders(),

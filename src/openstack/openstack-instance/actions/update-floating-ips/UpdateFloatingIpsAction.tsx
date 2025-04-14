@@ -25,6 +25,6 @@ export const UpdateFloatingIpsAction: ActionItemType = ({
     modalComponent={UpdateFloatingIpsDialog}
     extraResolve={{ refetch }}
     dialogSize="lg"
-    iconNode={<GitMerge />}
+    iconNode={<GitMerge weight="bold" />}
   />
 );

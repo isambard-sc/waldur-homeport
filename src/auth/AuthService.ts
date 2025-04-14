@@ -1,6 +1,6 @@
-import Axios from 'axios';
+import { apiAuthPassword } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { initApiClient } from '@waldur/core/api';
 import { router } from '@waldur/router';
 import store from '@waldur/store/store';
 import {
@@ -14,7 +14,7 @@ import { getToken, removeToken, setToken } from './TokenStorage';
 
 export function setAuthHeader(token) {
   setToken(token);
-  Axios.defaults.headers.Authorization = 'Token ' + token;
+  initApiClient();
 }
 
 export function loginSuccess(response) {
@@ -27,13 +27,12 @@ export function isAuthenticated() {
 }
 
 export async function signin(username, password) {
-  const response = await Axios.post<{ token: string }>(
-    ENV.apiEndpoint + 'api-auth/password/',
-    {
+  const response = await apiAuthPassword({
+    body: {
       username,
       password,
     },
-  );
+  });
   setAuthHeader(response.data.token);
   const user = await UsersService.getCurrentUser();
   loginSuccess({ data: { ...user, method: 'local' } });
@@ -60,12 +59,8 @@ export function redirectOnSuccess() {
     if (!href) {
       return router.stateService.go('profile.details', { reload: true });
     }
-    return router.stateService.go(redirect.toState, redirect.toParams, {
-      reload: true,
-      custom: {
-        fallbackState: 'profile.details',
-      },
-    });
+    // TODO: Use router.stateService.go(redirect.toState, redirect.toParams) instead
+    document.location = href;
   } else {
     return router.stateService.go('profile.details', { reload: true });
   }
@@ -74,7 +69,6 @@ export function redirectOnSuccess() {
 export function clearAuthCache() {
   store.dispatch(setCurrentUser(undefined));
   clearImpersonationData();
-  delete Axios.defaults.headers.Authorization;
   removeToken();
 }
 

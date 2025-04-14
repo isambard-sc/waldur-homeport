@@ -19,6 +19,10 @@ export const ChangesAmountBadge: FC<ChangesAmountBadgeProps> = ({
   let className = asBadge ? 'badge badge-light-' : 'text-';
   const arrowClassName = asBadge ? '' : 'fs-4';
 
+  if (typeof changes === 'string') {
+    changes = parseFloat(changes);
+  }
+
   if (changes !== 0 && !Number.isNaN(changes)) {
     if (changes < 0) {
       className += 'danger';

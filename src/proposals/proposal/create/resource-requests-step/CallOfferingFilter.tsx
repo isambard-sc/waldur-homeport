@@ -5,9 +5,9 @@ import { REACT_SELECT_TABLE_FILTER, Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { CallOffering } from '@waldur/proposals/types';
 
-export const CallOfferingFilter: React.FC<{ options: CallOffering[] }> = ({
-  options,
-}) => (
+export const CallOfferingFilter: React.FC<{
+  options: Partial<Pick<CallOffering, 'offering_name' | 'offering_uuid'>>[];
+}> = ({ options }) => (
   <Field
     name="offering"
     component={(fieldProps) => (

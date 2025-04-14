@@ -1,8 +1,7 @@
 import { FunctionComponent } from 'react';
+import { Resource } from 'waldur-js-client';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
-
-import { Resource } from '../types';
 
 import { PublicResourceLink } from './PublicResourceLink';
 

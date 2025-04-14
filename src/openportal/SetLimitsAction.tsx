@@ -19,7 +19,7 @@ const validators = [validateState('OK'), validateStaffAction];
 
 const useSetLimits = ({ resource, refetch }) => {
   const { tooltip, disabled } = useValidators(validators, resource);
-  const action = useModalDialogCallback(SetLimitsDialog, null, resource, {
+  const action = useModalDialogCallback(SetLimitsDialog, resource, {
     refetch,
   });
   return {
@@ -27,7 +27,7 @@ const useSetLimits = ({ resource, refetch }) => {
     action,
     tooltip,
     disabled,
-    iconNode: <PencilSimple />,
+    iconNode: <PencilSimple weight="bold" />,
   };
 };
 

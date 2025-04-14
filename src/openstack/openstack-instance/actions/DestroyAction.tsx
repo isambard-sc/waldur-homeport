@@ -1,8 +1,8 @@
 import { FileX } from '@phosphor-icons/react';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
@@ -13,7 +13,7 @@ const DestroyDialog = lazyComponent(() =>
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {
-  if (ctx.resource.state === 'Erred') {
+  if (ctx.resource.state === 'ERRED') {
     return;
   }
   if (ctx.resource.state === 'OK' && ctx.resource.runtime_state === 'SHUTOFF') {
@@ -37,7 +37,7 @@ export const DestroyAction: ActionItemType = ({ resource, refetch }) => (
     resource={resource}
     modalComponent={DestroyDialog}
     extraResolve={{ refetch }}
-    iconNode={<FileX />}
+    iconNode={<FileX weight="bold" />}
     iconColor="danger"
   />
 );

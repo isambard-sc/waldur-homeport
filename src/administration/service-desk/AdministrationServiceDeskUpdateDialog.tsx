@@ -1,15 +1,15 @@
 import { capitalize } from 'lodash-es';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { overrideSettings } from 'waldur-js-client';
 
+import { formDataOptions } from '@waldur/core/api';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import { saveConfig } from '../settings/api';
 
 import { SupportSettingsForm } from './SupportSettingsForm';
 
@@ -28,7 +28,7 @@ export const AdministrationServiceDeskUpdateDialog = reduxForm<
       }
     });
     try {
-      await saveConfig(relevantFormData);
+      await overrideSettings({ body: relevantFormData, ...formDataOptions });
       dispatch(showSuccess('Configurations have been updated'));
       dispatch(closeModalDialog());
     } catch (e) {

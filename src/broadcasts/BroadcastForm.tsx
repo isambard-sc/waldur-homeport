@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import { Col, Modal, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { change, FormName, getFormValues } from 'redux-form';
@@ -10,13 +11,15 @@ import { DateField } from '@waldur/form/DateField';
 import { WizardStepIndicator } from '@waldur/form/WizardStepIndicator';
 import { translate } from '@waldur/i18n';
 import {
-  offeringsAutocomplete,
   organizationAutocomplete,
+  providerOfferingsAutocomplete,
 } from '@waldur/marketplace/common/autocompletes';
+import { RootState } from '@waldur/store/reducers';
 
 import { templateAutocomplete } from './autocomplete';
+import { BROADCAST_CREATE_FORM_ID } from './constants';
 import { RecipientsList } from './RecipientsList';
-import { MessageTemplate, BroadcastFormData } from './types';
+import { BroadcastFormData, MessageTemplate } from './types';
 
 const RecipientsListQuery = ({ form }) => {
   const query = useSelector(getFormValues(form));
@@ -25,16 +28,18 @@ const RecipientsListQuery = ({ form }) => {
 
 export const BroadcastForm = ({
   submitting,
-  formValues,
   step,
   setStep,
 }: {
   submitting: boolean;
-  formValues: BroadcastFormData;
   step: number;
   setStep(step: number): void;
 }) => {
   const dispatch = useDispatch();
+  const formValues = useSelector<RootState, BroadcastFormData>(
+    getFormValues(BROADCAST_CREATE_FORM_ID) as any,
+  );
+
   return (
     <>
       <WizardStepIndicator
@@ -44,7 +49,7 @@ export const BroadcastForm = ({
       />
       <FormName>
         {({ form }) => (
-          <Modal.Body className="scroll-y mx-5 mx-xl-15 my-7">
+          <Modal.Body className="scroll-y border-0">
             {step === 0 ? (
               <FormContainer submitting={submitting} clearOnUnmount={false}>
                 <AsyncSelectField
@@ -85,7 +90,11 @@ export const BroadcastForm = ({
                   required={true}
                   validate={required}
                 />
-                <DateField name="send_at" label={translate('Send at')} />
+                <DateField
+                  name="send_at"
+                  label={translate('Send at')}
+                  minDate={DateTime.now().plus({ days: 1 }).toISO()}
+                />
               </FormContainer>
             ) : (
               <Row>
@@ -108,7 +117,7 @@ export const BroadcastForm = ({
                       label={translate('Offerings')}
                       placeholder={translate('Select offerings...')}
                       loadOptions={(query, prevOptions, page) =>
-                        offeringsAutocomplete(
+                        providerOfferingsAutocomplete(
                           { name: query, shared: true },
                           prevOptions,
                           page,

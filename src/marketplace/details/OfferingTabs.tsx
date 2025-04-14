@@ -1,21 +1,22 @@
-import { FormattedHtml } from '@waldur/core/FormattedHtml';
+import Markdown from 'markdown-to-jsx';
+import { NestedSection, PublicOfferingDetails } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
 import { ImagesTab } from '@waldur/marketplace/offerings/images/ImagesTab';
-import { Offering, Section } from '@waldur/marketplace/types';
 
 import { AttributesTable } from './attributes/AttributesTable';
 import { OfferingTab } from './OfferingTabsComponent';
 import { OverviewTab } from './OverviewTab';
 
 interface OfferingTabsProps {
-  sections: Section[];
-  offering: Offering;
+  sections: NestedSection[];
+  offering: PublicOfferingDetails;
   order?: any;
 }
 
 export const getTabs = (props: OfferingTabsProps): OfferingTab[] => {
   const attributes = props.offering.attributes;
-  const filterSection = (section: Section) =>
+  const filterSection = (section: NestedSection) =>
     section.attributes.some((attr) =>
       Object.prototype.hasOwnProperty.call(props.offering.attributes, attr.key),
     );
@@ -33,7 +34,7 @@ export const getTabs = (props: OfferingTabsProps): OfferingTab[] => {
     {
       visible: !!props.offering.terms_of_service,
       title: translate('Terms of Service'),
-      component: () => <FormattedHtml html={props.offering.terms_of_service} />,
+      component: () => <Markdown>{props.offering.terms_of_service}</Markdown>,
     },
     {
       visible: basicSections.length > 0,

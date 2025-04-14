@@ -9,7 +9,7 @@ import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
 import { PermissionEnum } from '@waldur/permissions/enums';
-import { isOwnerOrStaff } from '@waldur/workspace/selectors';
+import { getUser, isOwnerOrStaff } from '@waldur/workspace/selectors';
 
 import { fetchProvider } from './resolve';
 
@@ -86,6 +86,7 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Orders'),
       permissions: [
         () => !isFeatureVisible(MarketplaceFeatures.catalogue_only),
+        (state) => Boolean(getUser(state)),
       ],
     },
   },
@@ -258,9 +259,25 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     url: '',
+    redirectTo: 'marketplace-provider-organizations',
     data: {
       breadcrumb: () => translate('Customers'),
       priority: 110,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-tean',
+    parent: 'marketplace-provider',
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderTeamPage').then((module) => ({
+        default: module.ProviderTeamPage,
+      })),
+    ),
+    url: 'team',
+    data: {
+      breadcrumb: () => translate('Team'),
+      priority: 155,
     },
   },
 
@@ -343,7 +360,7 @@ export const states: StateDeclaration[] = [
       ),
     ),
     data: {
-      breadcrumb: () => translate('Organizations'),
+      skipBreadcrumb: true,
     },
   },
 
@@ -357,7 +374,7 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('Users'),
+      skipBreadcrumb: true,
     },
   },
   {

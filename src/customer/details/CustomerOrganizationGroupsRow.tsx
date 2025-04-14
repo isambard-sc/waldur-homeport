@@ -2,9 +2,10 @@ import { useDispatch } from 'react-redux';
 
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { getCustomer } from '@waldur/project/api';
 import { showErrorResponse } from '@waldur/store/notify';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
+
+import { getCustomer } from '../utils';
 
 import { UpdateCustomerOrganizationsGroupsButton } from './UpdateCustomerOrganizationsGroupsButton';
 

@@ -20,14 +20,7 @@ export const PublicOfferingComponents: FunctionComponent<
   return (
     <Row className="mb-10" id="components">
       <Col sm={12} md>
-        <Card className="card-bordered">
-          <Card.Body>
-            <PublicOfferingCardTitle>
-              {translate('Components')}
-            </PublicOfferingCardTitle>
-            <PublicOfferingComponentsTable offering={offering} />
-          </Card.Body>
-        </Card>
+        <PublicOfferingComponentsTable offering={offering} />
       </Col>
       {showExperimentalUiComponents && (
         <Col sm={12} md={4}>

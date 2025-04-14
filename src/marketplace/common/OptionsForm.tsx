@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { useSelector } from 'react-redux';
 
 import { required } from '@waldur/core/validators';
@@ -11,6 +12,7 @@ import {
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { DateField } from '@waldur/form/DateField';
+import { FormGroupProps } from '@waldur/form/FormGroup';
 import { SelectMultiCheckboxGroup } from '@waldur/form/SelectMultiCheckboxGroup';
 import { TimeSelectField } from '@waldur/form/TimeSelectField';
 import { translate } from '@waldur/i18n';
@@ -18,18 +20,28 @@ import {
   formatIntField,
   parseIntField,
 } from '@waldur/marketplace/common/utils';
-import { fetchInstanceOptions, fetchTenantOptions } from '@waldur/support/api';
+import { INSTANCE_TYPE, TENANT_TYPE } from '@waldur/openstack/constants';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { Offering } from '../types';
 
+import { fetchOpenstackOptions } from './fetchOpenstackOptions';
+import { DeployFormData } from './types';
+
 interface OptionsFormProps {
   options: Offering['options'];
   submitting?: boolean;
+  customer?: DeployFormData['customer'];
 }
 
-export const OptionsForm = ({ options, submitting }: OptionsFormProps) => {
-  const customer = useSelector(getCustomer);
+export const OptionsForm = ({
+  options,
+  submitting,
+  customer: preferedCustomer,
+}: OptionsFormProps) => {
+  const selectedCustomer = useSelector(getCustomer);
+  const customer = preferedCustomer || selectedCustomer;
+
   return (
     <FormContainer submitting={submitting} className="size-xl">
       {options.order &&
@@ -38,7 +50,7 @@ export const OptionsForm = ({ options, submitting }: OptionsFormProps) => {
           if (!option) {
             return null;
           }
-          let OptionField = StringField;
+          let OptionField: FC<Partial<FormGroupProps>> = StringField;
           let params = {};
           switch (option.type) {
             case 'text':
@@ -88,26 +100,34 @@ export const OptionsForm = ({ options, submitting }: OptionsFormProps) => {
             case 'select_openstack_tenant':
               OptionField = AsyncSelectField;
               params = {
+                key: key + '-' + customer?.uuid,
                 loadOptions: (query, prevOptions, currentPage) =>
-                  fetchTenantOptions(
+                  fetchOpenstackOptions(
                     query,
+                    TENANT_TYPE,
                     prevOptions,
                     currentPage,
-                    customer.uuid,
+                    customer?.uuid,
                   ),
+
+                getOptionValue: (option) => option.backend_id,
                 placeholder: translate('Select tenant...'),
               };
               break;
             case 'select_multiple_openstack_tenants':
               OptionField = AsyncSelectField;
               params = {
+                key: key + '-' + customer?.uuid,
                 loadOptions: (query, prevOptions, currentPage) =>
-                  fetchTenantOptions(
+                  fetchOpenstackOptions(
                     query,
+                    TENANT_TYPE,
                     prevOptions,
                     currentPage,
-                    customer.uuid,
+                    customer?.uuid,
                   ),
+
+                getOptionValue: (option) => option.backend_id,
                 placeholder: translate('Select tenants...'),
                 isMulti: true,
               };
@@ -115,26 +135,34 @@ export const OptionsForm = ({ options, submitting }: OptionsFormProps) => {
             case 'select_openstack_instance':
               OptionField = AsyncSelectField;
               params = {
+                key: key + '-' + customer?.uuid,
                 loadOptions: (query, prevOptions, currentPage) =>
-                  fetchInstanceOptions(
+                  fetchOpenstackOptions(
                     query,
+                    INSTANCE_TYPE,
                     prevOptions,
                     currentPage,
-                    customer.uuid,
+                    customer?.uuid,
                   ),
+
+                getOptionValue: (option) => option.backend_id,
                 placeholder: translate('Select instance...'),
               };
               break;
             case 'select_multiple_openstack_instances':
               OptionField = AsyncSelectField;
               params = {
+                key: key + '-' + customer?.uuid,
                 loadOptions: (query, prevOptions, currentPage) =>
-                  fetchInstanceOptions(
+                  fetchOpenstackOptions(
                     query,
+                    INSTANCE_TYPE,
                     prevOptions,
                     currentPage,
-                    customer.uuid,
+                    customer?.uuid,
                   ),
+
+                getOptionValue: (option) => option.backend_id,
                 placeholder: translate('Select instance...'),
                 isMulti: true,
               };
@@ -146,6 +174,7 @@ export const OptionsForm = ({ options, submitting }: OptionsFormProps) => {
               label={option.label}
               name={`attributes.${key}`}
               tooltip={option.help_text}
+              tooltipEnd
               required={option.required}
               validate={option.required ? required : undefined}
               {...params}

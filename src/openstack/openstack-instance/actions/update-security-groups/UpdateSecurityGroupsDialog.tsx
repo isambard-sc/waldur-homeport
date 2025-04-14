@@ -1,6 +1,5 @@
 import { FC } from 'react';
-
-import { OpenStackInstance } from '../../types';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { UpdateSecurityGroupsForm } from './UpdateSecurityGroupsForm';
 import { useUpdateSecurityGroupsForm } from './utils';

@@ -1,18 +1,13 @@
 import { useDispatch } from 'react-redux';
+import {
+  invoiceItemsPartialUpdate,
+  PatchedInvoiceItemUpdateRequest,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { updateInvoiceItem } from '../api';
-
-interface InvoiceItemUpdatePayload {
-  article_code?: string;
-  start?: string;
-  end?: string;
-  quantity?: number;
-}
 
 export const InvoiceItemUpdateDialog = ({
   resolve: { resource, refreshInvoiceItems },
@@ -47,7 +42,7 @@ export const InvoiceItemUpdateDialog = ({
       type: 'integer',
     });
   }
-  const initialValues: InvoiceItemUpdatePayload = {
+  const initialValues: PatchedInvoiceItemUpdateRequest = {
     article_code: resource.article_code,
   };
   if (resource.billing_type === 'fixed') {
@@ -62,9 +57,12 @@ export const InvoiceItemUpdateDialog = ({
         name: resource.name,
       })}
       formFields={fields}
-      submitForm={async (formData: InvoiceItemUpdatePayload) => {
+      submitForm={async (formData: PatchedInvoiceItemUpdateRequest) => {
         try {
-          await updateInvoiceItem(resource.uuid, formData);
+          await invoiceItemsPartialUpdate({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(showSuccess(translate('Invoice item has been updated.')));
           await refreshInvoiceItems();
           dispatch(closeModalDialog());

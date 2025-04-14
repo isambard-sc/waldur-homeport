@@ -1,12 +1,11 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { userInvitationsDelete } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
-
-import { InvitationService } from './InvitationService';
 
 export const MultiDeleteAction = ({ rows, refetch }) => {
   const user = useUser();
@@ -14,12 +13,12 @@ export const MultiDeleteAction = ({ rows, refetch }) => {
 
   const callback = () => {
     try {
-      Promise.all(rows.map((row) => InvitationService.delete(row.uuid))).then(
-        () => {
-          refetch();
-          dispatch(showSuccess(translate('Invitations have been deleted.')));
-        },
-      );
+      Promise.all(
+        rows.map((row) => userInvitationsDelete({ path: { uuid: row.uuid } })),
+      ).then(() => {
+        refetch();
+        dispatch(showSuccess(translate('Invitations have been deleted.')));
+      });
     } catch (e) {
       dispatch(
         showErrorResponse(e, translate('Unable to delete invitations.')),
@@ -35,7 +34,7 @@ export const MultiDeleteAction = ({ rows, refetch }) => {
     <ActionItem
       title={translate('Delete')}
       action={callback}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       disabled={!user.is_staff}
       tooltip={tooltip}
     />

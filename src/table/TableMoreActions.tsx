@@ -22,12 +22,12 @@ export const TableMoreActions: FunctionComponent<TableMoreActionsProps> = ({
     <div className="ms-auto">
       <Button
         variant="active-light-primary"
-        className="btn-icon btn-text-grey-500 no-arrow"
+        className="btn-icon btn-text-gray-500 no-arrow"
         data-kt-menu-trigger="click"
         data-kt-menu-placement="bottom-end"
         data-kt-menu-attach="parent"
       >
-        <span className="svg-icon svg-icon-1">
+        <span className="svg-icon svg-icon-2">
           <DotsThreeVertical weight="bold" />
         </span>
       </Button>

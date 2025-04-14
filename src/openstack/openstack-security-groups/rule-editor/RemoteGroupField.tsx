@@ -6,8 +6,8 @@ import { translate } from '@waldur/i18n';
 import { FormField } from './FormField';
 
 interface Choice {
-  url: string;
-  name: string;
+  url?: string;
+  name?: string;
 }
 
 interface RemoteGroupFieldProps {

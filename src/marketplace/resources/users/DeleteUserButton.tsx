@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
+import { marketplaceResourceUsersDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { deleteResourceUser } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
@@ -26,7 +26,7 @@ export const DeleteUserButton = ({ user, refetch }) => {
       return;
     }
     try {
-      await deleteResourceUser(user.uuid);
+      await marketplaceResourceUsersDestroy({ path: { uuid: user.uuid } });
       dispatch(showSuccess(translate('User has been removed.')));
       await refetch();
     } catch (error) {

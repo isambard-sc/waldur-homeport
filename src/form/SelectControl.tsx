@@ -1,8 +1,10 @@
 import { Props as SelectProps } from 'react-select';
 
+import { Option } from '@waldur/marketplace/common/registry';
+
 import { Select } from './themed-select';
 
-export function SelectControl<OptionType = { label: string; value: string }>(
+export function SelectControl<OptionType = Option>(
   props: SelectProps<OptionType>,
 ) {
   return (

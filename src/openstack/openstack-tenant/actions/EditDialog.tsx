@@ -1,7 +1,7 @@
 import { FC } from 'react';
+import { openstackTenantsUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateTenant } from '@waldur/openstack/api';
 import {
   createLatinNameField,
   createDescriptionField,
@@ -20,7 +20,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
         name: resource.name,
         description: resource.description,
       }}
-      updateResource={updateTenant}
+      updateResource={(uuid, body) =>
+        openstackTenantsUpdate({ path: { uuid }, body })
+      }
       verboseName={translate('OpenStack tenant')}
       refetch={refetch}
     />

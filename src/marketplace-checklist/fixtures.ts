@@ -19,6 +19,7 @@ export const checklists: Checklist[] = [
     questions_count: 2,
     category_name: 'Project checklist',
     category_uuid: '7fd33c0055d8453d84e4da5371dd8fab',
+    roles: [],
   },
   {
     uuid: '407296c2821345aab0f02a583293a476',
@@ -27,6 +28,7 @@ export const checklists: Checklist[] = [
     questions_count: 2,
     category_name: 'Project checklist',
     category_uuid: '7fd33c0055d8453d84e4da5371dd8fab',
+    roles: [],
   },
 ];
 

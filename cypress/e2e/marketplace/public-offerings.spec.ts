@@ -22,7 +22,7 @@ xdescribe('Public offerings page', () => {
           fixture: 'offerings/offeringCategory.json',
         },
       )
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
       .intercept(

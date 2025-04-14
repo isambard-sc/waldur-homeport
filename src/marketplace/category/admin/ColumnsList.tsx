@@ -39,7 +39,7 @@ const ColumnsHeader: FC = () => (
 const ColumnAddButton = ({ fields }) => (
   <Button variant="primary" size="sm" onClick={() => fields.push({})}>
     <span className="svg-icon svg-icon-2">
-      <Plus />
+      <Plus weight="bold" />
     </span>{' '}
     {translate('Add column')}
   </Button>

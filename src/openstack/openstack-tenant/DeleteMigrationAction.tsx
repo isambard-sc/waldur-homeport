@@ -1,11 +1,10 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { openstackMigrationsDestroy } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
-
-import { deleteMigration } from '../api';
 
 export const DeleteMigrationAction = ({ resource, refetch }) => {
   const dispatch = useDispatch();
@@ -20,14 +19,14 @@ export const DeleteMigrationAction = ({ resource, refetch }) => {
     } catch {
       return;
     }
-    await deleteMigration(resource.uuid);
+    await openstackMigrationsDestroy({ path: { uuid: resource.uuid } });
     await refetch();
   };
   return (
     <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       size="sm"
     />
   );

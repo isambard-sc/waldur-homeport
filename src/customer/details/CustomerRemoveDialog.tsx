@@ -3,13 +3,13 @@ import { useRouter } from '@uirouter/react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { customersDestroy } from 'waldur-js-client';
 
 import { FormContainer, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { deleteCustomer } from '@waldur/project/api';
 import { showErrorResponse } from '@waldur/store/notify';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { Customer } from '@waldur/workspace/types';
@@ -33,7 +33,7 @@ export const CustomerRemoveDialog = reduxForm<
 
   const callback = async () => {
     try {
-      await deleteCustomer(props.resolve.customer.uuid);
+      await customersDestroy({ path: { uuid: props.resolve.customer.uuid } });
       await router.stateService.go('organizations');
       dispatch(setCurrentCustomer(null));
       dispatch(closeModalDialog());

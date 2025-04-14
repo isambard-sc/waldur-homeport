@@ -1,54 +1,51 @@
+import { PlusCircle } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
-import React from 'react';
-import { Modal } from 'react-bootstrap';
+import { FC, useCallback } from 'react';
+import { Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { reset, SubmissionError } from 'redux-form';
+import { customersAddUser, customersCreate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-import { sendForm } from '@waldur/core/api';
+import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { addCustomerUser } from '@waldur/permissions/api';
+import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCurrentUser } from '@waldur/user/UsersService';
 import { setCurrentUser } from '@waldur/workspace/actions';
 import { getUser } from '@waldur/workspace/selectors';
-import { Customer } from '@waldur/workspace/types';
 
 import * as constants from './constants';
 import { CustomerCreateForm } from './CustomerCreateForm';
 
-const CUSTOMER_FIELDS = ['name', 'email'];
-
+interface CustomerCreateFormData {
+  name: string;
+  email: string;
+}
 interface OwnProps {
   resolve: { role: string };
 }
 
-export const CustomerCreateDialog: React.FC<OwnProps> = ({ resolve }) => {
+export const CustomerCreateDialog: FC<OwnProps> = ({ resolve }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const router = useRouter();
 
-  const createOrganization = React.useCallback(
-    async (formData) => {
-      const payload: Record<string, string | boolean> = {};
-      CUSTOMER_FIELDS.forEach((field) => {
-        if (formData[field]) {
-          payload[field] = formData[field];
-        }
-      });
+  const createOrganization = useCallback(
+    async (formData: CustomerCreateFormData) => {
       try {
-        const response = await sendForm<Customer>(
-          'POST',
-          `${ENV.apiEndpoint}api/customers/`,
-          payload,
-        );
+        const response = await customersCreate({
+          body: formData,
+        });
         const customer = response.data;
         if (resolve.role === constants.ROLES.provider) {
-          await addCustomerUser({
-            customer: customer.uuid,
-            role: RoleEnum.CUSTOMER_OWNER,
-            user: user.uuid,
+          await customersAddUser({
+            path: { uuid: customer.uuid },
+            body: {
+              role: RoleEnum.CUSTOMER_OWNER,
+              user: user.uuid,
+            },
           });
         }
         dispatch(showSuccess(translate('Organization has been created.')));
@@ -70,13 +67,33 @@ export const CustomerCreateDialog: React.FC<OwnProps> = ({ resolve }) => {
     [dispatch, router, user, resolve.role],
   );
   return (
-    <>
-      <Modal.Header>
-        <Modal.Title>{translate('Create organization')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <CustomerCreateForm onSubmit={createOrganization} />
-      </Modal.Body>
-    </>
+    <Form
+      onSubmit={createOrganization}
+      render={({ handleSubmit, submitting, invalid }) => (
+        <form onSubmit={handleSubmit}>
+          <ModalDialog
+            title={translate('Create an organization')}
+            subtitle={translate(
+              'Provide the required information to create a new organization.',
+            )}
+            iconNode={<PlusCircle weight="bold" />}
+            iconColor="success"
+            footer={
+              <>
+                <CloseDialogButton className="min-w-125px" />
+                <SubmitButton
+                  submitting={submitting}
+                  disabled={invalid}
+                  label={translate('Create')}
+                  className="btn btn-primary min-w-125px"
+                />
+              </>
+            }
+          >
+            <CustomerCreateForm />
+          </ModalDialog>
+        </form>
+      )}
+    />
   );
 };

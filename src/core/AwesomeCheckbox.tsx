@@ -1,5 +1,6 @@
 import { Question } from '@phosphor-icons/react';
-import React, { FunctionComponent } from 'react';
+import classNames from 'classnames';
+import React, { FC } from 'react';
 
 import { Tip } from './Tooltip';
 
@@ -9,13 +10,19 @@ interface AwesomeCheckboxProps {
   onChange(value: boolean): void;
   disabled?: boolean;
   tooltip?: React.ReactNode;
+  size?: 'sm';
+  className?: string;
 }
 
-export const AwesomeCheckbox: FunctionComponent<AwesomeCheckboxProps> = (
-  props,
-) => {
+export const AwesomeCheckbox: FC<AwesomeCheckboxProps> = (props) => {
   return (
-    <label className="form-check form-switch form-check-custom form-check-solid">
+    <label
+      className={classNames(
+        'form-check form-switch form-check-custom form-check-solid',
+        props.size === 'sm' && 'form-switch-sm',
+        props.className,
+      )}
+    >
       <input
         className="form-check-input"
         type="checkbox"
@@ -25,16 +32,18 @@ export const AwesomeCheckbox: FunctionComponent<AwesomeCheckboxProps> = (
           props.onChange(e.target.checked)
         }
       />
-      <span className="form-check-label fw-bold">
-        {props.tooltip && (
-          <>
-            <Tip label={props.tooltip} id="tooltip">
-              <Question />
-            </Tip>{' '}
-          </>
-        )}
-        {props.label}
-      </span>
+      {(props.label || props.tooltip) && (
+        <span className="form-check-label">
+          {props.tooltip && (
+            <>
+              <Tip label={props.tooltip} id="tooltip">
+                <Question />
+              </Tip>{' '}
+            </>
+          )}
+          {props.label}
+        </span>
+      )}
     </label>
   );
 };

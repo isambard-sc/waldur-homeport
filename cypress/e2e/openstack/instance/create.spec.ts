@@ -6,11 +6,11 @@ xdescribe('OpenStackInstanceCreateForm', () => {
       .intercept('GET', '/api/marketplace-plugins/', {
         fixture: 'offerings/marketplacePlugins.json',
       })
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .intercept('GET', '/api/marketplace-public-offerings/', {
         fixture: 'offerings/openstackInstance.json',
       })
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'offerings/offeringCategory.json',
       })
       .intercept('GET', '/api/service-settings/', {
@@ -32,8 +32,8 @@ xdescribe('OpenStackInstanceCreateForm', () => {
       .intercept('GET', '/api/openstack-floating-ips/', {
         fixture: 'offerings/floatingIps.json',
       })
-      .intercept('GET', '/api/openstack-instance-availability-zones/', [])
-      .intercept('GET', '/api/openstack-volume-types/', [])
+      .intercept('GET', '/api/openstack-instance-availability-zones/**', [])
+      .intercept('GET', '/api/openstack-volume-types/**', [])
       .visit(
         '/organizations/bf6d515c9e6e445f9c339021b30fc96b/marketplace-offering/3bcdcdb0987545f0b50e6eed26bb49d6/',
       )

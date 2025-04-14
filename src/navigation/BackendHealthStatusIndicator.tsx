@@ -1,10 +1,9 @@
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
-import Axios from 'axios';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
@@ -15,16 +14,13 @@ const BackendHealthStatusDialog = lazyComponent(() =>
 );
 
 export const getBackendHealthStatus = async () => {
-  try {
-    const response = await Axios.get(`${ENV.apiEndpoint}health-check/`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return response.data;
-  } catch (error) {
-    return error.response.data;
-  }
+  const headers = new Headers();
+  headers.append('Accept', 'application/json');
+
+  const response = await fetch(`${ENV.apiEndpoint}health-check/`, {
+    headers,
+  });
+  return await response.json();
 };
 
 export const isWorking = (data: Record<string, string>): boolean => {

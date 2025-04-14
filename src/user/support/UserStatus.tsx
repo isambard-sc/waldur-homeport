@@ -1,15 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { usersPartialUpdate } from 'waldur-js-client';
+import { User } from 'waldur-js-client';
 
 import { AwesomeCheckbox } from '@waldur/core/AwesomeCheckbox';
 import { Panel } from '@waldur/core/Panel';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { useNotify } from '@waldur/store/hooks';
-import { UserDetails } from '@waldur/workspace/types';
-
-import { activateUser, deactivateUser } from './api';
 
 const getConfirmationText = (isActive, name) => {
   return isActive
@@ -25,7 +24,7 @@ const getConfirmationText = (isActive, name) => {
       );
 };
 
-export const UserStatus = ({ user }: { user: UserDetails }) => {
+export const UserStatus = ({ user }: { user: User }) => {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const { showErrorResponse, showSuccess } = useNotify();
@@ -51,13 +50,17 @@ export const UserStatus = ({ user }: { user: UserDetails }) => {
     }
     try {
       setIsActive(!isActive);
-      const api = user.is_active ? deactivateUser : activateUser;
-      await api(user.uuid);
-      queryClient.setQueryData(['UserDetails', user.uuid], {
-        ...user,
-        is_active: !user.is_active,
+      await usersPartialUpdate({
+        path: { uuid: user.uuid },
+        body: {
+          is_active: !isActive,
+        },
       });
-      if (user.is_active) {
+      queryClient.setQueryData(['User', user.uuid], (user: User) => ({
+        ...user,
+        is_active: !isActive,
+      }));
+      if (isActive) {
         showSuccess(translate('User has been deactivated.'));
       } else {
         showSuccess(translate('User has been activated.'));
@@ -75,11 +78,11 @@ export const UserStatus = ({ user }: { user: UserDetails }) => {
         <AwesomeCheckbox
           value={!isActive}
           onChange={toggleUserStatus}
-          label={translate('Deactivated')}
+          label={isActive ? translate('Active') : translate('Deactivated')}
         />
       }
     >
-      <ul className="text-grey-500">
+      <ul className="text-gray-500">
         <li>{translate('Temporarily block account')}</li>
         <li>{translate('This action will disable account access')}</li>
         <li>

@@ -1,9 +1,8 @@
 import { getLatinNameValidators, max } from '@waldur/core/validators';
 import { translate } from '@waldur/i18n';
 import {
-  CustomerStep,
+  DetailsOverviewStep,
   PlanStep,
-  ProjectStep,
 } from '@waldur/marketplace/deploy/steps/constants';
 import { FormFinalConfigurationStep } from '@waldur/marketplace/deploy/steps/FormFinalConfigurationStep';
 import { OfferingConfigurationFormStep } from '@waldur/marketplace/deploy/types';
@@ -11,8 +10,7 @@ import { OfferingConfigurationFormStep } from '@waldur/marketplace/deploy/types'
 import { FormInternalNetworkStep } from './FormInternalNetworkStep';
 
 export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
-  CustomerStep,
-  ProjectStep,
+  DetailsOverviewStep,
   PlanStep,
   {
     label: translate('Internal network'),

@@ -16,6 +16,6 @@ export const RequestLimitsChangeAction: ActionItemType = ({ resource }) => (
     title={translate('Request limits change')}
     modalComponent={RequestLimitsChangeDialog}
     resource={resource}
-    iconNode={<Headset />}
+    iconNode={<Headset weight="bold" />}
   />
 );

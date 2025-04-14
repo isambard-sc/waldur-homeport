@@ -16,14 +16,14 @@ import { parseResponse } from '@waldur/table/api';
 import { InfiniteList } from './InfiniteList';
 import useOnScreen from './useOnScreen';
 
-interface DataPage {
+export interface DataPage {
   data: any[];
   nextPage?: number;
 }
 
-const loadData: QueryFunction<DataPage> = async (context) => {
+export const loadData: QueryFunction<DataPage> = async (context) => {
   const response = await parseResponse(
-    context.meta.api as any,
+    `api${context.meta.api}`,
     {
       page: context.pageParam,
       ...(context.meta.params as any),
@@ -102,7 +102,7 @@ export const AsyncSearchBox: FC<AsyncSearchBoxProps> = ({
       </div>
       <div
         ref={refPopup}
-        className="search-results-dropdown menu menu-sub menu-sub-dropdown menu-column border mw-400px mh-300px p-5"
+        className="search-results-dropdown menu menu-sub menu-sub-dropdown menu-column border mw-400px mh-300px py-2"
         data-kt-menu="true"
       >
         <div className="overflow-auto">

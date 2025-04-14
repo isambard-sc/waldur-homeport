@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
+import { Resource } from 'waldur-js-client';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 
 import { ResourceStateField } from '../list/ResourceStateField';
-import { Resource } from '../types';
 
 import { ParentResourceLink } from './ParentResourceLink';
 import { ResourceFlags } from './ResourceFlags';

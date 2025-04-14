@@ -1,0 +1,56 @@
+import { CaretDown } from '@phosphor-icons/react';
+import classNames from 'classnames';
+import { FC, PropsWithChildren, ReactNode, useContext } from 'react';
+import {
+  Accordion,
+  AccordionContext,
+  Card,
+  useAccordionButton,
+} from 'react-bootstrap';
+
+interface AccordionCardProps extends PropsWithChildren {
+  title: ReactNode;
+  id?: string;
+  className?: string;
+  defaultOpen?: boolean;
+}
+
+const CustomToggle = ({ eventKey, title }) => {
+  const { activeEventKey } = useContext(AccordionContext);
+  const decoratedOnClick = useAccordionButton(eventKey);
+
+  const isOpen = activeEventKey === eventKey;
+
+  return (
+    <Card.Header
+      role="button"
+      className={!isOpen && 'border-0'}
+      onClick={decoratedOnClick}
+    >
+      <h4 className="mb-0">{title}</h4>
+      <div className={'card-toolbar' + (isOpen ? ' active' : '')}>
+        <CaretDown
+          weight="bold"
+          size={20}
+          className="text-gray-700 rotate-180"
+        />
+      </div>
+    </Card.Header>
+  );
+};
+
+export const AccordionCard: FC<AccordionCardProps> = (props) => {
+  return (
+    <Accordion defaultActiveKey={props.defaultOpen && '0'}>
+      <Card
+        className={classNames('card-bordered', props.className)}
+        id={props.id}
+      >
+        <CustomToggle eventKey="0" title={props.title} />
+        <Accordion.Collapse eventKey="0">
+          <Card.Body>{props.children}</Card.Body>
+        </Accordion.Collapse>
+      </Card>
+    </Accordion>
+  );
+};

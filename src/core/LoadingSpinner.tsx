@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react';
 
 export const LoadingSpinnerIcon = ({ className }: { className? }) => (
   <Spinner
-    className={'animation-spin ' + (className || '')}
+    className={'animation-spin text-primary' + (className || '')}
     data-testid="spinner"
     role="status"
   />

@@ -14,11 +14,13 @@ export const ResourceComponentItem = ({ component, resource }) => {
           : normalize(resource.current_usages[component.type], component.factor)
       }
       limit={
-        component.billing_type === 'usage' || component.billing_type === 'limit'
+        (component.billing_type === 'usage' &&
+          resource.limits[component.type]) ||
+        component.billing_type === 'limit'
           ? normalize(resource.limits[component.type], component.factor)
           : null
       }
-      title={component.name}
+      title={component.name + ' ' + component.measured_unit}
       description={getBillingTypeLabel(component.billing_type)}
     />
   );

@@ -1,13 +1,12 @@
 import { Prohibit } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { userInvitationsCancel } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-import { getCustomer, getUser, getProject } from '@waldur/workspace/selectors';
-
-import { InvitationService } from '../InvitationService';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
 
@@ -19,7 +18,7 @@ export const InvitationCancelButton = ({ row, refetch }) => {
 
   const callback = async () => {
     try {
-      await InvitationService.cancel(row.uuid);
+      await userInvitationsCancel({ path: { uuid: row.uuid } });
       dispatch(showSuccess(translate('Invitation has been canceled.')));
       refetch();
     } catch (e) {
@@ -61,7 +60,7 @@ export const InvitationCancelButton = ({ row, refetch }) => {
     <ActionItem
       action={callback}
       title={translate('Cancel')}
-      iconNode={<Prohibit />}
+      iconNode={<Prohibit weight="bold" />}
       disabled={isDisabled}
       tooltip={tooltip}
     />

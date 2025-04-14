@@ -5,7 +5,7 @@ describe('OpenStack Volume detail view', () => {
       .mockChecklists()
       .setToken()
 
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
       .intercept(
@@ -35,7 +35,7 @@ describe('OpenStack Volume detail view', () => {
       .intercept('GET', '/api/marketplace-cart-items/**', {
         fixture: 'offerings/shoppingCartItem.json',
       })
-      .intercept('GET', '/api/openstack-snapshots/', [])
+      .intercept('GET', '/api/openstack-snapshots/**', [])
       .intercept('GET', '/api/projects/**', {
         fixture: 'projects/alice_azure.json',
       })

@@ -1,18 +1,22 @@
 import { useMemo } from 'react';
-import { Modal, Stack } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
+import { rolesUpdateDescriptionsUpdate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { CancelButton, StringField, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
-import { updateRoleDescriptions, getRoles } from './api';
+import { getRoles } from './utils';
 
 export const RoleDescriptionEditDialog = ({ resolve: { row, refetch } }) => {
   const { closeDialog } = useModal();
   const onSubmit = async (formData) => {
-    await updateRoleDescriptions(row.uuid, formData);
+    await rolesUpdateDescriptionsUpdate({
+      path: { uuid: row.uuid },
+      body: formData,
+    });
     ENV.roles = await getRoles();
     closeDialog();
     refetch();
@@ -35,10 +39,20 @@ export const RoleDescriptionEditDialog = ({ resolve: { row, refetch } }) => {
       initialValues={initialValues}
       render={({ handleSubmit, submitting, invalid }) => (
         <form onSubmit={handleSubmit}>
-          <Modal.Header>
-            <Modal.Title>{translate('Edit role description')}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
+          <ModalDialog
+            title={translate('Edit role description')}
+            footer={
+              <>
+                <CancelButton label={translate('Cancel')} />
+                <SubmitButton
+                  disabled={invalid}
+                  submitting={submitting}
+                  label={translate('Save')}
+                />
+              </>
+            }
+            closeButton
+          >
             <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
               <table className="table">
                 <tbody>
@@ -58,17 +72,7 @@ export const RoleDescriptionEditDialog = ({ resolve: { row, refetch } }) => {
                 </tbody>
               </table>
             </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Stack direction="horizontal" gap={4}>
-              <CancelButton label={translate('Cancel')} />
-              <SubmitButton
-                disabled={invalid}
-                submitting={submitting}
-                label={translate('Save')}
-              />
-            </Stack>
-          </Modal.Footer>
+          </ModalDialog>
         </form>
       )}
     />

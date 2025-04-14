@@ -1,14 +1,14 @@
 import { omit } from 'lodash-es';
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateOfferingComponent } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { updateOfferingComponent } from '@waldur/marketplace/common/api';
 import { formatComponent } from '@waldur/marketplace/offerings/store/utils';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { TENANT_TYPE } from '@waldur/openstack/constants';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
@@ -35,7 +35,10 @@ export const EditComponentDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
             offering.type === TENANT_TYPE
               ? omit(data, ['billing_type', 'name', 'measured_unit', 'type'])
               : data;
-          await updateOfferingComponent(offering.uuid, payload);
+          await marketplaceProviderOfferingsUpdateOfferingComponent({
+            path: { uuid: offering.uuid },
+            body: payload,
+          });
           dispatch(
             showSuccess(
               translate('Billing component has been updated successfully.'),
@@ -58,21 +61,20 @@ export const EditComponentDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
     );
     return (
       <form onSubmit={props.handleSubmit(update)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Edit component')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Edit component')}
+          footer={
+            <SubmitButton
+              disabled={props.invalid}
+              submitting={props.submitting}
+              label={translate('Save')}
+            />
+          }
+        >
           <ComponentForm
             readOnly={props.resolve.offering.type === TENANT_TYPE}
           />
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton
-            disabled={props.invalid}
-            submitting={props.submitting}
-            label={translate('Save')}
-          />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

@@ -1,21 +1,22 @@
 import { FunctionComponent, useMemo } from 'react';
+import { Customer, CustomersListData } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
-import { OrganizationExpandableRow } from '@waldur/user/affiliations/OrganizationExpandableRow';
-import { RoleField } from '@waldur/user/affiliations/RoleField';
+
+import { OrganizationExpandableRow } from './OrganizationExpandableRow';
 
 export const OrganizationGroupOrganizationsList: FunctionComponent<any> = (
   props,
 ) => {
-  const filter = useMemo(
+  const filter = useMemo<CustomersListData['query']>(
     () => ({
       organization_group_uuid: props.organizationGroup.uuid,
     }),
@@ -27,7 +28,7 @@ export const OrganizationGroupOrganizationsList: FunctionComponent<any> = (
     queryField: 'name',
     filter,
   });
-  const columns = [
+  const columns: Column<Customer>[] = [
     {
       title: translate('Organization'),
       render: ({ row }) => (
@@ -45,25 +46,9 @@ export const OrganizationGroupOrganizationsList: FunctionComponent<any> = (
       export: 'abbreviation',
     },
     {
-      title: translate('Role'),
-      render: RoleField,
-      export: (row) => {
-        const role = ENV.roles.find((role) => role.name === row.role_name);
-        return role?.description || role?.name || DASH_ESCAPE_CODE;
-      },
-      exportKeys: ['role_name'],
-    },
-    {
       title: translate('Email'),
       render: ({ row }) => <>{row.email || DASH_ESCAPE_CODE}</>,
       export: 'email',
-    },
-    {
-      title: translate('Organization group'),
-      render: ({ row }) => (
-        <>{row.organization_group_name || DASH_ESCAPE_CODE}</>
-      ),
-      export: 'organization_group_name',
     },
     {
       title: translate('Projects'),

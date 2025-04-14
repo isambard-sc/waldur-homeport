@@ -80,7 +80,7 @@ const renderDataVolumeRows = ({
             }
           >
             <span className="svg-icon svg-icon-2">
-              <Plus />
+              <Plus weight="bold" />
             </span>
             {translate('Add data volume')}
           </Button>
@@ -111,12 +111,10 @@ export const FormDataStorageStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Data storage')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       loading={isLoading}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
       className="step-data-storage"
     >
       {nodes?.length ? (

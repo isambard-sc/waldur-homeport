@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { MarketplaceOrdersListData, OrderDetails } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
@@ -6,7 +7,7 @@ import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
-import { TableProps } from '@waldur/table/types';
+import { Column, TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { OrderProviderActions } from '../actions/OrderProviderActions';
@@ -17,12 +18,13 @@ import { OrderTablePlaceholderActions } from './OrderTablePlaceholderActions';
 import { OrderTypeCell } from './OrderTypeCell';
 import { getOrderTypeOptions } from './OrderTypeFilter';
 
-interface OrdersTableComponentProps extends Partial<TableProps> {
+interface OrdersTableComponentProps extends Partial<TableProps<OrderDetails>> {
   table: string;
   hideColumns?: 'organization'[];
+  filter: MarketplaceOrdersListData['query'];
 }
 
-const mandatoryFields = [
+const mandatoryFields: MarketplaceOrdersListData['query']['field'] = [
   'uuid',
   // Row actions
   'state',
@@ -50,20 +52,21 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
     queryField: 'query',
     mandatoryFields,
   });
-  const columns = [
+
+  const columns: Array<Column<OrderDetails>> = [
     {
       title: translate('Name'),
       render: ({ row }) => (
         <Link
           state="marketplace-orders.details"
           params={{ order_uuid: row.uuid }}
-          label={row.attributes.name || row.uuid}
+          label={row.attributes['name'] || row.uuid}
         />
       ),
       keys: ['attributes'],
       id: 'name',
-      copyField: (row) => row.attributes.name,
-      export: (row) => row.attributes.name,
+      copyField: (row) => row.attributes['name'],
+      export: (row) => row.attributes['name'],
     },
     {
       title: translate('Created at'),
@@ -76,7 +79,9 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
     {
       title: translate('Created by'),
       render: ({ row }) => row.created_by_full_name || row.created_by_username,
-      keys: ['created_by_full_name', 'created_by_username'],
+      keys: ['created_by_full_name', 'created_by_username'] as Array<
+        keyof OrderDetails
+      >,
       id: 'created_by',
       export: (row) => row.created_by_full_name || row.created_by_username,
     },
@@ -148,12 +153,12 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
         row.consumer_reviewed_by_username ||
         DASH_ESCAPE_CODE,
     },
-  ].filter(Boolean);
+  ];
 
   return (
-    <Table
+    <Table<OrderDetails>
       {...props}
-      columns={columns}
+      columns={columns.filter(Boolean)}
       placeholderActions={<OrderTablePlaceholderActions />}
       verboseName={translate('Orders')}
       hasQuery={true}

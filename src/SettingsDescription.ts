@@ -30,6 +30,12 @@ export const SettingsDescription = [
         default: 'Your single pane of control for managing projects, teams and resources in a self-service manner.',
         type: 'string',
       },
+      {
+        key: 'HOMEPORT_URL',
+        description: translate('It is used for rendering callback URL in HomePort'),
+        default: 'https://example.com/',
+        type: 'string',
+      },
     ],
   },
   {
@@ -64,6 +70,12 @@ export const SettingsDescription = [
         description: translate('Marketplace landing page title.'),
         default: 'Marketplace',
         type: 'string',
+      },
+      {
+        key: 'COUNTRIES',
+        description: translate('It is used in organization creation dialog in order to limit country choices to predefined set.'),
+        default: ['AL', 'AT', 'BA', 'BE', 'BG', 'CH', 'CY', 'CZ', 'DE', 'DK', 'EE', 'ES', 'EU', 'FI', 'FR', 'GB', 'GE', 'GR', 'HR', 'HU', 'IE', 'IS', 'IT', 'LT', 'LU', 'LV', 'MC', 'MK', 'MT', 'NL', 'NO', 'PL', 'PT', 'RO', 'RS', 'SE', 'SI', 'SK', 'UA'],
+        type: 'country_list_field',
       },
     ],
   },
@@ -177,6 +189,12 @@ export const SettingsDescription = [
         type: 'dict_field',
       },
       {
+        key: 'DOCKER_VOLUME_NAME',
+        description: translate('A name of the shared volume to store scripts'),
+        default: 'waldur-docker-compose_waldur_script_launchzone',
+        type: 'string',
+      },
+      {
         key: 'K8S_NAMESPACE',
         description: translate('Kubernetes namespace where jobs will be executed'),
         default: 'default',
@@ -253,19 +271,13 @@ export const SettingsDescription = [
       },
       {
         key: 'BRAND_COLOR',
-        description: translate('Hex color definition is used in HomePort landing page for login button.'),
-        default: '#3a8500',
-        type: 'color_field',
-      },
-      {
-        key: 'BRAND_LABEL_COLOR',
-        description: translate('Hex color definition is used in HomePort landing page for font color of login button.'),
-        default: '#000000',
+        description: translate('Brand color is used for button background.'),
+        default: '#307300',
         type: 'color_field',
       },
       {
         key: 'DISABLE_DARK_THEME',
-        description: translate('Toggler for dark theme.'),
+        description: translate('Toggler to disable dark theme.'),
         default: false,
         type: 'boolean',
       },
@@ -328,6 +340,12 @@ export const SettingsDescription = [
         default: '',
         type: 'image_field',
       },
+      {
+        key: 'KEYCLOAK_ICON',
+        description: translate('A custom PNG icon for Keycloak login button'),
+        default: '',
+        type: 'image_field',
+      },
     ],
   },
   {
@@ -359,7 +377,7 @@ export const SettingsDescription = [
       {
         key: 'ATLASSIAN_API_URL',
         description: translate('Atlassian API server URL'),
-        default: 'http://example.com/',
+        default: 'https://example.com/',
         type: 'url_field',
       },
       {
@@ -509,7 +527,7 @@ export const SettingsDescription = [
       {
         key: 'ATLASSIAN_VERIFY_SSL',
         description: translate('Toggler for SSL verification'),
-        default: false,
+        default: true,
         type: 'boolean',
       },
       {
@@ -555,7 +573,7 @@ export const SettingsDescription = [
     items: [
       {
         key: 'ZAMMAD_API_URL',
-        description: translate('Zammad API server URL. For example <http://localhost:8080/>'),
+        description: translate('Zammad API server URL. For example <https://localhost:8080/>'),
         default: '',
         type: 'url_field',
       },
@@ -602,7 +620,7 @@ export const SettingsDescription = [
     items: [
       {
         key: 'SMAX_API_URL',
-        description: translate('SMAX API server URL. For example <http://localhost:8080/>'),
+        description: translate('SMAX API server URL. For example <https://localhost:8080/>'),
         default: '',
         type: 'url_field',
       },
@@ -718,8 +736,79 @@ export const SettingsDescription = [
       },
       {
         key: 'ENABLE_STRICT_CHECK_ACCEPTING_INVITATION',
-        description: translate('If this is true and user email is pre-validated then accepting invitation to only do that if user’s email and email of the invitation fully match.'),
+        description: translate('If true, user email in Waldur database and in invitatation must strictly match.'),
         default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'INVITATION_DISABLE_MULTIPLE_ROLES',
+        description: translate('Do not allow user to grant multiple roles in the same project or organization using invitation.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'DEFAULT_IDP',
+        description: translate('Triggers authentication flow at once.'),
+        default: '',
+        type: 'string',
+      },
+    ],
+  },
+  {
+    description: translate('FreeIPA settings'),
+    items: [
+      {
+        key: 'FREEIPA_ENABLED',
+        description: translate('Enable integration of identity provisioning in configured FreeIPA.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'FREEIPA_HOSTNAME',
+        description: translate('Hostname of FreeIPA server.'),
+        default: 'ipa.example.com',
+        type: 'string',
+      },
+      {
+        key: 'FREEIPA_USERNAME',
+        description: translate('Username of FreeIPA user with administrative privileges.'),
+        default: 'admin',
+        type: 'string',
+      },
+      {
+        key: 'FREEIPA_PASSWORD',
+        description: translate('Password of FreeIPA user with administrative privileges'),
+        default: 'secret',
+        type: 'secret_field',
+      },
+      {
+        key: 'FREEIPA_VERIFY_SSL',
+        description: translate('Validate TLS certificate of FreeIPA web interface / REST API'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'FREEIPA_USERNAME_PREFIX',
+        description: translate('Prefix to be appended to all usernames created in FreeIPA by Waldur'),
+        default: 'waldur_',
+        type: 'string',
+      },
+      {
+        key: 'FREEIPA_GROUPNAME_PREFIX',
+        description: translate('Prefix to be appended to all group names created in FreeIPA by Waldur'),
+        default: 'waldur_',
+        type: 'string',
+      },
+      {
+        key: 'FREEIPA_BLACKLISTED_USERNAMES',
+        description: translate('List of username that users are not allowed to select'),
+        default: ['root'],
+        type: 'list_field',
+      },
+      {
+        key: 'FREEIPA_GROUP_SYNCHRONIZATION_ENABLED',
+        description: translate('Optionally disable creation of user groups in FreeIPA matching Waldur structure'),
+        default: true,
         type: 'boolean',
       },
     ],

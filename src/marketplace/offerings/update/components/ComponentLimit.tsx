@@ -1,6 +1,5 @@
 import { formValues } from 'redux-form';
-
-import { BillingType } from '@waldur/marketplace/types';
+import { BillingTypeEnum } from 'waldur-js-client';
 
 import { ComponentBooleanDefaultLimitField } from './ComponentBooleanDefaultLimitField';
 import { ComponentBooleanLimitField } from './ComponentBooleanLimitField';
@@ -15,7 +14,7 @@ import { ComponentMinValueField } from './ComponentMinValueField';
 
 interface Values {
   billingType: {
-    value: BillingType;
+    value: BillingTypeEnum;
   };
   limitPeriod: LimitPeriodOption;
   isBoolean: boolean;

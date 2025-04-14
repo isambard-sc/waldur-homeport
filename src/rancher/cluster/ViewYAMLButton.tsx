@@ -15,9 +15,13 @@ const ViewYAMLDialog = lazyComponent(() =>
 export const ViewYAMLButton = ({
   resource,
   disabled,
+  yamlRetrieve,
+  yamlUpdate,
 }: {
   resource: any;
   disabled?: boolean;
+  yamlRetrieve: any;
+  yamlUpdate: any;
 }) => {
   const dispatch = useDispatch();
   return (
@@ -26,7 +30,7 @@ export const ViewYAMLButton = ({
       action={() =>
         dispatch(
           openModalDialog(ViewYAMLDialog, {
-            resolve: { resource },
+            resolve: { resource, yamlRetrieve, yamlUpdate },
             size: 'lg',
           }),
         )

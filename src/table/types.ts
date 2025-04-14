@@ -1,12 +1,12 @@
-import { AxiosRequestConfig } from 'axios';
 import React, { ReactNode } from 'react';
 import { ColProps } from 'react-bootstrap';
 import { BaseFieldProps } from 'redux-form';
 
 import { TableFiltersGroup } from './TableFilterService';
 
-interface RequestConfigExtended extends AxiosRequestConfig {
+interface RequestConfigExtended extends RequestInit {
   staleTime?: number;
+  params?: Record<string, any>;
 }
 
 export interface TableRequest {
@@ -54,18 +54,20 @@ export interface TableOptionsType<RowType = any> {
 export interface Column<RowType = any> {
   id?: string;
   title: ReactNode;
+  /** `meta` is placed in the header in front of the column name. */
+  meta?: ReactNode;
   render: React.ComponentType<{ row: RowType }>;
   className?: string;
   orderField?: string;
   visible?: boolean;
   copyField?: (row: RowType) => string | number;
   /** The keys that are required for optional columns to be fetched. */
-  keys?: string[];
+  keys?: Array<keyof RowType>;
   optional?: boolean;
   filter?: string;
   /** Enable it so that a filter icon appears on the row when hovering. By clicking on it, the filter defined here will be added. */
   inlineFilter?: (row: RowType) => any;
-  export?: string | boolean | ((row: RowType) => string | number);
+  export?: keyof RowType | boolean | ((row: RowType) => string | number);
   exportTitle?: string;
   exportKeys?: string[];
   disabledClick?: boolean;
@@ -75,6 +77,8 @@ export interface Column<RowType = any> {
 export type DisplayMode = 'table' | 'grid';
 
 export type FilterPosition = 'menu' | 'sidebar' | 'header';
+
+export type PinnedColumns = Record<string, boolean>;
 
 export interface Pagination {
   resultCount: number;
@@ -160,10 +164,13 @@ export interface TableProps<RowType = any> extends TableState {
   tableActions?: React.ReactNode;
   verboseName?: string;
   className?: string;
+  headerClassName?: string;
+  titleClassName?: string;
   id?: string;
-  rowClass?: (({ row }) => string) | string;
+  rowClass?: (({ row }: { row: RowType }) => string) | string;
   hoverable?: boolean;
   hoverShadow?: { table?: boolean; grid?: boolean } | boolean;
+  fullWidth?: boolean;
   minHeight?: number | 'auto';
   cardBordered?: boolean;
   showPageSizeSelector?: boolean;
@@ -173,25 +180,29 @@ export interface TableProps<RowType = any> extends TableState {
   hasPagination?: boolean;
   sortList?(sorting: Sorting): void;
   initialSorting?: Sorting;
-  expandableRow?: React.ComponentType<{ row: any }>;
+  expandableRow?: React.ComponentType<{ row: RowType }>;
   expandableRowClassName?: string;
-  rowActions?: React.ComponentType<{ row; fetch }>;
+  rowActions?: React.ComponentType<{ row: RowType; fetch }>;
   toggleRow?(row: any): void;
   toggled?: Record<string, boolean>;
   enableExport?: boolean;
   showExportInDropdown?: boolean;
   placeholderComponent?: React.ReactNode;
   placeholderActions?: React.ReactNode;
+  placeholderHasRetry?: boolean;
+  /** Prefered empty table message */
+  emptyMessage?: React.ReactNode;
   filters?: JSX.Element;
   title?: React.ReactNode;
   alterTitle?: React.ReactNode;
   subtitle?: React.ReactNode;
   hasActionBar?: boolean;
   hasHeaders?: boolean;
+  tabs?: Array<{ key; title; state; params? }>;
   enableMultiSelect?: boolean;
-  multiSelectActions?: React.ComponentType<{ rows: any[]; refetch }>;
-  selectRow?(row: any): void;
-  selectAllRows?(rows: any[]): void;
+  multiSelectActions?: React.ComponentType<{ rows: RowType[]; refetch }>;
+  selectRow?(row: RowType): void;
+  selectAllRows?(rows: RowType[]): void;
   resetSelection?: () => void;
   filter?: Record<string, any>;
   fieldType?: 'checkbox' | 'radio';

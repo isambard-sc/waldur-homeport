@@ -1,15 +1,13 @@
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { AuthenticationEvents } from './AuthenticationEvents';
 import { UserTokenLifetime } from './UserTokenLifetime';
 
 export const UserApiKey: FunctionComponent = () => {
-  const user = useSelector(getUser) as UserDetails;
+  const user = useUser();
   if (!user) {
     return <LoadingSpinner />;
   }

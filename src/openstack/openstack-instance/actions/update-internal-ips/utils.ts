@@ -2,17 +2,19 @@ import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 import { reduxForm } from 'redux-form';
+import { openstackInstancesUpdatePorts } from 'waldur-js-client';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { Option } from '@waldur/marketplace/common/registry';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { loadSubnets, updatePorts } from '@waldur/openstack/api';
+import { loadSubnets } from '@waldur/openstack/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { OpenStackInstance } from '../../types';
 import { formatSubnet } from '../../utils';
 
 interface UpdatePortsFormData {
-  ports: { value: string; label: string }[];
+  ports: Option[];
 }
 
 export const useUpdatePortsForm = (resource: OpenStackInstance, refetch) => {
@@ -29,10 +31,13 @@ export const useUpdatePortsForm = (resource: OpenStackInstance, refetch) => {
   const dispatch = useDispatch();
   const submitRequest = async (formData: UpdatePortsFormData) => {
     try {
-      await updatePorts(resource.uuid, {
-        ports: formData.ports.map((item) => ({
-          subnet: item.value,
-        })),
+      await openstackInstancesUpdatePorts({
+        path: { uuid: resource.uuid },
+        body: {
+          ports: formData.ports.map((item) => ({
+            subnet: item.value,
+          })),
+        },
       });
       dispatch(
         showSuccess(

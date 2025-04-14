@@ -1,8 +1,17 @@
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  remoteWaldurApiPullOfferingDetails,
+  remoteWaldurApiPullOfferingInvoices,
+  remoteWaldurApiPullOfferingOrders,
+  remoteWaldurApiPullOfferingResources,
+  remoteWaldurApiPullOfferingRobotAccounts,
+  remoteWaldurApiPullOfferingUsage,
+  remoteWaldurApiPullOfferingUsers,
+  remoteWaldurApiPushProjectData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import * as api from '@waldur/marketplace/common/api';
 import { REMOTE_OFFERING_TYPE } from '@waldur/marketplace-remote/constants';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import {
@@ -19,7 +28,7 @@ const usePullRemoteOfferingDetails = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingDetails(uuid);
+        await remoteWaldurApiPullOfferingDetails({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Offering details synchronization has been scheduled.'),
@@ -43,7 +52,7 @@ const usePullRemoteOfferingUsers = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingUsers(uuid);
+        await remoteWaldurApiPullOfferingUsers({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Offering users synchronization has been scheduled.'),
@@ -67,7 +76,7 @@ const usePushRemoteOfferingProjectData = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pushRemoteOfferingProjectData(uuid);
+        await remoteWaldurApiPushProjectData({ path: { uuid } });
         dispatch(
           showSuccess(
             translate(
@@ -93,7 +102,7 @@ const usePullRemoteOfferingUsage = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingUsage(uuid);
+        await remoteWaldurApiPullOfferingUsage({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Offering usage synchronization has been scheduled.'),
@@ -117,7 +126,7 @@ const usePullRemoteOfferingResources = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingResources(uuid);
+        await remoteWaldurApiPullOfferingResources({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Offering resources synchronization has been scheduled.'),
@@ -141,7 +150,7 @@ const usePullRemoteOfferingOrders = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingOrders(uuid);
+        await remoteWaldurApiPullOfferingOrders({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Offering orders synchronization has been scheduled.'),
@@ -166,7 +175,7 @@ const usePullRemoteOfferingInvoices = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingInvoices(uuid);
+        await remoteWaldurApiPullOfferingInvoices({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Offering invoices synchronization has been scheduled.'),
@@ -191,7 +200,7 @@ const usePullRemoteOfferingRobotAccounts = () => {
   return useCallback(
     async (uuid: string) => {
       try {
-        await api.pullRemoteOfferingRobotAccounts(uuid);
+        await remoteWaldurApiPullOfferingRobotAccounts({ path: { uuid } });
         dispatch(
           showSuccess(
             translate('Robot accounts synchronization has been scheduled.'),

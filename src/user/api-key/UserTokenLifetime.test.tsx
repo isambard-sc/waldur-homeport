@@ -1,20 +1,19 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { usersPartialUpdate } from 'waldur-js-client';
+import { User } from 'waldur-js-client';
 
 import { useNotify } from '@waldur/store/hooks';
-import { UserDetails } from '@waldur/workspace/types';
-
-import { updateUser } from '../support/api';
 
 import { UserTokenLifetime } from './UserTokenLifetime';
 
 vi.mock('@waldur/store/hooks');
 
-vi.mock('../support/api');
+vi.mock('waldur-js-client');
 
 describe('UserTokenLifetime component', () => {
-  const mockUser: UserDetails = {
+  const mockUser: User = {
     uuid: 'test-uuid',
     token_lifetime: 3600,
     token: 'test-token',
@@ -61,7 +60,7 @@ describe('UserTokenLifetime component', () => {
   });
 
   it('calls updateUser API on form submit with the correct payload', async () => {
-    vi.mocked(updateUser).mockResolvedValueOnce(null);
+    vi.mocked(usersPartialUpdate).mockResolvedValueOnce(null);
 
     render(<UserTokenLifetime user={mockUser} />);
 
@@ -71,15 +70,18 @@ describe('UserTokenLifetime component', () => {
     );
 
     await waitFor(() => {
-      expect(updateUser).toHaveBeenCalledWith(mockUser.uuid, {
-        token_lifetime: 3600,
+      expect(usersPartialUpdate).toHaveBeenCalledWith({
+        path: { uuid: mockUser.uuid },
+        body: {
+          token_lifetime: 3600,
+        },
       });
       expect(showSuccessMock).toHaveBeenCalledWith('User has been updated');
     });
   });
 
   it('shows error message when API call fails', async () => {
-    vi.mocked(updateUser).mockRejectedValue(new Error('API error'));
+    vi.mocked(usersPartialUpdate).mockRejectedValue(new Error('API error'));
 
     render(<UserTokenLifetime user={mockUser} />);
     await userEvent.click(

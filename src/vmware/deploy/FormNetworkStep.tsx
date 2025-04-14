@@ -2,7 +2,7 @@ import { Plus } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
@@ -33,17 +33,15 @@ export const FormNetworkStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Network interfaces')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
       actions={
         showExperimentalUiComponents ? (
           <div className="d-flex justify-content-end flex-grow-1">
             <Button variant="light" className="text-nowrap" size="sm">
               <span className="svg-icon svg-icon-2">
-                <Plus />
+                <Plus weight="bold" />
               </span>
               {translate('New interface')}
             </Button>

@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { useSelector } from 'react-redux';
+import { organizationGroupsList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
-
-import { getAllOrganizationGroups } from './api';
+import { getUser } from '@waldur/workspace/selectors';
 
 // See also: https://github.com/erikras/redux-form/issues/1852
 export const parseIntField = (value) => parseInt(value, 10) || 0;
@@ -78,16 +80,28 @@ export function getBillingPeriods(unit: string): BillingPeriodDescription {
   }
 }
 
-export const useOrganizationGroups = () =>
-  useQuery(
+export const useOrganizationGroups = () => {
+  const user = useSelector(getUser);
+
+  const query = useQuery(
     ['organizationGroups'],
     () =>
-      getAllOrganizationGroups().then((items) => {
-        return items.map((item) => ({
-          ...item,
-          name: [item.parent_name, item.name].filter(Boolean).join(' ➔ '),
-          value: item.url,
-        }));
-      }),
+      getAllPages((page) => organizationGroupsList({ query: { page } })).then(
+        (items) =>
+          items.map((item) => ({
+            ...item,
+            value: item.url,
+          })),
+      ),
     { staleTime: 5 * 60 * 1000 },
   );
+
+  const disabled = query.data?.length === 0 && !user.is_staff;
+  const tooltip = disabled
+    ? translate(
+        'Access policies cannot be configured because no organization groups are defined.',
+      )
+    : undefined;
+
+  return { ...query, disabled, tooltip };
+};

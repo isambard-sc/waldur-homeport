@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
+import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
@@ -57,6 +58,8 @@ const ProjectContainerWithHero = (props) => {
 
   usePageHero(<PageHero project={project} />, [project]);
 
+  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
+
   const breadcrumbItems = useMemo<IBreadcrumbItem[]>(
     () => [
       {
@@ -64,14 +67,10 @@ const ProjectContainerWithHero = (props) => {
         text: translate('Organizations'),
         to: 'organizations',
       },
-      {
-        key: 'organization.dashboard',
-        text: project.customer_name,
-        to: 'organization.dashboard',
-        params: { uuid: project.customer_uuid },
-        ellipsis: 'md',
-        maxLength: 11,
-      },
+      getOrganizationBreadcrumbItem(
+        { uuid: project.customer_uuid, name: project.customer_name },
+        { ellipsis: 'md' },
+      ),
       {
         key: 'organization.projects',
         text: translate('Projects'),

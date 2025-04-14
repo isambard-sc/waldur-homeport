@@ -1,15 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { overrideSettings } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-
-import * as api from '../settings/api';
+import { ENV } from '@waldur/core/config';
 
 import { AdministrationLanguages } from './AdministrationLanguages';
 
 // Mock dependencies
-vi.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/core/config', () => ({
   ENV: {
     plugins: {
       WALDUR_CORE: {
@@ -23,6 +22,8 @@ vi.mock('@waldur/configs/default', () => ({
     ],
   },
 }));
+
+vi.mock('waldur-js-client');
 
 vi.mock('@waldur/i18n', () => ({
   translate: (key: string) => key,
@@ -63,13 +64,15 @@ describe('AdministrationLanguages', () => {
   });
 
   it('successfully saves language choices', async () => {
-    const saveConfigMock = vi.spyOn(api, 'saveConfig').mockResolvedValue(null);
+    const saveConfigMock = vi.mocked(overrideSettings).mockResolvedValue(null);
     const { getByText } = render(<AdministrationLanguages />);
 
     await userEvent.click(getByText('Save'));
 
     expect(saveConfigMock).toHaveBeenCalledWith({
-      LANGUAGE_CHOICES: 'en,et',
+      body: {
+        LANGUAGE_CHOICES: 'en,et',
+      },
     });
   });
 });

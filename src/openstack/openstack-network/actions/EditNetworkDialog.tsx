@@ -1,7 +1,7 @@
 import { FC } from 'react';
+import { openstackNetworksUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateNetwork } from '@waldur/openstack/api';
 import {
   createNameField,
   createDescriptionField,
@@ -20,7 +20,9 @@ export const EditNetworkDialog: FC<ActionDialogProps> = ({
         name: resource.name,
         description: resource.description,
       }}
-      updateResource={updateNetwork}
+      updateResource={(uuid, body) =>
+        openstackNetworksUpdate({ path: { uuid }, body })
+      }
       verboseName={translate('network')}
       refetch={refetch}
     />

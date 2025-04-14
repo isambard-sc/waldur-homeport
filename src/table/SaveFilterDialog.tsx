@@ -7,7 +7,7 @@ import { FormContainer } from '@waldur/form/FormContainer';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showSuccess } from '@waldur/store/notify';
 
 interface SaveFilterDialogProps {
@@ -36,7 +36,7 @@ export const SaveFilterDialog = reduxForm<{ name }, SaveFilterDialogProps>({
 
   return (
     <form onSubmit={props.handleSubmit(callback)}>
-      <MetronicModalDialog
+      <ModalDialog
         title={isEdit ? translate('Update filter') : translate('Save filter')}
         subtitle={translate('Filters can be saved and reused on any pages')}
         footer={
@@ -61,7 +61,7 @@ export const SaveFilterDialog = reduxForm<{ name }, SaveFilterDialogProps>({
             spaceless
           />
         </FormContainer>
-      </MetronicModalDialog>
+      </ModalDialog>
     </form>
   );
 });

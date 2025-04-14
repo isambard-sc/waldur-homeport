@@ -57,10 +57,28 @@ describe('useUsageExport', () => {
         { type: 'ram', date: '2024-01-01', usage: 8 },
       ],
       userUsages: [
-        { component_type: 'cpu', date: '2024-01-01', usage: 5 },
-        { component_type: 'ram', date: '2024-01-01', usage: 4 },
+        {
+          username: 'user_1',
+          component_type: 'cpu',
+          date: '2024-01-01',
+          usage: 5,
+        },
+        {
+          username: 'user_1',
+          component_type: 'ram',
+          date: '2024-01-01',
+          usage: 4,
+        },
       ],
     },
+    users: [
+      {
+        uuid: '123',
+        username: '1b2f',
+        full_name: 'User',
+        offering_user_username: 'user_1',
+      },
+    ],
     months: 1,
   };
 
@@ -74,8 +92,12 @@ describe('useUsageExport', () => {
       'csv',
       'Usage history - Test Resource',
       {
-        fields: ['Date', 'CPU/cores', 'RAM/GB'],
-        data: [['1 - 2024', 10, 8]],
+        fields: ['Username', 'Date', 'CPU/cores', 'RAM/GB'],
+        data: [
+          ['user_1', '1 - 2024', 5, 4],
+          ['Total of {label}', '1 - 2024', 10, 8],
+          ['Total', '01/2024', 10, 8],
+        ],
       },
     );
   });
@@ -118,7 +140,10 @@ describe('useUsageExport', () => {
       'Usage history - Test Resource',
       {
         fields: ['Date', 'CPU/cores', 'RAM/GB'],
-        data: [['1 - 2024', 10, 8]],
+        data: [
+          ['1 - 2024', 10, 8],
+          ['Total', 10, 8],
+        ],
       },
     );
   });
@@ -156,8 +181,12 @@ describe('useUsageExport', () => {
       'pdf',
       'Usage history - Test Resource',
       {
-        fields: ['Date', 'CPU', 'RAM'],
-        data: [['1 - 2024', 10, 8]],
+        fields: ['Username', 'Date', 'CPU', 'RAM'],
+        data: [
+          ['user_1', '1 - 2024', 5, 4],
+          ['Total of {label}', '1 - 2024', 10, 8],
+          ['Total', '01/2024', 10, 8],
+        ],
       },
     );
   });
@@ -180,8 +209,12 @@ describe('useUsageExport', () => {
       'csv',
       'Usage history - Test Resource',
       {
-        fields: ['Date', 'CPU/cores', 'RAM/GB'],
-        data: [['1 - 2024', 10, 'N/A']],
+        fields: ['Username', 'Date', 'CPU/cores', 'RAM/GB'],
+        data: [
+          ['user_1', '1 - 2024', 5, '0'],
+          ['Total of {label}', '1 - 2024', 10, 'N/A'],
+          ['Total', '01/2024', 10, 'N/A'],
+        ],
       },
     );
   });

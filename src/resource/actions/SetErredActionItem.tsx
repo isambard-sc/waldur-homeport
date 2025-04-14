@@ -1,9 +1,9 @@
 import { CloudX } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { marketplaceProviderResourcesSetAsErred } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { setErredResource } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -61,7 +61,9 @@ export const SetErredActionItem: FC<{
     }
 
     try {
-      await setErredResource(resource_uuid);
+      await marketplaceProviderResourcesSetAsErred({
+        path: { uuid: resource_uuid },
+      });
       refetch();
       dispatch(showSuccess(translate('Resource has been set as erred.')));
     } catch (e) {
@@ -78,7 +80,8 @@ export const SetErredActionItem: FC<{
       title={translate('Set as erred')}
       action={callback}
       className="text-danger"
-      iconNode={<CloudX />}
+      iconNode={<CloudX weight="bold" />}
+      iconColor="danger"
     />
   );
 };

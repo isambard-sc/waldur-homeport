@@ -1,6 +1,7 @@
 import { useState, FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
+import { marketplaceChecklistsCustomerStats } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Panel } from '@waldur/core/Panel';
@@ -8,14 +9,9 @@ import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import {
-  getChecklists,
-  getCustomerStats,
-  getCategories,
-  countChecklists,
-} from './api';
 import { StatsTable } from './StatsTable';
 import { Checklist } from './types';
+import { getChecklists, getCategories, countChecklists } from './utils';
 
 const loadData = async () => {
   const checklistCount = await countChecklists();
@@ -45,7 +41,12 @@ const CategoryPanel = ({ category, checklists, customer }) => {
   const statsState = useAsync(
     () =>
       checklist
-        ? getCustomerStats(customer.uuid, checklist.uuid)
+        ? marketplaceChecklistsCustomerStats({
+            path: {
+              customer_uuid: customer.uuid,
+              checklist_uuid: checklist.uuid,
+            },
+          })
         : Promise.resolve([]),
     [customer, checklist],
   );

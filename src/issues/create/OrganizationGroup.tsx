@@ -12,7 +12,7 @@ export const OrganizationGroup = ({ disabled }) => (
     <Field
       component={Select}
       name="customer"
-      validate={!disabled && required}
+      validate={!disabled ? [required] : undefined}
       defaultOptions
       loadOptions={(query, prevOptions, page) =>
         organizationAutocomplete(query, prevOptions, page, {

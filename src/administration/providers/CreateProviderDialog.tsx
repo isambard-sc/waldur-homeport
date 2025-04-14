@@ -2,15 +2,17 @@ import { PlusCircle } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import {
+  IdentityProviderRequest,
+  identityProvidersCreate,
+} from 'waldur-js-client';
 
 import { EDUTEAMS_IDP, TARA_IDP } from '@waldur/auth/providers/constants';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import { createIdentityProvider } from '../api';
 
 import { ProviderForm } from './ProviderForm';
 
@@ -29,11 +31,13 @@ export const CreateProviderDialog = (props) => {
   const dispatch = useDispatch();
 
   const onSubmit = useCallback(
-    async (formData) => {
+    async (formData: IdentityProviderRequest) => {
       try {
-        await createIdentityProvider({
-          provider: props.resolve.type,
-          ...formData,
+        await identityProvidersCreate({
+          body: {
+            provider: props.resolve.type,
+            ...formData,
+          },
         });
         dispatch(
           showSuccess(
@@ -66,7 +70,7 @@ export const CreateProviderDialog = (props) => {
       }}
       render={({ handleSubmit, submitting, invalid }) => (
         <form onSubmit={handleSubmit}>
-          <MetronicModalDialog
+          <ModalDialog
             title={translate('Add identity provider')}
             iconNode={<PlusCircle weight="bold" />}
             iconColor="success"
@@ -79,7 +83,7 @@ export const CreateProviderDialog = (props) => {
             }
           >
             <ProviderForm />
-          </MetronicModalDialog>
+          </ModalDialog>
         </form>
       )}
     />

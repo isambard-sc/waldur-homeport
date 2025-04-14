@@ -3,21 +3,22 @@ import { useAsync } from 'react-use';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { countChecklists } from '@waldur/marketplace-checklist/api';
+import { countChecklists } from '@waldur/marketplace-checklist/utils';
 import { useUser } from '@waldur/workspace/hooks';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { UserAffiliationsList } from '../affiliations/UserAffiliationsList';
 
 export const UserDashboard: FC = () => {
-  const user = useUser() as UserDetails;
+  const user = useUser();
 
   const asyncState = useAsync(countChecklists);
 
   return !user || asyncState.loading ? (
     <LoadingSpinner />
   ) : asyncState.error ? (
-    <>{translate('Unable to load data.')}</>
+    <>
+      {translate('Unable to load data.')} {asyncState.error.stack}
+    </>
   ) : (
     <UserAffiliationsList user={user} />
   );

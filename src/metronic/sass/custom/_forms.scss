@@ -10,7 +10,7 @@
 .form-text {
   font-size: 1.075rem;
   font-weight: 400;
-  color: $gray-800;
+  color: $gray-700;
   display: block;
   line-height: 1;
 }
@@ -27,8 +27,8 @@
 
   &:focus {
     color: $dark;
-    border-color: $primary-300;
-    box-shadow: 0 0 0 4px rgba($primary-300, 0.25);
+    border-color: $brand-300;
+    box-shadow: 0 0 0 4px rgba($brand-300-rgb, 0.25);
   }
 
   &:disabled {

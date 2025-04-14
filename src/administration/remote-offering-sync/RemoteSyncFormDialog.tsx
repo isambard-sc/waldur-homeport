@@ -3,6 +3,14 @@ import arrayMutators from 'final-form-arrays';
 import { FC, useEffect, useState } from 'react';
 import { Alert, Col, Row } from 'react-bootstrap';
 import { Field, Form, FormRenderProps } from 'react-final-form';
+import {
+  marketplaceRemoteSynchronisationsCreate,
+  marketplaceRemoteSynchronisationsUpdate,
+  RemoteSynchronisation,
+  RemoteSynchronisationRequest,
+  remoteWaldurApiRemoteCategories,
+  remoteWaldurApiRemoteCustomers,
+} from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import {
@@ -20,20 +28,13 @@ import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { Category, ServiceProvider } from '@waldur/marketplace/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { useModal } from '@waldur/modal/hooks';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
 
-import {
-  createRemoteSync,
-  getRemoteCategories,
-  getRemoteCustomers,
-  updateRemoteSync,
-} from './api';
 import { CategoryMappingRulesField } from './CategoryMappingRulesField';
-import { RemoteSync, RemoteSyncForm } from './types';
 
 interface RemoteSyncFormDialogProps {
-  remoteSync?: RemoteSync;
+  remoteSync?: RemoteSynchronisation;
   refetch: () => void;
 }
 
@@ -59,7 +60,7 @@ export const RemoteSyncFormDialog: FC<RemoteSyncFormDialogProps> = ({
   const isEdit = Boolean(remoteSync?.uuid);
 
   const onSubmit = async (values: FormData) => {
-    const payload: RemoteSyncForm = {
+    const payload: RemoteSynchronisationRequest = {
       api_url: values.api_url,
       token: values.token,
       is_active: values.is_active,
@@ -74,9 +75,12 @@ export const RemoteSyncFormDialog: FC<RemoteSyncFormDialogProps> = ({
     };
     try {
       if (isEdit) {
-        await updateRemoteSync(payload, remoteSync.uuid);
+        await marketplaceRemoteSynchronisationsUpdate({
+          path: { uuid: remoteSync.uuid },
+          body: payload,
+        });
       } else {
-        await createRemoteSync(payload);
+        await marketplaceRemoteSynchronisationsCreate({ body: payload });
       }
       if (refetch) await refetch();
       showSuccess(
@@ -143,7 +147,7 @@ const RemoteSyncRenderer = ({
   values,
   remoteSync,
 }: FormRenderProps<FormData, Partial<FormData>> & {
-  remoteSync: RemoteSync;
+  remoteSync: RemoteSynchronisation;
 }) => {
   const [checkedCredentials, setCheckedCredentials] = useState({
     api_url: '',
@@ -159,7 +163,9 @@ const RemoteSyncRenderer = ({
     ['remoteCustomers', remoteSync?.uuid],
     async () =>
       values.api_url && values.token
-        ? await getRemoteCustomers(values.api_url, values.token)
+        ? await remoteWaldurApiRemoteCustomers({
+            body: { api_url: values.api_url, token: values.token },
+          }).then((response) => response.data)
         : [],
     {
       staleTime: 60 * 1000,
@@ -178,7 +184,9 @@ const RemoteSyncRenderer = ({
     ['remoteCategories', remoteSync?.uuid],
     async () =>
       values.api_url && values.token
-        ? await getRemoteCategories(values.api_url, values.token)
+        ? await remoteWaldurApiRemoteCategories({
+            body: { api_url: values.api_url, token: values.token },
+          }).then((response) => response.data)
         : [],
     {
       staleTime: 60 * 1000,
@@ -213,7 +221,7 @@ const RemoteSyncRenderer = ({
 
   return (
     <form onSubmit={handleSubmit}>
-      <MetronicModalDialog
+      <ModalDialog
         title={
           isEdit
             ? translate('Edit remote synchronization')
@@ -304,7 +312,7 @@ const RemoteSyncRenderer = ({
           label={translate('Enable synchronization')}
           className="text-gray-700"
         />
-      </MetronicModalDialog>
+      </ModalDialog>
     </form>
   );
 };

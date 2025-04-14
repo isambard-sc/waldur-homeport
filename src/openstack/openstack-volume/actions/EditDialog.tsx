@@ -1,7 +1,7 @@
 import { FC } from 'react';
+import { openstackVolumesUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateVolume } from '@waldur/openstack/api';
 import {
   createLatinNameField,
   createDescriptionField,
@@ -34,7 +34,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
         description: resource.description,
         bootable: resource.bootable,
       }}
-      updateResource={updateVolume}
+      updateResource={(uuid, body) =>
+        openstackVolumesUpdate({ path: { uuid }, body })
+      }
       refetch={refetch}
       verboseName={translate('OpenStack volume')}
     />

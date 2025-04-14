@@ -18,7 +18,7 @@ const CreateOfferingUserDialog = lazyComponent(() =>
 export const CreateOfferingUserButton = ({ offering, onSuccess }) => {
   const dispatch = useDispatch();
   const user = useUser();
-  if (!offering.secret_options.service_provider_can_create_offering_user) {
+  if (!offering.plugin_options?.service_provider_can_create_offering_user) {
     return null;
   }
   if (
@@ -32,7 +32,7 @@ export const CreateOfferingUserButton = ({ offering, onSuccess }) => {
   return (
     <ActionButton
       title={translate('Create')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       action={() =>
         dispatch(
           openModalDialog(CreateOfferingUserDialog, {

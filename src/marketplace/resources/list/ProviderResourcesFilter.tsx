@@ -12,6 +12,7 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
+import { parentOfferingFilter } from '@waldur/marketplace/offerings/utils';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { PROVIDER_RESOURCES_LIST_FILTER_FORM_ID } from '@waldur/marketplace/resources/list/constants';
 import { type RootState } from '@waldur/store/reducers';
@@ -42,6 +43,17 @@ const PureProviderResourcesFilter: FunctionComponent<StateProps> = (props) => {
         <OfferingAutocomplete
           offeringFilter={props.offeringFilter}
           reactSelectProps={REACT_SELECT_TABLE_FILTER}
+        />
+      </TableFilterItem>
+      <TableFilterItem
+        title={translate('Parent offering')}
+        name="parent_offering"
+        badgeValue={(value) => `${value?.category_title} / ${value?.name}`}
+      >
+        <OfferingAutocomplete
+          offeringFilter={parentOfferingFilter}
+          reactSelectProps={REACT_SELECT_TABLE_FILTER}
+          name="parent_offering"
         />
       </TableFilterItem>
       <TableFilterItem

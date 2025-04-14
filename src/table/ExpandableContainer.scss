@@ -40,6 +40,15 @@ table .expandable-container {
           white-space: nowrap;
         }
       }
+
+      &:not(:last-child) {
+        &.mb-1 > div {
+          padding-bottom: 0.25rem;
+        }
+        &.mb-2 > div {
+          padding-bottom: 0.5rem;
+        }
+      }
     }
   }
 
@@ -49,7 +58,7 @@ table .expandable-container {
     overflow: hidden;
 
     .card-body {
-      padding-bottom: 0;
+      padding-bottom: 0.5rem;
 
       .table {
         margin-bottom: 0;

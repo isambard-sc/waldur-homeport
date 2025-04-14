@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { UserAgreement } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -28,7 +29,7 @@ export const UserAgreementsList: FunctionComponent<{}> = () => {
     fetchData: createFetcher('user-agreements'),
   });
   return (
-    <Table
+    <Table<UserAgreement>
       {...props}
       columns={[
         {

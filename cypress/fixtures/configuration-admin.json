@@ -37,7 +37,6 @@
       "pricelist": true,
       "customers_requests": true,
       "users": true,
-      "shared_providers": true,
       "resource_usage": false,
       "vm_type_overview": false,
       "offering_comments": false,
@@ -47,10 +46,7 @@
       "conceal_civil_number": true,
       "create_missing_user": false,
       "disable_multiple_roles": false,
-      "show_tax_number": false,
-      "tax_number_required": false,
       "civil_number_required": false,
-      "require_user_details": false,
       "show_group_invitations": true
     },
     "invoice": {
@@ -94,22 +90,20 @@
     "FULL_PAGE_TITLE": "Waldur | Cloud Service Management",
     "USER_MANDATORY_FIELDS": ["full_name", "email"],
     "INVITATION_CIVIL_NUMBER_LABEL": "",
-    "INVITATION_TAX_NUMBER_LABEL": "",
     "HOMEPORT_SENTRY_DSN": null,
     "SIDEBAR_LOGO": null,
     "POWERED_BY_LOGO": null,
     "BRAND_COLOR": "#3a8500",
     "HERO_IMAGE": null,
     "HERO_LINK_LABEL": null,
-    "HERO_LINK_URL": null
+    "HERO_LINK_URL": null,
+    "DEFAULT_IDP": "",
+    "FREEIPA_ENABLED": true,
+    "FREEIPA_USERNAME_PREFIX": "hpcu_"
   },
   "WALDUR_AUTH_SOCIAL": {
     "REMOTE_EDUTEAMS_ENABLED": false,
     "ENABLE_EDUTEAMS_SYNC": false
-  },
-  "WALDUR_FREEIPA": {
-    "USERNAME_PREFIX": "hpcu_",
-    "ENABLED": true
   },
   "WALDUR_KEYCLOAK": {
     "ENABLED": false

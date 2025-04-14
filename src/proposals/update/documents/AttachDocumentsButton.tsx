@@ -26,7 +26,7 @@ export const AttachDocumentsButton = ({ call, refetch }) => {
     <ActionButton
       action={callback}
       title={translate('Add document')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
     />
   );
 };

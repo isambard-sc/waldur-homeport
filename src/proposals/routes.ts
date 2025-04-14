@@ -46,6 +46,18 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'call-management.team',
+    url: 'team/',
+    component: lazyComponent(() =>
+      import('./call-management/CallManagementTeamPage').then((module) => ({
+        default: module.CallManagementTeamPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Team'),
+    },
+  },
+  {
     name: 'call-management.call-list',
     url: 'calls/?{state}',
     component: lazyComponent(() =>
@@ -87,8 +99,8 @@ export const states: StateDeclaration[] = [
     name: 'call-management.proposal-details',
     url: 'proposals/:proposal_uuid/',
     component: lazyComponent(() =>
-      import('./proposal/ProposalDetailsContainer').then((module) => ({
-        default: module.ProposalDetailsContainer,
+      import('./proposal/create/ProposalManagePage').then((module) => ({
+        default: module.ProposalManagePage,
       })),
     ),
   },
@@ -311,6 +323,8 @@ export const states: StateDeclaration[] = [
         default: module.ProposalManagePage,
       })),
     ),
-    data: {},
+    data: {
+      hideHeaderMenu: true,
+    },
   },
 ];

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { reduxForm } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { INVITATION_CREATE_FORM_ID } from '../constants';
 import { GroupInviteRow, InvitationContext } from '../types';
@@ -24,16 +24,8 @@ export const InvitationCreateDialog = reduxForm<{}, OwnProps>({
   enableReinitialize: false,
   initialValues: { rows: [{}] },
 })(({ resolve, submitting, handleSubmit, change, valid }) => {
-  const {
-    createInvitations,
-    finish,
-    roles,
-    defaultRole,
-    defaultProject,
-    fetchUserDetailsCallback,
-    fetchingUserDetails,
-    usersDetails,
-  } = useInvitationCreateDialog(resolve);
+  const { createInvitations, finish, roles, defaultRole, defaultProject } =
+    useInvitationCreateDialog(resolve);
 
   const [step, setStep] = useState<1 | 2>(1);
 
@@ -81,11 +73,11 @@ export const InvitationCreateDialog = reduxForm<{}, OwnProps>({
     [createInvitations, setStep],
   );
 
-  const disabled = submitting || fetchingUserDetails;
+  const disabled = submitting;
 
   return (
     <form onSubmit={handleSubmit(submit)} className="invitation-create-dialog">
-      <MetronicModalDialog
+      <ModalDialog
         title={translate('Invite by email')}
         subtitle={translate(
           "We'll email them instructions and a link to accept the invitation.",
@@ -108,15 +100,13 @@ export const InvitationCreateDialog = reduxForm<{}, OwnProps>({
               roles={roles}
               customer={resolve.customer}
               project={resolve.project}
-              fetchUserDetails={fetchUserDetailsCallback}
-              usersDetails={usersDetails}
               disabled={disabled}
             />
           ) : step === 2 ? (
             <CustomMessageWrapper />
           ) : null}
         </div>
-      </MetronicModalDialog>
+      </ModalDialog>
     </form>
   );
 });

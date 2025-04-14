@@ -7,7 +7,7 @@ export const OfferingTosNotification = ({ offering }) => (
   <>
     {(offering.terms_of_service || offering.terms_of_service_link) &&
     offering.privacy_policy_link ? (
-      <p className="text-center fs-9 mb-0">
+      <p className="text-center text-gray-400 fs-6 mb-0">
         {translate(
           'You also agree to the service provider’s <tos>terms of service</tos> and provider’s <pp>privacy policy</pp>.',
           {
@@ -30,7 +30,7 @@ export const OfferingTosNotification = ({ offering }) => (
         )}
       </p>
     ) : offering.terms_of_service || offering.terms_of_service_link ? (
-      <p className="text-center fs-9 mb-0">
+      <p className="text-center text-gray-400 fs-6 mb-0">
         {translate(
           'You also agree to the service provider’s <tos>terms of service</tos>.',
           {
@@ -46,7 +46,7 @@ export const OfferingTosNotification = ({ offering }) => (
         )}
       </p>
     ) : offering.privacy_policy_link ? (
-      <p className="text-center fs-9 mb-0">
+      <p className="text-center text-gray-400 fs-6 mb-0">
         {translate(
           'You also agree to the service provider’s <pp>privacy policy</pp>.',
           {

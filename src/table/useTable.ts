@@ -27,7 +27,12 @@ const getDefaultTitle = (state: RootState) => {
     .map((part) => part.data.breadcrumb())
     .flat();
 
-  return breadcrumbs.pop() || pageTitle;
+  let breadcrumbTitle = breadcrumbs.pop();
+  if (!breadcrumbTitle) {
+    breadcrumbTitle = router.globals.$current.parent?.data?.breadcrumb?.();
+  }
+
+  return breadcrumbTitle || pageTitle;
 };
 
 export const useTable = (options: TableOptionsType) => {

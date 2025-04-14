@@ -11,16 +11,30 @@ interface AwesomeCheckboxFieldProps extends FormField {
   className?: string;
   checked?: boolean;
   tooltip?: ReactNode;
+  tooltipEnd?: boolean;
+  size?: 'sm';
   help_text?: ReactNode;
   disabled?: boolean;
+  alignMiddle?: boolean;
 }
 
 export const AwesomeCheckboxField: FunctionComponent<
   AwesomeCheckboxFieldProps
-> = ({ input, label, className, tooltip, help_text, ...props }) => (
+> = ({
+  input,
+  label,
+  className,
+  tooltip,
+  tooltipEnd,
+  help_text,
+  alignMiddle,
+  ...props
+}) => (
   <div
     className={classNames(
       'form-check form-switch form-check-custom form-check-solid',
+      props.size === 'sm' && 'form-switch-sm',
+      alignMiddle && 'align-items-center',
       className,
     )}
   >
@@ -30,14 +44,25 @@ export const AwesomeCheckboxField: FunctionComponent<
       data-testid={props['data-testid']}
       disabled={props.disabled}
     />
-    <label className="form-check-label">
-      {tooltip && (
-        <Tip id="form-field-tooltip" label={tooltip}>
-          <Question />{' '}
-        </Tip>
-      )}
-      {label}
-      {help_text && <p className="text-muted">{help_text}</p>}
-    </label>
+    {(tooltip || label || help_text) && (
+      <label className="form-check-label">
+        {tooltip && !tooltipEnd && (
+          <Tip id={'form-field-tooltip-' + input.name} label={tooltip}>
+            <Question weight="bold" size={20} className="text-muted" />{' '}
+          </Tip>
+        )}
+        {label}
+        {help_text && <p className="text-muted">{help_text}</p>}
+      </label>
+    )}
+    {tooltip && tooltipEnd && (
+      <Tip
+        id={'form-field-tooltip-' + input.name}
+        className="align-self-center ms-auto"
+        label={tooltip}
+      >
+        <Question weight="bold" size={20} className="text-muted" />
+      </Tip>
+    )}
   </div>
 );

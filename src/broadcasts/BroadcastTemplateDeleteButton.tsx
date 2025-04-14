@@ -1,7 +1,7 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { broadcastMessageTemplatesDestroy } from 'waldur-js-client';
 
-import { deleteBroadcastTemplate } from '@waldur/broadcasts/api';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
@@ -25,14 +25,14 @@ export const BroadcastTemplateDeleteButton = ({ row, refetch }) => {
     } catch {
       return;
     }
-    await deleteBroadcastTemplate(row.uuid);
+    await broadcastMessageTemplatesDestroy({ path: { uuid: row.uuid } });
     await refetch();
   };
   return (
     <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       size="sm"
       iconColor="danger"
       className="text-danger"

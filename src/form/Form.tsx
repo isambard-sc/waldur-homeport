@@ -6,10 +6,14 @@ type Children =
   | JSX.Element[]
   | ((props: Omit<InjectedFormProps, 'handleSubmit'>) => JSX.Element);
 
-export const Form = reduxForm<{}, { onSubmit; children: Children }>({})(
-  ({ handleSubmit, onSubmit, children, ...rest }) => (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {typeof children === 'function' ? children(rest) : children}
-    </form>
-  ),
-);
+export const Form = reduxForm<
+  {},
+  { onSubmit?; children: Children; className?: string }
+>({})(({ handleSubmit, onSubmit, children, className, ...rest }) => (
+  <form
+    onSubmit={onSubmit ? handleSubmit(onSubmit) : null}
+    className={className}
+  >
+    {typeof children === 'function' ? children(rest) : children}
+  </form>
+));

@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackSubNet, OpenstackSubnetsListData } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
@@ -11,7 +12,7 @@ import { useTable } from '@waldur/table/useTable';
 export const TenantSubnetsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackSubnetsListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
       field: [
@@ -48,7 +49,7 @@ export const TenantSubnetsList: FunctionComponent<{ resourceScope }> = ({
   });
 
   return (
-    <Table
+    <Table<OpenStackSubNet>
       {...props}
       columns={[
         {
@@ -69,6 +70,7 @@ export const TenantSubnetsList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => <ResourceState resource={row} />,
         },
       ]}
+      title={translate('Subnets')}
       verboseName={translate('subnets')}
       rowActions={({ row }) => (
         <ActionButtonResource url={row.url} refetch={props.fetch} />

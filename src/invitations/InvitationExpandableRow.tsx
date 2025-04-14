@@ -1,12 +1,11 @@
 import React from 'react';
+import { Invitation } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
 import { formatRoleType } from '@waldur/permissions/utils';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
-
-import { Invitation } from './types';
 
 export const InvitationExpandableRow: React.FC<{
   row: Invitation;
@@ -27,7 +26,10 @@ export const InvitationExpandableRow: React.FC<{
     {row.scope_type && (
       <p>
         <b>{translate('Scope type')}: </b>
-        {formatRoleType(row.scope_type)}
+        {
+          // @ts-ignore
+          formatRoleType(row.scope_type)
+        }
       </p>
     )}
     {row.scope_name && (

@@ -1,9 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useState } from 'react';
+import {
+  customersList,
+  marketplaceResourcesList,
+  projectsList,
+} from 'waldur-js-client';
 
-import { get, parseResultCount } from '@waldur/core/api';
-import { Resource } from '@waldur/marketplace/resources/types';
-import { Customer, Project } from '@waldur/workspace/types';
+import { fetchResultCount } from '@waldur/core/api';
 
 export const useSearch = () => {
   const [query, setQuery] = useState('');
@@ -33,23 +36,23 @@ export const useSearch = () => {
   const result = useQuery(
     [`global-search`, query],
     async ({ signal }) => {
-      const organizationsPromise = get<Customer[]>('/customers/', {
+      const organizationsPromise = customersList({
         signal,
-        params: {
+        query: {
           query: query,
           field: ['name', 'display_name', 'uuid', 'abbreviation', 'image'],
         },
       });
-      const projectsPromise = get<Project[]>('/projects/', {
+      const projectsPromise = projectsList({
         signal,
-        params: {
+        query: {
           query: query,
           field: ['name', 'uuid', 'image', 'customer_name', 'customer_uuid'],
         },
       });
-      const resourcesPromise = get<Resource[]>('/marketplace-resources/', {
+      const resourcesPromise = marketplaceResourcesList({
         signal,
-        params: {
+        query: {
           query: query,
           state: ['Creating', 'OK', 'Erred', 'Updating', 'Terminating'],
           field: [
@@ -65,22 +68,22 @@ export const useSearch = () => {
           ],
         },
       });
-      const res = await Promise.all([
+      const [organizations, projects, resources] = await Promise.all([
         organizationsPromise,
         projectsPromise,
         resourcesPromise,
       ]);
 
-      const customersCount = parseResultCount(res[0]);
-      const projectsCount = parseResultCount(res[1]);
-      const resourcesCount = parseResultCount(res[2]);
+      const customersCount = fetchResultCount(organizations);
+      const projectsCount = fetchResultCount(projects);
+      const resourcesCount = fetchResultCount(resources);
 
       return {
-        customers: res[0].data,
+        customers: organizations.data,
         customersCount,
-        projects: res[1].data,
+        projects: projects.data,
         projectsCount,
-        resources: res[2].data,
+        resources: resources.data,
         resourcesCount,
         resultsCount: customersCount + projectsCount + resourcesCount,
       };

@@ -1,15 +1,16 @@
 import { FC } from 'react';
 import { AsyncState } from 'react-use/lib/useAsync';
 import { FieldArray, InjectedFormProps, reduxForm } from 'redux-form';
+import { CategoryColumn } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { Category, CategoryColumn } from '@waldur/marketplace/types';
+import { Category } from '@waldur/marketplace/types';
 import { AsyncActionDialog } from '@waldur/resource/actions/AsyncActionDialog';
 
 import { ColumnsList } from './ColumnsList';
 
 interface ParentProps {
-  asyncState: AsyncState<{ columns: any[] }>;
+  asyncState: AsyncState<CategoryColumn[]>;
   submitRequest: (formData: FormData) => Promise<void>;
   category: Category;
 }
@@ -47,11 +48,11 @@ const CategoryColumnsFormComponent: FC<Props> = ({
         submitting={submitting}
         invalid={invalid}
       >
-        {asyncState.value?.columns ? (
+        {asyncState.value ? (
           <FieldArray
             name="columns"
             component={ColumnsList}
-            CategoryColumns={asyncState.value.columns}
+            CategoryColumns={asyncState.value}
             category={category}
           />
         ) : null}

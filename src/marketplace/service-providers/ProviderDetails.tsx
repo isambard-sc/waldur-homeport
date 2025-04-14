@@ -1,22 +1,23 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
+import { marketplaceProviderOfferingsList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import {
-  getServiceProviderByCustomer,
-  getProviderOfferings,
-} from '@waldur/marketplace/common/api';
+import { getServiceProviderByCustomer } from '@waldur/marketplace/common/api';
 import { useTitle } from '@waldur/navigation/title';
 
 import { ProviderDetailsBody } from './ProviderDetailsBody';
 
-async function loadProviderData(customerId) {
+async function loadProviderData(customer_uuid) {
   const provider = await getServiceProviderByCustomer({
-    customer_uuid: customerId,
+    customer_uuid,
   });
-  const offerings = await getProviderOfferings(customerId);
+  const offerings = await getAllPages((page) =>
+    marketplaceProviderOfferingsList({ query: { page, customer_uuid } }),
+  );
   return { provider, offerings };
 }
 
@@ -30,7 +31,9 @@ export const ProviderDetails: FunctionComponent = () => {
     [customer_uuid],
   );
 
-  useTitle(value ? value.provider.name : translate('Provider details'));
+  useTitle(
+    value ? value.provider.customer_name : translate('Provider details'),
+  );
 
   if (loading) {
     return <LoadingSpinner />;

@@ -40,7 +40,7 @@ export const useOfferingDropdownActions = (refetch?): TableDropdownItem[] => {
   return [
     {
       label: translate('Import offerings'),
-      iconNode: <Plus />,
+      iconNode: <Plus weight="bold" />,
       action: () => {
         dispatch(
           openModalDialog(OfferingImportDialog, {

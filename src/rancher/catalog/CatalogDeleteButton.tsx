@@ -1,14 +1,13 @@
 import { Trash } from '@phosphor-icons/react';
 import { FunctionComponent, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { rancherCatalogsDestroy } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
-
-import { deleteCatalog } from '../api';
 
 export const CatalogDeleteButton: FunctionComponent<{ catalog; refetch }> = ({
   catalog,
@@ -34,7 +33,7 @@ export const CatalogDeleteButton: FunctionComponent<{ catalog; refetch }> = ({
     }
     try {
       setRemoving(true);
-      await deleteCatalog(catalog.uuid);
+      await rancherCatalogsDestroy({ path: { uuid: catalog.uuid } });
       await refetch();
       dispatch(showSuccess(translate('Catalog has been deleted.')));
     } catch (e) {

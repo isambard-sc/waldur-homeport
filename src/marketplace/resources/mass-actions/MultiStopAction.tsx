@@ -6,7 +6,7 @@ import { VirtualMachineMultiAction } from './VirtualMachineMultiAction';
 
 export const MultiStopAction = ({ rows, refetch }) => (
   <VirtualMachineMultiAction
-    iconNode={<Stop />}
+    iconNode={<Stop weight="bold" />}
     rows={rows}
     refetch={refetch}
     {...getProps()}

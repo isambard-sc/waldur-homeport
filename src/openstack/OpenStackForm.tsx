@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react';
 
 import { CheckOrX } from '@waldur/core/CheckOrX';
 import { required } from '@waldur/core/validators';
-import { StringField, SecretField } from '@waldur/form';
+import { StringField, SecretField, TextField } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
@@ -56,6 +56,11 @@ const fields = [
     fieldProps: { required: true, validate: required },
   },
   {
+    label: translate('Openstack API TLS certificate'),
+    key: 'secret_options.openstack_api_tls_certificate',
+    component: TextField,
+  },
+  {
     label: translate('Verify server certificate'),
     key: 'service_attributes.verify_ssl',
     component: AwesomeCheckboxField,
@@ -71,6 +76,7 @@ export const OpenStackForm: FunctionComponent<OfferingEditPanelFormProps> = (
       key={field.key}
       label={field.label}
       description={field.description}
+      required={field.fieldProps?.required}
       value={
         field.component === SecretField ? (
           <PlainSecretField value={get(props.offering, field.key)} />
@@ -82,9 +88,10 @@ export const OpenStackForm: FunctionComponent<OfferingEditPanelFormProps> = (
       }
       actions={
         <FieldEditButton
-          title={props.title}
+          title={field.label}
           scope={props.offering}
           name={field.key}
+          description={field.description}
           callback={props.callback}
           fieldComponent={field.component}
           hideLabel={field.hideLabel}

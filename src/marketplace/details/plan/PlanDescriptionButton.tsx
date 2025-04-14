@@ -36,9 +36,9 @@ export const PlanDescriptionButton = (props: PlanDescriptionButtonProps) => {
 
   return (
     <ActionButton
-      title={translate('Details')}
+      title={translate('View details')}
       action={handleClick}
-      iconNode={<Eye />}
+      iconNode={<Eye weight="bold" />}
       className={props.className}
     />
   );

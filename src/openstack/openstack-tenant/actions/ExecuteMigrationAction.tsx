@@ -1,8 +1,8 @@
 import { Airplane } from '@phosphor-icons/react';
 import { FC } from 'react';
+import { openstackMigrationsRun } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { runMigration } from '@waldur/openstack/api';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
 import { validateState } from '@waldur/resource/actions/base';
 
@@ -14,10 +14,10 @@ export const ExecuteMigrationAction: FC<TenantActionProps> = ({
 }) => (
   <AsyncActionItem
     title={translate('Execute')}
-    iconNode={<Airplane />}
+    iconNode={<Airplane weight="bold" />}
     resource={resource}
-    apiMethod={runMigration}
+    apiMethod={(uuid) => openstackMigrationsRun({ path: { uuid } })}
     refetch={refetch}
-    validators={[validateState('Creation Scheduled')]}
+    validators={[validateState('CREATION_SCHEDULED')]}
   />
 );

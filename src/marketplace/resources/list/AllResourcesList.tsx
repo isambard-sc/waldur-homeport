@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Project } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import {
@@ -13,7 +14,6 @@ import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import { TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
-import { Project } from '@waldur/workspace/types';
 
 import { NON_TERMINATED_STATES } from './constants';
 import { ResourcesAllListTable } from './ResourcesAllListTable';
@@ -25,6 +25,9 @@ const mapStateToFilter = createSelector(
     const result: Record<string, any> = {};
     if (filters?.offering) {
       result.offering_uuid = filters.offering.uuid;
+    }
+    if (filters?.parent_offering) {
+      result.parent_offering_uuid = filters.parent_offering.uuid;
     }
     if (filters?.state) {
       result.state = filters.state.value;

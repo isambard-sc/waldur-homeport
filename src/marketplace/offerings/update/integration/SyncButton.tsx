@@ -2,8 +2,8 @@ import { ArrowsClockwise } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { marketplaceProviderOfferingsSync } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
@@ -13,7 +13,7 @@ export const SyncButton = ({ offering, refetch }) => {
   const dispatch = useDispatch();
   const callback = async () => {
     try {
-      await post(`/marketplace-provider-offerings/${offering.uuid}/sync/`);
+      await marketplaceProviderOfferingsSync({ path: { uuid: offering.uuid } });
       dispatch(
         showSuccess(translate('Service synchronization has been scheduled.')),
       );
@@ -31,8 +31,9 @@ export const SyncButton = ({ offering, refetch }) => {
   useQuery({
     queryKey: ['SyncButton', offering.scope],
     queryFn: refetch,
-    enabled:
-      offering.scope_state && !['OK', 'Erred'].includes(offering.scope_state),
+    enabled: Boolean(
+      offering.scope_state && !['OK', 'ERRED'].includes(offering.scope_state),
+    ),
     refetchInterval: 5000,
   });
 
@@ -46,7 +47,7 @@ export const SyncButton = ({ offering, refetch }) => {
     return null;
   }
 
-  const enabled = ['OK', 'Erred'].includes(offering.scope_state);
+  const enabled = ['OK', 'ERRED'].includes(offering.scope_state);
 
   return (
     <Button

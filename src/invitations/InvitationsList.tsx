@@ -4,21 +4,23 @@ import { getFormValues } from 'redux-form';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
+import { CustomerPermissionsLogButton } from '@waldur/customer/team/CustomerPermissionsLogButton';
+import { TeamDropdownActions } from '@waldur/customer/team/TeamDropdownActions';
 import { translate } from '@waldur/i18n';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
+import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { exportRoleField } from '@waldur/user/affiliations/RolePopover';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { InvitationCreateButton } from './actions/create/InvitationCreateButton';
 import { InvitationActions } from './InvitationActions';
 import { InvitationsFilter } from './InvitationsFilter';
 import { InvitationsMultiSelectActions } from './InvitationsMultiSelectActions';
 import { formatInvitationState } from './InvitationStateFilter';
-import { RoleField } from './RoleField';
+import { useTeamTableTabs } from './tabs';
 
 export const InvitationsList: FunctionComponent = () => {
   useTitle(translate('Invitations'));
@@ -39,6 +41,8 @@ export const InvitationsList: FunctionComponent = () => {
     queryField: 'email',
   });
 
+  const tableTabs = useTeamTableTabs();
+
   return (
     <Table
       {...props}
@@ -57,7 +61,7 @@ export const InvitationsList: FunctionComponent = () => {
         },
         {
           title: translate('Role'),
-          render: ({ row }) => <RoleField invitation={row} />,
+          render: RoleField,
           export: exportRoleField,
         },
         {
@@ -83,13 +87,14 @@ export const InvitationsList: FunctionComponent = () => {
           export: (row) => formatDate(row.expires),
         },
       ]}
+      tabs={tableTabs}
+      title={translate('Team')}
       verboseName={translate('team invitations')}
       tableActions={
-        <InvitationCreateButton
-          roleTypes={['customer', 'project']}
-          refetch={props.fetch}
-          enableBulkUpload={true}
-        />
+        <>
+          <CustomerPermissionsLogButton />
+          <TeamDropdownActions refetch={props.fetch} />
+        </>
       }
       hasQuery={true}
       enableExport

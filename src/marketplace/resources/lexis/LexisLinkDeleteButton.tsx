@@ -1,8 +1,8 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { lexisLinksDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { deleteLexisLink } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
@@ -25,9 +25,8 @@ export const LexisLinkDeleteButton = ({ row, refetch }) => {
     } catch {
       return;
     }
-    deleteLexisLink(row.url).then(() => {
-      refetch();
-    });
+    await lexisLinksDestroy({ path: { uuid: row.uuid } });
+    refetch();
   };
   return (
     <RowActionButton

@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import { notify } from 'reapop';
 
 import { format } from '@waldur/core/ErrorMessageFormatter';
@@ -44,10 +43,7 @@ export const showRedirectMessage = (title, message) =>
     dismissible: true,
   });
 
-export const showErrorResponse = (
-  response: AxiosResponse,
-  message?: string,
-) => {
+export const showErrorResponse = (response: Response, message?: string) => {
   const details = format(response);
   const errorMessage = `${message} ${details}`;
   return showError(errorMessage);

@@ -1,14 +1,12 @@
 import { Trash } from '@phosphor-icons/react';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { OrganizationGroup, organizationGroupsDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { OrganizationGroup } from '@waldur/marketplace/types';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse } from '@waldur/store/notify';
-
-import { removeOrganizationGroup } from './api';
 
 interface OrganizationGroupDeleteButtonProps {
   row: OrganizationGroup;
@@ -34,7 +32,7 @@ export const OrganizationGroupDeleteButton = (
         { forDeletion: true },
       );
       setRemoving(true);
-      await removeOrganizationGroup(props.row.uuid);
+      await organizationGroupsDestroy({ path: { uuid: props.row.uuid } });
       props.refetch();
     } catch (error) {
       dispatch(
@@ -50,7 +48,7 @@ export const OrganizationGroupDeleteButton = (
     <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       disabled={removing}
       size="sm"
       className="text-danger"

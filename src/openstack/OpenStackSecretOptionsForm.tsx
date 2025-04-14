@@ -10,8 +10,7 @@ import { OpenStackExternalIpsField } from './OpenStackExternalIpsField';
 export const OpenStackSecretOptionsForm: FunctionComponent<
   OfferingEditPanelFormProps
 > = (props) => {
-  const items: Array<{ floating_ip; external_ip }> =
-    props.offering.secret_options?.ipv4_external_ip_mapping;
+  const items = props.offering.secret_options?.ipv4_external_ip_mapping;
 
   return (
     <FormTable.Item

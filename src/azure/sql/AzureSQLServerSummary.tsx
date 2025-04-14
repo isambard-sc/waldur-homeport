@@ -1,6 +1,6 @@
 import { Question } from '@phosphor-icons/react';
+import { AzureSqlServer } from 'waldur-js-client';
 
-import { AzureSQLServer } from '@waldur/azure/common/types';
 import { Tip } from '@waldur/core/Tooltip';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -19,7 +19,7 @@ const ValueWithTooltip = ({ value, tooltip }) => (
 );
 
 export const AzureSQLServerSummary = (
-  props: ResourceSummaryProps<AzureSQLServer>,
+  props: ResourceSummaryProps<AzureSqlServer>,
 ) => {
   const { resource } = props;
   return (

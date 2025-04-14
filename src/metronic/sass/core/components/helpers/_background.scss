@@ -2,20 +2,51 @@
 // Custom background helpers
 //
 
+@mixin setBgColor($isNotBrand, $color, $colorRgb) {
+  @if ($isNotBrand) {
+    --bg-color: #{red($color)}, #{green($color)}, #{blue($color)};
+    background-color: $color !important;
+  } @else if ($colorRgb) {
+    --bg-color: #{$colorRgb} !important;
+    background-color: rgb(#{$colorRgb}) !important;
+  }
+}
+
 // Background theme light colors
 @each $color, $value in $theme-colors {
+  // Since the primary and secondary color is the brand, and the brand is a dynamic var(), we cannot apply some sass functions to it.
+  $isNotBrand: str-index($color, 'primary') ==
+    null and
+    str-index($color, 'secondary') ==
+    null;
+
+  $altColorRgb: null;
+  $brandColor: get-brand-color($color, true);
+  @if ($brandColor) {
+    $altColorRgb: $brandColor;
+  } @else if ($color == 'secondary') {
+    $altColorRgb: $brand-50-rgb;
+  }
+
   @if (theme-light-color($color)) {
     .bg-light-#{$color} {
       background-color: theme-light-color($color) !important;
 
-      &.hoverable:hover {
-        background-color: darken(theme-light-color($color), 6%) !important;
+      @if ($isNotBrand) {
+        &.hoverable:hover {
+          background-color: darken(theme-light-color($color), 6%) !important;
+        }
       }
     }
   }
 
   .bg-#{$color} {
-    --bg-color: #{red($value)}, #{green($value)}, #{blue($value)} !important;
+    @if ($isNotBrand) {
+      --bg-color: #{red($value)}, #{green($value)}, #{blue($value)} !important;
+    } @else if ($altColorRgb) {
+      background-color: rgb($altColorRgb) !important;
+      --bg-color: #{$altColorRgb} !important;
+    }
 
     &.hoverable:hover {
       background-color: theme-active-color($color) !important;
@@ -45,15 +76,13 @@
     cursor: pointer;
 
     &:hover {
-      --bg-color: #{red($value)}, #{green($value)}, #{blue($value)};
-      background-color: $value !important;
+      @include setBgColor($isNotBrand, $value, $altColorRgb);
     }
   }
 
   .bg-active-#{$color} {
     &.active {
-      --bg-color: #{red($value)}, #{green($value)}, #{blue($value)};
-      background-color: $value !important;
+      @include setBgColor($isNotBrand, $value, $altColorRgb);
     }
   }
 
@@ -62,8 +91,7 @@
 
     &.active,
     &:hover {
-      --bg-color: #{red($value)}, #{green($value)}, #{blue($value)};
-      background-color: $value !important;
+      @include setBgColor($isNotBrand, $value, $altColorRgb);
     }
   }
 }

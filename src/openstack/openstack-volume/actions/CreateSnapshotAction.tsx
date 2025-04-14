@@ -22,7 +22,7 @@ export const CreateSnapshotAction: FC<VolumeActionProps> = ({
 }) => (
   <DialogActionButton
     title={translate('Create')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={CreateSnapshotDialog}
     resource={resource}
     validators={validators}

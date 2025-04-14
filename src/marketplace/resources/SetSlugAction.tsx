@@ -1,4 +1,4 @@
-import { PencilSimpleLine } from '@phosphor-icons/react';
+import { Link } from '@phosphor-icons/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -24,7 +24,7 @@ export const SetSlugAction: ActionItemType = ({ resource, refetch }) => {
       extraResolve={{ refetch }}
       resource={resource}
       staff
-      iconNode={<PencilSimpleLine />}
+      iconNode={<Link weight="bold" />}
     />
   );
 };

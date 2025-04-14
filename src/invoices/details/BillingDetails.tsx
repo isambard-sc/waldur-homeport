@@ -2,23 +2,18 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { FunctionComponent, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsyncFn } from 'react-use';
+import { invoicesRetrieve } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-import { getById } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 import { showError, showSuccess } from '@waldur/store/notify';
 
-import { Invoice } from '../types';
-
 import { BillingRecordDetails } from './BillingRecordDetails';
 import { InvoiceDetails } from './InvoiceDetails';
 
 import './BillingDetails.scss';
-
-const loadData = (invoiceId: string) =>
-  getById<Invoice>('/invoices/', invoiceId);
 
 export const BillingDetails: FunctionComponent = () => {
   useTitle(
@@ -33,7 +28,10 @@ export const BillingDetails: FunctionComponent = () => {
   } = useCurrentStateAndParams();
 
   const [{ loading, error, value: invoice }, callback] = useAsyncFn(
-    () => loadData(invoiceId),
+    () =>
+      invoicesRetrieve({ path: { uuid: invoiceId } }).then(
+        (response) => response.data,
+      ),
     [invoiceId],
   );
 

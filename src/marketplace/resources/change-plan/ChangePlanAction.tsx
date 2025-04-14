@@ -23,6 +23,6 @@ export const ChangePlanAction: ActionItemType = ({ resource, refetch }) =>
       modalComponent={ChangePlanDialog}
       resource={resource}
       extraResolve={{ refetch }}
-      iconNode={<ArrowsLeftRight />}
+      iconNode={<ArrowsLeftRight weight="bold" />}
     />
   ) : null;

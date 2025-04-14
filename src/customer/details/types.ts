@@ -12,10 +12,3 @@ export interface EditCustomerProps {
   name: string;
   callback(formData, dispatch): Promise<any>;
 }
-
-export interface AccessSubnet {
-  uuid: string;
-  inet: string;
-  description?: string;
-  customer: string;
-}

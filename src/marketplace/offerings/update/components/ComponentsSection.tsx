@@ -1,45 +1,80 @@
-import { FC } from 'react';
-import { Card, Table } from 'react-bootstrap';
+import { FC, useState } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { showComponentsList } from '@waldur/marketplace/common/registry';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { getBillingTypeLabel } from '@waldur/marketplace/resources/usage/utils';
 import { STORAGE_MODE_OPTIONS, TENANT_TYPE } from '@waldur/openstack/constants';
+import Table from '@waldur/table/Table';
+import { useTable } from '@waldur/table/useTable';
 
 import { OfferingSectionProps } from '../types';
+import { useOfferingAccountingTableTabs } from '../utils';
 
 import { AddComponentButton } from './AddComponentButton';
 import { ChangeStorageModeButton } from './ChangeStorageModeButton';
 import { DeleteComponentButton } from './DeleteComponentButton';
 import { EditComponentButton } from './EditComponentButton';
-import { RefreshButton } from './RefreshButton';
 
 export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
   props,
 ) => {
+  const [firstFetch, setFirstFetch] = useState(true);
+
+  const tableProps = useTable({
+    table: 'OfferingComponents',
+    fetchData: async () => {
+      let freshComponents;
+      if (!firstFetch) {
+        const res = await props.refetch();
+        freshComponents = res.data?.offering?.components;
+      } else {
+        setFirstFetch(false);
+      }
+
+      return Promise.resolve({
+        rows: freshComponents || props.offering.components,
+      });
+    },
+  });
+
+  const tableTabs = useOfferingAccountingTableTabs(props.offering);
+
   if (!showComponentsList(props.offering.type)) {
     return null;
   }
-  return (
-    <Card id="components" className="card-bordered">
-      <Card.Header>
-        <Card.Title className="h5">
-          <ValidationIcon value={props.offering.components.length > 0} />
-          <span className="me-2">{translate('Accounting components')}</span>
-          <RefreshButton refetch={props.refetch} loading={props.loading} />
-        </Card.Title>
-        <div className="card-toolbar">
-          {!props.components.length && <AddComponentButton {...props} />}
 
-          {props.offering.type === TENANT_TYPE ? (
-            <ChangeStorageModeButton {...props} />
-          ) : null}
-        </div>
-      </Card.Header>
-      <Card.Body>
-        {props.offering.type === TENANT_TYPE ? (
-          <p>
+  return (
+    <Table
+      {...tableProps}
+      columns={[
+        {
+          title: translate('Name'),
+          render: ({ row }) => <>{row.name}</>,
+        },
+        {
+          title: translate('Type'),
+          render: ({ row }) => <>{row.type}</>,
+        },
+        {
+          title: translate('Unit'),
+          render: ({ row }) => <>{row.measured_unit}</>,
+        },
+        {
+          title: translate('Billing type'),
+          render: ({ row }) => <>{getBillingTypeLabel(row.billing_type)}</>,
+        },
+      ]}
+      tabs={tableTabs}
+      title={
+        <>
+          <ValidationIcon value={props.offering.components.length > 0} />
+          <span className="me-2">{translate('Accounting')}</span>
+        </>
+      }
+      subtitle={
+        props.offering.type === TENANT_TYPE ? (
+          <p className="mb-0">
             <strong>{translate('Storage mode')}</strong>:{' '}
             {
               STORAGE_MODE_OPTIONS.find(
@@ -49,46 +84,27 @@ export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
               )?.label
             }
           </p>
-        ) : null}
-
-        {props.offering.components.length === 0 ? (
-          <div className="justify-content-center row">
-            <div className="col-sm-4">
-              <p className="text-center">
-                {translate("Offering doesn't have components.")}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <Table bordered={true} hover={true} responsive={true}>
-            <tbody>
-              {props.offering.components.map((component, componentIndex) => (
-                <tr key={componentIndex}>
-                  <td className="col-md-3">{component.name}</td>
-                  <td className="col-md-3">{component.type}</td>
-                  <td className="col-md-3">{component.measured_unit}</td>
-                  <td className="col-md-3">
-                    {getBillingTypeLabel(component.billing_type)}
-                  </td>
-                  <td className="row-actions">
-                    <div>
-                      <EditComponentButton
-                        offering={props.offering}
-                        refetch={props.refetch}
-                        component={component}
-                      />
-                      <DeleteComponentButton
-                        offering={props.offering}
-                        component={component}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
-      </Card.Body>
-    </Card>
+        ) : null
+      }
+      verboseName={translate('Components')}
+      tableActions={
+        <>
+          {!props.components.length && <AddComponentButton {...props} />}
+          {props.offering.type === TENANT_TYPE ? (
+            <ChangeStorageModeButton {...props} />
+          ) : null}
+        </>
+      }
+      rowActions={({ row }) => (
+        <>
+          <EditComponentButton
+            offering={props.offering}
+            refetch={props.refetch}
+            component={row}
+          />
+          <DeleteComponentButton offering={props.offering} component={row} />
+        </>
+      )}
+    />
   );
 };

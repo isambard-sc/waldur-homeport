@@ -1,7 +1,7 @@
 import { Globe } from '@phosphor-icons/react';
 import Qs from 'qs';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
 import { LoginButton } from './LoginButton';
 

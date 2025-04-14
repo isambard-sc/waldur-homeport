@@ -27,9 +27,9 @@ export const CreatePaymentButton = ({ activePaymentProfile }) => {
   return (
     <AddButton
       action={action}
-      disabled={!user.is_staff}
+      disabled={!user?.is_staff}
       tooltip={
-        !user.is_staff
+        !user?.is_staff
           ? translate('You must be staff to modify payments')
           : null
       }

@@ -1,7 +1,4 @@
 .card.form-table-card {
-  .card-header {
-    padding: 0 1.85rem;
-  }
   .card-body {
     padding: 1rem 1.85rem;
   }
@@ -12,13 +9,14 @@
 
   tr:not(:last-child) {
     border-bottom: 1px solid var(--bs-border-color);
+    td {
+      border-bottom: 1px solid var(--bs-border-color);
+    }
   }
 
   th,
   td {
     font-size: 1.075rem;
-    padding-top: 1.6rem;
-    padding-bottom: 1.6rem;
     vertical-align: middle;
   }
 
@@ -38,23 +36,46 @@
     }
   }
 
-  .col-actions {
-    text-align: right;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+  &.gy-base {
+    td,
+    th {
+      padding-bottom: 24px;
+      padding-top: 24px;
+    }
   }
-}
 
-.table.form-table.details-table {
-  th,
-  td {
-    font-size: 1.075rem;
+  .col-actions {
+    text-align: end;
+    justify-items: end;
     padding-top: 1rem;
     padding-bottom: 1rem;
-    vertical-align: middle;
-    width: auto;
   }
-  .col-actions {
-    display: none;
+
+  &.hide-actions {
+    .col-actions {
+      display: none;
+    }
+    th,
+    td {
+      width: auto;
+    }
+  }
+
+  &.align-top {
+    th,
+    td {
+      vertical-align: top !important;
+    }
+  }
+
+  &.details-mode {
+    .title {
+      color: var(--bs-gray-700);
+      font-weight: 600;
+    }
+    .value {
+      color: var(--bs-gray-500);
+      font-weight: 400;
+    }
   }
 }

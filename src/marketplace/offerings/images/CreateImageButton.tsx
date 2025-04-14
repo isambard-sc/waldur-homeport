@@ -9,7 +9,6 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { useUser } from '@waldur/workspace/hooks';
-import type { User } from '@waldur/workspace/types';
 
 const CreateImageDialog = lazyComponent(() =>
   import('./CreateImageDialog').then((module) => ({
@@ -22,7 +21,7 @@ interface CreateImageButtonProps {
 }
 
 export const CreateImageButton = (props: CreateImageButtonProps) => {
-  const user = useUser() as User;
+  const user = useUser();
   const dispatch = useDispatch();
   const callback = () =>
     dispatch(
@@ -44,7 +43,7 @@ export const CreateImageButton = (props: CreateImageButtonProps) => {
   return (
     <ActionButton
       title={translate('Add image')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       action={callback}
     />
   );

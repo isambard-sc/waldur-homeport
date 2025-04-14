@@ -18,7 +18,7 @@ interface SubmitJobActionProps {
 export const SubmitJobAction: FC<SubmitJobActionProps> = ({ resource }) => (
   <DialogActionButton
     title={translate('Submit job')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={SubmitJobDialog}
     resource={resource}
   />

@@ -1,9 +1,9 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceResourcesTerminate } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { terminateResource } from '@waldur/marketplace/common/api';
 import { orderCanBeApproved as orderCanBeApprovedSelector } from '@waldur/marketplace/orders/actions/selectors';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
@@ -30,7 +30,9 @@ export const TerminateDialog = reduxForm<
   const dispatch = useDispatch();
   const callback = async () => {
     try {
-      await terminateResource(resource.marketplace_resource_uuid);
+      await marketplaceResourcesTerminate({
+        path: { uuid: resource.marketplace_resource_uuid },
+      });
       dispatch(
         showSuccess(
           translate('Resource termination request has been submitted.'),

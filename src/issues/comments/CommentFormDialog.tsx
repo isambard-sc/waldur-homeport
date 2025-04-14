@@ -2,19 +2,21 @@ import { FC } from 'react';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { InjectedFormProps, reduxForm } from 'redux-form';
+import {
+  Issue,
+  supportCommentsUpdate,
+  supportIssuesComment,
+} from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { FormContainer, SubmitButton, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse } from '@waldur/store/notify';
 
-import { Issue } from '../list/types';
-
 import * as actions from './actions';
-import { createComment, updateComment } from './api';
 import * as constants from './constants';
 import { getIssue } from './selectors';
 
@@ -28,10 +30,13 @@ const PureCommentFormDialog: FC<CommentFormDialogProps> = (props) => {
   const onSubmit = async (data: { [key: string]: string }, dispatch) => {
     if (props.isEdit) {
       try {
-        const response = await updateComment(
-          data[constants.FORM_FIELDS.comment],
-          props.resolve.comment.uuid,
-        );
+        const response = await supportCommentsUpdate({
+          path: { uuid: props.resolve.comment.uuid },
+          body: {
+            is_public: true,
+            description: data[constants.FORM_FIELDS.comment],
+          },
+        });
         dispatch(actions.issueCommentsUpdateSuccess(response.data));
         dispatch(closeModalDialog());
       } catch (error) {
@@ -41,10 +46,14 @@ const PureCommentFormDialog: FC<CommentFormDialogProps> = (props) => {
       }
     } else {
       try {
-        const response = await createComment(
-          data[constants.FORM_FIELDS.comment],
-          props.issue.uuid,
-        );
+        const response = await supportIssuesComment({
+          path: { uuid: props.issue.uuid },
+          body: {
+            is_public: true,
+            description: data[constants.FORM_FIELDS.comment],
+          },
+        });
+
         dispatch(actions.issueCommentsCreateSuccess(response.data));
         dispatch(closeModalDialog());
       } catch (error) {
@@ -57,7 +66,7 @@ const PureCommentFormDialog: FC<CommentFormDialogProps> = (props) => {
 
   return (
     <form onSubmit={props.handleSubmit(onSubmit)}>
-      <MetronicModalDialog
+      <ModalDialog
         title={
           props.isEdit ? translate('Change comment') : translate('Add comment')
         }
@@ -86,7 +95,7 @@ const PureCommentFormDialog: FC<CommentFormDialogProps> = (props) => {
             autoFocus
           />
         </FormContainer>
-      </MetronicModalDialog>
+      </ModalDialog>
     </form>
   );
 };

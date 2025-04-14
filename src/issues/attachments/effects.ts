@@ -1,11 +1,16 @@
 import { call, put, race, select, spawn, takeEvery } from 'redux-saga/effects';
+import {
+  supportAttachmentsCreate,
+  supportAttachmentsDestroy,
+  supportAttachmentsList,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { formDataOptions } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { showError, showErrorResponse } from '@waldur/store/notify';
 
 import * as actions from './actions';
-import * as api from './api';
 import * as constants from './constants';
 import { getDeleting } from './selectors';
 import * as utils from './utils';
@@ -13,7 +18,9 @@ import * as utils from './utils';
 function* issueAttachmentsGet(action) {
   const { issueUrl } = action.payload;
   try {
-    const response = yield call(api.getAttachments, issueUrl);
+    const response = yield call(supportAttachmentsList, {
+      query: { issue: issueUrl },
+    });
     const data = response.data.sort((a, b) => (a.created > b.created ? -1 : 1));
     yield put(actions.issueAttachmentsGetSuccess(data));
   } catch (error) {
@@ -29,14 +36,10 @@ function* issueAttachmentUpload(action) {
   const { cancel } = yield race({
     sync: call(function* () {
       try {
-        const response = yield call(
-          api.putAttachment,
-          issueUrl,
-          file,
-          (progress) => {
-            put(actions.issueAttachmentsProgressUpdate(file.size, progress));
-          },
-        );
+        const response = yield call(supportAttachmentsCreate, {
+          body: { issue: issueUrl, file },
+          ...formDataOptions,
+        });
         yield put(actions.issueAttachmentsPutSuccess(response.data));
       } catch (error) {
         yield put(actions.issueAttachmentsPutError(file, error));
@@ -77,7 +80,7 @@ function* issueAttachmentsDelete(action) {
   }
   try {
     yield put(actions.issueAttachmentsDeleteStart(uuid));
-    yield call(api.deleteAttachment, uuid);
+    yield call(supportAttachmentsDestroy, { path: { uuid } });
     yield put(actions.issueAttachmentsDeleteSuccess(uuid));
   } catch (error) {
     yield put(actions.issueAttachmentsDeleteError(error, uuid));

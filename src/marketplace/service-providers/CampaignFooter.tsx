@@ -2,6 +2,10 @@ import { CaretRight, PaperPlaneTilt } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  promotionsCampaignsCreate,
+  promotionsCampaignsUpdate,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import * as api from '@waldur/marketplace/common/api';
@@ -10,7 +14,6 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { createCampaign, updateCampaign } from './api';
 import { CampaignFormData } from './types';
 
 export const CampaignFooter = ({
@@ -46,7 +49,7 @@ export const CampaignFooter = ({
     async (formData: CampaignFormData) => {
       try {
         formData.service_provider = await getServiceProvider();
-        await createCampaign(serializeCampaign(formData));
+        await promotionsCampaignsCreate({ body: serializeCampaign(formData) });
         refetch();
         dispatch(showSuccess(translate('Campaign has been created.')));
         dispatch(closeModalDialog());
@@ -63,7 +66,10 @@ export const CampaignFooter = ({
     async (formData: CampaignFormData) => {
       try {
         formData.service_provider = await getServiceProvider();
-        await updateCampaign(formData.uuid, serializeCampaign(formData));
+        await promotionsCampaignsUpdate({
+          path: { uuid: formData.uuid },
+          body: serializeCampaign(formData),
+        });
         refetch();
         dispatch(showSuccess(translate('Campaign has been updated.')));
         dispatch(closeModalDialog());
@@ -77,35 +83,27 @@ export const CampaignFooter = ({
   );
 
   return (
-    <Modal.Footer>
+    <Modal.Footer className="border-0 pt-0 gap-2">
       {step === 0 ? (
-        <Button onClick={() => setStep(1)} className="ms-3">
+        <Button onClick={() => setStep(1)}>
           <span className="svg-icon svg-icon-2">
-            <CaretRight />
+            <CaretRight weight="bold" />
           </span>{' '}
           {translate('Continue')}
         </Button>
       ) : (
         <>
           {!isUpdate ? (
-            <Button
-              disabled={disabled}
-              className="ms-3"
-              onClick={handleSubmit(saveAndSend)}
-            >
+            <Button disabled={disabled} onClick={handleSubmit(saveAndSend)}>
               <span className="svg-icon svg-icon-2">
-                <PaperPlaneTilt />
+                <PaperPlaneTilt weight="bold" />
               </span>{' '}
               {translate('Create a campaign')}
             </Button>
           ) : (
-            <Button
-              disabled={disabled}
-              className="ms-3"
-              onClick={handleSubmit(saveAndUpdate)}
-            >
+            <Button disabled={disabled} onClick={handleSubmit(saveAndUpdate)}>
               <span className="svg-icon svg-icon-2">
-                <PaperPlaneTilt />
+                <PaperPlaneTilt weight="bold" />
               </span>{' '}
               {translate('Update a campaign')}
             </Button>

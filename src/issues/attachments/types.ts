@@ -1,15 +1,5 @@
-export interface Attachment {
-  created: string;
-  file: string;
-  file_name: string;
-  mime_type: string;
-  file_size: number;
-  thumbnail: string;
-  issue: string;
-  issue_key: string;
-  url: string;
-  uuid: string;
-}
+import { Attachment } from 'waldur-js-client';
+export { Attachment } from 'waldur-js-client';
 
 export type IssueAttachmentUploading = {
   key: string | number;

@@ -1,22 +1,21 @@
-import { Modal } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { UserCirclePlus } from '@phosphor-icons/react';
 import { reduxForm } from 'redux-form';
 
-import { SubmitButton } from '@waldur/auth/SubmitButton';
+import { post } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
-import { usersAutocomplete } from '@waldur/customer/team/api';
-import { FormContainer } from '@waldur/form';
+import { usersAutocomplete } from '@waldur/customer/team/utils';
+import { FormContainer, SubmitButton } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { useModal } from '@waldur/modal/hooks';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { Role } from '@waldur/permissions/types';
 import { ExpirationTimeGroup } from '@waldur/project/team/ExpirationTimeGroup';
 import { RoleGroup } from '@waldur/project/team/RoleGroup';
 import { UserListOptionInline } from '@waldur/project/team/UserListOptionInline';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 
-import { addScopeUser } from './api';
 import { AddUserDialogProps } from './types';
 
 const FORM_ID = 'AddUserDialog';
@@ -41,7 +40,8 @@ export const AddUserDialog = reduxForm<
   roleTypes,
   roles,
 }) => {
-  const dispatch = useDispatch();
+  const { showSuccess, showErrorResponse } = useNotify();
+  const { closeDialog } = useModal();
 
   const getOptionLabel = (option) =>
     option.email
@@ -50,31 +50,46 @@ export const AddUserDialog = reduxForm<
 
   const saveUser = async (formData: AddUserDialogFormData) => {
     try {
-      await addScopeUser({
-        scope: scope.url,
+      await post(`${scope.url}add_user/`, {
         user: formData.user.uuid,
         expiration_time: formData.expiration_time,
         role: roles && roles.length === 1 ? roles[0] : formData.role.name,
       });
+
       await refetch();
-      dispatch(showSuccess('User has been added.'));
-      dispatch(closeModalDialog());
+      showSuccess('User has been added.');
+      closeDialog();
     } catch (error) {
-      dispatch(showErrorResponse(error, translate('Unable to add user.')));
+      showErrorResponse(error, translate('Unable to add user.'));
     }
   };
 
   return (
     <form onSubmit={handleSubmit(saveUser)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Add user')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Add member')}
+        subtitle={translate(
+          'Select a user to assign a role within the project.',
+        )}
+        iconNode={<UserCirclePlus weight="bold" />}
+        iconColor="success"
+        footer={
+          <>
+            <CloseDialogButton className="min-w-125px" />
+            <SubmitButton
+              label={translate('Add role')}
+              submitting={submitting}
+              disabled={invalid}
+              className="btn btn-primary min-w-125px"
+            />
+          </>
+        }
+      >
         <FormContainer submitting={submitting}>
           <AsyncSelectField
             name="user"
             label={translate('User')}
-            placeholder={translate('Select user...')}
+            placeholder={translate('Search and select user...')}
             loadOptions={(query, prevOptions, page) =>
               usersAutocomplete({ query }, prevOptions, page)
             }
@@ -87,13 +102,7 @@ export const AddUserDialog = reduxForm<
           {roles && roles.length === 1 ? null : <RoleGroup types={roleTypes} />}
           <ExpirationTimeGroup />
         </FormContainer>
-      </Modal.Body>
-      <Modal.Footer>
-        <SubmitButton submitting={submitting} invalid={invalid}>
-          {translate('Save')}
-        </SubmitButton>
-        <CloseDialogButton />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

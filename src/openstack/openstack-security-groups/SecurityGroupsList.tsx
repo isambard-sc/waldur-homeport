@@ -1,5 +1,9 @@
 import { FunctionComponent, useMemo } from 'react';
 import { ButtonGroup } from 'react-bootstrap';
+import {
+  OpenStackSecurityGroup,
+  OpenstackSecurityGroupsListData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
@@ -11,12 +15,12 @@ import { useTable } from '@waldur/table/useTable';
 import { CreateSecurityGroupAction } from '../openstack-tenant/actions/CreateSecurityGroupAction';
 import { PullSecurityGroupsAction } from '../openstack-tenant/actions/PullSecurityGroupsAction';
 
-import { SecurityGroupExpandableRow } from './SecurityGroupExpandableRow';
+import { SecurityGroupRulesList } from './SecurityGroupRulesList';
 
 export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackSecurityGroupsListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
       field: [
@@ -26,7 +30,6 @@ export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
         'url',
         'marketplace_offering_uuid',
         'service_name',
-        'end_date',
         'backend_id',
         'rules',
         'resource_type',
@@ -41,7 +44,7 @@ export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
     queryField: 'query',
   });
   return (
-    <Table
+    <Table<OpenStackSecurityGroup>
       {...props}
       columns={[
         {
@@ -56,9 +59,11 @@ export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
           title: translate('Security groups'),
           render: null,
           export: (row) =>
-            row.rules.map((rule) => {
-              return JSON.stringify(rule).replaceAll(/"/g, "'");
-            }),
+            row.rules
+              .map((rule) => {
+                return JSON.stringify(rule).replaceAll(/"/g, "'");
+              })
+              .join(','),
           exportKeys: ['rules'],
         },
         {
@@ -73,7 +78,8 @@ export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
           export: false,
         },
       ]}
-      expandableRow={SecurityGroupExpandableRow}
+      title={translate('Security groups')}
+      expandableRow={SecurityGroupRulesList}
       enableExport={true}
       rowActions={({ row }) => (
         <ActionButtonResource url={row.url} refetch={props.fetch} />

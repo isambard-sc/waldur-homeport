@@ -1,6 +1,7 @@
+import { DownloadSimple } from '@phosphor-icons/react';
 import { Field } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { number, required } from '@waldur/core/validators';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
@@ -17,7 +18,6 @@ import { ActionButton } from '@waldur/table/ActionButton';
 
 import { FieldReviewComments } from '../create-review/FieldReviewComments';
 
-import { QuestionMark } from './QuestionMark';
 import { UploadDocumentationFiles } from './UploadDocumentationFiles';
 
 const isCodeRequired = ENV.plugins.WALDUR_CORE.OECD_FOS_2007_CODE_MANDATORY;
@@ -28,15 +28,14 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
   return (
     <VStepperFormStepCard
       title={props.title}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       actions={
         <div className="d-flex justify-content-end flex-grow-1">
           <ActionButton
             title={translate('Import project')}
             action={null}
-            variant="light"
+            iconNode={<DownloadSimple weight="bold" />}
+            disabled
           />
         </div>
       }
@@ -44,16 +43,14 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
       <Field
         name="name"
         component={FormGroup}
-        label={translate('Project title')}
+        label={translate('Name')}
+        placeholder={translate('Enter a name') + '...'}
+        tooltip={translate(
+          'Short title for the project, which explains the project goal as much as possible.',
+        )}
+        tooltipEnd
         validate={required}
         required
-        actions={
-          <QuestionMark
-            tooltip={translate(
-              'Short title for the project, which explains the project goal as much as possible.',
-            )}
-          />
-        }
       >
         <StringField />
       </Field>
@@ -65,14 +62,12 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         name="project_summary"
         component={FormGroup}
         maxLength={1000}
-        label={translate('Project summary')}
+        label={translate('Summary')}
+        placeholder={translate('Enter a summary') + '...'}
+        tooltip={translate('Brief description of the project.')}
+        tooltipEnd
         validate={required}
         required
-        actions={
-          <QuestionMark
-            tooltip={translate('Brief description of the project.')}
-          />
-        }
       >
         <TextField />
       </Field>
@@ -84,14 +79,12 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         name="description"
         component={FormGroup}
         maxLength={1000}
-        label={translate('Detailed description')}
-        actions={
-          <QuestionMark
-            tooltip={translate(
-              'Explanation of the scientific case of the project for which the resources are intended to be used.',
-            )}
-          />
-        }
+        label={translate('Description')}
+        placeholder={translate('Enter a description') + '...'}
+        tooltip={translate(
+          'Explanation of the scientific case of the project for which the resources are intended to be used.',
+        )}
+        tooltipEnd
       >
         <TextField />
       </Field>
@@ -102,14 +95,14 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
       <Field
         name="project_has_civilian_purpose"
         component={FormGroup}
-        label={translate('Project for civilian purpose?')}
-        actions={
-          <QuestionMark
-            tooltip={translate('Mark if the project has a civilian purpose.')}
-          />
-        }
+        hideLabel
       >
-        <AwesomeCheckboxField />
+        <AwesomeCheckboxField
+          label={translate('Project for civilian purpose?')}
+          size="sm"
+          tooltip={translate('Mark if the project has a civilian purpose.')}
+          tooltipEnd
+        />
       </Field>
       <FieldReviewComments
         reviews={reviews}
@@ -120,15 +113,10 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
           name="oecd_fos_2007_code"
           component={FormGroup}
           label={translate('Research field (OECD code)')}
+          tooltip={translate('Select the main research field for the project.')}
+          tooltipEnd
           validate={isCodeRequired ? required : undefined}
           required={isCodeRequired}
-          actions={
-            <QuestionMark
-              tooltip={translate(
-                'Select the main research field for the project.',
-              )}
-            />
-          }
         >
           <SelectField
             options={OECD_FOS_2007_CODES}
@@ -139,19 +127,15 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
           />
         </Field>
       ) : null}
-      <Field
-        name="project_is_confidential"
-        component={FormGroup}
-        label={translate('Is the project confidential?')}
-        actions={
-          <QuestionMark
-            tooltip={translate(
-              'Select if the project proposal contains confidential information.',
-            )}
-          />
-        }
-      >
-        <AwesomeCheckboxField />
+      <Field name="project_is_confidential" component={FormGroup} hideLabel>
+        <AwesomeCheckboxField
+          label={translate('Is the project confidential?')}
+          size="sm"
+          tooltip={translate(
+            'Select if the project proposal contains confidential information.',
+          )}
+          tooltipEnd
+        />
       </Field>
       <FieldReviewComments
         reviews={reviews}
@@ -161,15 +145,13 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         name="duration_in_days"
         component={FormGroup}
         label={translate('Project duration in days')}
+        placeholder={translate('Enter number of days') + '...'}
+        tooltip={translate(
+          'Expected project duration in days once resources have been granted.',
+        )}
+        tooltipEnd
         validate={[required, number]}
         required
-        actions={
-          <QuestionMark
-            tooltip={translate(
-              'Expected project duration in days once resources have been granted.',
-            )}
-          />
-        }
       >
         <StringField />
       </Field>
@@ -182,13 +164,10 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         className="mb-7"
         label={translate('Upload supporting documentation')}
         component={FormGroup}
-        actions={
-          <QuestionMark
-            tooltip={translate(
-              'Upload additional documents, which support the proposal and help to review it.',
-            )}
-          />
-        }
+        tooltip={translate(
+          'Upload additional documents, which support the proposal and help to review it.',
+        )}
+        tooltipEnd
       >
         <UploadDocumentationFiles proposal={props.params.proposal} />
       </Field>

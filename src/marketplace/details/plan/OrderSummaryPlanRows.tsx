@@ -13,7 +13,8 @@ import { useComponentsDetailPrices } from './utils';
 
 interface OrderSummaryPlanRowsProps {
   priceData: PricesData;
-  customer: Customer;
+  customer: Pick<Customer, 'name' | 'uuid' | 'url' | 'payment_profiles'>;
+  hasTotal?: boolean;
 }
 
 const getRowLabel = (component: Component) =>
@@ -41,8 +42,27 @@ export const OrderSummaryPlanRows = (props: OrderSummaryPlanRowsProps) => {
 
   return (
     <>
+      {oneTime.hasOneTimeCost && (
+        <div className="border-bottom mb-5">
+          {!shouldConcealPrices
+            ? oneTimeRows.map((row, i) => (
+                <CheckoutPricingRow
+                  key={i}
+                  label={getRowLabel(row)}
+                  value={defaultCurrency(row.prices[monthlyPriceIndex])}
+                />
+              ))
+            : oneTimeRows.map((row, i) => (
+                <CheckoutPricingRow
+                  key={i}
+                  label={row.name}
+                  value={`${row.amount} ${row.measured_unit}`}
+                />
+              ))}
+        </div>
+      )}
       {periodic.hasPeriodicCost && (
-        <>
+        <div className="border-bottom mb-5">
           {!shouldConcealPrices && activeFixedPriceProfile
             ? periodic.fixedRows.map((row, i) => (
                 <CheckoutPricingRow
@@ -73,51 +93,30 @@ export const OrderSummaryPlanRows = (props: OrderSummaryPlanRowsProps) => {
                   value={`${row.amount} ${row.measured_unit}`}
                 />
               ))}
-          {!shouldConcealPrices && activeFixedPriceProfile && (
-            <CheckoutPricingRow
-              label={translate('Monthly cost')}
-              value={
-                defaultCurrency(periodic.periodicTotal[monthlyPriceIndex]) +
-                '/mo'
-              }
-              className="fs-5"
-            />
-          )}
-          <hr />
-        </>
+        </div>
       )}
-      {oneTime.hasOneTimeCost && (
-        <>
-          {!shouldConcealPrices
-            ? oneTimeRows.map((row, i) => (
-                <CheckoutPricingRow
-                  key={i}
-                  label={getRowLabel(row)}
-                  value={defaultCurrency(row.prices[monthlyPriceIndex])}
-                />
-              ))
-            : oneTimeRows.map((row, i) => (
-                <CheckoutPricingRow
-                  key={i}
-                  label={row.name}
-                  value={`${row.amount} ${row.measured_unit}`}
-                />
-              ))}
-          {!shouldConcealPrices && (
-            <CheckoutPricingRow
-              label={translate('One time cost')}
-              value={defaultCurrency(oneTime.oneTimeTotal)}
-              className="fs-5"
-            />
-          )}
-          <hr />
-        </>
+      {oneTime.hasOneTimeCost && !shouldConcealPrices && (
+        <CheckoutPricingRow
+          label={translate('One time cost')}
+          value={defaultCurrency(oneTime.oneTimeTotal)}
+        />
       )}
-      {!shouldConcealPrices && (
+      {periodic.hasPeriodicCost &&
+        !shouldConcealPrices &&
+        activeFixedPriceProfile && (
+          <CheckoutPricingRow
+            label={translate('Monthly cost')}
+            value={
+              defaultCurrency(periodic.periodicTotal[monthlyPriceIndex]) + '/mo'
+            }
+          />
+        )}
+      {!shouldConcealPrices && props.hasTotal && (
         <CheckoutPricingRow
           label={translate('Total')}
           value={defaultCurrency(total || 0)}
-          className="fs-4"
+          total
+          className="fs-3"
         />
       )}
     </>

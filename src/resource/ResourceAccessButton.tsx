@@ -10,13 +10,13 @@ import { showSuccess } from '@waldur/store/notify';
 import { getResourceAccessEndpoints, isSshFormat } from './utils';
 
 interface Endpoint {
-  name: string;
-  url: string;
+  name?: string;
+  url?: string;
 }
 interface ResourceAccessButtonProps {
   resource: {
     endpoints?: Endpoint[];
-    username: string;
+    username?: string;
   };
   offering: {
     endpoints?: Endpoint[];

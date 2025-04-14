@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { hidePlanAddButton } from '@waldur/marketplace/common/registry';
+import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { Plan } from '@waldur/marketplace/types';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -14,6 +15,7 @@ import { useTable } from '@waldur/table/useTable';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { OfferingSectionProps } from '../types';
+import { useOfferingAccountingTableTabs } from '../utils';
 
 import { AddPlanButton } from './AddPlanButton';
 import { PlanActions } from './PlanActions';
@@ -75,11 +77,20 @@ export const PlansSection: FC<OfferingSectionProps> = (props) => {
       customerId: props.offering.customer_uuid,
     });
 
+  const tableTabs = useOfferingAccountingTableTabs(props.offering);
+
   return (
     <Table<Plan>
       {...tableProps}
       columns={columns}
+      title={
+        <>
+          <ValidationIcon value={props.offering.plans?.length > 0} />
+          {translate('Accounting')}
+        </>
+      }
       verboseName={translate('plans')}
+      tabs={tableTabs}
       tableActions={
         canCreatePlan && (
           <AddPlanButton refetch={tableProps.fetch} offering={props.offering} />

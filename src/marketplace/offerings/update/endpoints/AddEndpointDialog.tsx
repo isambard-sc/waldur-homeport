@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsAddEndpoint } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { StringField, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { createOfferingEndpoint } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { FormGroup } from '../../FormGroup';
@@ -24,7 +24,10 @@ export const AddEndpointDialog = reduxForm<
   const update = useCallback(
     async (formData) => {
       try {
-        await createOfferingEndpoint(props.resolve.offering.uuid, formData);
+        await marketplaceProviderOfferingsAddEndpoint({
+          path: { uuid: props.resolve.offering.uuid },
+          body: formData,
+        });
         dispatch(
           showSuccess(translate('Endpoint has been added successfully.')),
         );
@@ -41,24 +44,23 @@ export const AddEndpointDialog = reduxForm<
 
   return (
     <form onSubmit={props.handleSubmit(update)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Add endpoint')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Add endpoint')}
+        footer={
+          <SubmitButton
+            disabled={props.invalid}
+            submitting={props.submitting}
+            label={translate('Create')}
+          />
+        }
+      >
         <FormGroup label={translate('Name')} required={true}>
           <Field name="name" validate={required} component={StringField} />
         </FormGroup>
         <FormGroup label={translate('URL')} required={true}>
           <Field name="url" validate={required} component={StringField} />
         </FormGroup>
-      </Modal.Body>
-      <Modal.Footer>
-        <SubmitButton
-          disabled={props.invalid}
-          submitting={props.submitting}
-          label={translate('Create')}
-        />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

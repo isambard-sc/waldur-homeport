@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackNetwork, OpenstackNetworksListData } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
@@ -14,7 +15,7 @@ import { CreateNetworkAction } from '../openstack-tenant/actions/CreateNetworkAc
 export const TenantNetworksList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackNetworksListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
       field: [
@@ -25,6 +26,7 @@ export const TenantNetworksList: FunctionComponent<{ resourceScope }> = ({
         'created',
         'is_external',
         'type',
+        // @ts-ignore
         'segmentation_id',
         'mtu',
         'subnets',
@@ -46,7 +48,7 @@ export const TenantNetworksList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<OpenStackNetwork>
       {...props}
       columns={[
         {
@@ -71,6 +73,7 @@ export const TenantNetworksList: FunctionComponent<{ resourceScope }> = ({
         },
       ]}
       verboseName={translate('networks')}
+      title={translate('Networks')}
       tableActions={
         <CreateNetworkAction resource={resourceScope} refetch={props.fetch} />
       }

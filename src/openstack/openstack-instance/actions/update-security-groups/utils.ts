@@ -2,19 +2,17 @@ import { useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 import { reduxForm } from 'redux-form';
+import { openstackInstancesUpdateSecurityGroups } from 'waldur-js-client';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { Option } from '@waldur/marketplace/common/registry';
 import { closeModalDialog } from '@waldur/modal/actions';
-import {
-  loadSecurityGroups,
-  updateSecurityGroups,
-} from '@waldur/openstack/api';
+import { loadSecurityGroups } from '@waldur/openstack/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { OpenStackInstance } from '../../types';
-
 interface UpdateSecurityGroupsFormData {
-  security_groups: { value: string; label: string }[];
+  security_groups: Option[];
 }
 
 export const useUpdateSecurityGroupsForm = (
@@ -25,7 +23,7 @@ export const useUpdateSecurityGroupsForm = (
     () =>
       loadSecurityGroups({
         tenant_uuid: resource.tenant_uuid,
-        fields: ['name', 'url'],
+        field: ['name', 'url'],
       }).then((groups) =>
         groups.map((group) => ({
           label: group.name,
@@ -37,10 +35,13 @@ export const useUpdateSecurityGroupsForm = (
   const dispatch = useDispatch();
   const submitRequest = async (formData: UpdateSecurityGroupsFormData) => {
     try {
-      await updateSecurityGroups(resource.uuid, {
-        security_groups: (formData.security_groups || []).map((item) => ({
-          url: item.value,
-        })),
+      await openstackInstancesUpdateSecurityGroups({
+        path: { uuid: resource.uuid },
+        body: {
+          security_groups: (formData.security_groups || []).map(
+            (item) => item.value,
+          ),
+        },
       });
       dispatch(
         showSuccess(

@@ -1,6 +1,7 @@
+import { eventsEventGroupsRetrieve } from 'waldur-js-client';
+
 import { titleCase } from '@waldur/core/utils';
 
-import { getEventGroups } from './api';
 import { EventGroupOption } from './types';
 
 export const formatEventTitle = (choice) => {
@@ -21,7 +22,9 @@ export const formatEventTitle = (choice) => {
 export const loadEventGroupsOptions: () => Promise<
   EventGroupOption[]
 > = async () => {
-  const groups = await getEventGroups();
+  const groups = await eventsEventGroupsRetrieve().then(
+    (response) => response.data,
+  );
   const options = Object.keys(groups)
     .map((key) => ({
       key,

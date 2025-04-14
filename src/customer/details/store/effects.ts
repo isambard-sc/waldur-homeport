@@ -1,4 +1,8 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects';
+import {
+  CustomerPermissionReview,
+  customerPermissionsReviewsList,
+} from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -6,8 +10,6 @@ import { CustomerFeatures } from '@waldur/FeaturesEnums';
 import { openModalDialog } from '@waldur/modal/actions';
 import { SET_CURRENT_CUSTOMER } from '@waldur/workspace/constants';
 import { checkIsOwner, getUser } from '@waldur/workspace/selectors';
-
-import * as api from '../api';
 
 const PendingReviewDialog = lazyComponent(() =>
   import('@waldur/customer/team/PendingReviewDialog').then((module) => ({
@@ -26,7 +28,14 @@ function* checkPendingReview(action) {
     return;
   }
   try {
-    const review = yield call(api.getPendingReview, customer.uuid);
+    const review: CustomerPermissionReview = yield call(() =>
+      customerPermissionsReviewsList({
+        query: {
+          customer_uuid: customer.uuid,
+          is_pending: true,
+        },
+      }).then((r) => r.data[0]),
+    );
     if (review) {
       yield put(
         openModalDialog(PendingReviewDialog, {

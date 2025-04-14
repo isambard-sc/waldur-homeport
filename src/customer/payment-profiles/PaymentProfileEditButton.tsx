@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 
 const PaymentProfileUpdateDialogContainer = lazyComponent(() =>
@@ -15,15 +15,11 @@ export const PaymentProfileEditButton = (props) => {
   const callback = () =>
     dispatch(
       openModalDialog(PaymentProfileUpdateDialogContainer, {
-        resolve: { profile: props.profile, refetch: props.refetch },
+        resolve: { profile: props.row, refetch: props.refetch },
       }),
     );
 
   return (
-    <EditButton
-      onClick={callback}
-      size="sm"
-      {...props.tooltipAndDisabledAttributes}
-    />
+    <EditAction action={callback} {...props.tooltipAndDisabledAttributes} />
   );
 };

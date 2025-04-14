@@ -75,7 +75,11 @@ export const ActionItem: FC<ActionItemProps> = (props) => {
           id={`action-reason-${uniqueId()}`}
           className="ms-1 me-3"
         >
-          <Question size={20} />
+          <Question
+            size={20}
+            weight="bold"
+            className={classNames('text-muted', props.disabled && 'opacity-50')}
+          />
         </Tip>
       )}
       {props.staff && (

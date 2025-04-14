@@ -1,14 +1,15 @@
 import { useRouter } from '@uirouter/react';
 import { useState, FunctionComponent } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { customerPermissionsReviewsClose } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { closeReview } from './api';
 import { CustomerUsersList } from './CustomerUsersList';
 
 export const PendingReviewDialog: FunctionComponent<{
@@ -24,7 +25,7 @@ export const PendingReviewDialog: FunctionComponent<{
   const closeReviewCallback = async () => {
     setSubmitting(true);
     try {
-      await closeReview(reviewId);
+      await customerPermissionsReviewsClose({ path: { uuid: reviewId } });
       dispatch(showSuccess(translate('Review has been closed.')));
       dispatch(closeModalDialog());
     } catch (e) {
@@ -33,30 +34,27 @@ export const PendingReviewDialog: FunctionComponent<{
     setSubmitting(false);
   };
   return (
-    <>
-      <Modal.Header>
-        <Modal.Title>
-          {translate('Please review organization permissions')}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <CustomerUsersList />
-      </Modal.Body>
-      <Modal.Footer>
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={closeReviewCallback}
-        >
-          {submitting && (
-            <>
-              <LoadingSpinnerIcon className="me-1" />{' '}
-            </>
-          )}
-          {translate('Confirming that data is correct')}
-        </button>
-        <Button onClick={gotoTeam}>{translate('Edit permissions')}</Button>
-      </Modal.Footer>
-    </>
+    <ModalDialog
+      title={translate('Please review organization permissions')}
+      footer={
+        <>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={closeReviewCallback}
+          >
+            {submitting && (
+              <>
+                <LoadingSpinnerIcon className="me-1" />{' '}
+              </>
+            )}
+            {translate('Confirming that data is correct')}
+          </button>
+          <Button onClick={gotoTeam}>{translate('Edit permissions')}</Button>
+        </>
+      }
+    >
+      <CustomerUsersList />
+    </ModalDialog>
   );
 };

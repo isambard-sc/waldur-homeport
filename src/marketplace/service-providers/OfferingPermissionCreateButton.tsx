@@ -36,7 +36,7 @@ export const OfferingPermissionCreateButton: React.FC<{ fetch }> = ({
     <ActionButton
       action={callback}
       title={translate('Add user')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   ) : null;

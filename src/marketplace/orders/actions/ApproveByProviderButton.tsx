@@ -3,12 +3,13 @@ import { useMutation } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceOrdersApproveByProvider,
+  marketplaceOrdersRetrieve,
+  OrderDetails,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import {
-  approveOrderByProvider,
-  getOrder,
-} from '@waldur/marketplace/common/api';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { updateEntity } from '@waldur/table/actions';
@@ -19,10 +20,9 @@ import {
   TABLE_PENDING_PUBLIC_ORDERS,
   TABLE_PUBLIC_ORDERS,
 } from '../list/constants';
-import { OrderResponse } from '../types';
 
 interface SupportOrderApproveButtonProps {
-  row: OrderResponse;
+  row: OrderDetails;
   refetch?: () => void;
   as?: React.ComponentType;
 }
@@ -33,8 +33,12 @@ export const ApproveByProviderButton: FunctionComponent<
   const dispatch = useDispatch();
   const { mutate, isLoading } = useMutation(async () => {
     try {
-      await approveOrderByProvider(props.row.uuid);
-      const newOrder = await getOrder(props.row.uuid);
+      await marketplaceOrdersApproveByProvider({
+        path: { uuid: props.row.uuid },
+      });
+      const newOrder = await marketplaceOrdersRetrieve({
+        path: { uuid: props.row.uuid },
+      }).then((response) => response.data);
       dispatch(
         updateEntity(TABLE_MARKETPLACE_ORDERS, props.row.uuid, newOrder),
       );
@@ -68,7 +72,8 @@ export const ApproveByProviderButton: FunctionComponent<
       title={translate('Approve')}
       action={mutate}
       disabled={isLoading}
-      iconNode={<Check />}
+      iconNode={<Check weight="bold" />}
+      iconColor="success"
     />
   );
 };

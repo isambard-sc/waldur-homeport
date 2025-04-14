@@ -1,5 +1,6 @@
 import { useState, FunctionComponent } from 'react';
 
+import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 
 import { getConsent, setConsent } from './CookiesStorage';
@@ -23,14 +24,9 @@ export const CookiesConsent: FunctionComponent = () => {
       {translate(
         'This website uses cookies to ensure you get the best experience on our website.',
       )}{' '}
-      <a
-        href="http://cookies.insites.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{ textDecoration: 'underline' }}
-      >
+      <Link className="menu-link px-2" state="about.privacy">
         {translate('Learn more')}
-      </a>
+      </Link>
       <button
         type="button"
         className="btn btn-primary d-inline mx-auto ms-lg-5 acceptcookies mt-5 mt-lg-0"

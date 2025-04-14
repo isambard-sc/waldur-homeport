@@ -1,9 +1,14 @@
 import { Button, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceProviderOfferingsActivate,
+  marketplaceProviderOfferingsArchive,
+  marketplaceProviderOfferingsDraft,
+  marketplaceProviderOfferingsUnpause,
+} from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { updateOfferingState as updateOfferingStateApi } from '@waldur/marketplace/common/api';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
@@ -29,9 +34,9 @@ export const OfferingStateActions = ({
 }) => {
   const dispatch = useDispatch();
   const user = useUser();
-  const updateOfferingState = async (target, reason = null) => {
+  const updateOfferingState = async (api) => {
     try {
-      await updateOfferingStateApi(offering.uuid, target, reason);
+      await api();
       if (refreshOffering) {
         refreshOffering();
       }
@@ -45,7 +50,9 @@ export const OfferingStateActions = ({
   };
   const activate = () => {
     if (user.is_staff) {
-      updateOfferingState('activate');
+      updateOfferingState(() =>
+        marketplaceProviderOfferingsActivate({ path: { uuid: offering.uuid } }),
+      );
     } else {
       dispatch(
         openModalDialog(RequestActionDialog, {
@@ -56,7 +63,9 @@ export const OfferingStateActions = ({
   };
   const setDraft = () => {
     if (user.is_staff) {
-      updateOfferingState('draft');
+      updateOfferingState(() =>
+        marketplaceProviderOfferingsDraft({ path: { uuid: offering.uuid } }),
+      );
     } else {
       dispatch(
         openModalDialog(RequestActionDialog, {
@@ -73,9 +82,15 @@ export const OfferingStateActions = ({
     );
   };
 
-  const unpause = () => updateOfferingState('unpause');
+  const unpause = () =>
+    updateOfferingState(() =>
+      marketplaceProviderOfferingsUnpause({ path: { uuid: offering.uuid } }),
+    );
 
-  const archive = () => updateOfferingState('archive');
+  const archive = () =>
+    updateOfferingState(() =>
+      marketplaceProviderOfferingsArchive({ path: { uuid: offering.uuid } }),
+    );
 
   const draftTitle = user.is_staff
     ? translate('Set to draft')

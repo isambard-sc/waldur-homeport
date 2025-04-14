@@ -1,4 +1,5 @@
 import { FC } from 'react';
+//import { openportalAllocationsUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import {
@@ -8,9 +9,20 @@ import {
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { UpdateResourceDialog } from '@waldur/resource/actions/UpdateResourceDialog';
 
-import { updateAllocation } from './api';
-
 const getFields = () => [createNameField(), createDescriptionField()];
+
+// dummy function
+export const openportalAllocationsUpdate = (options: any) => {
+  return new Promise((resolve) => {
+    resolve({
+      data: {
+        uuid: options.path.uuid,
+        name: options.body.name,
+        description: options.body.description,
+      },
+    });
+  });
+};
 
 export const EditDialog: FC<ActionDialogProps> = ({
   resolve: { resource, refetch },
@@ -23,7 +35,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
         name: resource.name,
         description: resource.description,
       }}
-      updateResource={updateAllocation}
+      updateResource={(id, formData) =>
+        openportalAllocationsUpdate({ path: { uuid: id }, body: formData })
+      }
       verboseName={translate('OpenPortal allocation')}
       refetch={refetch}
     />

@@ -1,6 +1,6 @@
 import ipRegex from 'ip-regex';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
 import { translate } from '@waldur/i18n';
 import { ActionContext } from '@waldur/resource/actions/types';
@@ -25,7 +25,7 @@ export const parseQuotasUsage = listToDict(
 );
 
 // Subnet is restricted with /24 prefix length.
-export const SUBNET_PRIVATE_CIDR_PATTERN = new RegExp(
+const SUBNET_PRIVATE_CIDR_PATTERN = new RegExp(
   // Class A
   '(^(10)(.([2]([0-5][0-5]|[01234][6-9])|[1][0-9][0-9]|[1-9][0-9]|[0-9])){2}.0/24$)' +
     // Class B
@@ -75,11 +75,11 @@ export const validatePrivateCIDR = (value) => {
 };
 
 export const validatePermissionsForConsoleAction = (ctx: ActionContext) => {
-  if (ctx.user.is_staff) {
+  if (ctx.user?.is_staff) {
     return;
   }
   if (
-    !ctx.user.is_support &&
+    !ctx.user?.is_support &&
     ENV.plugins.WALDUR_OPENSTACK.ALLOW_CUSTOMER_USERS_OPENSTACK_CONSOLE_ACCESS
   ) {
     return;

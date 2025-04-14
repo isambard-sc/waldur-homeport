@@ -1,5 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 import { ButtonGroup } from 'react-bootstrap';
+import { RancherApplication, RancherCluster } from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -17,9 +18,9 @@ const ApplicationActions = ({ row }) => (
   </ButtonGroup>
 );
 
-export const ClusterApplicationsList: FunctionComponent<{ resourceScope }> = ({
-  resourceScope,
-}) => {
+export const ClusterApplicationsList: FunctionComponent<{
+  resourceScope: RancherCluster;
+}> = ({ resourceScope }) => {
   const filter = useMemo(
     () => ({
       cluster_uuid: resourceScope.uuid,
@@ -32,7 +33,7 @@ export const ClusterApplicationsList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<RancherApplication>
       {...props}
       columns={[
         {

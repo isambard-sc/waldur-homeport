@@ -22,6 +22,17 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'support-logs',
+    parent: 'support',
+    component: UIView,
+    abstract: true,
+    url: '',
+    data: {
+      breadcrumb: () => translate('Logs'),
+    },
+  },
+
+  {
     name: 'support-dashboard',
     url: '',
     parent: 'support',
@@ -59,7 +70,7 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('Issues'),
+      breadcrumb: () => translate('Requests'),
       permissions: [isStaffOrSupport, hasSupport],
       priority: 103,
     },
@@ -122,7 +133,7 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'support.audit-logs',
+    name: 'support-logs.audit-logs',
     url: 'audit-logs/',
     component: lazyComponent(() =>
       import('@waldur/support/SupportEventsList').then((module) => ({
@@ -131,7 +142,18 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Audit logs'),
-      priority: 105,
+    },
+  },
+  {
+    name: 'support-logs.email-logs',
+    url: 'email-logs/',
+    component: lazyComponent(() =>
+      import('@waldur/support/SupportEmailLogsList').then((module) => ({
+        default: module.SupportEmailLogsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Outgoing emails'),
     },
   },
 ];

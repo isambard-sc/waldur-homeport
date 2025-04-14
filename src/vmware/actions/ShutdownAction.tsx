@@ -1,4 +1,5 @@
 import { Power } from '@phosphor-icons/react';
+import { vmwareVirtualMachineShutdownGuest } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
@@ -8,8 +9,6 @@ import {
 } from '@waldur/resource/actions/base';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-import { shutdownVirtualMachine } from '../api';
-
 const validators = [validateState('OK'), validateRuntimeState('POWERED_ON')];
 
 export const ShutdownAction: ActionItemType = ({ resource, refetch }) => (
@@ -17,8 +16,10 @@ export const ShutdownAction: ActionItemType = ({ resource, refetch }) => (
     title={translate('Shutdown')}
     resource={resource}
     validators={validators}
-    apiMethod={shutdownVirtualMachine}
+    apiMethod={(id) =>
+      vmwareVirtualMachineShutdownGuest({ path: { uuid: id } })
+    }
     refetch={refetch}
-    iconNode={<Power />}
+    iconNode={<Power weight="bold" />}
   />
 );

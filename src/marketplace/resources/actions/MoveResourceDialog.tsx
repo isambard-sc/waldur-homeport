@@ -1,11 +1,10 @@
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceResourcesMoveResource, Resource } from 'waldur-js-client';
 
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { moveResource } from '@waldur/marketplace/common/api';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -28,10 +27,15 @@ const PureMoveResourceDialog: FunctionComponent<any> = (props) => {
 
   const submitRequest = async (formData: FormData) => {
     try {
-      await moveResource(
-        props.resolve.resource.marketplace_resource_uuid,
-        formData.project.url,
-      );
+      await marketplaceResourcesMoveResource({
+        path: { uuid: props.resolve.resource.marketplace_resource_uuid },
+        // @ts-ignore
+        body: {
+          project: {
+            url: formData.project.url,
+          },
+        },
+      });
       dispatch(
         showSuccess(
           translate(

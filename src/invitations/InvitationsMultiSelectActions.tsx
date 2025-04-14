@@ -1,4 +1,5 @@
 import { DropdownButton } from 'react-bootstrap';
+import { Invitation } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { useUser } from '@waldur/workspace/hooks';
@@ -6,7 +7,6 @@ import { useUser } from '@waldur/workspace/hooks';
 import { MultiCancelAction } from './MultiCancelAction';
 import { MultiDeleteAction } from './MultiDeleteAction';
 import { MultiResendAction } from './MultiResendAction';
-import { Invitation } from './types';
 
 export const InvitationsMultiSelectActions = ({
   rows,

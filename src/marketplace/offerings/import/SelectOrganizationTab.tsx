@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
+import { remoteWaldurApiRemoteCustomers } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { FormContainer, SelectField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { Customer } from '@waldur/workspace/types';
 
-import { loadRemoteOrganizations } from './api';
 import { ErredRemoteConnection } from './ErredRemoteConnection';
 import { importOfferingSelector } from './selectors';
 
@@ -16,7 +15,7 @@ export const SelectOrganizationTab = () => {
     isLoading,
     error,
     data: organizations,
-  } = useQuery<Customer[], any>(
+  } = useQuery(
     ['RemoteOrganizations', formData?.api_url, formData?.token],
     () => {
       if (!formData?.api_url || !formData?.token) {
@@ -24,7 +23,9 @@ export const SelectOrganizationTab = () => {
           new Error(translate('Please check the credentials again.')),
         );
       }
-      return loadRemoteOrganizations(formData);
+      return remoteWaldurApiRemoteCustomers({ body: formData }).then(
+        (r) => r.data,
+      );
     },
     { staleTime: 60 * 1000, retry: false },
   );

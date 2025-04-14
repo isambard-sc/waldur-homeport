@@ -13,14 +13,21 @@ export const UserRoleGroup = ({
   onClick,
 }: {
   role?: Role;
-  users: GenericPermission[];
+  users: Partial<
+    Pick<
+      GenericPermission,
+      'user_full_name' | 'user_username' | 'user_email' | 'role_name'
+    >
+  >[];
   altLabel?: string;
   max?: number;
   className?: string;
   onClick?(): any;
 }) => {
-  const items = useMemo(() => {
-    let _items;
+  const items = useMemo<
+    { full_name: string; username: string; email: string }[]
+  >(() => {
+    let _items: typeof users = [];
     if (role) {
       _items = users.filter((user) => user.role_name === role.name);
     } else {

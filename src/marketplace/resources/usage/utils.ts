@@ -1,11 +1,23 @@
 import { DateTime } from 'luxon';
+import {
+  PublicOfferingDetails,
+  marketplaceResourcesOfferingRetrieve,
+  marketplaceComponentUserUsagesList,
+  marketplaceComponentUsagesList,
+} from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { parseDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { getAccountingTypeOptions } from '@waldur/marketplace/offerings/update/components/ComponentAccountingTypeField';
 import { OfferingComponent } from '@waldur/marketplace/types';
+import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 
 import { ComponentUsage, ComponentUserUsage } from './types';
+
+/** Distance from the cursor point in x and y */
+const TOOLTIP_OFFSET = 4;
+const MAX_SHOW_ITEMS = 5;
 
 interface RowData {
   value: number;
@@ -19,26 +31,8 @@ const formatChart = (
   labels: string[],
   usages: RowData[],
   serieName: string = undefined,
+  openDialog?: (details) => void,
 ) => ({
-  toolbox: {
-    feature: {
-      saveAsImage: {
-        title: translate('Save'),
-        name: `components-usage-chart-${DateTime.now().toISODate()}`,
-        show: true,
-      },
-      dataView: {
-        title: translate('View data'),
-        show: true,
-        lang: [
-          translate('Data view'),
-          translate('Turn off'),
-          translate('Refresh'),
-        ],
-        readOnly: true,
-      },
-    },
-  },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -46,6 +40,28 @@ const formatChart = (
       crossStyle: {
         color: '#999',
       },
+    },
+    enterable: true,
+    renderMode: 'html',
+    appendToBody: true,
+    position: (point, _, __, ___, size) => {
+      const x = point[0];
+      const y = point[1];
+      const tipW = size.contentSize[0];
+      const tipH = size.contentSize[1];
+      const viewW = size.viewSize[0];
+      const viewH = size.viewSize[1];
+
+      let pointX = x + TOOLTIP_OFFSET;
+      let pointY = y + TOOLTIP_OFFSET;
+      if (x + tipW > viewW) {
+        pointX = x - tipW - TOOLTIP_OFFSET;
+      }
+      if (y + tipH > viewH) {
+        pointY = y - tipH - TOOLTIP_OFFSET;
+      }
+
+      return [pointX, pointY];
     },
     formatter: (params) => {
       const date = params[0].axisValue;
@@ -61,10 +77,32 @@ const formatChart = (
         `${
           description ? `<br/>${translate('Description')}: ${description}` : ''
         }`;
-      details.forEach((d) => {
-        tooltip += `<br/>${d.username} - ${d.usage} ${d.measured_unit}`;
-      });
-      return `<span>${tooltip}</span>`;
+      const hasMoreBtn =
+        details?.length > MAX_SHOW_ITEMS + 1 && Boolean(openDialog);
+      if (details?.length) {
+        tooltip += `<br/><b>${translate('Details')}:</b><br/>`;
+        tooltip += `<ul class="mb-0">`;
+        const len = hasMoreBtn ? MAX_SHOW_ITEMS : Infinity;
+        details.slice(0, len).forEach((d) => {
+          tooltip += `<li>${d.username} - ${d.usage} ${d.measured_unit}</li>`;
+        });
+        tooltip += `</ul>`;
+      }
+      if (hasMoreBtn) {
+        tooltip += `<div class="text-center mt-3">`;
+        tooltip += `<button id="see-more-btn" class="btn btn-link btn-icon-right py-0">${translate('See more')}`;
+        tooltip += `<span class="svg-icon svg-icon-2 svg-icon-primary"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 256 256"><path d="M128,20A108,108,0,1,0,236,128,108.12,108.12,0,0,0,128,20Zm0,192a84,84,0,1,1,84-84A84.09,84.09,0,0,1,128,212Zm48.49-108.49a12,12,0,0,1,0,17l-40,40a12,12,0,0,1-17,0l-40-40a12,12,0,0,1,17-17L128,135l31.51-31.52A12,12,0,0,1,176.49,103.51Z"></path></svg></span>`;
+        tooltip += `</button></div>`;
+
+        setTimeout(() => {
+          const btn = document.getElementById('see-more-btn');
+          if (btn) {
+            btn.onclick = () => openDialog(details);
+          }
+        }, 100);
+      }
+
+      return tooltip;
     },
   },
   xAxis: [
@@ -110,31 +148,33 @@ export const getFormattedUsages = (
   usages: ComponentUsage[],
   userUsages: ComponentUserUsage[] = [],
 ): RowData[] => {
-  const result = [];
-  for (let i = 0; i < periods.length; i++) {
-    for (let j = 0; j < usages.length; j++) {
-      const usageDate = parseDate(usages[j].billing_period).toFormat('yyyy-MM');
-      if (periods[i].toFormat('yyyy-MM') === usageDate) {
-        const details = userUsages.filter(
-          (u) => parseDate(u.billing_period).toFormat('yyyy-MM') === usageDate,
-        );
-        result.push({
-          value: usages[j].usage,
-          description: usages[j].description,
-          details,
-        });
-        break;
-      }
-      if (j === usages.length - 1) {
-        result.push({
-          value: 0,
-          description: '',
-          details: [],
-        });
-      }
+  return periods.map((period) => {
+    const matchingUsage = usages.find(
+      (usage) =>
+        parseDate(usage.billing_period).toFormat('yyyy-MM') ===
+        period.toFormat('yyyy-MM'),
+    );
+
+    if (matchingUsage) {
+      const details = userUsages.filter(
+        (usage) =>
+          parseDate(usage.billing_period).toFormat('yyyy-MM') ===
+          period.toFormat('yyyy-MM'),
+      );
+
+      return {
+        value: matchingUsage.usage,
+        description: matchingUsage.description,
+        details,
+      };
     }
-  }
-  return result;
+
+    return {
+      value: 0,
+      description: '',
+      details: [],
+    };
+  });
 };
 
 export const getUsagePeriods = (usages: ComponentUsage[], months: number) => {
@@ -142,7 +182,7 @@ export const getUsagePeriods = (usages: ComponentUsage[], months: number) => {
   if (!numberOfMonths) {
     // Calculate number of months from usages, if months param is not given
     const startDateUnix = Math.min(
-      ...usages.map((usage) => new Date(usage.date).getTime()),
+      ...usages.map((usage) => new Date(usage.billing_period).getTime()),
     );
     const _months = parseDate(startDateUnix)
       .startOf('month')
@@ -161,6 +201,7 @@ export const getEChartOptions = (
   userUsages: ComponentUserUsage[],
   months: number,
   color: string,
+  openDialog?: (userUsage: ComponentUserUsage[]) => void,
 ) => {
   const { labels, periods } = getUsagePeriods(usages, months);
   const formattedUsages = getFormattedUsages(
@@ -174,6 +215,7 @@ export const getEChartOptions = (
     labels,
     formattedUsages,
     component.name,
+    openDialog,
   );
 };
 
@@ -208,7 +250,7 @@ export const getBillingTypeLabel = (value) =>
   getAccountingTypeOptions().find((option) => option.value === value)?.label ||
   'N/A';
 
-export const getTableData = (
+export const getUsageTableData = (
   component: OfferingComponent,
   usages: ComponentUsage[],
 ) => {
@@ -216,8 +258,113 @@ export const getTableData = (
     .filter((usage) => usage.type === component.type)
     .map((usage) => {
       return {
-        date: parseDate(usage.date).toFormat('MM/yyyy'),
+        date: parseDate(usage.billing_period).toFormat('MM/yyyy'),
         usage: Number(usage.usage),
       };
     });
+};
+
+export const getUserUsageTableData = (
+  component: OfferingComponent,
+  userUsages: ComponentUserUsage[],
+) => {
+  return userUsages
+    .filter((usage) => usage.component_type === component.type)
+    .map((usage) => {
+      return {
+        username: usage.username,
+        date: parseDate(usage.billing_period).toFormat('MM/yyyy'),
+        usage: Number(usage.usage),
+      };
+    });
+};
+
+export const getTotalUsagePeriod = (
+  usages: ComponentUsage[],
+  component?: OfferingComponent,
+) => {
+  const dateObjects = usages
+    .filter((record) => (component ? record.type === component.type : true))
+    .map((record) => parseDate(record.billing_period));
+
+  if (!dateObjects.length) return DASH_ESCAPE_CODE;
+
+  const minDate = dateObjects.reduce((a, b) => (a < b ? a : b));
+  const maxDate = dateObjects.reduce((a, b) => (a > b ? a : b));
+
+  const _period = minDate.toFormat('MM/yyyy');
+  if (minDate !== maxDate) {
+    return _period + ` - ${maxDate.toFormat('MM/yyyy')}`;
+  }
+  return _period;
+};
+
+const getUsageBasedOfferingComponents = (components: OfferingComponent[]) => {
+  return components
+    .filter((component) =>
+      // Allow to report usage for limit-based components
+      ['usage', 'limit'].includes(component.billing_type),
+    )
+    .sort((a, b) => a.name.localeCompare(b.name));
+};
+
+export const getComponentsAndUsages = async (
+  resource_uuid: string,
+  months: number,
+) => {
+  if (!resource_uuid) {
+    return { components: null, usages: null, userUsages: null };
+  }
+
+  let offering: PublicOfferingDetails;
+  try {
+    offering = await marketplaceResourcesOfferingRetrieve({
+      path: { uuid: resource_uuid },
+    }).then((response) => response.data);
+  } catch (error) {
+    throw new Error(`Error while getting offering, ${error.message}`);
+  }
+
+  const components = getUsageBasedOfferingComponents(offering.components);
+
+  const date_after = months
+    ? DateTime.now().startOf('month').minus({ months }).toFormat('yyyy-MM-dd')
+    : undefined;
+
+  let usages: ComponentUsage[];
+  let userUsages: ComponentUserUsage[];
+  try {
+    usages = await getAllPages((page) =>
+      marketplaceComponentUsagesList({
+        query: {
+          page,
+          resource_uuid,
+          date_after,
+          field: ['type', 'usage', 'billing_period'],
+        },
+      }),
+    );
+    userUsages = await getAllPages((page) =>
+      marketplaceComponentUserUsagesList({
+        query: {
+          page,
+          resource_uuid,
+          date_after,
+          field: [
+            'component_type',
+            'usage',
+            'billing_period',
+            'username',
+            'measured_unit',
+          ],
+        },
+      }),
+    );
+  } catch (error) {
+    throw new Error(
+      `Error while getting usages for resource: ${resource_uuid}, ${error.message}`,
+    );
+  }
+
+  return { components, usages, userUsages };
 };

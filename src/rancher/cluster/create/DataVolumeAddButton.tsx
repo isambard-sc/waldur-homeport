@@ -10,7 +10,7 @@ interface DataVolumeAddButtonProps {
 export const DataVolumeAddButton = (props: DataVolumeAddButtonProps) => (
   <Button onClick={props.onClick}>
     <span className="svg-icon svg-icon-2">
-      <PlusCircle />
+      <PlusCircle weight="bold" />
     </span>{' '}
     {translate('Add data volume')}
   </Button>

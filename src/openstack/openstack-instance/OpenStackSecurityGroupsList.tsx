@@ -1,19 +1,17 @@
 import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
 
 import { OpenStackSecurityGroupsTable } from '../openstack-security-groups/OpenStackSecurityGroupsDialog';
-import { SecurityGroup } from '../openstack-security-groups/types';
 
 import { UpdateSecurityGroupsButton } from './actions/update-security-groups/UpdateSecurityGroupsButton';
 import { ManageSecurityGroupsButton } from './ManageSecurityGroupsButton';
 
 interface OwnProps {
-  resourceScope: {
-    security_groups: SecurityGroup[];
-  };
+  resourceScope: OpenStackInstance;
   resource;
   refetch?(): void;
   isLoading?: boolean;

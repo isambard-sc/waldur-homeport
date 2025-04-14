@@ -69,7 +69,8 @@ export function getResourceState(resource: Resource): StateIndicatorProps {
         getStateMessages(translate)[resource.action.toLowerCase()] ||
         resource.action;
       context.tooltip =
-        resource.action_details.message || `${resource.action} ${resourceType}`;
+        resource.action_details['message'] ||
+        `${resource.action} ${resourceType}`;
     } else {
       context.label = resource.state;
       if (runtimeErrorStates.indexOf(resource.state) !== -1) {

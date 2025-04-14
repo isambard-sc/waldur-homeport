@@ -19,6 +19,18 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'reporting-usage',
+    abstract: true,
+    parent: 'reporting',
+    component: UIView,
+    url: '',
+    redirectTo: 'marketplace-support-usage-reports',
+    data: {
+      breadcrumb: () => translate('Usage reports'),
+    },
+  },
+
+  {
     name: 'reporting-dashboard',
     url: '',
     parent: 'reporting',
@@ -112,15 +124,28 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'marketplace-support-usage-reports',
-    url: 'usage/',
+    url: 'resource-usage/',
     component: lazyComponent(() =>
       import('./resource-usage/ResourceUsageList').then((module) => ({
         default: module.ResourceUsageList,
       })),
     ),
-    parent: 'reporting',
+    parent: 'reporting-usage',
     data: {
-      breadcrumb: () => translate('Usage reports'),
+      skipBreadcrumb: true,
+    },
+  },
+  {
+    name: 'marketplace-support-user-usage-reports',
+    url: 'user-usage/',
+    component: lazyComponent(() =>
+      import('./resource-usage/UserUsageList').then((module) => ({
+        default: module.UserUsageList,
+      })),
+    ),
+    parent: 'reporting-usage',
+    data: {
+      skipBreadcrumb: true,
     },
   },
 ];

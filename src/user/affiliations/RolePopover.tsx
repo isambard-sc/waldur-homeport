@@ -3,7 +3,7 @@ import { Accordion, Card } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { PermissionOptions } from '@waldur/administration/roles/PermissionOptions';
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -12,11 +12,13 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 const RoleDetailsDialog = ({ role }) => (
   <ModalDialog
     title={translate('Role details: {roleName}', {
-      roleName: role.description || role.name,
+      roleName: role?.description || role?.name,
     })}
   >
     {PermissionOptions.filter((entity) =>
-      entity.options.find((option) => role.permissions.includes(option.value)),
+      entity.options.find((option) =>
+        (role?.permissions || []).includes(option.value),
+      ),
     ).map((entity, entityIndex) => (
       <Accordion key={entityIndex}>
         <Card>
@@ -41,8 +43,10 @@ export const RolePopover = ({ roleName }) => {
   const dispatch = useDispatch();
   return (
     <>
-      {role?.description || role?.name}{' '}
+      {role?.description || role?.name || roleName}{' '}
       <Question
+        size={12}
+        weight="bold"
         onClick={() => dispatch(openModalDialog(RoleDetailsDialog, { role }))}
       />
     </>

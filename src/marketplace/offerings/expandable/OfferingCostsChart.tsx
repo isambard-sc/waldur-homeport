@@ -1,16 +1,18 @@
+import { DateTime } from 'luxon';
 import { FunctionComponent, useMemo } from 'react';
 import { Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
 import { formValueSelector } from 'redux-form';
+import { marketplaceProviderOfferingsCostsList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { EChart } from '@waldur/core/EChart';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
 import { type RootState } from '@waldur/store/reducers';
 
-import { getProviderOfferingCostChartData } from './api';
 import { OFFERING_CUSTOMERS_LIST_FILTER } from './constants';
 import { OfferingCustomersListFilter } from './OfferingCustomersListFilter';
 import { formatOfferingCostsChart } from './utils';
@@ -39,9 +41,16 @@ export const OfferingCostsChart: FunctionComponent<OfferingCostChartProps> = (
     value: option,
   } = useAsync(
     () =>
-      getProviderOfferingCostChartData(
-        accountRunningState?.value,
-        props.offering.uuid,
+      getAllPages((page) =>
+        marketplaceProviderOfferingsCostsList({
+          path: { uuid: props.offering.uuid },
+          query: {
+            page,
+            accounting_is_running: accountRunningState?.value,
+            start: DateTime.now().minus({ months: 11 }).toFormat('yyyy-MM'),
+            end: DateTime.now().toFormat('yyyy-MM'),
+          },
+        }),
       ).then(formatOfferingCostsChart),
     [accountRunningState, props.offering],
   );

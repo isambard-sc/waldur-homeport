@@ -1,8 +1,10 @@
 import { FunctionComponent } from 'react';
+import { PlanComponent } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { BillingPeriod } from '../common/BillingPeriod';
@@ -14,7 +16,7 @@ export const PriceList: FunctionComponent = () => {
     fetchData: createFetcher('marketplace-plan-components'),
   });
 
-  const columns = [
+  const columns: Column<PlanComponent>[] = [
     {
       title: translate('Offering'),
       render: ({ row }) => row.offering_name,

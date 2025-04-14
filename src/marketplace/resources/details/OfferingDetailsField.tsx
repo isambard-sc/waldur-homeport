@@ -1,13 +1,26 @@
 import { useDispatch } from 'react-redux';
+import { PublicOfferingDetails } from 'waldur-js-client';
 
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { Tip } from '@waldur/core/Tooltip';
 import { truncate } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
 import { Field } from '@waldur/resource/summary';
 
-import { openOfferingDetailsDialog } from '../../offerings/details/OfferingDetailsButton';
+const OfferingDetailsDialog = lazyComponent(() =>
+  import('@waldur/marketplace/offerings/details/OfferingDetailsDialog').then(
+    (module) => ({
+      default: module.OfferingDetailsDialog,
+    }),
+  ),
+);
 
-export const OfferingDetailsField = ({ offering }) => {
+export const OfferingDetailsField = ({
+  offering,
+}: {
+  offering: PublicOfferingDetails;
+}) => {
   const dispatch = useDispatch();
   return (
     <Field
@@ -23,7 +36,14 @@ export const OfferingDetailsField = ({ offering }) => {
           <button
             className="text-link"
             type="button"
-            onClick={() => dispatch(openOfferingDetailsDialog(offering))}
+            onClick={() =>
+              dispatch(
+                openModalDialog(OfferingDetailsDialog, {
+                  resolve: { offering },
+                  size: 'lg',
+                }),
+              )
+            }
           >
             [{translate('Show offering')}]
           </button>

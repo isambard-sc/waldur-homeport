@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { InjectedFormProps, reduxForm, SubmissionError } from 'redux-form';
+import { keysCreate, SshKeyRequest } from 'waldur-js-client';
 
 import { FormContainer } from '@waldur/form/FormContainer';
 import { StringField } from '@waldur/form/StringField';
@@ -12,13 +13,7 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { createEntity } from '@waldur/table/actions';
 
-import { createKey } from './api';
 import * as constants from './constants';
-
-interface FormData {
-  name: string;
-  public_key: string;
-}
 
 const extractNameFromKey = (publicKey: string) => {
   if (publicKey) {
@@ -30,13 +25,15 @@ const extractNameFromKey = (publicKey: string) => {
   return '';
 };
 
-const PureKeyCreateDialog: React.FC<InjectedFormProps<FormData>> = (props) => {
+const PureKeyCreateDialog: React.FC<InjectedFormProps<SshKeyRequest>> = (
+  props,
+) => {
   const dispatch = useDispatch();
 
   const change = props.change;
 
   const processRequest = React.useCallback(
-    async (values: FormData) => {
+    async (values: SshKeyRequest) => {
       let data = { ...values };
       try {
         if (!values.name) {
@@ -44,7 +41,7 @@ const PureKeyCreateDialog: React.FC<InjectedFormProps<FormData>> = (props) => {
           data = { ...values, name };
           change('name', name);
         }
-        const response = await createKey(data);
+        const response = await keysCreate({ body: data });
         const createdKey = response.data;
         dispatch(
           createEntity(constants.keysListTable, createdKey.uuid, createdKey),
@@ -88,6 +85,6 @@ const PureKeyCreateDialog: React.FC<InjectedFormProps<FormData>> = (props) => {
   );
 };
 
-export const KeyCreateDialog = reduxForm<FormData>({ form: 'keyCreate' })(
+export const KeyCreateDialog = reduxForm<SshKeyRequest>({ form: 'keyCreate' })(
   PureKeyCreateDialog,
 );

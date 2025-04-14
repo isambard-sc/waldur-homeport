@@ -1,14 +1,13 @@
 import { Trash } from '@phosphor-icons/react';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceCategoryGroupsDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { CategoryGroup } from '@waldur/marketplace/types';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse } from '@waldur/store/notify';
-
-import { removeCategoryGroup } from './api';
 
 interface GroupDeleteButtonProps {
   row: CategoryGroup;
@@ -36,7 +35,9 @@ export const GroupDeleteButton = (props: GroupDeleteButtonProps) => {
     }
     try {
       setRemoving(true);
-      await removeCategoryGroup(props.row.uuid);
+      await marketplaceCategoryGroupsDestroy({
+        path: { uuid: props.row.uuid },
+      });
       props.refetch();
     } catch (e) {
       dispatch(
@@ -50,7 +51,7 @@ export const GroupDeleteButton = (props: GroupDeleteButtonProps) => {
     <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       disabled={removing}
       size="sm"
       className="text-danger"

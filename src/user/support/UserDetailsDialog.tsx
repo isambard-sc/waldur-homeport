@@ -2,6 +2,7 @@ import { UserGear } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { User } from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -9,21 +10,19 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { UserChecklist } from '@waldur/marketplace-checklist/UserChecklist';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { UserEvents } from '@waldur/user/dashboard/UserEvents';
 import { KeysList } from '@waldur/user/keys/KeysList';
 import { UserDetailsTable } from '@waldur/user/support/UserDetailsTable';
 import { UserOfferingList } from '@waldur/user/UserOfferingList';
 import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { UserAffiliationsList } from '../affiliations/UserAffiliationsList';
 
 interface UserDetailsDialogProps {
   resolve: {
-    user: UserDetails;
+    user: User;
     showChecklists?: boolean;
     loading?: boolean;
     error?;
@@ -34,9 +33,9 @@ interface UserDetailsDialogProps {
 export const UserDetailsDialog: FunctionComponent<UserDetailsDialogProps> = ({
   resolve: { user, showChecklists, loading, error, refetch },
 }) => {
-  const currentUser = useSelector(getUser) as UserDetails;
+  const currentUser = useSelector(getUser) as User;
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('User details of {fullName}', {
         fullName: renderFieldOrDash(user?.full_name),
       })}
@@ -45,8 +44,8 @@ export const UserDetailsDialog: FunctionComponent<UserDetailsDialogProps> = ({
       )}
       iconNode={<UserGear weight="bold" />}
       iconColor="success"
-      bodyClassName="min-h-350px"
-      footer={<CloseDialogButton label={translate('Close')} />}
+      bodyClassName="min-h-425px"
+      closeButton
     >
       {loading ? (
         <LoadingSpinner />
@@ -89,6 +88,6 @@ export const UserDetailsDialog: FunctionComponent<UserDetailsDialogProps> = ({
           ) : null}
         </Tabs>
       ) : null}
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

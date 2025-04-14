@@ -18,7 +18,7 @@ const SubmitReportDialog = lazyComponent(() =>
   })),
 );
 
-const validators = [validateState('OK', 'Erred'), validateStaffAction];
+const validators = [validateState('OK', 'ERRED'), validateStaffAction];
 
 export const SubmitReportAction: ActionItemType = ({
   resource,
@@ -38,7 +38,7 @@ export const SubmitReportAction: ActionItemType = ({
     <DialogActionItem
       validators={validators}
       title={translate('Submit report')}
-      iconNode={<FileText />}
+      iconNode={<FileText weight="bold" />}
       modalComponent={SubmitReportDialog}
       dialogSize="xl"
       resource={marketplaceResource || resource}

@@ -1,5 +1,4 @@
 import { ArrowsClockwise } from '@phosphor-icons/react';
-import { AxiosResponse } from 'axios';
 import { ReactElement } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -12,7 +11,7 @@ import { ActionContext } from './types';
 import { useValidators } from './useValidators';
 
 interface PullActionItemProps<T> {
-  apiMethod(id: string): Promise<AxiosResponse>;
+  apiMethod(id: string): Promise<any>;
   resource: T;
   staff?: boolean;
   iconClass?: string;
@@ -25,7 +24,7 @@ const hasBackendId = (ctx: ActionContext) =>
     ? undefined
     : translate('Resource does not have backend ID.');
 
-const validators = [validateState('OK', 'Erred'), hasBackendId];
+const validators = [validateState('OK', 'ERRED'), hasBackendId];
 
 const usePull = ({
   resource,
@@ -56,7 +55,7 @@ const usePull = ({
   } as ActionItemProps;
 };
 
-export const PullActionItem: <T extends { uuid: string; backend_id?: string }>(
+export const PullActionItem: <T extends { uuid?: string; backend_id?: string }>(
   props: PullActionItemProps<T>,
 ) => ReactElement = (props) => {
   const buttonProps = usePull(props);
@@ -65,7 +64,7 @@ export const PullActionItem: <T extends { uuid: string; backend_id?: string }>(
       {...buttonProps}
       as={props.as}
       staff={props.staff}
-      iconNode={<ArrowsClockwise />}
+      iconNode={<ArrowsClockwise weight="bold" />}
     />
   );
 };

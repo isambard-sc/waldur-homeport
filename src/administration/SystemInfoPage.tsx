@@ -1,15 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card } from 'react-bootstrap';
+import { databaseStatsList, TableSize } from 'waldur-js-client';
 
-import { get } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 
-const getDatabaseStats = () =>
-  get('/database-stats/').then((response) => response.data);
-
-const DatabaseStats = ({ data }) => (
+const DatabaseStats = ({ data }: { data: TableSize[] }) => (
   <Card className="card-bordered card-table full-width">
     <Card.Header>
       <Card.Title>{translate('Top 10 largest database tables')}</Card.Title>
@@ -41,7 +38,7 @@ const DatabaseStats = ({ data }) => (
 
 export const SystemInfoPage = () => {
   const { isLoading, error, data } = useQuery(['SystemInfoPage'], () =>
-    getDatabaseStats(),
+    databaseStatsList().then((r) => r.data),
   );
   if (isLoading) {
     return <LoadingSpinner />;

@@ -12,7 +12,7 @@ export const UserIssuesTable: FC = () => {
       scope={user}
       filter={filter}
       hiddenColumns={['caller', 'time_in_progress', 'customer', 'project']}
-      title={translate('Issues')}
+      title={translate('Requests')}
       initialPageSize={10}
     />
   );

@@ -40,7 +40,7 @@ const VolumeTypeRow = ({ volumeType, onRemove, options }) => (
 const VolumeTypeAddButton = ({ onClick }) => (
   <Button variant="default" onClick={onClick} size="sm">
     <span className="svg-icon svg-icon-2">
-      <Plus />
+      <Plus weight="bold" />
     </span>{' '}
     {translate('Add')}
   </Button>

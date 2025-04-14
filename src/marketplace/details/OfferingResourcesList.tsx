@@ -1,6 +1,7 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
+import { MarketplaceProviderResourcesListData } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import {
@@ -32,7 +33,7 @@ export const OfferingResourcesList: FunctionComponent<OwnProps> = (
     getFormValues(FILTER_OFFERING_RESOURCE),
   );
   const filter = useMemo(() => {
-    const filter: Record<string, string | string[]> = {};
+    const filter: MarketplaceProviderResourcesListData['query'] = {};
     if (filterValues?.state) {
       filter.state = filterValues.state.map((option) => option.value);
       if (filterValues?.include_terminated) {

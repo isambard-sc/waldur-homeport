@@ -1,3 +1,4 @@
+import { PlusCircle } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -37,8 +38,8 @@ export const AddResourceButton = ({
   return (
     <ActionButton
       title={translate('Add resource')}
+      iconNode={<PlusCircle weight="bold" />}
       action={openAddResourceDialog}
-      variant="primary"
     />
   );
 };

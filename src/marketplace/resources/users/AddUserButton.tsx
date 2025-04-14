@@ -31,7 +31,7 @@ export const AddUserButton: FunctionComponent<{
   };
   return (
     <ActionButton
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       title={translate('Assign user')}
       action={callback}
     />

@@ -1,7 +1,7 @@
-import { OrderResponse } from '../types';
+import { OrderDetails } from 'waldur-js-client';
 
 export interface OrderActionProps {
-  order: OrderResponse;
+  order: OrderDetails;
   refetch?(): void;
   as?: React.ElementType;
 }

@@ -4,6 +4,11 @@ import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import {
+  MarketplaceProviderResourcesListData,
+  Resource,
+} from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -16,9 +21,10 @@ import { Category, Offering } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 import {
   PROVIDER_RESOURCES_LIST_FILTER_FORM_ID,
@@ -38,6 +44,7 @@ interface ResourceFilter {
   project?: Project;
   category?: Category;
   offering?: Offering;
+  parent_offering?: Offering;
   include_terminated?: boolean;
 }
 
@@ -58,7 +65,11 @@ const ResourceField = ({ row }) => {
   };
   return (
     <>
-      <Button variant="flush" className="text-anchor" onClick={callback}>
+      <Button
+        variant="flush"
+        className="text-anchor fw-normal"
+        onClick={callback}
+      >
         {row.name || row.offering_name}
       </Button>
       <BackendIdTip backendId={row.backend_id} />
@@ -71,7 +82,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
   React.useEffect(() => {
     props.resetPagination();
   }, [props.filter]);
-  const columns = [
+  const columns: Column<Resource>[] = [
     {
       title: translate('Name'),
       render: ResourceField,
@@ -238,6 +249,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
       title: translate('State'),
       render: ({ row }) => <ResourceStateField resource={row} outline pill />,
       filter: 'state',
+      orderField: 'state',
       inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       id: 'state',
       keys: ['state', 'backend_metadata'],
@@ -279,9 +291,10 @@ const mapStateToFilter = createSelector(
   getCustomer,
   (state, formId) => getFormValues(formId)(state),
   (customer, filters: ResourceFilter) => {
-    const filter: Record<string, string | string[] | boolean> = {};
+    const filter: MarketplaceProviderResourcesListData['query'] = {};
 
     // Public resources should only contain resources from billable offerings.
+    // @ts-ignore
     filter.billable = true;
 
     if (customer) {
@@ -290,8 +303,11 @@ const mapStateToFilter = createSelector(
     if (filters?.offering) {
       filter.offering_uuid = filters.offering.uuid;
     }
+    if (filters?.parent_offering) {
+      filter.parent_offering_uuid = filters.parent_offering.uuid;
+    }
     if (filters?.state) {
-      filter.state = filters.state.map((option) => option.value) as string[];
+      filter.state = filters.state.map((option) => option.value);
       if (filters?.include_terminated) {
         filter.state = [...filter.state, 'Terminated'];
       }
@@ -313,28 +329,29 @@ const mapStateToFilter = createSelector(
   },
 );
 
-const mandatoryFields = [
-  'uuid', // Almost all actions
-  'name', // Almost all actions
-  'url', // CreateRobotAccountAction
-  'customer_uuid', // ReportUsageAction, SetBackendIdAction
-  'customer_name', // ShowUsageAction, ReportUsageAction
-  'project_uuid', // CreateRobotAccountAction
-  'project_name', // ShowUsageAction, ReportUsageAction
-  'offering_uuid', // ShowUsageAction, ReportUsageAction
-  'offering_customer_uuid', // CreateRobotAccountAction
-  'offering_plugin_options', // CreateRobotAccountAction
-  'backend_id', // ShowUsageAction, ReportUsageAction, SetBackendIdAction
-  'is_usage_based', // Expandable view, ShowUsageAction, ReportUsageAction
-  'is_limit_based', // Expandable view, ShowUsageAction, ReportUsageAction
-  'limits', // Expandable view
-  'limit_usage', // Expandable view
-  'current_usages', // Expandable view
-  'state', // Almost all actions
-  'slug', // SetSlugAction
-  'end_date', // EditResourceEndDateByProviderAction, EditResourceEndDateByStaffAction
-  'resource_type', // TerminateAction
-];
+const mandatoryFields: MarketplaceProviderResourcesListData['query']['field'] =
+  [
+    'uuid', // Almost all actions
+    'name', // Almost all actions
+    'url', // CreateRobotAccountAction
+    'customer_uuid', // ReportUsageAction, SetBackendIdAction
+    'customer_name', // ShowUsageAction, ReportUsageAction
+    'project_uuid', // CreateRobotAccountAction
+    'project_name', // ShowUsageAction, ReportUsageAction
+    'offering_uuid', // ShowUsageAction, ReportUsageAction
+    'offering_customer_uuid', // CreateRobotAccountAction
+    'offering_plugin_options', // CreateRobotAccountAction
+    'backend_id', // ShowUsageAction, ReportUsageAction, SetBackendIdAction
+    'is_usage_based', // Expandable view, ShowUsageAction, ReportUsageAction
+    'is_limit_based', // Expandable view, ShowUsageAction, ReportUsageAction
+    'limits', // Expandable view
+    'limit_usage', // Expandable view
+    'current_usages', // Expandable view
+    'state', // Almost all actions
+    'slug', // SetSlugAction
+    'end_date', // EditResourceEndDateByProviderAction, EditResourceEndDateByStaffAction
+    'resource_type', // TerminateAction
+  ];
 
 export const ProviderResourcesList: React.ComponentType<any> = () => {
   const filter = useSelector((state) =>

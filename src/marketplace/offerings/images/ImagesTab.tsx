@@ -1,19 +1,14 @@
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { NestedScreenshot } from 'waldur-js-client';
 
-import { Image } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 
 import { ImageDetailsDialog } from './ImageDetailsDialog';
 
-const openViewOfferingImageDialog = (image: Image) =>
-  openModalDialog(ImageDetailsDialog, {
-    resolve: image,
-  });
-
 interface ImagesTabProps {
-  images: Image[];
+  images: NestedScreenshot[];
 }
 
 export const ImagesTab: FunctionComponent<ImagesTabProps> = (props) => {
@@ -26,7 +21,13 @@ export const ImagesTab: FunctionComponent<ImagesTabProps> = (props) => {
             src={item.thumbnail}
             alt="thumb"
             className="img-thumbnail m-xs"
-            onClick={() => dispatch(openViewOfferingImageDialog(item))}
+            onClick={() =>
+              dispatch(
+                openModalDialog(ImageDetailsDialog, {
+                  resolve: item,
+                }),
+              )
+            }
             style={{ cursor: 'pointer' }}
             aria-hidden="true"
           />

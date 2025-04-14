@@ -1,11 +1,13 @@
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
+import { RobotAccountDetails } from 'waldur-js-client';
 
 import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
@@ -46,7 +48,7 @@ export const ProviderRobotAccountList: FC<{ provider }> = ({ provider }) => {
     filter,
   });
 
-  const columns = [
+  const columns: Column<RobotAccountDetails>[] = [
     {
       title: translate('Organization'),
       render: ({ row }) => row.customer_name,
@@ -85,7 +87,7 @@ export const ProviderRobotAccountList: FC<{ provider }> = ({ provider }) => {
   ];
 
   return (
-    <Table
+    <Table<RobotAccountDetails>
       {...tableProps}
       filters={<ProviderRobotAccountFilter provider={provider} />}
       columns={columns}

@@ -1,8 +1,8 @@
 import { ArrowsClockwise } from '@phosphor-icons/react';
 import { FC } from 'react';
+import { openstackTenantsPullSecurityGroups } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { pullTenantSecurityGroups } from '@waldur/openstack/api';
 import { AsyncActionButton } from '@waldur/resource/actions/AsyncActionButton';
 import { validateState } from '@waldur/resource/actions/base';
 
@@ -18,6 +18,6 @@ export const PullSecurityGroupsAction: FC<TenantActionProps> = ({
     iconNode={<ArrowsClockwise />}
     resource={resource}
     validators={validators}
-    apiMethod={pullTenantSecurityGroups}
+    apiMethod={(uuid) => openstackTenantsPullSecurityGroups({ path: { uuid } })}
   />
 );

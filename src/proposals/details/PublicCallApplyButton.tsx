@@ -46,18 +46,25 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
     }, [call]);
 
   const dispatch = useDispatch();
-  const openAddProposalDialog = useCallback(() => {
-    if (isFeatureVisible(MarketplaceFeatures.call_only) && call.external_url) {
-      document.location.href = call.external_url;
-    } else if (activeRound) {
-      dispatch(
-        openModalDialog(ProposalCreateDialog, {
-          resolve: { call, round: activeRound },
-          size: 'md',
-        }),
-      );
-    }
-  }, [dispatch, activeRound]);
+  const openAddProposalDialog = useCallback(
+    (e) => {
+      if (
+        isFeatureVisible(MarketplaceFeatures.call_only) &&
+        call.external_url
+      ) {
+        document.location.href = call.external_url;
+      } else if (activeRound) {
+        dispatch(
+          openModalDialog(ProposalCreateDialog, {
+            resolve: { call, round: activeRound },
+            size: 'md',
+          }),
+        );
+      }
+      e.preventDefault();
+    },
+    [dispatch, activeRound],
+  );
   if (isFeatureVisible(MarketplaceFeatures.call_only) && !call.external_url) {
     return null;
   }

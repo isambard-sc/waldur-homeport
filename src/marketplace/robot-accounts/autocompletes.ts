@@ -1,13 +1,12 @@
-import { ENV } from '@waldur/configs/default';
-import { getSelectData } from '@waldur/core/api';
-import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
-import { Customer, Project } from '@waldur/workspace/types';
+import {
+  marketplaceServiceProvidersRobotAccountCustomersList,
+  marketplaceServiceProvidersRobotAccountProjectsList,
+  NameUuid,
+} from 'waldur-js-client';
 
-const getProviderProjectList = ({ provider_uuid, ...params }) =>
-  getSelectData<Project>(
-    `/marketplace-service-providers/${provider_uuid}/robot_account_projects`,
-    params,
-  );
+import { parseSelectData } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
+import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 
 export const providerProjectAutocomplete = async (
   provider_uuid: string,
@@ -15,25 +14,20 @@ export const providerProjectAutocomplete = async (
   prevOptions,
   currentPage: number,
 ) => {
-  const params = {
-    project_name: query,
-    provider_uuid,
-    page: currentPage,
-    page_size: ENV.pageSize,
-  };
-  const response = await getProviderProjectList(params);
-  return returnReactSelectAsyncPaginateObject(
-    response,
+  const response = await marketplaceServiceProvidersRobotAccountProjectsList({
+    path: { uuid: provider_uuid },
+    query: {
+      project_name: query,
+      page: currentPage,
+      page_size: ENV.pageSize,
+    },
+  });
+  return returnReactSelectAsyncPaginateObject<NameUuid>(
+    parseSelectData(response),
     prevOptions,
     currentPage,
   );
 };
-
-const getProviderCustomerList = ({ provider_uuid, ...params }) =>
-  getSelectData<Customer>(
-    `/marketplace-service-providers/${provider_uuid}/robot_account_customers`,
-    params,
-  );
 
 export const providerCustomerAutocomplete = async (
   provider_uuid: string,
@@ -41,15 +35,16 @@ export const providerCustomerAutocomplete = async (
   prevOptions,
   currentPage: number,
 ) => {
-  const params = {
-    customer_name: query,
-    provider_uuid,
-    page: currentPage,
-    page_size: ENV.pageSize,
-  };
-  const response = await getProviderCustomerList(params);
-  return returnReactSelectAsyncPaginateObject(
-    response,
+  const response = await marketplaceServiceProvidersRobotAccountCustomersList({
+    path: { uuid: provider_uuid },
+    query: {
+      customer_name: query,
+      page: currentPage,
+      page_size: ENV.pageSize,
+    },
+  });
+  return returnReactSelectAsyncPaginateObject<NameUuid>(
+    parseSelectData(response),
     prevOptions,
     currentPage,
   );

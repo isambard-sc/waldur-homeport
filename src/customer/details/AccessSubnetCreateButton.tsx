@@ -5,9 +5,9 @@ import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-const AccessSubnetCreateForm = lazyComponent(() =>
-  import('./AccessSubnetCreateForm').then((module) => ({
-    default: module.AccessSubnetCreateForm,
+const AccessSubnetForm = lazyComponent(() =>
+  import('./AccessSubnetForm').then((module) => ({
+    default: module.AccessSubnetForm,
   })),
 );
 
@@ -17,13 +17,13 @@ export const AccessSubnetCreateButton = ({ refetch, customer_url }) => {
     <ActionButton
       title={translate('Add access subnet')}
       action={() =>
-        openDialog(AccessSubnetCreateForm, {
+        openDialog(AccessSubnetForm, {
           refetch,
           customer_url,
           size: 'md',
         })
       }
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

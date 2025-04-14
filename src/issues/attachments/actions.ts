@@ -92,11 +92,6 @@ export const issueAttachmentsPutCancel = (
   payload: { file },
 });
 
-export const issueAttachmentsProgressUpdate = (key, progress) => ({
-  type: constants.ISSUE_ATTACHMENTS_PROGRESS_UPDATE,
-  payload: { key, progress },
-});
-
 export const issueAttachmentsDelete = (
   uuid: string,
 ): Action<{ uuid: string }> => ({

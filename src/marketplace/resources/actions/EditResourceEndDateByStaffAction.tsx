@@ -1,11 +1,13 @@
-import { Clock } from '@phosphor-icons/react';
+import { CalendarBlank } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  marketplaceProviderResourcesSetEndDateByStaff,
+  Resource,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { updateResourceEndDateByStaff } from '@waldur/marketplace/common/api';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
@@ -34,7 +36,11 @@ export const EditResourceEndDateByStaffAction = ({
         resolve: {
           resource,
           refetch,
-          updateEndDate: updateResourceEndDateByStaff,
+          updateEndDate: (uuid, end_date) =>
+            marketplaceProviderResourcesSetEndDateByStaff({
+              path: { uuid },
+              body: { end_date },
+            }),
         },
         size: 'md',
       }),
@@ -49,7 +55,7 @@ export const EditResourceEndDateByStaffAction = ({
       title={translate('Set termination date')}
       action={callback}
       staff
-      iconNode={<Clock />}
+      iconNode={<CalendarBlank weight="bold" />}
     />
   ) : null;
 };

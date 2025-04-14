@@ -2,12 +2,12 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 import { formValueSelector, clearFields } from 'redux-form';
+import { rancherProjectsSecretsRetrieve } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { type RootState } from '@waldur/store/reducers';
 
-import { getProjectSecrets } from '../api';
 import { FieldProps } from '../types';
 
 import { FORM_ID } from './constants';
@@ -23,7 +23,12 @@ export const SecretField: React.FC<FieldProps> = (props) => {
     error,
     value: options,
   } = useAsync(
-    () => (project ? getProjectSecrets(project.uuid) : Promise.resolve([])),
+    () =>
+      project
+        ? rancherProjectsSecretsRetrieve({ path: { uuid: project.uuid } }).then(
+            (r) => r.data,
+          )
+        : Promise.resolve([]),
     [project],
   );
 

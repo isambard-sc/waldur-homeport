@@ -13,8 +13,8 @@ export const ActionDialogHeader = ({
   marketplaceResource;
   name: string;
 }) => (
-  <Modal.Header>
-    <Modal.Title>
+  <Modal.Header className="without-border pb-0">
+    <Modal.Title className="fw-bold">
       {marketplaceResource ? (
         <div className="d-flex flex-column-auto align-items-stretch gap-3 flex-grow-1">
           <Tip label={marketplaceResource.category_title} id="resource-tooltip">

@@ -1,50 +1,41 @@
-import Axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
-import Qs from 'qs';
+import { client } from 'waldur-js-client/client.gen';
 
 import { queryClient } from '@waldur/Application';
-import { ENV } from '@waldur/configs/default';
-import { getNextPageUrl, parseResultCount } from '@waldur/core/api';
+import { fetchResultCount, parseNextPage } from '@waldur/core/api';
 
 import { Fetcher, TableRequest } from './types';
 
-export function getNextPageNumber(link: string): number {
-  if (link) {
-    const parts = Qs.parse(link.split('/?')[1]);
-    if (parts && typeof parts.page === 'string') {
-      return parseInt(parts.page, 10);
-    }
-  } else {
-    return null;
-  }
-}
-
-export const parseResponse = (url, params, options?: AxiosRequestConfig) =>
-  Axios.request({
-    method: 'GET',
+export const parseResponse = async (url: string, query?, options?) => {
+  const result = await client.get({
     url,
-    params,
+    query,
+    security: [
+      {
+        name: 'Authorization',
+        type: 'apiKey',
+      },
+    ],
     ...options,
-  }).then((response: AxiosResponse<any>) => {
-    const resultCount = parseResultCount(response);
-    return {
-      rows: Array.isArray(response.data)
-        ? response.data
-        : Array.isArray(response.data.proposals)
-          ? response.data.proposals
-          : [],
-      resultCount,
-      nextPage: getNextPageNumber(getNextPageUrl(response)),
-    };
   });
+  const contentType = result.response.headers
+    .get('content-type')
+    .toLowerCase()
+    .split(';')[0]
+    .trim();
+  if (contentType !== 'application/json') {
+    throw new Error('Unexpected response content type');
+  }
+  const rows = result.data as any[];
+  const resultCount = fetchResultCount(result);
+  return {
+    rows,
+    resultCount,
+    nextPage: parseNextPage(result),
+  };
+};
 
-export function createFetcher(
-  endpoint: string,
-  options?: AxiosRequestConfig,
-): Fetcher {
+export function createFetcher(endpoint: string, options?): Fetcher {
   return (request: TableRequest) => {
-    const url = endpoint.startsWith('http')
-      ? endpoint
-      : `${ENV.apiEndpoint}api/${endpoint}/`;
     const { params: optionsParams, ...restOptions } = options || {};
     const { params: requestOptionsParams, ...restRequestOptions } =
       request.options || {};
@@ -57,8 +48,9 @@ export function createFetcher(
     };
     const mergedOptions = { ...restOptions, ...restRequestOptions };
     return queryClient.fetchQuery({
-      queryKey: ['table', url, mergedParams],
-      queryFn: () => parseResponse(url, mergedParams, mergedOptions),
+      queryKey: ['table', endpoint, mergedParams],
+      queryFn: () =>
+        parseResponse(`/api/${endpoint}/`, mergedParams, mergedOptions),
       staleTime: request.options?.staleTime,
     });
   };

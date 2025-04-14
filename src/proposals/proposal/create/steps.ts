@@ -1,13 +1,20 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { VStepperFormStep } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 
 import { ProjectDetailsStep } from './ProjectDetailsStep';
+import { ProposalDetailsOverviewStep } from './ProposalDetailsOverviewStep';
+import { ProposalTeamStep } from './ProposalTeamStep';
 import { FormResourceRequestsStep } from './resource-requests-step/FormResourceRequestsStep';
 
 const isCodeRequired = ENV.plugins.WALDUR_CORE.OECD_FOS_2007_CODE_MANDATORY;
 
 export const createProposalSteps: VStepperFormStep[] = [
+  {
+    label: translate('Details overview'),
+    id: 'step-general',
+    component: ProposalDetailsOverviewStep,
+  },
   {
     label: translate('Project details'),
     id: 'step-project',
@@ -37,5 +44,13 @@ export const createProposalSteps: VStepperFormStep[] = [
     fields: ['resources'],
     required: true,
     requiredFields: ['resources'],
+  },
+  {
+    label: translate('Project team'),
+    id: 'step-team',
+    component: ProposalTeamStep,
+    fields: ['users'],
+    required: true,
+    requiredFields: ['users'],
   },
 ];

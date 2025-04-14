@@ -1,9 +1,6 @@
 import { required } from '@waldur/core/validators';
 import { translate } from '@waldur/i18n';
-import {
-  CustomerStep,
-  ProjectStep,
-} from '@waldur/marketplace/deploy/steps/constants';
+import { DetailsOverviewStep } from '@waldur/marketplace/deploy/steps/constants';
 import { FormCloudStep } from '@waldur/marketplace/deploy/steps/FormCloudStep';
 import { FormFinalConfigurationStep } from '@waldur/marketplace/deploy/steps/FormFinalConfigurationStep';
 import { OfferingConfigurationFormStep } from '@waldur/marketplace/deploy/types';
@@ -11,18 +8,13 @@ import { INSTANCE_TYPE } from '@waldur/openstack/constants';
 
 import { validateOpenstackInstanceName } from '../utils';
 
-import { FormDataVolumeStep } from './FormDataVolumeStep';
-import { FormFlavorStep } from './FormFlavorStep';
+import { FormHardwareConfigurationStep } from './FormHardwareConfigurationStep';
 import { FormImageStep } from './FormImageStep';
-import { FormNetworkStep } from './FormNetworkStep';
-import { FormSecurityGroupsStep } from './FormSecurityGroupsStep';
-import { FormSSHPublicKeysStep } from './FormSSHPublicKeysStep';
+import { FormNetworkSecurityStep } from './FormNetworkSecurityStep';
 import { FormStartupScriptStep } from './FormStartupScriptStep';
-import { FormSystemVolumeStep } from './FormSystemVolumeStep';
 
 export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
-  CustomerStep,
-  ProjectStep,
+  DetailsOverviewStep,
   {
     label: translate('Cloud region'),
     id: 'step-cloud-region',
@@ -42,54 +34,36 @@ export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
     component: FormImageStep,
   },
   {
-    label: translate('Flavor'),
-    id: 'step-flavor',
-    fields: ['attributes.flavor'],
-    required: true,
-    requiredFields: ['attributes.flavor'],
-    component: FormFlavorStep,
-  },
-  {
-    label: translate('System volume'),
-    id: 'step-system-volume',
-    fields: ['attributes.system_volume_type', 'attributes.system_volume_size'],
+    label: translate('Hardware configuration'),
+    id: 'step-hardware',
+    fields: [
+      'attributes.flavor',
+      'attributes.system_volume_type',
+      'attributes.system_volume_size',
+      'attributes.data_volume_type',
+      'attributes.data_volume_size',
+    ],
     required: true,
     requiredFields: [
+      'attributes.flavor',
       'attributes.system_volume_type',
       'attributes.system_volume_size',
     ],
-    component: FormSystemVolumeStep,
+    component: FormHardwareConfigurationStep,
   },
   {
-    label: translate('Data volume'),
-    id: 'step-data-volume',
-    fields: ['attributes.data_volume_type', 'attributes.data_volume_size'],
+    label: translate('Network and security'),
+    id: 'step-network-security',
+    fields: [
+      'attributes.ssh_public_key',
+      'attributes.networks',
+      'attributes.security_groups',
+    ],
     required: false,
-    component: FormDataVolumeStep,
+    component: FormNetworkSecurityStep,
   },
   {
-    label: translate('SSH public key'),
-    id: 'step-ssh-public-key',
-    fields: ['attributes.ssh_public_key'],
-    required: false,
-    component: FormSSHPublicKeysStep,
-  },
-  {
-    label: translate('Network'),
-    id: 'step-network',
-    fields: ['attributes.networks'],
-    required: false,
-    component: FormNetworkStep,
-  },
-  {
-    label: translate('Security groups'),
-    id: 'step-security-groups',
-    fields: ['attributes.security_groups'],
-    required: false,
-    component: FormSecurityGroupsStep,
-  },
-  {
-    label: translate('Startup script'),
+    label: translate('Automation'),
     id: 'step-startup-script',
     fields: ['startup_script'],
     required: false,

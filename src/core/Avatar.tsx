@@ -2,11 +2,17 @@ import classNames from 'classnames';
 import { FC } from 'react';
 
 interface AvatarProps {
+  name: string;
   size?: number;
   className?: string;
-  name: string;
+  labelClassName?: string;
 }
-const Avatar: FC<AvatarProps> = ({ size = 35, name, className }) => {
+const Avatar: FC<AvatarProps> = ({
+  size = 35,
+  name,
+  className,
+  labelClassName,
+}) => {
   const acronym = name
     ? name
         ?.split(' ')
@@ -24,7 +30,9 @@ const Avatar: FC<AvatarProps> = ({ size = 35, name, className }) => {
       )}
       style={{ width: `${size}px`, height: `${size}px` }}
     >
-      <div className="symbol-label">{acronym}</div>
+      <div className={classNames('symbol-label', labelClassName)}>
+        {acronym}
+      </div>
     </div>
   );
 };

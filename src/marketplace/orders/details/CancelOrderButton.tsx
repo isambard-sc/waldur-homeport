@@ -1,10 +1,10 @@
 import { Prohibit } from '@phosphor-icons/react';
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceOrdersCancel } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { cancelOrder } from '@waldur/marketplace/common/api';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
@@ -19,7 +19,7 @@ export const CancelOrderButton: FC<CancelOrderButtonProps> = (props) => {
   const callback = async () => {
     setLoading(true);
     try {
-      await cancelOrder(props.uuid);
+      await marketplaceOrdersCancel({ path: { uuid: props.uuid } });
       dispatch(showSuccess(translate('Order has been canceled.')));
       props.loadData();
     } catch (response) {
@@ -40,7 +40,8 @@ export const CancelOrderButton: FC<CancelOrderButtonProps> = (props) => {
           title={translate('Cancel')}
           action={callback}
           disabled={loading}
-          iconNode={<Prohibit />}
+          iconNode={<Prohibit weight="bold" />}
+          iconColor="danger"
         />
       )}
     </>

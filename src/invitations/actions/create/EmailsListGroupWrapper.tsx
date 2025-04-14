@@ -8,8 +8,6 @@ export const EmailsListGroupWrapper = ({
   roles,
   customer,
   project,
-  fetchUserDetails,
-  usersDetails,
   disabled,
 }) => {
   return (
@@ -20,8 +18,6 @@ export const EmailsListGroupWrapper = ({
       project={project}
       component={EmailsListGroup}
       validate={[required]}
-      fetchUserDetails={fetchUserDetails}
-      usersDetails={usersDetails}
       disabled={disabled}
     />
   );

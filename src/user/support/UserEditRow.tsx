@@ -1,15 +1,15 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { User } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
-import { UserDetails } from '@waldur/workspace/types';
 
 interface RowProps {
-  user: UserDetails;
+  user: User;
   label: string;
   value: string;
   description?: string;

@@ -4,7 +4,7 @@ xdescribe('Google Calendar actions in public offerings view', () => {
       .mockUser()
       .setToken()
 
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'marketplace/anderson_and_sons.json',
       })
       .intercept('GET', '/api/marketplace-provider-offerings/', {
@@ -13,7 +13,7 @@ xdescribe('Google Calendar actions in public offerings view', () => {
       .intercept('GET', '/api/customers/**/counters/', {
         fixture: 'marketplace/counters.json',
       })
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .intercept('POST', '/api/booking-offerings/**/google_calendar_sync/', {})
       .as('syncGoogleCalendar')
       .intercept('POST', '/api/booking-offerings/**/share_google_calendar/', {})

@@ -1,8 +1,6 @@
 import { FC } from 'react';
 
 import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { getProvisioningConfigForm } from '@waldur/marketplace/common/registry';
@@ -10,7 +8,6 @@ import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constan
 
 import { EditSchedulesButton } from '../../../../booking/EditSchedulesButton';
 
-import { EditLexisLinkIntegrationButton } from './EditLexisLinkIntegrationButton';
 import { GoogleCalendarActions } from './GoogleCalendarActions';
 import { RemoteActions } from './RemoteActions';
 import { ScriptIntegrationSummary } from './ScriptIntegrationSummary';
@@ -46,13 +43,6 @@ export const ProvisioningConfigSection: FC<OfferingEditPanelProps> = (
       title={TITLE}
       actions={
         <>
-          {props.offering.type !== OFFERING_TYPE_BOOKING &&
-          isFeatureVisible(MarketplaceFeatures.lexis_links) ? (
-            <EditLexisLinkIntegrationButton
-              offering={props.offering}
-              refetch={props.refetch}
-            />
-          ) : null}
           <EditSchedulesButton {...props} />
           <RemoteActions offering={props.offering} />
           <GoogleCalendarActions offering={props.offering} />

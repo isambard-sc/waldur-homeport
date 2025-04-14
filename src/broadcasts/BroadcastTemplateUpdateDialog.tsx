@@ -1,11 +1,14 @@
 import { useCallback } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  broadcastMessageTemplatesUpdate,
+  MessageTemplate,
+} from 'waldur-js-client';
 
-import { updateBroadcastTemplate } from '@waldur/broadcasts/api';
 import { BroadcastTemplateForm } from '@waldur/broadcasts/BroadcastTemplateForm';
 import { BROADCAST_TEMPLATE_CREATE_FORM_ID } from '@waldur/broadcasts/constants';
-import { BroadcastTemplateFormData } from '@waldur/broadcasts/types';
+import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -18,7 +21,7 @@ interface OwnProps {
   resolve;
 }
 
-const enhance = reduxForm<BroadcastTemplateFormData, OwnProps>({
+const enhance = reduxForm<MessageTemplate, OwnProps>({
   form: BROADCAST_TEMPLATE_CREATE_FORM_ID,
 });
 
@@ -31,9 +34,12 @@ export const BroadcastTemplateUpdateDialog = connect(
     const dispatch = useDispatch();
 
     const callback = useCallback(
-      async (formData: BroadcastTemplateFormData) => {
+      async (formData: MessageTemplate) => {
         try {
-          await updateBroadcastTemplate(formData.uuid, formData);
+          await broadcastMessageTemplatesUpdate({
+            path: { uuid: formData.uuid },
+            body: formData,
+          });
           await resolve.refetch();
           dispatch(
             showSuccess(translate('Broadcast template has been updated.')),
@@ -52,11 +58,16 @@ export const BroadcastTemplateUpdateDialog = connect(
     );
 
     return (
-      <ModalDialog title={translate('Update a broadcast template')}>
-        <form onSubmit={handleSubmit(callback)}>
+      <form onSubmit={handleSubmit(callback)}>
+        <ModalDialog
+          title={translate('Update a broadcast template')}
+          footer={
+            <SubmitButton submitting={submitting} label={translate('Save')} />
+          }
+        >
           <BroadcastTemplateForm submitting={submitting} />
-        </form>
-      </ModalDialog>
+        </ModalDialog>
+      </form>
     );
   }),
 );

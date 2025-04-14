@@ -1,9 +1,8 @@
-import { PencilSimple } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { EditButton } from '@waldur/form/EditButton';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
@@ -22,6 +21,11 @@ export const UpdateResourceOptionButton: FunctionComponent<{
   refetch?;
 }> = (props) => {
   const user = useSelector(getUser);
+  const disabled = !hasPermission(user, {
+    permission: PermissionEnum.UPDATE_RESOURCE_OPTIONS,
+    projectId: props.resource.project_uuid,
+    customerId: props.resource.customer_uuid,
+  });
   const dispatch = useDispatch();
   const callback = () => {
     dispatch(
@@ -31,18 +35,13 @@ export const UpdateResourceOptionButton: FunctionComponent<{
     );
   };
   return (
-    <Button
+    <EditButton
       onClick={callback}
-      size="sm"
-      disabled={
-        !hasPermission(user, {
-          permission: PermissionEnum.UPDATE_RESOURCE_OPTIONS,
-          projectId: props.resource.project_uuid,
-          customerId: props.resource.customer_uuid,
-        })
+      disabled={disabled}
+      tooltip={
+        disabled &&
+        translate("You don't have enough privileges to perform this operation.")
       }
-    >
-      <PencilSimple /> {translate('Edit')}
-    </Button>
+    />
   );
 };

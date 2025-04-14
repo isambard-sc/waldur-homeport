@@ -1,8 +1,8 @@
 import { Share } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { invoicesSendNotification } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
@@ -17,7 +17,7 @@ export const SendNotificationButton: FunctionComponent<{ row }> = ({ row }) => {
 
   const onClick = async () => {
     try {
-      await post(`/invoices/${row.uuid}/send_notification/`);
+      await invoicesSendNotification({ path: { uuid: row.uuid } });
       dispatch(
         showSuccess(
           translate(

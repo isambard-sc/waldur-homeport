@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { User } from 'waldur-js-client';
 
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { IdentityProviderCard } from './IdentityProviderCard';
 import { TermsOfServiceCheckbox } from './TermsOfServiceCheckbox';
@@ -12,7 +12,7 @@ import { UserEditAvatarFormItem } from './UserEditAvatarFormItem';
 import { UserEditRows } from './UserEditRows';
 
 interface UserEditTabProps {
-  user: UserDetails;
+  user: User;
 }
 
 export const UserEditTab: React.FC<UserEditTabProps> = ({ user }) => {

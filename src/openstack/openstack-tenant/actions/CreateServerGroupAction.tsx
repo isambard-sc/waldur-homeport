@@ -22,7 +22,7 @@ export const CreateServerGroupAction: FC<TenantActionProps> = ({
 }) => (
   <DialogActionButton
     title={translate('Create')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={CreateServerGroupDialog}
     resource={resource}
     validators={validators}

@@ -22,7 +22,7 @@ export const CreateNetworkAction: FC<TenantActionProps> = ({
 }) => (
   <DialogActionButton
     title={translate('Create')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={CreateNetworkDialog}
     resource={resource}
     validators={validators}

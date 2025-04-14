@@ -3,20 +3,20 @@ import { useDispatch } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 import { RemoteSyncActionProps } from './types';
 
 const LastRunResultDialog = ({ remoteSync }) => {
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('Result of last run')}
       subtitle={remoteSync.api_url}
       closeButton
     >
       <pre>{remoteSync.last_output || translate('No results to display.')}</pre>
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };
 
@@ -33,7 +33,7 @@ export const RemoteSyncLastRunResultsAction = (
     <ActionItem
       title={translate('Show results of last run')}
       action={openDialog}
-      iconNode={<Eye />}
+      iconNode={<Eye weight="bold" />}
     />
   );
 };

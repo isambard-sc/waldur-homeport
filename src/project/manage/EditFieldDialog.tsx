@@ -1,7 +1,10 @@
 import { pick } from 'lodash-es';
 import { Field, Form } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
+import { projectsPartialUpdate } from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
+import { formatDate } from '@waldur/core/dateUtils';
 import { SubmitButton } from '@waldur/form';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
@@ -12,9 +15,7 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
 import { setCurrentProject } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
-import { Project } from '@waldur/workspace/types';
 
-import { updateProject } from '../api';
 import { DescriptionGroup } from '../create/DescriptionGroup';
 import { EndDateGroup } from '../create/EndDateGroup';
 import { IndustryGroup } from '../create/IndustryGroup';
@@ -23,15 +24,32 @@ import { OecdCodeGroup } from '../create/OecdCodeGroup';
 import { StartDateGroup } from '../create/StartDateGroup';
 import { EditProjectProps } from '../types';
 
+const formatValue = (key, value) => {
+  switch (key) {
+    case 'end_date':
+    case 'start_date':
+      return formatDate(value);
+    case 'oecd_fos_2007_code':
+      return value.value;
+    default:
+      return value;
+  }
+};
+
 export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
   const { showSuccess, showErrorResponse } = useNotify();
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (formData: FormData) => {
     try {
-      const project = await updateProject(resolve.project.uuid, data);
-      dispatch(setCurrentProject(project.data as Project));
+      const project = await projectsPartialUpdate({
+        path: { uuid: resolve.project.uuid },
+        body: {
+          [resolve.name]: formatValue(resolve.name, formData[resolve.name]),
+        },
+      });
+      dispatch(setCurrentProject(project.data as any as Project));
       showSuccess(translate('Project has been updated.'));
       dispatch(closeModalDialog());
     } catch (e) {

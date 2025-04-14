@@ -1,10 +1,10 @@
+import { OpenStackNestedPort, OpenStackVolumeType } from 'waldur-js-client';
+import { OpenStackFloatingIp } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
-import { Port } from '@waldur/resource/types';
 import { formatFlavor } from '@waldur/resource/utils';
 
-import { Quota, VolumeType } from '../types';
-
-import { FloatingIp } from './types';
+import { Quota } from '../types';
 
 const getTotalStorage = (formData) =>
   (formData.system_volume_size || 0) + (formData.data_volume_size || 0);
@@ -42,23 +42,24 @@ export const calculateSystemVolumeSize = (formData) => {
   return Math.max(currentValue, minValue);
 };
 
-export const formatVolumeTypeLabel = (volumeType: VolumeType): string =>
+export const formatVolumeTypeLabel = (
+  volumeType: OpenStackVolumeType,
+): string =>
   volumeType.description
     ? `${volumeType.name} (${volumeType.description})`
     : volumeType.name;
 
-export const formatVolumeTypeChoices = (volumeTypes: VolumeType[]) =>
+export const formatVolumeTypeChoices = (volumeTypes: OpenStackVolumeType[]) =>
   volumeTypes.map((volumeType) => ({
     label: formatVolumeTypeLabel(volumeType),
     value: volumeType.url,
     name: volumeType.name,
-    is_default: volumeType.is_default,
   }));
 
 export type VolumeTypeChoice = ReturnType<typeof formatVolumeTypeChoices>[0];
 
 export const getDefaultVolumeType = (volumeTypes: VolumeTypeChoice[]) =>
-  volumeTypes.find((volumeType) => volumeType.is_default);
+  volumeTypes[0];
 
 const DNS_LABEL_REGEX = new RegExp('^([a-zA-Z0-9-]{1,63})$');
 
@@ -138,7 +139,7 @@ export function flavorValidator(model, choice) {
   return false;
 }
 
-export const formatAddressList = (row: Port) =>
+export const formatAddressList = (row: OpenStackNestedPort) =>
   row.fixed_ips.map((fip) => fip.ip_address).join(', ') || 'N/A';
 
 export const getQuotas = ({ formData, usages, limits }) => {
@@ -176,4 +177,4 @@ export const getDefaultFloatingIps = () =>
       address: translate('Auto-assign floating IP'),
       url: 'true',
     },
-  ] as FloatingIp[];
+  ] as OpenStackFloatingIp[];

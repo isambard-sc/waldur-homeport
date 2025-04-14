@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Form } from 'react-bootstrap';
 import { InjectedFormProps } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { required } from '@waldur/core/validators';

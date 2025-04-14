@@ -1,6 +1,15 @@
 import { DateTime } from 'luxon';
+import { useMemo } from 'react';
+import {
+  NestedRound,
+  ProposalReviewStateEnum,
+  ProtectedRound,
+  ProtectedRoundRequest,
+} from 'waldur-js-client';
+import { User } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
 import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { RoleEnum } from '@waldur/permissions/enums';
 import {
@@ -8,14 +17,10 @@ import {
   CallOfferingState,
   CallState,
   ProposalState,
-  ReviewState,
-  Round,
   RoundAllocationStrategy,
   RoundAllocationTime,
-  RoundFormData,
   RoundReviewStrategy,
 } from '@waldur/proposals/types';
-import { User } from '@waldur/workspace/types';
 
 export const getRoundReviewStrategyOptions = () =>
   [
@@ -85,20 +90,12 @@ export const getProposalStateOptions = () =>
       value: 'draft',
     },
     {
-      label: translate('Team verification'),
-      value: 'team_verification',
-    },
-    {
       label: translate('Submitted'),
       value: 'submitted',
     },
     {
       label: translate('In review'),
       value: 'in_review',
-    },
-    {
-      label: translate('In revision'),
-      value: 'in_revision',
     },
     {
       label: translate('Accepted'),
@@ -131,13 +128,16 @@ export const getReviewStateOptions = () =>
     { value: 'in_review', label: translate('In review') },
     { value: 'submitted', label: translate('Submitted') },
     { value: 'rejected', label: translate('Rejected') },
-  ] as { value: ReviewState; label: string }[];
+  ] as { value: ProposalReviewStateEnum; label: string }[];
 
-export const formatReviewState = (value: ReviewState) =>
+export const formatReviewState = (value: ProposalReviewStateEnum) =>
   getReviewStateOptions().find((option) => option.value === value)?.label ||
   value;
 
-export const getRoundStatus = (round: Round) => {
+export const isReviewInFinalState = (state: ProposalReviewStateEnum) =>
+  !['in_review', 'created'].includes(state);
+
+export const getRoundStatus = (round: NestedRound) => {
   if (!round) {
     return null;
   } else if (round.status === 'scheduled') {
@@ -153,7 +153,7 @@ export const getRoundStatus = (round: Round) => {
   }
 };
 
-export const getRoundsWithStatus = (rounds: Round[]) =>
+export const getRoundsWithStatus = (rounds: NestedRound[]) =>
   rounds.map((round) => ({
     ...round,
     status: getRoundStatus(round),
@@ -171,9 +171,12 @@ export const getCallStatus = (call: Call) => {
   }
 };
 
-export const getRoundInitialValues = (round: Round): RoundFormData => ({
+export const getRoundInitialValues = (
+  round: ProtectedRound,
+): ProtectedRoundRequest => ({
   ...round,
   // FIX: we don't have timezone in round object on the backend?
+  // @ts-ignore
   timezone: DateTime.local().zoneName,
 });
 
@@ -185,31 +188,41 @@ export const checkIsCallManager = (call: Call, user: User): boolean =>
       permission.role_name === RoleEnum.CALL_MANAGER,
   );
 
-export const getCallBreadcrumbItems = (call: Call): IBreadcrumbItem[] => [
-  {
-    key: 'organizations',
-    text: translate('Organizations'),
-    to: 'organizations',
-  },
-  {
-    key: 'organization.dashboard',
-    text: call?.customer_name || '...',
-    to: 'organization.dashboard',
-    params: call ? { uuid: call.customer_uuid } : undefined,
-    ellipsis: 'xl',
-    maxLength: 11,
-  },
-  {
-    key: 'call-list',
-    text: translate('Calls for proposals'),
-    to: 'call-management.call-list',
-    params: call ? { uuid: call.customer_uuid } : undefined,
-    ellipsis: 'xl',
-  },
-  {
-    key: 'call',
-    text: call?.name || '...',
-    truncate: true,
-    active: true,
-  },
-];
+export const useCallBreadcrumbItems = (
+  call: Pick<Call, 'customer_uuid' | 'customer_name' | 'name'>,
+): IBreadcrumbItem[] => {
+  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
+
+  return useMemo(
+    () => [
+      {
+        key: 'organizations',
+        text: translate('Organizations'),
+        to: 'organizations',
+      },
+      call?.customer_uuid
+        ? getOrganizationBreadcrumbItem({
+            uuid: call.customer_uuid,
+            name: call?.customer_name || '...',
+          })
+        : {
+            key: 'organization.dashboard',
+            text: '...',
+          },
+      {
+        key: 'call-list',
+        text: translate('Calls for proposals'),
+        to: 'call-management.call-list',
+        params: call ? { uuid: call.customer_uuid } : undefined,
+        ellipsis: 'xl',
+      },
+      {
+        key: 'call',
+        text: call?.name || '...',
+        truncate: true,
+        active: true,
+      },
+    ],
+    [call],
+  );
+};

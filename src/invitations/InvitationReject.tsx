@@ -2,12 +2,11 @@ import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { useEffectOnce } from 'react-use';
+import { userInvitationsReject } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { InvitationService } from './InvitationService';
 
 export const InvitationReject: FunctionComponent = () => {
   const router = useRouter();
@@ -20,7 +19,7 @@ export const InvitationReject: FunctionComponent = () => {
   useEffectOnce(() => {
     async function processToken() {
       try {
-        await InvitationService.reject(token);
+        await userInvitationsReject({ body: { token } });
         dispatch(showSuccess(translate('Invitation has been rejected.')));
         router.stateService.go('login');
       } catch (e) {

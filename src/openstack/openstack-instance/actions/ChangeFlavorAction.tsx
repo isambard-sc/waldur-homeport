@@ -1,8 +1,8 @@
 import { Swap } from '@phosphor-icons/react';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import {
   validateState,
   validateRuntimeState,
@@ -35,6 +35,6 @@ export const ChangeFlavorAction: ActionItemType = ({ resource, refetch }) => (
     validators={validators}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<Swap />}
+    iconNode={<Swap weight="bold" />}
   />
 );

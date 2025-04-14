@@ -1,10 +1,9 @@
-import Axios, { AxiosResponse } from 'axios';
+import { configurationRetrieve } from 'waldur-js-client';
 
-import { getRoles } from '@waldur/administration/roles/api';
 import { afterBootstrap } from '@waldur/afterBootstrap';
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
-import { format } from './ErrorMessageFormatter';
+import { initApiClient } from './api';
 
 const getApiUrl = () =>
   document.querySelector('meta[name="api-url"]').getAttribute('content');
@@ -25,36 +24,31 @@ const parseLanguages = (inputValue) => {
     }));
 };
 
-class BadResponseFormatError extends Error {
-  constructor(public response: AxiosResponse) {
-    super('Malformed response');
-  }
-}
-
-const fetchJSON = async (url) => {
-  const response = await Axios.get(url);
-  if (response.headers['content-type'] !== 'application/json') {
-    throw new BadResponseFormatError(response);
-  }
-  if (typeof response.data !== 'object') {
-    throw new BadResponseFormatError(response);
-  }
-  return response.data;
-};
-
 export async function loadConfig() {
-  let backendSettings;
   const restApi = getApiUrl();
-  if (restApi != '__API_URL__') {
-    ENV.apiEndpoint = restApi;
+  if (restApi === '__API_URL__') {
+    throw new Error('API URL is not configured');
   }
-
+  ENV.apiEndpoint = restApi;
+  initApiClient();
   try {
-    backendSettings = await fetchJSON(`${ENV.apiEndpoint}api/configuration/`);
+    const { LANGUAGES, LANGUAGE_CODE, FEATURES, ...plugins } = (
+      await configurationRetrieve({ auth: null, parseAs: 'json' })
+    ).data as any;
+    Object.assign(ENV, {
+      plugins,
+      languageChoices: parseLanguages(LANGUAGES),
+      defaultLanguage: LANGUAGE_CODE,
+      FEATURES,
+    });
   } catch (error) {
-    if (!error) {
+    if (error instanceof TypeError) {
       throw new Error(
-        `Unfortunately, connection to server has failed. Please check if you can connect to ${ENV.apiEndpoint} from your browser and contact support if the error continues.`,
+        `Unable to fetch server configuration. Please check if you can connect to ${ENV.apiEndpoint} from your browser and contact support if the error continues.`,
+      );
+    } else if (error instanceof SyntaxError) {
+      throw new Error(
+        `Unable to fetch server configuration. Server does not return valid JSON.`,
       );
     } else if (error.response?.status >= 400) {
       throw new Error(
@@ -63,20 +57,6 @@ export async function loadConfig() {
     } else {
       throw new Error(error);
     }
-  }
-
-  const config = {
-    plugins: backendSettings,
-    languageChoices: parseLanguages(backendSettings.LANGUAGES),
-    defaultLanguage: backendSettings.LANGUAGE_CODE,
-    FEATURES: backendSettings.FEATURES,
-  };
-  Object.assign(ENV, config);
-  try {
-    const roles = await getRoles();
-    ENV.roles = roles;
-  } catch (error) {
-    throw new Error(`Unable to fetch user roles. ${format(error)}`);
   }
   afterBootstrap();
   return true;

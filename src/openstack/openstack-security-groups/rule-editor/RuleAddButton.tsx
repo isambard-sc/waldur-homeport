@@ -21,7 +21,7 @@ const DEFAULT_RULE = {
 export const RuleAddButton: FC<RuleAddButtonProps> = ({ fields }) => (
   <Button variant="primary" size="sm" onClick={() => fields.push(DEFAULT_RULE)}>
     <span className="svg-icon svg-icon-2">
-      <Plus />
+      <Plus weight="bold" />
     </span>
     &nbsp;
     {translate('Add rule')}

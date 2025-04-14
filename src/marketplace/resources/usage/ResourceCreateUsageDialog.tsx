@@ -3,7 +3,7 @@ import { useAsync } from 'react-use';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { getProviderUsageComponents } from './api';
 import { ResourceUsageFormContainer } from './ResourceUsageFormContainer';
@@ -23,7 +23,7 @@ export const ResourceCreateUsageDialog: FunctionComponent<
   );
 
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('Resource usage') + ` "${props.resolve.resource_name}"`}
       bodyClassName="pt-2"
       footer={<ResourceUsageSubmitButton params={props.resolve} />}
@@ -43,6 +43,6 @@ export const ResourceCreateUsageDialog: FunctionComponent<
           periods={value.periods}
         />
       )}
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

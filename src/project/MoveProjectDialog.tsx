@@ -1,6 +1,7 @@
 import { FunctionComponent, useCallback } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import { projectsMoveProject } from 'waldur-js-client';
 
 import { format } from '@waldur/core/ErrorMessageFormatter';
 import { required } from '@waldur/core/validators';
@@ -14,8 +15,6 @@ import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showError, showSuccess } from '@waldur/store/notify';
 
-import * as api from './api';
-
 export const MoveProjectDialog: FunctionComponent<{
   resolve: { project; refetch };
 }> = ({ resolve: { project, refetch } }) => {
@@ -23,9 +22,11 @@ export const MoveProjectDialog: FunctionComponent<{
   const onSubmit = useCallback(
     async (formData) => {
       try {
-        await api.moveProject({
-          organization: formData.organization,
-          project: project,
+        await projectsMoveProject({
+          path: { uuid: project.uuid },
+          body: {
+            customer: formData.organization.organization.url,
+          },
         });
         dispatch(
           showSuccess(

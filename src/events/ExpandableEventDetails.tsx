@@ -7,9 +7,7 @@ import { isStaffOrSupport } from '@waldur/workspace/selectors';
 import { ExpandableEventDetailsTable } from './ExpandableEventDetailsTable';
 import { Event } from './types';
 
-interface StateProps {
-  isStaffOrSupport: boolean;
-}
+type StateProps = ReturnType<typeof mapStateToProps>;
 
 interface ExpandableEventDetailsProps extends StateProps {
   row: Event;

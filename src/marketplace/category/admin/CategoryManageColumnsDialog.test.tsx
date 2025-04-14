@@ -2,8 +2,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import {
+  marketplaceCategoryColumnsCreate,
+  marketplaceCategoryColumnsDestroy,
+} from 'waldur-js-client';
+import { marketplaceCategoryColumnsList } from 'waldur-js-client';
 
-import * as api from '@waldur/marketplace/category/admin/api';
 import { Category } from '@waldur/marketplace/types';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { createActionStore } from '@waldur/resource/actions/testUtils';
@@ -17,7 +21,7 @@ const category = {
   columns: [],
 } as Category;
 
-vi.mock('@waldur/marketplace/category/admin/api');
+vi.mock('waldur-js-client');
 vi.mock('@waldur/store/hooks');
 vi.mock('@waldur/modal/actions');
 
@@ -41,7 +45,9 @@ describe('CategoryManageColumnsDialog', () => {
   });
 
   it('renders dialog with title and form', async () => {
-    vi.mocked(api.getCategoryColumns).mockResolvedValue([]);
+    vi.mocked(marketplaceCategoryColumnsList).mockResolvedValue({
+      data: [],
+    } as any);
 
     renderDialog();
     await screen.findByText('Set columns in Test Category category');
@@ -53,7 +59,9 @@ describe('CategoryManageColumnsDialog', () => {
   });
 
   it('allows adding a new column', async () => {
-    vi.mocked(api.getCategoryColumns).mockResolvedValue([]);
+    vi.mocked(marketplaceCategoryColumnsList).mockResolvedValue({
+      data: [],
+    } as any);
 
     renderDialog();
     await screen.findByText('Set columns in Test Category category');
@@ -79,10 +87,12 @@ describe('CategoryManageColumnsDialog', () => {
     await user.click(submitButton);
 
     // Verify API call
-    expect(api.createCategoryColumn).toHaveBeenCalledWith({
-      title: 'Test Column',
-      attribute: 'test_attribute',
-      index: '1',
+    expect(marketplaceCategoryColumnsCreate).toHaveBeenCalledWith({
+      body: {
+        title: 'Test Column',
+        attribute: 'test_attribute',
+        index: '1',
+      },
     });
   });
 
@@ -94,7 +104,9 @@ describe('CategoryManageColumnsDialog', () => {
       index: 1,
     };
 
-    vi.mocked(api.getCategoryColumns).mockResolvedValue([existingColumn]);
+    vi.mocked(marketplaceCategoryColumnsList).mockResolvedValue({
+      data: [existingColumn],
+    } as any);
 
     const { container } = renderDialog();
     await screen.findByText('Set columns in Test Category category');
@@ -111,6 +123,8 @@ describe('CategoryManageColumnsDialog', () => {
     // Mock confirmation dialog to return true
     vi.mocked(waitForConfirmation).mockRejectedValue(true);
     // Verify API call
-    expect(api.deleteCategoryColumn).toHaveBeenCalledWith(existingColumn.uuid);
+    expect(marketplaceCategoryColumnsDestroy).toHaveBeenCalledWith({
+      path: { uuid: existingColumn.uuid },
+    });
   });
 });

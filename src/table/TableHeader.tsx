@@ -6,8 +6,9 @@ import { translate } from '@waldur/i18n';
 
 import './TableHeader.scss';
 
+import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableFiltersMenu } from './TableFiltersMenu';
-import { TableProps, Column, Sorting } from './types';
+import { TableProps, Column, Sorting, PinnedColumns } from './types';
 
 interface TableHeaderProps {
   columns: Column[];
@@ -28,6 +29,7 @@ interface TableHeaderProps {
   columnPositions: string[];
   hasOptionalColumns?: boolean;
   toggleFilterMenu(show?): void;
+  pinnedColumns?: PinnedColumns;
 }
 
 function renderSortingIcon(
@@ -80,6 +82,16 @@ function renderSortingIcon(
   );
 }
 
+const WithThMeta = (children, meta) =>
+  meta ? (
+    <div className="th-wrapper">
+      {children}
+      {meta}
+    </div>
+  ) : (
+    children
+  );
+
 const TableTh = ({
   column,
   onSortClick,
@@ -99,20 +111,25 @@ const TableTh = ({
       ) || undefined
     }
   >
-    <span>
-      {column.title}
-      {renderSortingIcon(column, currentSorting, onSortClick)}
-    </span>
-    {column.filter && filters && (
-      <TableFiltersMenu
-        filters={filters}
-        filterPosition="menu"
-        filtersStorage={filtersStorage}
-        setFilter={setFilter}
-        applyFiltersFn={applyFiltersFn}
-        openName={column.filter}
-        toggleFilterMenu={toggleFilterMenu}
-      />
+    {WithThMeta(
+      <>
+        <span>
+          {column.title}
+          {renderSortingIcon(column, currentSorting, onSortClick)}
+        </span>
+        {column.filter && filters && (
+          <TableFiltersMenu
+            filters={filters}
+            filterPosition="menu"
+            filtersStorage={filtersStorage}
+            setFilter={setFilter}
+            applyFiltersFn={applyFiltersFn}
+            openName={column.filter}
+            toggleFilterMenu={toggleFilterMenu}
+          />
+        )}
+      </>,
+      column.meta,
     )}
   </th>
 );
@@ -135,6 +152,7 @@ export const TableHeader: FC<TableHeaderProps> = ({
   applyFiltersFn,
   hasOptionalColumns,
   toggleFilterMenu,
+  pinnedColumns = {},
 }) => {
   const isAllSelected = selectedRows?.length >= rows?.length;
 
@@ -208,7 +226,15 @@ export const TableHeader: FC<TableHeaderProps> = ({
                 ),
             )}
         {showActions ? (
-          <th className="header-actions">{translate('Actions')}</th>
+          <th
+            className={classNames(
+              'header-actions',
+              COLUMN_ACTIONS_KEY in pinnedColumns && 'pinned',
+              pinnedColumns[COLUMN_ACTIONS_KEY] && 'is-floating',
+            )}
+          >
+            {translate('Actions')}
+          </th>
         ) : null}
       </tr>
     </thead>

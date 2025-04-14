@@ -28,7 +28,7 @@ function CustomToggle({ children, eventKey }) {
     >
       {children}
       <span className="fs-4 ms-2 text-dark">
-        {isCurrentEventKey ? <Minus /> : <Plus />}
+        {isCurrentEventKey ? <Minus weight="bold" /> : <Plus weight="bold" />}
       </span>
     </Button>
   );

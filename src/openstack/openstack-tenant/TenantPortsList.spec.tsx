@@ -1,11 +1,12 @@
-import { renderTable } from '@waldur/table/testUtils';
+import { describe, it, expect } from 'vitest';
+import { OpenStackNestedPort } from 'waldur-js-client';
 
-import { Port } from '../types';
+import { renderTable } from '@waldur/table/testUtils';
 
 import { TenantPortsList } from './TenantPortsList';
 
 const renderList = () => {
-  const item: Port = {
+  const item: OpenStackNestedPort = {
     fixed_ips: [{ ip_address: '192.168.42.14', subnet_id: '' }],
     mac_address: 'fa:16:3e:93:f0:7d',
     network_name: 'theses-and-papers-on-mach-sub-net',

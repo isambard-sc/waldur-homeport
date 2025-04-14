@@ -1,22 +1,19 @@
 import { Eye, GearSix } from '@phosphor-icons/react';
-import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { useCallback } from 'react';
-import { Col } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { Project } from 'waldur-js-client';
 
 import { EChart } from '@waldur/core/EChart';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { WidgetCard } from '@waldur/dashboard/WidgetCard';
-import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { ChangesAmountBadge } from '@waldur/marketplace/service-providers/dashboard/ChangesAmountBadge';
+import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { isOwnerOrStaff as isOwnerOrStaffSelector } from '@waldur/workspace/selectors';
-import { Project } from '@waldur/workspace/types';
 
-import { loadChart } from './utils';
+import { useProjectCostChart } from './utils';
 
 const CostPoliciesDetailsDialog = lazyComponent(() =>
   import('./CostPoliciesDetailsDialog').then((module) => ({
@@ -32,11 +29,8 @@ export const ProjectDashboardCostLimits = ({
   const router = useRouter();
   const isOwnerOrStaff = useSelector(isOwnerOrStaffSelector);
 
-  const { data, isLoading, error, refetch } = useQuery(
-    ['ProjectDashboardChart', project.uuid],
-    () => loadChart(project),
-    { staleTime: 5 * 60 * 1000 },
-  );
+  const { chart, options, error, isLoading, refetch } =
+    useProjectCostChart(project);
 
   const dispatch = useDispatch();
   const viewDetails = useCallback(
@@ -62,14 +56,20 @@ export const ProjectDashboardCostLimits = ({
   }
   return (
     <WidgetCard
-      cardTitle={translate('Project cost')}
-      title={data.chart.current}
+      cardTitle={
+        <>
+          {translate('Project cost')}
+          <small className="text-muted fs-7 ms-4 fw-normal">
+            ({translate('Current month’s cost')}: {chart.current})
+          </small>
+        </>
+      }
       className="h-100"
       actions={[
         isOwnerOrStaff
           ? {
               label: translate('Manage policy'),
-              icon: <GearSix />,
+              icon: <GearSix weight="bold" />,
               callback: () =>
                 router.stateService.go('organization-cost-policies', {
                   uuid: project.customer_uuid,
@@ -78,33 +78,12 @@ export const ProjectDashboardCostLimits = ({
           : null,
         {
           label: translate('View details'),
-          icon: <Eye />,
+          icon: <Eye weight="bold" />,
           callback: viewDetails,
         },
       ].filter(Boolean)}
-      meta={
-        data.chart.changes
-          ? translate(
-              '{changes} vs last month',
-              {
-                changes: (
-                  <ChangesAmountBadge
-                    changes={data.chart.changes}
-                    showOnInfinity
-                    showOnZero
-                    asBadge={false}
-                  />
-                ),
-              },
-              formatJsxTemplate,
-            )
-          : null
-      }
-      right={
-        <Col xs={7}>
-          <EChart options={data.options} height="100px" />
-        </Col>
-      }
-    />
+    >
+      <EChart options={options} />
+    </WidgetCard>
   );
 };

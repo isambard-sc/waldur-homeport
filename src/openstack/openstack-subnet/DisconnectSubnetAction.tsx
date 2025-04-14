@@ -1,7 +1,7 @@
 import { Plugs } from '@phosphor-icons/react';
+import { openstackSubnetsDisconnect } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { disconnectSubnet } from '@waldur/openstack/api';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
 import { validateState } from '@waldur/resource/actions/base';
 import { ActionItemType } from '@waldur/resource/actions/types';
@@ -12,10 +12,10 @@ export const DisconnectSubnetAction: ActionItemType = ({
 }) => (
   <AsyncActionItem
     title={translate('Disconnect subnet')}
-    apiMethod={disconnectSubnet}
+    apiMethod={(uuid: string) => openstackSubnetsDisconnect({ path: { uuid } })}
     resource={resource}
     validators={[validateState('OK')]}
     refetch={refetch}
-    iconNode={<Plugs />}
+    iconNode={<Plugs weight="bold" />}
   />
 );

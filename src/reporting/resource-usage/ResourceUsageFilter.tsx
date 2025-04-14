@@ -11,6 +11,7 @@ import { translate } from '@waldur/i18n';
 import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { ProjectFilter } from '@waldur/marketplace/resources/list/ProjectFilter';
+import { ResourceAutocomplete } from '@waldur/resource/ResourceAutocomplete';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 import { Customer } from '@waldur/workspace/types';
 
@@ -64,6 +65,14 @@ const PureResourceUsageFilter: FunctionComponent<ResourceUsageFilterProps> = (
         offeringFilter={{ shared: true }}
         reactSelectProps={REACT_SELECT_TABLE_FILTER}
       />
+    </TableFilterItem>
+
+    <TableFilterItem
+      title={translate('Resource')}
+      name="resource"
+      badgeValue={(value) => value?.name}
+    >
+      <ResourceAutocomplete reactSelectProps={REACT_SELECT_TABLE_FILTER} />
     </TableFilterItem>
   </>
 );

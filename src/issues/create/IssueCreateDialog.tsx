@@ -1,11 +1,12 @@
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { IssueRequest } from 'waldur-js-client';
 
 import { IssueCreateButtonProps } from '../list/IssueCreateButton';
 import { ISSUE_IDS } from '../types/constants';
 
 import { IssueCreateForm } from './IssueCreateForm';
-import { IssueFormData, IssueRequestPayload } from './types';
+import { IssueFormData } from './types';
 import { sendIssueCreateRequest } from './utils';
 
 interface CreateIssueDialogProps {
@@ -20,7 +21,7 @@ export const IssueCreateDialog: FunctionComponent<CreateIssueDialogProps> = ({
   const onCreateIssue = async (formData: IssueFormData) => {
     const description = formData.description;
 
-    const payload: IssueRequestPayload = {
+    const payload: IssueRequest = {
       type: formData.type ? formData.type.id : ISSUE_IDS.INFORMATIONAL,
       summary: formData.summary,
       description,

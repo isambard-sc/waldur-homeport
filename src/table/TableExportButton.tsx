@@ -16,7 +16,7 @@ export const TableExportButton: FunctionComponent<TableProps> = (props) => {
       onClick={() => openExportDialog(props.table, 'clipboard', props)}
       disabled={props.rows?.length === 0}
     >
-      <span className="svg-icon svg-icon-1">
+      <span className="svg-icon svg-icon-2">
         <Export weight="bold" />
       </span>
       {translate('Export')}

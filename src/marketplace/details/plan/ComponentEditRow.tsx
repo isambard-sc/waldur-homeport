@@ -74,7 +74,7 @@ const RowWrapper2 = (
         onChange={(value) => props.input.onChange(value ? 1 : 0)}
       />
     ) : (
-      <InputGroup>
+      <InputGroup className="mw-200px">
         <Form.Control
           type="number"
           min={props.offeringComponent.min_value || 0}

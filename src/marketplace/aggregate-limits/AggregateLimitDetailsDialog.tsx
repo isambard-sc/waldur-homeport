@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceResourcesList,
+  MarketplaceResourcesListData,
+} from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -13,9 +18,8 @@ import { NON_TERMINATED_STATES } from '../resources/list/constants';
 import { PublicResourceLink } from '../resources/list/PublicResourceLink';
 
 import { AggregateLimitsExpandableRow } from './AggregateLimitsExpandableRow';
-import { getMarketplaceResources } from './api';
 
-const requiredFields = [
+const requiredFields: MarketplaceResourcesListData['query']['field'] = [
   'name',
   'current_usages',
   'limits',
@@ -35,16 +39,19 @@ export const AggregateLimitDetailsDialog = ({
   const fetchData = async (component) => {
     if (!component) return;
 
-    const filter = {
-      project_uuid: project?.uuid,
-      customer_uuid: customer?.uuid,
-      state: NON_TERMINATED_STATES,
-      field: requiredFields,
-      offering_uuid: component.offering_uuid,
-    };
-
     try {
-      const response = await getMarketplaceResources(filter);
+      const response = await getAllPages((page) =>
+        marketplaceResourcesList({
+          query: {
+            page,
+            project_uuid: project?.uuid,
+            customer_uuid: customer?.uuid,
+            state: NON_TERMINATED_STATES,
+            field: requiredFields,
+            offering_uuid: component.offering_uuid,
+          },
+        }),
+      );
       setAllRows(response || []);
     } catch (error) {
       dispatch(

@@ -5,7 +5,6 @@ import { createSelector } from 'reselect';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { PermissionRequestStateField } from '@waldur/invitations/PermissionRequestStateField';
-import { RoleField } from '@waldur/invitations/RoleField';
 import { useTitle } from '@waldur/navigation/title';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -16,6 +15,7 @@ import {
 } from '@waldur/user/constants';
 import { getUser } from '@waldur/workspace/selectors';
 
+import { RoleField } from './affiliations/RoleField';
 import { UserPermissionRequestsListFilter } from './UserPermissionRequestsListFilter';
 import { getStates } from './UserPermissionRequestsStateFilter';
 
@@ -56,7 +56,7 @@ export const UserPermissionRequestsList = () => {
     },
     {
       title: translate('Role'),
-      render: ({ row }) => <RoleField invitation={row} />,
+      render: RoleField,
     },
     {
       title: translate('Reviewed by'),

@@ -1,12 +1,16 @@
 import { EChartsOption } from 'echarts';
 import { DateTime } from 'luxon';
+import {
+  marketplaceComponentUsagesList,
+  SlurmAllocationUserUsage,
+  slurmAllocationUserUsageList,
+} from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
-import { getComponentUsages } from '@waldur/marketplace/common/api';
 import { getChartSpec, palette } from '@waldur/slurm/details/constants';
 
-import { getAllocationUserUsages } from './api';
-import { Period, Usage, UserUsage } from './types';
+import { Period, Usage } from './types';
 
 const eChartInitialOption = (): EChartsOption => ({
   color: palette,
@@ -61,8 +65,10 @@ const eChartInitialOption = (): EChartsOption => ({
   ],
 });
 
-const getDistinctUsers = (userUsages: UserUsage[]): UserUsage[] => {
-  const distinctUsers: UserUsage[] = [];
+const getDistinctUsers = (
+  userUsages: SlurmAllocationUserUsage[],
+): SlurmAllocationUserUsage[] => {
+  const distinctUsers: SlurmAllocationUserUsage[] = [];
   const map = new Map();
   for (const item of userUsages) {
     if (!map.has(item.username)) {
@@ -168,7 +174,7 @@ const filterUsagesBySixMonthsPeriod = (usages: Usage[]): Usage[] =>
 
 const fillSeriesAndLegendWithDistinctUsers = (
   option,
-  userUsages: UserUsage[],
+  userUsages: SlurmAllocationUserUsage[],
 ) => {
   const distinctUsers = getDistinctUsers(userUsages);
   distinctUsers.forEach((user) => {
@@ -182,7 +188,11 @@ const fillSeriesAndLegendWithDistinctUsers = (
   });
 };
 
-const getEChartOptions = (chart, usages: Usage[], userUsages: UserUsage[]) => {
+const getEChartOptions = (
+  chart,
+  usages: Usage[],
+  userUsages: SlurmAllocationUserUsage[],
+) => {
   const option = eChartInitialOption();
 
   // filling periods
@@ -205,7 +215,11 @@ export const loadCharts = async (
   if (!allocationUrl || !resourceUuid) {
     return;
   }
-  const componentUsages = await getComponentUsages(resourceUuid);
+  const componentUsages = await getAllPages((page) =>
+    marketplaceComponentUsagesList({
+      query: { page, resource_uuid: resourceUuid },
+    }),
+  );
   const periodUsages = {};
   componentUsages.forEach((component) => {
     const period = DateTime.fromISO(component.billing_period).toFormat(
@@ -224,9 +238,11 @@ export const loadCharts = async (
       ram_usage: periodUsages[period].ram,
     };
   });
-  const userUsages = await getAllocationUserUsages({
-    allocation: allocationUrl,
-  });
+  const userUsages = await getAllPages((page) =>
+    slurmAllocationUserUsageList({
+      query: { page, allocation: allocationUrl },
+    }),
+  );
   return getChartSpec().map((chart) => ({
     ...chart,
     options: getEChartOptions(chart, usages, userUsages),

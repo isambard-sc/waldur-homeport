@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent, useMemo } from 'react';
 import { Field } from 'redux-form';
+import { proposalPublicCallsRetrieve } from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -8,7 +9,6 @@ import { required } from '@waldur/core/validators';
 import { FormContainer, SelectField } from '@waldur/form';
 import { WizardForm, WizardFormStepProps } from '@waldur/form/WizardForm';
 import { translate } from '@waldur/i18n';
-import { getPublicCall } from '@waldur/proposals/api';
 
 export const ResourceRequestWizardFormFirstPage: FunctionComponent<
   WizardFormStepProps
@@ -20,7 +20,10 @@ export const ResourceRequestWizardFormFirstPage: FunctionComponent<
     refetch,
   } = useQuery(
     ['publicCall', props.data.call.uuid],
-    () => getPublicCall(props.data.call.uuid),
+    () =>
+      proposalPublicCallsRetrieve({
+        path: { uuid: props.data.call.uuid },
+      }).then((r) => r.data),
     {
       refetchOnWindowFocus: false,
       staleTime: 60 * 1000,

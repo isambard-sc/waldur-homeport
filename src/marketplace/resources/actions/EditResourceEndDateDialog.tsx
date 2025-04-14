@@ -3,12 +3,12 @@ import { FunctionComponent } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { compose } from 'redux';
 import { Field, reduxForm, InjectedFormProps } from 'redux-form';
+import { Resource } from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -38,7 +38,7 @@ const PureEditResourceEndDateDialog: FunctionComponent<
   const submitRequest = async (formData: FormData) => {
     try {
       await props.resolve.updateEndDate(
-        props.resolve.resource.marketplace_resource_uuid,
+        props.resolve.resource.uuid,
         formData.end_date ? formatDate(formData.end_date) : null,
       );
       dispatch(

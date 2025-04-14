@@ -1,4 +1,8 @@
 import { FunctionComponent, useMemo } from 'react';
+import {
+  MigrationDetails,
+  OpenstackMigrationsListData,
+} from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -14,7 +18,7 @@ import { MigrationExpandableRow } from './MigrationExpandableRow';
 export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackMigrationsListData['query']>(
     () => ({
       src_resource_uuid: resourceScope.marketplace_resource_uuid,
     }),
@@ -26,7 +30,7 @@ export const TenantMigrationsList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<MigrationDetails>
       {...props}
       columns={[
         {

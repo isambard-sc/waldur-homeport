@@ -1,6 +1,6 @@
 import { Fragment, ReactNode } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
 import { LanguageUtilsService } from './LanguageUtilsService';
 import { Translate } from './types';
@@ -52,7 +52,7 @@ const translateTemplate = (template) =>
   LanguageUtilsService.dictionary[template] || template;
 
 const getDomainMessage = (message) => {
-  const domain = ENV.plugins?.WALDUR_CORE?.TRANSLATION_DOMAIN;
+  const domain = ENV.plugins?.WALDUR_CORE.TRANSLATION_DOMAIN;
   if (!domain) {
     return message;
   }

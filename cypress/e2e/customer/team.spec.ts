@@ -32,7 +32,10 @@ describe('Team', () => {
       .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/', {
         fixture: 'customers/alice.json',
       })
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('GET', 'api/customer-credits/**', {
+        data: [],
+      })
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .intercept(
         'GET',
         '/api/customers/bf6d515c9e6e445f9c339021b30fc96b/users/**',
@@ -109,6 +112,7 @@ describe('Team', () => {
       .get('.modal [class*="-control"]')
       .first()
       .click(0, 0, { force: true })
+      .click()
 
       .get('.modal button')
       .contains('Save')

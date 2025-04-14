@@ -1,10 +1,10 @@
 import { useDispatch } from 'react-redux';
 import { InjectedFormProps } from 'redux-form';
+import { marketplaceResourcesUpdateLimits } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import * as api from '@waldur/marketplace/common/api';
 import { Limits } from '@waldur/marketplace/common/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
@@ -24,10 +24,12 @@ export const DialogBody = connector((props: DialogBodyProps) => {
   const dispatch = useDispatch();
   const submitRequest = async (formData) => {
     try {
-      await api.changeLimits(
-        props.asyncState.value.resource.uuid,
-        props.asyncState.value.limitSerializer(formData.limits),
-      );
+      await marketplaceResourcesUpdateLimits({
+        path: { uuid: props.asyncState.value.resource.uuid },
+        body: {
+          limits: props.asyncState.value.limitSerializer(formData.limits),
+        },
+      });
       dispatch(
         showSuccess(
           translate('Resource limits change request has been submitted.'),

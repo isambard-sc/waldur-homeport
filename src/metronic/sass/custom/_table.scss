@@ -14,38 +14,38 @@
   }
 
   thead > tr {
-    background-color: if(isDarkMode(), $primary-50, $gray-50);
+    background-color: $gray-50;
 
     > th {
       font-size: 12px;
-      color: $grey-500;
+      color: $gray-500;
       font-weight: 500;
       white-space: nowrap;
 
       svg {
-        color: $grey-400;
+        color: $gray-400;
       }
       &.sorting-column .sorting-buttons > button {
         &:hover svg {
-          color: $grey-500;
+          color: $gray-500;
         }
         &.active svg {
-          color: $primary;
+          color: $brand;
         }
       }
       &.filter-column > button {
         &:hover svg {
-          color: $grey-500;
+          color: $gray-500;
         }
         &.show svg {
-          color: $primary;
+          color: $brand;
         }
       }
     }
   }
 
   tbody > tr > td {
-    color: $grey-500;
+    color: $gray-500;
   }
 
   &:not(.px-0) {
@@ -63,12 +63,20 @@
   &.table-expandable tr {
     &.expanded,
     &.expanded + tr {
-      background-color: if(isDarkMode(), $primary-50, $gray-50);
+      background-color: $gray-50;
     }
     &.expanded + tr {
       > td {
         padding-top: 16px;
         padding-bottom: 16px;
+      }
+      .table-pagination {
+        padding-top: 0.5rem;
+      }
+
+      .search-no-result,
+      .search-error {
+        margin-top: -1rem !important;
       }
     }
   }
@@ -89,6 +97,10 @@
         .btn {
           white-space: nowrap;
         }
+      }
+
+      .dropdown-toggle:before {
+        display: none;
       }
     }
 
@@ -126,13 +138,13 @@
         border-radius: 5px;
 
         svg {
-          color: $grey-400;
+          color: $gray-400;
         }
         &:hover {
           background: $light;
 
           svg {
-            color: $grey-500;
+            color: $gray-500;
           }
         }
       }
@@ -150,6 +162,32 @@
 
     &:hover > td.has-filter button.inline-filter {
       opacity: 1;
+    }
+  }
+
+  // Pinned columns + Shadow
+  th.pinned,
+  td.pinned {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background-color: if(isDarkMode(), $brand-50, $gray-50);
+  }
+  td.pinned {
+    background-color: $card-bg;
+  }
+  th.is-floating,
+  td.is-floating {
+    &.pinned::before {
+      content: ' ';
+      position: absolute;
+      left: 0;
+      top: 0;
+      display: block;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(-90deg, rgba(0, 0, 0, 0.1), transparent);
+      margin-left: -5px;
     }
   }
 }
@@ -190,6 +228,14 @@
 
 /* TABLE IN CARD */
 .card.card-table {
+  &:not(.grid-table) .card-body {
+    padding-top: 0;
+  }
+
+  table {
+    margin-bottom: 0;
+  }
+
   &:not(.card-bordered) {
     border: unset;
   }
@@ -260,16 +306,19 @@
     }
   }
 
-  .search-no-result,
-  .search-error {
-    margin-top: -2rem;
-  }
-
+  // Full width for nested tables
+  .table.table-expandable tr.expanded + tr,
   /* TABLE FULL IN CARD */
   &.full-width {
     .table-filter {
       padding-left: 0;
       padding-right: 0;
+    }
+
+    &:not(.grid-table) .card-header {
+      margin: 0;
+      padding-left: $card-px;
+      padding-right: $card-px;
     }
 
     &:not(.grid-table) .card-body {
@@ -300,28 +349,34 @@
     }
 
     .table-pagination {
-      padding: 0 $card-px !important;
+      padding-left: $card-px !important;
+      padding-right: $card-px !important;
+    }
+  }
 
-      .page-item {
-        .page-link {
-          color: $grey-500;
-          width: 40px;
-          height: 40px;
-        }
-        .page-link:focus,
-        .page-link:hover,
-        &.active .page-link {
-          color: $primary;
-          background-color: $primary-50;
-        }
+  .table-pagination {
+    padding-top: $card-py;
+    border-top: 1px solid $border-color;
+
+    .page-item {
+      .page-link {
+        color: $gray-500;
+        width: 40px;
+        height: 40px;
       }
+      .page-link:focus,
+      .page-link:hover,
+      &.active .page-link {
+        color: if(isDarkMode(), $brand-600, $brand);
+        background-color: if(isDarkMode(), $brand-50, $brand-100);
+      }
+    }
 
-      .form-select {
-        color: $dark;
+    .form-select {
+      color: $dark;
 
-        option {
-          background-color: $body-bg;
-        }
+      option {
+        background-color: $body-bg;
       }
     }
   }
@@ -332,26 +387,12 @@
     }
     tr.checked,
     tr.checked:hover {
-      background-color: $primary !important;
+      background-color: $gray-50 !important;
 
       > * {
-        color: $dark-inverse !important;
         border: unset;
-        --bs-table-accent-bg: $primary;
+        --bs-table-accent-bg: $gray-50;
       }
-    }
-
-    .form-check .form-check-input[type='checkbox']:checked {
-      background-image: escape-svg(
-        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 11' width='13' height='11' fill='none'><path d='M11.0426 1.02893C11.3258 0.695792 11.8254 0.655283 12.1585 0.938451C12.4917 1.22162 12.5322 1.72124 12.249 2.05437L5.51985 9.97104C5.23224 10.3094 4.72261 10.3451 4.3907 10.05L0.828197 6.88335C0.50141 6.59288 0.471975 6.09249 0.762452 5.7657C1.05293 5.43891 1.55332 5.40948 1.88011 5.69995L4.83765 8.32889L11.0426 1.02893Z' fill='#{$primary}'/></svg>")
-      );
-      background-color: $dark-inverse;
-    }
-    .form-check .form-check-input[type='radio']:checked {
-      background-image: escape-svg(
-        url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$primary}'/></svg>")
-      );
-      background-color: $dark-inverse;
     }
   }
 }
@@ -457,6 +498,29 @@ $mobile-spacing: get($content-spacing, tablet-and-mobile);
     td:last-child,
     th:last-child {
       padding-right: $mobile-spacing !important;
+    }
+  }
+}
+
+// Dark mode
+@if (isDarkMode()) {
+  // No result background
+  .search-no-result,
+  .search-error {
+    .search-icon,
+    .error-icon {
+      border: 1px solid $gray-200 !important;
+    }
+  }
+
+  // Another table inside expanded view
+  .table.table-expandable tr {
+    .expandable-container .card-table {
+      border-color: $gray-200 !important;
+
+      .card-header {
+        border-color: $gray-200 !important;
+      }
     }
   }
 }

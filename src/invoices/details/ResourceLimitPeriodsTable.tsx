@@ -1,14 +1,22 @@
+import { BillingUnit, ResourceLimitPeriod } from 'waldur-js-client';
+
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 
-const getBillingPeriodTitle = (unit: string) =>
+const getBillingPeriodTitle = (unit: BillingUnit) =>
   ({
     day: translate('Days'),
     hour: translate('Hours'),
     month: translate('Months'),
   })[unit] || translate('Billing periods');
 
-export const ResourceLimitPeriodsTable = ({ periods, unit }) => (
+export const ResourceLimitPeriodsTable = ({
+  periods,
+  unit,
+}: {
+  periods: ResourceLimitPeriod[];
+  unit: BillingUnit;
+}) => (
   <small>
     {periods.map((period, index) => (
       <div key={index}>

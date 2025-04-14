@@ -5,14 +5,16 @@ import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useEffectOnce } from 'react-use';
 import { Field } from 'redux-form';
+import {
+  marketplacePublicOfferingsList,
+  PublicOfferingDetails,
+} from 'waldur-js-client';
 
-import { fixURL } from '@waldur/core/api';
+import { parseNextPage } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
-import { Offering } from '@waldur/marketplace/types';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
-import { parseResponse } from '@waldur/table/api';
 import { getProject } from '@waldur/workspace/selectors';
 
 import { FormStepProps } from '../types';
@@ -22,7 +24,7 @@ import { BoxRadioField } from './BoxRadioField';
 import { StepCardTabs, TabSpec } from './StepCardTabs';
 
 interface DataPage {
-  data: Offering[];
+  data: PublicOfferingDetails[];
   nextPage?: number;
 }
 
@@ -30,19 +32,18 @@ const loadData: QueryFunction<DataPage> = async (context) => {
   if (!context.meta.project_uuid) {
     return { data: [], nextPage: null };
   }
-  const response = await parseResponse(
-    fixURL('/marketplace-public-offerings/'),
-    {
+  const result = await marketplacePublicOfferingsList({
+    query: {
       page: context.pageParam,
       page_size: 5,
-      project_uuid: context.meta.project_uuid,
-      type: context.meta.type,
+      project_uuid: context.meta.project_uuid as string,
+      type: [context.meta.type as string],
     },
-    { signal: context.signal },
-  );
+    signal: context.signal,
+  });
   return {
-    data: response.rows,
-    nextPage: response.nextPage,
+    data: result.data,
+    nextPage: parseNextPage(result),
   };
 };
 
@@ -154,11 +155,9 @@ export const FormCloudStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={props.title || translate('Cloud')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
       actions={
         showExperimentalUiComponents ? (
           <div className="d-flex justify-content-between flex-grow-1 align-items-center">
@@ -168,7 +167,7 @@ export const FormCloudStep = (props: FormStepProps) => {
             <div className="d-flex gap-10 justify-content-end">
               <Button variant="light" className="text-nowrap" size="sm">
                 <span className="svg-icon svg-icon-2">
-                  <Plus />
+                  <Plus weight="bold" />
                 </span>
                 {translate('New cloud')}
               </Button>

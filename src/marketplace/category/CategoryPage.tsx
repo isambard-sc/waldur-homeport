@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
+import { marketplaceCategoriesRetrieve } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { getCategory } from '@waldur/marketplace/common/api';
 import {
   useExtraToolbar,
   useFullPage,
@@ -26,8 +26,11 @@ export const CategoryPage: FunctionComponent = () => {
     params: { category_uuid },
   } = useCurrentStateAndParams();
   const category = useQuery({
-    queryKey: ['CategoryPage', category_uuid],
-    queryFn: () => getCategory(category_uuid),
+    queryKey: ['CategoryData', category_uuid],
+    queryFn: () =>
+      marketplaceCategoriesRetrieve({ path: { uuid: category_uuid } }).then(
+        (response) => response.data,
+      ),
   });
 
   useFullPage();

@@ -6,6 +6,10 @@
     "description": "High Performance Computing",
     "icon": "/media/marketplace_category_icons/hpc.svg",
     "offering_count": 3,
+    "group": null,
+    "default_tenant_category": false,
+    "default_vm_category": false,
+    "default_volume_category": false,
     "sections": [
       {
         "key": "hpc_Security",

@@ -1,14 +1,15 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { RoleModifyRequest, rolesUpdate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n/translate';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-import { editRole, getRoles } from './api';
+import { getRoles } from './utils';
 
 const RoleEditDialog = lazyComponent(() =>
   import('./RoleEditDialog').then((module) => ({
@@ -25,14 +26,11 @@ export const RoleEditButton = ({ row, refetch }) => {
           resolve: {
             row,
           },
-          onSubmit: async (formData) => {
-            await editRole(row.uuid, formData);
+          submitFn: async (formData: RoleModifyRequest) => {
+            await rolesUpdate({ path: { uuid: row.uuid }, body: formData });
             ENV.roles = await getRoles();
             dispatch(closeModalDialog());
             refetch();
-          },
-          onCancel: () => {
-            dispatch(closeModalDialog());
           },
         }),
       ),
@@ -42,7 +40,7 @@ export const RoleEditButton = ({ row, refetch }) => {
   return (
     <ActionItem
       title={translate('Edit role')}
-      iconNode={<PencilSimple />}
+      iconNode={<PencilSimple weight="bold" />}
       action={openRoleEditDialog}
     />
   );

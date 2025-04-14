@@ -1,20 +1,24 @@
 import { FunctionComponent } from 'react';
-import { Card } from 'react-bootstrap';
 
-import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
 import { UserPermissionRequestsList } from '@waldur/invitations/UserPermissionRequestsList';
+import { Field } from '@waldur/resource/summary';
+import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+
+import { getGroupInvitationLink } from './utils';
 
 export const GroupInvitationsListExpandableRow: FunctionComponent<{
   row;
 }> = ({ row }) => (
-  <Card.Body>
-    <p>
-      <b>{translate('Invitation link')}: </b>
-      <CopyToClipboardContainer
-        value={`${location.origin}/user-group-invitation/${row.uuid}/`}
-      />
-    </p>
+  <ExpandableContainer>
+    <Field
+      label={translate('Invitation link')}
+      value={getGroupInvitationLink(row)}
+      hasCopy
+      isStuck
+      labelClass="min-w-150px fw-bolder"
+      space={5}
+    />
     <UserPermissionRequestsList groupInvitationUuid={row.uuid} />
-  </Card.Body>
+  </ExpandableContainer>
 );

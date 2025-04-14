@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { BroadcastMessage } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
@@ -10,7 +11,6 @@ import { useTable } from '@waldur/table/useTable';
 import { BroadcastCreateButton } from './BroadcastCreateButton';
 import { BroadcastExpandableRow } from './BroadcastExpandableRow';
 import { BroadcastsRowActions } from './BroadcastsRowActions';
-import { BroadcastResponseData } from './types';
 
 const mandatoryFields = [
   'uuid',
@@ -31,26 +31,22 @@ export const BroadcastList: FunctionComponent<{}> = () => {
     mandatoryFields,
   });
   return (
-    <Table
+    <Table<BroadcastMessage>
       {...props}
       columns={[
         {
           title: translate('Author'),
-          render: ({ row }: { row: BroadcastResponseData }) => (
-            <>{row.author_full_name}</>
-          ),
+          render: ({ row }) => <>{row.author_full_name}</>,
           orderField: 'author_full_name',
         },
         {
           title: translate('Subject'),
-          render: ({ row }: { row: BroadcastResponseData }) => (
-            <>{row.subject}</>
-          ),
+          render: ({ row }) => <>{row.subject}</>,
           orderField: 'subject',
         },
         {
           title: translate('State'),
-          render: ({ row }: { row: BroadcastResponseData }) => (
+          render: ({ row }) => (
             <StateIndicator
               label={row.state}
               variant={

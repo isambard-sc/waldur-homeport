@@ -1,9 +1,9 @@
 import { Button } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
+import { featureValues } from 'waldur-js-client';
 
 import { TelemetryExampleButton } from '@waldur/administration/TelemetryExampleButton';
-import { ENV } from '@waldur/configs/default';
-import { post } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { FeaturesDescription } from '@waldur/features/FeaturesDescription';
 import { TelemetryFeatures } from '@waldur/FeaturesEnums';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
@@ -11,29 +11,31 @@ import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { useNotify } from '@waldur/store/hooks';
 
-const saveFeatures = (payload) => post('/feature-values/', payload);
-
 const FeatureSection = ({ section }) => (
   <FormTable.Card title={section.description} className="card-bordered mb-5">
     <FormTable>
       {section.items.map((item) => (
-        <tr key={item.key}>
-          <td>
-            {item.description}
-            {`${section.key}.${item.key}` === TelemetryFeatures.send_metrics ? (
-              <div>
-                <TelemetryExampleButton />
-              </div>
-            ) : null}
-          </td>
-          <td className="col-md-1">
+        <FormTable.Item
+          key={item.key}
+          description={
+            <>
+              {item.description}
+              {`${section.key}.${item.key}` ===
+              TelemetryFeatures.send_metrics ? (
+                <div>
+                  <TelemetryExampleButton />
+                </div>
+              ) : null}
+            </>
+          }
+          actions={
             <Field
               name={`${section.key}.${item.key}`}
               component={AwesomeCheckboxField as any}
               data-testid={`${section.key}.${item.key}`}
             />
-          </td>
-        </tr>
+          }
+        />
       ))}
     </FormTable>
   </FormTable.Card>
@@ -44,7 +46,7 @@ export const FeaturesList = () => {
 
   const saveFeaturesCallback = async (formData) => {
     try {
-      await saveFeatures(formData);
+      await featureValues({ body: formData });
       showSuccess(translate('Features have been updated.'));
       location.reload();
     } catch (e) {

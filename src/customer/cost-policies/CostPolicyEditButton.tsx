@@ -1,14 +1,18 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceCustomerEstimatedCostPoliciesUpdate,
+  marketplaceProjectEstimatedCostPoliciesUpdate,
+} from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
-import { Customer, Project } from '@waldur/workspace/types';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
+import { Customer } from '@waldur/workspace/types';
 
-import { updateOrganizationCostPolicy, updateProjectCostPolicy } from './api';
 import { CostPolicyFormData, CostPolicyType, PolicyPeriod } from './types';
 import { getCostPolicyActionOptions } from './utils';
 
@@ -48,9 +52,15 @@ const submit = (
       options,
     };
     if (type === 'project') {
-      return updateProjectCostPolicy(uuid, data);
+      return marketplaceProjectEstimatedCostPoliciesUpdate({
+        path: { uuid },
+        body: data,
+      });
     }
-    return updateOrganizationCostPolicy(uuid, data);
+    return marketplaceCustomerEstimatedCostPoliciesUpdate({
+      path: { uuid },
+      body: data,
+    });
   });
   return Promise.all(promises);
 };
@@ -73,7 +83,7 @@ export const CostPolicyEditButton = ({
         openModalDialog(CostPolicyFormDialog, {
           size: 'lg',
           formId: 'CostPolicyEditForm',
-          onSubmit: (formData) => {
+          submitFn: (formData) => {
             return submit(row.uuid, formData, type).then(() => {
               dispatch(closeModalDialog());
               refetch();
@@ -110,11 +120,10 @@ export const CostPolicyEditButton = ({
   );
 
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Edit')}
       action={openCostPolicyEditDialog}
-      iconNode={<PencilSimple />}
-      size="sm"
+      iconNode={<PencilSimple weight="bold" />}
     />
   );
 };

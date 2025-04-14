@@ -1,12 +1,12 @@
 import React from 'react';
 import { Field, Form } from 'react-final-form';
 import { useAsync } from 'react-use';
+import { marketplaceResourcesSwitchPlan } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SubmitButton } from '@waldur/form';
 import { ChoicesTable } from '@waldur/form/ChoicesTable';
 import { translate } from '@waldur/i18n';
-import { switchPlan } from '@waldur/marketplace/common/api';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { useModal } from '@waldur/modal/hooks';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -38,7 +38,10 @@ const ChangePlanComponent = (props: FetchedData & { refetch? }) => {
 
   const handleSwitchPlan = async (data) => {
     try {
-      await switchPlan(props.resource.uuid, data.plan.url);
+      await marketplaceResourcesSwitchPlan({
+        path: { uuid: props.resource.uuid },
+        body: { plan: data.plan.url },
+      });
       showSuccess(
         translate('Resource plan change request has been submitted.'),
       );

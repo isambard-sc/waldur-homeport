@@ -1,11 +1,10 @@
 import Markdown from 'markdown-to-jsx';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
-
-import { BroadcastResponseData } from './types';
+import { BroadcastMessage } from 'waldur-js-client';
 
 export const BroadcastTemplateExpandableRow: FunctionComponent<{
-  row: BroadcastResponseData;
+  row: BroadcastMessage;
 }> = ({ row }) => (
   <Row>
     <Col sm={8}>

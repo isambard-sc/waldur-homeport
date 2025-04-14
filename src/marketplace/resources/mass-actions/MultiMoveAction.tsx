@@ -31,7 +31,7 @@ export const MultiMoveAction = ({ rows, refetch }) => {
     <ActionItem
       title={translate('Move')}
       action={callback}
-      iconNode={<ArrowsOutCardinal />}
+      iconNode={<ArrowsOutCardinal weight="bold" />}
     />
   ) : null;
 };

@@ -10,6 +10,10 @@ import {
 import { FC, ReactNode } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import { useAsync } from 'react-use';
+import {
+  marketplaceServiceProvidersStatRetrieve,
+  ServiceProviderStatistics,
+} from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -17,10 +21,8 @@ import { translate } from '@waldur/i18n';
 import { getStates as getResourceStates } from '@waldur/marketplace/resources/list/ResourceStateFilter';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 
-import { getServiceProviderStatistics } from './api';
 import { ChangesAmountBadge } from './ChangesAmountBadge';
 import IconPendingApproval from './icons/pending-approval.svg';
-import { ProviderStatistics } from './types';
 
 interface ProviderWidget {
   icon?: any;
@@ -32,7 +34,7 @@ interface ProviderWidget {
   to: { state; params? };
 }
 
-const generateWidgetsData = (statistics: ProviderStatistics) => [
+const generateWidgetsData = (statistics: ServiceProviderStatistics) => [
   {
     iconNode: <SealPercent size={40} />,
     value: statistics.active_campaigns,
@@ -154,20 +156,22 @@ const WidgetItem: FC<{ item: ProviderWidget }> = ({ item }) => (
 export const ProviderWidgets = ({ provider }) => {
   const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
 
-  const { loading, error, value } = useAsync(() => {
-    return getServiceProviderStatistics(provider.uuid).then((res) => {
-      const widgets = generateWidgetsData(res.data);
-      if (!showExperimentalUiComponents) {
-        return widgets.filter(
-          (widget) =>
-            !['Open support tickets', 'Active notifications'].includes(
-              widget.title,
-            ),
-        );
-      }
-      return widgets;
-    });
-  }, [provider, showExperimentalUiComponents]);
+  const { loading, error, value } = useAsync(
+    () =>
+      marketplaceServiceProvidersStatRetrieve(provider.uuid).then((res) => {
+        const widgets = generateWidgetsData(res.data);
+        if (!showExperimentalUiComponents) {
+          return widgets.filter(
+            (widget) =>
+              !['Open support tickets', 'Active notifications'].includes(
+                widget.title,
+              ),
+          );
+        }
+        return widgets;
+      }),
+    [provider, showExperimentalUiComponents],
+  );
 
   return (
     <Row>

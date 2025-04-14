@@ -23,6 +23,6 @@ export const ExtendAction: ActionItemType = ({ resource, refetch }) => (
     validators={validators}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<ArrowsOut />}
+    iconNode={<ArrowsOut weight="bold" />}
   />
 );

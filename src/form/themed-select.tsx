@@ -1,4 +1,5 @@
 import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import classNames from 'classnames';
 import { uniqueId } from 'lodash-es';
 import { FC } from 'react';
 import { OverlayTrigger, Popover } from 'react-bootstrap';
@@ -10,8 +11,10 @@ import BaseSelect, {
   Props as SelectProps,
   ThemeConfig,
 } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import { AsyncPaginate as BaseAsyncPaginate } from 'react-select-async-paginate';
 import BaseWindowedSelect from 'react-windowed-select';
+import { BaseFieldProps } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import CheckboxIcon from '@waldur/table/Checkbox.svg';
@@ -42,7 +45,7 @@ export const FilterSelectClearIndicator = (props: ClearIndicatorProps) => {
       <div
         style={{ padding: '0px 5px', marginRight: '7px', cursor: 'pointer' }}
       >
-        <X size={20} weight="bold" className="text-grey-500" />
+        <X size={20} weight="bold" className="text-gray-500" />
       </div>
     </div>
   );
@@ -51,7 +54,7 @@ export const FilterSelectClearIndicator = (props: ClearIndicatorProps) => {
 export const FilterSelectControl = ({ children, ...props }: ControlProps) => (
   <components.Control {...props}>
     {!(props.hasValue && props.selectProps.components.SingleValue) && (
-      <MagnifyingGlass size={20} weight="bold" className="text-grey-500 ms-3" />
+      <MagnifyingGlass size={20} weight="bold" className="text-gray-500 ms-3" />
     )}
     {children}
   </components.Control>
@@ -118,6 +121,7 @@ const MultiSelectLimitedValueContainer = (props) => {
 export const REACT_SELECT_TABLE_FILTER: Partial<SelectProps> = {
   className: 'metronic-select-container',
   classNamePrefix: 'metronic-select',
+  autoFocus: true,
   menuIsOpen: true,
   components: {
     Control: FilterSelectControl,
@@ -155,7 +159,7 @@ const REACT_MULTI_SELECT: Partial<SelectProps> = {
 };
 
 const DARK_COLORS = {
-  neutral0: '#1A261D',
+  neutral0: '#0c111d',
   neutral10: '#4C6351',
   neutral20: '#4C6351',
   neutral30: '#4C6351',
@@ -181,18 +185,46 @@ const useSelectTheme = (): ThemeConfig => {
   };
 };
 
-export const Select = ({ components = undefined, ...props }) => {
+type CustomSelectProps = {
+  size?: 'sm';
+  creatable?: boolean;
+} & SelectProps<any> &
+  Partial<Omit<BaseFieldProps, 'onChange'>>;
+
+export const Select: FC<CustomSelectProps> = ({
+  components = undefined,
+  size = undefined,
+  creatable = false,
+  ...props
+}) => {
   const theme = useSelectTheme();
   const composedComponents = props.isMulti
     ? { ...REACT_MULTI_SELECT.components, ...components }
     : components;
-  return (
+  const className = classNames(
+    'metronic-select-container',
+    size === 'sm' && 'select-sm',
+    props.className,
+  );
+  return !creatable ? (
     <BaseSelect
       theme={theme}
       placeholder={translate('Select') + '...'}
       {...(props.isMulti ? REACT_MULTI_SELECT : REACT_SELECT_MENU_PORTALING)}
       components={composedComponents}
       {...props}
+      className={className}
+      classNamePrefix="metronic-select"
+    />
+  ) : (
+    <CreatableSelect
+      theme={theme}
+      placeholder={translate('Select or type to add a new option') + '...'}
+      {...(props.isMulti ? REACT_MULTI_SELECT : REACT_SELECT_MENU_PORTALING)}
+      components={composedComponents}
+      {...props}
+      className={className}
+      classNamePrefix="metronic-select"
     />
   );
 };

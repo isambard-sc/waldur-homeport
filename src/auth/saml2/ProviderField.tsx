@@ -1,9 +1,31 @@
 import { createFilter } from 'react-select';
 import { Field } from 'redux-form';
+import { apiAuthSaml2ProvidersList } from 'waldur-js-client';
 
-import * as api from '@waldur/auth/saml2/api';
+import { parseSelectData } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
+import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
+
+const getSaml2IdentityProviders = async (
+  name: string,
+  prevOptions,
+  currentPage: number,
+) => {
+  const response = await apiAuthSaml2ProvidersList({
+    query: {
+      name,
+      page: currentPage,
+      page_size: ENV.pageSize,
+    },
+  });
+  return returnReactSelectAsyncPaginateObject(
+    parseSelectData(response),
+    prevOptions,
+    currentPage,
+  );
+};
 
 export const ProviderField = () => (
   <Field
@@ -11,7 +33,7 @@ export const ProviderField = () => (
     component={(fieldProps) => (
       <AsyncPaginate
         loadOptions={(query, prevOptions, { page }) =>
-          api.getSaml2IdentityProviders(query, prevOptions, page)
+          getSaml2IdentityProviders(query, prevOptions, page)
         }
         placeholder={translate('Select organization...')}
         noOptionsMessage={() => translate('No results found')}

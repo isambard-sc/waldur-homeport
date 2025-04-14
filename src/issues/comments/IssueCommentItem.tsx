@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { formatMediumDateTime, formatRelative } from '@waldur/core/dateUtils';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { FormattedJira } from '@waldur/core/FormattedJira';

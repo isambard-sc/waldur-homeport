@@ -1,6 +1,6 @@
 import { Play } from '@phosphor-icons/react';
+import { azureVirtualmachinesStart } from 'waldur-js-client';
 
-import { startVirtualMachine } from '@waldur/azure/api';
 import { translate } from '@waldur/i18n';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
 import {
@@ -16,8 +16,8 @@ export const StartAction: ActionItemType = ({ resource, refetch }) => (
     title={translate('Start')}
     resource={resource}
     validators={validators}
-    apiMethod={startVirtualMachine}
+    apiMethod={(id) => azureVirtualmachinesStart({ path: { uuid: id } })}
     refetch={refetch}
-    iconNode={<Play />}
+    iconNode={<Play weight="bold" />}
   />
 );

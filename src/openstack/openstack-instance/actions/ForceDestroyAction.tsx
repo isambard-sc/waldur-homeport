@@ -1,8 +1,8 @@
 import { X } from '@phosphor-icons/react';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { OpenStackInstance } from '@waldur/openstack/openstack-instance/types';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
 import { ActionContext, ActionItemType } from '@waldur/resource/actions/types';
 
@@ -13,7 +13,7 @@ const ForceDestroyDialog = lazyComponent(() =>
 );
 
 function validate(ctx: ActionContext<OpenStackInstance>): string {
-  if (ctx.resource.state === 'Erred') {
+  if (ctx.resource.state === 'ERRED') {
     return;
   }
   if (ctx.resource.state === 'OK') {
@@ -32,7 +32,7 @@ export const ForceDestroyAction: ActionItemType = ({ resource, refetch }) => (
     className="text-danger"
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<X />}
+    iconNode={<X weight="bold" />}
     iconColor="danger"
   />
 );

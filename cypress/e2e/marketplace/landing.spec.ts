@@ -8,16 +8,16 @@ xdescribe('Marketplace landing view', () => {
       .intercept('GET', '/api/customers/**/counters/', {
         fixture: 'marketplace/counters.json',
       })
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'marketplace/anderson_and_sons.json',
       })
       .intercept('GET', '/api/marketplace-public-offerings/', {
         fixture: 'marketplace/offerings.json',
       })
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .visit('/organizations/10a05c2fcab44588a7aa2e16809504cf/marketplace/')
       .waitForSpinner();
   });

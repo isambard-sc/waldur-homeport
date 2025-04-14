@@ -43,9 +43,28 @@ const FieldsListGroup = ({
     }
   };
 
-  const removeRow = (index) => {
-    fields.length > 1 && fields.remove(index);
-    refreshPageOnRemove();
+  const removeRow = (index: number) => {
+    if (fields.length > 1) {
+      const currentPageItems = fields.value.slice(
+        (page - 1) * pageSize,
+        page * pageSize,
+      );
+      fields.remove(index);
+
+      const newLength = fields.length - 1;
+
+      const lastPage = Math.ceil(newLength / pageSize);
+      const isLastItemOnPage = currentPageItems.length === 1;
+
+      if (isLastItemOnPage && page > 1 && page === lastPage) {
+        setPage(page - 1);
+      }
+
+      const actualIndex = (page - 1) * pageSize + index;
+      if (actualIndex < fields.value.length) {
+        refreshPageOnRemove();
+      }
+    }
   };
 
   return (
@@ -60,14 +79,15 @@ const FieldsListGroup = ({
             </tr>
           </thead>
           <tbody>
-            {visibleItems.map((component, i) =>
-              component ? (
-                <Fragment key={component}>
+            {visibleItems.map((component, i) => {
+              const actualIndex = (page - 1) * pageSize + i;
+              return component ? (
+                <Fragment key={`${page}-${i}-${fields.length}`}>
                   <tr>
                     <td>
                       <Field
                         component={SelectField}
-                        name={`${component}.remote_category`}
+                        name={`${fields.name}[${actualIndex}].remote_category`}
                         options={remoteCategories}
                         getOptionValue={(option) => option.uuid}
                         getOptionLabel={(option) => option.title}
@@ -76,7 +96,7 @@ const FieldsListGroup = ({
                     </td>
                     <td>
                       <Field
-                        name={`${component}.local_category`}
+                        name={`${fields.name}[${actualIndex}].local_category`}
                         validate={required}
                       >
                         {(fieldProps) => (
@@ -100,7 +120,7 @@ const FieldsListGroup = ({
                       <Button
                         variant="active-light-danger"
                         className="btn-icon btn-icon-danger"
-                        onClick={() => removeRow(i)}
+                        onClick={() => removeRow(actualIndex)}
                         disabled={fields.length < 2}
                       >
                         <span className="svg-icon svg-icon-1">
@@ -110,8 +130,8 @@ const FieldsListGroup = ({
                     </td>
                   </tr>
                 </Fragment>
-              ) : null,
-            )}
+              ) : null;
+            })}
           </tbody>
         </table>
       </Form.Group>

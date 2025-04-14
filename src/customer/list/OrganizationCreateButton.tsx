@@ -28,7 +28,7 @@ export const OrganizationCreateButton: FunctionComponent = () => {
     <ActionButton
       title={translate('Add')}
       action={handleClick}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   ) : null;

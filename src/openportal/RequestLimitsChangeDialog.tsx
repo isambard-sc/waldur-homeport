@@ -1,12 +1,12 @@
 import { useEffect, FunctionComponent } from 'react';
-import { Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { openIssueCreateDialog } from '@waldur/issues/create/actions';
 import { ISSUE_IDS } from '@waldur/issues/types/constants';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 export const RequestLimitsChangeDialog: FunctionComponent<{
   resolve: { resource };
@@ -37,30 +37,23 @@ export const RequestLimitsChangeDialog: FunctionComponent<{
     }
   });
   return (
-    <>
-      <Modal.Header>
-        <Modal.Title>
-          {translate('Change of limits of OpenPortal allocation {name}', {
-            name: resource.name,
-          })}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          {translate(
-            'To change allocation limits, please send a request to {supportEmail}.',
-            { supportEmail: ENV.plugins.WALDUR_CORE.SITE_EMAIL },
-          )}
-        </p>
-        <p>
-          {translate(
-            'Please note that request should specify allocation name and provide a reason for change.',
-          )}
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <CloseDialogButton label={translate('Ok')} />
-      </Modal.Footer>
-    </>
+    <ModalDialog
+      title={translate('Change of limits of OpenPortal allocation {name}', {
+        name: resource.name,
+      })}
+      footer={<CloseDialogButton label={translate('Ok')} />}
+    >
+      <p>
+        {translate(
+          'To change allocation limits, please send a request to {supportEmail}.',
+          { supportEmail: ENV.plugins.WALDUR_CORE.SITE_EMAIL },
+        )}
+      </p>
+      <p>
+        {translate(
+          'Please note that request should specify allocation name and provide a reason for change.',
+        )}
+      </p>
+    </ModalDialog>
   );
 };

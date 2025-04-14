@@ -1,8 +1,15 @@
-.filter-column > button {
+.th-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.filter-column > button,
+.filter-column > .th-wrapper > button {
   margin-left: 4px;
 }
 
-.sorting-column > span {
+.sorting-column > span,
+.sorting-column > .th-wrapper > span {
   vertical-align: middle;
 
   .sorting-buttons {

@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
+import { Customer, Project } from 'waldur-js-client';
 
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -20,14 +21,15 @@ interface ResourcesAllListTableProps extends TableProps {
   hasProjectColumn?: boolean;
   hasCustomerColumn?: boolean;
   context?: 'organization' | 'project';
+  customer?: Customer;
+  project?: Project;
 }
 
 const AddResourceButton = ({
   context,
-}: Pick<ResourcesAllListTableProps, 'context'>) => {
-  const customer = useSelector(getCustomer);
-  const project = useSelector(getProject);
-
+  customer,
+  project,
+}: Pick<ResourcesAllListTableProps, 'context' | 'customer' | 'project'>) => {
   return (
     <CreateResourceButton
       organization={context ? customer : undefined}
@@ -39,6 +41,8 @@ const AddResourceButton = ({
 export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
   props,
 ) => {
+  const customer = useSelector(getCustomer);
+  const project = useSelector(getProject);
   return (
     <Table
       {...props}
@@ -46,6 +50,8 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
         <ProjectResourcesAllFilter
           hasProjectFilter={props.hasProjectColumn}
           hasCustomerFilter={props.hasCustomerColumn}
+          customer={customer}
+          project={project}
         />
       }
       columns={getResourceAllListColumns(
@@ -70,7 +76,11 @@ export const ResourcesAllListTable: FC<ResourcesAllListTableProps> = (
           {isFeatureVisible(MarketplaceFeatures.import_resources) && (
             <ResourceImportButton />
           )}
-          <AddResourceButton context={props.context} />
+          <AddResourceButton
+            context={props.context}
+            customer={customer}
+            project={project}
+          />
         </>
       }
     />

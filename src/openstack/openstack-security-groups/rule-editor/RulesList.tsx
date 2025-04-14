@@ -1,10 +1,9 @@
 import { FC } from 'react';
 import { Table } from 'react-bootstrap';
 import { FormName, FormSection, WrappedFieldArrayProps } from 'redux-form';
+import { OpenStackSecurityGroup } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-
-import { SecurityGroup } from '../types';
 
 import { RuleAddButton } from './RuleAddButton';
 import { RuleRow } from './RuleRow';
@@ -19,7 +18,7 @@ const RulesPlaceholder: FC = () => (
 );
 
 interface RulesListProps extends WrappedFieldArrayProps {
-  remoteSecurityGroups: SecurityGroup[];
+  remoteSecurityGroups: OpenStackSecurityGroup[];
 }
 
 export const RulesList: FC<RulesListProps> = ({

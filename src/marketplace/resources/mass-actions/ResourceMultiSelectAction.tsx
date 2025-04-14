@@ -1,9 +1,8 @@
 import { DropdownButton, DropdownDivider } from 'react-bootstrap';
+import { Resource } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { useUser } from '@waldur/workspace/hooks';
-
-import { Resource } from '../types';
 
 import { MultiDestroyAction } from './MultiDestroyAction';
 import { MultiMoveAction } from './MultiMoveAction';

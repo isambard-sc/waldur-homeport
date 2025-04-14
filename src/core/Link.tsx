@@ -22,10 +22,10 @@ export const Link: FunctionComponent<LinkProps> = ({
   className,
   ...rest
 }) => {
-  const sref = useSref(state, params);
+  const sref = useSref(state || '404', params);
   return (
     <a
-      {...sref}
+      {...(state ? sref : {})}
       target={target}
       onClick={(e) => {
         sref.onClick?.(e);

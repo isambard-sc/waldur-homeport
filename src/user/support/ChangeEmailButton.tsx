@@ -1,11 +1,11 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import { FunctionComponent, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { User } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
-import { UserDetails } from '@waldur/workspace/types';
 
 const UserEmailChangeDialog = lazyComponent(() =>
   import('./UserEmailChangeDialog').then((module) => ({
@@ -14,7 +14,7 @@ const UserEmailChangeDialog = lazyComponent(() =>
 );
 
 interface ChangeEmailButtonProps {
-  user: UserDetails;
+  user: User;
   protected?: boolean;
 }
 

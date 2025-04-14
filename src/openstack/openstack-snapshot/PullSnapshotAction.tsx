@@ -1,11 +1,11 @@
+import { openstackSnapshotsPull } from 'waldur-js-client';
+
 import { PullActionItem } from '@waldur/resource/actions/PullActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-import { pullSnapshot } from '../api';
-
 export const PullSnapshotAction: ActionItemType = ({ resource, refetch }) => (
   <PullActionItem
-    apiMethod={pullSnapshot}
+    apiMethod={(uuid: string) => openstackSnapshotsPull({ path: { uuid } })}
     resource={resource}
     refetch={refetch}
   />

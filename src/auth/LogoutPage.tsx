@@ -13,9 +13,8 @@
  */
 import { useRouter } from '@uirouter/react';
 import { useEffect, FunctionComponent } from 'react';
+import { apiAuthLogout } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-import { post } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 
@@ -24,16 +23,14 @@ import * as AuthService from './AuthService';
 export const LogoutPage: FunctionComponent = () => {
   const router = useRouter();
   useEffect(() => {
-    post<{ logout_url?: string }>(ENV.apiEndpoint + 'api-auth/logout/').then(
-      (response) => {
-        AuthService.clearAuthCache();
-        if (response.data.logout_url) {
-          document.location.href = response.data.logout_url;
-        } else {
-          router.stateService.go('login');
-        }
-      },
-    );
+    apiAuthLogout().then((response) => {
+      AuthService.clearAuthCache();
+      if (typeof response.data === 'object' && response.data.logout_url) {
+        document.location.href = response.data.logout_url;
+      } else {
+        router.stateService.go('login');
+      }
+    });
   }, []);
   return (
     <div className="middle-box text-center">

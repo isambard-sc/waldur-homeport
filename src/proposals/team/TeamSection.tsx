@@ -1,69 +1,65 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { FC, useMemo, useState } from 'react';
-import { Card } from 'react-bootstrap';
+import { FC, useMemo } from 'react';
+import { Card, Nav, Tab } from 'react-bootstrap';
 
+import { TableTabsContainer } from '@waldur/customer/list/TableTabsContainer';
 import { BaseEventsList } from '@waldur/events/BaseEventsList';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
-import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
 import { GenericInvitationContext } from '@waldur/invitations/types';
-import {
-  StepCardTabs,
-  TabSpec,
-} from '@waldur/marketplace/deploy/steps/StepCardTabs';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { createFetcher } from '@waldur/table/api';
+import { TableTabs } from '@waldur/table/TableTabs';
 import { useTable } from '@waldur/table/useTable';
 
 import { CALL_REVIEWERS_QUERY_KEY } from '../constants';
+import { AddCommentButton } from '../proposal/create-review/AddCommentButton';
 import { FieldReviewComments } from '../proposal/create-review/FieldReviewComments';
 import { ProposalReview } from '../types';
 
-import { AddUserButton } from './AddUserButton';
 import { InvitationsList } from './InvitationsList';
+import { TeamDropdownActions } from './TeamDropdownActions';
 import { UsersList } from './UsersList';
-
-const tabs: TabSpec<GenericInvitationContext>[] = [
-  {
-    title: translate('Users'),
-    key: 'users',
-  },
-  {
-    title: translate('Permission log'),
-    key: 'permissions',
-  },
-  {
-    title: translate('Invitations'),
-    key: 'invitations',
-  },
-];
 
 export const TeamSection: FC<
   GenericInvitationContext & {
     title: string;
     change?(field: string, value: any): void;
     reviews?: ProposalReview[];
+    onAddCommentClick?({ commentField, label }): void;
+    readOnlyMode?: boolean;
+    id?: string;
+    hasTeamTabs?: boolean;
   }
 > = (props) => {
   const queryClient = useQueryClient();
   const hideRole = props.roles && props.roles.length === 1;
 
-  const [tab, setTab] = useState<TabSpec<GenericInvitationContext>>(tabs[0]);
   const usersFilter = useMemo(
     () => ({
       role: props.roles,
     }),
     [props.roles],
   );
+
+  const url =
+    props.roleTypes?.[0] === 'proposal'
+      ? 'proposal-proposals/' + props.scope.uuid + '/list_users'
+      : props.roleTypes?.[0] === 'call'
+        ? 'proposal-protected-calls/' + props.scope.uuid + '/list_users'
+        : undefined;
+
   const usersTable = useTable({
     table: `UserList${props.title}`,
-    fetchData: createFetcher(`${props.scope.url}list_users`),
+    fetchData: createFetcher(url),
     filter: usersFilter,
     onFetch(rows) {
       if (props.change) {
         props.change('users', rows);
       }
       // Update query data for the call reviewers
-      if (props.roles?.includes(RoleEnum.CALL_REVIEWER)) {
+      if (props.roles && props.roles.includes(RoleEnum.CALL_REVIEWER)) {
         const newReviewers = rows.filter(
           (row) => row.role_name === RoleEnum.CALL_REVIEWER,
         );
@@ -95,50 +91,111 @@ export const TeamSection: FC<
   );
 
   return (
-    <Card className="card-bordered">
+    <Card className="card-bordered" id={props.id}>
       <Card.Header className="pt-4 pb-2">
         <Card.Title>
           <h3>{props.title}</h3>
         </Card.Title>
-        <div className="card-toolbar row flex-grow-1">
-          <div className="col">
-            <StepCardTabs tabs={tabs} tab={tab} setTab={setTab} />
-          </div>
-          <div className="col d-flex justify-content-end text-nowrap">
-            <AddUserButton refetch={usersTable.fetch} {...props} />
-            &nbsp;
-            <InvitationCreateButton
+        <div className="card-toolbar gap-3">
+          {!props.readOnlyMode ? (
+            // <div className="col d-flex justify-content-end text-nowrap gap-3">
+            <TeamDropdownActions
+              refetchUsers={usersTable.fetch}
+              refetchInvitations={invitationsTable.fetch}
               {...props}
-              refetch={invitationsTable.fetch}
             />
-          </div>
+          ) : // </div>
+          props.onAddCommentClick ? (
+            <AddCommentButton
+              review={props.reviews?.[0]}
+              onClick={() =>
+                props.onAddCommentClick({
+                  commentField: 'comment_team',
+                  label: props.title,
+                })
+              }
+            />
+          ) : null}
         </div>
       </Card.Header>
-      <Card.Body className="p-0 min-h-550px">
-        {tab.key === 'users' && (
-          <UsersList
-            table={usersTable}
-            scope={props.scope}
-            hideRole={hideRole}
-            cardBordered={false}
-          />
+      {props.hasTeamTabs &&
+        !isFeatureVisible(MarketplaceFeatures.call_only) && (
+          <Card.Header className="table-tabs border-bottom align-items-stretch py-0 min-h-auto">
+            <TableTabs
+              tabs={[
+                {
+                  key: 'reviewers',
+                  title: translate('Reviewers'),
+                  state: 'protected-call.main',
+                  params: { tab: 'reviewers' },
+                },
+                {
+                  key: 'managers',
+                  title: translate('Managers'),
+                  state: 'protected-call.main',
+                  params: { tab: 'managers' },
+                },
+              ]}
+            />
+          </Card.Header>
         )}
-        {tab.key === 'invitations' && (
-          <InvitationsList
-            table={invitationsTable}
-            hideRole={hideRole}
-            cardBordered={false}
-          />
-        )}
-        {tab.key === 'permissions' && (
-          <BaseEventsList
-            table={`permissions-log${props.scope.url}`}
-            filter={eventsFilter}
-            cardBordered={false}
-          />
-        )}
+      <Card.Body className="pt-0">
+        <TableTabsContainer defaultActiveKey="users" className="min-h-175px">
+          <div className="overflow-auto">
+            <Nav variant="tabs" className="nav-line-tabs flex-nowrap">
+              <Nav.Item className="text-nowrap">
+                <Nav.Link eventKey="users">{translate('Users')}</Nav.Link>
+              </Nav.Item>
+              <Nav.Item className="text-nowrap">
+                <Nav.Link eventKey="invitations">
+                  {translate('Invitations')}
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item className="text-nowrap">
+                <Nav.Link eventKey="permissions">
+                  {translate('Permissions')}
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </div>
+          <Tab.Content className="overflow-auto">
+            <Tab.Pane eventKey="users" unmountOnExit={true}>
+              <UsersList
+                table={usersTable}
+                scope={props.scope}
+                hideRole={hideRole}
+                cardBordered={false}
+                hasActionBar={false}
+                fullWidth
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey="invitations" unmountOnExit={true}>
+              <InvitationsList
+                table={invitationsTable}
+                hideRole={hideRole}
+                cardBordered={false}
+                hasActionBar={false}
+                fullWidth
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey="permissions" unmountOnExit={true}>
+              <BaseEventsList
+                table={`permissions-log${props.scope.url}`}
+                filter={eventsFilter}
+                cardBordered={false}
+                hasActionBar={false}
+                fullWidth
+                minHeight="auto"
+              />
+            </Tab.Pane>
+          </Tab.Content>
+        </TableTabsContainer>
 
-        <FieldReviewComments reviews={props.reviews} fieldName="comment_team" />
+        <FieldReviewComments
+          reviews={props.reviews}
+          fieldName="comment_team"
+          space={0}
+        />
       </Card.Body>
     </Card>
   );

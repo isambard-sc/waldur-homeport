@@ -1,32 +1,25 @@
 import { DateTime } from 'luxon';
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
+import { invoicesList } from 'waldur-js-client';
 
-import { getList } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 
 import { getOptions } from './AccountingRunningField';
 import { CustomerList } from './CustomerList';
-import { TotalCostContainer } from './TotalCostComponent';
 import { makeAccountingPeriods } from './utils';
 
-interface Invoice {
-  year: number;
-  month: number;
-}
-
-const getInvoices = (params) => getList<Invoice>('/invoices/', params);
-
 async function oldestInvoice() {
-  const params = {
-    page_size: 1,
-    o: ['year', 'month'].join(','),
-    field: ['year', 'month'],
-  };
-  const response = await getInvoices(params);
-  if (response.length === 1) {
-    const invoice = response[0];
+  const response = await invoicesList({
+    query: {
+      page_size: 1,
+      o: ['year', 'month'],
+      field: ['year', 'month'],
+    },
+  });
+  if (response.data.length === 1) {
+    const invoice = response.data[0];
     return DateTime.fromObject({
       year: invoice.year,
       month: invoice.month,
@@ -54,10 +47,5 @@ export const CustomerListContainer: FunctionComponent = () => {
   if (error) {
     return <>{translate('Unable to load financial overview.')}</>;
   }
-  return (
-    <>
-      <CustomerList {...data} />
-      <TotalCostContainer />
-    </>
-  );
+  return <CustomerList {...data} />;
 };

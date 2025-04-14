@@ -7,6 +7,8 @@
   font-size: 14px;
   font-weight: bold;
   color: $gray-700;
+  margin: 0 $card-px;
+  padding: $card-header-py 0;
 }
 
 /* LIST-GROUP & ITEMS */
@@ -84,7 +86,7 @@
   text-decoration: underline;
 
   &:hover {
-    color: $primary;
+    color: $brand;
     text-decoration: none;
   }
 }
@@ -106,7 +108,7 @@
 }
 .text-btn {
   background-color: transparent;
-  color: $gray-600;
+  color: $text-muted;
   border: none;
   cursor: pointer;
   display: inline;

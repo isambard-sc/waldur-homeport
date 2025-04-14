@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { vmwareVirtualMachineUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import {
@@ -7,8 +8,6 @@ import {
 } from '@waldur/resource/actions/base';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { UpdateResourceDialog } from '@waldur/resource/actions/UpdateResourceDialog';
-
-import { updateVirtualMachine } from '../api';
 
 export const EditDialog: FC<ActionDialogProps> = ({
   resolve: { resource, refetch },
@@ -20,7 +19,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
       name: resource.name,
       description: resource.description,
     }}
-    updateResource={updateVirtualMachine}
+    updateResource={(id, formData) =>
+      vmwareVirtualMachineUpdate({ path: { uuid: id }, body: formData })
+    }
     verboseName={translate('virtual machine')}
     refetch={refetch}
   />

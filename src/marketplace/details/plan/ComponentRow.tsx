@@ -2,9 +2,10 @@ import { Question } from '@phosphor-icons/react';
 import React, { PropsWithChildren } from 'react';
 import { useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { defaultCurrency, formatCurrency } from '@waldur/core/formatCurrency';
 import { Tip } from '@waldur/core/Tooltip';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
@@ -72,45 +73,33 @@ export const ComponentRow2: React.FC<PropsWithChildren<ComponentRowProps>> = (
       : ' /mo';
 
   return (
-    <tr>
-      <th>
-        {props.offeringComponent.name}
-        <Tip
-          label={props.offeringComponent.type}
-          id={`componentTypeTooltip-${props.offeringComponent.type}`}
-          className="mx-1"
-        >
-          {' '}
-          <Question />
-        </Tip>
-        <span className="fw-normal fst-italic">
-          (
-          {props.offeringComponent.measured_unit
-            ? translate('{price} per {unit}', {
-                price: defaultCurrency(props.offeringComponent.price),
-                unit: props.offeringComponent.measured_unit,
-              })
-            : defaultCurrency(props.offeringComponent.price)}
-          )
-        </span>
-      </th>
-      <td>{props.hasX ? 'X' : ''}</td>
-      <td className={props.className}>{props.children}</td>
-      {!props.hidePrices ? (
-        <>
-          <td className="text-center" width="20px">
-            =
-          </td>
-          <td className="estimate">
+    <FormTable.Item
+      label={props.offeringComponent.name}
+      description={
+        translate('Cost') +
+        ': ' +
+        (props.offeringComponent.measured_unit
+          ? translate('{price} per {unit}', {
+              price: defaultCurrency(props.offeringComponent.price),
+              unit: props.offeringComponent.measured_unit,
+            })
+          : defaultCurrency(props.offeringComponent.price))
+      }
+      value={props.children}
+      actions={
+        !props.hidePrices && (
+          <>
+            {translate('Total')}
+            {': '}
             {formatCurrency(
               componentTotalPrice,
               ENV.plugins.WALDUR_CORE.CURRENCY_NAME,
               4,
             )}
             {perPeriod}
-          </td>
-        </>
-      ) : null}
-    </tr>
+          </>
+        )
+      }
+    />
   );
 };

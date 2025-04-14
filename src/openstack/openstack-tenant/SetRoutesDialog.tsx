@@ -1,8 +1,8 @@
 import { connect, useDispatch } from 'react-redux';
 import { compose } from 'redux';
 import { FieldArray, reduxForm } from 'redux-form';
+import { openstackRoutersSetRoutes } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -39,8 +39,11 @@ export const SetRoutesDialog = enhance(
     const dispatch = useDispatch();
     const setRoutes = async (formData: FormData) => {
       try {
-        await post(`/openstack-routers/${resolve.router.uuid}/set_routes/`, {
-          routes: formData.routes,
+        await openstackRoutersSetRoutes({
+          path: { uuid: resolve.router.uuid },
+          body: {
+            routes: formData.routes,
+          },
         });
         dispatch(showSuccess(translate('Static routes update was scheduled.')));
         dispatch(closeModalDialog());

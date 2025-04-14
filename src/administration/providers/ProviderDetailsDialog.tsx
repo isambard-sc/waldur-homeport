@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ListGroup, Modal } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 
 import { getIdentityProviders } from '@waldur/administration/api';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
@@ -7,6 +7,7 @@ import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { CancelButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 export const ProviderDetailsDialog = (props) => {
   const neededProvider = props.provider.provider;
@@ -51,36 +52,30 @@ export const ProviderDetailsDialog = (props) => {
         <LoadingSpinner />
       ) : error ? (
         <LoadingErred
-          message={translate('Unable to load identity provider details')}
+          message={translate('Details for {provider}', {
+            provider: props.resolve.type,
+          })}
           loadData={refetch}
         />
       ) : data ? (
-        <>
-          <Modal.Header closeButton>
-            <Modal.Title>
-              {translate('Details for {provider}', {
-                provider: props.resolve.type,
-              })}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <ListGroup>
-              {data[neededProvider] && (
-                <>
-                  {renderUrlItem('discovery_url', 'Discovery URL')}
-                  {renderUrlItem('userinfo_url', 'User info URL')}
-                  {renderUrlItem('token_url', 'Token URL')}
-                  {renderUrlItem('auth_url', 'Auth URL')}
-                  {renderUrlItem('logout_url', 'Logout URL')}
-                  {renderUrlItem('management_url', 'Management URL')}
-                </>
-              )}
-            </ListGroup>
-          </Modal.Body>
-          <Modal.Footer>
-            <CancelButton label={translate('OK')} />
-          </Modal.Footer>
-        </>
+        <ModalDialog
+          title={translate('Edit user agreement')}
+          footer={<CancelButton label={translate('OK')} />}
+          closeButton
+        >
+          <ListGroup>
+            {data[neededProvider] && (
+              <>
+                {renderUrlItem('discovery_url', 'Discovery URL')}
+                {renderUrlItem('userinfo_url', 'User info URL')}
+                {renderUrlItem('token_url', 'Token URL')}
+                {renderUrlItem('auth_url', 'Auth URL')}
+                {renderUrlItem('logout_url', 'Logout URL')}
+                {renderUrlItem('management_url', 'Management URL')}
+              </>
+            )}
+          </ListGroup>
+        </ModalDialog>
       ) : null}
     </>
   );

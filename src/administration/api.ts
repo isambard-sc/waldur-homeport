@@ -1,75 +1,13 @@
-import Axios, { AxiosRequestConfig } from 'axios';
-
-import { ENV } from '@waldur/configs/default';
 import {
-  deleteById,
-  get,
-  getAll,
-  parseResultCount,
-  post,
-  put,
-} from '@waldur/core/api';
+  identityProvidersList,
+  MarketplaceResourcesListData,
+} from 'waldur-js-client';
 
-export const getCustomersCount = () =>
-  Axios.head(`${ENV.apiEndpoint}api/customers/`).then((response) =>
-    parseResultCount(response),
-  );
+import { count, getAllPages } from '@waldur/core/api';
 
-export const getProjectsCount = () =>
-  Axios.head(`${ENV.apiEndpoint}api/projects/`).then((response) =>
-    parseResultCount(response),
-  );
-
-export const getUsersCount = () =>
-  Axios.head(`${ENV.apiEndpoint}api/users/`).then((response) =>
-    parseResultCount(response),
-  );
-
-export const getCategoriesCount = () =>
-  Axios.head(`${ENV.apiEndpoint}api/marketplace-categories/`).then((response) =>
-    parseResultCount(response),
-  );
-
-export const getProviderOfferingsCount = (configs?: AxiosRequestConfig<any>) =>
-  Axios.head(
-    `${ENV.apiEndpoint}api/marketplace-provider-offerings/`,
-    configs,
-  ).then((response) => parseResultCount(response));
-
-export const getResourcesCount = (configs?: AxiosRequestConfig<any>) =>
-  Axios.head(`${ENV.apiEndpoint}api/marketplace-resources/`, configs).then(
-    (response) => parseResultCount(response),
-  );
-
-export const getVersion = () =>
-  get<{ version: string | number }>('/version/').then(
-    (response) => response.data,
-  );
+export const getResourcesCount = (
+  query?: MarketplaceResourcesListData['query'],
+) => count('/api/marketplace-resources/', query);
 
 export const getIdentityProviders = () =>
-  getAll<{ provider }>('/identity-providers/');
-
-export const getIdentityProvider = (type) =>
-  get<{ client_id; logout_url }>(`/identity-providers/${type}/`).then(
-    (response) => response.data,
-  );
-
-export const createIdentityProvider = (formData) =>
-  post('/identity-providers/', formData);
-
-export const updateIdentityProvider = (provider, formData) =>
-  put(`/identity-providers/${provider}/`, formData);
-
-export const deleteToken = (tokenURL: string) => Axios.delete(tokenURL);
-
-export const getAdminAnnouncements = (configs?: AxiosRequestConfig<any>) =>
-  getAll<any>('/admin-announcements/', configs);
-
-export const createAdminAnnouncement = (formData) =>
-  post('/admin-announcements/', formData);
-
-export const updateAdminAnnouncement = (formData, uuid) =>
-  put(`/admin-announcements/${uuid}/`, formData);
-
-export const deleteAdminAnnouncement = (uuid) =>
-  deleteById('/admin-announcements/', uuid);
+  getAllPages((page) => identityProvidersList({ query: { page } }));

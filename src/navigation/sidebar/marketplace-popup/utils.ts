@@ -1,27 +1,30 @@
 import {
-  getCategories,
-  getProviderOfferingsOptions,
-  getPublicOfferingsList,
-  getPublicOfferingsOptions,
-} from '@waldur/marketplace/common/api';
-import { Category } from '@waldur/marketplace/types';
-import { Customer, Project } from '@waldur/workspace/types';
+  marketplaceCategoriesList,
+  marketplaceProviderOfferingsList,
+  marketplacePublicOfferingsList,
+} from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
-export const fetchCategories = async (
+import { getAllPages, parseSelectData } from '@waldur/core/api';
+import { Category, Offering } from '@waldur/marketplace/types';
+import { Customer } from '@waldur/workspace/types';
+
+export const fetchCategories = (
   customer: Customer,
   project: Project,
   offering_name = '',
-) => {
-  return await getCategories({
-    params: {
-      ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
-      ...(project ? { project_uuid: project.uuid } : {}),
-      field: ['uuid', 'title', 'offering_count', 'icon', 'group'],
-      has_offerings: true,
-      offering_name,
-    },
-  });
-};
+) =>
+  getAllPages((page) =>
+    marketplaceCategoriesList({
+      query: {
+        page,
+        ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
+        ...(project ? { project_uuid: project.uuid } : {}),
+        field: ['uuid', 'title', 'offering_count', 'icon', 'group'],
+        offering_name,
+      },
+    }),
+  );
 
 export const fetchOfferingsByPage = (
   customer: Customer,
@@ -33,34 +36,38 @@ export const fetchOfferingsByPage = (
   importable: boolean = false,
 ) => {
   const api = importable
-    ? getProviderOfferingsOptions
-    : getPublicOfferingsOptions;
+    ? marketplaceProviderOfferingsList
+    : marketplacePublicOfferingsList;
   return api({
-    ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
-    ...(project ? { project_uuid: project.uuid } : {}),
-    ...(importable ? { importable: true } : {}),
-    category_uuid: category.uuid,
-    name: search,
-    field: [
-      'uuid',
-      'category_uuid',
-      'category_title',
-      'customer_uuid',
-      'customer_name',
-      'name',
-      'description',
-      'image',
-      'state',
-      'paused_reason',
-      'plans',
-    ],
-    state: ['Active', 'Paused'],
-    page,
-    page_size: pageSize,
-  }).then((res) => ({
-    pageElements: res.options,
-    itemCount: res.totalItems,
-  }));
+    query: {
+      ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
+      ...(project ? { project_uuid: project.uuid } : {}),
+      ...(importable ? { importable: true } : {}),
+      category_uuid: category.uuid,
+      name: search,
+      field: [
+        'uuid',
+        'category_uuid',
+        'category_title',
+        'customer_uuid',
+        'customer_name',
+        'name',
+        'description',
+        'image',
+        'state',
+        'paused_reason',
+        'plans',
+      ],
+      state: ['Active', 'Paused'],
+      page,
+      page_size: pageSize,
+    },
+  })
+    .then(parseSelectData)
+    .then((res) => ({
+      pageElements: res.options,
+      itemCount: res.totalItems,
+    }));
 };
 
 export const fetchLastNOfferings = async (
@@ -68,24 +75,28 @@ export const fetchLastNOfferings = async (
   project: Project,
   page_size = 5,
 ) => {
-  const offerings = await getPublicOfferingsList({
-    page: 1,
-    page_size,
-    ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
-    ...(project ? { project_uuid: project.uuid } : {}),
-    field: [
-      'uuid',
-      'category_uuid',
-      'customer_uuid',
-      'category_title',
-      'name',
-      'description',
-      'image',
-      'state',
-      'paused_reason',
-    ],
-    state: ['Active', 'Paused'],
-    o: '-created',
-  });
+  const offerings = (
+    await marketplacePublicOfferingsList({
+      query: {
+        page: 1,
+        page_size,
+        ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
+        ...(project ? { project_uuid: project.uuid } : {}),
+        field: [
+          'uuid',
+          'category_uuid',
+          'customer_uuid',
+          'category_title',
+          'name',
+          'description',
+          'image',
+          'state',
+          'paused_reason',
+        ],
+        state: ['Active', 'Paused'],
+        o: ['-created'],
+      },
+    })
+  ).data as any as Offering[];
   return offerings;
 };

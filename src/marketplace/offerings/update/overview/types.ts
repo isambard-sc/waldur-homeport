@@ -4,6 +4,8 @@ export interface Attribute {
   type: string;
   maxLength?: number;
   required?: boolean;
+  description?: string;
+  requiredMsg?: string;
 }
 export interface EditOfferingProps {
   offering;
@@ -11,3 +13,5 @@ export interface EditOfferingProps {
   attribute: Attribute;
   disabled?: boolean;
 }
+
+export type MediaType = 'thumbnail' | 'image';

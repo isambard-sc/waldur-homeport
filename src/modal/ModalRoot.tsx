@@ -45,6 +45,8 @@ export const ModalRoot: FunctionComponent = () => {
       onHide={onHide}
       style={modalStyle}
       centered
+      enforceFocus={false}
+      scrollable
       {...rest}
     >
       <ErrorBoundary fallback={ErrorMessage}>

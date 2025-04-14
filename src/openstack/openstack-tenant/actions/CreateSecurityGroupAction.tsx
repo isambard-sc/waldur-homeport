@@ -22,7 +22,7 @@ export const CreateSecurityGroupAction: FC<TenantActionProps> = ({
 }) => (
   <DialogActionButton
     title={translate('Create')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={CreateSecurityGroupDialog}
     resource={resource}
     dialogSize="xl"

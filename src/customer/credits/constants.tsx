@@ -1,10 +1,9 @@
-import { startCase } from 'lodash-es';
 import { DateTime } from 'luxon';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { change, getFormValues } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { CustomRadioButton } from '@waldur/core/CustomRadioButton';
 import { formatDate, parseDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
@@ -13,12 +12,12 @@ import { NumberField } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
-import { BooleanField } from '@waldur/table/BooleanField';
+import { Column } from '@waldur/table/types';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { BaseCreditFormData } from './types';
 
-export const COMMON_CREDIT_COLUMNS = [
+export const COMMON_CREDIT_COLUMNS: Column[] = [
   {
     title: translate('Eligible offerings'),
     render: ({ row }) => (
@@ -32,34 +31,6 @@ export const COMMON_CREDIT_COLUMNS = [
       renderFieldOrDash(
         row.offerings.map((offering) => offering.name).join(', '),
       ),
-  },
-  {
-    title: translate('Minimal consumption logic'),
-    render: ({ row }) => startCase(row.minimal_consumption_logic),
-    export: 'minimal_consumption_logic',
-  },
-  {
-    title: translate('Minimal consumption'),
-    render: ({ row }) => defaultCurrency(row.minimal_consumption),
-    export: (row) => defaultCurrency(row.minimal_consumption),
-  },
-  {
-    title: translate('Expected consumption'),
-    render: ({ row }) => defaultCurrency(row.expected_consumption),
-    orderField: 'expected_consumption',
-    export: (row) => defaultCurrency(row.expected_consumption),
-  },
-  {
-    title: translate('Grace coefficient'),
-    render: ({ row }) => row.grace_coefficient,
-    export: 'grace_coefficient',
-  },
-  {
-    title: translate('Apply as minimal consumption'),
-    render: ({ row }) => (
-      <BooleanField value={row.apply_as_minimal_consumption} />
-    ),
-    export: (row) => (row.apply_as_minimal_consumption ? 'Yes' : 'No'),
   },
   {
     title: translate('End date'),

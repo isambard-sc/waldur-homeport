@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { RequestedOffering } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { CallOfferingDeleteButton } from '@waldur/proposals/details/CallOfferingDeleteButton';
@@ -25,7 +26,7 @@ export const CallOfferingsSection: FC<CallOfferingsSectionProps> = (props) => {
   });
 
   return (
-    <Table
+    <Table<RequestedOffering>
       {...tableProps}
       id="offerings"
       columns={[

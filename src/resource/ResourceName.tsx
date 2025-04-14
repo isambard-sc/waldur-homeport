@@ -10,19 +10,19 @@ import { formatDefault, formatResourceType, getResourceIcon } from './utils';
 
 interface ResourceIconProps {
   resource: {
-    name: string;
-    uuid: string;
-    resource_type: string;
+    name?: string;
+    uuid?: string;
+    resource_type?: string;
   };
 }
 
 interface ResourceNameProps {
   resource: {
     marketplace_uuid?: string;
-    name: string;
-    uuid: string;
-    resource_type: string;
-    project_uuid: string;
+    name?: string;
+    uuid?: string;
+    resource_type?: string;
+    project_uuid?: string;
     is_link_valid?: boolean;
     marketplace_resource_uuid?: string;
   };

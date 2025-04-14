@@ -1,4 +1,4 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 
 const formatErrorObject = (error) =>
@@ -21,8 +21,8 @@ export const format = (error, parseResponse?) => {
   See also: https://fetch.spec.whatwg.org/#concept-filtered-response
   */
 
-  if (error && error.isAxiosError) {
-    error = error.response;
+  if (Object.prototype.hasOwnProperty.call(error, 'message')) {
+    return error.message;
   }
 
   if (!error || error.status === -1) {
@@ -33,7 +33,11 @@ export const format = (error, parseResponse?) => {
   }
 
   if (!Object.prototype.hasOwnProperty.call(error, 'status')) {
-    return error;
+    if (typeof error === 'object') {
+      return formatErrorObject(error);
+    } else {
+      return error;
+    }
   }
 
   if (error.response && error.response.status === 413) {

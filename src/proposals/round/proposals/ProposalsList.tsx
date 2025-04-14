@@ -1,9 +1,10 @@
 import { FC } from 'react';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { ProposalBadge } from '@waldur/proposals/proposal/ProposalBadge';
-import { Call, Round } from '@waldur/proposals/types';
+import { Call } from '@waldur/proposals/types';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -13,16 +14,16 @@ import { ProposalRowActions } from '../../proposal/ProposalRowActions';
 import { ProposalExpandableRow } from './ProposalExpandableRow';
 
 interface RoundProposalsListProps {
-  round: Round;
+  round: ProtectedRound;
   call: Call;
 }
 
 export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
   const tableProps = useTable({
     table: 'RoundProposalsList',
-    fetchData: createFetcher(
-      `proposal-protected-calls/${props.call.uuid}/rounds/${props.round.uuid}`,
-    ),
+    fetchData: createFetcher('proposal-proposals', {
+      params: { round: props.round.uuid },
+    }),
     queryField: 'name',
   });
 
@@ -50,9 +51,9 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
         },
       ]}
       title={translate('Proposals')}
+      hasQuery
       verboseName={translate('Proposals')}
       expandableRow={ProposalExpandableRow}
-      hasQuery={true}
       rowActions={({ row }) => (
         <ProposalRowActions
           row={{

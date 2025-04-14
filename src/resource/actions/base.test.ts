@@ -8,7 +8,7 @@ const resource: BaseResource = {
   name: 'VM',
   uuid: 'uuid',
   project_uuid: 'project_uuid',
-  state: 'Erred',
+  state: 'ERRED',
   runtime_state: 'ACTIVE',
 };
 
@@ -27,13 +27,13 @@ describe('Resource state validation', () => {
   });
 
   it('validates resource states list', () => {
-    expect(validateState('Creating', 'Updating')(ctx)).toBe(
-      'Valid states for operation: Creating, Updating.',
+    expect(validateState('CREATING', 'UPDATING')(ctx)).toBe(
+      'Valid states for operation: CREATING, UPDATING.',
     );
   });
 
   it('skips validation if resource is in target state', () => {
-    expect(validateState('Erred')(ctx)).toBeUndefined();
+    expect(validateState('ERRED')(ctx)).toBeUndefined();
   });
 });
 

@@ -1,14 +1,18 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { change, getFormValues } from 'redux-form';
+import {
+  ImportableResource,
+  marketplaceProviderOfferingsImportResource,
+} from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { importResource } from '@waldur/marketplace/common/api';
-import { ImportableResource, Offering, Plan } from '@waldur/marketplace/types';
+import { Offering, Plan } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { createEntity } from '@waldur/table/actions';
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 export const IMPORT_RESOURCE_FORM_ID = 'ResourceImportDialog';
 
@@ -57,13 +61,17 @@ export const useImportDialog = () => {
     async (_formValues: FormData) => {
       try {
         for (const resource of _formValues.resources) {
-          const payload = {
-            offering_uuid: offering.uuid,
-            backend_id: resource.backend_id,
-            project: _formValues.project.uuid,
-            plan: plans[resource.backend_id] && plans[resource.backend_id].uuid,
-          };
-          const marketplaceResource = await importResource(payload);
+          const marketplaceResource = (
+            await marketplaceProviderOfferingsImportResource({
+              path: { uuid: offering.uuid },
+              body: {
+                backend_id: resource.backend_id,
+                project: _formValues.project.uuid,
+                plan:
+                  plans[resource.backend_id] && plans[resource.backend_id].uuid,
+              },
+            })
+          ).data;
           dispatch(
             createEntity(
               'ProjectResourcesList',

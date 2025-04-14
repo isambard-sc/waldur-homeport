@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { OrderDetails } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { OrderNameField } from '@waldur/marketplace/orders/list/OrderNameField';
@@ -10,10 +11,9 @@ import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { OrderProviderActions } from '../actions/OrderProviderActions';
-import { OrderDetailsType } from '../types';
 
 export const OrdersListExpandableRow: FunctionComponent<{
-  row: OrderDetailsType;
+  row: OrderDetails;
 }> = ({ row: order }) => (
   <ExpandableContainer asTable>
     <Field

@@ -11,33 +11,40 @@ import { ActionDialog } from '@waldur/modal/ActionDialog';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
-import { getYAML, putYAML } from '../api';
-
 export const ViewYAMLDialog = reduxForm<
   { yaml: string },
-  { resolve: { resource: { url: string } } }
+  { resolve: { resource: { uuid?: string }; yamlRetrieve; yamlUpdate } }
 >({ form: 'ViewYAMLDialog' })(({ resolve, handleSubmit, submitting }) => {
   const dispatch = useDispatch();
 
-  const { loading, value } = useAsync(() => getYAML(resolve.resource.url));
+  const { loading, value } = useAsync(() =>
+    resolve
+      .yamlRetrieve({ path: { uuid: resolve.resource.uuid } })
+      .then((response) => response.data.yaml),
+  );
 
   useEffect(() => {
     if (value) {
-      dispatch(change('ViewYAMLDialog', 'yaml', value.yaml));
+      dispatch(change('ViewYAMLDialog', 'yaml', value));
     }
   }, [dispatch, value]);
 
   const updateYAML = useCallback(
-    async (formData) => {
+    async (formData: { yaml: string }) => {
       try {
-        await putYAML(resolve.resource.url, formData.yaml);
+        await resolve.yamlUpdate({
+          uuid: resolve.resource.uuid,
+          body: {
+            yaml: formData.yaml,
+          },
+        });
         dispatch(showSuccess(translate('YAML has been updated.')));
         dispatch(closeModalDialog());
       } catch (e) {
         dispatch(showErrorResponse(e, translate('Unable to update YAML.')));
       }
     },
-    [dispatch, resolve.resource.url],
+    [dispatch, resolve.resource.uuid],
   );
 
   const [showDiff, toggleShowDiff] = useToggle(false);
@@ -53,14 +60,14 @@ export const ViewYAMLDialog = reduxForm<
       <MonacoField
         name="yaml"
         language="yaml"
-        original={value?.yaml}
+        original={value as string}
         diff={showDiff}
         height={400}
         options={{ scrollBeyondLastLine: false }}
       />
-      {value?.yaml && (
+      {value && (
         <>
-          <CopyToClipboard value={value.yaml} textButton className="my-2" />{' '}
+          <CopyToClipboard value={value} textButton className="my-2" />{' '}
           <Button onClick={toggleShowDiff}>
             {showDiff ? translate('Hide diff') : translate('Show diff')}
           </Button>

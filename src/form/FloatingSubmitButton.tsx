@@ -6,7 +6,7 @@ import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 
-import { FieldError } from './FieldError';
+import { FieldErrorMessage } from './FieldError';
 import { FloatingButton } from './FloatingButton';
 
 interface OwnProps {
@@ -28,13 +28,13 @@ export const FloatingSubmitButton: FC<OwnProps> = ({
   return (
     <FloatingButton>
       <Tip
-        label={errorsExist ? <FieldError error={errors} /> : null}
+        label={errorsExist ? <FieldErrorMessage error={errors} center /> : null}
         id="floating-button-errors"
         autoWidth
         className="w-100"
+        tipClassName="mw-225px"
       >
         <Button
-          size="sm"
           variant={variant}
           type="submit"
           disabled={disabled || submitting || errorsExist}

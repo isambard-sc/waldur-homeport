@@ -2,7 +2,7 @@ xdescribe('Customer creation toggle', () => {
   beforeEach(() => {
     cy.mockUser()
       .mockChecklists()
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'customers/alice_bob_web.json',
       })
       .setToken()

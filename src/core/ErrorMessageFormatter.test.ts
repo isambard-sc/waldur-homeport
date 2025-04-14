@@ -2,7 +2,7 @@ import { vi, describe, it, expect } from 'vitest';
 
 import { format } from './ErrorMessageFormatter';
 
-vi.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/core/config', () => ({
   ENV: { apiEndpoint: 'https://example.com/' },
 }));
 

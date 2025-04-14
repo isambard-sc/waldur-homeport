@@ -1,14 +1,13 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { rancherClustersImportYaml } from 'waldur-js-client';
 
 import { MonacoField } from '@waldur/form/MonacoField';
 import { translate } from '@waldur/i18n';
 import { ActionDialog } from '@waldur/modal/ActionDialog';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { importYAML } from '../api';
 
 export const ImportYAMLDialog = reduxForm<
   { yaml: string },
@@ -19,7 +18,10 @@ export const ImportYAMLDialog = reduxForm<
   const handler = useCallback(
     async (formData) => {
       try {
-        await importYAML(resolve.cluster_id, formData.yaml);
+        await rancherClustersImportYaml({
+          path: { uuid: resolve.cluster_id },
+          body: { yaml: formData.yaml },
+        });
         dispatch(showSuccess(translate('YAML has been imported.')));
         dispatch(closeModalDialog());
       } catch (e) {

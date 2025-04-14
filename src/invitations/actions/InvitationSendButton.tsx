@@ -1,13 +1,12 @@
 import { Share } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { userInvitationsSend } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { getCustomer, getUser, getProject } from '@waldur/workspace/selectors';
-
-import { InvitationService } from '../InvitationService';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
 
@@ -21,7 +20,7 @@ export const InvitationSendButton = ({ row, refetch }) => {
 
   const callback = async () => {
     try {
-      await InvitationService.resend(row.uuid);
+      await userInvitationsSend({ path: { uuid: row.uuid } });
       dispatch(showSuccess(translate('Invitation has been sent again.')));
       refetch();
     } catch (e) {
@@ -65,7 +64,7 @@ export const InvitationSendButton = ({ row, refetch }) => {
     <ActionItem
       action={callback}
       title={translate('Resend')}
-      iconNode={<Share />}
+      iconNode={<Share weight="bold" />}
       disabled={isDisabled}
       tooltip={tooltip}
     />

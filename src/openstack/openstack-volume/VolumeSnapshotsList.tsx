@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackSnapshot } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { formatFilesize } from '@waldur/core/utils';
@@ -29,7 +30,7 @@ export const VolumeSnapshotsList: FunctionComponent<{ resourceScope }> = ({
   });
 
   return (
-    <Table
+    <Table<OpenStackSnapshot>
       {...props}
       columns={[
         {

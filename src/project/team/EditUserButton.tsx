@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -16,12 +16,12 @@ const EditUserDialog = lazyComponent(() =>
 );
 
 interface EditUserButtonProps {
-  permission: GenericPermission;
+  row: GenericPermission;
   refetch;
 }
 
 export const EditUserButton: React.FC<EditUserButtonProps> = ({
-  permission,
+  row: permission,
   refetch,
 }) => {
   const dispatch = useDispatch();
@@ -48,5 +48,5 @@ export const EditUserButton: React.FC<EditUserButtonProps> = ({
         },
       }),
     );
-  return <EditButton onClick={callback} size="sm" />;
+  return <EditAction action={callback} size="sm" />;
 };

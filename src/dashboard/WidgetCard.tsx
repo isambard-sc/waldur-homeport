@@ -1,4 +1,4 @@
-import { DotsThreeOutlineVertical } from '@phosphor-icons/react';
+import { DotsThreeVertical } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, PropsWithChildren, ReactNode } from 'react';
 import { Card, Col, Dropdown, Row } from 'react-bootstrap';
@@ -42,8 +42,8 @@ export const WidgetCard: FC<PropsWithChildren<WidgetCardProps>> = ({
       <Card.Body className="d-flex">
         {left && <div className="me-4 flex-shrink-0">{left}</div>}
         <div className="d-flex flex-column flex-grow-1">
-          <div className="d-flex align-items-center mb-4">
-            <Card.Title as="div" className="fw-bolder flex-grow-1 h4 mb-0">
+          <div className="d-flex align-items-center mb-2">
+            <Card.Title as="div" className="fw-bold flex-grow-1 h4 mb-0">
               {cardTitle}
             </Card.Title>
             {actions?.length && (
@@ -52,11 +52,12 @@ export const WidgetCard: FC<PropsWithChildren<WidgetCardProps>> = ({
                   variant="active-light-primary"
                   size="sm"
                   bsPrefix="btn-icon"
+                  className="h-25px w-25px"
                 >
-                  <DotsThreeOutlineVertical
+                  <DotsThreeVertical
                     size={20}
-                    weight="fill"
-                    className="text-muted"
+                    weight="bold"
+                    className="text-gray-400"
                   />
                 </Dropdown.Toggle>
                 <Dropdown.Menu>

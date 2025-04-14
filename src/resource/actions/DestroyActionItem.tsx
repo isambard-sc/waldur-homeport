@@ -25,7 +25,7 @@ const getConfirmationText = (resource) => {
     name: resource.name.toUpperCase(),
     resourceType: formatResourceType(resource) || 'resource',
   };
-  if (resource.state === 'Erred') {
+  if (resource.state === 'ERRED') {
     return translate(
       'Are you sure you want to delete a {name} {resourceType} in an Erred state? A cleanup attempt will be performed if you choose so. ',
       context,
@@ -38,7 +38,7 @@ const getConfirmationText = (resource) => {
   }
 };
 
-export const DestroyActionItem: <T extends { uuid: string }>(
+export const DestroyActionItem: <T extends { uuid?: string }>(
   props: DestroyActionItemProps<T>,
 ) => ReactElement = ({
   resource,
@@ -76,7 +76,7 @@ export const DestroyActionItem: <T extends { uuid: string }>(
       title={translate('Destroy')}
       action={callback}
       className="text-danger"
-      iconNode={<FileX />}
+      iconNode={<FileX weight="bold" />}
       iconColor="danger"
       {...validationState}
     />

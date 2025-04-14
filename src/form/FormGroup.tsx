@@ -22,6 +22,8 @@ export interface FormGroupProps extends FormField {
   meta: WrappedFieldMetaProps;
   clearOnUnmount?: boolean;
   actions?: ReactNode;
+  quickAction?: ReactNode;
+  tooltipEnd?: boolean;
   containerClassName?: string;
 }
 
@@ -35,10 +37,12 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
     label,
     description,
     tooltip,
+    tooltipEnd,
     hideLabel,
     meta,
     children,
     actions,
+    quickAction,
     clearOnUnmount,
     spaceless,
     containerClassName,
@@ -66,17 +70,19 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
     },
     isInvalid: meta.touched && !!meta.error,
   };
+
   const labelNode = !hideLabel && (
     <Form.Label className={classNames({ required })}>
-      {tooltip && (
-        <Tip id="form-field-tooltip" label={tooltip}>
-          <Question />{' '}
+      {tooltip && !tooltipEnd && (
+        <Tip id={'form-field-tooltip-' + input.name} label={tooltip}>
+          <Question weight="bold" size={20} className="text-muted" />{' '}
         </Tip>
       )}
       {label}
     </Form.Label>
   );
-  const main = (
+
+  const mainContent = (
     <div
       className={classNames(
         {
@@ -87,12 +93,31 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
         !spaceless && `mb-${space}`,
       )}
     >
-      {labelNode}
+      {quickAction || (tooltip && tooltipEnd) ? (
+        <div className="d-flex align-items-end">
+          <span className="me-auto">{labelNode}</span>
+          {props.quickAction}
+          {tooltip && tooltipEnd && (
+            <Tip
+              id={'form-field-tooltip-' + input.name}
+              className="align-self-center ms-2"
+              label={tooltip}
+            >
+              <Question weight="bold" size={20} className="text-muted" />
+            </Tip>
+          )}
+        </div>
+      ) : (
+        labelNode
+      )}
       {cloneElement(children as any, newProps)}
-      {description && <Form.Text>{description}</Form.Text>}
+      {description && (
+        <Form.Text className="text-muted">{description}</Form.Text>
+      )}
       {meta.touched && <FieldError error={meta.error} />}
     </div>
   );
+
   if (actions) {
     return (
       <div
@@ -101,10 +126,10 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
           containerClassName,
         )}
       >
-        {main}
+        {mainContent}
         {actions}
       </div>
     );
   }
-  return main;
+  return mainContent;
 };

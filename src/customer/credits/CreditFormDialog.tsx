@@ -3,7 +3,7 @@ import { Accordion, Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { formValueSelector, reduxForm } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { EChart } from '@waldur/core/EChart';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { LoadingErred } from '@waldur/core/LoadingErred';
@@ -18,19 +18,19 @@ import {
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { translate } from '@waldur/i18n';
 import {
-  offeringsAutocomplete,
+  providerOfferingsAutocomplete,
   organizationAutocomplete,
 } from '@waldur/marketplace/common/autocompletes';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
-import { getCustomerCostChartData } from '../dashboard/api';
+import { useCustomerCostChart } from '../dashboard/utils';
 
 import { useMinimalConsumptionFields } from './constants';
 import { CustomerCreditFormData } from './types';
 
 interface CreditFormDialogProps {
-  onSubmit(formData: CustomerCreditFormData): void;
+  submitFn(formData: CustomerCreditFormData): void;
 }
 
 export const CreditFormDialog = reduxForm<
@@ -46,8 +46,7 @@ export const CreditFormDialog = reduxForm<
   );
   const { data, isLoading, error, refetch } = useQuery(
     ['customerDashboardCharts', customer?.uuid, true],
-    () =>
-      isEdit && customer ? getCustomerCostChartData(customer, true) : null,
+    () => (isEdit && customer ? useCustomerCostChart(customer) : null),
     { staleTime: 5 * 60 * 1000 },
   );
   const CONSUMPTION_FIELDS = useMinimalConsumptionFields(
@@ -56,8 +55,8 @@ export const CreditFormDialog = reduxForm<
   );
 
   return (
-    <form onSubmit={props.handleSubmit(props.onSubmit)}>
-      <MetronicModalDialog
+    <form onSubmit={props.handleSubmit(props.submitFn)}>
+      <ModalDialog
         title={
           isEdit ? translate('Edit credit') : translate('Add allocation credit')
         }
@@ -129,7 +128,7 @@ export const CreditFormDialog = reduxForm<
             label={translate('Offering(s)')}
             placeholder={translate('All')}
             loadOptions={(query, prevOptions, { page }) =>
-              offeringsAutocomplete(
+              providerOfferingsAutocomplete(
                 { name: query, billable: true },
                 prevOptions,
                 page,
@@ -159,7 +158,7 @@ export const CreditFormDialog = reduxForm<
             <FieldError error={props.error} />
           </Form.Group>
         </FormContainer>
-      </MetronicModalDialog>
+      </ModalDialog>
     </form>
   );
 });

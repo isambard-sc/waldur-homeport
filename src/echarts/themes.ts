@@ -98,6 +98,9 @@ function registerDarkTheme() {
         },
       },
     },
+    axisPointer: {
+      label: { backgroundColor: '#505050' },
+    },
     dataZoom: {
       textStyle: {
         color: contrastColor,
@@ -207,7 +210,7 @@ function registerLightTheme() {
     },
 
     tooltip: {
-      backgroundColor: 'rgba(0,0,0,0.6)',
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
       textStyle: {
         color: '#fff',
       },

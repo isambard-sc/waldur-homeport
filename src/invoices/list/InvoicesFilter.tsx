@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Field, reduxForm } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import {
   REACT_MULTI_SELECT_TABLE_FILTER,
   Select,

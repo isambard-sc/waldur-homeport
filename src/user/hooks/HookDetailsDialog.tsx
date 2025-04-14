@@ -1,6 +1,13 @@
 import { FunctionComponent } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useAsync } from 'react-use';
+import {
+  EventGroupsEnum,
+  hooksEmailCreate,
+  hooksEmailPartialUpdate,
+  hooksWebCreate,
+  hooksWebPartialUpdate,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -14,7 +21,6 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
 
-import { createHook, updateHook } from './api';
 import { HookTypeField } from './HookTypeField';
 import { MultiSelectField } from './MultiSelectField';
 import { HookFormData, HookResponse, HookType } from './types';
@@ -24,19 +30,30 @@ const useHookForm = (hook, refetch) => {
   const { showErrorResponse, showSuccess } = useNotify();
   const saveHook = async (formData: HookFormData) => {
     const hookType = hook ? hook.hook_type : formData.hook_type;
-    const payload: Partial<HookResponse> = {
-      hook_type: hookType,
-      is_active: formData.is_active,
-      event_groups: Object.keys(formData.event_groups),
-    };
-    if (hookType === 'email') {
-      payload.email = formData.email;
-    } else if (hookType === 'webhook') {
-      payload.destination_url = formData.destination_url;
-    }
+    const event_groups = Object.keys(
+      formData.event_groups,
+    ) as EventGroupsEnum[];
     if (hook) {
       try {
-        await updateHook(hook.uuid, hook.hook_type, payload);
+        if (hookType == 'email') {
+          await hooksEmailPartialUpdate({
+            path: { uuid: hook.uuid },
+            body: {
+              is_active: formData.is_active,
+              email: formData.email,
+              event_groups,
+            },
+          });
+        } else {
+          await hooksWebPartialUpdate({
+            path: { uuid: hook.uuid },
+            body: {
+              is_active: formData.is_active,
+              destination_url: formData.destination_url,
+              event_groups,
+            },
+          });
+        }
         await refetch();
         showSuccess(translate('Notification has been updated.'));
         closeModalDialog();
@@ -45,7 +62,23 @@ const useHookForm = (hook, refetch) => {
       }
     } else {
       try {
-        await createHook(hookType, payload);
+        if (hookType == 'email') {
+          await hooksEmailCreate({
+            body: {
+              is_active: formData.is_active,
+              email: formData.email,
+              event_groups,
+            },
+          });
+        } else {
+          await hooksWebCreate({
+            body: {
+              is_active: formData.is_active,
+              destination_url: formData.destination_url,
+              event_groups,
+            },
+          });
+        }
         await refetch();
         showSuccess(translate('Notification has been created.'));
         closeModalDialog();

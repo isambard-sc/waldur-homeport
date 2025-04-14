@@ -1,12 +1,12 @@
 import { FunctionComponent } from 'react';
+import { NestedScreenshot } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { Image } from '@waldur/marketplace/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 interface ImageDetailsDialogProps {
-  resolve: Image;
+  resolve: NestedScreenshot;
 }
 
 export const ImageDetailsDialog: FunctionComponent<ImageDetailsDialogProps> = (

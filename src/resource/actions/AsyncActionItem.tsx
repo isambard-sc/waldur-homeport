@@ -1,4 +1,3 @@
-import { AxiosResponse } from 'axios';
 import { ReactElement } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -12,7 +11,7 @@ import { useValidators } from './useValidators';
 
 export interface AsyncActionItemProps<T>
   extends Omit<ActionItemProps, 'disabled' | 'action'> {
-  apiMethod(id: string): Promise<AxiosResponse>;
+  apiMethod(id: string): Promise<any>;
   resource: T;
   validators: ActionValidator<T>[];
   successMessage?: string;
@@ -20,7 +19,7 @@ export interface AsyncActionItemProps<T>
   refetch?(): void;
 }
 
-export const AsyncActionItem: <T extends { uuid: string; name?: string }>(
+export const AsyncActionItem: <T extends { uuid?: string; name?: string }>(
   props: AsyncActionItemProps<T>,
 ) => ReactElement = ({
   resource,

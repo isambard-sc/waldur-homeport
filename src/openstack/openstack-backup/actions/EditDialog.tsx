@@ -1,7 +1,7 @@
 import { FC } from 'react';
+import { openstackBackupsUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateBackup } from '@waldur/openstack/api';
 import {
   createNameField,
   createDescriptionField,
@@ -33,7 +33,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
         description: resource.description,
         kept_until: resource.kept_until,
       }}
-      updateResource={updateBackup}
+      updateResource={(uuid, body) =>
+        openstackBackupsUpdate({ path: { uuid }, body })
+      }
       verboseName={translate('VM snapshot')}
       refetch={refetch}
     />

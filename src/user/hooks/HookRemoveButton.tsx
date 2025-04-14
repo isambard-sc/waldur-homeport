@@ -1,19 +1,22 @@
 import { Trash } from '@phosphor-icons/react';
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { hooksEmailDestroy, hooksWebDestroy } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { removeHook } from './api';
 interface HookRemoveButtonProps {
   refetch();
-  url: string;
+  hook;
 }
 
-export const HookRemoveButton: FC<HookRemoveButtonProps> = (props) => {
+export const HookRemoveButton: FC<HookRemoveButtonProps> = ({
+  hook,
+  refetch,
+}) => {
   const [removing, setRemoving] = useState(false);
   const dispatch = useDispatch();
 
@@ -30,8 +33,16 @@ export const HookRemoveButton: FC<HookRemoveButtonProps> = (props) => {
     }
     try {
       setRemoving(true);
-      await removeHook(props.url);
-      await props.refetch();
+      if (hook.hook_type == 'email') {
+        await hooksEmailDestroy({
+          path: { uuid: hook.uuid },
+        });
+      } else {
+        await hooksWebDestroy({
+          path: { uuid: hook.uuid },
+        });
+      }
+      await refetch();
       dispatch(showSuccess(translate('Hook has been removed.')));
     } catch (e) {
       dispatch(showErrorResponse(e, translate('Unable to remove hook.')));
@@ -44,7 +55,7 @@ export const HookRemoveButton: FC<HookRemoveButtonProps> = (props) => {
       title={translate('Remove')}
       action={action}
       disabled={removing}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       size="sm"
       className="text-danger"
       iconColor="danger"

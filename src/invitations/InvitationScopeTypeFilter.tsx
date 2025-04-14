@@ -5,13 +5,13 @@ import { translate } from '@waldur/i18n';
 import { ROLE_TYPES } from '@waldur/permissions/constants';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
-export const InvitationScopeTypeFilter = () => (
+export const InvitationScopeTypeFilter = (props) => (
   <TableFilterItem title={translate('Scope type')} name="scope_type">
     <Field
       name="scope_type"
       component={(fieldProps) => (
         <Select
-          options={ROLE_TYPES}
+          options={props.options || ROLE_TYPES}
           value={fieldProps.input.value}
           onChange={(item) => fieldProps.input.onChange(item)}
           isClearable={true}

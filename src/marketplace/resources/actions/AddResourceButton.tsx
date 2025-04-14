@@ -1,10 +1,10 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
 import { useAsync } from 'react-use';
+import { marketplaceProviderResourcesOfferingForSubresourcesList } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n/translate';
-import { getSubResourcesOfferings } from '@waldur/marketplace/common/api';
 import { OfferingLink } from '@waldur/marketplace/links/OfferingLink';
 import { Resource } from '@waldur/resource/types';
 
@@ -15,7 +15,10 @@ interface AddResourceButtonProps {
 
 export const AddResourceButton = (props: AddResourceButtonProps) => {
   const { value, loading } = useAsync(
-    () => getSubResourcesOfferings(props.resource.marketplace_resource_uuid),
+    () =>
+      marketplaceProviderResourcesOfferingForSubresourcesList({
+        path: { uuid: props.resource.marketplace_resource_uuid },
+      }).then((r) => r.data),
     [props.resource],
   );
 

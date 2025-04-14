@@ -12,9 +12,8 @@ import { TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
 
+import { CostPolicyActions } from './CostPolicyActions';
 import { CostPolicyCreateButton } from './CostPolicyCreateButton';
-import { CostPolicyDeleteButton } from './CostPolicyDeleteButton';
-import { CostPolicyEditButton } from './CostPolicyEditButton';
 import { getCostPolicyActionOptions, policyPeriodOptions } from './utils';
 
 const filtersSelector = createSelector(getCustomer, (customer) => {
@@ -115,18 +114,11 @@ export const CostPoliciesListTable: FC<CostPoliciesListTableProps> = ({
       verboseName={translate('Cost policies')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       rowActions={({ row }) => (
-        <>
-          <CostPolicyEditButton
-            row={row}
-            type="project"
-            refetch={tableProps.fetch}
-          />
-          <CostPolicyDeleteButton
-            row={row}
-            type="project"
-            refetch={tableProps.fetch}
-          />
-        </>
+        <CostPolicyActions
+          row={row}
+          type="project"
+          refetch={tableProps.fetch}
+        />
       )}
       hasQuery={true}
       showPageSizeSelector={true}

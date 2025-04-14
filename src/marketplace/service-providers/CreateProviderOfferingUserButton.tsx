@@ -17,7 +17,7 @@ export const CreateProviderOfferingUserButton = ({ refetch }) => {
   return (
     <ActionButton
       title={translate('Create')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       action={() =>
         dispatch(
           openModalDialog(CreateProviderOfferingUserDialog, {

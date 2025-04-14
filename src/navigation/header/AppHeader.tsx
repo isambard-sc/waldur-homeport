@@ -2,7 +2,8 @@ import { List } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 
-import { fixURL } from '@waldur/core/api';
+import { getIconUrl } from '@waldur/core/api';
+import { Link } from '@waldur/core/Link';
 import DefaultLogo from '@waldur/images/logo.svg';
 import { hasSupport as hasSupportSelector } from '@waldur/issues/hooks';
 import { useUser } from '@waldur/workspace/hooks';
@@ -35,7 +36,7 @@ export const AppHeader: FunctionComponent<AppHeaderProps> = ({
 }) => {
   const pageTitle = useSelector(getTitle);
   const user = useUser();
-  const imageUrl = fixURL('/icons/sidebar_logo_mobile/');
+  const imageUrl = getIconUrl('sidebar_logo_mobile');
 
   const hasSupport = useSelector(hasSupportSelector);
 
@@ -43,16 +44,19 @@ export const AppHeader: FunctionComponent<AppHeaderProps> = ({
     <div className="header align-items-stretch">
       <div className="container-fluid d-flex align-items-stretch justify-content-between">
         <div className="d-flex align-items-center d-lg-none ms-n2 me-2">
-          <AsideMobileToggle />
+          {Boolean(user) && <AsideMobileToggle />}
 
           <div className="d-flex align-items-center flex-grow-1 flex-lg-grow-0">
-            <div className="d-lg-none">
+            <Link
+              state={user ? 'profile.details' : null}
+              className="d-lg-none text-dark"
+            >
               {imageUrl ? (
                 <img src={imageUrl} alt="Logo" className="h-30px" />
               ) : (
                 <DefaultLogo className="h-30px" />
               )}
-            </div>
+            </Link>
           </div>
         </div>
         <div className="d-flex align-items-stretch justify-content-between flex-grow-1">

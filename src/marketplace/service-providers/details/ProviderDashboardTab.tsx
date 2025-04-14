@@ -7,9 +7,11 @@ import { getLabel } from '@waldur/marketplace/common/registry';
 import { OfferingStateField } from '@waldur/marketplace/offerings/OfferingStateField';
 import { Offering } from '@waldur/marketplace/types';
 import { PublicCallsList } from '@waldur/proposals/PublicCallsList';
+import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
+
 export const ProviderOfferingsList = (props) => {
   const columns = [
     {
@@ -41,11 +43,9 @@ export const ProviderOfferingsList = (props) => {
 
   const tableProps = useTable({
     table: 'ProviderOfferingsList',
-    fetchData: () =>
-      Promise.resolve({
-        rows: props.items,
-        resultCount: props.items.length,
-      }),
+    fetchData: createFetcher('marketplace-public-offerings', {
+      params: { customer_uuid: props.provider_uuid },
+    }),
     queryField: 'keyword',
   });
 
@@ -57,6 +57,7 @@ export const ProviderOfferingsList = (props) => {
       title={translate('Offerings')}
       gridSize={{ lg: 6, xl: 4 }}
       gridItem={({ row }) => <OfferingCard offering={row} />}
+      hoverShadow={{ grid: false }}
     />
   );
 };
@@ -64,7 +65,10 @@ export const ProviderOfferingsList = (props) => {
 export const ProviderDashboardTab = (props) => {
   return (
     <>
-      <ProviderOfferingsList items={props.data.offerings} initialMode="grid" />
+      <ProviderOfferingsList
+        provider_uuid={props.data.provider.customer_uuid}
+        initialMode="grid"
+      />
       {isFeatureVisible(
         MarketplaceFeatures.show_call_management_functionality,
       ) && (

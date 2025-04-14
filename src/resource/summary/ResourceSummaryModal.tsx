@@ -1,19 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 
+import { get } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
-import { fetchResource } from './api';
 import { ResourceSummary } from './ResourceSummary';
 
 export const ResourceSummaryModal: FC<{ resolve: { url } }> = ({
   resolve: { url },
 }) => {
   const { isLoading, data } = useQuery(['ResourceSummaryModal', url], () =>
-    fetchResource(url),
+    get(url),
   );
   return (
     <ModalDialog

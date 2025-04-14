@@ -22,7 +22,7 @@ import { translate } from '@waldur/i18n';
 
 import CheckboxIcon from './Checkbox.svg';
 import CheckboxEmptyIcon from './CheckboxEmpty.svg';
-import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
+import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableProps } from './types';
 
 const SortableItem = (props) => {
@@ -138,11 +138,9 @@ const ColumnsPopover = ({
         </DndContext>
 
         {hasActions && (
-          <Dropdown.Item
-            onClick={() => toggleColumn(OPTIONAL_COLUMN_ACTIONS_KEY)}
-          >
+          <Dropdown.Item onClick={() => toggleColumn(COLUMN_ACTIONS_KEY)}>
             <span className="svg-icon svg-icon-2 svg-icon-transparent me-3">
-              {activeColumns[OPTIONAL_COLUMN_ACTIONS_KEY] ? (
+              {activeColumns[COLUMN_ACTIONS_KEY] ? (
                 <CheckboxIcon />
               ) : (
                 <CheckboxEmptyIcon />
@@ -163,6 +161,7 @@ export const TableColumnButton: FC<TableProps> = ({
   swapColumns,
   columnPositions,
   rowActions,
+  mode,
 }) => (
   <OverlayTrigger
     trigger="click"
@@ -181,8 +180,12 @@ export const TableColumnButton: FC<TableProps> = ({
     }
     rootClose
   >
-    <Button variant="outline-default" className="btn-outline btn-icon">
-      <span className="svg-icon svg-icon-1">
+    <Button
+      disabled={mode !== 'table'}
+      variant="outline-default"
+      className="btn-outline btn-icon"
+    >
+      <span className="svg-icon svg-icon-2">
         <Gear weight="bold" />
       </span>
     </Button>

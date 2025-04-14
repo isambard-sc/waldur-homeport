@@ -45,6 +45,10 @@ export const ProviderProjectResourcesList: FunctionComponent<{
           render: ({ row }) => row.offering_name,
         },
         {
+          title: translate('Parent offering'),
+          render: ({ row }) => row.parent_offering_name || 'N/A',
+        },
+        {
           title: translate('Created at'),
           render: ({ row }) => <>{formatDateTime(row.created)}</>,
           orderField: 'created',
@@ -54,6 +58,7 @@ export const ProviderProjectResourcesList: FunctionComponent<{
           render: ({ row }) => (
             <ResourceStateField resource={row} outline pill />
           ),
+          orderField: 'state',
         },
       ]}
       verboseName={translate('Resources')}

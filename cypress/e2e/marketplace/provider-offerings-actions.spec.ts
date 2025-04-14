@@ -5,6 +5,9 @@ describe('Offerings list actions in Provider dashboard page', () => {
       .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/', {
         fixture: 'customers/alice.json',
       })
+      .intercept('GET', 'api/customer-credits/**', {
+        data: [],
+      })
       .intercept('GET', '/api/marketplace-service-providers/**/stat/', {
         fixture: 'marketplace/service_providers_stat.json',
       })
@@ -42,7 +45,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
       },
     );
     cy.intercept('GET', '/api/marketplace-service-providers/**/revenue/**', [])
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
       .intercept(
@@ -60,7 +63,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
   });
 
   it("edit action should redirect to provider's offering update page", () => {
-    cy.get('td .dropdown')
+    cy.get('td .dropstart')
       .first()
       .find('button.dropdown-toggle')
       .click()
@@ -77,7 +80,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
   });
 
   it('preview order form action should open the preview offering modal', () => {
-    cy.get('td .dropdown')
+    cy.get('td .dropstart')
       .first()
       .find('button.dropdown-toggle')
       .click()
@@ -92,7 +95,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
     cy.get('.modal-body').within(() => {
       cy.get('form').should('be.visible');
       cy.get('form').within(() => {
-        cy.get('h6').should('contain', 'Project');
+        cy.get('h4').should('contain', 'Details overview');
       });
     });
 
@@ -102,7 +105,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
   });
 
   it('open public page action should redirect to public-offering', () => {
-    cy.get('td .dropdown')
+    cy.get('td .dropstart')
       .first()
       .find('button.dropdown-toggle')
       .click()

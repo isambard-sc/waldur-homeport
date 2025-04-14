@@ -37,6 +37,7 @@ export const states: StateDeclaration[] = [
     parent: 'project',
     component: UIView,
     url: '',
+    redirectTo: 'project-users',
     data: {
       breadcrumb: () => translate('Team'),
       priority: 120,
@@ -106,7 +107,7 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('Issues'),
+      breadcrumb: () => translate('Requests'),
       permissions: [hasSupport],
       priority: 140,
     },
@@ -135,6 +136,7 @@ export const states: StateDeclaration[] = [
     ),
     parent: 'project-team',
     data: {
+      skipBreadcrumb: true,
       breadcrumb: () => translate('Users'),
     },
   },
@@ -148,20 +150,8 @@ export const states: StateDeclaration[] = [
     ),
     parent: 'project-team',
     data: {
+      skipBreadcrumb: true,
       breadcrumb: () => translate('Invitations'),
-    },
-  },
-  {
-    name: 'project-permissions-log',
-    url: 'permissions-log/',
-    component: lazyComponent(() =>
-      import('./team/ProjectPermissionsLogList').then((module) => ({
-        default: module.ProjectPermissionsLogList,
-      })),
-    ),
-    parent: 'project-team',
-    data: {
-      breadcrumb: () => translate('Permissions log'),
     },
   },
 ];

@@ -1,13 +1,13 @@
 import { FC } from 'react';
+import { ProtectedRound, RoundReviewer } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { Reviewer, Round } from '@waldur/proposals/types';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
 interface RoundReviewersListProps {
-  round: Round;
+  round: ProtectedRound;
 }
 
 export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
@@ -17,17 +17,19 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
   });
 
   return (
-    <Table<Reviewer>
+    <Table<RoundReviewer>
       {...tableProps}
       id="reviewers"
       columns={[
         {
           title: translate('Full name'),
           render: ({ row }) => <>{row.full_name || '-'} </>,
+          copyField: (row) => row.full_name,
         },
         {
           title: translate('Email'),
           render: ({ row }) => <>{row.email || '-'} </>,
+          copyField: (row) => row.email,
         },
         {
           title: translate('Proposals in progress'),

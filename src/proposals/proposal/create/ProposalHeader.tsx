@@ -1,19 +1,11 @@
-import { Card } from 'react-bootstrap';
-
-import { translate } from '@waldur/i18n';
-
 import { ProposalBadge } from '../ProposalBadge';
 
-export const ProposalHeader = ({ proposal }) => (
-  <Card className="card-bordered">
-    <Card.Body>
-      <div className="d-flex mb-4">
-        <h3 className="mb-0">
-          {translate('Proposal')} - {proposal.name}
-        </h3>
-        <ProposalBadge state={proposal.state} />
-      </div>
-      <p className="text-muted fst-italic">UUID: {proposal.uuid}</p>
-    </Card.Body>
-  </Card>
+export const ProposalHeader = ({ proposal, className = undefined }) => (
+  <div className={className}>
+    <div className="d-flex align-items-center gap-4 mb-1">
+      <h1 className="mb-0 fs-1x">{proposal.name}</h1>
+      <ProposalBadge state={proposal.state} />
+    </div>
+    <p className="fs-6 text-muted mb-0">UUID: {proposal.uuid}</p>
+  </div>
 );

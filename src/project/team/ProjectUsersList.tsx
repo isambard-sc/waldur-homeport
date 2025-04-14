@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { UserRoleDetails } from 'waldur-js-client';
 
 import Avatar from '@waldur/core/Avatar';
 import { renderRoleExpirationDate } from '@waldur/customer/team/CustomerUsersList';
@@ -13,10 +14,12 @@ import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { getProject } from '@waldur/workspace/selectors';
 
 import { PROJECT_USERS_LIST_FILTER_FORM_ID } from '../constants';
+import { PROJECT_TEAM_TABLE_TABS } from '../utils';
 
-import { AddUserButton } from './AddUserButton';
 import { ProjectPermisionActions } from './ProjectPermisionActions';
+import { ProjectPermissionsLogButton } from './ProjectPermissionsLogButton';
 import { ProjectUsersListFilter } from './ProjectUsersListFilter';
+import { TeamDropdownActions } from './TeamDropdownActions';
 
 const mandatoryFields = [
   // Required for actions
@@ -41,19 +44,27 @@ const mapStateToFilter = createSelector(
   },
 );
 
-export const ProjectUsersList = () => {
+export const ProjectUsersList = ({
+  hideTabs = false,
+  projectId,
+}: {
+  hideTabs?: boolean;
+  projectId?: string;
+}) => {
   const filter = useSelector(mapStateToFilter);
   const project = useSelector(getProject);
   const tableProps = useTable({
     table: 'project-users',
-    fetchData: createFetcher(`projects/${project.uuid}/list_users`),
+    fetchData: createFetcher(
+      `projects/${project?.uuid || projectId}/list_users`,
+    ),
     queryField: 'search_string',
     filter,
     mandatoryFields,
   });
 
   return (
-    <Table
+    <Table<UserRoleDetails>
       {...tableProps}
       columns={[
         {
@@ -64,14 +75,15 @@ export const ProjectUsersList = () => {
                 <img
                   src={row.user_image}
                   alt={row.user_username}
-                  width={25}
-                  height={25}
+                  width={32}
+                  height={32}
+                  className="rounded-circle"
                 />
               ) : (
                 <Avatar
-                  className="symbol symbol-25px"
+                  className="symbol symbol-32px symbol-circle"
                   name={row.user_full_name}
-                  size={25}
+                  size={32}
                 />
               )}
               {row.user_full_name || DASH_ESCAPE_CODE}
@@ -79,12 +91,14 @@ export const ProjectUsersList = () => {
           ),
           id: 'member',
           keys: ['user_full_name', 'user_username', 'user_image'],
+          copyField: (row) => row.user_full_name,
         },
         {
           title: translate('Email'),
           render: ({ row }) => row.user_email || DASH_ESCAPE_CODE,
           id: 'user_email',
           keys: ['user_email'],
+          copyField: (row) => row.user_email,
         },
         {
           title: translate('Username'),
@@ -107,9 +121,23 @@ export const ProjectUsersList = () => {
           keys: ['expiration_time'],
         },
       ]}
+      tabs={!hideTabs && PROJECT_TEAM_TABLE_TABS}
       hasQuery={true}
-      tableActions={<AddUserButton refetch={tableProps.fetch} />}
-      title={translate('Team members')}
+      tableActions={
+        <>
+          <ProjectPermissionsLogButton projectId={projectId} />
+          <TeamDropdownActions
+            project={
+              project ||
+              ({
+                uuid: projectId,
+              } as any)
+            }
+            refetch={tableProps.fetch}
+          />
+        </>
+      }
+      title={translate('Team')}
       verboseName={translate('Team members')}
       rowActions={ProjectPermisionActions}
       filters={<ProjectUsersListFilter />}

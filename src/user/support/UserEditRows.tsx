@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
+import { User } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { UserFeatures } from '@waldur/FeaturesEnums';
@@ -9,7 +10,6 @@ import { getNativeNameVisible } from '@waldur/store/config';
 import { getShortNameVisible } from '@waldur/store/config';
 import { formatUserStatus } from '@waldur/user/support/utils';
 import { getUser, isStaffOrSupport } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { ChangeEmailButton } from './ChangeEmailButton';
 import { UserEditRow } from './UserEditRow';
@@ -23,7 +23,7 @@ const getDefaultRequiredMsg = (field, isSelf) =>
     ? translate('Your {field} is required', { field })
     : translate("The user's {field} is required", { field });
 
-const fieldIsProtected = (user: UserDetails, field: string) =>
+const fieldIsProtected = (user: User, field: string) =>
   user.identity_provider_fields.includes(field) ||
   (
     ENV.plugins.WALDUR_CORE.PROTECT_USER_DETAILS_FOR_REGISTRATION_METHODS || []
@@ -279,7 +279,7 @@ const ShortNameRow = ({ user, isSelf }) => {
   ) : null;
 };
 
-export const UserEditRows = ({ user }: { user: UserDetails }) => {
+export const UserEditRows = ({ user }: { user: User }) => {
   const currentUser = useSelector(getUser);
   const isSelf = currentUser.uuid === user.uuid;
 

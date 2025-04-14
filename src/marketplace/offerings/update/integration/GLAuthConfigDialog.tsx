@@ -5,13 +5,13 @@ import { MonacoField } from '@waldur/form/MonacoField';
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 type OwnProps = { resolve: { offering: Offering; config: string } };
 
 export const GLAuthConfigDialog: FC<OwnProps> = (props) => {
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('GLAuth configuration for {offering}', {
         offering: props.resolve.offering.name,
       })}
@@ -34,6 +34,6 @@ export const GLAuthConfigDialog: FC<OwnProps> = (props) => {
         input={{ onChange: null, value: props.resolve.config }}
         readOnly
       />
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

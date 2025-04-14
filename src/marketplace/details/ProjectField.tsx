@@ -18,50 +18,59 @@ interface ProjectFieldProps {
   hideLabel?: boolean;
 }
 
-export const ProjectField: FC<ProjectFieldProps> = ({
-  previewMode,
-  hideLabel,
-}) => {
+export const ProjectField: FC<ProjectFieldProps> = ({ previewMode }) => {
   const dispatch = useDispatch();
   const customer = useSelector(orderCustomerSelector);
-  if (!customer) {
-    return translate('Please select organization first.');
-  }
+
   return (
     <FormGroup
-      label={hideLabel ? undefined : translate('Project')}
+      label={translate('Project')}
       required={true}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div style={{ flexGrow: 1, marginRight: 10 }}>
-          <Field
-            name="project"
-            validate={required}
-            component={(fieldProps) => (
-              <AsyncPaginate
-                placeholder={translate('Select project...')}
-                noOptionsMessage={() => translate('No projects found')}
-                loadOptions={(query, prevOptions, { page }) =>
-                  projectAutocomplete(customer.uuid, query, prevOptions, page, {
-                    // UUID is used in suggest name API request
-                    field: ['name', 'url', 'uuid'],
-                  })
-                }
-                label={translate('Project')}
-                value={fieldProps.input.value}
-                onChange={(value) => {
-                  fieldProps.input.onChange(value);
-                  dispatch(setCurrentProject(value));
-                }}
-                getOptionValue={(option) => option.url}
-                getOptionLabel={(option) => option.name}
-                isClearable={false}
-              />
-            )}
+      spaceless
+      quickAction={
+        !previewMode && (
+          <ProjectCreateButton
+            customer={customer}
+            title={translate('Add project')}
+            variant="link"
+            size="sm"
+            className="btn-text-primary btn-icon-primary mb-1"
           />
-        </div>
-        {!previewMode && <ProjectCreateButton />}
-      </div>
+        )
+      }
+    >
+      <Field
+        name="project"
+        validate={required}
+        component={(fieldProps) => (
+          <AsyncPaginate
+            placeholder={
+              customer
+                ? translate('Select project...')
+                : translate('Please select organization first')
+            }
+            noOptionsMessage={() => translate('No projects found')}
+            loadOptions={(query, prevOptions, { page }) =>
+              projectAutocomplete(customer.uuid, query, prevOptions, page, {
+                // UUID is used in suggest name API request
+                field: ['name', 'url', 'uuid'],
+              })
+            }
+            label={translate('Project')}
+            value={fieldProps.input.value}
+            onChange={(value) => {
+              fieldProps.input.onChange(value);
+              dispatch(setCurrentProject(value));
+            }}
+            getOptionValue={(option) => option.url}
+            getOptionLabel={(option) => option.name}
+            isClearable={false}
+            isDisabled={!customer}
+            className="metronic-select-container"
+            classNamePrefix="metronic-select"
+          />
+        )}
+      />
     </FormGroup>
   );
 };

@@ -1,9 +1,4 @@
-import { Project } from '@waldur/workspace/types';
-
-export interface ProjectCounterResourceItem {
-  label: string;
-  value: number | string;
-}
+import { Project } from 'waldur-js-client';
 
 export interface EditProjectProps {
   project: Project;

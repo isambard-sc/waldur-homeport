@@ -16,9 +16,9 @@ export const CustomerActions = ({ customer }) => {
           className="btn btn-secondary"
         >
           <span className="svg-icon svg-icon-2">
-            <Warning />
+            <Warning weight="bold" />
           </span>
-          {translate('Issues')}
+          {translate('Requests')}
         </Link>
       )}
     </div>

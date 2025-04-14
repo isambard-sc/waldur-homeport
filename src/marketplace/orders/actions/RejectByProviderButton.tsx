@@ -3,12 +3,13 @@ import { useMutation } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceOrdersRejectByProvider,
+  marketplaceOrdersRetrieve,
+  OrderDetails,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import {
-  getOrder,
-  rejectOrderByProvider,
-} from '@waldur/marketplace/common/api';
 import {
   TABLE_MARKETPLACE_ORDERS,
   TABLE_PENDING_PROVIDER_PUBLIC_ORDERS,
@@ -19,10 +20,8 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { updateEntity } from '@waldur/table/actions';
 
-import { OrderResponse } from '../types';
-
 interface RejectByProviderButtonProps {
-  row: OrderResponse;
+  row: OrderDetails;
   refetch?: () => void;
   as?: React.ComponentType;
 }
@@ -33,8 +32,12 @@ export const RejectByProviderButton: FunctionComponent<
   const dispatch = useDispatch();
   const { mutate, isLoading } = useMutation(async () => {
     try {
-      await rejectOrderByProvider(props.row.uuid);
-      const newOrder = await getOrder(props.row.uuid);
+      await marketplaceOrdersRejectByProvider({
+        path: { uuid: props.row.uuid },
+      });
+      const newOrder = await marketplaceOrdersRetrieve({
+        path: { uuid: props.row.uuid },
+      }).then((response) => response.data);
       dispatch(
         updateEntity(TABLE_MARKETPLACE_ORDERS, props.row.uuid, newOrder),
       );
@@ -70,7 +73,8 @@ export const RejectByProviderButton: FunctionComponent<
       title={translate('Reject')}
       action={mutate}
       disabled={isLoading}
-      iconNode={<Prohibit />}
+      iconNode={<Prohibit weight="bold" />}
+      iconColor="danger"
     />
   );
 };

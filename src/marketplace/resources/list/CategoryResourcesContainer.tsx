@@ -1,10 +1,10 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 import React from 'react';
 import { useAsync } from 'react-use';
+import { marketplaceCategoriesRetrieve } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { getCategory } from '@waldur/marketplace/common/api';
 
 import { CategoryResourcesList } from './CategoryResourcesList';
 
@@ -15,9 +15,10 @@ export const CategoryResourcesContainer: React.FC = () => {
 
   const { loading, value, error } = useAsync(
     () =>
-      getCategory(category_uuid, {
-        params: { field: ['columns', 'title'] },
-      }),
+      marketplaceCategoriesRetrieve({
+        path: { uuid: category_uuid },
+        query: { field: ['columns', 'title'] },
+      }).then((response) => response.data),
     [category_uuid],
   );
 

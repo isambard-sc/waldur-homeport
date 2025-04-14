@@ -1,25 +1,25 @@
 import { Trash } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { projectsDeleteUser } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { deleteProjectUser } from '@waldur/permissions/api';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { GenericPermission } from '@waldur/permissions/types';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 import { useUser } from '@waldur/workspace/hooks';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 
 interface UserRemoveButtonProps {
-  permission: GenericPermission;
+  row: GenericPermission;
   refetch(): void;
 }
 
 export const UserRemoveButton: React.FC<UserRemoveButtonProps> = ({
-  permission,
+  row: permission,
   refetch,
 }) => {
   const dispatch = useDispatch();
@@ -51,10 +51,12 @@ export const UserRemoveButton: React.FC<UserRemoveButtonProps> = ({
     }
 
     try {
-      await deleteProjectUser({
-        project: project.uuid,
-        user: permission.user_uuid,
-        role: permission.role_name,
+      await projectsDeleteUser({
+        path: { uuid: project.uuid },
+        body: {
+          user: permission.user_uuid,
+          role: permission.role_name,
+        },
       });
       refetch();
       dispatch(showSuccess(translate('Team member has been removed.')));
@@ -65,10 +67,12 @@ export const UserRemoveButton: React.FC<UserRemoveButtonProps> = ({
     }
   };
   return (
-    <RowActionButton
+    <ActionItem
       action={callback}
       title={translate('Remove')}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
+      className="text-danger"
+      iconColor="danger"
       size="sm"
     />
   );

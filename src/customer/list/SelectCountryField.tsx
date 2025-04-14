@@ -3,8 +3,8 @@ import { FunctionComponent } from 'react';
 import { Form } from 'react-bootstrap';
 import { components } from 'react-select';
 import { Field } from 'redux-form';
+import { customersCountriesList } from 'waldur-js-client';
 
-import { get } from '@waldur/core/api';
 import { WindowedSelect } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
@@ -27,19 +27,18 @@ const SingleValue: FunctionComponent<any> = (props) => (
   </components.SingleValue>
 );
 
-const loadCountries = async () => {
-  const response = await get('/customers/countries/');
-  return response.data;
-};
-
 const WindowedSelectField = ({ input: { value, onChange }, ...props }) => (
   <WindowedSelect value={value} onChange={onChange} {...props} />
 );
 
 export const SelectCountryField: FunctionComponent = () => {
-  const { isLoading, data } = useQuery(['countries'], loadCountries, {
-    staleTime: 5 * 60 * 1000,
-  });
+  const { isLoading, data } = useQuery(
+    ['countries'],
+    () => customersCountriesList().then((r) => r.data),
+    {
+      staleTime: 5 * 60 * 1000,
+    },
+  );
   return (
     <Form.Group className="mb-7">
       <Field

@@ -1,12 +1,12 @@
-import { ENV } from '@waldur/configs/default';
+import { VmwareVirtualMachine } from 'waldur-js-client';
+
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { Field, ResourceSummaryProps } from '@waldur/resource/summary';
 import { formatSummary } from '@waldur/resource/utils';
 
-import { VMwareVirtualMachine } from './types';
-
 export const VMwareVirtualMachineSummary = (
-  props: ResourceSummaryProps<VMwareVirtualMachine>,
+  props: ResourceSummaryProps<VmwareVirtualMachine>,
 ) => {
   const { resource } = props;
   const advancedMode = !ENV.plugins.WALDUR_VMWARE.BASIC_MODE;

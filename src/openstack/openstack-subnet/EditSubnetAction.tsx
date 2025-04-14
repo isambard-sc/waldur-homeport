@@ -22,6 +22,6 @@ export const EditSubnetAction: ActionItemType = ({ resource, refetch }) => (
     resource={resource}
     extraResolve={{ refetch }}
     dialogSize="lg"
-    iconNode={<PencilSimple />}
+    iconNode={<PencilSimple weight="bold" />}
   />
 );

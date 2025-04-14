@@ -2,13 +2,12 @@ import { useState, useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffectOnce } from 'react-use';
 import { reduxForm } from 'redux-form';
+import { RancherHpa, rancherHpasUpdate } from 'waldur-js-client';
 
 import { StringField, SelectField, NumberField, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { ActionDialog } from '@waldur/modal/ActionDialog';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { updateHPA } from '@waldur/rancher/api';
-import { HPA } from '@waldur/rancher/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { updateEntity } from '@waldur/table/actions';
 
@@ -23,23 +22,26 @@ import {
 
 interface OwnProps {
   resolve: {
-    hpa: HPA;
+    hpa: RancherHpa;
   };
 }
 
-const useHPAUpdateDialog = (originalHPA) => {
+const useHPAUpdateDialog = (originalHPA: RancherHpa) => {
   const [submitting, setSubmitting] = useState(false);
   const dispatch = useDispatch();
   const callback = useCallback(
     async (formData: HPAUpdateFormData) => {
       try {
         setSubmitting(true);
-        const response = await updateHPA(originalHPA.uuid, {
-          name: formData.name,
-          description: formData.description,
-          min_replicas: formData.min_replicas,
-          max_replicas: formData.max_replicas,
-          metrics: serializeMetrics(formData),
+        const response = await rancherHpasUpdate({
+          path: { uuid: originalHPA.uuid },
+          body: {
+            name: formData.name,
+            description: formData.description,
+            min_replicas: formData.min_replicas,
+            max_replicas: formData.max_replicas,
+            metrics: serializeMetrics(formData),
+          },
         });
         const hpa = response.data;
         dispatch(updateEntity('rancher-hpas', hpa.uuid, hpa));

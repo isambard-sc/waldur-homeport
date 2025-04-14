@@ -4,8 +4,11 @@ import { Button, Table } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { compose } from 'redux';
 import { Field, FieldArray, reduxForm } from 'redux-form';
+import {
+  OpenStackAllowedAddressPairRequest,
+  openstackInstancesUpdateAllowedAddressPairs,
+} from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { SubmitButton } from '@waldur/form';
 import { renderValidationWrapper } from '@waldur/form/FieldValidationWrapper';
 import { InputField } from '@waldur/form/InputField';
@@ -19,15 +22,10 @@ import { validatePrivateCIDR } from '../utils';
 
 import { formatAddressList } from './utils';
 
-interface AllowedAddressPair {
-  ip_address: string;
-  mac_address: string;
-}
-
 interface OwnProps {
   resolve: {
     port: {
-      allowed_address_pairs: AllowedAddressPair[];
+      allowed_address_pairs: OpenStackAllowedAddressPairRequest[];
     };
     instance: {
       url: string;
@@ -36,7 +34,7 @@ interface OwnProps {
 }
 
 interface FormData {
-  pairs: AllowedAddressPair[];
+  pairs: OpenStackAllowedAddressPairRequest[];
 }
 
 const ValidatedInputField = renderValidationWrapper(InputField);
@@ -67,7 +65,7 @@ const PairRow = ({ pair, onRemove }) => (
 const PairAddButton = ({ onClick }) => (
   <Button variant="default" onClick={onClick}>
     <span className="svg-icon svg-icon-2">
-      <Plus />
+      <Plus weight="bold" />
     </span>{' '}
     {translate('Add pair')}
   </Button>
@@ -115,13 +113,13 @@ export const SetAllowedAddressPairsDialog = enhance(
     const dispatch = useDispatch();
     const setAllowedAddressPairs = async (formData: FormData) => {
       try {
-        await post(
-          `/openstack-instances/${resolve.instance.uuid}/update_allowed_address_pairs/`,
-          {
+        await openstackInstancesUpdateAllowedAddressPairs({
+          path: { uuid: resolve.instance.uuid },
+          body: {
             subnet: resolve.port.subnet,
             allowed_address_pairs: formData.pairs || [],
           },
-        );
+        });
         dispatch(
           showSuccess(translate('Allowed address pairs update was scheduled.')),
         );

@@ -2,13 +2,14 @@ import arrayMutators from 'final-form-arrays';
 import { useCallback } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import { notificationMessagesTemplatesOverride } from 'waldur-js-client';
 
+import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { overrideNotificationTemplate } from './api';
 import { NotificationForm } from './NotificationForm';
 
 function findDifferentTemplates(formTemplate, initTemplate) {
@@ -34,8 +35,11 @@ export const NotificationUpdateDialog = ({ resolve }) => {
 
       for (const template of templatesToUpdate) {
         try {
-          await overrideNotificationTemplate(template.url, {
-            content: template.content,
+          await notificationMessagesTemplatesOverride({
+            path: { uuid: template.uuid },
+            body: {
+              content: template.content,
+            },
           });
           await resolve.refetch();
           dispatch(showSuccess(translate('Notification has been updated.')));
@@ -51,19 +55,28 @@ export const NotificationUpdateDialog = ({ resolve }) => {
   );
 
   return (
-    <ModalDialog title={translate('Update a notification')}>
-      <Form
-        onSubmit={onSubmit}
-        initialValues={{ templates: resolve.notification.templates }}
-        mutators={{
-          ...arrayMutators,
-        }}
-        render={({ handleSubmit, submitting }) => (
-          <form onSubmit={handleSubmit}>
+    <Form
+      onSubmit={onSubmit}
+      initialValues={{ templates: resolve.notification.templates }}
+      mutators={{
+        ...arrayMutators,
+      }}
+      render={({ handleSubmit, submitting, pristine }) => (
+        <form onSubmit={handleSubmit}>
+          <ModalDialog
+            title={translate('Update a notification')}
+            footer={
+              <SubmitButton
+                submitting={submitting}
+                disabled={pristine}
+                label={translate('Save')}
+              />
+            }
+          >
             <NotificationForm submitting={submitting} />
-          </form>
-        )}
-      />
-    </ModalDialog>
+          </ModalDialog>
+        </form>
+      )}
+    />
   );
 };

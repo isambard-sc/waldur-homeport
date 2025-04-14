@@ -8,6 +8,8 @@ import {
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
+import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
+import { parentOfferingFilter } from '@waldur/marketplace/offerings/utils';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
@@ -51,6 +53,17 @@ const PureProjectResourcesFilter = ({ category_uuid, initialValues }) => {
         badgeValue={(value) => value?.name}
       >
         <OfferingFilter category_uuid={category_uuid} />
+      </TableFilterItem>
+      <TableFilterItem
+        title={translate('Parent offering')}
+        name="parent_offering"
+        badgeValue={(value) => value?.name}
+      >
+        <OfferingAutocomplete
+          reactSelectProps={REACT_SELECT_TABLE_FILTER}
+          name="parent_offering"
+          offeringFilter={parentOfferingFilter}
+        />
       </TableFilterItem>
       <TableFilterItem
         title={translate('Runtime state')}

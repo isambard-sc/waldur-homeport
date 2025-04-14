@@ -1,8 +1,8 @@
 import MatomoTracker from '@jonkoops/matomo-tracker';
 import * as Sentry from '@sentry/react';
 
-import { initAuthToken } from './auth/interceptor';
-import { ENV } from './configs/default';
+import { ENV } from './core/config';
+import { generateBrandColors, hexToRgb } from './core/generateColors';
 import { LanguageUtilsService } from './i18n/LanguageUtilsService';
 import { attachTransitions } from './transitions';
 
@@ -21,13 +21,49 @@ function initSentry() {
   }
 }
 
+const generateCheckboxSvgUrl = (color) => {
+  const svg = `<svg width='12' height='9' viewBox='0 0 12 9' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M11 1.25L4.125 8.125L1 5' stroke='${color}' stroke-width='1.6666' stroke-linecap='round' stroke-linejoin='round'/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+};
+
+const generateCheckboxIndeterminateSvgUrl = (color) => {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='${color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+};
+
+const generateRadioSvgUrl = (color) => {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='${color}'/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+};
+
 function initCssVariables() {
-  if (ENV.plugins.WALDUR_CORE.BRAND_COLOR) {
-    document.documentElement.style.setProperty(
-      '--waldur-aside-bg-color',
-      ENV.plugins.WALDUR_CORE.BRAND_COLOR,
-    );
-  }
+  const brand600 = ENV.plugins.WALDUR_CORE.BRAND_COLOR || '#307300';
+  document.documentElement.style.setProperty('--waldur-brand-color', brand600);
+  const brandRgb = hexToRgb(brand600);
+  document.documentElement.style.setProperty(
+    `--waldur-brand-color-rgb`,
+    brandRgb,
+  );
+
+  const brandColors = generateBrandColors(brand600);
+
+  Object.entries(brandColors).forEach(([key, color]) => {
+    document.documentElement.style.setProperty(`--waldur-brand-${key}`, color);
+  });
+
+  // Generate checkbox & radio bg
+  document.documentElement.style.setProperty(
+    '--checkbox-bg',
+    generateCheckboxSvgUrl(brand600),
+  );
+  document.documentElement.style.setProperty(
+    '--checkbox-indeterminate-bg',
+    generateCheckboxIndeterminateSvgUrl(brand600),
+  );
+  document.documentElement.style.setProperty(
+    '--radio-bg',
+    generateRadioSvgUrl(brand600),
+  );
 }
 
 export let MatomoInstance: MatomoTracker = null;
@@ -43,7 +79,6 @@ export function afterBootstrap() {
       siteId: ENV.plugins.WALDUR_CORE.MATOMO_SITE_ID,
     });
   initSentry();
-  initAuthToken();
   LanguageUtilsService.checkLanguage();
   attachTransitions();
   initCssVariables();

@@ -1,16 +1,17 @@
 import { FC, useMemo } from 'react';
 import { Card } from 'react-bootstrap';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime, parseDate } from '@waldur/core/dateUtils';
 import { ReadOnlyFormControl } from '@waldur/form/ReadOnlyFormControl';
 import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
-import { Call, Round } from '@waldur/proposals/types';
+import { Call } from '@waldur/proposals/types';
 
 import { EditSubmissionInfoButton } from './EditSubmissionInfoButton';
 
 interface RoundSubmissionSectionProps {
-  round: Round;
+  round: ProtectedRound;
   call: Call;
   refetch(): void;
   loading: boolean;

@@ -1,23 +1,23 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  Project,
+  projectsAddUser,
+  projectsDeleteUser,
+  projectsUpdateUser,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { FormContainer } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import {
-  addProjectUser,
-  deleteProjectUser,
-  updateProjectUser,
-} from '@waldur/permissions/api';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { GenericPermission, Role } from '@waldur/permissions/types';
 import { getProjectRoles } from '@waldur/permissions/utils';
 import { showErrorResponse } from '@waldur/store/notify';
 import { getProject } from '@waldur/workspace/selectors';
-import { Project } from '@waldur/workspace/types';
 
 import { ExpirationTimeGroup } from './ExpirationTimeGroup';
 import { RoleGroup } from './RoleGroup';
@@ -47,23 +47,29 @@ const savePermissions = async (
 ) => {
   if (resolve.permission) {
     if (resolve.permission.role_name === formData.role.name) {
-      await updateProjectUser({
-        project: project.uuid,
-        user: resolve.permission.user_uuid,
-        role: formData.role.name,
-        expiration_time: formData.expiration_time,
+      await projectsUpdateUser({
+        path: { uuid: project.uuid },
+        body: {
+          user: resolve.permission.user_uuid,
+          role: formData.role.name,
+          expiration_time: formData.expiration_time,
+        },
       });
     } else {
-      await deleteProjectUser({
-        project: project.uuid,
-        user: resolve.permission.user_uuid,
-        role: resolve.permission.role_name,
+      await projectsDeleteUser({
+        path: { uuid: project.uuid },
+        body: {
+          user: resolve.permission.user_uuid,
+          role: resolve.permission.role_name,
+        },
       });
-      await addProjectUser({
-        project: project.uuid,
-        user: resolve.permission.user_uuid,
-        role: formData.role.name,
-        expiration_time: formData.expiration_time,
+      await projectsAddUser({
+        path: { uuid: project.uuid },
+        body: {
+          user: resolve.permission.user_uuid,
+          role: formData.role.name,
+          expiration_time: formData.expiration_time,
+        },
       });
     }
   }
@@ -102,22 +108,23 @@ export const EditUserDialog = connect(
 
     return (
       <form onSubmit={handleSubmit(saveUser)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Edit project member')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Edit project member')}
+          footer={
+            <>
+              <SubmitButton submitting={submitting}>
+                {translate('Save')}
+              </SubmitButton>
+              <CloseDialogButton />
+            </>
+          }
+        >
           <FormContainer submitting={submitting}>
             <UserGroup permission={resolve.permission} />
             <RoleGroup types={['project']} />
             <ExpirationTimeGroup disabled={submitting} />
           </FormContainer>
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton submitting={submitting}>
-            {translate('Save')}
-          </SubmitButton>
-          <CloseDialogButton />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

@@ -1,6 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
-import { FunctionComponent, useMemo } from 'react';
-import { useAsyncFn, useEffectOnce } from 'react-use';
+import { FC, useMemo } from 'react';
+import { proposalPublicCallsRetrieve } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -12,8 +13,7 @@ import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
-import { getPublicCall } from '../api';
-import { getCallBreadcrumbItems } from '../utils';
+import { useCallBreadcrumbItems } from '../utils';
 
 import { CallTabs } from './CallTabs';
 import { PublicCallDetailsHero } from './PublicCallDetailsHero';
@@ -70,47 +70,59 @@ const PageHero = ({ call }) =>
     </div>
   ) : null;
 
-export const PublicCallDetailsContainer: FunctionComponent = () => {
+export const PublicCallDetailsContainer: FC = () => {
   const {
     params: { call_uuid },
   } = useCurrentStateAndParams();
 
-  const [{ loading, error, value }, refreshCall] = useAsyncFn(
-    () => getPublicCall(call_uuid),
-    [call_uuid],
+  const {
+    data: call,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery(
+    ['publicCall', call_uuid],
+    () =>
+      proposalPublicCallsRetrieve({ path: { uuid: call_uuid } }).then(
+        (r) => r.data,
+      ),
+    {
+      refetchOnWindowFocus: false,
+      staleTime: 60 * 1000,
+    },
   );
 
-  useEffectOnce(() => {
-    refreshCall();
-  });
+  useTitle(call ? call.name : translate('Call details'));
 
-  useTitle(value ? value.name : translate('Call details'));
+  usePageHero(<PageHero call={call} />, [call]);
 
-  usePageHero(<PageHero call={value} />);
-
-  const breadcrumbItems = useMemo(() => getCallBreadcrumbItems(value), [value]);
+  const breadcrumbItems = useCallBreadcrumbItems(call);
   useBreadcrumbs(breadcrumbItems);
 
-  const { tabSpec } = usePageTabsTransmitter(
-    tabs.filter(
-      (tab) =>
-        !isFeatureVisible(MarketplaceFeatures.call_only) ||
-        tab.key !== 'rounds',
-    ),
+  const filteredTabs = useMemo(
+    () =>
+      tabs.filter(
+        (tab) =>
+          !isFeatureVisible(MarketplaceFeatures.call_only) ||
+          tab.key !== 'rounds',
+      ),
+    [tabs],
   );
 
-  return loading ? (
+  const { tabSpec } = usePageTabsTransmitter(filteredTabs);
+
+  return isLoading ? (
     <LoadingSpinner />
   ) : error ? (
     <h3>{translate('Unable to load call details.')}</h3>
-  ) : value ? (
+  ) : call ? (
     <UIView
       render={(Component, { key, ...props }) => (
         <Component
           key={key}
           {...props}
-          refresh={refreshCall}
-          call={value}
+          refresh={refetch}
+          call={call}
           tabSpec={tabSpec}
         />
       )}

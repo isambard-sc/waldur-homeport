@@ -59,7 +59,8 @@
     // Fixed header & fixed toolbar & enabled page bar modes
     .header-fixed.toolbar-fixed.outstanding-bar-enabled & {
       top: calc(
-        #{get($header-config, fixed, height, desktop)} + var(--kt-pagebar-height)
+        #{get($header-config, fixed, height, desktop)} +
+          var(--kt-pagebar-height)
       );
     }
 
@@ -73,15 +74,15 @@
     // With header & fixed toolbar
     .header-fixed.toolbar-fixed & {
       top: calc(
-        #{get($header-config, fixed, height, desktop)} + var(--kt-toolbar-height)
+        #{get($header-config, fixed, height, desktop)} +
+          var(--kt-toolbar-height)
       );
     }
     // With header & fixed toolbar & enabled page bar modes
     .header-fixed.toolbar-fixed.outstanding-bar-enabled & {
       top: calc(
-        #{get($header-config, fixed, height, desktop)} + var(
-            --kt-toolbar-height
-          ) + var(--kt-pagebar-height)
+        #{get($header-config, fixed, height, desktop)} +
+          var(--kt-toolbar-height) + var(--kt-pagebar-height)
       );
     }
   }
@@ -166,7 +167,8 @@ $mobile-breadcrumb-height: get(
     .header-tablet-and-mobile-fixed.toolbar-tablet-and-mobile-fixed.outstanding-bar-enabled
       & {
       top: calc(
-        #{get($header-config, default, height, tablet-and-mobile)} + var(--kt-pagebar-height)
+        #{get($header-config, default, height, tablet-and-mobile)} +
+          var(--kt-pagebar-height)
       );
     }
     // And with breadcrumb
@@ -195,16 +197,16 @@ $mobile-breadcrumb-height: get(
     // With header & fixed toolbar
     .header-tablet-and-mobile-fixed.toolbar-tablet-and-mobile-fixed & {
       top: calc(
-        #{get($header-config, fixed, height, tablet-and-mobile)} + var(--kt-toolbar-height-tablet-and-mobile)
+        #{get($header-config, fixed, height, tablet-and-mobile)} +
+          var(--kt-toolbar-height-tablet-and-mobile)
       );
     }
     // With header & fixed toolbar & enabled page bar modes
     .header-tablet-and-mobile-fixed.toolbar-tablet-and-mobile-fixed.outstanding-bar-enabled
       & {
       top: calc(
-        #{get($header-config, fixed, height, tablet-and-mobile)} + var(
-            --kt-toolbar-height-tablet-and-mobile
-          ) + var(--kt-pagebar-height)
+        #{get($header-config, fixed, height, tablet-and-mobile)} +
+          var(--kt-toolbar-height-tablet-and-mobile) + var(--kt-pagebar-height)
       );
     }
   }

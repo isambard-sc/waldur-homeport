@@ -1,15 +1,16 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { openstackVolumesRetype, OpenStackVolumeType } from 'waldur-js-client';
+import { OpenStackVolume } from 'waldur-js-client';
 
 import { useModal } from '@waldur/modal/hooks';
 import * as api from '@waldur/openstack/api';
-import { VolumeType } from '@waldur/openstack/types';
-import { Volume } from '@waldur/resource/types';
 import { useNotify } from '@waldur/store/hooks';
 
 import { RetypeDialog } from './RetypeDialog';
 
+vi.mock('waldur-js-client');
 vi.mock('@waldur/openstack/api');
 vi.mock('@waldur/store/hooks');
 vi.mock('@waldur/modal/hooks');
@@ -21,7 +22,7 @@ const resource = {
   tenant_uuid: 'tenant_uuid',
   type_name: 'Fast SSD',
   type: 'ssd',
-} as unknown as Volume;
+} as Partial<OpenStackVolume>;
 
 const fakeVolumeTypes = [
   {
@@ -38,7 +39,7 @@ const fakeVolumeTypes = [
     name: 'Fast SSD',
     url: 'ssd',
   },
-] as unknown as VolumeType[];
+] as unknown as OpenStackVolumeType[];
 
 const renderDialog = () =>
   render(<RetypeDialog resolve={{ resource, refetch: vi.fn() }} />);
@@ -99,7 +100,7 @@ describe('RetypeDialog', () => {
 
   it('makes API request when form is submitted', async () => {
     apiMock.loadVolumeTypes.mockResolvedValue(fakeVolumeTypes);
-    apiMock.retypeVolume.mockResolvedValue(null);
+    vi.mocked(openstackVolumesRetype).mockResolvedValue(null);
 
     renderDialog();
 
@@ -115,15 +116,18 @@ describe('RetypeDialog', () => {
     const submitButton = screen.getByRole('button', { name: /submit/i });
     await user.click(submitButton);
 
-    expect(apiMock.retypeVolume).toHaveBeenCalledWith(resource.uuid, {
-      type: 'prod',
+    expect(vi.mocked(openstackVolumesRetype)).toHaveBeenCalledWith({
+      path: { uuid: resource.uuid },
+      body: {
+        type: 'prod',
+      },
     });
   });
 
   it('displays error message when API call fails', async () => {
     const error = new Error('Network error');
     apiMock.loadVolumeTypes.mockResolvedValue(fakeVolumeTypes);
-    apiMock.retypeVolume.mockRejectedValue(error);
+    vi.mocked(openstackVolumesRetype).mockRejectedValue(error);
 
     renderDialog();
 

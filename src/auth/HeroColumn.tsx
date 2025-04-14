@@ -1,5 +1,5 @@
-import { ENV } from '@waldur/configs/default';
-import { fixURL } from '@waldur/core/api';
+import { getIconUrl } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 
 // Image is taken from https://www.flickr.com/photos/visitestonia/33974817076
 import DefaultHeroImage from './estonian-bog.jpg';
@@ -11,9 +11,7 @@ export const HeroColumn = () => (
   <div
     className="hero-column"
     style={{
-      backgroundImage: `url(${
-        fixURL('/icons/hero_image/') || DefaultHeroImage
-      })`,
+      backgroundImage: `url(${getIconUrl('hero_image') || DefaultHeroImage})`,
     }}
   >
     <div className="hero-background">

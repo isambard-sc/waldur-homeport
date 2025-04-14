@@ -16,6 +16,6 @@ export const ResourceDetailsAction: ActionItemType = ({ resource }) => (
     title={translate('View details')}
     modalComponent={ResourceDetailsDialog}
     resource={resource}
-    iconNode={<Eye />}
+    iconNode={<Eye weight="bold" />}
   />
 );

@@ -1,9 +1,10 @@
-import { PaymentProfile } from '@waldur/workspace/types';
+import { PaymentProfile } from 'waldur-js-client';
 
 export type ChartData = Array<{
   label: string;
   value: number | string;
   xAxisValue?: any;
+  itemStyle?: any;
 }>;
 
 export interface Chart {
@@ -17,20 +18,16 @@ export interface Chart {
   yAxisLabel?: string;
 }
 
+export interface CostChart extends Chart {
+  incurred?: ChartData;
+  compensation?: ChartData;
+}
+
+export interface CreditChart extends Chart {
+  remaining?: ChartData;
+}
+
 export interface Scope {
   url?: string;
   payment_profiles?: PaymentProfile[];
-}
-
-export interface InvoiceSummary {
-  year: number;
-  month: number;
-  price: number;
-}
-
-export interface RingChartOption {
-  title: string;
-  label: string;
-  value: number;
-  max?: number;
 }

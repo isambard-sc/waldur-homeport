@@ -26,11 +26,22 @@
 }
 .modal .has-icon .icon-background {
   position: absolute;
-  top: -25px;
+  top: -18px;
   left: 49px;
   transform: translateX(-50%);
   height: 270px;
 }
 .modal .has-icon .btn-close {
   align-self: start;
+}
+
+/* To fix scrollable modal body if we wrap it nested in other tags */
+.modal-dialog-scrollable
+  .modal-content
+  *:not(.modal-header):not(.modal-body):not(.modal-footer):not(
+    .modal-header *
+  ):not(.modal-body *):not(.modal-footer *) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }

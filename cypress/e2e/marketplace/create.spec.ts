@@ -5,7 +5,7 @@ xdescribe('Offering creation', () => {
       .setToken()
 
       .log('Visit Marketplace Offering Create')
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
       .intercept('GET', '/api/marketplace-plugins/', {

@@ -36,7 +36,7 @@ export const DropdownBreadcrumbItem = ({ item }: { item: IBreadcrumbItem }) => {
       overlay={
         <Popover
           id={`BreadcrumbPopover-${item.key}`}
-          className="mw-400px min-w-200px py-2"
+          className="mw-400px min-w-200px pb-2"
         >
           {show &&
             (typeof item.dropdown === 'function'

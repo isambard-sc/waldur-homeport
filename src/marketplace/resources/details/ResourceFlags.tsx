@@ -1,9 +1,8 @@
 import { ArrowsInSimple, PauseCircle, XCircle } from '@phosphor-icons/react';
+import { Resource } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { translate } from '@waldur/i18n';
-
-import { Resource } from '../types';
 
 export const ResourceFlags = ({ resource }: { resource: Resource }) => {
   return (

@@ -1,14 +1,13 @@
 import { Trash } from '@phosphor-icons/react';
 import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceCategoriesDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { Category } from '@waldur/marketplace/types';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse } from '@waldur/store/notify';
-
-import { removeCategory } from './api';
 
 interface CategoryDeleteActionProps {
   row: Category;
@@ -36,7 +35,7 @@ export const CategoryDeleteAction = (props: CategoryDeleteActionProps) => {
     }
     setRemoving(true);
     try {
-      await removeCategory(props.row.uuid);
+      await marketplaceCategoriesDestroy({ path: { uuid: props.row.uuid } });
       props.refetch();
     } catch (e) {
       dispatch(showErrorResponse(e, translate('Unable to remove category.')));
@@ -50,7 +49,8 @@ export const CategoryDeleteAction = (props: CategoryDeleteActionProps) => {
       title={translate('Remove')}
       className="text-danger"
       action={openDialog}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
+      iconColor="danger"
       disabled={removing}
     />
   );

@@ -1,7 +1,6 @@
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-
-import { SecurityGroup } from '../types';
+import { OpenStackSecurityGroup } from 'waldur-js-client';
 
 import { ActionsField } from './ActionsField';
 import { CIDRField } from './CIDRField';
@@ -17,7 +16,7 @@ interface RuleRowProps {
   formName: string;
   ruleName: string;
   onRemove(): void;
-  remoteSecurityGroups: SecurityGroup[];
+  remoteSecurityGroups: OpenStackSecurityGroup[];
 }
 
 export const RuleRow: FC<RuleRowProps> = ({

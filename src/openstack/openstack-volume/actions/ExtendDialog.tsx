@@ -1,10 +1,10 @@
 import { useEffect, useCallback } from 'react';
-import { Form, InputGroup, Modal } from 'react-bootstrap';
+import { Form, InputGroup } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { Field, reduxForm, change } from 'redux-form';
+import { OpenStackVolume, openstackVolumesExtend } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
-import { post } from '@waldur/core/api';
 import { formatFilesize } from '@waldur/core/utils';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
@@ -14,15 +14,11 @@ import {
 } from '@waldur/marketplace/common/utils';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { BaseResource } from '@waldur/resource/types';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
-interface Volume extends BaseResource {
-  size: number;
-}
-
 interface VolumeExtendDialogOwnProps {
-  resolve: { resource: Volume; refetch };
+  resolve: { resource: OpenStackVolume; refetch };
 }
 
 interface VolumeExtendDialogFormData {
@@ -47,11 +43,13 @@ export const VolumeExtendDialog = reduxForm<
 
   const extendVolume = useCallback(
     async (formData: VolumeExtendDialogFormData) => {
-      const payload = {
-        disk_size: formData.size * 1024,
-      };
       try {
-        await post(`/openstack-volumes/${resource.uuid}/extend/`, payload);
+        await openstackVolumesExtend({
+          path: { uuid: resource.uuid },
+          body: {
+            disk_size: formData.size * 1024,
+          },
+        });
         dispatch(
           showSuccess(translate('Volume extension has been scheduled.')),
         );
@@ -67,10 +65,15 @@ export const VolumeExtendDialog = reduxForm<
   );
   return (
     <form onSubmit={handleSubmit(extendVolume)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Extend OpenStack volume')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Extend OpenStack volume')}
+        footer={
+          <>
+            <CloseDialogButton />
+            <SubmitButton submitting={submitting} label={translate('Submit')} />
+          </>
+        }
+      >
         <p>
           <strong>{translate('Volume name')}:</strong> {resource.name}
         </p>
@@ -96,11 +99,7 @@ export const VolumeExtendDialog = reduxForm<
             <InputGroup.Text>{translate('GB')}</InputGroup.Text>
           </InputGroup>
         </Form.Group>
-      </Modal.Body>
-      <Modal.Footer>
-        <CloseDialogButton />
-        <SubmitButton submitting={submitting} label={translate('Submit')} />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

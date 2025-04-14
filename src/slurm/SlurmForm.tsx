@@ -1,7 +1,7 @@
 import { get } from 'lodash-es';
 import { FunctionComponent } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { required } from '@waldur/core/validators';
 import { StringField } from '@waldur/form';
@@ -61,7 +61,7 @@ export const OpenPortalForm: FunctionComponent<OfferingEditPanelFormProps> = (
       value={get(props.offering, field.key, 'N/A')}
       actions={
         <FieldEditButton
-          title={props.title}
+          title={field.label}
           scope={props.offering}
           name={field.key}
           callback={props.callback}

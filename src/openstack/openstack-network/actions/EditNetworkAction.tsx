@@ -21,6 +21,6 @@ export const EditNetworkAction: ActionItemType = ({ resource, refetch }) => (
     modalComponent={EditNetworkDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<PencilSimple />}
+    iconNode={<PencilSimple weight="bold" />}
   />
 );

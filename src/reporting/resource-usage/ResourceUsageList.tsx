@@ -2,28 +2,59 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import {
+  ComponentUsage,
+  MarketplaceComponentUsagesListData,
+} from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { getStartAndEndDatesOfMonth } from '@waldur/issues/utils';
-import {
-  UsageReport,
-  UsageReportRequest,
-} from '@waldur/marketplace/resources/usage/types';
+import { ResourceLink } from '@waldur/resource/ResourceLink';
 import { createFetcher } from '@waldur/table/api';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
+import { usageTableTabs } from '../utils';
+
 import { FORM_ID, ResourceUsageFilter } from './ResourceUsageFilter';
 
-const UsageExpandableRow = ({ row }) => (
+export const UsageExpandableRow = ({ row }) => (
   <ExpandableContainer>
     <p>
       <strong>{translate('Comment')}</strong>: {row.description || 'N/A'}
     </p>
   </ExpandableContainer>
+);
+
+export const mapStateToFilter = createSelector(
+  getFormValues(FORM_ID),
+  (usageFilter: any) => {
+    const filter: MarketplaceComponentUsagesListData['query'] = {};
+    if (usageFilter) {
+      if (usageFilter.accounting_period) {
+        const { start } = getStartAndEndDatesOfMonth(
+          usageFilter.accounting_period.value,
+        );
+        filter.billing_period = start;
+      }
+      if (usageFilter.organization) {
+        filter.customer_uuid = usageFilter.organization.uuid;
+      }
+      if (usageFilter.project) {
+        filter.project_uuid = usageFilter.project.uuid;
+      }
+      if (usageFilter.offering) {
+        filter.offering_uuid = usageFilter.offering.uuid;
+      }
+      if (usageFilter.resource) {
+        filter.resource_uuid = usageFilter.resource.uuid;
+      }
+    }
+    return filter;
+  },
 );
 
 export const ResourceUsageList: FC = () => {
@@ -33,7 +64,19 @@ export const ResourceUsageList: FC = () => {
     fetchData: createFetcher('marketplace-component-usages'),
     filter,
   });
-  const columns: Array<Column<UsageReport>> = [
+  const columns: Array<Column<ComponentUsage>> = [
+    {
+      title: translate('Resource name'),
+      render: ({ row }) => (
+        <ResourceLink uuid={row.resource_uuid} label={row.resource_name} />
+      ),
+      filter: 'resource',
+      inlineFilter: (row) => ({
+        name: row.resource_name,
+        uuid: row.resource_uuid,
+      }),
+      export: 'resource_name',
+    },
     {
       title: translate('Client organization'),
       render: ({ row }) => <>{row.customer_name}</>,
@@ -65,11 +108,6 @@ export const ResourceUsageList: FC = () => {
       export: 'offering_name',
     },
     {
-      title: translate('Resource name'),
-      render: ({ row }) => <>{row.resource_name}</>,
-      export: 'resource_name',
-    },
-    {
       title: translate('Plan component name'),
       render: ({ row }) => <>{row.name}</>,
       export: 'name',
@@ -98,6 +136,7 @@ export const ResourceUsageList: FC = () => {
     <Table
       {...props}
       columns={columns}
+      tabs={usageTableTabs}
       verboseName={translate('Usages')}
       showPageSizeSelector={true}
       enableExport={true}
@@ -106,28 +145,3 @@ export const ResourceUsageList: FC = () => {
     />
   );
 };
-
-const mapStateToFilter = createSelector(
-  getFormValues(FORM_ID),
-  (usageFilter: any) => {
-    const filter: UsageReportRequest = {};
-    if (usageFilter) {
-      if (usageFilter.accounting_period) {
-        const { start } = getStartAndEndDatesOfMonth(
-          usageFilter.accounting_period.value,
-        );
-        filter.billing_period = start;
-      }
-      if (usageFilter.organization) {
-        filter.customer_uuid = usageFilter.organization.uuid;
-      }
-      if (usageFilter.project) {
-        filter.project_uuid = usageFilter.project.uuid;
-      }
-      if (usageFilter.offering) {
-        filter.offering_uuid = usageFilter.offering.uuid;
-      }
-    }
-    return filter;
-  },
-);

@@ -2,16 +2,16 @@ import { Prohibit } from '@phosphor-icons/react';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { marketplaceOrdersRejectByProvider } from 'waldur-js-client';
+import { OrderDetails as OrderResponse } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { rejectOrderByProvider } from '@waldur/marketplace/common/api';
 import {
   TABLE_PENDING_PROVIDER_PUBLIC_ORDERS,
   TABLE_PENDING_PUBLIC_ORDERS,
   TABLE_PUBLIC_ORDERS,
 } from '@waldur/marketplace/orders/list/constants';
-import { OrderResponse } from '@waldur/marketplace/orders/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { fetchListStart, resetPagination } from '@waldur/table/actions';
 
@@ -27,7 +27,9 @@ export const RejectAllButton: React.FC<RejectAllButtonProps> = (props) => {
     try {
       const promises = [];
       props.orders.forEach((order) => {
-        promises.push(rejectOrderByProvider(order.uuid));
+        promises.push(
+          marketplaceOrdersRejectByProvider({ path: { uuid: order.uuid } }),
+        );
       });
       await Promise.all(promises);
       // refresh tables

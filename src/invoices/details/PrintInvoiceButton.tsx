@@ -2,7 +2,7 @@ import { Printer } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 
 export const PrintInvoiceButton: FunctionComponent = () => (

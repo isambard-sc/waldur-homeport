@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { compose } from 'redux';
 import { Field, reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateUser } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { FormContainer } from '@waldur/form';
@@ -10,7 +10,7 @@ import { DateTimeField } from '@waldur/form/DateTimeField';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { updateOfferingPermission } from '@waldur/permissions/api';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { UPDATE_OFFERING_PERMISSION_EXPIRATION_TIME_FORM_ID } from './constants';
@@ -20,11 +20,13 @@ const PureUpdateOfferingPermissionExpirationTimeDialog = (props) => {
   const update = useCallback(
     async (formData) => {
       try {
-        await updateOfferingPermission({
-          offering: props.resolve.permission.offering_uuid,
-          user: props.resolve.permission.user_uuid,
-          role: props.resolve.permission.role_name,
-          expiration_time: formData.expiration_time,
+        await marketplaceProviderOfferingsUpdateUser({
+          path: { uuid: props.resolve.permission.offering_uuid },
+          body: {
+            user: props.resolve.permission.user_uuid,
+            role: props.resolve.permission.role_name,
+            expiration_time: formData.expiration_time,
+          },
         });
         dispatch(
           showSuccess(translate('Permission has been updated successfully.')),
@@ -41,14 +43,19 @@ const PureUpdateOfferingPermissionExpirationTimeDialog = (props) => {
   );
   return (
     <form onSubmit={props.handleSubmit(update)}>
-      <Modal.Header>
-        <Modal.Title>
-          {translate('Update permission of {name}', {
-            name: props.resolve.permission.offering_name,
-          })}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Update permission of {name}', {
+          name: props.resolve.permission.offering_name,
+        })}
+        footer={
+          <>
+            <CloseDialogButton />
+            <SubmitButton submitting={props.submitting}>
+              {translate('Update')}
+            </SubmitButton>
+          </>
+        }
+      >
         <FormContainer submitting={props.submitting}>
           <Field
             name="expiration_time"
@@ -56,13 +63,7 @@ const PureUpdateOfferingPermissionExpirationTimeDialog = (props) => {
             component={DateTimeField}
           />
         </FormContainer>
-      </Modal.Body>
-      <Modal.Footer>
-        <SubmitButton submitting={props.submitting}>
-          {translate('Update')}
-        </SubmitButton>
-        <CloseDialogButton />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 };

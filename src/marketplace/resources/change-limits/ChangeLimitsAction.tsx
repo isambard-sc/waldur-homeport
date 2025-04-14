@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { Timer } from '@phosphor-icons/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -29,7 +29,7 @@ const useChangeLimits = ({ resource, refetch }) => {
     action,
     tooltip,
     disabled,
-    iconNode: <PencilSimple />,
+    iconNode: <Timer weight="bold" />,
     important: true,
   };
 };

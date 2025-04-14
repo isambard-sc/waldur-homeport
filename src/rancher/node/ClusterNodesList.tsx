@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { RancherCluster, RancherNode } from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
@@ -14,9 +15,9 @@ import { CreateNodeAction } from '../cluster/actions/CreateNodeAction';
 
 import { NodeRoleField } from './NodeRoleField';
 
-export const ClusterNodesList: FunctionComponent<{ resourceScope }> = ({
-  resourceScope,
-}) => {
+export const ClusterNodesList: FunctionComponent<{
+  resourceScope: RancherCluster;
+}> = ({ resourceScope }) => {
   const filter = useMemo(
     () => ({
       cluster_uuid: resourceScope.uuid,
@@ -29,7 +30,7 @@ export const ClusterNodesList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<RancherNode>
       {...props}
       columns={[
         {
@@ -42,7 +43,7 @@ export const ClusterNodesList: FunctionComponent<{ resourceScope }> = ({
         },
         {
           title: translate('State'),
-          render: ({ row }) => <ResourceState resource={row} />,
+          render: ({ row }) => <ResourceState resource={row as any} />,
         },
         {
           title: translate('Instance'),

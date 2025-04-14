@@ -1,11 +1,11 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
+import { supportIssuesRetrieve } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-import { getById } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { formatDateTime, formatRelative } from '@waldur/core/dateUtils';
 import { ExternalLink } from '@waldur/core/ExternalLink';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
@@ -24,14 +24,12 @@ import { IssueAttachmentsContainer } from './attachments/IssueAttachmentsContain
 import { IssueCommentsContainer } from './comments/IssueCommentsContainer';
 import { IssueInfoButton } from './IssueInfo';
 import { IssueStatus } from './IssueStatus';
-import { getIssueBreadcrumbItems } from './utils';
-
-const loadIssue = (id) => getById<any>('/support-issues/', id);
+import { useIssueBreadcrumbItems } from './utils';
 
 const loadDependencies = async (issueId: string) => {
   const [issue, issueAttachmentsSaga, issueCommentsSaga, reducer] =
     await Promise.all([
-      loadIssue(issueId),
+      supportIssuesRetrieve({ path: { uuid: issueId } }),
       import('@waldur/issues/attachments/effects').then(
         (module) => module.default,
       ),
@@ -43,7 +41,7 @@ const loadDependencies = async (issueId: string) => {
   injectSaga('issueAttachmentsSaga', issueAttachmentsSaga);
   injectSaga('issueCommentsSaga', issueCommentsSaga);
   injectReducer('issues', reducer);
-  return issue;
+  return issue.data;
 };
 
 export const IssueDetails: FunctionComponent = () => {
@@ -66,10 +64,8 @@ export const IssueDetails: FunctionComponent = () => {
     value: issue,
   } = useAsync(() => loadDependencies(issue_uuid));
 
-  const breadcrumbItems = useMemo(
-    () => getIssueBreadcrumbItems(issue),
-    [issue],
-  );
+  const breadcrumbItems = useIssueBreadcrumbItems(issue);
+
   useBreadcrumbs(breadcrumbItems);
 
   if (loading) {

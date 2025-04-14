@@ -1,15 +1,20 @@
 import { useMemo } from 'react';
-import { Modal } from 'react-bootstrap';
+import { User, UsersListData } from 'waldur-js-client';
 
+import { FREEIPA_IDP } from '@waldur/auth/providers/constants';
 import { CancelButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
+
+import { FreeIPAUsersList } from '../users/FreeIPAUsersList';
+
 const ProviderUsersList = (props) => {
-  const filter = useMemo(
+  const filter = useMemo<UsersListData['query']>(
     () => ({
       registration_method: props.resolve.type,
       field: ['full_name', 'email', 'is_active'],
@@ -24,16 +29,18 @@ const ProviderUsersList = (props) => {
   });
 
   return (
-    <Table
+    <Table<User>
       {...tableProps}
       columns={[
         {
           title: translate('Full name'),
           render: ({ row }) => <>{renderFieldOrDash(row.full_name)}</>,
+          copyField: (row) => row.full_name,
         },
         {
           title: translate('Email'),
           render: ({ row }) => <>{renderFieldOrDash(row.email)}</>,
+          copyField: (row) => row.email,
         },
         {
           title: translate('Status'),
@@ -50,17 +57,17 @@ const ProviderUsersList = (props) => {
 };
 
 export const ProviderUsersDialog = (props) => (
-  <>
-    <Modal.Header>
-      <Modal.Title>
-        {translate('Users from {provider}', { provider: props.resolve.type })}
-      </Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
+  <ModalDialog
+    title={translate('Users from {provider}', {
+      provider: props.resolve.type,
+    })}
+    footer={<CancelButton label={translate('OK')} />}
+    closeButton
+  >
+    {props.resolve.type === FREEIPA_IDP ? (
+      <FreeIPAUsersList />
+    ) : (
       <ProviderUsersList {...props} />
-    </Modal.Body>
-    <Modal.Footer>
-      <CancelButton label={translate('OK')} />
-    </Modal.Footer>
-  </>
+    )}
+  </ModalDialog>
 );

@@ -1,6 +1,6 @@
 import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
-import { isEqual } from 'lodash-es';
+import { debounce, isEqual } from 'lodash-es';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Card, Col, Row, Stack } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
@@ -11,7 +11,7 @@ import { titleCase } from '@waldur/core/utils';
 import { ErrorMessage } from '@waldur/ErrorMessage';
 import { ErrorView } from '@waldur/ErrorView';
 
-import { OPTIONAL_COLUMN_ACTIONS_KEY } from './constants';
+import { COLUMN_ACTIONS_KEY } from './constants';
 import { FilterContextProvider } from './FilterContextProvider';
 import { GridBody } from './GridBody';
 import { HiddenActionsMessage } from './HiddenActionsMessage';
@@ -25,13 +25,17 @@ import { TablePagination } from './TablePagination';
 import { TablePlaceholder } from './TablePlaceholder';
 import { TableQuery } from './TableQuery';
 import { TableRefreshButton } from './TableRefreshButton';
-import { TableProps } from './types';
+import { TableTabs } from './TableTabs';
+import { PinnedColumns, TableProps } from './types';
 import { useTableLoader } from './useTableLoader';
 
 import './Table.scss';
 
 const TableComponent = (
-  props: TableProps & { toggleFilterMenu?(show?): void },
+  props: TableProps & {
+    toggleFilterMenu?(show?): void;
+    pinnedColumns?: PinnedColumns;
+  },
 ) => {
   const visibleColumns = useMemo(
     () =>
@@ -45,7 +49,7 @@ const TableComponent = (
 
   const showActions = useMemo(() => {
     if (props.rowActions && !props.hasOptionalColumns) return true;
-    return Boolean(props.activeColumns[OPTIONAL_COLUMN_ACTIONS_KEY]);
+    return Boolean(props.activeColumns[COLUMN_ACTIONS_KEY]);
   }, [props.rowActions, props.hasOptionalColumns, props.activeColumns]);
 
   return (
@@ -77,6 +81,7 @@ const TableComponent = (
           columnPositions={props.columnPositions}
           hasOptionalColumns={props.hasOptionalColumns}
           toggleFilterMenu={props.toggleFilterMenu}
+          pinnedColumns={props.pinnedColumns}
         />
       )}
       <TableBody
@@ -98,6 +103,7 @@ const TableComponent = (
         validate={props.validate}
         columnPositions={props.columnPositions}
         hasOptionalColumns={props.hasOptionalColumns}
+        pinnedColumns={props.pinnedColumns}
       />
     </table>
   );
@@ -114,6 +120,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     hasHeaders: true,
     cardBordered: true,
     hoverShadow: true,
+    placeholderRetry: true,
   };
 
   state = {
@@ -121,11 +128,20 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     /** Controls whether the main add filter toggle is displayed. \
      * Used with `filterPosition = 'menu'`*/
     showFilterMenuToggle: false,
+    /**
+     * If the key of a column is in this object, it is pinned. \
+     * If its value is `true`, it is floating, otherwise it is contained within the scroll range. */
+    pinnedColumns: { [COLUMN_ACTIONS_KEY]: false },
   };
+
+  tableResponsive: React.RefObject<HTMLDivElement> = null;
 
   constructor(props) {
     super(props);
     this.toggleFilterMenu = this.toggleFilterMenu.bind(this);
+
+    this.tableResponsive = React.createRef();
+    this.handleHorizontalScroll = this.handleHorizontalScroll.bind(this);
   }
 
   render() {
@@ -159,7 +175,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
         <Card
           className={classNames(
             'card-table',
-            'full-width',
+            this.props.fullWidth && 'full-width',
             this.props.cardBordered && 'card-bordered',
             this.props.fieldName ? 'field-table' : '',
             this.props.mode === 'grid' &&
@@ -170,17 +186,27 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
           id={this.props.id}
         >
           {this.props.hasActionBar && (
-            <Card.Header className="border-bottom">
+            <Card.Header
+              className={classNames(
+                'border-bottom',
+                this.props.headerClassName,
+              )}
+            >
               <Row className="card-toolbar g-0 gap-4 w-100">
                 {!this.props.standalone && (
                   <Col xs className="order-0">
                     <Card.Title>
                       <div className="me-2">
-                        <span className="h3">
+                        <span
+                          className={classNames(
+                            'h3',
+                            this.props.titleClassName,
+                          )}
+                        >
                           {this.props.title ||
+                            this.props.alterTitle ||
                             (this.props.verboseName &&
-                              titleCase(this.props.verboseName)) ||
-                            this.props.alterTitle}
+                              titleCase(this.props.verboseName))}
                         </span>
                         {Boolean(this.props.subtitle) && (
                           <small className="fs-6 fw-normal d-block mt-2">
@@ -225,6 +251,13 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
             </Card.Header>
           )}
 
+          {/* Tabs */}
+          {this.props.tabs?.length ? (
+            <Card.Header className="table-tabs border-bottom align-items-stretch py-0 min-h-auto">
+              <TableTabs tabs={this.props.tabs} />
+            </Card.Header>
+          ) : null}
+
           {this.props.filterPosition === 'header' && this.props.filters ? (
             <Card.Header className="table-filter border-bottom align-items-stretch">
               <TableFilterContainer filters={this.props.filters} />
@@ -259,7 +292,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
 
           {!this.state.closedHiddenActionsMessage &&
             this.props.hasOptionalColumns &&
-            this.props.activeColumns[OPTIONAL_COLUMN_ACTIONS_KEY] === false && (
+            this.props.activeColumns[COLUMN_ACTIONS_KEY] === false && (
               <Card.Header className="border-bottom">
                 <HiddenActionsMessage
                   toggleColumn={this.props.toggleColumn}
@@ -272,8 +305,10 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
 
           <Card.Body>
             <div
+              ref={this.tableResponsive}
               className="table-responsive dataTables_wrapper"
               style={{ minHeight: this.props.minHeight || 300 }}
+              onScroll={this.handleHorizontalScroll}
             >
               <div
                 className={classNames(
@@ -322,9 +357,12 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
         return (
           <TablePlaceholder
             query={query}
+            filtersStorage={this.props.filtersStorage}
             verboseName={verboseName}
+            emptyMessage={this.props.emptyMessage}
             clearSearch={() => setQuery('')}
             fetch={this.props.fetch}
+            hasRetry={this.props.placeholderHasRetry}
             actions={this.props.placeholderActions}
           />
         );
@@ -344,6 +382,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
         <TableComponent
           {...this.props}
           toggleFilterMenu={this.toggleFilterMenu}
+          pinnedColumns={this.state.pinnedColumns}
         />
       </ErrorBoundary>
     );
@@ -397,11 +436,45 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
     ) {
       this.props.fetch();
     }
+
+    // Fire the scroll handler fn to check floating state of pinned columns
+    if (this.tableResponsive?.current) {
+      this.handleHorizontalScroll({
+        target: this.tableResponsive.current,
+      } as any);
+    }
   }
 
   componentWillUnmount() {
     this.props.resetSelection();
   }
+
+  handleHorizontalScroll = debounce(
+    (event: React.UIEvent<HTMLDivElement, UIEvent>) => {
+      const responsiveEl = event.target as HTMLDivElement;
+      const tableEl = responsiveEl.querySelector('table');
+
+      if (!responsiveEl || !tableEl) return;
+
+      const responsiveWidth =
+        responsiveEl.getBoundingClientRect()?.width || responsiveEl.clientWidth;
+      const tableWidth =
+        tableEl.getBoundingClientRect()?.width || responsiveEl.clientWidth;
+
+      const actionsIsFloating =
+        responsiveWidth + responsiveEl.scrollLeft < tableWidth - 4;
+
+      if (this.state.pinnedColumns[COLUMN_ACTIONS_KEY] !== actionsIsFloating) {
+        this.setState({
+          pinnedColumns: {
+            ...this.state.pinnedColumns,
+            [COLUMN_ACTIONS_KEY]: actionsIsFloating,
+          },
+        });
+      }
+    },
+    10,
+  );
 
   toggleFilterMenu(show: boolean = null) {
     this.setState({
@@ -476,7 +549,7 @@ function Table<RowType = any>(props: TableProps<RowType>) {
       });
       // Add actions column to the optional columns
       if (rowActions) {
-        toggleColumn(OPTIONAL_COLUMN_ACTIONS_KEY, { keys: [] }, true);
+        toggleColumn(COLUMN_ACTIONS_KEY, { keys: [] }, true);
       }
     }
   }, []);

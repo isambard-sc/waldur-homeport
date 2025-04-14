@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
+import { Invitation } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 
 import { formatInvitation } from './formatInvitation';
-import { Invitation } from './types';
 
 export const GroupInvitationMessage: FunctionComponent<{
   invitation: Invitation;

@@ -1,11 +1,10 @@
 import { FunctionComponent } from 'react';
+import { Resource } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { CategoryColumn } from '@waldur/marketplace/types';
 import { validateIP } from '@waldur/marketplace/utils';
 import { IPList } from '@waldur/resource/IPList';
-
-import { Resource } from '../types';
 
 interface CategoryColumnFieldProps {
   row: Resource;

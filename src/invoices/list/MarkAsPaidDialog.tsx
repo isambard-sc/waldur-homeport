@@ -1,34 +1,41 @@
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { invoicesPaid } from 'waldur-js-client';
 
-import { format } from '@waldur/core/ErrorMessageFormatter';
+import { formDataOptions, fileSerializer } from '@waldur/core/api';
+import { formatDate } from '@waldur/core/dateUtils';
 import { FileUploadField, FormContainer, SubmitButton } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
 import { translate } from '@waldur/i18n';
-import * as api from '@waldur/invoices/api';
 import { MARK_AS_PAID_FORM_ID } from '@waldur/invoices/constants';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showError, showSuccess } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 const MarkAsPaidDialogContainer: FunctionComponent<any> = (props) => {
   const dispatch = useDispatch();
   async function markInvoiceAsPaid(formData) {
     try {
-      await api.markAsPaid({
-        formData,
-        invoiceUuid: props.resolve.invoice.uuid,
+      await invoicesPaid({
+        path: { uuid: props.resolve.invoice.uuid },
+        body: {
+          date: formData.date ? formatDate(formData.date) : undefined,
+          proof: fileSerializer(formData.proof),
+        },
+        ...formDataOptions,
       });
       dispatch(showSuccess(translate('The invoice has been marked as paid.')));
       dispatch(closeModalDialog());
       await props.resolve.refetch();
     } catch (error) {
-      const errorMessage = `${translate(
-        'Unable to mark the invoice as paid.',
-      )} ${format(error)}`;
-      dispatch(showError(errorMessage));
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to mark the invoice as paid.'),
+        ),
+      );
     }
   }
 

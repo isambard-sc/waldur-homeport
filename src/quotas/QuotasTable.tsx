@@ -2,6 +2,7 @@ import { EChartsOption } from 'echarts';
 import { useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
+import { ENV } from '@waldur/core/config';
 import { EChart } from '@waldur/core/EChart';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
 import { translate } from '@waldur/i18n';
@@ -18,7 +19,7 @@ interface Resource {
 const ResourceQuotaChart = ({ value, max }) => {
   const empty = Math.max(max - value, 0);
 
-  let color = '#108F10';
+  let color = ENV.plugins?.WALDUR_CORE?.BRAND_COLOR || '#108F10';
   const percentage = (value / max) * 100;
   if (percentage > 95) color = '#CC0808';
   else if (percentage > 60) color = '#FCCF5C';

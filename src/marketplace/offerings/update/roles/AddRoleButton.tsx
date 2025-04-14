@@ -30,7 +30,7 @@ export const AddRoleButton: FunctionComponent<{
   };
   return (
     <ActionButton
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       title={translate('Add role')}
       action={callback}
     />

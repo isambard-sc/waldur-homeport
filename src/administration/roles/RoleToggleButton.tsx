@@ -1,8 +1,8 @@
 import { CheckSquare, XSquare } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { rolesDisable, rolesEnable } from 'waldur-js-client';
 
-import { disableRole, enableRole } from '@waldur/administration/roles/api';
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -15,7 +15,7 @@ export const RoleToggleButton: FunctionComponent<{
   const callback = async () => {
     if (row.is_active) {
       try {
-        await disableRole(row.uuid);
+        await rolesDisable({ path: { uuid: row.uuid } });
         dispatch(showSuccess(translate('The role has been disabled')));
       } catch (error) {
         dispatch(
@@ -24,7 +24,7 @@ export const RoleToggleButton: FunctionComponent<{
       }
     } else {
       try {
-        await enableRole(row.uuid);
+        await rolesEnable({ path: { uuid: row.uuid } });
         dispatch(showSuccess(translate('The role has been enabled')));
       } catch (error) {
         dispatch(
@@ -38,7 +38,13 @@ export const RoleToggleButton: FunctionComponent<{
     <ActionItem
       action={callback}
       title={row.is_active ? translate('Disable') : translate('Enable')}
-      iconNode={row.is_active ? <XSquare /> : <CheckSquare />}
+      iconNode={
+        row.is_active ? (
+          <XSquare weight="bold" />
+        ) : (
+          <CheckSquare weight="bold" />
+        )
+      }
     />
   );
 };

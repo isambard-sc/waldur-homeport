@@ -1,9 +1,9 @@
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { change, reduxForm } from 'redux-form';
+import { marketplaceComponentUsagesSetUsage } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { submitUsageReport } from '@waldur/marketplace/common/api';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -61,16 +61,16 @@ const mapDispatchToProps = (dispatch) => ({
     }
   },
   submitReport: async ({ period, components }) => {
-    const payload = {
-      plan_period: period.value?.uuid,
-      usages: Object.keys(components).map((key) => ({
-        type: key,
-        ...components[key],
-      })),
-    };
-
     try {
-      await submitUsageReport(payload);
+      await marketplaceComponentUsagesSetUsage({
+        body: {
+          plan_period: period.value?.uuid,
+          usages: Object.keys(components).map((key) => ({
+            type: key,
+            ...components[key],
+          })),
+        },
+      });
       dispatch(showSuccess(translate('Usage report has been submitted.')));
       dispatch(closeModalDialog());
     } catch (error) {

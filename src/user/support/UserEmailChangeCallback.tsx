@@ -1,9 +1,9 @@
 import { useRouter } from '@uirouter/react';
 import { useEffect, FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { usersConfirmEmail } from 'waldur-js-client';
 
 import * as AuthService from '@waldur/auth/AuthService';
-import { post } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { wait } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -19,8 +19,10 @@ export const UserEmailChangeCallback: FunctionComponent = () => {
   useEffect(() => {
     async function load() {
       try {
-        await post('/users/confirm_email/', {
-          code: router.globals.params.token,
+        await usersConfirmEmail({
+          body: {
+            code: router.globals.params.token,
+          },
         });
         dispatch(showSuccess(translate('Email has been updated.')));
       } catch (error) {

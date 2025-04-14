@@ -1,11 +1,11 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { UserPlus } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { AddUserDialogProps } from './types';
@@ -21,7 +21,8 @@ export const AddUserButton: React.FC<AddUserDialogProps> = (props) => {
   const user = useSelector(getUser);
   return (
     user.is_staff && (
-      <ActionButton
+      <ActionItem
+        title={translate('Member')}
         action={() =>
           dispatch(
             openModalDialog(AddUserDialog, {
@@ -33,8 +34,7 @@ export const AddUserButton: React.FC<AddUserDialogProps> = (props) => {
             }),
           )
         }
-        title={translate('Add user')}
-        iconNode={<PlusCircle />}
+        iconNode={<UserPlus weight="bold" />}
       />
     )
   );

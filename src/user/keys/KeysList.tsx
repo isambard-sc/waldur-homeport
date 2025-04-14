@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { SshKey } from 'waldur-js-client';
 
 import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
 import { translate } from '@waldur/i18n';
@@ -30,7 +31,7 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
     queryField: 'name',
     filter,
   });
-  const columns: Column[] = [
+  const columns: Column<SshKey>[] = [
     {
       title: translate('Title'),
       render: ({ row }) => row.name,

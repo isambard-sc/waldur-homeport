@@ -9,6 +9,7 @@ import { formatQuotaName, formatQuotaValue } from '@waldur/quotas/utils';
 
 interface QuotaUsageBarChartProps {
   quotas: Quota[];
+  hideLabel?: boolean;
   className?: string;
 }
 
@@ -50,21 +51,21 @@ export const ProgressTooltipMessage = ({ quota }) => (
   </div>
 );
 
-export const QuotaUsageBarChartDescription = ({ quota }) => (
-  <div className="quota-info d-flex justify-content-between gap-3 mb-2">
+export const QuotaUsageBarChartDescription = ({ quota, hideLabel = false }) => (
+  <div className="quota-info d-flex justify-content-between gap-4 text-muted mb-2">
     <p className="mb-0">
-      <strong className="text-dark">{formatQuotaName(quota.name)}</strong>
+      {!hideLabel && formatQuotaName(quota.name)}
       {exceeds(quota) && (
         <Tip
           id={quota.name}
           label={translate('Quota usage exceeds available limit.')}
         >
           {' '}
-          <Warning data-testid="warning" />
+          <Warning className="text-warning" size={16} data-testid="warning" />
         </Tip>
       )}
     </p>
-    <span className="text-muted fw-normal">{getSummary(quota)}</span>
+    <span>{getSummary(quota)}</span>
   </div>
 );
 
@@ -76,7 +77,10 @@ export const QuotaUsageBarChart: FunctionComponent<QuotaUsageBarChartProps> = (
       if (quota.limit !== -1) {
         return (
           <div key={index} className={props.className}>
-            <QuotaUsageBarChartDescription quota={quota} />
+            <QuotaUsageBarChartDescription
+              quota={quota}
+              hideLabel={props.hideLabel}
+            />
             <Tip
               id="quota-usage"
               label={<ProgressTooltipMessage quota={quota} />}
@@ -84,7 +88,7 @@ export const QuotaUsageBarChart: FunctionComponent<QuotaUsageBarChartProps> = (
             >
               <ProgressBar>
                 <ProgressBar
-                  variant="success"
+                  variant="primary"
                   now={(quota.usage * 100) / quota.limit}
                   key={1}
                 />

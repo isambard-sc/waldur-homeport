@@ -30,7 +30,7 @@ export const SetBackendIdAction: ActionItemType = ({ resource, refetch }) => {
       modalComponent={SetBackendIdDialog}
       extraResolve={{ refetch }}
       resource={resource}
-      iconNode={<Code />}
+      iconNode={<Code weight="bold" />}
     />
   );
 };

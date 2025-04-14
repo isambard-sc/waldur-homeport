@@ -1,16 +1,20 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  hooksEmailCreate,
+  hooksWebCreate,
+  hooksWebPartialUpdate,
+} from 'waldur-js-client';
 
 import { useNotify } from '@waldur/store/hooks';
 
-import { createHook, updateHook } from './api';
 import { HookDetailsDialog } from './HookDetailsDialog';
 import { HookResponse } from './types';
 import { loadEventGroupsOptions } from './utils';
 
 // Mock the required modules
-vi.mock('./api');
+vi.mock('waldur-js-client');
 vi.mock('./utils');
 vi.mock('@waldur/modal/actions', () => ({
   closeModalDialog: vi.fn(),
@@ -68,7 +72,7 @@ describe('HookDetailsDialog', () => {
     });
 
     it('should handle webhook creation', async () => {
-      vi.mocked(createHook).mockResolvedValue(null);
+      vi.mocked(hooksWebCreate).mockResolvedValue(null);
 
       await userEvent.type(
         screen.getByTestId('destination-url'),
@@ -79,10 +83,11 @@ describe('HookDetailsDialog', () => {
       userEvent.click(screen.getByText('Create'));
 
       await waitFor(() => {
-        expect(createHook).toHaveBeenCalledWith('webhook', {
-          hook_type: 'webhook',
-          destination_url: 'https://example.com/webhook',
-          event_groups: ['users'],
+        expect(hooksWebCreate).toHaveBeenCalledWith({
+          body: {
+            destination_url: 'https://example.com/webhook',
+            event_groups: ['users'],
+          },
         });
         expect(mockShowSuccess).toHaveBeenCalledWith(
           'Notification has been created.',
@@ -91,7 +96,7 @@ describe('HookDetailsDialog', () => {
     });
 
     it('should handle email hook creation', async () => {
-      vi.mocked(createHook).mockResolvedValue(null);
+      vi.mocked(hooksEmailCreate).mockResolvedValue(null);
 
       await userEvent.click(screen.getByText('Email'));
       await userEvent.type(
@@ -103,10 +108,11 @@ describe('HookDetailsDialog', () => {
       userEvent.click(screen.getByText('Create'));
 
       await waitFor(() => {
-        expect(createHook).toHaveBeenCalledWith('email', {
-          hook_type: 'email',
-          email: 'test@example.com',
-          event_groups: ['users'],
+        expect(hooksEmailCreate).toHaveBeenCalledWith({
+          body: {
+            email: 'test@example.com',
+            event_groups: ['users'],
+          },
         });
         expect(mockShowSuccess).toHaveBeenCalledWith(
           'Notification has been created.',
@@ -145,7 +151,7 @@ describe('HookDetailsDialog', () => {
     });
 
     it('should handle hook update', async () => {
-      vi.mocked(updateHook).mockResolvedValue(null);
+      vi.mocked(hooksWebPartialUpdate).mockResolvedValue(null);
       // Update URL
       const urlInput = screen.getByTestId('destination-url');
       await userEvent.clear(urlInput);
@@ -163,11 +169,13 @@ describe('HookDetailsDialog', () => {
       const submitButton = screen.getByText('Update');
       await userEvent.click(submitButton);
       await waitFor(() => {
-        expect(updateHook).toHaveBeenCalledWith('test-uuid', 'webhook', {
-          hook_type: 'webhook',
-          destination_url: 'https://new-example.com/webhook',
-          is_active: true,
-          event_groups: ['users', 'resources'],
+        expect(hooksWebPartialUpdate).toHaveBeenCalledWith({
+          path: { uuid: 'test-uuid' },
+          body: {
+            destination_url: 'https://new-example.com/webhook',
+            is_active: true,
+            event_groups: ['users', 'resources'],
+          },
         });
         expect(mockRefetch).toHaveBeenCalled();
       });
@@ -175,7 +183,7 @@ describe('HookDetailsDialog', () => {
 
     it('should handle update error', async () => {
       const error = new Error('Update failed');
-      vi.mocked(updateHook).mockRejectedValue(error);
+      vi.mocked(hooksWebPartialUpdate).mockRejectedValue(error);
 
       // Submit form without changes
       const submitButton = screen.getByText('Update');

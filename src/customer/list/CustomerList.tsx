@@ -2,7 +2,7 @@ import { FunctionComponent, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { formatDate } from '@waldur/core/dateUtils';
 import { FinancialReportSendButton } from '@waldur/customer/list/FinancialReportSendButton';
 import { translate } from '@waldur/i18n';
@@ -21,7 +21,8 @@ import {
   EstimatedCostField,
   ExportEstimatedCostField,
 } from './EstimatedCostField';
-import { OrganizationLink } from './OrganizationLink';
+import { OrganizationNameLink } from './OrganizationNameLink';
+import { TotalCostContainer } from './TotalCostComponent';
 
 const AbbreviationField = ({ row }) => (
   <>{renderFieldOrDash(row.abbreviation)}</>
@@ -66,7 +67,7 @@ export const CustomerList: FunctionComponent<{
   const columns: Column<Customer>[] = [
     {
       title: translate('Organization'),
-      render: OrganizationLink,
+      render: OrganizationNameLink,
       orderField: 'name',
       export: 'name',
     },
@@ -145,6 +146,7 @@ export const CustomerList: FunctionComponent<{
     <Table
       {...props}
       columns={columns}
+      subtitle={<TotalCostContainer />}
       verboseName={translate('Organizations')}
       hasQuery={true}
       showPageSizeSelector={true}
@@ -172,7 +174,7 @@ const formatFilter = (filter) => {
         month: filter.accounting_period.value.month,
       }),
       ...(filter.provider && {
-        provider_uuid: filter.provider.customer_uuid,
+        customer_uuid: filter.provider.customer_uuid,
       }),
     };
     return formattedFilter;

@@ -1,11 +1,10 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { adminAnnouncementsDestroy } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
-
-import { deleteAdminAnnouncement } from '../api';
 
 export const AnnouncementDeleteAction = ({ row, refetch }) => {
   const dispatch = useDispatch();
@@ -20,14 +19,14 @@ export const AnnouncementDeleteAction = ({ row, refetch }) => {
     } catch {
       return;
     }
-    await deleteAdminAnnouncement(row.uuid);
+    await adminAnnouncementsDestroy({ path: { uuid: row.uuid } });
     await refetch();
   };
   return (
     <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       className="text-danger"
       iconColor="danger"
       size="sm"

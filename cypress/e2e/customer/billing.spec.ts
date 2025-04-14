@@ -8,6 +8,9 @@ describe('Billing page', () => {
       .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/', {
         fixture: 'customers/alice.json',
       })
+      .intercept('GET', 'api/customer-credits/?customer_uuid=bf6d515c9e6e445f9c339021b30fc96b', {
+        data: [],
+      })
       .intercept('GET', /\/api\/invoices\/\?.*/, {
         fixture: 'customers/invoices2.json',
       })

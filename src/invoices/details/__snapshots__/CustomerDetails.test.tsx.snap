@@ -14,7 +14,7 @@ exports[`CustomerDetails > renders all rows 1`] = `
       Lille 4-205
     </div>
     <div>
-      Estonia
+      EE
       , 
       80041
     </div>
@@ -25,7 +25,7 @@ exports[`CustomerDetails > renders all rows 1`] = `
         P:
       </abbr>
        
-      (+372)-555-55-55
+      3725555555
     </div>
     <div>
       Estonian Bank

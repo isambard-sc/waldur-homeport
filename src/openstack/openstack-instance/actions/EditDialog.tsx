@@ -1,8 +1,8 @@
 import { FC } from 'react';
+import { openstackInstancesUpdate } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { translate } from '@waldur/i18n';
-import { updateInstance } from '@waldur/openstack/api';
 import { createDescriptionField } from '@waldur/resource/actions/base';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { UpdateResourceDialog } from '@waldur/resource/actions/UpdateResourceDialog';
@@ -70,7 +70,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
         name: resource.name,
         description: resource.description,
       }}
-      updateResource={updateInstance}
+      updateResource={(uuid, body) =>
+        openstackInstancesUpdate({ path: { uuid }, body })
+      }
       refetch={refetch}
       verboseName={translate('OpenStack instance')}
     />

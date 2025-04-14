@@ -2,6 +2,7 @@ import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Issue } from 'waldur-js-client';
 
 import { formatDate, formatRelative } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -57,7 +58,7 @@ export const IssuesList: FC<OwnProps & Partial<TableProps>> = (props) => {
   });
 
   const columns = useMemo(() => {
-    const columns: Array<Column> = [
+    const columns: Array<Column<Issue>> = [
       {
         title: translate('Key'),
         orderField: 'key',
@@ -167,7 +168,7 @@ export const IssuesList: FC<OwnProps & Partial<TableProps>> = (props) => {
       {...tableProps}
       filters={props.filter ? undefined : <IssuesFilter />}
       columns={columns}
-      title={translate('Issues')}
+      title={translate('Requests')}
       verboseName={translate('support requests')}
       hasQuery={true}
       showPageSizeSelector={true}

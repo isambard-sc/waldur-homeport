@@ -1,12 +1,11 @@
 import { FunctionComponent } from 'react';
 import { Table } from 'react-bootstrap';
-
-import { Section } from '@waldur/marketplace/types';
+import { NestedSection } from 'waldur-js-client';
 
 import { AttributeSection } from './AttributeSection';
 
 interface AttributesTableProps {
-  sections: Section[];
+  sections: NestedSection[];
   attributes: any;
 }
 

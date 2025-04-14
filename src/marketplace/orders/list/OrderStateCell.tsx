@@ -1,8 +1,8 @@
+import { OrderDetails, OrderState } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
 
-import { OrderDetailsType, OrderState } from '../types';
-
-export const OrderStateCell = ({ row }: { row: OrderDetailsType }) => (
+export const OrderStateCell = ({ row }: { row: OrderDetails }) => (
   <>
     {
       (

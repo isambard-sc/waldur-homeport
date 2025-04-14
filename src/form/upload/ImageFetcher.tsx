@@ -16,10 +16,9 @@ export const ImageFetcher = ({ url, name, thumb = false }) => {
       setError(null);
 
       try {
-        const response = await get<Blob>(url, { responseType: 'blob' });
+        const blob = await get<Blob>(url);
 
         // Convert blob to a URL and set it to state
-        const blob = await response.data;
         const imageUrl = URL.createObjectURL(blob);
         setImageUrl(imageUrl);
       } catch {

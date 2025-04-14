@@ -2,7 +2,7 @@ import { PlusCircle } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
@@ -26,7 +26,7 @@ export const CatalogCreateButton: FC<{ cluster }> = ({ cluster }) => {
     <ActionButton
       title={translate('Create')}
       action={() => dispatch(createCatalogDialog(cluster))}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
     />
   );
 };

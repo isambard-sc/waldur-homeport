@@ -1,13 +1,15 @@
-import { set, unset } from 'lodash-es';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { SubmissionError } from 'redux-form';
+import {
+  marketplaceProviderOfferingsUpdateIntegration,
+  OfferingIntegrationUpdateRequest,
+  ProviderOfferingDetails,
+} from 'waldur-js-client';
 
-import { flattenObject } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { updateOfferingIntegration } from '@waldur/marketplace/common/api';
-import { Offering } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { showError, showSuccess } from '@waldur/store/notify';
 
 export const SCRIPT_ROWS = [
   { label: translate('Script language'), type: 'language' },
@@ -35,38 +37,26 @@ export const SCRIPT_ROWS = [
   },
 ];
 
-export const useUpdateOfferingIntegration = (offering: Offering, refetch?) => {
+export const useUpdateOfferingIntegration = (
+  offering: ProviderOfferingDetails,
+  refetch?,
+) => {
   const dispatch = useDispatch();
   const update = useCallback(
-    async (formData) => {
-      const payload = {
-        service_attributes: offering.service_attributes,
-        secret_options: offering.secret_options,
-        plugin_options: offering.plugin_options,
-        backend_id: offering.backend_id,
-      };
-      // Replace edited field(s)
-      const flattenKeys = flattenObject(formData);
-      Object.entries(flattenKeys).map(([key, value]) => {
-        if (Array.isArray(value) && value.length === 0) {
-          unset(payload, key);
-        } else if (value || [0, false].includes(value)) {
-          set(payload, key, value);
-        } else {
-          unset(payload, key);
-        }
-      });
+    async (formData: OfferingIntegrationUpdateRequest) => {
       try {
-        await updateOfferingIntegration(offering.uuid, payload);
+        await marketplaceProviderOfferingsUpdateIntegration({
+          path: { uuid: offering.uuid },
+          body: formData,
+        });
         dispatch(
           showSuccess(translate('Offering has been updated successfully.')),
         );
         if (refetch) await refetch();
         dispatch(closeModalDialog());
       } catch (error) {
-        dispatch(
-          showErrorResponse(error, translate('Unable to update offering.')),
-        );
+        dispatch(showError(translate('Unable to update offering.')));
+        throw new SubmissionError(error);
       }
     },
     [dispatch, offering, refetch],

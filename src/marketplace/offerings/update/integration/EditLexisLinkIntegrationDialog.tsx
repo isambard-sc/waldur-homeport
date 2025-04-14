@@ -1,19 +1,27 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { FormSection, reduxForm } from 'redux-form';
+import {
+  marketplaceProviderOfferingsUpdateIntegration,
+  MergedPluginOptionsRequest,
+  MergedSecretOptionsRequest,
+} from 'waldur-js-client';
 
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { updateOfferingIntegration } from '@waldur/marketplace/common/api';
 import { UserLexisLinkPluginOptionsForm } from '@waldur/marketplace/UserLexisLInkPluginOptionsForm';
 import { UserLexisLinkSecretOptionsForm } from '@waldur/marketplace/UserLexisLInkSecretOptionsForm';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { EDIT_LEXIS_LINK_INTEGRATION_FORM_ID } from './constants';
 
+type FormData = {
+  secret_options?: MergedSecretOptionsRequest;
+  plugin_options?: MergedPluginOptionsRequest;
+};
 export const EditLexisLinkIntegrationDialog = connect(
   (_, ownProps: { resolve: { offering } }) => ({
     initialValues: {
@@ -22,17 +30,17 @@ export const EditLexisLinkIntegrationDialog = connect(
     },
   }),
 )(
-  reduxForm<{}, { resolve: { offering; provider; refetch } }>({
+  reduxForm<FormData, { resolve: { offering; provider; refetch } }>({
     form: EDIT_LEXIS_LINK_INTEGRATION_FORM_ID,
   })((props) => {
     const dispatch = useDispatch();
     const update = useCallback(
-      async (formData) => {
+      async (formData: FormData) => {
         try {
-          await updateOfferingIntegration(
-            props.resolve.offering.uuid,
-            formData,
-          );
+          await marketplaceProviderOfferingsUpdateIntegration({
+            path: { uuid: props.resolve.offering.uuid },
+            body: formData,
+          });
           dispatch(
             showSuccess(
               translate(
@@ -56,10 +64,18 @@ export const EditLexisLinkIntegrationDialog = connect(
 
     return (
       <form onSubmit={props.handleSubmit(update)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Update LEXIS link options')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Update LEXIS link options')}
+          footer={
+            <>
+              <CloseDialogButton />
+              <SubmitButton
+                submitting={props.submitting}
+                label={translate('Save')}
+              />
+            </>
+          }
+        >
           <FormContainer {...props}>
             <FormSection name="secret_options">
               <UserLexisLinkSecretOptionsForm />
@@ -68,14 +84,7 @@ export const EditLexisLinkIntegrationDialog = connect(
               <UserLexisLinkPluginOptionsForm />
             </FormSection>
           </FormContainer>
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton
-            submitting={props.submitting}
-            label={translate('Save')}
-          />
-          <CloseDialogButton />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

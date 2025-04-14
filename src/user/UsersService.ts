@@ -1,46 +1,50 @@
-import Axios from 'axios';
+import {
+  Options,
+  User,
+  usersMeRetrieve,
+  UsersMeRetrieveData,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-import { get, getById, patch } from '@waldur/core/api';
+import { getRoles } from '@waldur/administration/roles/utils';
+import { initApiClient } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import store from '@waldur/store/store';
 import { setCurrentUser } from '@waldur/workspace/actions';
 import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
 import {
   setImpersonatedUserUuid,
   clearImpersonatedUserUuid,
+  getImpersonatedUserUuid,
 } from '@waldur/workspace/WorkspaceStorage';
 
-export const getCurrentUser = (config?) =>
-  get<UserDetails>('/users/me/', config).then((response) => response.data);
+export const getCurrentUser = async (
+  options?: Options<UsersMeRetrieveData>,
+) => {
+  const user = await usersMeRetrieve(options).then((response) => response.data);
+  if (ENV.roles.length === 0) {
+    ENV.roles = await getRoles();
+  }
+  return user;
+};
 
 export const setImpersonationData = (userUuid) => {
-  Axios.defaults.headers['X-IMPERSONATED-USER-UUID'] = userUuid;
   setImpersonatedUserUuid(userUuid);
+  initApiClient();
 };
+
 export const clearImpersonationData = () => {
-  delete Axios.defaults.headers['X-IMPERSONATED-USER-UUID'];
   clearImpersonatedUserUuid();
+  initApiClient();
 };
 
 class UsersServiceClass {
-  get(userId) {
-    return getById<UserDetails>('/users/', userId);
-  }
-
-  update(user) {
-    return patch(`/users/${user.uuid}/`, user);
-  }
-
   getCurrentUser(refetch = false) {
     const cached = this.getCachedUser();
     if (!refetch && cached) {
       return Promise.resolve(cached);
     }
     return getCurrentUser().then((user) => {
-      const isImpersonated = Boolean(
-        Axios.defaults.headers['X-IMPERSONATED-USER-UUID'],
-      );
+      const isImpersonated = Boolean(getImpersonatedUserUuid());
       store.dispatch(setCurrentUser(user, isImpersonated));
       return user;
     });
@@ -54,8 +58,7 @@ class UsersServiceClass {
     return this.getCurrentUser().then((user) => {
       return (
         user.is_staff ||
-        (!this.mandatoryFieldsMissing(user) &&
-          (user as UserDetails).agreement_date)
+        (!this.mandatoryFieldsMissing(user) && (user as User).agreement_date)
       );
     });
   }

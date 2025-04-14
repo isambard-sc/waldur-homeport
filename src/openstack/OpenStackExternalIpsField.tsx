@@ -81,7 +81,7 @@ const FieldsListGroup = ({ fields }: BaseFieldArrayProps<any>) => {
           onClick={addRow}
         >
           <span className="svg-icon svg-icon-2">
-            <Plus />
+            <Plus weight="bold" />
           </span>{' '}
           {translate('Add')}
         </Button>

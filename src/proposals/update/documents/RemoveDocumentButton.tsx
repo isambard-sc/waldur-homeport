@@ -1,9 +1,9 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { proposalProtectedCallsDetachDocuments } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { detachDocuments } from '@waldur/proposals/update/documents/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
@@ -31,7 +31,10 @@ export const RemoveDocumentButton = (props) => {
         } catch {
           return;
         }
-        await detachDocuments(props.call, props.file.uuid);
+        await proposalProtectedCallsDetachDocuments({
+          path: { uuid: props.call.uuid },
+          body: { documents: [props.file.uuid] },
+        });
       }
       dispatch(showSuccess(translate('Documents have been removed.')));
       props.refetch();

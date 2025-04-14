@@ -1,7 +1,7 @@
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { CustomerFeatures } from '@waldur/FeaturesEnums';
 import FormTable from '@waldur/form/FormTable';
@@ -137,7 +137,7 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
             label={translate('Slug')}
             value={props.customer.slug}
             actions={
-              user.is_staff ? (
+              user?.is_staff ? (
                 <FieldEditButton
                   customer={props.customer}
                   name="slug"

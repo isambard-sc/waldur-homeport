@@ -1,13 +1,11 @@
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
 import Avatar from '@waldur/core/Avatar';
+import { ENV } from '@waldur/core/config';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
-import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { ThemeSwitcher } from '../../theme/ThemeSwitcher';
 
@@ -16,7 +14,7 @@ import { UserDropdownMenuItems } from './UserDropdownMenuItems';
 import { UserToken } from './UserToken';
 
 export const UserDropdownMenu: FunctionComponent = () => {
-  const user = useSelector(getUser) as UserDetails;
+  const user = useUser();
   return (
     <>
       <div

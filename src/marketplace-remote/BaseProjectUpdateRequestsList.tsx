@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { RemoteProjectUpdateRequest } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -21,7 +22,7 @@ export const BaseProjectUpdateRequestsList: FunctionComponent<{
     filter,
   });
   return (
-    <Table
+    <Table<RemoteProjectUpdateRequest>
       {...props}
       columns={[
         {

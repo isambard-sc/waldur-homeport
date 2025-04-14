@@ -53,7 +53,7 @@ export const ResourceDeleteButton: FunctionComponent<{
       title={translate('Delete')}
       disabled={loading}
       action={callback}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       size="sm"
       className="text-danger"
       iconColor="danger"

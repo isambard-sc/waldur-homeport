@@ -79,7 +79,7 @@ export const HooksList: FunctionComponent = () => {
       rowActions={({ row }) => (
         <>
           <HookUpdateButton hook={row} refetch={props.fetch} />
-          <HookRemoveButton url={row.url} refetch={props.fetch} />
+          <HookRemoveButton hook={row} refetch={props.fetch} />
         </>
       )}
       enableExport={true}

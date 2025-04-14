@@ -17,7 +17,7 @@ export const UserAgreementsEditButton = ({ row, refetch }) => {
       openModalDialog(UserAgreementsEditDialog, {
         resolve: {
           initialValues: {
-            url: row.url,
+            uuid: row.uuid,
             agreement_type: row.agreement_type,
             content: row.content,
           },

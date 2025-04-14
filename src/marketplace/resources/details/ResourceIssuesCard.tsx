@@ -19,7 +19,7 @@ const CreateIssueButton = ({ resource }) => {
     );
   return (
     <ActionButton
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       title={translate('Create')}
       action={callback}
       variant="primary"

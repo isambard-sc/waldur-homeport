@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
+import { marketplaceOfferingUsersCreate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { createOfferingUser } from '@waldur/marketplace/common/api';
 import { userAutocomplete } from '@waldur/marketplace/common/autocompletes';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
@@ -32,10 +32,12 @@ export const CreateOfferingUserDialog = ({
       formFields={fields}
       submitForm={async (formData) => {
         try {
-          await createOfferingUser({
-            offering: offering.url,
-            user: formData.user.url,
-            username: formData.username,
+          await marketplaceOfferingUsersCreate({
+            body: {
+              offering: offering.url,
+              user: formData.user.url,
+              username: formData.username,
+            },
           });
           dispatch(showSuccess(translate('Offering user has been created.')));
           dispatch(closeModalDialog());

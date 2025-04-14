@@ -2,9 +2,13 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import {
+  ProposalRequestedOfferingsListData,
+  ProtectedRound,
+  ProviderRequestedOffering,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { Round } from '@waldur/proposals/types';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -19,14 +23,14 @@ import { OfferingRequestsListExpandableRow } from './OfferingRequestsListExpanda
 import { OfferingRequestsTableFilter } from './OfferingRequestsTableFilter';
 
 interface OfferingRequestsListProps {
-  round: Round;
+  round: ProtectedRound;
 }
 
 const filtersSelctor = createSelector(
   getCustomer,
   getFormValues(OFFERING_REQUESTS_FILTER_FORM_ID),
   (customer, filters: any) => {
-    const result: Record<string, any> = {};
+    const result: ProposalRequestedOfferingsListData['query'] = {};
     if (customer) {
       result.provider_uuid = customer.uuid;
     }
@@ -57,12 +61,12 @@ export const OfferingRequestsList: FC<OfferingRequestsListProps> = () => {
   });
 
   return (
-    <Table
+    <Table<ProviderRequestedOffering>
       {...tableProps}
       columns={[
         {
           title: translate('Call'),
-          render: ({ row }) => <b>{row.call_name}</b>,
+          render: ({ row }) => <>{row.call_name}</>,
           filter: 'call',
           inlineFilter: (row) => ({ name: row.call_name, url: row.call }),
         },

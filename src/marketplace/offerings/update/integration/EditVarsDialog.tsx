@@ -1,13 +1,15 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { useCallback } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { FieldArray, reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateIntegration } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { updateOfferingSecretOptions } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { ENVIRON_FORM_ID } from './constants';
@@ -27,10 +29,13 @@ export const EditVarsDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
     const update = useCallback(
       async (formData) => {
         try {
-          await updateOfferingSecretOptions(props.resolve.offering.uuid, {
-            secret_options: {
-              ...props.resolve.offering.secret_options,
-              environ: formData.environ,
+          await marketplaceProviderOfferingsUpdateIntegration({
+            path: { uuid: props.resolve.offering.uuid },
+            body: {
+              secret_options: {
+                ...props.resolve.offering.secret_options,
+                environ: formData.environ,
+              },
             },
           });
           dispatch(
@@ -60,31 +65,32 @@ export const EditVarsDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
         name="environ"
         component={(nestedProps) => (
           <form onSubmit={props.handleSubmit(update)}>
-            <Modal.Header>
-              <Modal.Title>
-                {translate('Edit environment variables')}
-              </Modal.Title>
-              <Button
-                variant="light"
-                size="sm"
-                className="btn-icon"
-                onClick={() => nestedProps.fields.push({})}
-              >
-                <span className="svg-icon svg-icon-2">
-                  <PlusCircle />
-                </span>
-              </Button>
-            </Modal.Header>
-            <Modal.Body>
+            <ModalDialog
+              title={translate('Edit environment variables')}
+              actions={
+                <Button
+                  variant="outline btn-outline-default"
+                  className="btn-icon"
+                  onClick={() => nestedProps.fields.push({})}
+                >
+                  <span className="svg-icon svg-icon-2">
+                    <PlusCircle weight="bold" />
+                  </span>
+                </Button>
+              }
+              footer={
+                <>
+                  <CloseDialogButton />
+                  <SubmitButton
+                    disabled={props.invalid}
+                    submitting={props.submitting}
+                    label={translate('Save')}
+                  />
+                </>
+              }
+            >
               <EnvironmentVariablesList fields={nestedProps.fields} />
-            </Modal.Body>
-            <Modal.Footer>
-              <SubmitButton
-                disabled={props.invalid}
-                submitting={props.submitting}
-                label={translate('Save')}
-              />
-            </Modal.Footer>
+            </ModalDialog>
           </form>
         )}
       />

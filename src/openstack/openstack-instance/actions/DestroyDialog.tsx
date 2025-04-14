@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceResourcesTerminate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { destroyInstance, DestroyInstanceParams } from '@waldur/openstack/api';
+import { DestroyInstanceParams } from '@waldur/openstack/api';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
@@ -22,7 +23,10 @@ export const DestroyDialog: FC<ActionDialogProps> = ({
       {...getDeleteField()}
       submitForm={async (formData: DestroyInstanceParams) => {
         try {
-          await destroyInstance(resource.marketplace_resource_uuid, formData);
+          await marketplaceResourcesTerminate({
+            path: { uuid: resource.marketplace_resource_uuid },
+            body: { attributes: formData },
+          });
           dispatch(
             showSuccess(translate('Instance deletion has been scheduled.')),
           );

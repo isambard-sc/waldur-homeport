@@ -1,3 +1,5 @@
+import { AuthToken } from 'waldur-js-client';
+
 import { TokenDeleteButton } from '@waldur/administration/TokenDeleteButton';
 import { translate } from '@waldur/i18n';
 import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
@@ -21,7 +23,7 @@ export const TokensList = () => {
   );
 
   return (
-    <Table
+    <Table<AuthToken>
       {...tableProps}
       columns={[
         {

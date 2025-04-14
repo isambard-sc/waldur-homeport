@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 
-import { MetronicModalDialog } from './MetronicModalDialog';
+import { ModalDialog } from './ModalDialog';
 import { ConfirmationDialogType } from './types';
 
 interface ConfirmationDialogProps {
@@ -21,6 +21,8 @@ interface ConfirmationDialogProps {
     type?: ConfirmationDialogType;
     positiveButton?: string;
     negativeButton?: string;
+    positiveButtonVariant?: string;
+    iconNode?: ReactNode;
   };
 }
 
@@ -32,6 +34,8 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     type = 'warning',
     positiveButton = translate('Yes'),
     negativeButton = translate('No'),
+    positiveButtonVariant,
+    iconNode,
   },
 }) => {
   const dispatch = useDispatch();
@@ -48,11 +52,11 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   };
 
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={title}
-      iconNode={<WarningCircle weight="bold" />}
+      iconNode={iconNode || <WarningCircle weight="bold" />}
       iconColor={type}
-      bodyClassName="text-grey-500 pt-2"
+      bodyClassName="text-gray-500 pt-2"
       footer={
         <>
           <Button
@@ -62,13 +66,17 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           >
             {negativeButton}
           </Button>
-          <Button className="flex-equal" onClick={handleSubmit}>
+          <Button
+            variant={positiveButtonVariant}
+            className="flex-equal"
+            onClick={handleSubmit}
+          >
             {positiveButton}
           </Button>
         </>
       }
     >
       {body}
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

@@ -15,9 +15,9 @@ export const DeployButton = ({
   isFeatureVisible(MarketplaceFeatures.catalogue_only) ? null : (
     <OfferingLink
       offering_uuid={offering.uuid}
-      className="btn btn-text-primary btn-active-secondary"
+      className="btn btn-text-primary btn-active-secondary btn-sm"
       disabled={disabled}
     >
-      {translate('Deploy')}
+      {translate('Add resource')}
     </OfferingLink>
   );

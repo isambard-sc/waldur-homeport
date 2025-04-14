@@ -18,16 +18,17 @@ describe('User manage', () => {
   beforeEach(() => {
     cy.mockUser()
       .mockChecklists()
-      .intercept('GET', '/api/support-templates/', [])
+      .intercept('GET', '/api/support-templates/**', [])
       .intercept('PATCH', '/api/users/3a836bc76e1b40349ec1a0d8220f374f/', {
         fixture: 'users/alice.json',
       })
-      .intercept('HEAD', '/api/customers/', [])
       .intercept(
-        'GET',
-        '/api/marketplace-categories/?field=uuid&field=title&has_offerings=true',
-        [],
+        'POST',
+        'api/users/3a836bc76e1b40349ec1a0d8220f374f/change_email/',
+        {data: {}},
       )
+      .intercept('HEAD', '/api/customers/**', [])
+      .intercept('GET', '/api/marketplace-categories/**', [])
       .intercept('GET', '/api/customers/**', [])
       .setToken()
       .visit('/profile/manage/');
@@ -82,25 +83,6 @@ describe('User manage', () => {
       openUpdateDialog('Phone number');
       getInputField('phone_number').should('have.value', user.phone_number);
       closeUpdateDialog();
-
-    // Ensure that Request deletion button works
-    /*.get('input[type="checkbox"]')
-      .last()
-      .click()
-      .get('button')
-      .contains('Request deletion')
-      .click()
-
-      // Close remove profile dialog
-      .get('button')
-      .contains('Cancel')
-      .last()
-      .click()
-
-      // Ensure that Discard button exists and works
-      .get('button')
-      .contains('Discard')
-      .click()*/
     });
   });
 });

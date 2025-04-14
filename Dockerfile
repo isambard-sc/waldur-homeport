@@ -16,9 +16,9 @@ RUN mkdir -p /app/build-info && echo "$COMMIT_INFO" > /app/build-info/COMMIT_INF
 ARG VERSION=latest
 ARG ASSET_PATH="/"
 ENV VITE_API_URL="__API_URL__"
-RUN sed -i "s/buildId: 'develop'/buildId: '$VERSION'/" src/configs/default.ts
+RUN sed -i "s/buildId: 'develop'/buildId: '$VERSION'/" src/core/config.ts
 ENV NODE_OPTIONS="--max-old-space-size=8096"
-RUN rm -rf /app/node_modules && yarn install
+
 RUN yarn vite build --base=$ASSET_PATH
 
 # production environment
@@ -30,9 +30,23 @@ COPY --from=build /app/build-info/ /build-info/
 ENV API_URL="http://localhost:8080"
 ENV TITLE="Waldur | Cloud Service Management"
 
+RUN mkdir -p /tmp/nginx && \
+    chgrp -R 0 /tmp/nginx && \
+    chmod -R g=u /tmp/nginx
+
 # replace default configuration
+RUN chgrp -R 0 /etc/nginx && \
+    chmod -R g=u /etc/nginx && \
+    chgrp -R 0 /var/cache/nginx && \
+    chmod -R g=u /var/cache/nginx && \
+    chgrp -R 0 /var/log/nginx && \
+    chmod -R g=u /var/log/nginx && \
+    chgrp -R 0 /usr/share/nginx && \
+    chmod -R g=u /usr/share/nginx
+
 COPY docker/nginx-tpl.conf /etc/nginx/nginx-tpl.conf
 COPY docker/entrypoint.sh /
+RUN chmod g+x /entrypoint.sh
 
-EXPOSE 80
+EXPOSE 8080
 CMD [ "/entrypoint.sh" ]

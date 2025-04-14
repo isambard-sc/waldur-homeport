@@ -5,7 +5,7 @@ import { ProgressStep, ProgressSteps } from '@waldur/core/ProgressSteps';
 interface StepsListProps {
   steps: ProgressStep[];
   value: ProgressStep;
-  onClick?(step: ProgressStep): void;
+  onClick?(step: ProgressStep, index: number): void;
   disabled?: boolean;
 }
 
@@ -21,6 +21,11 @@ export const StepsList: FC<StepsListProps> = (props) => {
   }, [props.steps, props.value]);
 
   return (
-    <ProgressSteps steps={steps} bgClass="bg-body" className="mt-3 mb-10" />
+    <ProgressSteps
+      steps={steps}
+      onClick={props.onClick}
+      bgClass="bg-body"
+      className="mt-3 mb-10"
+    />
   );
 };

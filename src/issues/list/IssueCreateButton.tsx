@@ -26,7 +26,7 @@ export const IssueCreateButton: FunctionComponent<IssueCreateButtonProps> = (
     <ActionButton
       title={translate('Create')}
       action={handleClick}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

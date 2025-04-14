@@ -1,7 +1,7 @@
 import { Plugs } from '@phosphor-icons/react';
+import { openstackVolumesDetach } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { detachVolume } from '@waldur/openstack/api';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
 import {
   validateRuntimeState,
@@ -20,11 +20,11 @@ const validators = [
 export const DetachAction: ActionItemType = ({ resource, refetch }) => (
   <AsyncActionItem
     title={translate('Detach')}
-    apiMethod={detachVolume}
+    apiMethod={(uuid) => openstackVolumesDetach({ path: { uuid } })}
     resource={resource}
     validators={validators}
     refetch={refetch}
     important
-    iconNode={<Plugs />}
+    iconNode={<Plugs weight="bold" />}
   />
 );

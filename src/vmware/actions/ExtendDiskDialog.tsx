@@ -1,13 +1,12 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { vmwareDisksExtend } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { extendDisk } from '../api';
 
 export const ExtendDiskDialog: FC<ActionDialogProps> = ({
   resolve: { resource, refetch },
@@ -25,7 +24,10 @@ export const ExtendDiskDialog: FC<ActionDialogProps> = ({
       initialValues={{ size: resource.size }}
       submitForm={async (formData) => {
         try {
-          await extendDisk(resource.uuid, formData.size);
+          await vmwareDisksExtend({
+            path: { uuid: resource.uuid },
+            body: { size: formData.size },
+          });
           dispatch(
             showSuccess(translate('Disk extension has been scheduled.')),
           );

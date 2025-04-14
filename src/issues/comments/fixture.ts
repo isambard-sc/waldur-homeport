@@ -1,4 +1,4 @@
-import { Issue } from '../list/types';
+import { Issue } from 'waldur-js-client';
 
 import { Comment } from './types';
 

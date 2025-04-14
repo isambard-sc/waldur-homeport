@@ -45,7 +45,7 @@ export const GlobalProjectCreateButton: FC<{ refetch }> = ({ refetch }) => {
           }),
         )
       }
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

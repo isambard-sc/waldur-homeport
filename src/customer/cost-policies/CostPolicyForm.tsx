@@ -2,8 +2,12 @@ import { FC, useEffect, useState } from 'react';
 import { Form, Table } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { InjectedFormProps } from 'redux-form';
+import {
+  invoiceItemsCustomerCostsForPeriodRetrieve,
+  invoiceItemsProjectCostsForPeriodRetrieve,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { required } from '@waldur/core/validators';
 import {
@@ -19,10 +23,10 @@ import {
   organizationAutocomplete,
   projectAutocomplete,
 } from '@waldur/marketplace/common/autocompletes';
+import { Option } from '@waldur/marketplace/common/registry';
 import { ProjectCostField } from '@waldur/project/ProjectCostField';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { fetchProjectCostsForPeriod, fetchCustomerCostsForPeriod } from './api';
 import { CostPolicyFormData, CostPolicyType } from './types';
 import { getCostPolicyActionOptions, policyPeriodOptions } from './utils';
 
@@ -47,10 +51,7 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
       : null,
   );
 
-  const [selectedAction, setSelectedAction] = useState<{
-    value: string;
-    label: string;
-  } | null>(
+  const [selectedAction, setSelectedAction] = useState<Option | null>(
     typeof props.initialValues?.actions === 'string'
       ? {
           value: props.initialValues.actions,
@@ -63,19 +64,30 @@ export const CostPolicyForm: FC<CostPolicyFormProps> = (props) => {
 
   useEffect(() => {
     if (selectedEntities.length && selectedPeriod) {
-      const fetchCosts =
-        props.type === 'project'
-          ? fetchProjectCostsForPeriod
-          : fetchCustomerCostsForPeriod;
-
       Promise.all(
-        selectedEntities.map((entity) =>
-          fetchCosts(entity.uuid, selectedPeriod),
-        ),
+        selectedEntities.map((entity) => {
+          if (props.type === 'project') {
+            return invoiceItemsProjectCostsForPeriodRetrieve({
+              query: {
+                project_uuid: entity.uuid,
+                period: selectedPeriod,
+              },
+            }).then((r) => r.data);
+          } else {
+            return invoiceItemsCustomerCostsForPeriodRetrieve({
+              query: {
+                customer_uuid: entity.uuid,
+                period: selectedPeriod,
+              },
+            }).then((r) => r.data);
+          }
+        }),
       ).then((costs) => {
         setCostsData(
           costs.map((cost, index) => {
-            const previousMonths = parseFloat(cost.total_price || '0');
+            const previousMonths = cost.total_price
+              ? parseFloat(cost.total_price)
+              : 0;
             const currentMonth = parseFloat(
               selectedEntities[index].billing_price_estimate.current || 0,
             );

@@ -1,12 +1,12 @@
 import { useEffect, FunctionComponent } from 'react';
-import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { openIssueCreateDialog } from '@waldur/issues/create/actions';
 import { ISSUE_IDS } from '@waldur/issues/types/constants';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 export const RequestActionDialog: FunctionComponent<{
@@ -73,25 +73,18 @@ export const RequestActionDialog: FunctionComponent<{
     }
   });
   return (
-    <>
-      <Modal.Header>
-        <Modal.Title>
-          {translate('Request {mode} of {name}', {
-            name: offering.name,
-            mode: offeringRequestMode,
-          })}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p>
-          {translate(
-            'Please note that request should specify offering and provide a reason.',
-          )}
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <CloseDialogButton label={translate('Ok')} />
-      </Modal.Footer>
-    </>
+    <ModalDialog
+      title={translate('Request {mode} of {name}', {
+        name: offering.name,
+        mode: offeringRequestMode,
+      })}
+      footer={<CloseDialogButton label={translate('Ok')} />}
+    >
+      <p>
+        {translate(
+          'Please note that request should specify offering and provide a reason.',
+        )}
+      </p>
+    </ModalDialog>
   );
 };

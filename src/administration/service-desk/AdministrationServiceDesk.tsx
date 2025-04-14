@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { capitalize } from 'lodash-es';
-import { Button, Card, Col, Row, Table } from 'react-bootstrap';
+import { Button, Card, Col, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { overrideSettingsRetrieve } from 'waldur-js-client';
 
 import { ServiceDeskProviderLogo } from '@waldur/administration/service-desk/ServiceDeskProviderLogo';
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -12,7 +13,6 @@ import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { SettingsDescription } from '@waldur/SettingsDescription';
 
-import { getDBSettings } from '../settings/api';
 import { FieldRow } from '../settings/FieldRow';
 
 const AdministrationServiceDeskUpdateDialog = lazyComponent(() =>
@@ -80,7 +80,7 @@ export const AdministrationServiceDesk = () => {
   const serviceDeskProviders = ['atlassian', 'zammad', 'smax'];
   const { data, error, isLoading, refetch } = useQuery(
     ['AdministrationServiceDesk'],
-    () => getDBSettings().then((response) => response.data),
+    () => overrideSettingsRetrieve().then((response) => response.data),
   );
 
   return isLoading ? (
@@ -97,11 +97,11 @@ export const AdministrationServiceDesk = () => {
         key={INTEGRATION_SETTINGS.description}
         className="card-bordered mb-5"
       >
-        <Table bordered={true} responsive={true} className="form-table">
+        <FormTable>
           {INTEGRATION_SETTINGS.items.map((item) => (
             <FieldRow item={item} key={item.key} value={data[item.key]} />
           ))}
-        </Table>
+        </FormTable>
       </FormTable.Card>
       <Card className="card-bordered">
         <Card.Body>

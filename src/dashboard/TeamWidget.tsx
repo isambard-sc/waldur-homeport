@@ -54,7 +54,7 @@ export const TeamWidget: FC<TeamWidgetProps> = ({
   return (
     <WidgetCard
       className={className}
-      cardTitle={translate('Team size')}
+      cardTitle={translate('Team')}
       title={
         count == 0
           ? translate('No members')

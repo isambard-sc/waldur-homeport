@@ -1,19 +1,20 @@
-import { FunctionComponent } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
+import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 
 import { DeletePaymentButton } from './DeletePaymentButton';
 import { EditPaymentButton } from './EditPaymentButton';
 import { LinkInvoiceAction } from './LinkInvoiceAction';
 import { UnlinkInvoiceButton } from './UnlinkInvoiceButton';
 
-export const PaymentActions: FunctionComponent<{ payment }> = ({ payment }) => (
-  <ButtonGroup>
-    <EditPaymentButton payment={payment} />
-    <DeletePaymentButton payment={payment} />
-    {!payment.invoice ? (
-      <LinkInvoiceAction payment={payment} />
-    ) : (
-      <UnlinkInvoiceButton payment={payment} />
-    )}
-  </ButtonGroup>
-);
+export const PaymentActions = ({ row, refetch }) => {
+  return (
+    <ActionsDropdown
+      row={row}
+      refetch={refetch}
+      actions={[
+        EditPaymentButton,
+        DeletePaymentButton,
+        !row.invoice ? LinkInvoiceAction : UnlinkInvoiceButton,
+      ].filter(Boolean)}
+    />
+  );
+};

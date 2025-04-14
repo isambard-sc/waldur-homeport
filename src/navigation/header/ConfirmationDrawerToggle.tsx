@@ -2,11 +2,11 @@ import { Bell } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 
+import { count } from '@waldur/core/api';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openDrawerDialog } from '@waldur/drawer/actions';
 import { translate } from '@waldur/i18n';
 import { countOrders } from '@waldur/marketplace/common/api';
-import { countProjectUpdateRequestsList } from '@waldur/marketplace-remote/api';
 
 import {
   PENDING_CONSUMER_ORDERS_FILTER,
@@ -30,9 +30,10 @@ export const ConfirmationDrawerToggle: React.FC = () => {
     const pendingProvidersCount = await countOrders(
       PENDING_PROVIDER_ORDERS_FILTER,
     );
-    const pendingProjectUpdatesCount = await countProjectUpdateRequestsList({
-      state: 'pending',
-    });
+    const pendingProjectUpdatesCount = await count(
+      '/api/marketplace-project-update-requests/',
+      { state: ['pending'] },
+    );
     return {
       pendingOrdersCount,
       pendingProvidersCount,
@@ -60,7 +61,7 @@ export const ConfirmationDrawerToggle: React.FC = () => {
       <button
         id="pending-confirmations-toggle"
         type="button"
-        className="btn btn-icon btn-icon-grey-500 btn-active-secondary position-relative w-35px h-35px w-md-40px h-md-40px"
+        className="btn btn-icon btn-icon-gray-500 btn-active-secondary position-relative w-35px h-35px w-md-40px h-md-40px"
         onClick={openDrawer}
       >
         <span className="svg-icon" title={translate('Pending tasks')}>

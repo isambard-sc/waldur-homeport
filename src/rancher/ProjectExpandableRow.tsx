@@ -1,9 +1,8 @@
 import React from 'react';
+import { RancherProject } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
-
-import { RancherProject } from './types';
 
 export const ProjectExpandableRow: React.FC<{
   row: RancherProject;

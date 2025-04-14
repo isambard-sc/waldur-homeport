@@ -26,10 +26,12 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
 }) => {
   const user = useUser();
   const customer = useSelector(getCustomer);
-  const canUpdateRestrictedStatus = hasPermission(user, {
-    permission: PermissionEnum.UPDATE_OFFERING_USER_RESTRICTION,
-    customerId: customer.uuid,
-  });
+  const canUpdateRestrictedStatus = customer
+    ? hasPermission(user, {
+        permission: PermissionEnum.UPDATE_OFFERING_USER_RESTRICTION,
+        customerId: customer.uuid,
+      })
+    : true;
 
   return (
     <ActionsDropdown

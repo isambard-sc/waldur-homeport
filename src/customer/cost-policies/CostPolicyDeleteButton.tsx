@@ -1,11 +1,14 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceCustomerEstimatedCostPoliciesDestroy,
+  marketplaceProjectEstimatedCostPoliciesDestroy,
+} from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-import { deleteOrganizationCostPolicy, deleteProjectCostPolicy } from './api';
 import { CostPolicyType } from './types';
 
 export const CostPolicyDeleteButton = ({
@@ -40,22 +43,24 @@ export const CostPolicyDeleteButton = ({
       return;
     }
     if (type === 'project') {
-      deleteProjectCostPolicy(row.uuid).then(() => {
-        refetch();
+      await marketplaceProjectEstimatedCostPoliciesDestroy({
+        path: { uuid: row.uuid },
       });
+      refetch();
     } else {
-      deleteOrganizationCostPolicy(row.uuid).then(() => {
-        refetch();
+      await marketplaceCustomerEstimatedCostPoliciesDestroy({
+        path: { uuid: row.uuid },
       });
+      refetch();
     }
   };
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      variant="outline-danger"
-      iconNode={<Trash />}
-      size="sm"
+      iconNode={<Trash weight="bold" />}
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

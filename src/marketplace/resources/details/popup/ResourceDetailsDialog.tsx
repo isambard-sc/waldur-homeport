@@ -3,7 +3,7 @@ import { FC } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 
 import { ResourceDetailsTable } from './ResourceDetailsTable';
@@ -12,7 +12,7 @@ export const ResourceDetailsDialog: FC<ActionDialogProps> = ({
   resolve: { resource },
 }) => {
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('Resource details')}
       subtitle={translate('Key information about the resource.')}
       closeButton
@@ -25,6 +25,6 @@ export const ResourceDetailsDialog: FC<ActionDialogProps> = ({
           <ResourceDetailsTable resource={resource} />
         </Tab>
       </Tabs>
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

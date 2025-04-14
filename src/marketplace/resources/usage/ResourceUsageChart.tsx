@@ -1,14 +1,23 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 
 import { EChart } from '@waldur/core/EChart';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { getEChartOptions } from '@waldur/marketplace/resources/usage/utils';
 import { OfferingComponent } from '@waldur/marketplace/types';
+import { openModalDialog } from '@waldur/modal/actions';
 
 import { ComponentUsage, ComponentUserUsage } from './types';
 
+const UserUsagesDialog = lazyComponent(() =>
+  import('./UserUsagesDialog').then((module) => ({
+    default: module.UserUsagesDialog,
+  })),
+);
+
 interface ResourceUsageChartProps {
-  resource?: { name };
+  resource?: { name?: string };
   offeringComponent: OfferingComponent;
   usages: ComponentUsage[];
   userUsages?: ComponentUserUsage[];
@@ -26,6 +35,21 @@ export const ResourceUsageChart: FunctionComponent<ResourceUsageChartProps> = ({
   chartColor,
   hasExport,
 }) => {
+  const dispatch = useDispatch();
+  const openUserUsagesDetailsDialog = useCallback(
+    (userUsages: ComponentUserUsage[]) =>
+      dispatch(
+        openModalDialog(UserUsagesDialog, {
+          resolve: {
+            userUsages,
+            component: offeringComponent,
+          },
+          size: 'sm',
+        }),
+      ),
+    [dispatch],
+  );
+
   const options = useMemo(
     () =>
       getEChartOptions(
@@ -34,6 +58,7 @@ export const ResourceUsageChart: FunctionComponent<ResourceUsageChartProps> = ({
         userUsages,
         months,
         chartColor,
+        openUserUsagesDetailsDialog,
       ),
     [offeringComponent, usages, userUsages, chartColor],
   );

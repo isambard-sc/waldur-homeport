@@ -2,72 +2,6 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { ResourceTabsConfiguration } from '@waldur/resource/tabs/types';
 
-const FloatingIpsList = lazyComponent(() =>
-  import('../openstack-floating-ips/FloatingIpsList').then((module) => ({
-    default: module.FloatingIpsList,
-  })),
-);
-const TenantNetworksList = lazyComponent(() =>
-  import('../openstack-network/TenantNetworksList').then((module) => ({
-    default: module.TenantNetworksList,
-  })),
-);
-const TenantSubnetsList = lazyComponent(() =>
-  import('../openstack-subnet/TenantSubnetsList').then((module) => ({
-    default: module.TenantSubnetsList,
-  })),
-);
-const SecurityGroupsList = lazyComponent(() =>
-  import('../openstack-security-groups/SecurityGroupsList').then((module) => ({
-    default: module.SecurityGroupsList,
-  })),
-);
-const ServerGroupsList = lazyComponent(() =>
-  import('../openstack-server-groups/ServerGroupsList').then((module) => ({
-    default: module.ServerGroupsList,
-  })),
-);
-const TenantPortsList = lazyComponent(() =>
-  import('./TenantPortsList').then((module) => ({
-    default: module.TenantPortsList,
-  })),
-);
-const TenantRoutersList = lazyComponent(() =>
-  import('./TenantRoutersList').then((module) => ({
-    default: module.TenantRoutersList,
-  })),
-);
-const TenantFlavorsList = lazyComponent(() =>
-  import('./TenantFlavorsList').then((module) => ({
-    default: module.TenantFlavorsList,
-  })),
-);
-const TenantInstancesList = lazyComponent(() =>
-  import('./TenantInstancesList').then((module) => ({
-    default: module.TenantInstancesList,
-  })),
-);
-const TenantVolumesList = lazyComponent(() =>
-  import('../openstack-volume/TenantVolumesList').then((module) => ({
-    default: module.TenantVolumesList,
-  })),
-);
-const TenantVolumeTypesList = lazyComponent(() =>
-  import('../openstack-volume/TenantVolumeTypesList').then((module) => ({
-    default: module.TenantVolumeTypesList,
-  })),
-);
-const TenantSnapshotsList = lazyComponent(() =>
-  import('../openstack-snapshot/TenantSnapshotsList').then((module) => ({
-    default: module.TenantSnapshotsList,
-  })),
-);
-const TenantImagesList = lazyComponent(() =>
-  import('./TenantImagesList').then((module) => ({
-    default: module.TenantImagesList,
-  })),
-);
-
 export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
   type: 'OpenStack.Tenant',
   tabs: [
@@ -78,22 +12,40 @@ export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
         {
           key: 'instances',
           title: translate('Instances'),
-          component: TenantInstancesList,
+          component: lazyComponent(() =>
+            import('./TenantInstancesList').then((module) => ({
+              default: module.TenantInstancesList,
+            })),
+          ),
         },
         {
           key: 'flavors',
           title: translate('Flavors'),
-          component: TenantFlavorsList,
+          component: lazyComponent(() =>
+            import('./TenantFlavorsList').then((module) => ({
+              default: module.TenantFlavorsList,
+            })),
+          ),
         },
         {
           key: 'images',
           title: translate('Images'),
-          component: TenantImagesList,
+          component: lazyComponent(() =>
+            import('./TenantImagesList').then((module) => ({
+              default: module.TenantImagesList,
+            })),
+          ),
         },
         {
           key: 'server_groups',
           title: translate('Server groups'),
-          component: ServerGroupsList,
+          component: lazyComponent(() =>
+            import('../openstack-server-groups/ServerGroupsList').then(
+              (module) => ({
+                default: module.ServerGroupsList,
+              }),
+            ),
+          ),
         },
       ],
     },
@@ -104,32 +56,62 @@ export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
         {
           key: 'routers',
           title: translate('Routers'),
-          component: TenantRoutersList,
+          component: lazyComponent(() =>
+            import('./TenantRoutersList').then((module) => ({
+              default: module.TenantRoutersList,
+            })),
+          ),
         },
         {
           key: 'networks',
           title: translate('Networks'),
-          component: TenantNetworksList,
+          component: lazyComponent(() =>
+            import('../openstack-network/TenantNetworksList').then(
+              (module) => ({
+                default: module.TenantNetworksList,
+              }),
+            ),
+          ),
         },
         {
           key: 'subnets',
           title: translate('Subnets'),
-          component: TenantSubnetsList,
+          component: lazyComponent(() =>
+            import('../openstack-subnet/TenantSubnetsList').then((module) => ({
+              default: module.TenantSubnetsList,
+            })),
+          ),
         },
         {
           key: 'security_groups',
           title: translate('Security groups'),
-          component: SecurityGroupsList,
+          component: lazyComponent(() =>
+            import('../openstack-security-groups/SecurityGroupsList').then(
+              (module) => ({
+                default: module.SecurityGroupsList,
+              }),
+            ),
+          ),
         },
         {
           key: 'floating_ips',
           title: translate('Floating IPs'),
-          component: FloatingIpsList,
+          component: lazyComponent(() =>
+            import('../openstack-floating-ips/FloatingIpsList').then(
+              (module) => ({
+                default: module.FloatingIpsList,
+              }),
+            ),
+          ),
         },
         {
           key: 'ports',
           title: translate('Ports'),
-          component: TenantPortsList,
+          component: lazyComponent(() =>
+            import('./TenantPortsList').then((module) => ({
+              default: module.TenantPortsList,
+            })),
+          ),
         },
       ],
     },
@@ -140,17 +122,33 @@ export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
         {
           key: 'volumes',
           title: translate('Volumes'),
-          component: TenantVolumesList,
+          component: lazyComponent(() =>
+            import('../openstack-volume/TenantVolumesList').then((module) => ({
+              default: module.TenantVolumesList,
+            })),
+          ),
         },
         {
           key: 'volume-types',
           title: translate('Volume types'),
-          component: TenantVolumeTypesList,
+          component: lazyComponent(() =>
+            import('../openstack-volume/TenantVolumeTypesList').then(
+              (module) => ({
+                default: module.TenantVolumeTypesList,
+              }),
+            ),
+          ),
         },
         {
           key: 'snapshots',
           title: translate('Snapshots'),
-          component: TenantSnapshotsList,
+          component: lazyComponent(() =>
+            import('../openstack-snapshot/TenantSnapshotsList').then(
+              (module) => ({
+                default: module.TenantSnapshotsList,
+              }),
+            ),
+          ),
         },
       ],
     },

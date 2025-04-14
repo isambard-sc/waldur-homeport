@@ -3,18 +3,6 @@ import { Customer, Project, User } from '@waldur/workspace/types';
 
 import { GenericInvitationContext } from '../types';
 
-export interface UserDetails {
-  full_name: string;
-  native_name: string;
-  organization: string;
-  job_title: string;
-}
-
-export interface StoredUserDetails {
-  civil_number: string;
-  details: UserDetails;
-}
-
 export interface InvitationContext extends GenericInvitationContext {
   user: User;
   customer: Customer;
@@ -25,9 +13,8 @@ export interface InvitationContext extends GenericInvitationContext {
 
 export interface GroupInviteRow {
   email: string;
-  role_project: { role: Role; project?: Project };
+  role_project: { role: Role; project?: Pick<Project, 'uuid' | 'url'> };
   civil_number?: string;
-  tax_number?: string;
 }
 
 export interface GroupInvitationFormData {

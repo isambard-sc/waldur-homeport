@@ -1,7 +1,7 @@
 import { DeviceMobile } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 

@@ -1,12 +1,13 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { rolesDestroy } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
-import { deleteRole, getRoles } from './api';
+import { getRoles } from './utils';
 
 export const RoleDeleteButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ export const RoleDeleteButton = ({ row, refetch }) => {
     } catch {
       return;
     }
-    await deleteRole(row.uuid);
+    await rolesDestroy({ path: { uuid: row.uuid } });
     ENV.roles = await getRoles();
     refetch();
   };
@@ -35,7 +36,7 @@ export const RoleDeleteButton = ({ row, refetch }) => {
       action={openDialog}
       disabled={row.users_count > 0}
       tooltip={translate('Users should be revoked before role is removed.')}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
     />
   );
 };

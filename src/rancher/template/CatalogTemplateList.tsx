@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { RancherTemplate } from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
@@ -6,8 +7,6 @@ import { OfferingLogo } from '@waldur/marketplace/common/OfferingLogo';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-
-import { Catalog } from '../types';
 
 interface OwnProps {
   clusterUuid: string;
@@ -29,7 +28,7 @@ export const CatalogTemplatesList: FC<OwnProps> = (props) => {
     queryField: 'name',
   });
   return (
-    <Table<Catalog>
+    <Table<RancherTemplate>
       {...tableProps}
       columns={[
         {

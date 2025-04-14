@@ -52,7 +52,7 @@ export const AzureForm: FunctionComponent<OfferingEditPanelFormProps> = (
       value={get(props.offering, field.key, 'N/A')}
       actions={
         <FieldEditButton
-          title={props.title}
+          title={field.label}
           scope={props.offering}
           name={field.key}
           callback={props.callback}

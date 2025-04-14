@@ -51,21 +51,23 @@ export const OfferingCard: FunctionComponent<OfferingCardProps> = (props) => {
                 .filter(Boolean)
                 .join(' - ')
         }
+        clickable
         logo={props.offering.thumbnail}
         image={getOfferingImage(props.offering)}
+        imageCover={Boolean(props.offering.image)}
         placeholder={
           <span className="svg-icon svg-icon-5tx svg-icon-dark">
-            <Placeholder className="mh-90px" />
+            <Placeholder className="mh-85px" />
           </span>
         }
         footer={
           !isRestricted ? (
-            <div className="d-flex justify-content-end align-items-center gap-2 my-n3 me-n3">
+            <div className="d-flex justify-content-end align-items-center gap-2">
               <DeployButton offering={props.offering} />
               <ViewOfferingButton offering={props.offering} />
             </div>
           ) : (
-            <div className="d-flex justify-content-between align-items-center gap-4 my-n3 me-n3">
+            <div className="d-flex justify-content-between align-items-center gap-4">
               {isRestricted && (
                 <Tip
                   id={`tip-restricted-${props.offering.uuid}`}

@@ -4,11 +4,11 @@ import ReactStars from 'react-rating-stars-component';
 import { connect, useDispatch } from 'react-redux';
 import { compose } from 'redux';
 import { Field, reduxForm } from 'redux-form';
+import { supportFeedbacksCreate } from 'waldur-js-client';
 
 import { RATING_STAR_ACTIVE_COLOR } from '@waldur/core/constants';
 import { FormContainer, SubmitButton, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { addFeedback } from '@waldur/issues/feedback/api';
 import { SUPPORT_FEEDBACK_FORM_ID } from '@waldur/issues/feedback/constants';
 import { useTitle } from '@waldur/navigation/title';
 import { router } from '@waldur/router';
@@ -22,9 +22,11 @@ const SupportFeedbackContainer = (props) => {
 
   const submitRequest = async (formData) => {
     try {
-      await addFeedback({
-        ...formData,
-        token: router.globals.params.token,
+      await supportFeedbacksCreate({
+        body: {
+          ...formData,
+          token: router.globals.params.token,
+        },
       });
       dispatch(showSuccess(translate('Thank you for your response!')));
       router.stateService.go('login');

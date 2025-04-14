@@ -1,22 +1,27 @@
 import { FunctionComponent, useMemo } from 'react';
+import { ImportableResource } from 'waldur-js-client';
 
 import { requiredArray } from '@waldur/core/validators';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { ImportableResource, Offering } from '@waldur/marketplace/types';
+import { Offering } from '@waldur/marketplace/types';
 import { ResourceIcon } from '@waldur/resource/ResourceName';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-const serializeResource = (resource) => ({
-  name: resource.name,
-  uuid: resource.backend_id,
-  resource_type: resource.type,
-});
-
-const NameField = ({ row }) =>
-  row.type ? <ResourceIcon resource={serializeResource(row)} /> : row.name;
+const NameField = ({ row }: { row: ImportableResource }) =>
+  row.type ? (
+    <ResourceIcon
+      resource={{
+        name: row.name,
+        uuid: row.backend_id,
+        resource_type: row.type,
+      }}
+    />
+  ) : (
+    row.name
+  );
 
 export const ResourcesList: FunctionComponent<{
   offering: Offering;

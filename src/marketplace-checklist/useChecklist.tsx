@@ -1,18 +1,20 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  ChecklistCategory,
+  marketplaceChecklistsAnswersSubmitCreate,
+  marketplaceChecklistsCategoriesRetrieve,
+  marketplaceChecklistsQuestionsList,
+  marketplaceChecklistsStatsList,
+  marketplaceChecklistsUserAnswersList,
+} from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
-import {
-  getChecklists,
-  getQuestions,
-  getAnswers,
-  postAnswers,
-  getStats,
-  getCategory,
-} from './api';
 import { Checklist, Answer, ChecklistStats, Question } from './types';
+import { getChecklists } from './utils';
 
 const useChecklistSelector = (categoryId?: string) => {
   const [checklistOptions, setChecklistOptions] = useState([]);
@@ -73,7 +75,7 @@ export const useUserChecklist = (userId, categoryId?) => {
   const [questionsList, setQuestionsList] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [questionsErred, setQuestionsErred] = useState(true);
-  const [categoryInfo, setCategoryInfo] = useState(null);
+  const [categoryInfo, setCategoryInfo] = useState<ChecklistCategory>(null);
 
   const [answers, setAnswers] = useState<AnswersTableType>();
   const [answersTable, setAnswersTable] = useState<AnswersTableType>();
@@ -86,11 +88,26 @@ export const useUserChecklist = (userId, categoryId?) => {
       setQuestionsLoading(true);
       setQuestionsErred(false);
       try {
-        const questions = await getQuestions(checklist.uuid);
-        const answersList = await getAnswers(userId, checklist.uuid);
+        const questions = await getAllPages((page) =>
+          marketplaceChecklistsQuestionsList({
+            path: { checklist_uuid: checklist.uuid },
+            query: { page },
+          }),
+        );
+        const answersList = await getAllPages((page) =>
+          marketplaceChecklistsUserAnswersList({
+            path: {
+              checklist_uuid: checklist.uuid,
+              user_uuid: userId,
+            },
+            query: { page },
+          }),
+        );
         if (categoryId) {
-          const category = await getCategory(categoryId);
-          setCategoryInfo(category);
+          const category = await marketplaceChecklistsCategoriesRetrieve({
+            path: { uuid: categoryId },
+          });
+          setCategoryInfo(category.data);
         }
 
         setQuestionsList(questions);
@@ -124,7 +141,10 @@ export const useUserChecklist = (userId, categoryId?) => {
         question_uuid,
         value: answersTable[question_uuid],
       }));
-      await postAnswers(checklist.uuid, payload);
+      await marketplaceChecklistsAnswersSubmitCreate({
+        path: { checklist_uuid: checklist.uuid },
+        body: payload,
+      });
       setAnswers(answersTable);
     } catch (error) {
       setSubmitting(false);
@@ -167,7 +187,9 @@ export const useChecklistOverview = (categoryId: string) => {
       setStatsLoading(true);
       setStatsErred(false);
       try {
-        const stats = await getStats(checklist.uuid);
+        const stats = await marketplaceChecklistsStatsList({
+          path: { checklist_uuid: checklist.uuid },
+        }).then((r) => r.data);
         setStatsList(stats);
         setStatsLoading(false);
       } catch (error) {

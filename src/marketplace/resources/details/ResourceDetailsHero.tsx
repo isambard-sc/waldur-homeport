@@ -1,3 +1,9 @@
+import {
+  OfferingComponent,
+  PublicOfferingDetails,
+  Resource,
+} from 'waldur-js-client';
+
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
 import { RefreshButton } from '@waldur/marketplace/common/RefreshButton';
 import { INSTANCE_TYPE, VOLUME_TYPE } from '@waldur/openstack/constants';
@@ -21,6 +27,13 @@ export const ResourceDetailsHero = ({
   components,
   refetch,
   isLoading,
+}: {
+  resource: Resource;
+  scope;
+  offering: PublicOfferingDetails;
+  components: OfferingComponent[];
+  refetch;
+  isLoading;
 }) => {
   return (
     <>
@@ -48,6 +61,7 @@ export const ResourceDetailsHero = ({
               scope={scope}
               refetch={refetch}
               labeled
+              drop="down"
             />
           </div>
         }

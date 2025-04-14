@@ -2,6 +2,8 @@ import { Eye } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { ComponentsUsageStats } from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -10,14 +12,14 @@ import { translate } from '@waldur/i18n';
 import { AggregateLimitsShowMoreButton } from '@waldur/marketplace/aggregate-limits/AggregateLimitsShowMoreButton';
 import { QuotaCell } from '@waldur/marketplace/resources/details/QuotaCell';
 import { openModalDialog } from '@waldur/modal/actions';
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 import { getBillingTypeLabel } from '../resources/usage/utils';
 
 interface AggregateLimitWidgetProps {
   project?: Project;
   customer?: Customer;
-  data: any;
+  data: ComponentsUsageStats;
   isLoading: boolean;
   error: any;
 }
@@ -61,7 +63,7 @@ export const AggregateLimitWidget = ({
             [isProject ? 'project' : 'customer']: isProject
               ? project
               : customer,
-            components: data?.data.components,
+            components: data?.components,
           },
           size: 'lg',
         }),
@@ -81,7 +83,7 @@ export const AggregateLimitWidget = ({
     );
   }
 
-  const components = data.data.components;
+  const components = data.components;
 
   return components?.length ? (
     <WidgetCard

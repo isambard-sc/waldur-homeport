@@ -9,18 +9,18 @@ import {
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { projectTypesList, projectsCreate } from 'waldur-js-client';
 
-import * as config from '@waldur/configs/default';
+import { formDataOptions } from '@waldur/core/api';
+import * as config from '@waldur/core/config';
 import { Customer } from '@waldur/workspace/types';
-
-import { createProject, loadProjectTypes } from '../api';
 
 import { ProjectCreateDialog } from './ProjectCreateDialog';
 
 // Mock API calls
 vi.mock('../api');
-
-vi.mock('@waldur/configs/default');
+vi.mock('waldur-js-client');
+vi.mock('@waldur/core/config');
 
 describe('ProjectCreateDialog', () => {
   const mockedRefetch = vi.fn();
@@ -33,13 +33,10 @@ describe('ProjectCreateDialog', () => {
           is_staff: true,
           permissions: [],
         },
-        customer: {
-          uuid: 'mock-customer-id',
-        },
       },
     }));
 
-    vi.mocked(createProject).mockResolvedValue({
+    vi.mocked(projectsCreate).mockResolvedValue({
       data: { uuid: 'mock-project-uuid' },
     } as any);
 
@@ -51,7 +48,7 @@ describe('ProjectCreateDialog', () => {
       <Provider store={mockStore}>
         <UIRouter router={router}>
           <ProjectCreateDialog
-            customer={{ uuid: 'mock-customer-id' } as Customer}
+            customer={{ url: 'mock-customer-url' } as Customer}
             refetch={mockedRefetch}
           />
         </UIRouter>
@@ -80,7 +77,7 @@ describe('ProjectCreateDialog', () => {
   });
 
   it('should render the form correctly', () => {
-    vi.mocked(loadProjectTypes).mockResolvedValue([]);
+    vi.mocked(projectTypesList).mockResolvedValue({ data: [] } as any);
     renderComponent();
     // Assert that the form fields are rendered
     expect(screen.getByText('Project name')).toBeInTheDocument();
@@ -112,7 +109,7 @@ describe('ProjectCreateDialog', () => {
   });
 
   it('should create a new project using entered values', async () => {
-    vi.mocked(loadProjectTypes).mockResolvedValue([]);
+    vi.mocked(projectTypesList).mockResolvedValue({ data: [] } as any);
     renderComponent();
     // Fill out the form
     await userEvent.type(screen.getByText('Project name'), 'Test Project');
@@ -126,21 +123,28 @@ describe('ProjectCreateDialog', () => {
 
     // Wait for the form submission to complete
     await waitFor(() => {
-      expect(createProject).toHaveBeenCalledWith({
-        customer: {
-          uuid: 'mock-customer-id',
+      expect(projectsCreate).toHaveBeenCalledWith({
+        body: {
+          customer: 'mock-customer-url',
+          name: 'Test Project',
+          description: 'This is a test project',
+          end_date: undefined,
+          image: undefined,
+          is_industry: undefined,
+          oecd_fos_2007_code: undefined,
+          start_date: undefined,
+          type: undefined,
         },
-        name: 'Test Project',
-        description: 'This is a test project',
+        ...formDataOptions,
       });
       expect(mockedRefetch).toHaveBeenCalled();
     });
   });
 
   it('allows to select type if choices are available', async () => {
-    vi.mocked(loadProjectTypes).mockResolvedValue([
-      { name: 'Basic project type', url: 'basic-project-type-url' },
-    ]);
+    vi.mocked(projectTypesList).mockResolvedValue({
+      data: [{ name: 'Basic project type', url: 'basic-project-type-url' }],
+    } as any);
     renderComponent();
     await userEvent.type(screen.getByText('Project name'), 'Test Project');
     await userEvent.type(
@@ -155,13 +159,19 @@ describe('ProjectCreateDialog', () => {
 
     // Wait for the form submission to complete
     await waitFor(() => {
-      expect(createProject).toHaveBeenCalledWith({
-        customer: {
-          uuid: 'mock-customer-id',
+      expect(projectsCreate).toHaveBeenCalledWith({
+        body: {
+          customer: 'mock-customer-url',
+          name: 'Test Project',
+          description: 'This is a test project',
+          type: 'basic-project-type-url',
+          end_date: undefined,
+          image: undefined,
+          is_industry: undefined,
+          oecd_fos_2007_code: undefined,
+          start_date: undefined,
         },
-        name: 'Test Project',
-        description: 'This is a test project',
-        type: { name: 'Basic project type', url: 'basic-project-type-url' },
+        ...formDataOptions,
       });
       expect(mockedRefetch).toHaveBeenCalled();
     });

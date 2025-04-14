@@ -2,10 +2,10 @@ import { XCircle } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { marketplaceOrdersRejectByConsumer } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { rejectOrderByConsumer } from '@waldur/marketplace/common/api';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
@@ -21,7 +21,7 @@ export const RejectByConsumerButton: FC<
   const user = useSelector(getUser);
   const { mutate, isLoading } = useMutation(async () => {
     try {
-      await rejectOrderByConsumer(order.uuid);
+      await marketplaceOrdersRejectByConsumer({ path: { uuid: order.uuid } });
       if (refetch) {
         await refetch();
       }

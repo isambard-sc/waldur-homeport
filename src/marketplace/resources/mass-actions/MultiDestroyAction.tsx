@@ -1,9 +1,9 @@
 import { X } from '@phosphor-icons/react';
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceResourcesTerminate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { terminateResource } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
@@ -11,7 +11,7 @@ export const MultiDestroyAction = ({ rows, refetch }) => {
   const dispatch = useDispatch();
 
   const validResources = useMemo(
-    () => rows.filter((resource) => ['OK', 'Erred'].includes(resource.state)),
+    () => rows.filter((resource) => ['OK', 'ERRED'].includes(resource.state)),
     [rows],
   );
   const callback = useCallback(async () => {
@@ -28,7 +28,9 @@ export const MultiDestroyAction = ({ rows, refetch }) => {
     }
 
     Promise.all(
-      validResources.map((resource) => terminateResource(resource.uuid)),
+      validResources.map((resource) =>
+        marketplaceResourcesTerminate({ path: { uuid: resource.uuid } }),
+      ),
     ).then(() => {
       refetch();
     });
@@ -39,7 +41,8 @@ export const MultiDestroyAction = ({ rows, refetch }) => {
       title={translate('Destroy')}
       action={callback}
       disabled={validResources.length !== rows.length}
-      iconNode={<X />}
+      iconNode={<X weight="bold" />}
+      iconColor="danger"
       className="text-danger"
     />
   );

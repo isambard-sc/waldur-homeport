@@ -1,12 +1,18 @@
 import React from 'react';
 import { Props as SelectProps } from 'react-select';
 import { Field, Validator } from 'redux-form';
+import {
+  proposalProtectedCallsList,
+  proposalPublicCallsList,
+  ProposalPublicCallsListData,
+} from 'waldur-js-client';
 
+import { parseSelectData } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
+import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { FieldError } from '@waldur/form';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-
-import { callAutocomplete } from './api';
 
 interface CallAutocompleteProps {
   protectedCalls?: boolean;
@@ -16,6 +22,31 @@ interface CallAutocompleteProps {
   validate?: Validator | Validator[];
   reactSelectProps?: Partial<SelectProps>;
 }
+
+const callAutocomplete = async (
+  query: ProposalPublicCallsListData['query'],
+  prevOptions,
+  currentPage: number,
+  protectedCalls = false,
+) => {
+  const api = protectedCalls
+    ? proposalProtectedCallsList
+    : proposalPublicCallsList;
+  const response = await api({
+    query: {
+      field: ['name', 'uuid', 'url'],
+      o: ['name'],
+      ...query,
+      page: currentPage,
+      page_size: ENV.pageSize,
+    },
+  });
+  return returnReactSelectAsyncPaginateObject(
+    parseSelectData(response),
+    prevOptions,
+    currentPage,
+  );
+};
 
 export const CallAutocomplete: React.FC<CallAutocompleteProps> = (props) => (
   <Field

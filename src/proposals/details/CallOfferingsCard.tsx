@@ -1,13 +1,12 @@
 import { FC } from 'react';
 
 import { translate } from '@waldur/i18n';
+import { OfferingDetailsLink } from '@waldur/marketplace/links/OfferingDetailsLink';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 import { CallOffering, Call } from '../types';
-
-import { CallOfferingStateField } from './CallOfferingStateField';
 
 interface CallOfferingsCardProps {
   call: Call;
@@ -30,15 +29,19 @@ export const CallOfferingsCard: FC<CallOfferingsCardProps> = (props) => {
       columns={[
         {
           title: translate('Offering name'),
-          render: ({ row }) => <>{row.offering_name}</>,
+          render: ({ row }) => (
+            <OfferingDetailsLink offering_uuid={row.offering_uuid}>
+              {row.offering_name}
+            </OfferingDetailsLink>
+          ),
         },
         {
           title: translate('Provider'),
           render: ({ row }) => <>{renderFieldOrDash(row.provider_name)}</>,
         },
         {
-          title: translate('State'),
-          render: CallOfferingStateField,
+          title: translate('Category'),
+          render: ({ row }) => <>{row.category_name}</>,
         },
       ]}
       title={translate('Offerings')}

@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 
 import { getNextPageUrl } from './api';
 
 describe('getNextPageUrl', () => {
   const fakeResponse = (link) => ({
-    headers: { link },
+    headers: { link, get: vi.fn() },
   });
   it('parses links header and returns next URL', () => {
     const links =

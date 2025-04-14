@@ -1,9 +1,7 @@
 import { FunctionComponent, PropsWithChildren, useMemo } from 'react';
-import { Container } from 'react-bootstrap';
+import { Resource } from 'waldur-js-client';
 
 import { Field } from '@waldur/resource/summary';
-
-import { Resource } from '../types';
 
 import { getResourceSummaryFields } from './utils';
 
@@ -26,7 +24,7 @@ export const ResourceSummary: FunctionComponent<
   );
 
   return (
-    <Container className="container-metadata">
+    <>
       {fields.map((field) =>
         field.custom ? (
           field.custom
@@ -41,6 +39,6 @@ export const ResourceSummary: FunctionComponent<
         ),
       )}
       {children}
-    </Container>
+    </>
   );
 };

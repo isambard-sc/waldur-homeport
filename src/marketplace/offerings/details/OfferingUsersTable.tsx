@@ -55,7 +55,7 @@ export const OfferingUsersTable: FunctionComponent<{ offering }> = ({
       showPageSizeSelector={true}
       initialPageSize={5}
       tableActions={
-        offering.secret_options.service_provider_can_create_offering_user && (
+        offering.plugin_options?.service_provider_can_create_offering_user && (
           <CreateOfferingUserButton
             offering={offering}
             onSuccess={props.fetch}

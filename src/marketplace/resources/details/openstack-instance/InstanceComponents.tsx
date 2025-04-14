@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 
@@ -14,19 +15,19 @@ const ResourceComponentItem = ({ title, usage, units, isSmallScreen }) => {
   );
 };
 
-export const InstanceComponents = ({ resource }) => {
+export const InstanceComponents = ({
+  resource,
+}: {
+  resource: OpenStackInstance;
+}) => {
   const { volumes } = resource;
-  const volumeTypes = useMemo<Record<string, number>>(
-    () =>
-      volumes.reduce(
-        (result, volume) => ({
-          ...result,
-          [volume.type_name]: (result[volume.type_name] || 0) + volume.size,
-        }),
-        {},
-      ),
-    [volumes],
-  );
+  const volumeTypes = useMemo<Record<string, number>>(() => {
+    const result = {};
+    volumes.forEach((volume) => {
+      result[volume.type_name] = (result[volume.type_name] || 0) + volume.size;
+    });
+    return result;
+  }, [volumes]);
   const isSmallScreen = useMediaQuery({ maxWidth: 320 });
 
   return (

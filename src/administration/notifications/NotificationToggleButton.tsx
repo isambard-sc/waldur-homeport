@@ -1,12 +1,14 @@
 import { BellSimple, BellSimpleSlash } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  notificationMessagesDisable,
+  notificationMessagesEnable,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import { disableNotification, enableNotification } from './api';
 
 export const NotificationToggleButton: FunctionComponent<{
   row;
@@ -16,7 +18,7 @@ export const NotificationToggleButton: FunctionComponent<{
   const callback = async () => {
     if (row.enabled) {
       try {
-        await disableNotification(row.url);
+        await notificationMessagesDisable({ path: { uuid: row.uuid } });
         dispatch(showSuccess(translate('The notification has been disabled')));
       } catch (error) {
         dispatch(
@@ -28,7 +30,7 @@ export const NotificationToggleButton: FunctionComponent<{
       }
     } else {
       try {
-        await enableNotification(row.url);
+        await notificationMessagesEnable({ path: { uuid: row.uuid } });
         dispatch(showSuccess(translate('The notification has been enabled')));
       } catch (error) {
         dispatch(
@@ -45,7 +47,13 @@ export const NotificationToggleButton: FunctionComponent<{
     <ActionItem
       action={callback}
       title={row.enabled ? translate('Disable') : translate('Enable')}
-      iconNode={row.enabled ? <BellSimple /> : <BellSimpleSlash />}
+      iconNode={
+        row.enabled ? (
+          <BellSimple weight="bold" />
+        ) : (
+          <BellSimpleSlash weight="bold" />
+        )
+      }
       size="sm"
       className={row.enabled ? 'text-warning' : 'text-success'}
       iconColor={row.enabled ? 'warning' : 'success'}

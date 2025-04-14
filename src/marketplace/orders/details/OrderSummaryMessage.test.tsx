@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-
-import { BillingType } from '@waldur/marketplace/types';
+import { BillingTypeEnum } from 'waldur-js-client';
 
 import { getUpdateSummary } from './OrderSummaryMessage';
 
@@ -10,7 +9,7 @@ vi.mock('@waldur/core/formatCurrency', () => ({
 
 const COMPONENTS = [
   {
-    billing_type: 'usage' as BillingType,
+    billing_type: 'usage' as BillingTypeEnum,
     type: 'gigabytes_gpfs',
     name: 'Storage (gpfs)',
     description: 'Capacity optimized HDD',
@@ -24,7 +23,7 @@ const COMPONENTS = [
     uuid: '10ff42e159d7472fb35d4db517e6c16e',
   },
   {
-    billing_type: 'usage' as BillingType,
+    billing_type: 'usage' as BillingTypeEnum,
     type: 'gigabytes_rbd-ec',
     name: 'Storage (rbd-ec)',
     description: 'General purpose SSD',
@@ -38,7 +37,7 @@ const COMPONENTS = [
     uuid: '36d5008a3b6611eebe560242ac120002',
   },
   {
-    billing_type: 'fixed' as BillingType,
+    billing_type: 'fixed' as BillingTypeEnum,
     type: 'cores',
     name: 'Cores',
     description: '',
@@ -52,7 +51,7 @@ const COMPONENTS = [
     uuid: '36d506483b6611eebe560242ac120002',
   },
   {
-    billing_type: 'fixed' as BillingType,
+    billing_type: 'fixed' as BillingTypeEnum,
     type: 'ram',
     name: 'RAM',
     description: '',
@@ -66,7 +65,7 @@ const COMPONENTS = [
     uuid: '36d508503b6611eebe560242ac120002',
   },
   {
-    billing_type: 'fixed' as BillingType,
+    billing_type: 'fixed' as BillingTypeEnum,
     type: 'storage',
     name: 'Storage',
     description: '',
@@ -106,7 +105,7 @@ describe('OrderSummary', () => {
       user: 'Alice Lebowski',
       components: COMPONENTS,
     };
-    expect(getUpdateSummary(ctx)).toMatchSnapshot();
+    expect(getUpdateSummary(ctx as any)).toMatchSnapshot();
   });
 
   it('formats update summary without components', () => {

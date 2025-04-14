@@ -1,14 +1,14 @@
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
+import { Resource } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { ResourceUsageTabsContainer } from '@waldur/marketplace/resources/usage/ResourceUsageTabsContainer';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
-import { getComponentsAndUsages } from './api';
+import { getComponentsAndUsages } from './utils';
 
 interface ResourceUsageDialogProps {
   resolve: {

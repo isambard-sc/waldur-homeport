@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { RancherCluster, RancherTemplate } from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
@@ -6,9 +7,9 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-export const ClusterTemplatesList: FunctionComponent<{ resourceScope }> = ({
-  resourceScope,
-}) => {
+export const ClusterTemplatesList: FunctionComponent<{
+  resourceScope: RancherCluster;
+}> = ({ resourceScope }) => {
   const filter = useMemo(
     () => ({
       cluster_uuid: resourceScope.uuid,
@@ -22,7 +23,7 @@ export const ClusterTemplatesList: FunctionComponent<{ resourceScope }> = ({
     queryField: 'name',
   });
   return (
-    <Table
+    <Table<RancherTemplate>
       {...props}
       columns={[
         {

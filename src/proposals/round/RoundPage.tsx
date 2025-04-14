@@ -1,14 +1,15 @@
 import { FunctionComponent } from 'react';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { InvalidRoutePage } from '@waldur/error/InvalidRoutePage';
 import { translate } from '@waldur/i18n';
 
-import { Call, Round } from '../types';
+import { Call } from '../types';
 
 interface OwnProps {
   call: Call;
-  round: Round;
+  round: ProtectedRound;
   refetch;
   isLoading;
   isRefetching;

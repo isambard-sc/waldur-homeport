@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackFlavor, OpenstackFlavorsListData } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -10,7 +11,7 @@ import { useTable } from '@waldur/table/useTable';
 export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackFlavorsListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
     }),
@@ -25,7 +26,7 @@ export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
   });
 
   return (
-    <Table
+    <Table<OpenStackFlavor>
       {...props}
       columns={[
         {
@@ -66,6 +67,7 @@ export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
           copyField: (row) => row.uuid,
         },
       ]}
+      title={translate('Flavors')}
       verboseName={translate('flavors')}
       hasQuery={true}
       hasOptionalColumns

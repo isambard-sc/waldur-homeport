@@ -5,7 +5,3 @@ export interface Component {
   usage: number;
   limit: number | null;
 }
-
-export interface AggregateLimitStatsResponse {
-  components: Component[];
-}

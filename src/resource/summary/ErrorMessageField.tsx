@@ -9,7 +9,7 @@ import { ResourceSummaryProps } from './types';
 
 const formatErrorField = (props: ResourceSummaryProps) => {
   if (
-    props.resource.state !== 'Erred' &&
+    props.resource.state !== 'ERRED' &&
     props.resource.runtime_state !== 'ERROR'
   ) {
     return null;

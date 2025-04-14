@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { PropsWithChildren, useEffect, useRef } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import {
   DrawerComponent,
   MenuComponent,

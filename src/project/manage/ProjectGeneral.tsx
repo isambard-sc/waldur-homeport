@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
+import { Project } from 'waldur-js-client';
 
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { Project } from '@waldur/workspace/types';
 
 import { FieldEditButton } from './FieldEditButton';
 import { ProjectAvatar } from './ProjectAvatar';

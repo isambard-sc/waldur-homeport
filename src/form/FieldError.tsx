@@ -26,19 +26,33 @@ const isOneLine = (error) => {
 
 interface FieldErrorProps {
   error?: string | object | Array<any>;
+  center?: boolean;
 }
 
-export const FieldError: FunctionComponent<FieldErrorProps> = (props) => {
-  return props.error ? (
-    <Form.Text
-      className={'text-danger' + (isOneLine(props.error) ? '' : ' text-start')}
-      as="div"
-    >
-      {Array.isArray(props.error)
-        ? props.error.map((e, i) => <div key={i}>{e}</div>)
-        : typeof props.error === 'object'
-          ? getKeyValueElement(props.error)
-          : props.error}
+export const FieldErrorMessage: FunctionComponent<FieldErrorProps> = ({
+  error,
+  center,
+}) => {
+  return (
+    <span className={isOneLine(error) || center ? undefined : 'text-start'}>
+      {error
+        ? Array.isArray(error)
+          ? error.map((e, i) => <div key={i}>{e}</div>)
+          : typeof error === 'object'
+            ? getKeyValueElement(error)
+            : error
+        : null}
+    </span>
+  );
+};
+
+export const FieldError: FunctionComponent<FieldErrorProps> = ({
+  error,
+  center,
+}) => {
+  return error ? (
+    <Form.Text className="text-danger" as="div">
+      <FieldErrorMessage error={error} center={center} />
     </Form.Text>
   ) : null;
 };

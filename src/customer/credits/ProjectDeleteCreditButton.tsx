@@ -1,13 +1,12 @@
 import { Trash } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
+import { projectCreditsDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
-
-import { deleteProjectCredit } from './api';
 
 export const ProjectDeleteCreditButton = ({ row, refetch }) => {
   const customer = useSelector(getCustomer);
@@ -32,7 +31,7 @@ export const ProjectDeleteCreditButton = ({ row, refetch }) => {
       return;
     }
     try {
-      await deleteProjectCredit(row.uuid);
+      await projectCreditsDestroy({ path: { uuid: row.uuid } });
       refetch();
       dispatch(showSuccess(translate('Credit deleted successfully.')));
     } catch (error) {

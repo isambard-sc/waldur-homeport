@@ -1,12 +1,16 @@
 import classNames from 'classnames';
 import { FC, PropsWithChildren } from 'react';
+import { FormLabel } from 'react-bootstrap';
 
+import Avatar from '@waldur/core/Avatar';
 import { translate } from '@waldur/i18n';
-import { RatingStars } from '@waldur/marketplace/common/RatingStars';
+
+import { RateStars } from './RateStars';
 
 interface ReviewCommentProps {
   title?: string;
   score?: number;
+  time?: string;
   className?: string;
 }
 
@@ -15,26 +19,34 @@ export const ReviewComment: FC<PropsWithChildren<ReviewCommentProps>> = (
 ) => {
   return (
     <div
-      className={classNames(
-        'review-comment rounded fst-italic bg-light-warning py-4 px-6',
-        props.className,
-      )}
-      style={{ whiteSpace: 'pre-line' }}
+      className={classNames('review-comment d-flex p-5 gap-4', props.className)}
     >
-      {props.title && <b>{props.title}: </b>}
-      {props.children ? (
-        props.children
-      ) : (
-        <span className="text-muted">{translate('No explanation')}</span>
-      )}
-      {(props.score || props.score === 0) && (
-        <RatingStars
-          rating={props.score}
-          size="medium"
-          color="text-dark"
-          className="d-block mb-0"
-        />
-      )}
+      <Avatar
+        className="symbol symbol-32px symbol-circle flex-shrink-0 lh-0"
+        labelClassName="bg-primary-200 text-primary-700"
+        name={props.title}
+        size={32}
+      />
+      <div className="fw-semibold">
+        <FormLabel className="mb-0">
+          {props.title}
+          {Boolean(props.time) && (
+            <small className="text-muted ms-2 fw-normal">{props.time}</small>
+          )}
+        </FormLabel>
+        {props.children ? (
+          <p className="text-muted mb-0" style={{ whiteSpace: 'pre-line' }}>
+            {props.children}
+          </p>
+        ) : (
+          <p className="text-muted fst-italic mb-0">
+            {translate('No explanation')}
+          </p>
+        )}
+        {(props.score || props.score === 0) && (
+          <RateStars value={props.score} size={16} />
+        )}
+      </div>
     </div>
   );
 };

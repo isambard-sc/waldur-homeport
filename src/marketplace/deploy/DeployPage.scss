@@ -1,31 +1,30 @@
 .capacity-bar {
   .progress {
-    width: 150px;
+    width: 100%;
+    height: 4px;
+    flex-grow: 1;
   }
 
   .quota-info {
-    margin-bottom: 0;
-    margin-top: 0.4rem;
-    font-size: 0.7rem;
-    font-weight: bold;
+    margin-bottom: 1px !important;
+    font-size: 12px;
+    font-weight: 500;
     text-align: center;
     white-space: nowrap;
   }
 }
 
-.deploy-page-banner {
-  padding-right: 350px;
-}
+/* Equals to bootstrap sm screen size */
+@media (min-width: 576px) {
+  .capacity-bar {
+    flex-grow: 0;
+    margin-left: auto;
 
-@media (width <= 1650px) {
-  .deploy-page-banner {
-    padding-right: 300px;
-  }
-}
-
-/* Equals to bootstrap xl screen size */
-@media (width <= 1200px) {
-  .deploy-page-banner {
-    padding-right: 0;
+    .quota-progress {
+      min-width: 132px;
+      display: block;
+      justify-self: end;
+      width: 100%;
+    }
   }
 }

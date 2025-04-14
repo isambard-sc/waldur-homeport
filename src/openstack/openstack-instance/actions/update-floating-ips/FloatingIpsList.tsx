@@ -53,7 +53,7 @@ export const FloatingIpsList: FC<FloatingIpsListProps> = ({
           }}
         >
           <span className="svg-icon svg-icon-2">
-            <PlusCircle />
+            <PlusCircle weight="bold" />
           </span>
           {translate('Add')}
         </Button>

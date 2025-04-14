@@ -1,9 +1,10 @@
 import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { reduxForm, InjectedFormProps } from 'redux-form';
+import { InjectedFormProps, reduxForm } from 'redux-form';
+import { paymentsCreate } from 'waldur-js-client';
 
+import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { formatDate } from '@waldur/core/dateUtils';
-import * as api from '@waldur/customer/payments/api';
 import { ADD_PAYMENT_FORM_ID } from '@waldur/customer/payments/constants';
 import {
   FileUploadField,
@@ -16,7 +17,7 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { updatePaymentsList } from './utils';
@@ -35,11 +36,14 @@ const PaymentCreateDialog: FunctionComponent<PaymentCreateDialogProps> = (
 
   const submitRequest = async (formData) => {
     try {
-      await api.createPayment({
-        date_of_payment: formatDate(formData.date_of_payment),
-        sum: formData.sum,
-        proof: formData.proof,
-        profile: props.resolve.profileUrl,
+      await paymentsCreate({
+        body: {
+          date_of_payment: formatDate(formData.date_of_payment),
+          sum: formData.sum,
+          proof: fileSerializer(formData.proof),
+          profile: props.resolve.profileUrl,
+        },
+        ...formDataOptions,
       });
       dispatch(showSuccess(translate('Payment has been created.')));
       dispatch(closeModalDialog());

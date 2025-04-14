@@ -30,7 +30,7 @@ export const AddComponentButton: FunctionComponent<{
   };
   return (
     <ActionButton
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       title={translate('Add component')}
       action={callback}
     />

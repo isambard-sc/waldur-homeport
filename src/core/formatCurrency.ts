@@ -1,4 +1,4 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
 export const formatCurrency = (
   value: string | number,
@@ -12,7 +12,23 @@ export const formatCurrency = (
   }).format(value)}`;
 };
 
-export const defaultCurrency = (value) => {
+const abbreviateNumber = (value: string | number) => {
+  if (typeof value === 'string') value = parseFloat(value);
+  const suffixes = ['', 'k', 'M', 'B', 'T'];
+  let magnitude = 0;
+
+  while (Math.abs(value) >= 1000 && magnitude < suffixes.length - 1) {
+    value /= 1000;
+    magnitude++;
+  }
+
+  return `${value.toFixed(value % 1 === 0 ? 0 : 1)}${suffixes[magnitude]}`;
+};
+
+export const defaultCurrency = (
+  value,
+  shorten = false,
+): string | null | undefined => {
   if (value === undefined || value === null) {
     return value;
   }
@@ -23,6 +39,11 @@ export const defaultCurrency = (value) => {
   }
   if (value !== 0 && Math.abs(value) < 0.005) {
     fractionSize = 4;
+  }
+
+  if (shorten && Number(value) >= 1000) {
+    const formattedValue = abbreviateNumber(value);
+    return `${ENV.plugins.WALDUR_CORE.CURRENCY_NAME} ${formattedValue}`;
   }
   return formatCurrency(
     value,

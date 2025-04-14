@@ -16,7 +16,7 @@ export const TablePageSize: FunctionComponent<TablePageSizeProps> = (props) => {
   }
   return (
     <div className="d-flex align-items-center">
-      <label className="text-grey-500 text-nowrap">
+      <label className="text-gray-500 text-nowrap">
         {translate('Rows per page')}:
       </label>
       <select

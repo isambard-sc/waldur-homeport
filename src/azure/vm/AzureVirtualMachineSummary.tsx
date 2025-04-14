@@ -1,4 +1,5 @@
-import { AzureVirtualMachine } from '@waldur/azure/common/types';
+import { AzureVirtualMachine } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
 import { IPList } from '@waldur/resource/IPList';
 import { Field, ResourceSummaryProps } from '@waldur/resource/summary';

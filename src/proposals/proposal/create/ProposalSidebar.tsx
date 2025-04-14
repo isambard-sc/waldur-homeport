@@ -2,15 +2,19 @@ import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { getFormSyncErrors } from 'redux-form';
 
+import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
+import { Panel } from '@waldur/core/Panel';
 import { FloatingSubmitButton } from '@waldur/form/FloatingSubmitButton';
 import { FormSteps } from '@waldur/form/FormSteps';
 import { SidebarProps } from '@waldur/form/SidebarProps';
+import { TosNotification } from '@waldur/form/TosNotification';
 import { translate } from '@waldur/i18n';
 import { PROPOSAL_UPDATE_SUBMISSION_FORM_ID } from '@waldur/proposals/constants';
 
 interface CompletionPageSidebarProps extends SidebarProps {
-  canSwitchToTeam: boolean;
-  switchToTeam(): void;
+  saveAsDraft(): void;
+  isSaving?: boolean;
+  editable?: boolean;
 }
 
 const formErrorsSelector = (state) =>
@@ -21,36 +25,47 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
 
   return (
     <>
-      <FormSteps
-        steps={props.steps}
-        completedSteps={props.completedSteps}
-        errors={errors}
-      />
-      {props.canSwitchToTeam && (
+      <Panel title={translate('Progress')} cardBordered className="mb-5">
+        <FormSteps
+          steps={props.steps}
+          completedSteps={props.completedSteps}
+          errors={errors}
+          showRequiredErrors
+        />
+      </Panel>
+      {props.editable && (
         <>
-          <div className="d-flex justify-content-between mt-5">
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={props.switchToTeam}
-              className="w-100"
-            >
-              {translate('To team verification')}
-            </Button>
-          </div>
-
-          <p className="text-center fs-9 mt-2 mb-0">
-            {translate(
-              'Please make sure that project proposal details and resource requests are finalised. During team verification they will not be editable.',
-            )}
-          </p>
-
           <FloatingSubmitButton
             submitting={props.submitting}
-            label={translate('Save draft')}
-            variant="secondary"
-            errors={errors}
+            label={translate('Submit')}
+            variant="primary"
+            errors={
+              Object.keys(errors).length
+                ? [
+                    translate(
+                      'Complete all required sections: {sections} and {lastSection} to proceed.',
+                      {
+                        sections: [
+                          translate('Project details'),
+                          translate('Resource requests'),
+                        ].join(', '),
+                        lastSection: translate('Project team'),
+                      },
+                    ),
+                  ]
+                : undefined
+            }
           />
+          <Button
+            variant="secondary"
+            onClick={props.saveAsDraft}
+            className="w-100 mt-2"
+            disabled={props.submitting || props.isSaving}
+          >
+            {props.isSaving && <LoadingSpinnerIcon className="me-1" />}
+            {translate('Save as draft')}
+          </Button>
+          <TosNotification />
         </>
       )}
     </>

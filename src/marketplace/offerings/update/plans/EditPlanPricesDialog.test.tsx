@@ -3,14 +3,13 @@ import { Provider } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
 import { vi, describe, it, expect } from 'vitest';
-
-import { updatePlanPrices } from '@waldur/marketplace/common/api';
+import { marketplacePlansUpdatePrices } from 'waldur-js-client';
 
 import { EditPlanPricesDialog } from './EditPlanPricesDialog';
 
 // Mock dependencies
-vi.mock('@waldur/marketplace/common/api', () => ({
-  updatePlanPrices: vi.fn(),
+vi.mock('waldur-js-client', () => ({
+  marketplacePlansUpdatePrices: vi.fn(),
 }));
 
 vi.mock('@waldur/modal/hooks', () => ({
@@ -61,7 +60,7 @@ const renderComponent = () => {
 
 describe('EditPlanPricesDialog', () => {
   it('should successfully update prices', async () => {
-    const mockUpdatePlanPrices = vi.mocked(updatePlanPrices);
+    const mockPlansUpdatePrices = vi.mocked(marketplacePlansUpdatePrices);
 
     renderComponent();
 
@@ -69,10 +68,15 @@ describe('EditPlanPricesDialog', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockUpdatePlanPrices).toHaveBeenCalledWith('plan-1', {
-        prices: {
-          cpu: 10,
-          ram: 5,
+      expect(mockPlansUpdatePrices).toHaveBeenCalledWith({
+        path: {
+          uuid: 'plan-1',
+        },
+        body: {
+          prices: {
+            cpu: 10,
+            ram: 5,
+          },
         },
       });
     });
@@ -92,11 +96,15 @@ describe('EditPlanPricesDialog', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(updatePlanPrices).toHaveBeenCalledWith('plan-1', {
-        prices: {
-          cpu: 10,
-          ram: 5,
-          // storage price should be filtered out
+      expect(marketplacePlansUpdatePrices).toHaveBeenCalledWith({
+        path: {
+          uuid: 'plan-1',
+        },
+        body: {
+          prices: {
+            cpu: 10,
+            ram: 5,
+          },
         },
       });
     });

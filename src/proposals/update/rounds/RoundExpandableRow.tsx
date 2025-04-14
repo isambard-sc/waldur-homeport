@@ -1,8 +1,8 @@
 import { FunctionComponent } from 'react';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { Round } from '@waldur/proposals/types';
 import {
   formatRoundAllocationStrategy,
   formatRoundAllocationTime,
@@ -13,7 +13,7 @@ import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
 interface RoundExpandableRowProps {
-  row: Round;
+  row: ProtectedRound;
 }
 
 export const RoundExpandableRow: FunctionComponent<RoundExpandableRowProps> = ({

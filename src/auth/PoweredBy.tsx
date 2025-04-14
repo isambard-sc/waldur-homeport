@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
-import { ENV } from '@waldur/configs/default';
-import { fixURL } from '@waldur/core/api';
+import { getIconUrl } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import './PoweredBy.scss';
 
@@ -10,7 +10,7 @@ export const PoweredBy: FunctionComponent = () =>
     <div className="powered-by">
       <div>{translate('Powered by')}</div>
       <div>
-        <img src={fixURL('/icons/powered_by_logo/')} alt="Powered by" />
+        <img src={getIconUrl('powered_by_logo')} alt="Powered by" />
       </div>
     </div>
   ) : null;

@@ -5,6 +5,8 @@ import { Variant } from 'react-bootstrap/esm/types';
 
 import './ProgressSteps.scss';
 
+const DEFAULT_VARIANT = 'primary';
+
 export interface ProgressStep {
   key?: string;
   label: any;
@@ -19,6 +21,7 @@ interface ProgressStepsProps {
   steps: ProgressStep[];
   bgClass?: string;
   className?: string;
+  onClick?(step: ProgressStep, index: number): void;
 }
 
 export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
@@ -26,6 +29,7 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
   className,
   bgClass,
   children,
+  onClick,
 }) => {
   return (
     <div className={classNames('progress-steps-view', className, bgClass)}>
@@ -37,6 +41,7 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
               const current =
                 (i === 0 && !step.completed) ||
                 (steps[i - 1] && steps[i - 1].completed && !step.completed);
+              const variant = step.variant || DEFAULT_VARIANT;
               return (
                 <div
                   key={step.key ?? i}
@@ -50,11 +55,12 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
                     <div
                       className={classNames(
                         'stepper-icon w-25px h-25px',
-                        current ? `bg-${step.variant || 'warning'}` : '',
-                        current
-                          ? `ring-light-${step.variant || 'warning'} ring-4`
-                          : '',
+                        current ? `bg-${variant}` : '',
+                        current ? `ring-light-${variant} ring-4` : '',
+                        Boolean(onClick) && 'cursor-pointer',
                       )}
+                      onClick={() => onClick(step, i)}
+                      aria-hidden="true"
                     >
                       {step.icon ? (
                         typeof step.icon === 'string' ? (
@@ -77,7 +83,7 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
                       <div
                         className={classNames(
                           'stepper-line',
-                          current && `bg-${step.variant || 'warning'}`,
+                          current && `bg-${variant}`,
                         )}
                         style={{ width: 100 / steps.length + 'vw' }}
                       />
@@ -87,14 +93,19 @@ export const ProgressSteps: FC<PropsWithChildren<ProgressStepsProps>> = ({
                       <div
                         className={classNames(
                           'stepper-title h3',
-                          current && `text-${step.variant || 'warning'}`,
+                          current && `text-${variant}-700`,
                           step.labelClass,
                         )}
                       >
                         {step.label}
                       </div>
                       {step.description && (
-                        <div className="stepper-desc">
+                        <div
+                          className={classNames(
+                            'stepper-desc',
+                            current && `text-${variant}`,
+                          )}
+                        >
                           {step.description.map((line, i) => (
                             <div key={i}>{line}</div>
                           ))}

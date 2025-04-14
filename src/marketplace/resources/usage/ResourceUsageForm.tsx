@@ -39,7 +39,7 @@ export interface ResourceUsageFormProps extends InjectedFormProps {
 
 const SummaryField = ({ label, value }) => (
   <span>
-    <strong className="text-grey-700">{label}</strong>: {value}
+    <strong className="text-gray-700">{label}</strong>: {value}
   </span>
 );
 
@@ -101,7 +101,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
 
   return (
     <form onSubmit={props.handleSubmit(props.submitReport)}>
-      <div className="text-grey-500 mb-4">
+      <div className="text-gray-500 mb-4">
         <SummaryField
           label={translate('Client organization')}
           value={props.params.customer_name}
@@ -194,7 +194,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                   <Dropdown>
                     <Dropdown.Toggle
                       variant="active-light-primary"
-                      className="btn-icon btn-text-grey-500 no-arrow w-35px h-35px"
+                      className="btn-icon btn-text-gray-500 no-arrow w-35px h-35px"
                     >
                       <DotsThree size={22} weight="bold" />
                       {wrappedComponents.some((comp) =>

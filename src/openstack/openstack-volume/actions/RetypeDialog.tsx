@@ -1,13 +1,14 @@
 import { FC } from 'react';
 import { Field, Form } from 'react-final-form';
 import { useAsync } from 'react-use';
+import { openstackVolumesRetype } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { useModal } from '@waldur/modal/hooks';
-import { loadVolumeTypes, retypeVolume } from '@waldur/openstack/api';
+import { loadVolumeTypes } from '@waldur/openstack/api';
 import { AsyncActionDialog } from '@waldur/resource/actions/AsyncActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { useNotify } from '@waldur/store/hooks';
@@ -36,7 +37,10 @@ export const RetypeDialog: FC<ActionDialogProps> = ({
 
   const submitRequest = async (formData) => {
     try {
-      await retypeVolume(resource.uuid, { type: formData.type.value });
+      await openstackVolumesRetype({
+        path: { uuid: resource.uuid },
+        body: { type: formData.type.value },
+      });
       showSuccess(translate('Volume has been retyped.'));
       closeDialog();
       if (refetch) {

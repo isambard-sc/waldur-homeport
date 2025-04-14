@@ -1,15 +1,17 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
+import {
+  openstackInstancesList,
+  openstackVolumesAttach,
+} from 'waldur-js-client';
 
-import { getAll } from '@waldur/core/api';
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { attachVolume } from '@waldur/openstack/api';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
-import { VirtualMachine } from '@waldur/resource/types';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 export const AttachDialog: FC<ActionDialogProps> = ({
   resolve: { resource, refetch },
@@ -17,13 +19,15 @@ export const AttachDialog: FC<ActionDialogProps> = ({
   const dispatch = useDispatch();
 
   const asyncState = useAsync(async () => {
-    const params = {
-      attach_volume_uuid: resource.uuid,
-      field: ['url', 'name'],
-    };
-    const instances = await getAll<VirtualMachine>('/openstack-instances/', {
-      params,
-    });
+    const instances = await getAllPages((page) =>
+      openstackInstancesList({
+        query: {
+          page,
+          attach_volume_uuid: resource.uuid,
+          field: ['url', 'name'],
+        },
+      }),
+    );
     return {
       instances: instances.map((choice) => ({
         value: choice.url,
@@ -50,7 +54,11 @@ export const AttachDialog: FC<ActionDialogProps> = ({
       formFields={fields}
       submitForm={async (formData) => {
         try {
-          await attachVolume(resource.uuid, formData.instance);
+          await openstackVolumesAttach({
+            path: { uuid: resource.uuid },
+            body: { instance: formData.instance },
+          });
+
           dispatch(
             showSuccess(translate('Volume has been attached to instance.')),
           );

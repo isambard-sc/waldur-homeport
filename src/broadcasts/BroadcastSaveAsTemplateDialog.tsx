@@ -3,10 +3,12 @@ import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  broadcastMessageTemplatesCreate,
+  MessageTemplateRequest,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
-import { createBroadcastTemplate } from '@waldur/broadcasts/api';
-import { BroadcastTemplateFormData } from '@waldur/broadcasts/types';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { required } from '@waldur/core/validators';
 import { FormContainer, StringField } from '@waldur/form';
@@ -22,7 +24,7 @@ const BroadcastCreateDialog = lazyComponent(() =>
 );
 
 export const BroadcastSaveAsTemplateDialog = reduxForm<
-  BroadcastTemplateFormData,
+  MessageTemplateRequest,
   { resolve: { refetch; broadcastData } }
 >({
   form: 'BroadcastSaveAsTemplateDialog',
@@ -40,11 +42,13 @@ export const BroadcastSaveAsTemplateDialog = reduxForm<
       }),
     );
   const callback = useCallback(
-    async (formData: BroadcastTemplateFormData) => {
+    async (formData: MessageTemplateRequest) => {
       try {
-        await createBroadcastTemplate({
-          ...formData,
-          ...resolve.broadcastData,
+        await broadcastMessageTemplatesCreate({
+          body: {
+            ...formData,
+            ...resolve.broadcastData,
+          },
         });
         await resolve.refetch();
         dispatch(

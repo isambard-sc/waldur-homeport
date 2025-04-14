@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Form } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Field, FieldArray, WrappedFieldArrayProps } from 'redux-form';
+import { marketplaceCategoriesList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
@@ -11,7 +13,6 @@ import { required, requiredArray } from '@waldur/core/validators';
 import { SelectField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { useCategories } from '@waldur/marketplace/category/useCategories';
-import { getCategories } from '@waldur/marketplace/common/api';
 import { Category, Offering } from '@waldur/marketplace/types';
 
 import { importOfferingSelector } from './selectors';
@@ -100,12 +101,11 @@ export const SelectCategoryTab = () => {
   } = useQuery(
     ['categories'],
     () =>
-      getCategories({
-        params: {
-          field: ['uuid', 'title', 'group'],
-          page_size: 100,
-        },
-      }),
+      getAllPages((page) =>
+        marketplaceCategoriesList({
+          query: { page, field: ['uuid', 'title', 'group'], page_size: 100 },
+        }),
+      ),
     { staleTime: 3 * 60 * 1000 },
   );
   const formData = useSelector(importOfferingSelector);

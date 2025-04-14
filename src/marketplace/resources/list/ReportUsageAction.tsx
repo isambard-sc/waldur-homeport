@@ -1,9 +1,9 @@
-import { FileText } from '@phosphor-icons/react';
+import { ChartPie } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { Resource } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { UsageReportContext } from '@waldur/marketplace/resources/usage/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
@@ -51,7 +51,7 @@ export const ReportUsageAction = ({ resource }: { resource: Resource }) => {
   return (
     <ActionItem
       title={translate('Report usage')}
-      iconNode={<FileText />}
+      iconNode={<ChartPie weight="bold" />}
       action={() =>
         callback({
           offering_uuid: resource.offering_uuid,

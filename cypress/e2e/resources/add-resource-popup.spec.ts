@@ -22,7 +22,7 @@ describe('Add resource pop up is visible', { testIsolation: false }, () => {
           });
         }
       })
-      .intercept('GET', '/api/marketplace-category-groups/', [])
+      .intercept('GET', '/api/marketplace-category-groups/**', [])
       .intercept('GET', '/api/projects/6f3ae6f43d284ca196afeb467880b3b9/', {
         fixture: 'projects/alice_azure.json',
       })

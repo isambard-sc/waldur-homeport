@@ -1,18 +1,19 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
+import { marketplaceResourceUsersCreate, usersList } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { parseSelectData } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { required } from '@waldur/core/validators';
 import { SubmitButton } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { createResourceUser, getUsers } from '@waldur/marketplace/common/api';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { USER_FORM_ID } from './constants';
@@ -27,10 +28,12 @@ export const AddUserDialog = reduxForm<
   const update = useCallback(
     async (formData) => {
       try {
-        await createResourceUser({
-          resource: props.resolve.resource.url,
-          user: formData.user.url,
-          role: formData.role.url,
+        await marketplaceResourceUsersCreate({
+          body: {
+            resource: props.resolve.resource.url,
+            user: formData.user.url,
+            role: formData.role.url,
+          },
         });
         dispatch(
           showSuccess(translate('User has been assigned successfully.')),
@@ -46,25 +49,37 @@ export const AddUserDialog = reduxForm<
 
   const loadUsers = useCallback(
     (query, prevOptions, page) =>
-      getUsers({
-        full_name: query,
-        project_uuid: props.resolve.resource.project_uuid,
-        field: ['full_name', 'email', 'url', 'uuid'],
-        o: 'full_name',
-        page,
-        page_size: ENV.pageSize,
+      usersList({
+        query: {
+          full_name: query,
+          project_uuid: props.resolve.resource.project_uuid,
+          field: ['full_name', 'email', 'url', 'uuid'],
+          o: ['full_name'],
+          page,
+          page_size: ENV.pageSize,
+        },
       }).then((response) =>
-        returnReactSelectAsyncPaginateObject(response, prevOptions, page),
+        returnReactSelectAsyncPaginateObject(
+          parseSelectData(response),
+          prevOptions,
+          page,
+        ),
       ),
     [props.resolve.resource],
   );
 
   return (
     <form onSubmit={props.handleSubmit(update)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Assign user')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Assign user')}
+        footer={
+          <SubmitButton
+            disabled={props.invalid}
+            submitting={props.submitting}
+            label={translate('Create')}
+          />
+        }
+      >
         <FormGroup label={translate('User')} required={true}>
           <Field
             name="user"
@@ -90,14 +105,7 @@ export const AddUserDialog = reduxForm<
             )}
           />
         </FormGroup>
-      </Modal.Body>
-      <Modal.Footer>
-        <SubmitButton
-          disabled={props.invalid}
-          submitting={props.submitting}
-          label={translate('Create')}
-        />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

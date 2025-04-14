@@ -1,10 +1,11 @@
 import { Col, Form, Row } from 'react-bootstrap';
 import { useAsync } from 'react-use';
+import { marketplaceOfferingPermissionsList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SymbolsGroup } from '@waldur/customer/dashboard/SymbolsGroup';
 import { translate } from '@waldur/i18n';
-import { getAllOfferingPermissions } from '@waldur/marketplace/common/api';
 import { Customer } from '@waldur/workspace/types';
 
 export const ProviderOfferingPermissions = ({
@@ -18,11 +19,11 @@ export const ProviderOfferingPermissions = ({
     value: offeringPermissions,
   } = useAsync(
     () =>
-      getAllOfferingPermissions({
-        params: {
-          customer: customer.uuid,
-        },
-      }),
+      getAllPages((page) =>
+        marketplaceOfferingPermissionsList({
+          query: { page, customer: customer.uuid },
+        }),
+      ),
     [customer],
   );
 

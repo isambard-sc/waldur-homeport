@@ -1,9 +1,6 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
-import {
-  CustomerStep,
-  ProjectStep,
-} from '@waldur/marketplace/deploy/steps/constants';
+import { DetailsOverviewStep } from '@waldur/marketplace/deploy/steps/constants';
 import { FormFinalConfigurationStep } from '@waldur/marketplace/deploy/steps/FormFinalConfigurationStep';
 import { OfferingConfigurationFormStep } from '@waldur/marketplace/deploy/types';
 
@@ -15,8 +12,7 @@ import { FormStorageStep } from './FormStorageStep';
 import { FormTemplateStep } from './FormTemplateStep';
 
 export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
-  CustomerStep,
-  ProjectStep,
+  DetailsOverviewStep,
   {
     label: translate('Template'),
     id: 'step-template',

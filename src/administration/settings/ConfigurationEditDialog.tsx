@@ -1,8 +1,10 @@
 import { FormControl } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { overrideSettings } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { formDataOptions } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { SelectField, SubmitButton, TextField } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { FormContainer } from '@waldur/form/FormContainer';
@@ -15,7 +17,6 @@ import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { saveConfig } from './api';
 import { getKeyTitle } from './utils';
 
 const SIDEBAR_STYLES = [
@@ -81,7 +82,7 @@ const ColorField = (props) => (
 );
 
 export const ConfigurationEditDialog = reduxForm<
-  FormData,
+  any,
   { resolve: { item: { key; description; type } } }
 >({
   form: 'ConfigurationEditDialog',
@@ -90,7 +91,10 @@ export const ConfigurationEditDialog = reduxForm<
   const dispatch = useDispatch();
   const callback = async (formData) => {
     try {
-      await saveConfig({ [item.key]: formData.value });
+      await overrideSettings({
+        body: { [item.key]: formData.value },
+        ...formDataOptions,
+      });
       ENV.plugins.WALDUR_CORE[item.key] = formData.value;
       dispatch(showSuccess(translate('Configuration has been updated.')));
       dispatch(closeModalDialog());
@@ -128,6 +132,14 @@ export const ConfigurationEditDialog = reduxForm<
               height={100}
               label={item.description}
             />
+          ) : item.type === 'dict_field' ? (
+            <MonacoField
+              name="value"
+              language="json"
+              format={(value) => (value ? JSON.stringify(value, null, 2) : '')}
+              height={100}
+              label={item.description}
+            />
           ) : item.type === 'text_field' ? (
             <TextField name="value" label={item.description} />
           ) : item.key === 'SIDEBAR_STYLE' ? (
@@ -153,7 +165,11 @@ export const ConfigurationEditDialog = reduxForm<
               hideLabel
             />
           ) : item.type === 'image_field' ? (
-            <WideImageField name="value" label={item.description} />
+            <WideImageField
+              name="value"
+              label={item.description}
+              initialValue={props.initialValues.value}
+            />
           ) : (
             <StringField name="value" label={item.description} />
           )}

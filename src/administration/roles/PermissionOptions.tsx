@@ -349,4 +349,53 @@ export const PermissionOptions = [
       },
     ],
   },
+  {
+    label: translate('Call management'),
+    options: [
+      {
+        label: translate('List calls'),
+        value: 'CALL.LIST',
+      },
+      {
+        label: translate('List rounds'),
+        value: 'ROUND.LIST',
+      },
+      {
+        label: translate('List proposals'),
+        value: 'PROPOSAL.LIST',
+      },
+      {
+        label: translate('Approve and reject proposals'),
+        value: 'CALL.APPROVE_AND_REJECT_PROPOSALS',
+      },
+      {
+        label: translate('Close rounds'),
+        value: 'CALL.CLOSE_ROUNDS',
+      },
+      {
+        label: translate('Create call permission'),
+        value: 'CALL.CREATE_PERMISSION',
+      },
+      {
+        label: translate('Update call permission'),
+        value: 'CALL.UPDATE_PERMISSION',
+      },
+      {
+        label: translate('Delete call permission'),
+        value: 'CALL.DELETE_PERMISSION',
+      },
+      {
+        label: translate('Manage proposal'),
+        value: 'PROPOSAL.MANAGE',
+      },
+      {
+        label: translate('Update proposal permission'),
+        value: 'PROPOSAL.UPDATE_PERMISSION',
+      },
+      {
+        label: translate('Delete proposal permission'),
+        value: 'PROPOSAL.DELETE_PERMISSION',
+      },
+    ],
+  },
 ];

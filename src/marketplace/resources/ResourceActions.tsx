@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { FC, useMemo } from 'react';
+import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
 
 import { translate } from '@waldur/i18n';
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
@@ -9,10 +10,19 @@ import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 import { ActionsList } from './actions/ActionsList';
 import { ActionsLists } from './actions/ActionsLists';
 
-export const ResourceActions = ({
+interface ResourceActionsProps {
+  resource;
+  scope;
+  refetch;
+  labeled?: boolean;
+  drop?: DropDirection;
+}
+
+export const ResourceActions: FC<ResourceActionsProps> = ({
   resource,
   scope,
   refetch,
+  drop,
   labeled = false,
 }) => {
   const extraActions = useMemo(() => {
@@ -31,6 +41,7 @@ export const ResourceActions = ({
         }
         refetch={refetch}
         labeled
+        drop={drop}
       />
     );
   }
@@ -43,11 +54,16 @@ export const ResourceActions = ({
         name={resource.name}
         refetch={refetch}
         labeled={labeled}
+        drop={drop}
       />
     );
   }
   return (
-    <ActionsDropdownComponent label={translate('Actions')} labeled={labeled}>
+    <ActionsDropdownComponent
+      label={translate('Actions')}
+      labeled={labeled}
+      drop={drop}
+    >
       {ActionsList.map((ActionComponent, index) => (
         <ActionComponent key={index} resource={resource} refetch={refetch} />
       ))}

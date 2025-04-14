@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useAsyncFn, useEffectOnce } from 'react-use';
 import { Field } from 'redux-form';
+import { notificationMessagesTemplatesList } from 'waldur-js-client';
 
-import { getNotificationMessagesTemplates } from '@waldur/administration/notifications/api';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -11,7 +11,9 @@ import { translate } from '@waldur/i18n';
 
 export const CustomMessageWrapper = () => {
   const [{ loading, error, value }, loadTemplate] = useAsyncFn(() =>
-    getNotificationMessagesTemplates({ name: 'invitation_created' }),
+    notificationMessagesTemplatesList({
+      query: { name: 'invitation_created' },
+    }),
   );
 
   useEffectOnce(() => {
@@ -19,9 +21,9 @@ export const CustomMessageWrapper = () => {
   });
 
   const htmlMessage = useMemo(() => {
-    if (!value || !value.length) return '';
+    if (!value || !value.data.length) return '';
     return (
-      value.find(
+      value.data.find(
         (template) => template.path === 'users/invitation_created_message.html',
       )?.content || ''
     );

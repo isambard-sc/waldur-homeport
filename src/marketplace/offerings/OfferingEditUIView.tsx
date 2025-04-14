@@ -1,15 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
+import {
+  marketplaceCategoriesRetrieve,
+  marketplacePluginsList,
+  marketplaceProviderOfferingsRetrieve,
+} from 'waldur-js-client';
 
 import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import {
-  getCategory,
-  getPlugins,
-  getProviderOffering,
-} from '@waldur/marketplace/common/api';
 import { Offering, ServiceProvider } from '@waldur/marketplace/types';
 import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constants';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
@@ -97,13 +97,15 @@ const RolesSection = lazyComponent(() =>
   })),
 );
 
-const getOfferingData = async (offering_uuid) => {
-  const offering = await getProviderOffering(offering_uuid);
-  const category = await getCategory(offering.category_uuid);
+const getOfferingData = async (offering_uuid: string) => {
+  const offering = (await marketplaceProviderOfferingsRetrieve({
+    path: { uuid: offering_uuid },
+  }).then((response) => response.data)) as Offering;
+  const category = await marketplaceCategoriesRetrieve({
+    path: { uuid: offering.category_uuid },
+  }).then((response) => response.data);
   return { offering, category };
 };
-
-type Awaited<T> = T extends PromiseLike<infer U> ? U : T;
 
 export type OfferingData = Awaited<ReturnType<typeof getOfferingData>>;
 
@@ -215,6 +217,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
   tabs.push({
     title: translate('Accounting'),
     key: 'accounting',
+    defaultKey: 'plans',
     children: [
       {
         title: (
@@ -225,6 +228,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
         ),
         key: 'plans',
         component: PlansSection,
+        visible: false,
       },
       showComponentsList(offering.type) && {
         key: 'components',
@@ -235,6 +239,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
             {translate('Accounting components')}
           </>
         ),
+        visible: false,
       },
     ].filter(Boolean),
   });
@@ -257,16 +262,21 @@ export const OfferingEditUIView = ({
     { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
   );
 
-  const { data: plugins } = useQuery(['marketplacePlugins'], getPlugins, {
-    refetchOnWindowFocus: false,
-    staleTime: 3 * 60 * 1000,
-  });
+  const { data: plugins } = useQuery(
+    ['marketplacePlugins'],
+    marketplacePluginsList,
+    {
+      refetchOnWindowFocus: false,
+      staleTime: 3 * 60 * 1000,
+    },
+  );
 
   const components = useMemo(
     () =>
       data?.offering && plugins
-        ? plugins.find((plugin) => plugin.offering_type === data.offering.type)
-            .components
+        ? plugins.data.find(
+            (plugin) => plugin.offering_type === data.offering.type,
+          ).components
         : [],
     [plugins, data?.offering],
   );

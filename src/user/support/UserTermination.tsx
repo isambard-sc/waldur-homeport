@@ -1,12 +1,12 @@
 import { useSelector } from 'react-redux';
+import { User } from 'waldur-js-client';
 
 import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { UserDelete } from './UserDelete';
 import { UserStatus } from './UserStatus';
 
-export const UserTermination = ({ user }: { user: UserDetails }) => {
+export const UserTermination = ({ user }: { user: User }) => {
   const currentUser = useSelector(getUser);
   return currentUser.is_staff ? (
     <>

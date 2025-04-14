@@ -22,6 +22,7 @@ export const CallsForProposalsList: FC = () => {
       {...tableProps}
       gridItem={({ row }) => <CallCard call={row} />}
       gridSize={{ lg: 6, xl: 4 }}
+      hoverShadow={{ grid: false }}
       mode="grid"
       title={translate('Open calls')}
       verboseName={translate('Open calls')}
@@ -29,7 +30,7 @@ export const CallsForProposalsList: FC = () => {
         <Link
           state="calls-for-proposals-all-calls"
           label={translate('View all')}
-          className="btn btn-light"
+          className="btn btn-outline btn-outline-default"
         />
       }
       hasQuery={false}

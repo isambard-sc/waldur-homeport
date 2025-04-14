@@ -9,6 +9,14 @@ import { translate } from '@waldur/i18n';
 import { Role, RoleType } from '@waldur/permissions/types';
 import { getRoles } from '@waldur/permissions/utils';
 
+const renderRoleType = (roleType: RoleType) =>
+  ({
+    customer: 'O',
+    project: 'P',
+    service_provider: 'SP',
+    call_organizer: 'CO',
+  })[roleType] || '';
+
 const RoleOption: FunctionComponent<OptionProps<Role>> = (props) => (
   <components.Option {...props}>
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -19,11 +27,7 @@ const RoleOption: FunctionComponent<OptionProps<Role>> = (props) => (
           marginLeft: 'auto',
         }}
       >
-        {props.data.content_type === 'customer'
-          ? 'O'
-          : props.data.content_type === 'project'
-            ? 'P'
-            : ''}
+        {renderRoleType(props.data.content_type)}
       </span>
     </div>
   </components.Option>

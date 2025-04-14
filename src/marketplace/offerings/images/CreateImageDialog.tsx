@@ -1,6 +1,7 @@
-import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceScreenshotsCreate } from 'waldur-js-client';
 
+import { fileSerializer, formDataOptions } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
 import {
   FormContainer,
@@ -10,24 +11,32 @@ import {
 } from '@waldur/form';
 import { ImageField } from '@waldur/form/ImageField';
 import { translate } from '@waldur/i18n';
-import { uploadOfferingImage } from '@waldur/marketplace/common/api';
 import { OFFERING_IMAGES_FORM_ID } from '@waldur/marketplace/offerings/store/constants';
-import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { useModal } from '@waldur/modal/hooks';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 
 export const CreateImageDialog = reduxForm<{}, { resolve: { offering } }>({
   form: OFFERING_IMAGES_FORM_ID,
 })((props) => {
-  const dispatch = useDispatch();
+  const { showSuccess, showErrorResponse } = useNotify();
+  const { closeDialog } = useModal();
   const submitRequest = async (formData) => {
     try {
-      await uploadOfferingImage(formData, props.resolve.offering);
-      dispatch(showSuccess(translate('Image has been added.')));
-      dispatch(closeModalDialog());
+      await marketplaceScreenshotsCreate({
+        body: {
+          image: fileSerializer(formData.image),
+          name: formData.name,
+          description: formData.description,
+          offering: props.resolve.offering.url,
+        },
+        ...formDataOptions,
+      });
+      showSuccess(translate('Image has been added.'));
+      closeDialog();
     } catch (error) {
-      dispatch(showErrorResponse(error, translate('Unable to add image.')));
+      showErrorResponse(error, translate('Unable to add image.'));
     }
   };
   return (

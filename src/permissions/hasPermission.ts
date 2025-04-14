@@ -1,5 +1,6 @@
-import { ENV } from '@waldur/configs/default';
-import { User } from '@waldur/workspace/types';
+import { User } from 'waldur-js-client';
+
+import { ENV } from '@waldur/core/config';
 
 import { PermissionRequest, RoleType } from './types';
 
@@ -9,7 +10,7 @@ export function checkScope(
   targetScopeId,
   targetPerm,
 ) {
-  if (user.is_staff) {
+  if (user?.is_staff) {
     return true;
   }
   const userRole = user.permissions?.find(
@@ -25,7 +26,7 @@ export function checkScope(
 }
 
 export const hasPermission = (user: User, request: PermissionRequest) => {
-  if (user.is_staff) {
+  if (user?.is_staff) {
     return true;
   }
   if (request.projectId) {

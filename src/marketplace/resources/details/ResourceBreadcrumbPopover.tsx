@@ -1,4 +1,3 @@
-import { fixURL } from '@waldur/core/api';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { BreadcrumbDropdown } from '@waldur/navigation/header/breadcrumb/BreadcrumbDropdown';
@@ -32,7 +31,7 @@ export const ResourceBreadcrumbPopover = ({ resource, close }) => {
 
   return (
     <BreadcrumbDropdown
-      api={fixURL('/marketplace-resources/')}
+      api="/marketplace-resources/"
       queryField="query"
       params={{
         state: ['Creating', 'OK', 'Erred', 'Updating', 'Terminating'],

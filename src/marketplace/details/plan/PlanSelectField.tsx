@@ -1,13 +1,13 @@
 import { FunctionComponent } from 'react';
 import { Field } from 'redux-form';
+import { BasePublicPlan } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { FieldError } from '@waldur/form';
 import { Select } from '@waldur/form/themed-select';
-import { Plan } from '@waldur/marketplace/types';
 
 interface PlanSelectFieldProps {
-  plans: Plan[];
+  plans: BasePublicPlan[];
 }
 
 export const PlanSelectField: FunctionComponent<PlanSelectFieldProps> = (
@@ -21,8 +21,8 @@ export const PlanSelectField: FunctionComponent<PlanSelectFieldProps> = (
         <Select
           value={fieldProps.input.value}
           onChange={(value) => fieldProps.input.onChange(value)}
-          getOptionValue={(option) => option.url}
-          getOptionLabel={(option) => option.name}
+          getOptionValue={(option: BasePublicPlan) => option.url}
+          getOptionLabel={(option: BasePublicPlan) => option.name}
           options={props.plans}
           isClearable={false}
         />

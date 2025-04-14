@@ -35,7 +35,7 @@ export const CategoryManageColumns = ({
     <ActionItem
       title={translate('Configure columns')}
       action={openFormDialog}
-      iconNode={<Wrench />}
+      iconNode={<Wrench weight="bold" />}
     />
   );
 };

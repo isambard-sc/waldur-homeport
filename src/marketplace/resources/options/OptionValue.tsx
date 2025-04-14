@@ -1,14 +1,13 @@
 import { ReactNode } from 'react';
+import { OptionField, OptionFieldTypeEnum } from 'waldur-js-client';
 
 import { formatDate, formatTime } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { translate } from '@waldur/i18n';
 import { isEmpty } from '@waldur/marketplace/offerings/update/components/OptionalNumberField';
-import { FieldType } from '@waldur/marketplace/offerings/update/options/types';
-import { OptionField } from '@waldur/marketplace/types';
 
-const OptionValueRenders: Record<FieldType, (value) => ReactNode> = {
+const OptionValueRenders: Record<OptionFieldTypeEnum, (value) => ReactNode> = {
   integer: (value) => value,
   text: (value) => value,
   string: (value) => value,

@@ -23,7 +23,10 @@ export const CreditUsageButton = ({ row }) => {
           creditUuid: row.uuid,
           ...(row?.project_uuid
             ? { projectUuid: row.project_uuid }
-            : { customerUuid: row.customer_uuid }),
+            : {
+                customerUuid: row.customer_uuid,
+                customerName: row.customer_name,
+              }),
         }),
       ),
     [dispatch, row],

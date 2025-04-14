@@ -2,10 +2,10 @@ import { CheckCircle } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { marketplaceOrdersApproveByConsumer } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { approveOrderByConsumer } from '@waldur/marketplace/common/api';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
@@ -22,7 +22,7 @@ export const ApproveByConsumerButton: FC<
   const dispatch = useDispatch();
   const { mutate, isLoading } = useMutation(async () => {
     try {
-      await approveOrderByConsumer(order.uuid);
+      await marketplaceOrdersApproveByConsumer({ path: { uuid: order.uuid } });
       if (refetch) {
         await refetch();
       }

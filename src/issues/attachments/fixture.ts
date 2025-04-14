@@ -6,13 +6,13 @@ export const attachment: Attachment = {
   file: 'https://example.com/media/support_attachments/panda.jpg',
   file_name: 'panda.jpg',
   mime_type: 'image/jpg',
-  thumbnail:
-    'https://example.com/media/support_attachments_thumbnails/panda.jpg',
   issue:
     'https://example.com/api/support-issues/784fd0b3502849f6bd613d574e06b1e4/',
   issue_key: 'WAL-164',
   url: 'https://example.com/api/support-attachments/30a44649ee2d4a67ba1f17938a8a5f6e/',
   uuid: '30a44649ee2d4a67ba1f17938a8a5f6e',
+  backend_id: 'backend_id',
+  destroy_is_available: false,
 };
 
 export const attachmentUploading: IssueAttachmentUploading[] = [

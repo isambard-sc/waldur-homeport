@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceOfferingUsersPartialUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
-import { updateOfferingUser } from '../common/api';
 import { ServiceProvider } from '../types';
 
 import { OfferingUser } from './types';
@@ -32,8 +32,11 @@ export const ProviderOfferingUserUpdateDialog: FC<{
       initialValues={{ username: row.username }}
       submitForm={async (formData) => {
         try {
-          await updateOfferingUser(row.uuid, {
-            username: formData.username,
+          await marketplaceOfferingUsersPartialUpdate({
+            path: { uuid: row.uuid },
+            body: {
+              username: formData.username,
+            },
           });
           dispatch(showSuccess(translate('Username has been updated.')));
           dispatch(closeModalDialog());

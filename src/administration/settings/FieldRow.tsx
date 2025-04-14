@@ -1,6 +1,10 @@
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { EditButton } from '@waldur/form/EditButton';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 
 import { ConfigurationEditButton } from './ConfigurationEditButton';
+import { CountryListField } from './CountryListField';
 import { getKeyTitle } from './utils';
 
 const ColorField = ({ value }) => (
@@ -23,17 +27,27 @@ const ImageField = ({ value }) => (
     />
   </div>
 );
-export const FieldRow = ({ item, value }) => {
+
+const CountryListEditButton = ({ onEdit }) => (
+  <EditButton onClick={onEdit} size="sm" />
+);
+
+interface FieldRowProps {
+  item: any;
+  value: any;
+  onEdit?: any;
+  isLoading?: boolean;
+}
+
+export const FieldRow = ({ item, value, onEdit, isLoading }: FieldRowProps) => {
   return (
-    <tr>
-      <td className="col-md-4">
-        <p className="py-0">
-          <strong>{getKeyTitle(item.key)}</strong>
-        </p>
-        <p className="text-muted py-0 mb-0">{item.description}</p>
-      </td>
-      <td className="col-md">
-        {item.type === 'image_field' ? (
+    <FormTable.Item
+      key={item.key}
+      label={getKeyTitle(item.key)}
+      description={item.description}
+      descriptionClassName="text-gray-600"
+      value={
+        item.type === 'image_field' ? (
           <ImageField value={value} />
         ) : item.type === 'color_field' ? (
           <ColorField value={value} />
@@ -43,13 +57,25 @@ export const FieldRow = ({ item, value }) => {
           ) : (
             translate('No')
           )
+        ) : item.type === 'country_list_field' ? (
+          isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <CountryListField value={value} />
+          )
+        ) : typeof value === 'object' ? (
+          <pre>{JSON.stringify(value, null, 2)}</pre>
         ) : (
           value
-        )}
-      </td>
-      <td className="col-md-auto col-actions">
-        <ConfigurationEditButton item={item} value={value} />
-      </td>
-    </tr>
+        )
+      }
+      actions={
+        item.type === 'country_list_field' ? (
+          <CountryListEditButton onEdit={onEdit} />
+        ) : (
+          <ConfigurationEditButton item={item} value={value} />
+        )
+      }
+    />
   );
 };

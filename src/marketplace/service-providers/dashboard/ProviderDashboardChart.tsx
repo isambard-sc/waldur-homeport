@@ -6,8 +6,8 @@ import { EChart } from '@waldur/core/EChart';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { ServiceProvider } from '@waldur/marketplace/types';
 
-import { loadProviderCharts } from './api';
 import { ChangesAmountBadge } from './ChangesAmountBadge';
+import { loadProviderCharts } from './utils';
 
 interface ProviderDashboardChartProps {
   provider: ServiceProvider;

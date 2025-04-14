@@ -1,9 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FC } from 'react';
-import { Form, Field } from 'react-final-form';
+import { Field, Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceCategoriesCreate,
+  marketplaceCategoriesRetrieve,
+  marketplaceCategoriesUpdate,
+  MarketplaceCategoryRequest,
+} from 'waldur-js-client';
 
+import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { LoadingErred } from '@waldur/core/LoadingErred';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { required } from '@waldur/core/validators';
 import {
   SelectField,
@@ -20,18 +28,6 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { createCategory, updateCategory } from './api';
-
-interface FormData {
-  title: string;
-  description: string;
-  icon: any;
-  default_volume_category: boolean;
-  default_vm_category: boolean;
-  default_tenant_category: boolean;
-  group?: string;
-}
-
 interface CategoryEditDialogProps {
   resolve: {
     category?: any;
@@ -42,6 +38,26 @@ interface CategoryEditDialogProps {
 export const CategoryEditDialog: FC<CategoryEditDialogProps> = ({
   resolve: { category, refetch },
 }) => {
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const isEdit = Boolean(category?.uuid);
+
+  const {
+    data: categoryData,
+    isLoading,
+    error,
+    refetch: refetchData,
+  } = useQuery(
+    ['CategoryData', category?.uuid],
+    () =>
+      isEdit
+        ? marketplaceCategoriesRetrieve({ path: { uuid: category.uuid } }).then(
+            (response) => response.data,
+          )
+        : null,
+    { staleTime: 30 * 1000 },
+  );
+
   const {
     data: categoryGroups,
     isLoading: loadingGroups,
@@ -51,17 +67,30 @@ export const CategoryEditDialog: FC<CategoryEditDialogProps> = ({
     staleTime: 30 * 1000,
   });
 
-  const dispatch = useDispatch();
-
-  const isEdit = Boolean(category?.uuid);
-
-  const onSubmit = async (values: FormData) => {
+  const onSubmit = async (formData: MarketplaceCategoryRequest) => {
     try {
+      let result;
       if (isEdit) {
-        await updateCategory(values, category.uuid);
+        result = await marketplaceCategoriesUpdate({
+          path: { uuid: category.uuid },
+          body: {
+            ...formData,
+            icon: fileSerializer(formData.icon),
+          },
+          ...formDataOptions,
+        }).then((response) => response.data);
       } else {
-        await createCategory(values);
+        result = await marketplaceCategoriesCreate({
+          body: {
+            ...formData,
+            icon: fileSerializer(formData.icon),
+          },
+          ...formDataOptions,
+        }).then((response) => response.data);
       }
+
+      // Update the cached data
+      queryClient.setQueryData(['CategoryData', category?.uuid], result);
 
       refetch();
       dispatch(
@@ -84,16 +113,22 @@ export const CategoryEditDialog: FC<CategoryEditDialogProps> = ({
     }
   };
 
+  if (isLoading) {
+    return <LoadingSpinner />;
+  } else if (error) {
+    return <LoadingErred loadData={refetchData} />;
+  }
+
   return (
     <Form
       onSubmit={onSubmit}
-      initialValues={category}
+      initialValues={categoryData}
       render={({ handleSubmit, submitting, pristine, invalid }) => (
         <form onSubmit={handleSubmit}>
           <ModalDialog
             title={
               isEdit
-                ? translate('Edit {title}', { title: category.title })
+                ? translate('Edit {title}', { title: categoryData.title })
                 : translate('Create category')
             }
             closeButton
@@ -108,7 +143,7 @@ export const CategoryEditDialog: FC<CategoryEditDialogProps> = ({
             <Field
               name="icon"
               component={ImageField as any}
-              initialValue={category?.icon}
+              initialValue={categoryData?.icon}
             />
             <FormGroup label={translate('Title')} required>
               <Field
@@ -133,6 +168,7 @@ export const CategoryEditDialog: FC<CategoryEditDialogProps> = ({
                   options={categoryGroups}
                   isLoading={loadingGroups}
                   isClearable
+                  simpleValue
                 />
               </FormGroup>
             )}

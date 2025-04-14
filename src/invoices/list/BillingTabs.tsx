@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
 import { AgreementInfo } from './AgreementInfo';
 import { BillingRecordsList } from './BillingRecordsList';

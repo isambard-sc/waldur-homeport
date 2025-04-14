@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceProviderResourcesSetBackendId } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { setBackendId } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
@@ -28,7 +28,10 @@ export const SetBackendIdDialog: FC<ActionDialogProps> = ({
       }}
       submitForm={async (formData) => {
         try {
-          await setBackendId(resource.uuid, formData);
+          await marketplaceProviderResourcesSetBackendId({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(
             showSuccess(translate('Backend ID has been successfully set.')),
           );

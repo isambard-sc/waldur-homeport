@@ -1,8 +1,8 @@
 import { FC } from 'react';
+import { Project } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
-import { Project } from '@waldur/workspace/types';
 
 import { DeleteAction } from './DeleteAction';
 import { MoveProjectAction } from './MoveProjectAction';

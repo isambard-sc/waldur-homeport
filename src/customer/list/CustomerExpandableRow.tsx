@@ -1,29 +1,30 @@
+import { DateTime } from 'luxon';
 import { memo } from 'react';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
 import { formValueSelector } from 'redux-form';
+import { invoicesList } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { makeLastTwelveMonthsFilterPeriods } from '@waldur/form/utils';
 import { translate } from '@waldur/i18n';
 import { AgreementInfo } from '@waldur/invoices/list/AgreementInfo';
 import { InvoicesStatsList } from '@waldur/invoices/list/InvoicesStatsList';
 import { type RootState } from '@waldur/store/reducers';
 
-import { getInvoice } from './api';
-
 export const CustomerExpandableRow = memo((props: any) => {
   const accountingPeriod = useSelector((state: RootState) =>
     formValueSelector('customerListFilter')(state, 'accounting_period'),
   );
-  const invoiceUrl = `${ENV.apiEndpoint}api/customers/${props.row.uuid}/`;
+  const now = DateTime.now().startOf('month');
   const { loading, error, value } = useAsync(
     () =>
-      getInvoice(
-        invoiceUrl,
-        (accountingPeriod || makeLastTwelveMonthsFilterPeriods()[0]).value,
-      ),
+      invoicesList({
+        query: {
+          customer_uuid: props.row.uuid,
+          year: accountingPeriod ? accountingPeriod.value.year : now.year,
+          month: accountingPeriod ? accountingPeriod.value.month : now.month,
+        },
+      }).then((response) => response.data[0]),
     [props.row, accountingPeriod],
   );
   if (loading) {

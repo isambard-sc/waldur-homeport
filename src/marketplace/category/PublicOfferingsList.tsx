@@ -168,6 +168,7 @@ export const PublicOfferingsList: FunctionComponent<{
       hasQuery={true}
       gridSize={{ lg: 6, xl: 4 }}
       gridItem={({ row }) => <OfferingCard offering={row} />}
+      hoverShadow={{ grid: false }}
       filters={
         <AdminOfferingsFilter
           showCategory={showCategory}

@@ -1,13 +1,22 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import {
+  proposalRequestedOfferingsCancel,
+  RequestedOffering,
+} from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { deleteRequestedOffering } from '@waldur/proposals/api';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
-export const CallOfferingDeleteButton = ({ row, refetch }) => {
+export const CallOfferingDeleteButton = ({
+  row,
+  refetch,
+}: {
+  row: RequestedOffering;
+  refetch(): void;
+}) => {
   const dispatch = useDispatch();
   const openDialog = async () => {
     try {
@@ -27,7 +36,7 @@ export const CallOfferingDeleteButton = ({ row, refetch }) => {
       return;
     }
     try {
-      await deleteRequestedOffering(row.url);
+      await proposalRequestedOfferingsCancel({ path: { uuid: row.uuid } });
       await refetch();
       dispatch(showSuccess(translate('Requested offering has been removed.')));
     } catch (e) {

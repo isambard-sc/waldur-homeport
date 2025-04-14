@@ -1,14 +1,14 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
+import {
+  InstanceFlavorChangeRequest,
+  openstackInstancesChangeFlavor,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import {
-  changeFlavor,
-  ChangeFlavorRequestBody,
-  loadFlavors,
-} from '@waldur/openstack/api';
+import { loadFlavors } from '@waldur/openstack/api';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { formatFlavor } from '@waldur/resource/utils';
@@ -24,7 +24,7 @@ export const ChangeFlavorDialog: FC<ActionDialogProps> = ({
   const asyncState = useAsync(async () => {
     const flavors = await loadFlavors({
       tenant_uuid: resource.tenant_uuid,
-      fields: ['url', 'name', 'cores', 'ram'],
+      field: ['url', 'name', 'cores', 'ram'],
     });
     return {
       flavors: flavors
@@ -59,9 +59,12 @@ export const ChangeFlavorDialog: FC<ActionDialogProps> = ({
       loading={asyncState.loading}
       error={asyncState.error}
       formFields={fields}
-      submitForm={async (formData: ChangeFlavorRequestBody) => {
+      submitForm={async (formData: InstanceFlavorChangeRequest) => {
         try {
-          await changeFlavor(resource.uuid, formData);
+          await openstackInstancesChangeFlavor({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           if (refetch) {
             await refetch();
           }

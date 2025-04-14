@@ -16,7 +16,6 @@ body:not(.toolbar-fixed) {
 
 .nav.page-tabs-container {
   flex-direction: column;
-  padding-left: 1.75rem;
   border-bottom: none;
 
   .nav-item {
@@ -38,6 +37,10 @@ body:not(.toolbar-fixed) {
       &:hover {
         border-bottom: none;
         border-left: 2px solid transparent;
+      }
+
+      &:not(.active) .has-error {
+        color: var(--bs-warning);
       }
     }
   }

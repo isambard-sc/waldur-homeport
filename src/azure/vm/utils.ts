@@ -1,10 +1,17 @@
-import { Size, Image } from '@waldur/azure/common/types';
-import { ENV } from '@waldur/configs/default';
-import { getSelectData } from '@waldur/core/api';
+import {
+  AzureImage,
+  azureImagesList,
+  azureLocationsList,
+  AzureSize,
+  azureSizesList,
+} from 'waldur-js-client';
+
+import { parseSelectData } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { formatFlavor } from '@waldur/resource/utils';
 
-export const getSizeLabel = (size: Size): string => {
+export const getSizeLabel = (size: AzureSize): string => {
   const summary = formatFlavor({
     disk: size.os_disk_size_in_mb + size.resource_disk_size_in_mb,
     cores: size.number_of_cores,
@@ -14,7 +21,7 @@ export const getSizeLabel = (size: Size): string => {
   return `${name} (${summary})`;
 };
 
-export const getImageLabel = (image: Image): string =>
+export const getImageLabel = (image: AzureImage): string =>
   `${image.publisher} ${image.name} ${image.sku}`;
 
 export const loadLocationOptions = async (
@@ -23,15 +30,17 @@ export const loadLocationOptions = async (
   prevOptions,
   currentPage: number,
 ) => {
-  const response = await getSelectData('/azure-locations/', {
-    settings_uuid,
-    name: query,
-    page: currentPage,
-    page_size: ENV.pageSize,
-    has_sizes: true,
+  const response = await azureLocationsList({
+    query: {
+      settings_uuid,
+      name: query,
+      page: currentPage,
+      page_size: ENV.pageSize,
+      has_sizes: true,
+    },
   });
   return returnReactSelectAsyncPaginateObject(
-    response,
+    parseSelectData(response),
     prevOptions,
     currentPage,
   );
@@ -45,17 +54,18 @@ export const loadSizeOptions = async (
   prevOptions,
   currentPage: number,
 ) => {
-  const response = await getSelectData('/azure-sizes/', {
-    settings_uuid,
-    location_uuid,
-    zone,
-    name: query,
-    page: currentPage,
-    page_size: ENV.pageSize,
-    has_sizes: true,
+  const response = await azureSizesList({
+    query: {
+      settings_uuid,
+      location_uuid,
+      zone,
+      name: query,
+      page: currentPage,
+      page_size: ENV.pageSize,
+    },
   });
   return returnReactSelectAsyncPaginateObject(
-    response,
+    parseSelectData(response),
     prevOptions,
     currentPage,
   );
@@ -68,16 +78,17 @@ export const loadImageOptions = async (
   prevOptions,
   currentPage: number,
 ) => {
-  const response = await getSelectData('/azure-images/', {
-    settings_uuid,
-    location_uuid,
-    name: query,
-    page: currentPage,
-    page_size: ENV.pageSize,
-    has_sizes: true,
+  const response = await azureImagesList({
+    query: {
+      settings_uuid,
+      location_uuid,
+      name: query,
+      page: currentPage,
+      page_size: ENV.pageSize,
+    },
   });
   return returnReactSelectAsyncPaginateObject(
-    response,
+    parseSelectData(response),
     prevOptions,
     currentPage,
   );

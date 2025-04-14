@@ -6,13 +6,9 @@ import {
   Select,
 } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
+import { Option } from '@waldur/marketplace/common/registry';
 
-interface RequestStateFilterOption {
-  value: string;
-  label: string;
-}
-
-export const getStates = (): RequestStateFilterOption[] => [
+export const getStates = (): Option[] => [
   { value: 'pending', label: translate('Pending') },
   { value: 'approved', label: translate('Approved') },
   { value: 'rejected', label: translate('Rejected') },

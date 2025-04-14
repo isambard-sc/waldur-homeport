@@ -1,12 +1,16 @@
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceCustomerEstimatedCostPoliciesCreate,
+  marketplaceProjectEstimatedCostPoliciesCreate,
+} from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
 
 import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
-import { createOrganizationCostPolicy, createProjectCostPolicy } from './api';
 import { CostPolicyFormData, CostPolicyType, PolicyPeriod } from './types';
 
 const CostPolicyFormDialog = lazyComponent(() =>
@@ -43,9 +47,9 @@ const submit = (formData: SubmitedFormData, type: CostPolicyType) => {
         : undefined,
     };
     if (type === 'project') {
-      return createProjectCostPolicy(data);
+      return marketplaceProjectEstimatedCostPoliciesCreate({ body: data });
     }
-    return createOrganizationCostPolicy(data);
+    return marketplaceCustomerEstimatedCostPoliciesCreate({ body: data });
   });
   return Promise.all(promises);
 };
@@ -66,7 +70,7 @@ export const CostPolicyCreateButton = ({
         openModalDialog(CostPolicyFormDialog, {
           size: 'lg',
           formId: 'CostPolicyCreateForm',
-          onSubmit: (formData) => {
+          submitFn: (formData) => {
             return submit(formData, type).then(() => {
               dispatch(closeModalDialog());
               refetch();

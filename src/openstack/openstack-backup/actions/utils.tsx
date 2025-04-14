@@ -1,26 +1,23 @@
-import { translate } from '@waldur/i18n';
 import {
-  BackupRestoreRequestBody,
-  loadFlavors,
-  loadFloatingIps,
-  loadSecurityGroups,
-  loadSubnets,
-} from '@waldur/openstack/api';
+  OpenStackBackup,
+  OpenStackBackupRestorationRequest,
+  openstackFlavorsList,
+  openstackFloatingIpsList,
+  openstackSecurityGroupsList,
+  openstackSubnetsList,
+} from 'waldur-js-client';
+
+import { getAllPages } from '@waldur/core/api';
+import { translate } from '@waldur/i18n';
+import { Option } from '@waldur/marketplace/common/registry';
 import {
   formatFlavorTitle,
   formatSubnet,
 } from '@waldur/openstack/openstack-instance/utils';
 
-import { OpenStackBackup } from '../types';
-
 const AUTO_ASSIGN_FLOATING_IP = 'AUTO_ASSIGN_FLOATING_IP';
 
 export const SKIP_FLOATING_IP_ASSIGNMENT = 'SKIP_FLOATING_IP_ASSIGNMENT';
-
-interface Option {
-  label: string;
-  value: string;
-}
 
 export interface BackupFormChoices {
   securityGroups: Option[];
@@ -44,23 +41,43 @@ export const loadData = async (
   resource: OpenStackBackup,
 ): Promise<BackupFormChoices> => {
   const [flavors, securityGroups, floatingIps, subnets] = await Promise.all([
-    loadFlavors({
-      tenant_uuid: resource.tenant_uuid,
-      fields: ['url', 'name', 'cores', 'ram'],
-    }),
-    loadSecurityGroups({
-      tenant_uuid: resource.tenant_uuid,
-      fields: ['url', 'name'],
-    }),
-    loadFloatingIps({
-      tenant_uuid: resource.tenant_uuid,
-      free: 'True',
-      fields: ['url', 'address'],
-    }),
-    loadSubnets({
-      tenant_uuid: resource.tenant_uuid,
-      fields: ['url', 'name', 'cidr'],
-    }),
+    getAllPages((page) =>
+      openstackFlavorsList({
+        query: {
+          page,
+          tenant_uuid: resource.tenant_uuid,
+          field: ['url', 'name', 'cores', 'ram'],
+        },
+      }),
+    ),
+    getAllPages((page) =>
+      openstackSecurityGroupsList({
+        query: {
+          page,
+          tenant_uuid: resource.tenant_uuid,
+          field: ['url', 'name'],
+        },
+      }),
+    ),
+    getAllPages((page) =>
+      openstackFloatingIpsList({
+        query: {
+          page,
+          tenant_uuid: resource.tenant_uuid,
+          free: true,
+          field: ['url', 'address'],
+        },
+      }),
+    ),
+    getAllPages((page) =>
+      openstackSubnetsList({
+        query: {
+          page,
+          tenant_uuid: resource.tenant_uuid,
+          field: ['url', 'name', 'cidr'],
+        },
+      }),
+    ),
   ]);
 
   return {
@@ -116,7 +133,7 @@ export const getInitialValues = (
 
 export const serializeBackupRestoreFormData = (
   form: BackupRestoreFormData,
-): BackupRestoreRequestBody => ({
+): OpenStackBackupRestorationRequest => ({
   flavor: form.flavor.value,
   ports: form.networks
     .filter((item) => item.subnet)
@@ -140,6 +157,7 @@ export const serializeBackupRestoreFormData = (
         };
       }
     }),
+  // @ts-ignore
   security_groups: form.security_groups.map(({ value }) => ({
     url: value,
   })),

@@ -15,7 +15,7 @@ export const HookCreateButton: FunctionComponent<{ refetch; hook? }> = (
     <ActionButton
       title={translate('Add notification')}
       action={() => dispatch(showHookUpdateDialog(props))}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

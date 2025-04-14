@@ -2,37 +2,37 @@ xdescribe('Financial overview', () => {
   beforeEach(() => {
     cy.mockUser()
       .mockChecklists()
-      .intercept('GET', '/api/marketplace-provider-offerings/', {
+      .intercept('GET', '/api/marketplace-provider-offerings/**', {
         fixture: 'marketplace/offerings.json',
       })
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'customers/alice_bob_web.json',
       })
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
-      .intercept('GET', '/api/marketplace-resources/', {
+      .intercept('GET', '/api/marketplace-resources/**', {
         fixture: 'marketplace/resources.json',
       })
-      .intercept('GET', '/api/marketplace-service-providers/', {
+      .intercept('GET', '/api/marketplace-service-providers/**', {
         fixture: 'marketplace/service_providers.json',
       })
-      .intercept('GET', '/api/marketplace-plans/usage_stats/', {
+      .intercept('GET', '/api/marketplace-plans/usage_stats/**', {
         fixture: 'marketplace/plans_usage_stats.json',
       })
-      .intercept('GET', '/api/invoices/', {
+      .intercept('GET', '/api/invoices/**', {
         fixture: 'customers/invoices.json',
       })
-      .intercept('GET', '/api/billing-total-cost/', {
+      .intercept('GET', '/api/billing-total-cost/**', {
         fixture: 'customers/billing_total_cost.json',
       })
-      .intercept('GET', '/api/invoices/growth/', {
+      .intercept('GET', '/api/invoices/growth/**', {
         fixture: 'customers/invoices_growth.json',
       })
-      .intercept('GET', '/api/marketplace-orders/', {
+      .intercept('GET', '/api/marketplace-orders/**', {
         fixture: 'marketplace/orders.json',
       })
-      .intercept('GET', '/api/marketplace-component-usages/', {
+      .intercept('GET', '/api/marketplace-component-usages/**', {
         fixture: 'marketplace/component_usages.json',
       })
       .setToken()

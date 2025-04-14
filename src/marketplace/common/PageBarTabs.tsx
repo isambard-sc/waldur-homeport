@@ -1,8 +1,19 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { FC, ReactNode, useContext, useEffect } from 'react';
+import classNames from 'classnames';
+import { debounce, throttle } from 'lodash-es';
+import {
+  FC,
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Button, Nav, TabContainer } from 'react-bootstrap';
 
 import { Link } from '@waldur/core/Link';
+import { useDOMChangeObserver } from '@waldur/core/useDomChangeObserver';
 
 import { PageBarContext, PageBarTab } from '../context';
 import { scrollToSectionById } from '../offerings/utils';
@@ -81,6 +92,7 @@ interface PageBarTabsProps {
   right?: ReactNode;
   showFirstTab?: boolean;
   mode?: 'bar' | 'tabs-left';
+  className?: string;
 }
 
 export const PageBarTabs: FC<PageBarTabsProps> = (props) => {
@@ -88,7 +100,7 @@ export const PageBarTabs: FC<PageBarTabsProps> = (props) => {
   const { state, params } = useCurrentStateAndParams();
   const router = useRouter();
 
-  useEffect(() => {
+  useDOMChangeObserver(() => {
     addTabs(props.tabs);
   }, [props.tabs]);
 
@@ -98,10 +110,48 @@ export const PageBarTabs: FC<PageBarTabsProps> = (props) => {
     }
   }, [props.showFirstTab, tabs, params, state, router]);
 
+  // When a tab is clicked, we need to keep it active until the user scrolls for a while
+  // or clicks another tab. This is to prevent the tab from being unselected when the user
+  // scrolls to other sections.
+  const [clickedTabId, setClickedTabId] = useState<string | null>(null);
+
+  const releaseClickedTabFlag = useRef<boolean>(true);
+  const releaseClickedTab = debounce(() => {
+    releaseClickedTabFlag.current = true;
+  }, 1000);
+
+  const selectTab = useCallback((key) => {
+    releaseClickedTabFlag.current = false;
+    setClickedTabId(key);
+    scrollToSectionById(key);
+    releaseClickedTab();
+  }, []);
+
+  const clearClickedTabId = useCallback(
+    throttle(() => {
+      if (releaseClickedTabFlag.current) {
+        setClickedTabId(null);
+      }
+    }, 100),
+    [setClickedTabId, releaseClickedTabFlag.current],
+  );
+
+  useEffect(() => {
+    window.addEventListener('scroll', clearClickedTabId);
+    return () => {
+      window.removeEventListener('scroll', clearClickedTabId);
+    };
+  }, [clearClickedTabId]);
+
   if (!tabs.length) return;
 
   return (props.mode ?? 'bar') === 'bar' ? (
-    <div className="page-bar-container bg-body shadow-sm">
+    <div
+      className={classNames(
+        'page-bar-container bg-body shadow-sm',
+        props.className,
+      )}
+    >
       <div className="container-fluid">
         <div className="d-flex scroll-x pt-2">
           <div className="d-flex align-items-center w-100">
@@ -135,10 +185,16 @@ export const PageBarTabs: FC<PageBarTabsProps> = (props) => {
   ) : props.mode === 'tabs-left' ? (
     <TabContainer
       defaultActiveKey={tabs[0].key}
-      activeKey={visibleSectionId}
-      onSelect={(key) => scrollToSectionById(key)}
+      activeKey={clickedTabId || visibleSectionId}
+      onSelect={(key) => selectTab(key)}
     >
-      <Nav variant="tabs" className="page-tabs-container nav-line-tabs">
+      <Nav
+        variant="tabs"
+        className={classNames(
+          'page-tabs-container nav-line-tabs',
+          props.className,
+        )}
+      >
         {tabs.map((tab) => (
           <Nav.Item key={tab.key}>
             <Nav.Link
@@ -146,8 +202,9 @@ export const PageBarTabs: FC<PageBarTabsProps> = (props) => {
               as={Link}
               state={tab.state ?? state.name}
               params={tab.params ?? { '#': tab.key }}
+              className="flex-grow-1"
             >
-              {tab.title}
+              {props.tabs.find((t) => t.key === tab.key).title}
             </Nav.Link>
           </Nav.Item>
         ))}

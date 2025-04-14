@@ -2,13 +2,17 @@ import { Swap, Trash } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsyncFn } from 'react-use';
+import {
+  rancherWorkloadsDestroy,
+  rancherWorkloadsRedeploy,
+  rancherWorkloadsYamlRetrieve,
+  rancherWorkloadsYamlUpdate,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
 import { deleteEntity } from '@waldur/table/actions';
-
-import { redeployWorkload, deleteWorkload } from '../api';
 
 import { ViewYAMLButton } from './ViewYAMLButton';
 
@@ -18,7 +22,7 @@ export const WorkloadActions: FunctionComponent<{ workload }> = ({
   const dispatch = useDispatch();
   const [redeployResult, redeployCallback] = useAsyncFn(async () => {
     try {
-      await redeployWorkload(workload.uuid);
+      await rancherWorkloadsRedeploy({ path: { uuid: workload.uuid } });
       dispatch(showSuccess('Workload has been redeployed.'));
     } catch (e) {
       dispatch(showErrorResponse(e, 'Unable to redeploy workload.'));
@@ -27,7 +31,7 @@ export const WorkloadActions: FunctionComponent<{ workload }> = ({
 
   const [deleteResult, deleteCallback] = useAsyncFn(async () => {
     try {
-      await deleteWorkload(workload.uuid);
+      await rancherWorkloadsDestroy({ path: { uuid: workload.uuid } });
       dispatch(showSuccess('Workload has been deleted.'));
       dispatch(deleteEntity('rancher-workloads', workload.uuid));
     } catch (e) {
@@ -39,7 +43,12 @@ export const WorkloadActions: FunctionComponent<{ workload }> = ({
 
   return (
     <>
-      <ViewYAMLButton resource={workload} disabled={disabled} />
+      <ViewYAMLButton
+        yamlRetrieve={rancherWorkloadsYamlRetrieve}
+        yamlUpdate={rancherWorkloadsYamlUpdate}
+        resource={workload}
+        disabled={disabled}
+      />
       <RowActionButton
         title={translate('Redeploy')}
         action={redeployCallback}

@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import { FormControl, FormGroup } from 'react-bootstrap';
 import { Field } from 'redux-form';
+import { Project } from 'waldur-js-client';
 
 import { Tip } from '@waldur/core/Tooltip';
 import { required } from '@waldur/core/validators';
@@ -15,12 +16,12 @@ import { FormField } from '@waldur/form/types';
 import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 import { Role } from '@waldur/permissions/types';
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 interface RoleAndProjectSelectPopupProps {
   roles: (Role & { tooltip? })[];
   customer: Customer;
-  currentProject: Project;
+  currentProject: Pick<Project, 'uuid'>;
   selectedRole: Role;
   selectedProject;
   select;
@@ -59,7 +60,7 @@ const RoleAndProjectSelectPopup: React.FC<RoleAndProjectSelectPopupProps> = ({
   );
 
   const onClickProject = useCallback(
-    (project: Project) => {
+    (project: Pick<Project, 'uuid' | 'url'>) => {
       if (project.uuid !== selectedProject?.uuid) {
         select(selectedRole, project);
       }

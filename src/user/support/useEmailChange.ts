@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { usersCancelChangeEmail, usersChangeEmail } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { format } from '@waldur/core/ErrorMessageFormatter';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -16,7 +16,7 @@ export const useEmailChange = (user) => {
   const handleSubmit = useCallback(async () => {
     setSubmitting(false);
     try {
-      await post(`/users/${user.uuid}/change_email/`, { email });
+      await usersChangeEmail({ path: { uuid: user.uuid }, body: { email } });
     } catch (error) {
       const errorMessage = `${translate('Unable to change email.')} ${format(
         error,
@@ -36,7 +36,7 @@ export const useEmailChange = (user) => {
   const cancelRequest = useCallback(async () => {
     try {
       setSubmitting(true);
-      await post(`/users/${user.uuid}/cancel_change_email/`, { user });
+      await usersCancelChangeEmail({ path: { uuid: user.uuid } });
       dispatch(setCurrentUser({ ...user, requested_email: null }));
     } catch (error) {
       setSubmitting(false);

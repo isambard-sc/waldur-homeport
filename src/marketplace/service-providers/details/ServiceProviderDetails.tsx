@@ -6,7 +6,7 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
-import { Offering, ServiceProvider } from '@waldur/marketplace/types';
+import { ServiceProvider } from '@waldur/marketplace/types';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
@@ -24,7 +24,6 @@ import '@waldur/core/CustomCard.scss';
 
 interface ProviderDetailsProps {
   provider: ServiceProvider;
-  offerings: Offering[];
 }
 
 const getProviderPageTabs = (data): PageBarTab[] => {
@@ -37,7 +36,7 @@ const getProviderPageTabs = (data): PageBarTab[] => {
     {
       key: 'offerings',
       title: translate('Offerings'),
-      component: () => <ProviderOfferingsTab offerings={data.offerings} />,
+      component: () => <ProviderOfferingsTab data={data} />,
     },
     isFeatureVisible(
       MarketplaceFeatures.show_call_management_functionality,

@@ -1,18 +1,12 @@
-import React from 'react';
-
-import { SecurityGroupRule } from '../types';
+import { OpenStackSecurityGroup } from 'waldur-js-client';
 
 import { SecurityGroupRuleCell } from './SecurityGroupRuleCell';
 import { SecurityGroupRuleHeader } from './SecurityGroupRuleHeader';
 
-interface SecurityGroupRulesListProps {
-  resource: {
-    rules: SecurityGroupRule[];
-  };
-}
-
-export const SecurityGroupRulesList: React.FC<SecurityGroupRulesListProps> = ({
-  resource,
+export const SecurityGroupRulesList = ({
+  row,
+}: {
+  row: OpenStackSecurityGroup;
 }) => (
   <div className="table-responsive">
     <table className="table table-bordered">
@@ -22,7 +16,7 @@ export const SecurityGroupRulesList: React.FC<SecurityGroupRulesListProps> = ({
         </tr>
       </thead>
       <tbody>
-        {resource.rules.map((rule, index) => (
+        {row.rules.map((rule, index) => (
           <tr key={index}>
             <SecurityGroupRuleCell rule={rule} />
           </tr>

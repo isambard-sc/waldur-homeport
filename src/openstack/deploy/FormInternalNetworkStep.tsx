@@ -13,11 +13,9 @@ export const FormInternalNetworkStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Internal network')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
     >
       <Field
         name="attributes.subnet_cidr"

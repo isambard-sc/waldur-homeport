@@ -1,19 +1,19 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateOverview } from 'waldur-js-client';
 
-import { WysiwygEditor } from '@waldur/core/WysiwygEditor';
 import {
   StringField,
   FormContainer,
   SubmitButton,
   TextField,
 } from '@waldur/form';
+import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { translate } from '@waldur/i18n';
-import { updateOfferingOverview } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { OVERVIEW_FORM_ID } from './constants';
@@ -34,9 +34,12 @@ export const EditOverviewDialog = connect(
     const update = useCallback(
       async (formData) => {
         try {
-          await updateOfferingOverview(props.resolve.offering.uuid, {
-            ...pickOverview(props.resolve.offering),
-            [props.resolve.attribute.key]: formData.value,
+          await marketplaceProviderOfferingsUpdateOverview({
+            path: { uuid: props.resolve.offering.uuid },
+            body: {
+              ...pickOverview(props.resolve.offering),
+              [props.resolve.attribute.key]: formData.value,
+            },
           });
           dispatch(
             showSuccess(translate('Offering has been updated successfully.')),
@@ -53,30 +56,38 @@ export const EditOverviewDialog = connect(
     );
     return (
       <form onSubmit={props.handleSubmit(update)}>
-        <Modal.Header>
-          <Modal.Title>{props.resolve.attribute.title}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <FormContainer {...props}>
+        <ModalDialog
+          title={props.resolve.attribute.title}
+          footer={
+            <>
+              <CloseDialogButton />
+              <SubmitButton
+                submitting={props.submitting}
+                label={translate('Update')}
+              />
+            </>
+          }
+        >
+          <FormContainer
+            {...props}
+            className={
+              props.resolve.attribute.type === 'html' ? 'size-lg' : undefined
+            }
+          >
             {props.resolve.attribute.type === 'html' ? (
-              <WysiwygEditor name="value" />
+              <MarkdownEditor name="value" autoFocus hideLabel spaceless />
             ) : props.resolve.attribute.type === 'text' ? (
-              <TextField name="value" />
+              <TextField name="value" hideLabel spaceless />
             ) : (
               <StringField
                 name="value"
                 maxLength={props.resolve.attribute.maxLength}
+                hideLabel
+                spaceless
               />
             )}
           </FormContainer>
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton
-            submitting={props.submitting}
-            label={translate('Update')}
-          />
-          <CloseDialogButton />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

@@ -2,7 +2,7 @@ import { Info } from '@phosphor-icons/react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 

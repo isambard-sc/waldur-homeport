@@ -1,11 +1,10 @@
 import { useDispatch } from 'react-redux';
+import { invoiceItemsCreateCompensation } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { createInvoiceItemCompensation } from '../api';
 
 export const InvoiceItemCompensationDialog = ({
   resolve: { resource, refreshInvoiceItems },
@@ -27,7 +26,10 @@ export const InvoiceItemCompensationDialog = ({
       formFields={fields}
       submitForm={async (formData) => {
         try {
-          await createInvoiceItemCompensation(resource.uuid, formData);
+          await invoiceItemsCreateCompensation({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(showSuccess(translate('Compensation has been created.')));
           await refreshInvoiceItems();
           dispatch(closeModalDialog());

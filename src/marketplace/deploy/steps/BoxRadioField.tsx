@@ -2,7 +2,10 @@ import { CaretDown, Check } from '@phosphor-icons/react';
 import { isEqual } from 'lodash-es';
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
+import { Select } from '@waldur/form/themed-select';
 import { FormField } from '@waldur/form/types';
+import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 
 import './BoxRadioField.scss';
@@ -17,6 +20,7 @@ export interface BoxRadioChoice {
 
 interface BoxRadioFieldProps extends FormField {
   choices: BoxRadioChoice[];
+  vertical?: boolean;
 }
 
 const getRadioVersions = (choices: BoxRadioChoice[]) => {
@@ -56,6 +60,82 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = (props) => {
     setSelectedVersions(getRadioVersions(choices));
     MenuComponent.reinitialization();
   }, [choices, setSelectedVersions]);
+
+  if (props.vertical) {
+    return (
+      <div className="form-check-boxes-wrapper vertical">
+        {choices.map((choice, index) => {
+          const isChecked = [choice.value]
+            .concat((choice.options || []).map((x) => x.value))
+            .some((v) => isEqual(v, input.value));
+
+          if (!choice) {
+            return null;
+          }
+          return (
+            <div
+              key={index}
+              className={'form-check-box' + (isChecked ? ' active' : '')}
+              onClick={() => onChange(selectedVersions[index].value)}
+              role="radio"
+              aria-checked={isChecked}
+              tabIndex={index}
+              onKeyDown={(e) =>
+                e.key === 'Enter' && onChange(selectedVersions[index].value)
+              }
+            >
+              <div className="form-check-header">
+                <div className="form-check-wrapper">
+                  {choice.image ? (
+                    choice.image
+                  ) : typeof choice.label === 'string' ? (
+                    <ImagePlaceholder width="48px" height="48px">
+                      {choice.label.toUpperCase().substring(0, 4)}
+                    </ImagePlaceholder>
+                  ) : (
+                    <span className="display-6">
+                      <Check />
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <p className="fs-6 fw-bold mb-1">{choice.label}</p>
+                  {Boolean(choice.metadata) && (
+                    <p className="fs-6 fw-semibold text-muted mb-0">
+                      {choice.metadata}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="form-check-info">
+                <Select
+                  value={selectedVersions[index]}
+                  onChange={(value) => onChangeSelect(value, index)}
+                  options={choice.options}
+                  getOptionLabel={(option) =>
+                    option.label || translate('Default')
+                  }
+                  className="metronic-select-container"
+                  classNamePrefix="metronic-select"
+                />
+                <div className="form-check form-check-custom form-check-sm d-block">
+                  <input
+                    {...input}
+                    className="form-check-input flex-shrink-0"
+                    type="radio"
+                    checked={isChecked}
+                    value={selectedVersions[index]?.value}
+                    onChange={() => onChange(selectedVersions[index].value)}
+                    {...rest}
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="form-check-boxes-wrapper">

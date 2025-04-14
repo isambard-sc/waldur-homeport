@@ -16,7 +16,7 @@ interface OpenConsoleActionItemProps<T> {
   staff?: boolean;
 }
 
-export const OpenConsoleActionItem: <T extends { uuid: string }>(
+export const OpenConsoleActionItem: <T extends { uuid?: string }>(
   props: OpenConsoleActionItemProps<T>,
 ) => ReactElement = ({ resource, apiMethod, validators, staff }) => {
   const dispatch = useDispatch();
@@ -34,7 +34,7 @@ export const OpenConsoleActionItem: <T extends { uuid: string }>(
       title={translate('Open console')}
       action={callback}
       staff={staff}
-      iconNode={<Terminal />}
+      iconNode={<Terminal weight="bold" />}
       {...validationState}
     />
   );

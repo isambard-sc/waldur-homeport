@@ -22,6 +22,6 @@ export const SetRulesAction: ActionItemType = ({ resource, refetch }) => (
     dialogSize="xl"
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<ShieldPlus />}
+    iconNode={<ShieldPlus weight="bold" />}
   />
 );

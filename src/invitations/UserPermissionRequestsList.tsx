@@ -48,20 +48,30 @@ export const UserPermissionRequestsList: FC<OwnProps> = ({
     {
       title: translate('State'),
       render: PermissionRequestStateField,
+      className: 'w-175px',
     },
     {
       title: translate('Actions'),
       render: ({ row }) => (
         <UserPermissionRequestRowActions row={row} refetch={props.fetch} />
       ),
+      className: 'w-90px',
     },
   ];
   return (
     <Table
       {...props}
       columns={columns}
+      title={translate('User permission requests')}
       verboseName={translate('user permission requests')}
-      showPageSizeSelector={true}
+      showPageSizeSelector
+      initialPageSize={5}
+      minHeight="auto"
+      placeholderHasRetry={false}
+      hoverShadow={false}
+      hideRefresh
+      headerClassName="py-0 min-h-45px"
+      titleClassName="fs-6 fw-bolder text-gray-700"
     />
   );
 };

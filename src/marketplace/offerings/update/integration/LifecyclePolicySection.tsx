@@ -70,6 +70,24 @@ export const LifecyclePolicySection: FC<OfferingEditPanelProps> = (props) => {
           props.offering.plugin_options?.latest_date_for_resource_termination,
         component: DateField,
       },
+      {
+        label: translate('Supports downscaling'),
+        key: 'plugin_options.supports_downscaling',
+        value: (
+          <CheckOrX
+            value={props.offering.plugin_options?.supports_downscaling}
+          />
+        ),
+        component: AwesomeCheckboxField,
+      },
+      {
+        label: translate('Supports pausing'),
+        key: 'plugin_options.supports_pausing',
+        value: (
+          <CheckOrX value={props.offering.plugin_options?.supports_pausing} />
+        ),
+        component: AwesomeCheckboxField,
+      },
     ],
     [props],
   );

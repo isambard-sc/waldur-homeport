@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux';
+import { marketplaceOfferingUsersCreate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -12,26 +13,14 @@ import {
 } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
 
-import { createOfferingUser } from '../common/api';
 import {
-  offeringsAutocomplete,
+  providerOfferingsAutocomplete,
   userAutocomplete,
 } from '../common/autocompletes';
 
 const handleSubmit =
   ({ formData, dispatch, curretUser, refetch }) =>
   async () => {
-    if (
-      !formData.offering.secret_options
-        .service_provider_can_create_offering_user
-    ) {
-      dispatch(
-        showError(
-          translate('It is not allowed to create users for current offering.'),
-        ),
-      );
-      return;
-    }
     const canCreateOfferingUser = hasPermission(curretUser, {
       permission: PermissionEnum.CREATE_OFFERING_USER,
       customerId: formData.offering.customer_uuid,
@@ -47,10 +36,12 @@ const handleSubmit =
     }
 
     try {
-      await createOfferingUser({
-        offering: formData.offering.url,
-        user: formData.user.url,
-        username: formData.username,
+      await marketplaceOfferingUsersCreate({
+        body: {
+          offering: formData.offering.url,
+          user: formData.user.url,
+          username: formData.username,
+        },
       });
       dispatch(showSuccess(translate('Offering user has been created.')));
       dispatch(closeModalDialog());
@@ -79,7 +70,7 @@ export const CreateProviderOfferingUserDialog = ({ resolve: { refetch } }) => {
       name: 'offering',
       label: translate('Offering'),
       type: 'async_select',
-      loadOptions: offeringsAutocomplete,
+      loadOptions: providerOfferingsAutocomplete,
       getOptionLabel: ({ name, customer_name }) => (
         <>
           {name} | {customer_name}

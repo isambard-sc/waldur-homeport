@@ -59,7 +59,7 @@ export const QuotaCell = ({
         units={units}
       />
       <ProgressBar
-        variant={percent < 33 ? 'success' : percent < 66 ? 'warning' : 'danger'}
+        variant={percent < 33 ? 'primary' : percent < 66 ? 'warning' : 'danger'}
         now={percent}
         className="h-4px resource-progress shadow-none w-100 mt-1"
       />

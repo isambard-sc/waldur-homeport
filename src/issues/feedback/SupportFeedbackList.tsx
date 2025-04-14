@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Feedback, SupportFeedbacksListData } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -14,6 +15,7 @@ import { SupportFeedbackListExpandableRow } from '@waldur/issues/feedback/Suppor
 import { getStartAndEndDatesOfMonth } from '@waldur/issues/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { SupportFeedbackListFilter } from './SupportFeedbackListFilter';
@@ -27,7 +29,7 @@ export const SupportFeedbackList: FC = () => {
     filter,
     queryField: 'query',
   });
-  const columns = [
+  const columns: Column<Feedback>[] = [
     {
       title: translate('Issue'),
       render: IssueField,
@@ -38,7 +40,7 @@ export const SupportFeedbackList: FC = () => {
       render: ({ row }) => row.user_full_name,
       orderField: 'user_full_name',
       filter: 'user',
-      export: 'user_name',
+      export: 'user_full_name',
     },
     {
       title: translate('Evaluation'),
@@ -75,7 +77,7 @@ export const SupportFeedbackList: FC = () => {
 const mapStateToProps = createSelector(
   getFormValues(SUPPORT_FEEDBACK_LIST_FILTER_FORM),
   (filterValues: any) => {
-    const filter: Record<string, string | number> = {};
+    const filter: SupportFeedbacksListData['query'] = {};
     if (!filterValues) {
       return {};
     }

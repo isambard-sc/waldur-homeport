@@ -10,31 +10,29 @@ export const FileDownloader = ({ url, name, size = 40 }) => {
   const { showErrorResponse } = useNotify();
   const [loading, setLoading] = useState(false);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     setLoading(true);
 
-    get<Blob>(url, { responseType: 'blob' })
-      .then((response) => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
+    try {
+      const blob = await get<Blob>(url);
+      const href = window.URL.createObjectURL(blob);
 
-        const link = document.createElement('a');
-        link.setAttribute('download', name);
-        link.href = url;
+      const link = document.createElement('a');
+      link.setAttribute('download', name);
+      link.href = href;
 
-        document.body.appendChild(link);
+      document.body.appendChild(link);
 
-        // Trigger the download by simulating a click
-        link.click();
+      // Trigger the download by simulating a click
+      link.click();
 
-        // Clean up by removing the link
-        link.parentNode.removeChild(link);
-      })
-      .catch((error) => {
-        showErrorResponse(error, translate('File download failed'));
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      // Clean up by removing the link
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      showErrorResponse(error, translate('File download failed'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

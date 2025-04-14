@@ -19,7 +19,7 @@ export const CreateMigrationButton: FC<TenantActionProps> = ({
 }) => (
   <DialogActionButton
     title={translate('Create')}
-    iconNode={<Plus />}
+    iconNode={<Plus weight="bold" />}
     modalComponent={MigrateTenantDialog}
     resource={resource}
     extraResolve={{ refetch }}

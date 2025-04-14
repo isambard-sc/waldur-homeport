@@ -8,8 +8,3 @@ export interface Usage extends Period {
   gpu_usage: number;
   ram_usage: number;
 }
-
-export interface UserUsage extends Usage {
-  username: string;
-  full_name: string;
-}

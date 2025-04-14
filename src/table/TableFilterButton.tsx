@@ -13,7 +13,7 @@ export const TableFilterButton = ({ onClick, hasFilter = false }) => {
         className="btn-outline btn-icon btn-toggle-filters position-relative"
         onClick={onClick}
       >
-        <span className="svg-icon svg-icon-1">
+        <span className="svg-icon svg-icon-2">
           <FunnelSimple weight="bold" />
         </span>
         {hasFilter && (

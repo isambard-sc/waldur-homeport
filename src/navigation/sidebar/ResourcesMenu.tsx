@@ -5,6 +5,10 @@ import classNames from 'classnames';
 import { useMemo, useState } from 'react';
 import { Badge } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import {
+  marketplaceGlobalCategoriesRetrieve,
+  MarketplaceGlobalCategoriesRetrieveData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { getGroupedCategories } from '@waldur/marketplace/category/utils';
@@ -12,8 +16,6 @@ import { getCategoryGroups } from '@waldur/marketplace/common/api';
 import { ALL_RESOURCES_TABLE_ID } from '@waldur/marketplace/resources/list/constants';
 import { selectFiltersStorage } from '@waldur/table/selectors';
 import { getResource } from '@waldur/workspace/selectors';
-
-import { getGlobalCounters } from '../workspace/api';
 
 import { MenuAccordion } from './MenuAccordion';
 import { MenuItem } from './MenuItem';
@@ -104,19 +106,21 @@ const RenderMenuItems = ({ items }) => {
   );
 };
 
-export const ResourcesMenu = ({ anonymous = false, user }) => {
-  const categories = useOfferingCategories(anonymous);
+export const ResourcesMenu = ({ user }) => {
+  const categories = useOfferingCategories();
 
   const { data: categoryGroups } = useQuery(
     ['MarketplaceCategoryGroups'],
-    () => getCategoryGroups({ params: { field: ['uuid', 'title', 'url'] } }),
+    () => getCategoryGroups({ field: ['uuid', 'title', 'url'] }),
     { staleTime: 1 * 60 * 1000 },
   );
 
   const resourcesFilters = useSelector((state: any) =>
     selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID),
   );
-  const filtersObj = useMemo(() => {
+  const query = useMemo<
+    MarketplaceGlobalCategoriesRetrieveData['query']
+  >(() => {
     if (!resourcesFilters) return undefined;
     const project = resourcesFilters.find((item) => item.name === 'project');
     const organization = resourcesFilters.find(
@@ -134,10 +138,13 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
       'ResourcesMenu',
       'Counters',
       user?.uuid,
-      filtersObj?.customer_uuid,
-      filtersObj?.project_uuid,
+      query?.customer_uuid,
+      query?.project_uuid,
     ],
-    () => getGlobalCounters(filtersObj),
+    () =>
+      marketplaceGlobalCategoriesRetrieve({ query }).then(
+        (response) => response.data,
+      ),
     { refetchOnWindowFocus: false },
   );
   const [expanded, setExpanded] = useState(false);
@@ -145,7 +152,7 @@ export const ResourcesMenu = ({ anonymous = false, user }) => {
   const sortedCategoryGroups = useMemo(() => {
     if (!categories) return [];
     const _categories = categories.map((category) => {
-      category.resource_count = counters[category.uuid] || 0;
+      category['resource_count'] = counters[category.uuid] || 0;
       return category;
     });
 

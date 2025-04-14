@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackImage, OpenstackImagesListData } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -10,7 +11,7 @@ import { useTable } from '@waldur/table/useTable';
 export const TenantImagesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackImagesListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
     }),
@@ -23,7 +24,7 @@ export const TenantImagesList: FunctionComponent<{ resourceScope }> = ({
     queryField: 'name',
   });
   return (
-    <Table
+    <Table<OpenStackImage>
       {...props}
       columns={[
         {
@@ -63,6 +64,7 @@ export const TenantImagesList: FunctionComponent<{ resourceScope }> = ({
         },
       ]}
       verboseName={translate('images')}
+      title={translate('Images')}
       hasQuery={true}
       hasOptionalColumns
     />

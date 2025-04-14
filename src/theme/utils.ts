@@ -1,4 +1,4 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
 import * as ThemeStorage from './ThemeStorage';
 import { ThemeName } from './types';

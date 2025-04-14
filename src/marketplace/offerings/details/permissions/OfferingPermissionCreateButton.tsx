@@ -29,7 +29,7 @@ export const OfferingPermissionCreateButton: React.FC<{
     <ActionButton
       action={callback}
       title={translate('Add user')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

@@ -19,10 +19,6 @@ const preprocessedTimezones = TIMEZONES.map(getTimezoneMetadata).sort(
   (a, b) => a.offset - b.offset,
 );
 
-export function getDefaultTimezone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
-}
-
 export const TimezoneField: FunctionComponent<any> = (props) => {
   const { input, ...rest } = props;
   const options = useMemo(() => preprocessedTimezones, []);

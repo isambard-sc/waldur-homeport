@@ -5,34 +5,19 @@ import eventsRegistry from '@waldur/events/registry';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { ExpandableEventDetails } from './ExpandableEventDetails';
 
 const EventDateField = ({ row }) => <>{formatDateTime(row.created)}</>;
 
-export const BaseEventsList: FunctionComponent<{
-  filter?;
-  table?: string;
-  filters?;
-  title?;
-  id?;
-  initialPageSize?;
-  className?;
-  actions?;
-  hasActionBar?;
-  cardBordered?;
-}> = ({
+export const BaseEventsList: FunctionComponent<Partial<TableProps>> = ({
   filter,
-  filters,
   table,
   title,
-  id,
-  initialPageSize,
-  className,
-  actions,
   hasActionBar = true,
-  cardBordered,
+  ...rest
 }) => {
   const options = useMemo(
     () => ({
@@ -70,18 +55,13 @@ export const BaseEventsList: FunctionComponent<{
         },
       ]}
       hasQuery={true}
-      cardBordered={cardBordered}
+      hasActionBar={hasActionBar}
       title={title || translate('Events')}
       verboseName={translate('events')}
-      tableActions={actions}
       enableExport={true}
       expandableRow={ExpandableEventDetails}
-      filters={filters}
-      id={id}
-      initialPageSize={initialPageSize}
-      className={className}
-      hasActionBar={hasActionBar}
       {...props}
+      {...rest}
     />
   );
 };

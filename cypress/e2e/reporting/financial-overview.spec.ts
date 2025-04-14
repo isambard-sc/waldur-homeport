@@ -3,7 +3,7 @@ describe('Financial overview', () => {
     cy.mockUser()
       .mockChecklists()
       .setToken()
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'customers/alice_bob_web.json',
       })
       .intercept('GET', /\/api\/billing-total-cost\/\?.*/, {

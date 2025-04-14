@@ -61,6 +61,9 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
     if (filterValues?.offering) {
       filter.offering_uuid = filterValues.offering.uuid;
     }
+    if (filterValues?.parent_offering) {
+      filter.parent_offering_uuid = filterValues.parent_offering.uuid;
+    }
     if (filterValues?.project) {
       filter.project_uuid = filterValues.project.uuid;
     }
@@ -131,6 +134,13 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       export: (row) => row.offering_name,
     },
     {
+      title: translate('Parent offering'),
+      render: ({ row }) => row.parent_offering_name || 'N/A',
+      id: 'parent_offering',
+      keys: ['parent_offering_name'],
+      optional: true,
+    },
+    {
       title: translate('Paused'),
       render: ({ row }) => <BooleanField value={row.paused} />,
       id: 'paused',
@@ -188,6 +198,7 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       title: translate('State'),
       render: ({ row }) => <ResourceStateField resource={row} outline pill />,
       filter: 'state',
+      orderField: 'state',
       inlineFilter: (row) => getStates().filter((op) => op.value === row.state),
       id: 'state',
       keys: ['state', 'backend_metadata'],

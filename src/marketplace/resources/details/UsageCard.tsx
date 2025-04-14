@@ -3,16 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import { Button, Card, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { useAsync } from 'react-use';
+import { marketplaceResourcesTeamList } from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-import { getResourceTeam } from '@waldur/marketplace/common/api';
 
-import { getComponentsAndUsages } from '../usage/api';
 import { ResourceUsageTabsContainer } from '../usage/ResourceUsageTabsContainer';
 import { UsageExportDropdown } from '../usage/UsageExportDropdown';
+import { getComponentsAndUsages } from '../usage/utils';
 import { getUsageHistoryPeriodOptions } from '../usage/utils';
 
 export const UsageCard = ({ resource }) => {
@@ -43,7 +43,10 @@ export const UsageCard = ({ resource }) => {
     refetch: refetchTeam,
   } = useQuery(
     ['ResourceTeam', resource.uuid],
-    () => getResourceTeam(resource.uuid),
+    () =>
+      marketplaceResourcesTeamList({ path: { uuid: resource.uuid } }).then(
+        (r) => r.data,
+      ),
     { staleTime: 3 * 60 * 1000 },
   );
 
@@ -51,6 +54,16 @@ export const UsageCard = ({ resource }) => {
     () => getComponentsAndUsages(resourceRef.resource_uuid, period),
     [resourceRef, period],
   );
+
+  const usersFilterOptions = useMemo(() => {
+    if (!team?.length || !value?.userUsages?.length) return [];
+    return team.filter((user) =>
+      value.userUsages.some(
+        (record) =>
+          record.username === user.offering_user_username && record.usage > 0,
+      ),
+    );
+  }, [team, value]);
 
   return resource.is_usage_based || resource.is_limit_based ? (
     <Card className="card-bordered">
@@ -61,7 +74,7 @@ export const UsageCard = ({ resource }) => {
         <div className="card-toolbar gap-4">
           {teamError ? (
             <LoadingErred message={translate('Error')} loadData={refetchTeam} />
-          ) : (
+          ) : usersFilterOptions.length > 0 ? (
             <Select
               getOptionValue={(option) => option.uuid}
               getOptionLabel={(option) => option.full_name}
@@ -69,12 +82,12 @@ export const UsageCard = ({ resource }) => {
               isMulti
               placeholder={translate('All users')}
               onChange={(value) => setUsers(value)}
-              options={team || []}
+              options={usersFilterOptions}
               isLoading={teamIsLoading}
               className="metronic-select-container min-w-150px min-w-lg-200px"
               classNamePrefix="metronic-select"
             />
-          )}
+          ) : null}
           {periodOptions.length > 1 && (
             <ToggleButtonGroup
               type="radio"
@@ -98,6 +111,7 @@ export const UsageCard = ({ resource }) => {
           <UsageExportDropdown
             resource={resourceRef}
             data={value}
+            users={team}
             months={period}
           />
           <Button

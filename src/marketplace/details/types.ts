@@ -1,5 +1,9 @@
+import { PublicOfferingDetails } from 'waldur-js-client';
+import { Project } from 'waldur-js-client';
+
 import { Offering, Plan } from '@waldur/marketplace/types';
-import { Project } from '@waldur/workspace/types';
+
+import { DeployFormData } from '../common/types';
 
 import { PricesData } from './plan/types';
 
@@ -7,23 +11,17 @@ export interface Limits {
   [key: string]: number;
 }
 
-export interface OfferingFormData {
-  plan?: Plan;
-  attributes?: { [key: string]: any };
-  project?: Project;
-  limits?: Limits;
-  customer?: any;
-}
-
 export interface OrderSummaryProps {
-  offering: Offering;
+  offering: PublicOfferingDetails;
   prices?: PricesData;
-  formData: OfferingFormData;
+  formData: DeployFormData;
   formValid?: boolean;
   errors?: any;
+  isSubmitting?: boolean;
   updateMode?: boolean;
   extraComponent?: React.ComponentType<any>;
   shouldConcealPrices?: boolean;
+  onlyDetails?: boolean;
 }
 export interface PureOfferingConfiguratorProps {
   offering: Offering;

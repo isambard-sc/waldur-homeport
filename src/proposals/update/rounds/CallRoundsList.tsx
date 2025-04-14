@@ -1,11 +1,12 @@
 import { FC } from 'react';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
-import { Call, Round } from '@waldur/proposals/types';
+import { Call } from '@waldur/proposals/types';
 import { getRoundStatus } from '@waldur/proposals/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -26,7 +27,7 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
     ),
   });
 
-  const renderRoundState = (row: Round) => {
+  const renderRoundState = (row: ProtectedRound) => {
     const roundState = getRoundStatus(row);
     return (
       <StateIndicator
@@ -39,7 +40,7 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
   };
 
   return (
-    <Table<Round>
+    <Table<ProtectedRound>
       {...tableProps}
       id="rounds"
       columns={[

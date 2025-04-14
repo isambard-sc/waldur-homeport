@@ -14,40 +14,50 @@ interface ModelCard1Props {
   logo?: string;
   body?: ReactNode;
   image?: string;
+  imageCover?: boolean;
   placeholder?: ReactNode;
   footer?: ReactNode;
+  clickable?: boolean;
 }
 
 export const ModelCard1: FC<ModelCard1Props> = ({
   ellipsisLines = 1,
   ...props
 }) => (
-  <Card className="model-card-1 card-bordered h-100">
+  <Card
+    className={classNames(
+      'model-card-1 card-bordered h-100 overflow-hidden',
+      props.clickable && 'cursor-pointer border-hover-brand',
+    )}
+  >
     {(props.image || props.placeholder) && (
-      <div className="h-90px d-flex flex-center border-bottom">
+      <div className="h-85px d-flex flex-center border-bottom">
         {props.image ? (
           <img
             alt="model-card"
             src={props.image}
-            height={90}
-            style={{ margin: 'auto', padding: '10px' }}
+            height={85}
+            style={
+              props.imageCover ? { objectFit: 'cover' } : { padding: '10px' }
+            }
+            className={props.imageCover ? 'w-100 h-100' : 'm-auto'}
           />
         ) : (
           props.placeholder
         )}
       </div>
     )}
-    <Card.Body className="p-7 d-flex flex-column">
+    <Card.Body className="p-5 d-flex flex-column">
       <div
         className={classNames(
-          'd-flex align-items-center gap-2',
-          props.body && 'mb-7',
+          'd-flex align-items-center gap-4',
+          props.body && 'mb-6',
         )}
       >
         {props.logo ? (
-          <Image src={props.logo} size={50} isContain />
+          <Image src={props.logo} size={48} isContain circle />
         ) : (
-          <ImagePlaceholder width="50px" height="50px">
+          <ImagePlaceholder width="48px" height="48px" circle>
             {getAbbreviation(props.title, 3)}
           </ImagePlaceholder>
         )}
@@ -62,7 +72,7 @@ export const ModelCard1: FC<ModelCard1Props> = ({
             {props.titleNode || props.title}
           </Card.Title>
           {props.subtitle && (
-            <Card.Subtitle className="text-gray-600 fw-normal ellipsis">
+            <Card.Subtitle className="text-gray-600 fw-bold ellipsis">
               {props.subtitle}
             </Card.Subtitle>
           )}
@@ -72,13 +82,13 @@ export const ModelCard1: FC<ModelCard1Props> = ({
         (typeof props.body === 'object' ? (
           props.body
         ) : (
-          <Card.Text className="text-gray-600 flex-grow-1 flex-shrink-0 ellipsis-lines-3">
+          <Card.Text className="text-muted fs-6 flex-grow-1 flex-shrink-0 ellipsis-lines-3">
             {props.body}
           </Card.Text>
         ))}
     </Card.Body>
     {props.footer && (
-      <Card.Footer className="py-5 px-7">{props.footer}</Card.Footer>
+      <Card.Footer className="py-4 px-5">{props.footer}</Card.Footer>
     )}
   </Card>
 );

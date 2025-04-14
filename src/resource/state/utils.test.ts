@@ -32,7 +32,7 @@ describe('getResourceState', () => {
   it('renders error state', () => {
     const resource: Resource = {
       ...baseResource,
-      state: 'Erred',
+      state: 'ERRED',
       runtime_state: 'ONLINE',
       service_settings_state: 'OK',
     };
@@ -79,23 +79,23 @@ describe('getResourceState', () => {
   it('renders progress state', () => {
     const resource: Resource = {
       ...baseResource,
-      state: 'Updating',
+      state: 'UPDATING',
       runtime_state: 'RESIZING',
       service_settings_state: 'OK',
     };
     expect(getResourceState(resource)).toEqual({
       variant: 'primary',
-      label: 'Updating',
+      label: 'UPDATING',
       active: true,
       tooltip:
-        'Updating OpenStack Instance, current state on backend: RESIZING.',
+        'UPDATING OpenStack Instance, current state on backend: RESIZING.',
     });
   });
 
   it('renders action details', () => {
     const resource: Resource = {
       ...baseResource,
-      state: 'Updating',
+      state: 'UPDATING',
       runtime_state: 'RESIZING',
       service_settings_state: 'OK',
       action: 'change_flavor',

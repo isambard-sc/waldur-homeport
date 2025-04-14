@@ -1,5 +1,10 @@
 import { ProviderOfferingsList } from './ProviderDashboardTab';
 
 export const ProviderOfferingsTab = (props) => {
-  return <ProviderOfferingsList items={props.offerings} initialMode="table" />;
+  return (
+    <ProviderOfferingsList
+      provider_uuid={props.data.provider.customer_uuid}
+      initialMode="table"
+    />
+  );
 };

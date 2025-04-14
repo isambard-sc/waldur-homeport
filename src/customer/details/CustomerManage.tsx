@@ -1,6 +1,8 @@
 import { FunctionComponent, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { customersPartialUpdate } from 'waldur-js-client';
 
+import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -9,11 +11,10 @@ import { PageBarProvider } from '@waldur/marketplace/context';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { showError, showSuccess } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-import { updateCustomer } from './api';
 import { CustomerCallManagerPanel } from './CustomerCallManagerPanel';
 import { CustomerEditPanels } from './CustomerEditPanels';
 import { CustomerManagePageBar } from './CustomerManagePageBar';
@@ -42,14 +43,25 @@ export const CustomerManage: FunctionComponent<OwnProps> = ({ tabSpec }) => {
     async (formData, dispatch) => {
       if (canEditCustomer) {
         try {
-          const response = await updateCustomer(customer.uuid, formData);
+          const response = await customersPartialUpdate({
+            path: { uuid: customer.uuid },
+            body: {
+              ...formData,
+              image: fileSerializer(formData.image),
+              country:
+                'country' in formData && formData.country
+                  ? formData.country.value
+                  : undefined,
+            },
+            ...formDataOptions,
+          });
           dispatch(showSuccess(translate('Organization updated successfully')));
           if (response.data?.uuid === customer.uuid) {
             dispatch(setCurrentCustomer(response.data));
           }
           return response;
         } catch (error) {
-          dispatch(showError(error.message));
+          dispatch(showErrorResponse(error));
           // Throw exception to the edit dialog
           if (!('image' in formData)) {
             throw error;

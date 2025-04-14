@@ -1,22 +1,42 @@
 import { Factory } from '@phosphor-icons/react';
+import { FC, PropsWithChildren } from 'react';
+import { Project } from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
+import { AtLeast } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 
-export const ProjectLink = ({ row, onClick = undefined }) => (
-  <div>
+interface OwnProps {
+  row: AtLeast<Project, 'uuid' | 'name'>;
+  className?: string;
+  showIndustry?: boolean;
+  onClick?(): void;
+}
+
+export const ProjectLink: FC<PropsWithChildren<OwnProps>> = ({
+  row,
+  className,
+  children,
+  showIndustry = true,
+  onClick,
+}) => (
+  <>
     <Link
       state="project.dashboard"
       params={{ uuid: row.uuid }}
-      label={row.name}
+      label={children ? undefined : row.name}
       onClick={onClick}
-    />
-    {isFeatureVisible(ProjectFeatures.show_industry_flag) &&
+      className={className}
+    >
+      {children}
+    </Link>
+    {showIndustry &&
+      isFeatureVisible(ProjectFeatures.show_industry_flag) &&
       row.is_industry && (
         <span className="svg-icon svg-icon-4 ms-3">
           <Factory />
         </span>
       )}
-  </div>
+  </>
 );

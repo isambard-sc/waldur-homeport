@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -16,9 +16,9 @@ const UpdateOfferingPermissionExpirationTimeDialog = lazyComponent(() =>
 );
 
 export const UpdateOfferingPermissionExpirationTimeButton: FunctionComponent<{
-  permission;
-  fetch;
-}> = ({ permission, fetch }) => {
+  row;
+  refetch;
+}> = ({ row: permission, refetch }) => {
   const user = useUser();
   const customer = useSelector(getCustomer);
   const canUpdatePermission = hasPermission(user, {
@@ -30,11 +30,9 @@ export const UpdateOfferingPermissionExpirationTimeButton: FunctionComponent<{
   const callback = () => {
     dispatch(
       openModalDialog(UpdateOfferingPermissionExpirationTimeDialog, {
-        resolve: { permission, fetch },
+        resolve: { permission, refetch },
       }),
     );
   };
-  return canUpdatePermission ? (
-    <EditButton onClick={callback} size="sm" />
-  ) : null;
+  return canUpdatePermission ? <EditAction action={callback} /> : null;
 };

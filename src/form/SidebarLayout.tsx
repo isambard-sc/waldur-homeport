@@ -8,7 +8,7 @@ import { useFullPage } from '@waldur/navigation/context';
 import './SidebarLayout.scss';
 
 const Container: FC<PropsWithChildren> = (props) => (
-  <div className="v-stepper-form d-flex flex-column flex-xl-row gap-5 gap-lg-7 pb-10">
+  <div className="v-stepper-form container-xxl d-flex flex-column flex-xl-row gap-5 pb-10">
     {props.children}
   </div>
 );
@@ -16,7 +16,7 @@ const Container: FC<PropsWithChildren> = (props) => (
 const Body: FC<PropsWithChildren<{ className? }>> = (props) => (
   <div
     className={classNames(
-      'container-xxl d-flex flex-column flex-lg-row-fluid gap-5 gap-lg-7',
+      'd-flex flex-column flex-lg-row-fluid gap-5',
       props.className,
     )}
   >
@@ -24,7 +24,13 @@ const Body: FC<PropsWithChildren<{ className? }>> = (props) => (
   </div>
 );
 
-const Sidebar: FC<PropsWithChildren<{ transparent?: boolean }>> = (props) => {
+const Sidebar: FC<
+  PropsWithChildren<{
+    title?: string;
+    transparent?: boolean;
+    hideOnVertical?: boolean;
+  }>
+> = (props) => {
   const isVMode = useMediaQuery({ maxWidth: 1200 });
   useFullPage();
 
@@ -32,11 +38,21 @@ const Sidebar: FC<PropsWithChildren<{ transparent?: boolean }>> = (props) => {
     <div
       className={
         isVMode
-          ? 'v-stepper-form-sidebar container-xxl'
+          ? classNames(
+              'v-stepper-form-sidebar',
+              props.hideOnVertical && 'd-none',
+            )
           : 'v-stepper-form-sidebar drawer drawer-end drawer-on'
       }
     >
-      <Card className="card-flush border-0 w-100">
+      <Card className="card-bordered w-100">
+        {props.title ? (
+          <Card.Header>
+            <div className="me-2">
+              <h4 className="mb-0">{props.title}</h4>
+            </div>
+          </Card.Header>
+        ) : null}
         <Card.Body>{props.children}</Card.Body>
       </Card>
     </div>
@@ -44,13 +60,30 @@ const Sidebar: FC<PropsWithChildren<{ transparent?: boolean }>> = (props) => {
     <div
       className={
         isVMode
-          ? 'v-stepper-form-sidebar container-xxl d-none'
-          : 'v-stepper-form-sidebar'
+          ? classNames(
+              'v-stepper-form-sidebar transparent',
+              props.hideOnVertical && 'd-none',
+            )
+          : 'v-stepper-form-sidebar transparent drawer drawer-end drawer-on'
       }
     >
-      {props.children}
+      <div className="w-100">
+        {props.title ? <h4>{props.title}</h4> : null}
+        {props.children}
+      </div>
     </div>
   );
 };
 
-export const SidebarLayout = { Container, Body, Sidebar };
+const Header: FC<PropsWithChildren<{ className?: string }>> = (props) => (
+  <div
+    className={classNames(
+      'container-xxl v-stepper-form-header',
+      props.className,
+    )}
+  >
+    {props.children}
+  </div>
+);
+
+export const SidebarLayout = { Container, Header, Body, Sidebar };

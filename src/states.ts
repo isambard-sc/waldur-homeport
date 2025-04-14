@@ -13,7 +13,6 @@ import { states as projectRoutes } from '@waldur/project/routes';
 import { states as proposalsRoutes } from '@waldur/proposals/routes';
 import { states as rancherRoutes } from '@waldur/rancher/routes';
 import { states as reportingRoutes } from '@waldur/reporting/routes';
-import { states as resourceSupportRoutes } from '@waldur/resource/support/routes';
 import { states as userRoutes } from '@waldur/user/routes';
 
 import { states as aboutRoutes } from './about';
@@ -37,7 +36,6 @@ export const states: StateDeclaration[] = [
   ...administrationRoutes,
   ...rancherRoutes,
   ...reportingRoutes,
-  ...resourceSupportRoutes,
   ...aboutRoutes,
   ...errorRoutes,
 ];

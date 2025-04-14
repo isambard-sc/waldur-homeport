@@ -29,7 +29,7 @@ export const ResourceEvents: FC<{
       id={id}
       initialPageSize={initialPageSize}
       className={className}
-      actions={actions}
+      tableActions={actions}
     />
   );
 };

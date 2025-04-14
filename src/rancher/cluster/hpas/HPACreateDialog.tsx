@@ -2,12 +2,17 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
 import { reduxForm, formValueSelector, change } from 'redux-form';
+import {
+  rancherHpasCreate,
+  rancherNamespacesList,
+  rancherWorkloadsList,
+} from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { StringField, SelectField, NumberField, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { ActionDialog } from '@waldur/modal/ActionDialog';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { createHPA, listWorkloads, listNamespaces } from '@waldur/rancher/api';
 import { Resource } from '@waldur/resource/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { type RootState } from '@waldur/store/reducers';
@@ -35,13 +40,15 @@ const useHPACreateDialog = (cluster) => {
     async (formData: HPACreateFormData) => {
       try {
         setSubmitting(true);
-        const response = await createHPA({
-          name: formData.name,
-          description: formData.description,
-          workload: formData.workload.url,
-          min_replicas: formData.min_replicas,
-          max_replicas: formData.max_replicas,
-          metrics: serializeMetrics(formData),
+        const response = await rancherHpasCreate({
+          body: {
+            name: formData.name,
+            description: formData.description,
+            workload: formData.workload.url,
+            min_replicas: formData.min_replicas,
+            max_replicas: formData.max_replicas,
+            metrics: serializeMetrics(formData),
+          },
         });
         const hpa = response.data;
         dispatch(createEntity('rancher-hpas', hpa.uuid, hpa));
@@ -81,9 +88,16 @@ export const HPACreateDialog = reduxForm<{}, OwnProps>({
   const { submitting, createHPA } = useHPACreateDialog(props.resolve.cluster);
 
   const { loading, value } = useAsync(async () => {
-    const params = { cluster_uuid: props.resolve.cluster.uuid, o: 'name' };
-    const namespaces = await listNamespaces({ params });
-    const workloads = await listWorkloads({ params });
+    const namespaces = await getAllPages((page) =>
+      rancherNamespacesList({
+        query: { page, cluster_uuid: props.resolve.cluster.uuid, o: ['name'] },
+      }),
+    );
+    const workloads = await getAllPages((page) =>
+      rancherWorkloadsList({
+        query: { page, cluster_uuid: props.resolve.cluster.uuid, o: ['name'] },
+      }),
+    );
     return { namespaces, workloads };
   }, [props.resolve.cluster.uuid]);
 

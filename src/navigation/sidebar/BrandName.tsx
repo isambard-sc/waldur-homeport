@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback } from 'react';
 
-import { ENV } from '@waldur/configs/default';
-import { fixURL } from '@waldur/core/api';
+import { getIconUrl } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { Link } from '@waldur/core/Link';
 import { useLayout } from '@waldur/metronic/layout/core';
 import { useTheme } from '@waldur/theme/useTheme';
@@ -20,9 +20,9 @@ export const BrandName: FunctionComponent = () => {
     });
   }, [layout]);
 
-  const sidebarLogoUrl = fixURL('/icons/sidebar_logo/');
-  const sidebarLogoMobileUrl = fixURL('/icons/sidebar_logo_mobile/');
-  const sidebarLogoDarkUrl = fixURL('/icons/sidebar_logo_dark/');
+  const sidebarLogoUrl = getIconUrl('sidebar_logo');
+  const sidebarLogoMobileUrl = getIconUrl('sidebar_logo_mobile');
+  const sidebarLogoDarkUrl = getIconUrl('sidebar_logo_dark');
   const sidebarLogo =
     (theme === 'dark' || sidebarTheme === 'dark') &&
     ENV.plugins.WALDUR_CORE.SIDEBAR_LOGO_DARK

@@ -1,9 +1,9 @@
 import { FC } from 'react';
+import { PlanUsageResponse } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { Category, Offering } from '@waldur/marketplace/types';
-import { PlanUsageRow } from '@waldur/reporting/plan-usage/types';
 
 import { OfferingDetails } from './OfferingDetails';
 
@@ -11,7 +11,7 @@ interface OwnProps {
   data: {
     offering: Offering;
     category: Category;
-    plansUsage: PlanUsageRow[];
+    plansUsage: PlanUsageResponse[];
   };
   refetch;
   isLoading;

@@ -22,6 +22,6 @@ export const RetypeAction: ActionItemType = ({ resource, refetch }) => (
     modalComponent={RetypeDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<ArrowURightDown />}
+    iconNode={<ArrowURightDown weight="bold" />}
   />
 );

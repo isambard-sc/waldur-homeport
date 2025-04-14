@@ -20,6 +20,6 @@ export const AttachAction: ActionItemType = ({ resource, refetch }) => (
     resource={resource}
     extraResolve={{ refetch }}
     important
-    iconNode={<PlugsConnected />}
+    iconNode={<PlugsConnected weight="bold" />}
   />
 );

@@ -1,27 +1,23 @@
 import { FunctionComponent, useMemo } from 'react';
 import { ButtonGroup } from 'react-bootstrap';
+import {
+  OpenStackServerGroup,
+  OpenstackServerGroupsListData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { CreateServerGroupAction } from '@waldur/openstack/openstack-tenant/actions/CreateServerGroupAction';
 import { PullServerGroupsAction } from '@waldur/openstack/openstack-tenant/actions/PullServerGroupsAction';
-import { ServerGroupType } from '@waldur/openstack/types';
 import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
 import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { Resource } from '@waldur/resource/types';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-interface ResourceRules extends Resource {
-  policy: ServerGroupType;
-}
-
-const ResourcePolicy = (resource: ResourceRules) => resource.policy;
-
 export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackServerGroupsListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
     }),
@@ -33,7 +29,7 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<OpenStackServerGroup>
       {...props}
       columns={[
         {
@@ -44,7 +40,7 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
         },
         {
           title: translate('Policy'),
-          render: ({ row }) => ResourcePolicy(row),
+          render: ({ row }) => row.policy,
           copyField: null,
           orderField: 'policy',
         },
@@ -61,6 +57,7 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
           className: 'col-sm-2',
         },
       ]}
+      title={translate('Server groups')}
       verboseName={translate('server groups')}
       initialSorting={{ field: 'name', mode: 'asc' }}
       showPageSizeSelector={true}

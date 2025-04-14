@@ -1,12 +1,21 @@
+import { WarningCircle } from '@phosphor-icons/react';
 import { FunctionComponent, useMemo, useState } from 'react';
+import { Nav, Tab } from 'react-bootstrap';
 import { connect, useSelector } from 'react-redux';
+import { BasePublicPlan, PublicOfferingDetails } from 'waldur-js-client';
 
+import { AwesomeCheckbox } from '@waldur/core/AwesomeCheckbox';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
+import { Tip } from '@waldur/core/Tooltip';
+import { FieldError } from '@waldur/form';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
-import { concealPricesSelector } from '@waldur/marketplace/deploy/utils';
+import {
+  concealPricesSelector,
+  formSubmitErrorsSelector,
+} from '@waldur/marketplace/deploy/utils';
 import { Limits } from '@waldur/marketplace/details/types';
-import { Offering, Plan } from '@waldur/marketplace/types';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
 import { getCustomer } from '@waldur/workspace/selectors';
 
@@ -38,7 +47,7 @@ const FixedRows = (props: {
         period={props.period}
         activePriceIndex={props.activePriceIndex}
       >
-        {component.amount}x
+        {translate('Quantity')}: {component.amount}x
       </ComponentRow2>
     ))}
   </>
@@ -89,30 +98,36 @@ const ControlRows = (props: {
     </>
   );
 
-const SeparatorRow = (props: { message?: any }) => (
-  <tr className="separator-space">
-    <td colSpan={5}>{props.message}</td>
-  </tr>
-);
-
 const ComponentRowTotal = (props: {
   amount: number;
-  from?: boolean;
   period?: PlanPeriod;
-  final?: boolean;
+  setPeriod?;
 }) => {
   return (
-    <tr className={'total' + (props.final ? ' total-final' : '')}>
-      <th colSpan={props.final ? 3 : 4}>{translate('Total')}</th>
-      <td colSpan={props.final ? 2 : 1}>
-        {props.from ? translate('From') + ' ' : ''}
-        {defaultCurrency(props.amount)}
-        {Boolean(props.period) && (
-          <>
-            {' '}
-            /{props.period === 'annual' ? 'year' : props.final ? 'month' : 'mo'}
-          </>
-        )}
+    <tr className="total">
+      <th className="col-md title fs-4 fw-normal">{translate('Total')}</th>
+      <td colSpan={2} className="col-md-auto col-actions">
+        <div className="d-flex align-items-center justify-content-end gap-4">
+          {props.period && props.setPeriod && (
+            <AwesomeCheckbox
+              label={translate('Yearly estimate')}
+              value={props.period === 'monthly' ? false : true}
+              size="sm"
+              onChange={(value) =>
+                props.setPeriod(value ? 'annual' : 'monthly')
+              }
+            />
+          )}
+          <span className="fs-4 text-gray-700 min-w-150px text-start">
+            {defaultCurrency(props.amount)}
+            {Boolean(props.period) && (
+              <>
+                {' /'}
+                {props.period === 'annual' ? 'year' : 'month'}
+              </>
+            )}
+          </span>
+        </div>
       </td>
     </tr>
   );
@@ -137,198 +152,166 @@ const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (props) => {
     [props.periodKeys, selectedPeriod],
   );
 
+  const submitErrors = useSelector(formSubmitErrorsSelector);
+
   if (!periodic.hasPeriodicCost && !oneTime.hasOneTimeCost) {
     return null;
   }
 
   return (
     <div className="plan-details-container">
-      {periodic.hasPeriodicCost && (
-        <section className="plan-details-section bg-light rounded p-6 mb-10">
-          <div className="d-flex justify-content-between">
-            <h5 className="mb-6">
-              {selectedPeriod === 'monthly'
-                ? shouldConcealPrices
-                  ? translate('Monthly')
-                  : translate('Monthly cost')
-                : shouldConcealPrices
-                  ? translate('Annual')
-                  : translate('Annual cost')}
-              {!shouldConcealPrices && <PriceTooltip />}
-            </h5>
-            {props.periods.length > 1 && (
-              <button
-                className="text-link"
-                type="button"
-                onClick={() => {
-                  setSelectedPeriod((prev) =>
-                    prev === 'monthly' ? 'annual' : 'monthly',
-                  );
-                }}
-              >
-                {selectedPeriod === 'monthly'
-                  ? translate('Show yearly estimates')
-                  : translate('Show monthly estimates')}
-                *
-              </button>
-            )}
-          </div>
+      <Tab.Container
+        defaultActiveKey={oneTime.hasOneTimeCost ? 'onetime' : 'periodic'}
+      >
+        {/* TABS */}
+        <Nav variant="tabs" className="nav-line-tabs">
+          {props.extraTabs &&
+            props.extraTabs.map((tab) => (
+              <Nav.Item key={tab.eventKey}>
+                <Nav.Link eventKey={tab.eventKey}>{tab.title}</Nav.Link>
+              </Nav.Item>
+            ))}
+          {oneTime.hasOneTimeCost && (
+            <Nav.Item>
+              <Nav.Link eventKey="onetime">
+                {translate('One time cost')}
+              </Nav.Link>
+            </Nav.Item>
+          )}
+          {periodic.hasPeriodicCost && (
+            <Nav.Item>
+              <Nav.Link eventKey="periodic">
+                {translate('Monthly cost')}
+              </Nav.Link>
+            </Nav.Item>
+          )}
+          {submitErrors && 'plan_entries' in submitErrors && (
+            <Tip
+              label={<FieldError error={submitErrors.plan_entries} />}
+              id="order-plan-errors"
+              autoWidth
+            >
+              <WarningCircle
+                size={18}
+                weight="bold"
+                className="ms-2 text-warning mb-1"
+                data-testid="warning"
+              />
+            </Tip>
+          )}
+          {!shouldConcealPrices && (
+            <div className="ms-auto text-muted">
+              <PriceTooltip size={20} />
+            </div>
+          )}
+        </Nav>
 
-          <table className="table-details w-100">
-            <tbody>
-              {/* Fixed */}
-              {periodic.fixedRows.length > 0 && (
-                <>
-                  <FixedRows
-                    components={periodic.fixedRows}
-                    hidePrices={Boolean(
-                      activeFixedPriceProfile && !shouldConcealPrices,
-                    )}
-                    period={selectedPeriod}
-                    activePriceIndex={activePriceIndex}
-                  />
+        {/* CONTENT */}
+        <Tab.Content>
+          {props.extraTabs &&
+            props.extraTabs.map((tab) => (
+              <Tab.Pane key={tab.eventKey} eventKey={tab.eventKey}>
+                <tab.component />
+              </Tab.Pane>
+            ))}
+          {oneTime.hasOneTimeCost && (
+            <Tab.Pane eventKey="onetime">
+              <section className="plan-details-section">
+                <FormTable>
+                  {/* One */}
+                  {oneTime.initialRows.length > 0 && (
+                    <FixedRows
+                      components={oneTime.initialRows}
+                      hidePrices={shouldConcealPrices}
+                      activePriceIndex={0}
+                    />
+                  )}
+
+                  {/* Few */}
+                  {oneTime.switchRows.length > 0 && (
+                    <FixedRows
+                      components={oneTime.switchRows}
+                      hidePrices={shouldConcealPrices}
+                      activePriceIndex={0}
+                    />
+                  )}
+
+                  {/* Limit */}
+                  {oneTime.totalLimitedRows.length > 0 && (
+                    <ControlRows
+                      components={oneTime.totalLimitedRows}
+                      hidePrices={Boolean(shouldConcealPrices)}
+                      viewMode={props.viewMode}
+                      activePriceIndex={0}
+                    />
+                  )}
+
+                  {!shouldConcealPrices && (
+                    <ComponentRowTotal amount={oneTime.oneTimeTotal} />
+                  )}
+                </FormTable>
+              </section>
+            </Tab.Pane>
+          )}
+
+          {periodic.hasPeriodicCost && (
+            <Tab.Pane eventKey="periodic">
+              <section className="plan-details-section">
+                <FormTable>
+                  {/* Fixed */}
+                  {periodic.fixedRows.length > 0 && (
+                    <FixedRows
+                      components={periodic.fixedRows}
+                      hidePrices={Boolean(
+                        activeFixedPriceProfile && !shouldConcealPrices,
+                      )}
+                      period={selectedPeriod}
+                      activePriceIndex={activePriceIndex}
+                    />
+                  )}
+
+                  {/* Usage */}
+                  {periodic.usageRows.length > 0 && (
+                    <UsageRows
+                      components={periodic.usageRows}
+                      hidePrices={shouldConcealPrices}
+                      period={selectedPeriod}
+                    />
+                  )}
+
+                  {/* Limit */}
+                  {periodic.periodicLimitedRows.length > 0 && (
+                    <ControlRows
+                      components={periodic.periodicLimitedRows}
+                      hidePrices={Boolean(shouldConcealPrices)}
+                      viewMode={props.viewMode}
+                      period={selectedPeriod}
+                      activePriceIndex={activePriceIndex}
+                    />
+                  )}
+
                   {!activeFixedPriceProfile && !shouldConcealPrices ? (
                     <ComponentRowTotal
-                      amount={periodic.fixedTotalPeriods[activePriceIndex]}
+                      amount={periodic.periodicTotal[activePriceIndex]}
                       period={selectedPeriod}
-                    />
-                  ) : null}
-                  <SeparatorRow />
-                </>
-              )}
-
-              {/* Usage */}
-              {periodic.usageRows.length > 0 && (
-                <>
-                  <UsageRows
-                    components={periodic.usageRows}
-                    hidePrices={shouldConcealPrices}
-                    period={selectedPeriod}
-                  />
-                  {!shouldConcealPrices ? (
-                    <ComponentRowTotal
-                      amount={0}
-                      period={selectedPeriod}
-                      from
-                    />
-                  ) : null}
-                  <SeparatorRow />
-                </>
-              )}
-
-              {/* Limit */}
-              {periodic.periodicLimitedRows.length > 0 && (
-                <>
-                  <ControlRows
-                    components={periodic.periodicLimitedRows}
-                    hidePrices={Boolean(shouldConcealPrices)}
-                    viewMode={props.viewMode}
-                    period={selectedPeriod}
-                    activePriceIndex={activePriceIndex}
-                  />
-                  {!shouldConcealPrices ? (
-                    <ComponentRowTotal
-                      amount={
-                        periodic.periodicLimitedTotalPeriods[activePriceIndex]
+                      setPeriod={
+                        props.periods.length > 1 ? setSelectedPeriod : null
                       }
-                      period={selectedPeriod}
                     />
                   ) : null}
-                  <SeparatorRow />
-                </>
-              )}
-
-              {!activeFixedPriceProfile && !shouldConcealPrices ? (
-                <ComponentRowTotal
-                  amount={periodic.periodicTotal[activePriceIndex]}
-                  period={selectedPeriod}
-                  final
-                />
-              ) : null}
-            </tbody>
-          </table>
-        </section>
-      )}
-
-      {oneTime.hasOneTimeCost && (
-        <section className="plan-details-section bg-light rounded p-6">
-          <h5 className="mb-6">
-            {shouldConcealPrices ? (
-              translate('One time')
-            ) : (
-              <>
-                {translate('One time cost')}
-                <PriceTooltip />
-              </>
-            )}
-          </h5>
-
-          <table className="table-details table-details-limit w-100">
-            <tbody>
-              {/* One */}
-              {oneTime.initialRows.length > 0 && (
-                <>
-                  <FixedRows
-                    components={oneTime.initialRows}
-                    hidePrices={shouldConcealPrices}
-                    activePriceIndex={0}
-                  />
-                  {!shouldConcealPrices ? (
-                    <ComponentRowTotal
-                      amount={oneTime.initialTotalPeriods[0]}
-                    />
-                  ) : null}
-                  <SeparatorRow />
-                </>
-              )}
-
-              {/* Few */}
-              {oneTime.switchRows.length > 0 && (
-                <>
-                  <FixedRows
-                    components={oneTime.switchRows}
-                    hidePrices={shouldConcealPrices}
-                    activePriceIndex={0}
-                  />
-                  {!shouldConcealPrices ? (
-                    <ComponentRowTotal amount={oneTime.switchTotalPeriods[0]} />
-                  ) : null}
-                  <SeparatorRow />
-                </>
-              )}
-
-              {/* Limit */}
-              {oneTime.totalLimitedRows.length > 0 && (
-                <>
-                  <ControlRows
-                    components={oneTime.totalLimitedRows}
-                    hidePrices={Boolean(shouldConcealPrices)}
-                    viewMode={props.viewMode}
-                    activePriceIndex={0}
-                  />
-                  {!shouldConcealPrices ? (
-                    <ComponentRowTotal
-                      amount={oneTime.totalLimitTotalPeriods[0]}
-                    />
-                  ) : null}
-                  <SeparatorRow />
-                </>
-              )}
-
-              {!shouldConcealPrices && (
-                <ComponentRowTotal amount={oneTime.oneTimeTotal} final />
-              )}
-            </tbody>
-          </table>
-        </section>
-      )}
+                </FormTable>
+              </section>
+            </Tab.Pane>
+          )}
+        </Tab.Content>
+      </Tab.Container>
     </div>
   );
 };
 
 interface PlanDetailsTable2 {
-  offering: Offering;
-  plan?: Plan;
+  offering: PublicOfferingDetails;
+  plan?: BasePublicPlan;
   limits?: Limits;
   viewMode?: boolean;
 }

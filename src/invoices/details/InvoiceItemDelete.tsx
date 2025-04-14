@@ -1,12 +1,11 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
+import { invoiceItemsDestroy } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import { deleteInvoiceItem } from '../api';
 
 export const InvoiceItemDelete = ({ item, refreshInvoiceItems }) => {
   const dispatch = useDispatch();
@@ -23,7 +22,7 @@ export const InvoiceItemDelete = ({ item, refreshInvoiceItems }) => {
       return;
     }
     try {
-      await deleteInvoiceItem(item.uuid);
+      await invoiceItemsDestroy({ path: { uuid: item.uuid } });
       refreshInvoiceItems();
       dispatch(showSuccess(translate('Invoice item has been removed.')));
     } catch (e) {

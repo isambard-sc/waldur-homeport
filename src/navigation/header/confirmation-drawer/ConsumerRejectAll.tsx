@@ -2,10 +2,10 @@ import { Prohibit } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { marketplaceOrdersRejectByConsumer } from 'waldur-js-client';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { rejectOrderByConsumer } from '@waldur/marketplace/common/api';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
 export const ConsumerRejectAll = ({ orders, refetch }) => {
@@ -13,7 +13,9 @@ export const ConsumerRejectAll = ({ orders, refetch }) => {
   const { mutate, isLoading } = useMutation(async () => {
     try {
       await Promise.all(
-        orders.map((order) => rejectOrderByConsumer(order.uuid)),
+        orders.map((order) =>
+          marketplaceOrdersRejectByConsumer({ path: { uuid: order.uuid } }),
+        ),
       );
       await refetch();
       dispatch(showSuccess(translate('All orders have been rejected.')));

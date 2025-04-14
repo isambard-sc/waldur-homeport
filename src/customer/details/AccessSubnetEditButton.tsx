@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditButton } from '@waldur/form/EditButton';
+import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const AccessSubnetEditDialog = lazyComponent(() =>
-  import('./AccessSubnetEditDialog').then((module) => ({
-    default: module.AccessSubnetEditDialog,
+const AccessSubnetForm = lazyComponent(() =>
+  import('./AccessSubnetForm').then((module) => ({
+    default: module.AccessSubnetForm,
   })),
 );
 
@@ -16,14 +16,14 @@ export const AccessSubnetEditButton = ({ row, refetch }) => {
   const openFormDialog = useCallback(
     () =>
       dispatch(
-        openModalDialog(AccessSubnetEditDialog, {
-          refetch: refetch,
-          row: row,
+        openModalDialog(AccessSubnetForm, {
+          refetch,
+          row,
           size: 'md',
         }),
       ),
-    [dispatch],
+    [dispatch, row, refetch],
   );
 
-  return <EditButton onClick={openFormDialog} size="sm" />;
+  return <EditAction action={openFormDialog} />;
 };

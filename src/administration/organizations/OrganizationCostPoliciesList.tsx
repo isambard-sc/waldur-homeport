@@ -2,14 +2,17 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import {
+  CustomerEstimatedCostPolicy,
+  MarketplaceCustomerEstimatedCostPoliciesListData,
+} from 'waldur-js-client';
 
 import { BooleanBadge } from '@waldur/core/BooleanBadge';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
+import { CostPolicyActions } from '@waldur/customer/cost-policies/CostPolicyActions';
 import { CostPolicyCreateButton } from '@waldur/customer/cost-policies/CostPolicyCreateButton';
-import { CostPolicyDeleteButton } from '@waldur/customer/cost-policies/CostPolicyDeleteButton';
-import { CostPolicyEditButton } from '@waldur/customer/cost-policies/CostPolicyEditButton';
 import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
-import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
+import { OrganizationNameLink } from '@waldur/customer/list/OrganizationNameLink';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -20,7 +23,8 @@ import { OrganizationCostPoliciesFilter } from './OrganizationCostPoliciesFilter
 const filtersSelector = createSelector(
   getFormValues('OrgCostPoliciesFilter'),
   (filterValues: any) => {
-    const result: Record<string, any> = {};
+    const result: MarketplaceCustomerEstimatedCostPoliciesListData['query'] =
+      {};
     if (filterValues?.organization) {
       result.customer_uuid = filterValues.organization.uuid;
     }
@@ -39,13 +43,13 @@ export const OrganizationCostPoliciesList: FC = () => {
   });
 
   return (
-    <Table
+    <Table<CustomerEstimatedCostPolicy>
       {...tableProps}
       columns={[
         {
           title: translate('Organization'),
           render: ({ row }) => (
-            <OrganizationLink
+            <OrganizationNameLink
               row={{ name: row.scope_name, uuid: row.scope_uuid }}
             />
           ),
@@ -97,18 +101,11 @@ export const OrganizationCostPoliciesList: FC = () => {
       initialSorting={{ field: 'created', mode: 'desc' }}
       filters={<OrganizationCostPoliciesFilter />}
       rowActions={({ row }) => (
-        <>
-          <CostPolicyEditButton
-            row={row}
-            type="organization"
-            refetch={tableProps.fetch}
-          />
-          <CostPolicyDeleteButton
-            row={row}
-            type="organization"
-            refetch={tableProps.fetch}
-          />
-        </>
+        <CostPolicyActions
+          row={row}
+          type="organization"
+          refetch={tableProps.fetch}
+        />
       )}
       hasQuery={true}
       showPageSizeSelector={true}

@@ -1,11 +1,11 @@
 import { FunctionComponent } from 'react';
+import { Resource } from 'waldur-js-client';
 
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
 import { ResourceActionsButton as BaseResourceActionsButton } from '@waldur/marketplace/resources/actions/ResourceActionsButton';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
 
 import { ActionsLists } from '../actions/ActionsLists';
-import { Resource } from '../types';
 
 interface ResourceActionsButtonProps {
   row: Resource;

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { bookingResourcesReject } from 'waldur-js-client';
 
-import { rejectBooking } from '@waldur/booking/api';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -26,7 +26,7 @@ export const RejectBookingButton: FC<RejectBookingButtonProps> = ({
   const rejectRequest = async () => {
     try {
       setIsRejecting(true);
-      await rejectBooking(resourceUuid);
+      await bookingResourcesReject({ path: { uuid: resourceUuid } });
       setIsRejecting(false);
       if (refetch) refetch();
       dispatch(showSuccess(translate('Booking has been cancelled.')));

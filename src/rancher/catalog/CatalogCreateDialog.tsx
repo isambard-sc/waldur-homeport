@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { rancherCatalogsCreate } from 'waldur-js-client';
 
 import { StringField, TextField, SecretField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -9,8 +10,6 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { Resource } from '@waldur/resource/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { createEntity } from '@waldur/table/actions';
-
-import { createCatalog } from '../api';
 
 interface FormData {
   name: string;
@@ -34,9 +33,11 @@ const useCatalogCreateDialog = (cluster) => {
     async (formData) => {
       try {
         setSubmitting(true);
-        const response = await createCatalog({
-          scope: cluster.url,
-          ...formData,
+        const response = await rancherCatalogsCreate({
+          body: {
+            scope: cluster.url,
+            ...formData,
+          },
         });
         const catalog = response.data;
         dispatch(createEntity('rancher-catalogs', catalog.uuid, catalog));

@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
+import { marketplaceScreenshotsDestroy } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { deleteOfferingImage } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -24,7 +24,7 @@ export const DeleteImageButton = ({ row }) => {
       return;
     }
     try {
-      await deleteOfferingImage(row.uuid);
+      await marketplaceScreenshotsDestroy({ path: { uuid: row.uuid } });
       dispatch(showSuccess(translate('Image has been removed.')));
     } catch (error) {
       dispatch(showErrorResponse(error, translate('Unable to remove image.')));

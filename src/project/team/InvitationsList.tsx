@@ -3,25 +3,29 @@ import { FunctionComponent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Invitation } from 'waldur-js-client';
 
 import Avatar from '@waldur/core/Avatar';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
-import { InvitationCancelButton } from '@waldur/invitations/actions/InvitationCancelButton';
 import { InvitationPolicyService } from '@waldur/invitations/actions/InvitationPolicyService';
-import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSendButton';
+import { InvitationActions } from '@waldur/invitations/InvitationActions';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
 import { InvitationsFilter } from '@waldur/invitations/InvitationsFilter';
 import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
 import { choices } from '@waldur/invitations/InvitationStateFilter';
-import { RoleField } from '@waldur/invitations/RoleField';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
+import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { useUser } from '@waldur/workspace/hooks';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
+
+import { PROJECT_TEAM_TABLE_TABS } from '../utils';
+
+import { ProjectPermissionsLogButton } from './ProjectPermissionsLogButton';
+import { TeamDropdownActions } from './TeamDropdownActions';
 
 const InvitationsListComponent: FunctionComponent = () => {
   const filter = useSelector(mapStateToFilter);
@@ -33,7 +37,7 @@ const InvitationsListComponent: FunctionComponent = () => {
   });
   const project = useSelector(getProject);
   return (
-    <Table
+    <Table<Invitation>
       {...props}
       columns={[
         {
@@ -41,9 +45,9 @@ const InvitationsListComponent: FunctionComponent = () => {
           render: ({ row }) => (
             <div className="d-flex align-items-center gap-1">
               <Avatar
-                className="symbol symbol-25px"
+                className="symbol symbol-32px symbol-circle"
                 name={row?.email}
-                size={25}
+                size={32}
               />
               {row.email}
               <CopyToClipboardButton value={row.email} />
@@ -53,7 +57,7 @@ const InvitationsListComponent: FunctionComponent = () => {
         },
         {
           title: translate('Role'),
-          render: ({ row }) => <RoleField invitation={row} />,
+          render: RoleField,
         },
         {
           title: translate('Status'),
@@ -73,20 +77,17 @@ const InvitationsListComponent: FunctionComponent = () => {
           render: ({ row }) => formatDate(row.expires),
         },
       ]}
+      tabs={PROJECT_TEAM_TABLE_TABS}
       rowActions={({ row }) => (
-        <>
-          <InvitationSendButton row={row} refetch={props.fetch} />
-          <InvitationCancelButton row={row} refetch={props.fetch} />
-        </>
+        <InvitationActions invitation={row} refetch={props.fetch} />
       )}
+      title={translate('Team')}
       verboseName={translate('Team invitations')}
       tableActions={
-        <InvitationCreateButton
-          project={project}
-          roleTypes={['project']}
-          refetch={props.fetch}
-          enableBulkUpload={true}
-        />
+        <>
+          <ProjectPermissionsLogButton />
+          <TeamDropdownActions project={project} refetch={props.fetch} />
+        </>
       }
       hasQuery={true}
       expandableRow={InvitationExpandableRow}

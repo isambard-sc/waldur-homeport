@@ -87,12 +87,6 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
       render: ({ row }) => formatDateTime(row.modified),
       orderField: 'modified',
     },
-    {
-      title: translate('Propagated'),
-      render: ({ row }) =>
-        row.propagation_date ? formatDateTime(row.propagation_date) : 'N/A',
-      orderField: 'propagation_date',
-    },
   ];
   return (
     <Table

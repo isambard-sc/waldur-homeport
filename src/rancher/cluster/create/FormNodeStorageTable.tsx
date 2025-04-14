@@ -3,7 +3,7 @@ import { FC, PropsWithChildren, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { BaseFieldProps, Field } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { SelectField, StringField } from '@waldur/form';
 import { BoxNumberField } from '@waldur/form/BoxNumberField';
 import { translate } from '@waldur/i18n';

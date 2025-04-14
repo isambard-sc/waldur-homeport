@@ -1,21 +1,21 @@
 import { Fragment, FunctionComponent } from 'react';
 import { Table } from 'react-bootstrap';
+import { OpenStackNestedSecurityGroup } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { SecurityGroupRuleCell } from './SecurityGroupRuleCell';
 import { SecurityGroupRuleHeader } from './SecurityGroupRuleHeader';
-import { SecurityGroup } from './types';
 
 interface OpenStackSecurityGroupsDialogProps {
   resolve: {
-    securityGroups: SecurityGroup[];
+    securityGroups: OpenStackNestedSecurityGroup[];
   };
 }
 
 export const OpenStackSecurityGroupsTable: FunctionComponent<{
-  securityGroups: SecurityGroup[];
+  securityGroups: OpenStackNestedSecurityGroup[];
 }> = ({ securityGroups }) => {
   return (
     <Table responsive className="table-row-bordered">
@@ -55,7 +55,7 @@ export const OpenStackSecurityGroupsTable: FunctionComponent<{
                   ) : (
                     <td className="d-none" />
                   )}
-                  <SecurityGroupRuleCell rule={rule} />
+                  <SecurityGroupRuleCell rule={rule as any} />
                 </tr>
               ))
             )}

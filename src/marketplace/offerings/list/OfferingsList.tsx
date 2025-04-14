@@ -1,4 +1,8 @@
 import { FunctionComponent } from 'react';
+import {
+  MarketplaceProviderOfferingsListData,
+  ProviderOfferingDetails,
+} from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -10,6 +14,7 @@ import { createFetcher } from '@waldur/table/api';
 import { BooleanField } from '@waldur/table/BooleanField';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
@@ -25,7 +30,7 @@ const mandatoryFields = ['customer_uuid', 'components', 'plans'];
 
 export const BaseOfferingsList: FunctionComponent<{
   table: string;
-  filter;
+  filter: MarketplaceProviderOfferingsListData['query'];
   hasOrganizationColumn?: boolean;
   showActions?: boolean;
   filters?;
@@ -38,24 +43,25 @@ export const BaseOfferingsList: FunctionComponent<{
     mandatoryFields,
   });
 
-  const organizationColumn = hasOrganizationColumn
-    ? [
-        {
-          title: translate('Organization'),
-          render: ({ row }) => renderFieldOrDash(row.customer_name),
-          filter: 'organization',
-          inlineFilter: (row) => ({
-            name: row.customer_name,
-            uuid: row.customer_uuid,
-          }),
-          export: 'customer_name',
-          keys: ['customer_name'],
-          id: 'organization',
-        },
-      ]
-    : [];
+  const organizationColumn: Column<ProviderOfferingDetails>[] =
+    hasOrganizationColumn
+      ? [
+          {
+            title: translate('Organization'),
+            render: ({ row }) => renderFieldOrDash(row.customer_name),
+            filter: 'organization',
+            inlineFilter: (row) => ({
+              name: row.customer_name,
+              uuid: row.customer_uuid,
+            }),
+            export: 'customer_name',
+            keys: ['customer_name'],
+            id: 'organization',
+          },
+        ]
+      : [];
 
-  const columns = [
+  const columns: Column<ProviderOfferingDetails>[] = [
     {
       title: translate('Name'),
       render: OfferingNameColumn,
@@ -114,7 +120,7 @@ export const BaseOfferingsList: FunctionComponent<{
       keys: ['shared'],
       optional: true,
     },
-    SLUG_COLUMN,
+    SLUG_COLUMN as Column<ProviderOfferingDetails>,
   ];
 
   const dropdownActions = useOfferingDropdownActions(props.fetch);

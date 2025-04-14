@@ -1,14 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi, describe, expect, beforeEach, it } from 'vitest';
+import { featureValues } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { useNotify } from '@waldur/store/hooks';
 
 import { FeaturesList } from './FeaturesList';
 
 // Mock dependencies
-vi.mock('@waldur/core/api');
+vi.mock('waldur-js-client');
 vi.mock('@waldur/store/hooks', () => ({
   useNotify: vi.fn().mockReturnValue({
     showSuccess: vi.fn(),
@@ -42,7 +42,7 @@ vi.mock('@waldur/features/FeaturesDescription', () => ({
     },
   ],
 }));
-vi.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/core/config', () => ({
   ENV: {
     FEATURES: {
       billing: {
@@ -68,7 +68,7 @@ describe('FeaturesList', () => {
     });
 
     // Mock post function
-    vi.mocked(post).mockReset();
+    vi.mocked(featureValues).mockReset();
 
     vi.spyOn(window, 'location', 'get');
   });
@@ -123,12 +123,14 @@ describe('FeaturesList', () => {
     await userEvent.click(submitButton);
 
     // Verify API call
-    expect(post).toHaveBeenCalledWith('/feature-values/', {
-      billing: {
-        enabled: false,
-      },
-      support: {
-        enabled: true,
+    expect(featureValues).toHaveBeenCalledWith({
+      body: {
+        billing: {
+          enabled: false,
+        },
+        support: {
+          enabled: true,
+        },
       },
     });
 
@@ -141,7 +143,7 @@ describe('FeaturesList', () => {
   it('handles failed form submission', async () => {
     const { showErrorResponse } = useNotify();
     const error = new Error('API Error');
-    vi.mocked(post).mockRejectedValueOnce(error as never);
+    vi.mocked(featureValues).mockRejectedValueOnce(error as never);
 
     render(<FeaturesList />);
 
@@ -159,7 +161,7 @@ describe('FeaturesList', () => {
   });
 
   it('disables submit button while submitting', async () => {
-    vi.mocked(post).mockImplementation(
+    vi.mocked(featureValues).mockImplementation(
       () => new Promise((resolve) => setTimeout(resolve, 100)),
     );
 

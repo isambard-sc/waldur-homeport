@@ -4,12 +4,16 @@ describe('Link persistance after login', () => {
       .intercept('GET', '/api/customers/bf6d515c9e6e445f9c339021b30fc96b/', {
         fixture: 'customers/alice.json',
       })
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'customers/alice_bob_web.json',
       })
       .intercept('GET', '/api/projects/df4193e2bee24a4c8e339474d74c5f8c/', {
         fixture: 'projects/alice_azure.json',
-      });
+      })
+      .intercept('GET', '/api/marketplace-categories/**', [])
+      .intercept('GET', '/api/marketplace-category-groups/**', [])
+      .intercept('GET', '/api/marketplace-global-categories/**', [])
+      .intercept('GET', '/api/admin-announcements/**', []);
   });
 
   it('should redirect to attempted url after login', () => {
@@ -38,12 +42,12 @@ describe('Expired token redirect', () => {
       fixture: 'configuration.json',
     })
       .intercept('POST', '/api-auth/password/', { token: 'valid' })
-      .intercept('GET', '/api/roles/', { fixture: 'roles.json' })
-      .intercept('GET', '/api/events/', [])
+      .intercept('GET', '/api/roles/**', { fixture: 'roles.json' })
+      .intercept('GET', '/api/events/**', [])
       .intercept('GET', '/api/customers/bf6d515c9e6e445f9c339021b30fc96b/', {
         fixture: 'customers/alice.json',
       })
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'customers/alice_bob_web.json',
       })
       .intercept('GET', '/api/projects/df4193e2bee24a4c8e339474d74c5f8c/', {
@@ -64,8 +68,12 @@ describe('Expired token redirect', () => {
     cy.intercept('GET', '/api/configuration/', {
       fixture: 'configuration.json',
     })
-      .intercept('GET', '/api/roles/', { fixture: 'roles.json' })
+      .intercept('GET', '/api/roles/**', { fixture: 'roles.json' })
       .intercept('GET', '/api/users/me/', { fixture: 'users/alice.json' })
+      .intercept('GET', '/api/marketplace-categories/**', [])
+      .intercept('GET', '/api/marketplace-category-groups/**', [])
+      .intercept('GET', '/api/marketplace-global-categories/**', [])
+      .intercept('GET', '/api/admin-announcements/**', [])
       .intercept('POST', '/api-auth/password/', { token: 'valid' })
       .intercept('GET', '/api/events/**', [])
       .as('success')

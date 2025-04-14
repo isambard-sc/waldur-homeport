@@ -12,6 +12,10 @@ interface UploadContainerProps extends DropzoneOptions {
   className?: string;
 }
 
+const rejectStyle = {
+  borderColor: '#ff1744',
+};
+
 export const UploadContainer: React.FC<UploadContainerProps> = (props) => {
   const { message, className, ...rest } = props;
   const dropzoneNode = useRef<DropzoneRef>(null);
@@ -24,16 +28,24 @@ export const UploadContainer: React.FC<UploadContainerProps> = (props) => {
 
   return (
     <Dropzone noClick ref={dropzoneNode} {...rest}>
-      {({ getRootProps, getInputProps, isDragActive }) => (
+      {({ getRootProps, getInputProps, isDragActive, isDragReject }) => (
         <div
           {...getRootProps({
             className: classNames('dropzone metronic-upload', className),
           })}
         >
           {isDragActive && (
-            <div className="dropzone__overlay">
-              <div className="dropzone__overlay-message">
-                {translate('Drop files to attach them.')}
+            <div
+              className="dropzone__overlay"
+              style={isDragReject ? rejectStyle : undefined}
+            >
+              <div
+                className="dropzone__overlay-message"
+                style={isDragReject ? rejectStyle : undefined}
+              >
+                {isDragReject
+                  ? translate('Invalid files')
+                  : translate('Drop files to attach them.')}
               </div>
             </div>
           )}

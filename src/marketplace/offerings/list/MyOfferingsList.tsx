@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { MarketplaceProviderOfferingsListData } from 'waldur-js-client';
 
 import { PUBLIC_OFFERINGS_FILTER_FORM_ID } from '@waldur/marketplace/offerings/store/constants';
 import { getCustomer } from '@waldur/workspace/selectors';
@@ -12,7 +13,7 @@ const mapStateToFilter = createSelector(
   getCustomer,
   getFormValues(PUBLIC_OFFERINGS_FILTER_FORM_ID),
   (customer, filterValues: any) => {
-    const filter: Record<string, string | boolean> = {
+    const filter: MarketplaceProviderOfferingsListData['query'] = {
       billable: false,
     };
     if (customer) {

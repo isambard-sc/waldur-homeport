@@ -35,6 +35,8 @@ export const waitForConfirmation = (
     positiveButton?: string;
     negativeButton?: string;
     size?: DialogSizeType;
+    positiveButtonVariant?: string;
+    iconNode?: ReactNode;
   } = {},
 ) => {
   const deferred = createDeferred();

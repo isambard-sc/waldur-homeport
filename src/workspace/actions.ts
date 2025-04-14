@@ -1,3 +1,5 @@
+import { Customer, Resource } from 'waldur-js-client';
+
 import {
   SET_CURRENT_CUSTOMER,
   SET_CURRENT_PROJECT,
@@ -6,7 +8,7 @@ import {
 } from './constants';
 import { Project } from './types';
 
-export const setCurrentCustomer = (customer) => ({
+export const setCurrentCustomer = (customer: Customer) => ({
   type: SET_CURRENT_CUSTOMER,
   payload: {
     customer,
@@ -28,7 +30,7 @@ export const setCurrentUser = (user, impersonated = false) => ({
   },
 });
 
-export const setCurrentResource = (resource) => ({
+export const setCurrentResource = (resource: Resource) => ({
   type: SET_CURRENT_RESOURCE,
   payload: {
     resource,

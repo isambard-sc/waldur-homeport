@@ -45,12 +45,10 @@ export const FormProcessorStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Processor')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       loading={isLoading}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
     >
       <Field
         name="limits.cpu"

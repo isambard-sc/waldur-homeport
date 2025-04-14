@@ -11,7 +11,7 @@ export const IdentityProviderIndicator = ({ user, hasLabel = false }) => (
       </Tip>
     </div>
     <div className="d-flex flex-column">
-      <span className="text-grey-500 text-hover-primary fw-bold">
+      <span className="text-gray-500 text-hover-primary fw-bold">
         {user.identity_provider_label}
       </span>
       {hasLabel && (

@@ -1,7 +1,6 @@
 import { ErrorBoundary } from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UIRouter, UIView } from '@uirouter/react';
-import { AxiosError } from 'axios';
 import { FunctionComponent } from 'react';
 import { Provider } from 'react-redux';
 import { useAsync } from 'react-use';
@@ -23,8 +22,8 @@ import { ThemeProvider } from './theme/ThemeProvider';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      onError: (error) => {
-        if ((error as AxiosError)?.response?.status == 404) {
+      onError: (error: any) => {
+        if (error?.response?.status == 404) {
           router.stateService.go('errorPage.notFound');
         }
       },

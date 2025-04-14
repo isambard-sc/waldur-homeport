@@ -1,11 +1,11 @@
+import { openstackSubnetsPull } from 'waldur-js-client';
+
 import { PullActionItem } from '@waldur/resource/actions/PullActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-import { pullSubnet } from '../api';
-
 export const PullSubnetAction: ActionItemType = ({ resource, refetch }) => (
   <PullActionItem
-    apiMethod={pullSubnet}
+    apiMethod={(uuid: string) => openstackSubnetsPull({ path: { uuid } })}
     resource={resource}
     refetch={refetch}
   />

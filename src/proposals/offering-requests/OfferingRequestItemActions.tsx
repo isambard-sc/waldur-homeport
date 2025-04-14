@@ -1,18 +1,18 @@
 import { useMutation } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
+import {
+  proposalRequestedOfferingsAccept,
+  proposalRequestedOfferingsCancel,
+  ProviderRequestedOffering,
+} from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import {
-  acceptCallOfferingRequest,
-  rejectCallOfferingRequest,
-} from '@waldur/proposals/api';
-import { CallOffering } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
 
 interface OfferingRequestItemActionsProps {
-  row: CallOffering;
+  row: ProviderRequestedOffering;
   fetch;
 }
 
@@ -39,7 +39,7 @@ export const OfferingRequestItemActions = ({
         return;
       }
       try {
-        await acceptCallOfferingRequest(row.uuid);
+        await proposalRequestedOfferingsAccept({ path: { uuid: row.uuid } });
         fetch();
         dispatch(showSuccess(translate('Offering request has been accepted.')));
       } catch (response) {
@@ -70,7 +70,7 @@ export const OfferingRequestItemActions = ({
         return;
       }
       try {
-        await rejectCallOfferingRequest(row.uuid);
+        await proposalRequestedOfferingsCancel({ path: { uuid: row.uuid } });
         fetch();
         dispatch(showSuccess(translate('Offering request has been rejected.')));
       } catch (response) {

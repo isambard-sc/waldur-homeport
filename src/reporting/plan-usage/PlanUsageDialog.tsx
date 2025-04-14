@@ -1,14 +1,13 @@
 import { EChartsOption } from 'echarts';
 import { DateTime } from 'luxon';
+import { PlanUsageResponse } from 'waldur-js-client';
 
 import { EChart } from '@waldur/core/EChart';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 
-import { PlanUsageRowProps } from './types';
-
-const getChartData = (props: PlanUsageRowProps): EChartsOption => ({
+const getChartData = (props: { row: PlanUsageResponse }): EChartsOption => ({
   toolbox: {
     show: true,
     showTitle: false,
@@ -40,7 +39,9 @@ const getChartData = (props: PlanUsageRowProps): EChartsOption => ({
   ],
 });
 
-export const PlanUsageDialog = (props: { resolve: PlanUsageRowProps }) => (
+export const PlanUsageDialog = (props: {
+  resolve: { row: PlanUsageResponse };
+}) => (
   <ModalDialog
     title={translate('Plan capacity')}
     footer={<CloseDialogButton label={translate('Ok')} />}

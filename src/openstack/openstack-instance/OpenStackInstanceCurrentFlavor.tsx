@@ -1,9 +1,8 @@
 import { FunctionComponent } from 'react';
+import { OpenStackInstance } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { formatFlavor } from '@waldur/resource/utils';
-
-import { OpenStackInstance } from './types';
 
 interface OpenStackInstanceCurrentFlavorProps {
   context: {

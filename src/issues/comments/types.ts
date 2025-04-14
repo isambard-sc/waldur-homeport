@@ -1,4 +1,4 @@
-import { Issue } from '../list/types';
+import { Issue } from 'waldur-js-client';
 
 export interface Comment {
   author_name: string;
@@ -8,7 +8,7 @@ export interface Comment {
   backend_id: string;
   created: string;
   description: string;
-  is_public: boolean;
+  is_public?: boolean;
   issue: string;
   issue_key: string;
   url: string;
@@ -23,7 +23,6 @@ export interface IssueCommentState {
   items: Comment[];
   deleting: { [key: string]: boolean };
   issue: Issue;
-  uiDisabled: boolean;
   getErred: boolean;
 }
 
@@ -35,7 +34,6 @@ export interface Payload {
   formId?: string;
   commentId?: string;
   issue?: Issue;
-  uiDisabled?: boolean;
   uuid: string;
   resolve(): void;
   reject(): void;

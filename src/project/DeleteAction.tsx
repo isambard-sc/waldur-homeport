@@ -13,7 +13,7 @@ export const DeleteAction = ({ project, refetch }) => {
       title={translate('Delete')}
       action={callback}
       disabled={!canDelete}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
     />
   );
 };

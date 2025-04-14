@@ -1,18 +1,20 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
+import { Invitation, UserInvitationsListData } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { formatInvitationState } from '@waldur/invitations/InvitationStateFilter';
-import { RoleField } from '@waldur/invitations/RoleField';
 import { useTitle } from '@waldur/navigation/title';
+import { RoleType } from '@waldur/permissions/types';
 import { formatRoleType } from '@waldur/permissions/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
+import { RoleField } from '@waldur/user/affiliations/RoleField';
 
 import { InvitationScopeLink } from './InvitationScopeLink';
 import { InvitationsFilter } from './InvitationsFilter';
@@ -20,7 +22,7 @@ import { InvitationsFilter } from './InvitationsFilter';
 export const InvitationList: FunctionComponent = () => {
   useTitle(translate('Invitations'));
   const filterForm: any = useSelector(getFormValues('AdminInvitationsFilter'));
-  const filter = useMemo(
+  const filter = useMemo<UserInvitationsListData['query']>(
     () => ({
       state: filterForm?.state?.map((option) => option.value),
       role_uuid: filterForm?.role?.uuid,
@@ -37,7 +39,7 @@ export const InvitationList: FunctionComponent = () => {
   });
 
   return (
-    <Table
+    <Table<Invitation>
       {...props}
       filters={<InvitationsFilter />}
       columns={[
@@ -53,11 +55,11 @@ export const InvitationList: FunctionComponent = () => {
         },
         {
           title: translate('Scope type'),
-          render: ({ row }) => formatRoleType(row.scope_type),
+          render: ({ row }) => formatRoleType(row.scope_type as RoleType),
           filter: 'scope_type',
           inlineFilter: (row) => ({
             value: row.scope_type,
-            label: formatRoleType(row.scope_type),
+            label: formatRoleType(row.scope_type as RoleType),
           }),
         },
         {
@@ -66,7 +68,7 @@ export const InvitationList: FunctionComponent = () => {
         },
         {
           title: translate('Role'),
-          render: ({ row }) => <RoleField invitation={row} />,
+          render: RoleField,
           filter: 'role',
           inlineFilter: (row) =>
             ENV.roles.find((role) => role.name === row.role_name),

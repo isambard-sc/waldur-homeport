@@ -3,7 +3,9 @@ import { Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
 import { change, Field, formValueSelector, isSubmitting } from 'redux-form';
+import { supportTemplatesList, Template } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { InputGroup } from '@waldur/customer/create/InputGroup';
 import { SelectField, TextField } from '@waldur/form';
@@ -11,7 +13,6 @@ import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
 import { RootState } from '@waldur/store/reducers';
 
-import { getTemplates, IssueTemplate } from '../api';
 import { ISSUE_IDS } from '../types/constants';
 
 import { AttachmentsGroup } from './AttachmentsGroup';
@@ -25,12 +26,14 @@ export const IssueDescriptionTab = () => {
   const dispatch = useDispatch();
   const submitting = useSelector(isSubmitting(ISSUE_CREATION_FORM_ID));
 
-  const templateState = useAsync(getTemplates);
+  const templateState = useAsync(() =>
+    getAllPages((page) => supportTemplatesList({ query: { page } })),
+  );
 
   const issueType = useSelector<RootState, IssueTypeOption>((state) =>
     selector(state, 'type'),
   );
-  const issueTemplate = useSelector<RootState, IssueTemplate>((state) =>
+  const issueTemplate = useSelector<RootState, Template>((state) =>
     selector(state, 'template'),
   );
 

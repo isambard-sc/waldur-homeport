@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { customersPartialUpdate } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
@@ -10,8 +11,6 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
-
-import { updateOrganization } from './api';
 
 const SetLocationDialog = lazyComponent(() =>
   import('@waldur/map/SetLocationDialog').then((module) => ({
@@ -34,7 +33,13 @@ export const SetLocationButton: FC<SetLocationButtonProps> = ({ customer }) => {
   const currentCustomer = useSelector(getCustomer);
   const setOrganizationLocation = async (payload: SetLocationPayload) => {
     try {
-      const response = await updateOrganization(payload);
+      const response = await customersPartialUpdate({
+        path: { uuid: payload.uuid },
+        body: {
+          latitude: payload.latitude,
+          longitude: payload.longitude,
+        },
+      });
       dispatch(showSuccess(translate('Location has been saved successfully.')));
       dispatch(closeModalDialog());
       if (customer.uuid === currentCustomer?.uuid) {

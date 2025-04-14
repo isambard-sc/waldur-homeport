@@ -1,14 +1,14 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
-import { useEffectOnce } from 'react-use';
+import { useAsync } from 'react-use';
+import { PaymentProfile, paymentsList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { formatDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
-import { getTotalOfSumPaid } from '@waldur/customer/payments/api';
 import { translate } from '@waldur/i18n';
 import { getActiveFixedPricePaymentProfile } from '@waldur/invoices/details/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
-import { PaymentProfile } from '@waldur/workspace/types';
 
 interface AgreementInfoProps {
   paymentProfiles?: PaymentProfile[];
@@ -19,16 +19,18 @@ export const AgreementInfo: FunctionComponent<AgreementInfoProps> = (props) => {
   const activeFixedPricePaymentProfile = getActiveFixedPricePaymentProfile(
     customer ? customer.payment_profiles : props.paymentProfiles,
   );
-  const [totalOfSumPaid, setTotalOfSumPaid] = useState();
-  useEffectOnce(() => {
+  const { value: totalOfSumPaid } = useAsync(async () => {
     if (activeFixedPricePaymentProfile) {
-      (async () => {
-        setTotalOfSumPaid(
-          await getTotalOfSumPaid(activeFixedPricePaymentProfile.uuid),
-        );
-      })();
+      const response = await getAllPages((page) =>
+        paymentsList({
+          query: { page, profile_uuid: activeFixedPricePaymentProfile.uuid },
+        }),
+      );
+      return response
+        .map((payment) => parseInt(payment.sum))
+        .reduce((a, b) => a + b);
     }
-  });
+  }, [activeFixedPricePaymentProfile]);
   return (
     <>
       {activeFixedPricePaymentProfile ? (

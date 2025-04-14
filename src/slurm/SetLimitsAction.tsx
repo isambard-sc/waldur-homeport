@@ -27,7 +27,7 @@ const useSetLimits = ({ resource, refetch }) => {
     action,
     tooltip,
     disabled,
-    iconNode: <PencilSimple />,
+    iconNode: <PencilSimple weight="bold" />,
   };
 };
 

@@ -3,7 +3,7 @@ import { Fragment, useCallback, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Field } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { Tip } from '@waldur/core/Tooltip';
 import { usePagination } from '@waldur/core/usePagination';
 import { email, required } from '@waldur/core/validators';
@@ -14,10 +14,6 @@ import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
 import { TablePagination } from '@waldur/table/TablePagination';
 
-import { LoadUserDetailsButton } from '../LoadUserDetailsButton';
-import { GroupInviteRow, StoredUserDetails } from '../types';
-import { UserDetailsGroup } from '../UserDetailsGroup';
-
 import { RoleAndProjectSelectField } from './RoleAndProjectSelectField';
 
 export const EmailsListGroup = ({
@@ -25,8 +21,6 @@ export const EmailsListGroup = ({
   roles,
   customer,
   project,
-  fetchUserDetails,
-  usersDetails,
   disabled,
 }) => {
   const [warn, setWarn] = useState(false);
@@ -64,19 +58,6 @@ export const EmailsListGroup = ({
     refreshPageOnRemove();
   };
 
-  const getUserDetails = useCallback(
-    (user: GroupInviteRow): StoredUserDetails =>
-      usersDetails.find((u) => u.civil_number === user.civil_number),
-    [],
-  );
-
-  const isRoleDisabled = useCallback(
-    (userDetails: StoredUserDetails) =>
-      isFeatureVisible(InvitationsFeatures.require_user_details) &&
-      !userDetails,
-    [],
-  );
-
   return (
     <div className="mb-3">
       <div id="emails-list-group">
@@ -103,21 +84,6 @@ export const EmailsListGroup = ({
                       </Tip>
                     </td>
                   )}
-                  {isFeatureVisible(InvitationsFeatures.show_tax_number) && (
-                    <td className="tax-column">
-                      {ENV.plugins.WALDUR_CORE.INVITATION_TAX_NUMBER_LABEL ||
-                        translate('Tax number')}
-                      <Tip
-                        label={translate(
-                          'Must start with a country prefix ie EE34501234215',
-                        )}
-                        id="taxTooltip"
-                      >
-                        {' '}
-                        <Question />
-                      </Tip>
-                    </td>
-                  )}
                   <td className="role-column">{translate('Role')}</td>
                   <td className="w-5px" />
                 </tr>
@@ -125,7 +91,6 @@ export const EmailsListGroup = ({
               <tbody>
                 {visibleItems.map((user, i) => {
                   if (!user) return null;
-                  const userDetails = getUserDetails(fields.get(i));
                   return (
                     <Fragment key={user}>
                       <tr className="fs-6">
@@ -146,7 +111,6 @@ export const EmailsListGroup = ({
                               name={`${user}.civil_number`}
                               placeholder={translate('e.g. EE123456789')}
                               component={InputField}
-                              className={null}
                               disabled={disabled}
                               validate={
                                 isFeatureVisible(
@@ -158,41 +122,12 @@ export const EmailsListGroup = ({
                             />
                           </td>
                         )}
-                        {isFeatureVisible(
-                          InvitationsFeatures.show_tax_number,
-                        ) && (
-                          <td>
-                            <Field
-                              name={`${user}.tax_number`}
-                              placeholder={translate('e.g. EE123456789')}
-                              component={InputField}
-                              className={null}
-                              disabled={disabled}
-                              validate={
-                                isFeatureVisible(
-                                  InvitationsFeatures.tax_number_required,
-                                )
-                                  ? required
-                                  : undefined
-                              }
-                            />
-                            {isFeatureVisible(
-                              InvitationsFeatures.require_user_details,
-                            ) && (
-                              <LoadUserDetailsButton
-                                loading={disabled}
-                                onClick={() => fetchUserDetails(fields.get(i))}
-                              />
-                            )}
-                          </td>
-                        )}
                         <td className="role-column">
                           <RoleAndProjectSelectField
                             name={`${user}.role_project`}
                             roles={roles}
                             customer={customer}
                             currentProject={project}
-                            disabled={isRoleDisabled(userDetails)}
                           />
                         </td>
                         <td>
@@ -208,15 +143,6 @@ export const EmailsListGroup = ({
                           </Button>
                         </td>
                       </tr>
-                      {userDetails && (
-                        <tr>
-                          <td colSpan={10}>
-                            <UserDetailsGroup
-                              userDetails={userDetails.details}
-                            />
-                          </td>
-                        </tr>
-                      )}
                     </Fragment>
                   );
                 })}
@@ -232,7 +158,7 @@ export const EmailsListGroup = ({
             onClick={addRow}
           >
             <div className="svg-icon svg-icon-2">
-              <Plus />
+              <Plus weight="bold" />
             </div>
             {fields.length > 0
               ? translate('Add another user')

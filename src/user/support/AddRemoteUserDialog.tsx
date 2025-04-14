@@ -1,11 +1,10 @@
 import { useDispatch } from 'react-redux';
+import { remoteEduteams } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { addRemoteUser } from './api';
 
 export const AddRemoteUserDialog = ({ resolve: { refetch } }) => {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ export const AddRemoteUserDialog = ({ resolve: { refetch } }) => {
       ]}
       submitForm={async (formData) => {
         try {
-          await addRemoteUser(formData.cuid);
+          await remoteEduteams({ body: { cuid: formData.cuid } });
           dispatch(showSuccess(translate('User has been successfully added.')));
           if (refetch) {
             await refetch();

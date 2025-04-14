@@ -3,6 +3,7 @@ import { useState, createElement, FC, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { change, getFormValues } from 'redux-form';
 
+import { ProgressStep } from '@waldur/core/ProgressSteps';
 import { WizardFormStepProps } from '@waldur/form/WizardForm';
 import { translate } from '@waldur/i18n';
 
@@ -12,7 +13,7 @@ interface WizardFormContainerProps {
   onSubmit: WizardFormStepProps['onSubmit'];
   submitLabel?: string;
   nextLabel?: string;
-  steps: string[];
+  steps: ProgressStep[];
   wizardForms: FC<WizardFormStepProps>[];
   initialValues?: any;
   data?: any;

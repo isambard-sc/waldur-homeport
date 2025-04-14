@@ -1,9 +1,10 @@
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
+import { marketplaceResourcesDetailsRetrieve } from 'waldur-js-client';
+import { Resource } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { getResourceDetails } from '@waldur/marketplace/common/api';
 import { PlanDetailsLink } from '@waldur/marketplace/details/plan/PlanDetailsLink';
 import { Field } from '@waldur/resource/summary';
 import { ResourceComponentsSummary } from '@waldur/resource/summary/ResourceComponentsSummary';
@@ -15,7 +16,6 @@ import {
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
 import { KeyValueButton } from '../KeyValueButton';
-import { Resource } from '../types';
 
 const StaticResourceSummary: FunctionComponent<{ row }> = ({ row }) => (
   <ExpandableContainer hasMultiSelect asTable>
@@ -40,7 +40,10 @@ const StaticResourceSummary: FunctionComponent<{ row }> = ({ row }) => (
 
 const DynamicResourceSummary: FunctionComponent<{ row }> = ({ row }) => {
   const { value, error, loading } = useAsync(
-    () => getResourceDetails(row.uuid),
+    () =>
+      marketplaceResourcesDetailsRetrieve({
+        path: { uuid: row.uuid },
+      }),
     [row],
   );
 
@@ -55,7 +58,7 @@ const DynamicResourceSummary: FunctionComponent<{ row }> = ({ row }) => {
   return (
     <ResourceSummaryResources
       resource={{
-        ...value,
+        ...value.data,
         end_date: row.end_date,
         parent_uuid: row.parent_uuid,
         parent_name: row.parent_name,

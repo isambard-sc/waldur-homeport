@@ -1,4 +1,4 @@
-import { DotsThreeVertical, Spinner } from '@phosphor-icons/react';
+import { CaretDown, DotsThreeVertical, Spinner } from '@phosphor-icons/react';
 import { FunctionComponent, PropsWithChildren } from 'react';
 import { Dropdown, DropdownProps } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';
@@ -39,10 +39,13 @@ export const TableDropdownToggle = ({
     <Dropdown.Toggle
       variant={variant}
       size="sm"
-      className={className}
+      className={className + ' btn-icon-right no-arrow'}
       disabled={disabled}
     >
       {label || translate('Actions')}
+      <span className="svg-icon svg-icon-4 rotate-180">
+        <CaretDown weight="bold" />
+      </span>
     </Dropdown.Toggle>
   ) : (
     <Dropdown.Toggle
@@ -72,7 +75,7 @@ export const ActionsDropdownComponent: FunctionComponent<
   className,
   ...rest
 }) => (
-  <Dropdown onToggle={onToggle} {...rest}>
+  <Dropdown onToggle={onToggle} drop="start" align="end" {...rest}>
     <TableDropdownToggle
       label={label}
       labeled={labeled}
@@ -82,16 +85,20 @@ export const ActionsDropdownComponent: FunctionComponent<
     />
     <PortalDropdown>
       <Dropdown.Menu
-        popperConfig={{
-          modifiers: [
-            {
-              name: 'flip',
-              options: {
-                fallbackPlacements: ['top', 'left', 'bottom'],
-              },
-            },
-          ],
-        }}
+        popperConfig={
+          rest.drop
+            ? undefined
+            : {
+                modifiers: [
+                  {
+                    name: 'flip',
+                    options: {
+                      fallbackPlacements: ['top', 'left', 'bottom'],
+                    },
+                  },
+                ],
+              }
+        }
       >
         {children}
       </Dropdown.Menu>

@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 
-import { MetronicModalDialog } from './MetronicModalDialog';
+import { ModalDialog } from './ModalDialog';
 
 interface DeleteConfirmationDialogProps {
   resolve: {
@@ -36,11 +36,11 @@ export const DeleteConfirmationDialog: React.FC<
   };
 
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={title}
       iconNode={<WarningCircle weight="bold" />}
       iconColor="danger"
-      bodyClassName="text-grey-500 pt-2"
+      bodyClassName="text-gray-500 pt-2"
       footer={
         <>
           <Button
@@ -61,6 +61,6 @@ export const DeleteConfirmationDialog: React.FC<
       }
     >
       {body}
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

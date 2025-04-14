@@ -1,3 +1,4 @@
+import { Robot } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -37,6 +38,10 @@ export const CreateRobotAccountAction: ActionItemType = ({ resource }) => {
   }
 
   return (
-    <ActionItem title={translate('Create robot account')} action={callback} />
+    <ActionItem
+      title={translate('Create robot account')}
+      action={callback}
+      iconNode={<Robot weight="bold" />}
+    />
   );
 };

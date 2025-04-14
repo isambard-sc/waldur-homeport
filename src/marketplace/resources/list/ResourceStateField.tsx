@@ -1,7 +1,7 @@
+import { Resource } from 'waldur-js-client';
+
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
-
-import { Resource } from '../types';
 
 export const ResourceStateField = ({
   resource,
@@ -24,10 +24,10 @@ export const ResourceStateField = ({
   const backendState = resource.backend_metadata?.state;
   const isActive =
     ['Creating', 'Updating', 'Terminating'].includes(resource.state) ||
-    (backendState && !['OK', 'Erred', 'Deleted'].includes(backendState));
-  const isErred = [runtimeState, resource.state, backendState].includes(
-    'Erred',
-  );
+    (backendState && !['OK', 'ERRED', 'Deleted'].includes(backendState));
+  const isErred =
+    [runtimeState, resource.state, backendState].includes('Erred') ||
+    [runtimeState, resource.state, backendState].includes('ERRED');
   const isDead = resource.state === 'Terminated' || backendState === 'Deleted';
 
   const state = runtimeState || backendState || resource.state;
@@ -41,7 +41,7 @@ export const ResourceStateField = ({
             ? 'warning'
             : ['SHUTOFF', 'STOPPED', 'SUSPENDED'].includes(runtimeState)
               ? 'default'
-              : 'primary'
+              : 'success'
       }
       active={isActive}
       roundless={roundless}

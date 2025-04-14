@@ -15,7 +15,7 @@ vi.mock('@waldur/features/connect', () => ({
   isFeatureVisible: () => true,
 }));
 
-vi.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/core/config', () => ({
   ENV: {
     plugins: {
       WALDUR_CORE: {

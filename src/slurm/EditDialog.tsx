@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { slurmAllocationsUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import {
@@ -7,8 +8,6 @@ import {
 } from '@waldur/resource/actions/base';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { UpdateResourceDialog } from '@waldur/resource/actions/UpdateResourceDialog';
-
-import { updateAllocation } from './api';
 
 const getFields = () => [createNameField(), createDescriptionField()];
 
@@ -23,7 +22,9 @@ export const EditDialog: FC<ActionDialogProps> = ({
         name: resource.name,
         description: resource.description,
       }}
-      updateResource={updateAllocation}
+      updateResource={(id, formData) =>
+        slurmAllocationsUpdate({ path: { uuid: id }, body: formData })
+      }
       verboseName={translate('SLURM allocation')}
       refetch={refetch}
     />

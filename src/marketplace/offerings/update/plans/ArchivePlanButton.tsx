@@ -1,9 +1,9 @@
 import { Trash } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { marketplacePlansArchive } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { archivePlan } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
@@ -26,7 +26,7 @@ export const ArchivePlanButton = ({ plan, refetch }) => {
       return;
     }
     try {
-      await archivePlan(plan.uuid);
+      await marketplacePlansArchive({ path: { uuid: plan.uuid } });
       await refetch();
       dispatch(showSuccess(translate('Plan has been archived.')));
     } catch (error) {

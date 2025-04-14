@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
@@ -7,14 +8,14 @@ import { translate } from '@waldur/i18n';
 import heroBg from '@waldur/proposals/proposal-calls.png';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { Call, Round } from '../types';
+import { Call } from '../types';
 import { getRoundStatus } from '../utils';
 
 import { RoundPageHeaderBody } from './RoundPageHeaderBody';
 import { RoundQuotas } from './RoundQuotas';
 
 interface RoundPageHeroProps {
-  round: Round;
+  round: ProtectedRound;
   call: Call;
 }
 
@@ -47,7 +48,7 @@ export const RoundPageHero: FC<RoundPageHeroProps> = ({ round, call }) => {
           state="protected-call.main"
           params={{ call_uuid: call.uuid }}
           label={translate('See call')}
-          className="btn btn-light w-50"
+          className="btn btn-outline btn-outline-default w-50"
         />
       }
       quickBody={<RoundQuotas round={round} />}

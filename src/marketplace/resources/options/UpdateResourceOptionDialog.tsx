@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  marketplaceResourcesUpdateOptions,
+  OptionField,
+} from 'waldur-js-client';
+import { Resource } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { submitResourceOptions } from '@waldur/marketplace/common/api';
 import { OptionsForm } from '@waldur/marketplace/common/OptionsForm';
-import { Offering, OptionField } from '@waldur/marketplace/types';
+import { Offering } from '@waldur/marketplace/types';
 import { ActionDialog } from '@waldur/modal/ActionDialog';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import { Resource } from '../types';
 
 interface UpdateResourceOptionDialogProps {
   resolve: {
@@ -47,8 +49,11 @@ export const UpdateResourceOptionDialog = connect(
     const dispatch = useDispatch();
     const submitForm = async (formData) => {
       try {
-        await submitResourceOptions(props.resolve.resource.uuid, {
-          options: formData.attributes,
+        await marketplaceResourcesUpdateOptions({
+          path: { uuid: props.resolve.resource.uuid },
+          body: {
+            options: formData.attributes,
+          },
         });
         dispatch(showSuccess(translate('Options have been updated')));
         if (props.resolve.refetch) {

@@ -34,5 +34,5 @@ spec:
           value: "${CI_MERGE_REQUEST_ID}/"
         ports:
         - name: http
-          containerPort: 80
+          containerPort: 8080
           protocol: TCP

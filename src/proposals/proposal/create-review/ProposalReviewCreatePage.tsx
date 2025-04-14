@@ -2,8 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { createRef, useCallback, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  proposalProposalsRetrieve,
+  proposalReviewsPartialUpdate,
+  proposalReviewsRetrieve,
+  proposalReviewsSubmit,
+} from 'waldur-js-client';
 
-import { Badge } from '@waldur/core/Badge';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -17,21 +22,14 @@ import {
   openModalDialog,
   waitForConfirmation,
 } from '@waldur/modal/actions';
-import { useFullPage } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
-import {
-  getProposal,
-  getProposalReview,
-  submitProposalReview,
-  updateProposalReview,
-} from '@waldur/proposals/api';
 import { PROPOSAL_UPDATE_REVIEW_FORM_ID } from '@waldur/proposals/constants';
 import { ProposalReview } from '@waldur/proposals/types';
-import { formatReviewState } from '@waldur/proposals/utils';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { CreatePageSidebar } from './CreatePageSidebar';
+import { ReviewHeader } from './ReviewHeader';
 import { createReviewSteps } from './steps/steps';
 
 const CommentFormDialog = lazyComponent(() =>
@@ -40,15 +38,18 @@ const CommentFormDialog = lazyComponent(() =>
   })),
 );
 
-const loadData = async (reviewUuid) => {
-  const review = await getProposalReview(reviewUuid);
-  const proposal = await getProposal(getUUID(review.proposal));
+const loadData = async (reviewUuid: string) => {
+  const review = (await proposalReviewsRetrieve({
+    path: { uuid: reviewUuid },
+  }).then((response) => response.data)) as ProposalReview;
+  const proposal = await proposalProposalsRetrieve({
+    path: { uuid: getUUID(review.proposal) },
+  }).then((response) => response.data);
   return { review, proposal };
 };
 
 export const ProposalReviewCreatePage = (props) => {
   useTitle(translate('Create review'));
-  useFullPage();
 
   const {
     params: { review_uuid },
@@ -78,37 +79,37 @@ export const ProposalReviewCreatePage = (props) => {
     (_, i) => stepRefs.current[i] ?? createRef(),
   );
 
-  const submit = useCallback(
-    async (formData, dispatch) => {
-      try {
-        await waitForConfirmation(
-          dispatch,
-          translate('Confirm your review'),
-          translate(
-            'Are you sure you want to submit this review for the {name} proposal?',
-            {
-              name: <b>{data.proposal.name}</b>,
-            },
-            formatJsxTemplate,
-          ),
-        );
-      } catch {
-        return;
-      }
-      return submitProposalReview(formData, data.review.uuid)
-        .then(() => {
-          dispatch(
-            showSuccess(translate('Proposal review submitted successfully')),
-          );
-        })
-        .catch((error) => {
-          dispatch(showErrorResponse(error, translate('Something went wrong')));
-        });
-    },
-    [data, router, user],
-  );
-
   const dispatch = useDispatch();
+
+  const submit = useCallback(async () => {
+    try {
+      await waitForConfirmation(
+        dispatch,
+        translate('Confirm your review'),
+        translate(
+          'Are you sure you want to submit this review for the {name} proposal?',
+          {
+            name: <b>{data.proposal.name}</b>,
+          },
+          formatJsxTemplate,
+        ),
+      );
+    } catch {
+      return;
+    }
+    try {
+      await proposalReviewsSubmit({
+        path: { uuid: data.review.uuid },
+      });
+      dispatch(
+        showSuccess(translate('Proposal review submitted successfully')),
+      );
+      refetch();
+    } catch (error) {
+      dispatch(showErrorResponse(error, translate('Something went wrong')));
+    }
+  }, [data, router, user]);
+
   const openCommentFormDialog = useCallback(
     ({ commentField, label }) =>
       dispatch(
@@ -116,23 +117,22 @@ export const ProposalReviewCreatePage = (props) => {
           resolve: {
             title: label,
             value: reviewObject[commentField],
-            onSubmit: (formData) => {
-              return updateProposalReview(
-                { [commentField]: formData.comment },
-                data.review.uuid,
-              )
-                .then((res) => {
-                  setReviewObject(res.data);
-                  dispatch(closeModalDialog());
-                })
-                .catch((error) => {
-                  dispatch(
-                    showErrorResponse(error, translate('Something went wrong')),
-                  );
+            onSubmit: async (formData) => {
+              try {
+                const res = await proposalReviewsPartialUpdate({
+                  path: { uuid: data.review.uuid },
+                  body: { [commentField]: formData.comment },
                 });
+                setReviewObject(res.data);
+                dispatch(closeModalDialog());
+              } catch (error) {
+                dispatch(
+                  showErrorResponse(error, translate('Something went wrong')),
+                );
+              }
             },
           },
-          size: 'md',
+          size: 'sm',
         }),
       ),
     [dispatch, data, setReviewObject, reviewObject],
@@ -145,46 +145,43 @@ export const ProposalReviewCreatePage = (props) => {
   }
 
   return (
-    <PageBarProvider scrollTrackSide="top" scrollOffset={200}>
+    <PageBarProvider scrollOffset={100}>
       <Form form={PROPOSAL_UPDATE_REVIEW_FORM_ID} onSubmit={submit}>
-        <div className="container-fluid">
-          <div className="my-8 border-bottom">
-            <div className="hstack gap-4 mb-2">
-              <h1 className="mb-0">{data.review.proposal_name}</h1>
-              <Badge variant="default" outline pill>
-                {formatReviewState(data.review.state)}
-              </Badge>
-            </div>
-            <p className="text-grey-500 mb-8">
-              {translate(
-                'Please review the application below. If you want to add a comment to a specific field, click on the comment action in the corresponding field.',
-              )}
-            </p>
-          </div>
-        </div>
-        <SidebarLayout.Container>
-          <SidebarLayout.Body>
-            {formSteps.map((step, i) => (
-              <div ref={stepRefs.current[i]} key={step.id}>
-                <step.component
-                  id={step.id}
-                  title={step.label}
-                  observed={false}
-                  change={props.change}
-                  params={{
-                    proposal: data.proposal,
-                    reviews: data.review ? [data.review] : null,
-                    onAddCommentClick: openCommentFormDialog,
-                    readOnly: true,
-                  }}
-                />
+        {({ submitting }) => (
+          <>
+            <SidebarLayout.Header className="pb-5">
+              <div className="w-100">
+                <ReviewHeader review={data.review} />
               </div>
-            ))}
-          </SidebarLayout.Body>
-          <SidebarLayout.Sidebar transparent>
-            <CreatePageSidebar />
-          </SidebarLayout.Sidebar>
-        </SidebarLayout.Container>
+            </SidebarLayout.Header>
+            <SidebarLayout.Container>
+              <SidebarLayout.Body>
+                {formSteps.map((step, i) => (
+                  <div ref={stepRefs.current[i]} key={step.id}>
+                    <step.component
+                      id={step.id}
+                      title={step.label}
+                      change={props.change}
+                      params={{
+                        proposal: data.proposal,
+                        reviews: reviewObject ? [reviewObject] : [],
+                        onAddCommentClick: openCommentFormDialog,
+                        readOnly: true,
+                      }}
+                    />
+                  </div>
+                ))}
+              </SidebarLayout.Body>
+              <SidebarLayout.Sidebar transparent>
+                <CreatePageSidebar
+                  review={reviewObject}
+                  submitting={submitting}
+                  refetch={refetch}
+                />
+              </SidebarLayout.Sidebar>
+            </SidebarLayout.Container>
+          </>
+        )}
       </Form>
     </PageBarProvider>
   );

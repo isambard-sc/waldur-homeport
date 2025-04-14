@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import { FunctionComponent } from 'react';
+import { NestedSection as Section } from 'waldur-js-client';
 
 import { AttributeCell } from '@waldur/marketplace/common/AttributeCell';
-import { Section } from '@waldur/marketplace/types';
 
 import { isValidAttribute } from './utils';
 

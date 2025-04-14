@@ -1,10 +1,10 @@
+import { openstackSnapshotsDestroy } from 'waldur-js-client';
+
 import { validateState } from '@waldur/resource/actions/base';
 import { DestroyActionItem } from '@waldur/resource/actions/DestroyActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-import { destroySnapshot } from '../api';
-
-const validators = [validateState('OK', 'Erred')];
+const validators = [validateState('OK', 'ERRED')];
 
 export const DestroySnapshotAction: ActionItemType = ({
   resource,
@@ -14,6 +14,6 @@ export const DestroySnapshotAction: ActionItemType = ({
     validators={validators}
     resource={resource}
     refetch={refetch}
-    apiMethod={destroySnapshot}
+    apiMethod={(id) => openstackSnapshotsDestroy({ path: { uuid: id } })}
   />
 );

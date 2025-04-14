@@ -1,4 +1,6 @@
-import { ENV } from '@waldur/configs/default';
+import { Resource } from 'waldur-js-client';
+
+import { ENV } from '@waldur/core/config';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { CreatedField } from '@waldur/resource/summary/CreatedField';
@@ -6,7 +8,6 @@ import { formatResourceType } from '@waldur/resource/utils';
 
 import { KeyValueButton } from '../KeyValueButton';
 import { ResourceStateField } from '../list/ResourceStateField';
-import { Resource } from '../types';
 
 import { PlanDetailsField } from './PlanDetailsField';
 

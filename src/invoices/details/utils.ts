@@ -1,12 +1,12 @@
 import { createSelector } from 'reselect';
+import { PaymentProfile } from 'waldur-js-client';
 
 import { getCustomer } from '@waldur/workspace/selectors';
-import { PaymentProfile } from '@waldur/workspace/types';
 
 import { InvoiceItem, InvoiceTableItem } from '../types';
 
 const getResourceKey = (item: InvoiceItem) =>
-  item.resource_uuid || item.details?.scope_uuid || item.details.resource_uuid;
+  item.resource_uuid || item.details.resource_uuid;
 
 export const groupInvoiceItems = (items: InvoiceItem[]): InvoiceTableItem[] => {
   const groupedByProjectAndResource = items.reduce<
@@ -20,6 +20,8 @@ export const groupInvoiceItems = (items: InvoiceItem[]): InvoiceTableItem[] => {
         resource_name:
           item.resource_name || item.details.resource_name || item.name,
         resource_uuid: resourceKey,
+        offering_name: item.details.offering_name,
+        offering_uuid: item.details.offering_uuid,
         project_name: item.project_name,
         project_uuid: item.project_uuid,
         service_provider_name: item.details.service_provider_name,

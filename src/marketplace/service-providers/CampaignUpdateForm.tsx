@@ -13,7 +13,7 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { DateField } from '@waldur/form/DateField';
 import { WizardStepIndicator } from '@waldur/form/WizardStepIndicator';
 import { translate } from '@waldur/i18n';
-import { offeringsAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { providerOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 import { CAMPAIGN_CREATE_FORM_ID } from '@waldur/marketplace/service-providers/constants';
 import { CampaignFormData } from '@waldur/marketplace/service-providers/types';
 
@@ -37,7 +37,7 @@ export const CampaignUpdateForm = enhance(({ submitting, step, setStep }) => (
       onSelect={setStep}
     />
     <form>
-      <Modal.Body className="scroll-y mx-5 mx-xl-15 my-7">
+      <Modal.Body className="scroll-y">
         {step === 0 ? (
           <FormContainer submitting={submitting} clearOnUnmount={false}>
             <StringField
@@ -74,7 +74,7 @@ export const CampaignUpdateForm = enhance(({ submitting, step, setStep }) => (
               label={translate('Offerings')}
               placeholder={translate('Select offerings...')}
               loadOptions={(query, prevOptions, page) =>
-                offeringsAutocomplete(
+                providerOfferingsAutocomplete(
                   { name: query, shared: true },
                   prevOptions,
                   page,

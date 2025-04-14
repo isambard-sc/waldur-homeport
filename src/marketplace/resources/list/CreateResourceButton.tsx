@@ -1,10 +1,11 @@
 import { FC, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { Project } from 'waldur-js-client';
 
 import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 const MarketplacePopup = lazyComponent(() =>
   import('@waldur/navigation/sidebar/marketplace-popup/MarketplacePopup').then(

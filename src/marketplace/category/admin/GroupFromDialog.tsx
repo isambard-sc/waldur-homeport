@@ -1,7 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { SubmissionError, reduxForm } from 'redux-form';
+import {
+  CategoryGroupRequest,
+  marketplaceCategoryGroupsCreate,
+  marketplaceCategoryGroupsPartialUpdate,
+} from 'waldur-js-client';
 
+import { fileSerializer, formDataOptions } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
 import { SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
@@ -13,14 +19,6 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { createCategoryGroup, updateCategoryGroup } from './api';
-
-interface FormData {
-  title: string;
-  description: string;
-  icon: any;
-}
-
 export const GroupFromDialog = connect<
   {},
   {},
@@ -30,48 +28,56 @@ export const GroupFromDialog = connect<
     ? { ...ownProps.resolve.categoryGroup }
     : undefined,
 }))(
-  reduxForm<FormData, { resolve: { categoryGroup?; refetch } }>({
+  reduxForm<CategoryGroupRequest, { resolve: { categoryGroup?; refetch } }>({
     form: 'CategoryGroupForm',
   })((props) => {
     const isEdit = Boolean(props.resolve.categoryGroup?.uuid);
 
     const processRequest = React.useCallback(
-      (values: FormData, dispatch) => {
-        let action;
-        if (isEdit) {
-          action = updateCategoryGroup(
-            values,
-            props.resolve.categoryGroup.uuid,
+      async (values: CategoryGroupRequest, dispatch) => {
+        try {
+          if (isEdit) {
+            await marketplaceCategoryGroupsPartialUpdate({
+              path: { uuid: props.resolve.categoryGroup.uuid },
+              body: {
+                title: values.title,
+                description: values.description,
+                icon: fileSerializer(values.icon),
+              },
+              ...formDataOptions,
+            });
+          } else {
+            await marketplaceCategoryGroupsCreate({
+              body: {
+                title: values.title,
+                description: values.description,
+                icon: fileSerializer(values.icon),
+              },
+              ...formDataOptions,
+            });
+          }
+          props.resolve.refetch();
+          dispatch(
+            showSuccess(
+              isEdit
+                ? translate('The category group has been updated.')
+                : translate('The category group has been created.'),
+            ),
           );
-        } else {
-          action = createCategoryGroup(values);
+          dispatch(closeModalDialog());
+        } catch (e) {
+          dispatch(
+            showErrorResponse(
+              e,
+              isEdit
+                ? translate('Unable to update category group.')
+                : translate('Unable to create category group.'),
+            ),
+          );
+          if (e.response && e.response.status === 400) {
+            throw new SubmissionError(e.response.data);
+          }
         }
-
-        return action
-          .then(() => {
-            props.resolve.refetch();
-            dispatch(
-              showSuccess(
-                isEdit
-                  ? translate('The category group has been updated.')
-                  : translate('The category group has been created.'),
-              ),
-            );
-            dispatch(closeModalDialog());
-          })
-          .catch((e) => {
-            dispatch(
-              showErrorResponse(
-                e,
-                isEdit
-                  ? translate('Unable to update category group.')
-                  : translate('Unable to create category group.'),
-              ),
-            );
-            if (e.response && e.response.status === 400) {
-              throw new SubmissionError(e.response.data);
-            }
-          });
       },
       [props.resolve],
     );
@@ -99,7 +105,7 @@ export const GroupFromDialog = connect<
             <ImageField
               label={translate('Icon')}
               name="icon"
-              initialValue={props.initialValues?.icon}
+              initialValue={props.initialValues?.icon as any as string}
             />
             <StringField
               label={translate('Title')}

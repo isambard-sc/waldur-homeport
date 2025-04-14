@@ -2,16 +2,20 @@ import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import {
+  MarketplacePlansUsageStatsListData,
+  PlanUsageResponse,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { PlanRemainingColumn } from '@waldur/marketplace/common/PlanRemainingColumn';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
-import { PlanUsageButton } from './PlanUsageButton';
 import { PlanUsageFilter } from './PlanUsageFilter';
-import { PlanUsageRowProps } from './types';
+import { PlanUsageRowActions } from './PlanUsageRowActions';
 
 export const PlanUsageList: FunctionComponent = () => {
   const filter = useSelector(mapStateToProps);
@@ -20,10 +24,10 @@ export const PlanUsageList: FunctionComponent = () => {
     fetchData: createFetcher('marketplace-plans/usage_stats'),
     filter,
   });
-  const columns = [
+  const columns: Column<PlanUsageResponse>[] = [
     {
       title: translate('Service provider'),
-      render: ({ row }: PlanUsageRowProps) => <>{row.customer_provider_name}</>,
+      render: ({ row }) => <>{row.customer_provider_name}</>,
       filter: 'provider',
       inlineFilter: (row) => ({
         customer_name: row.customer_provider_name,
@@ -33,7 +37,7 @@ export const PlanUsageList: FunctionComponent = () => {
     },
     {
       title: translate('Offering'),
-      render: ({ row }: PlanUsageRowProps) => <>{row.offering_name}</>,
+      render: ({ row }) => <>{row.offering_name}</>,
       filter: 'offering',
       inlineFilter: (row) => ({
         name: row.offering_name,
@@ -43,19 +47,19 @@ export const PlanUsageList: FunctionComponent = () => {
     },
     {
       title: translate('Plan'),
-      render: ({ row }: PlanUsageRowProps) => <>{row.plan_name}</>,
+      render: ({ row }) => <>{row.plan_name}</>,
       export: 'plan_name',
     },
     {
       title: translate('Active count'),
-      render: ({ row }: PlanUsageRowProps) => <>{row.usage}</>,
+      render: ({ row }) => <>{row.usage}</>,
       orderField: 'usage',
       exportTitle: translate('Active plan count'),
       export: 'usage',
     },
     {
       title: translate('Limit'),
-      render: ({ row }: PlanUsageRowProps) => <>{row.limit || 'N/A'}</>,
+      render: ({ row }) => <>{row.limit || 'N/A'}</>,
       orderField: 'limit',
       export: 'limit',
     },
@@ -68,14 +72,14 @@ export const PlanUsageList: FunctionComponent = () => {
   ];
 
   return (
-    <Table
+    <Table<PlanUsageResponse>
       {...props}
       columns={columns}
       verboseName={translate('plans')}
       showPageSizeSelector={true}
       enableExport={true}
       initialSorting={{ field: 'usage', mode: 'desc' }}
-      rowActions={PlanUsageButton}
+      rowActions={PlanUsageRowActions}
       filters={<PlanUsageFilter />}
     />
   );
@@ -84,7 +88,7 @@ export const PlanUsageList: FunctionComponent = () => {
 const mapStateToProps = createSelector(
   getFormValues('PlanUsageFilter'),
   (filterValues: any) => {
-    const filter: Record<string, string> = {};
+    const filter: MarketplacePlansUsageStatsListData['query'] = {};
     if (filterValues) {
       if (filterValues.provider) {
         filter.customer_provider_uuid = filterValues.provider.customer_uuid;

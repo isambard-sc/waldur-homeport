@@ -4,12 +4,10 @@ import {
 } from '@waldur/azure/sql/summary';
 import { AzureVirtualMachineSummaryConfiguration } from '@waldur/azure/vm/summary';
 import { OpenStackBackupSummaryConfiguration } from '@waldur/openstack/openstack-backup/summary';
-import { OpenStackBackupScheduleSummaryConfiguration } from '@waldur/openstack/openstack-backup-schedule/summary';
 import { OpenStackFloatingIpSummaryConfiguration } from '@waldur/openstack/openstack-floating-ips/summary';
 import { OpenStackInstanceSummaryConfiguration } from '@waldur/openstack/openstack-instance/summary';
 import { OpenStackNetworkSummaryConfiguration } from '@waldur/openstack/openstack-network/summary';
 import { OpenStackSnapshotSummaryConfiguration } from '@waldur/openstack/openstack-snapshot/summary';
-import { OpenStackSnapshotScheduleSummaryConfiguration } from '@waldur/openstack/openstack-snapshot-schedule/summary';
 import { OpenStackSubNetSummaryConfiguration } from '@waldur/openstack/openstack-subnet/summary';
 import {
   OpenStackRouterSummaryConfiguration,
@@ -38,12 +36,10 @@ export const get = (type: string): ResourceSummaryConfiguration => {
 register(AzureSQLDatabaseSummaryConfiguration);
 register(AzureSQLServerSummaryConfiguration);
 register(AzureVirtualMachineSummaryConfiguration);
-register(OpenStackBackupScheduleSummaryConfiguration);
 register(OpenStackBackupSummaryConfiguration);
 register(OpenStackFloatingIpSummaryConfiguration);
 register(OpenStackNetworkSummaryConfiguration);
 register(OpenStackRouterSummaryConfiguration);
-register(OpenStackSnapshotScheduleSummaryConfiguration);
 register(OpenStackSnapshotSummaryConfiguration);
 register(OpenStackSubNetSummaryConfiguration);
 register(OpenStackTenantSummaryConfiguration);

@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceResourcesSetSlug } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { setSlug } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
@@ -28,7 +28,10 @@ export const SetSlugDialog: FC<ActionDialogProps> = ({
       }}
       submitForm={async (formData) => {
         try {
-          await setSlug(resource.uuid, formData);
+          await marketplaceResourcesSetSlug({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(showSuccess(translate('Slug has been successfully set.')));
           if (refetch) {
             await refetch();

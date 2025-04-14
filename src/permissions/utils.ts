@@ -1,4 +1,4 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { ROLE_TYPES } from '@waldur/permissions/constants';
 
 import { RoleEnum } from './enums';

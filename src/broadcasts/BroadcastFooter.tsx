@@ -6,15 +6,23 @@ import {
 } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFormValues } from 'redux-form';
+import {
+  broadcastMessagesCreate,
+  broadcastMessagesSend,
+  broadcastMessagesUpdate,
+} from 'waldur-js-client';
 
+import { formatDate } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { RootState } from '@waldur/store/reducers';
 
-import { createBroadcast, sendBroadcast, updateBroadcast } from './api';
+import { BROADCAST_CREATE_FORM_ID } from './constants';
 import { BroadcastFormData } from './types';
 import { serializeBroadcast } from './utils';
 
@@ -40,6 +48,10 @@ export const BroadcastFooter = ({
   broadcastId?;
 }) => {
   const dispatch = useDispatch();
+  const formValues = useSelector<RootState, BroadcastFormData>(
+    getFormValues(BROADCAST_CREATE_FORM_ID) as any,
+  );
+
   const saveAsTemplate = (broadcastData) =>
     dispatch(
       openModalDialog(BroadcastSaveAsTemplateDialog, {
@@ -55,9 +67,12 @@ export const BroadcastFooter = ({
     async (formData: BroadcastFormData) => {
       try {
         if (broadcastId) {
-          await updateBroadcast(broadcastId, serializeBroadcast(formData));
+          await broadcastMessagesUpdate({
+            path: { uuid: broadcastId },
+            body: serializeBroadcast(formData),
+          });
         } else {
-          await createBroadcast(serializeBroadcast(formData));
+          await broadcastMessagesCreate({ body: serializeBroadcast(formData) });
         }
         await refetch();
         dispatch(
@@ -76,32 +91,53 @@ export const BroadcastFooter = ({
       try {
         let response;
         if (broadcastId) {
-          response = await updateBroadcast(
-            broadcastId,
-            serializeBroadcast(formData),
+          response = await broadcastMessagesUpdate({
+            path: { uuid: broadcastId },
+            body: serializeBroadcast(formData),
+          });
+        } else {
+          response = await broadcastMessagesCreate({
+            body: serializeBroadcast(formData),
+          });
+        }
+        if (!formValues.send_at) {
+          await broadcastMessagesSend({ path: { uuid: response.data.uuid } });
+        }
+        await refetch();
+        if (formValues.send_at) {
+          dispatch(
+            showSuccess(
+              translate('This message will be sent on {date}.', {
+                date: formatDate(formValues.send_at),
+              }),
+            ),
           );
         } else {
-          response = await createBroadcast(serializeBroadcast(formData));
+          dispatch(showSuccess(translate('Broadcast has been sent.')));
         }
-        await sendBroadcast((response.data as { uuid: string }).uuid);
-        await refetch();
-        dispatch(showSuccess(translate('Broadcast has been sent.')));
         dispatch(closeModalDialog());
       } catch (e) {
-        dispatch(showErrorResponse(e, translate('Unable to send broadcast.')));
+        if (formValues.send_at) {
+          dispatch(
+            showErrorResponse(e, translate('Unable to schedule broadcast.')),
+          );
+        } else {
+          dispatch(
+            showErrorResponse(e, translate('Unable to send broadcast.')),
+          );
+        }
       }
     },
-    [dispatch, refetch, broadcastId],
+    [dispatch, refetch, broadcastId, formValues],
   );
 
   return (
-    <Modal.Footer>
+    <Modal.Footer className="border-0 pt-0 gap-2">
       {step === 0 ? (
         <>
           <CloseDialogButton />
           <Button
             onClick={handleSubmit(saveAsDraft)}
-            className="ms-3"
             variant="secondary"
             disabled={disabled}
           >
@@ -112,7 +148,6 @@ export const BroadcastFooter = ({
           </Button>
           <Button
             onClick={handleSubmit(saveAsTemplate)}
-            className="ms-3"
             variant="secondary"
             disabled={disabled}
           >
@@ -121,7 +156,7 @@ export const BroadcastFooter = ({
             </span>{' '}
             {translate('Save as a template')}
           </Button>
-          <Button onClick={() => setStep(1)} className="ms-3">
+          <Button onClick={() => setStep(1)}>
             <span className="svg-icon svg-icon-2">
               <ArrowRight />
             </span>{' '}
@@ -138,7 +173,6 @@ export const BroadcastFooter = ({
           </Button>
           <Button
             onClick={handleSubmit(saveAsDraft)}
-            className="ms-3"
             variant="secondary"
             disabled={disabled}
           >
@@ -147,15 +181,13 @@ export const BroadcastFooter = ({
             </span>{' '}
             {translate('Save as draft')}
           </Button>
-          <Button
-            disabled={disabled}
-            className="ms-3"
-            onClick={handleSubmit(saveAndSend)}
-          >
+          <Button disabled={disabled} onClick={handleSubmit(saveAndSend)}>
             <span className="svg-icon svg-icon-2">
               <Share />
             </span>{' '}
-            {translate('Send broadcast')}
+            {formValues.send_at
+              ? translate('Schedule broadcast')
+              : translate('Send now')}
           </Button>
         </>
       )}

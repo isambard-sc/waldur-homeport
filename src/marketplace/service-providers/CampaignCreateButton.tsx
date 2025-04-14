@@ -31,7 +31,7 @@ export const CampaignCreateButton: FunctionComponent<{ refetch }> = ({
     <ActionButton
       action={callback}
       title={translate('Create')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

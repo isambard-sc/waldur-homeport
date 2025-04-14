@@ -21,6 +21,6 @@ export const RestoreAction: ActionItemType = ({ resource, refetch }) => (
     modalComponent={BackupRestoreDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<ClockClockwise />}
+    iconNode={<ClockClockwise weight="bold" />}
   />
 );

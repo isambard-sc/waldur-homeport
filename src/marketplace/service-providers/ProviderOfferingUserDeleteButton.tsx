@@ -1,6 +1,7 @@
 import { Trash } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceOfferingUsersDestroy } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
@@ -10,7 +11,6 @@ import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
 
-import { deleteOfferingUser } from '../common/api';
 import { ServiceProvider } from '../types';
 
 import { OfferingUser } from './types';
@@ -41,7 +41,7 @@ export const ProviderOfferingUserDeleteButton: FC<{
         }),
         { forDeletion: true },
       );
-      await deleteOfferingUser(props.row.uuid);
+      await marketplaceOfferingUsersDestroy({ path: { uuid: props.row.uuid } });
       dispatch(showSuccess(translate('Offering user has been deleted.')));
       props.refetch();
     } catch (e) {
@@ -54,8 +54,9 @@ export const ProviderOfferingUserDeleteButton: FC<{
     canDeleteOfferingUser && (
       <ActionItem
         title={translate('Delete')}
-        iconNode={<Trash />}
+        iconNode={<Trash weight="bold" />}
         className="text-danger"
+        iconColor="danger"
         action={handleDelete}
       />
     )

@@ -1,39 +1,48 @@
 import { useQuery } from '@tanstack/react-query';
+import { debounce } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
+import { FormLabel } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { Field } from 'redux-form';
+import { openstackImagesList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { LoadingErred } from '@waldur/core/LoadingErred';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { required } from '@waldur/core/validators';
+import { FilterBox } from '@waldur/form/FilterBox';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { BoxRadioField } from '@waldur/marketplace/deploy/steps/BoxRadioField';
-import {
-  StepCardTabs,
-  TabSpec,
-} from '@waldur/marketplace/deploy/steps/StepCardTabs';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { generateSystemImageChoices } from '@waldur/marketplace/deploy/utils';
-import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
-import { loadImages } from '@waldur/openstack/api';
 import { flavorValidator } from '@waldur/openstack/openstack-instance/utils';
 
 import { formFlavorSelector } from './utils';
 
-const tabs: TabSpec[] = [
-  { title: translate('Images'), key: 'images' },
-  { title: translate('Apps'), key: 'apps' },
-];
-
 export const FormImageStep = (props: FormStepProps) => {
-  const [tab, setTab] = useState<TabSpec>(tabs[0]);
-  const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
+  const [query, setQuery] = useState('');
+
+  const applyQuery = useCallback(
+    debounce((value) => {
+      setQuery(String(value).trim());
+    }, 1000),
+    [setQuery],
+  );
 
   const { data, isLoading, error, refetch } = useQuery(
-    ['deployImages', props.offering?.scope_uuid],
+    ['deployImages', props.offering?.scope_uuid, query],
     () =>
       props.offering.scope_uuid
-        ? loadImages({ tenant_uuid: props.offering.scope_uuid })
+        ? getAllPages((page) =>
+            openstackImagesList({
+              query: {
+                page,
+                tenant_uuid: props.offering.scope_uuid,
+                name: query,
+              },
+            }),
+          )
         : Promise.resolve([]),
     { staleTime: 3 * 60 * 1000 },
   );
@@ -53,19 +62,24 @@ export const FormImageStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Image')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
       actions={
-        showExperimentalUiComponents ? (
-          <StepCardTabs tabs={tabs} tab={tab} setTab={setTab} />
-        ) : null
+        <div className="ms-auto">
+          <FilterBox
+            type="search"
+            placeholder={translate('Search')}
+            onChange={(e) => applyQuery(e.target.value)}
+          />
+        </div>
       }
     >
+      <FormLabel className="required">
+        {translate('Operating system options')}
+      </FormLabel>
       {isLoading ? (
-        <p className="text-center">{translate('Loading')}</p>
+        <LoadingSpinner />
       ) : error ? (
         <LoadingErred loadData={refetch} />
       ) : data.length === 0 ? (
@@ -78,6 +92,7 @@ export const FormImageStep = (props: FormStepProps) => {
           validate={[required]}
           component={BoxRadioField}
           choices={choices}
+          vertical
           required
           onChange={onChangeImage}
         />

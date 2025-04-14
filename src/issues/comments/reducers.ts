@@ -10,7 +10,6 @@ const INITIAL_STATE: IssueCommentState = {
   items: [],
   deleting: {},
   issue: null,
-  uiDisabled: false,
   getErred: false,
 };
 

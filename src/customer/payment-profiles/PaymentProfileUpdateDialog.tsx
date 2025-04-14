@@ -1,9 +1,9 @@
 import { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { paymentProfilesPartialUpdate } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
-import * as api from '@waldur/customer/payment-profiles/api';
 import { EDIT_PAYMENT_PROFILE_FORM_ID } from '@waldur/customer/payment-profiles/constants';
 import {
   getInitialValues,
@@ -22,10 +22,11 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { getCustomer as getCustomerApi } from '@waldur/project/api';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
+
+import { getCustomer as getCustomerApi } from '../utils';
 
 const PaymentProfileUpdateDialog: FunctionComponent<any> = (props) => {
   const dispatch = useDispatch();
@@ -46,7 +47,18 @@ const PaymentProfileUpdateDialog: FunctionComponent<any> = (props) => {
 
   const submitRequest = async (formData) => {
     try {
-      await api.updatePaymentProfile(props.resolve.profile.uuid, formData);
+      await paymentProfilesPartialUpdate({
+        path: { uuid: props.resolve.profile.uuid },
+        body: {
+          name: formData.name,
+          payment_type: formData.payment_type.value,
+          attributes: {
+            end_date: formData.end_date,
+            agreement_number: formData.agreement_number,
+            contract_sum: formData.contract_sum,
+          },
+        },
+      });
       dispatch(showSuccess(translate('Payment profile has been updated.')));
       dispatch(closeModalDialog());
       await props.resolve.refetch();

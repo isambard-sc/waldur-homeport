@@ -1,7 +1,10 @@
 import { FC } from 'react';
 
+import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { GenericPermission } from '@waldur/permissions/types';
+import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
+import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 
@@ -14,6 +17,8 @@ interface UsersListProps {
   readOnly?: boolean;
   tableFooter?;
   cardBordered?: boolean;
+  hasActionBar?: boolean;
+  fullWidth?: boolean;
 }
 
 export const UsersList: FC<UsersListProps> = ({
@@ -23,14 +28,16 @@ export const UsersList: FC<UsersListProps> = ({
   readOnly,
   tableFooter,
   cardBordered,
+  hasActionBar,
+  fullWidth,
 }) => {
   const columns = [
     {
-      title: translate('User'),
+      title: translate('Name'),
       render: ({ row }) => <>{row.user_full_name || row.user_username}</>,
     },
     {
-      title: translate('Email'),
+      title: translate('Mail'),
       render: ({ row }) => <>{row.user_email}</>,
     },
   ];
@@ -40,23 +47,37 @@ export const UsersList: FC<UsersListProps> = ({
       render: RoleField,
     });
   }
+  columns.push({
+    title: translate('Role expiration'),
+    render: ({ row }) => (
+      <>
+        {row.expiration_time
+          ? formatDate(row.expiration_time)
+          : DASH_ESCAPE_CODE}
+      </>
+    ),
+  });
   return (
     <Table<GenericPermission>
       {...table}
-      className="mb-7"
       columns={columns}
       title={translate('Users')}
       verboseName={translate('users')}
       cardBordered={cardBordered}
+      hasActionBar={hasActionBar}
+      fullWidth={fullWidth}
+      minHeight="auto"
       rowActions={
         readOnly
           ? null
           : ({ row }) => (
-              <UserRemoveButton
-                permission={row}
-                refetch={table.fetch}
-                scope={scope}
-              />
+              <ActionsDropdownComponent>
+                <UserRemoveButton
+                  permission={row}
+                  refetch={table.fetch}
+                  scope={scope}
+                />
+              </ActionsDropdownComponent>
             )
       }
       footer={tableFooter}

@@ -1,6 +1,7 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { CustomerUser } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -10,8 +11,6 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
-import { NestedCustomerPermission } from './types';
-
 const EditUserDialog = lazyComponent(() =>
   import('./EditUserDialog').then((module) => ({
     default: module.EditUserDialog,
@@ -19,7 +18,7 @@ const EditUserDialog = lazyComponent(() =>
 );
 
 interface UserEditButtonProps {
-  customer: NestedCustomerPermission;
+  customer: CustomerUser;
   refetch;
 }
 

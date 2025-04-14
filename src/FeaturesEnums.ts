@@ -10,9 +10,6 @@ export enum CustomerFeatures {
 export enum InvitationsFeatures {
   civil_number_required = 'invitations.civil_number_required',
   conceal_civil_number = 'invitations.conceal_civil_number',
-  require_user_details = 'invitations.require_user_details',
-  show_tax_number = 'invitations.show_tax_number',
-  tax_number_required = 'invitations.tax_number_required',
 }
 
 export enum MarketplaceFeatures {
@@ -52,7 +49,6 @@ export enum SlurmFeatures {
 export enum SupportFeatures {
   conceal_change_request = 'support.conceal_change_request',
   pricelist = 'support.pricelist',
-  shared_providers = 'support.shared_providers',
   users = 'support.users',
   vm_type_overview = 'support.vm_type_overview',
 }

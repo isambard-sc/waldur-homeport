@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { celeryStatsRetrieve } from 'waldur-js-client';
 
-import { get } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
@@ -8,12 +8,15 @@ import { translate } from '@waldur/i18n';
 type CeleryStats = Record<string, Array<any>>;
 
 const getCeleryStats = () =>
-  get<{
-    active: CeleryStats;
-    scheduled: CeleryStats;
-    reserved: CeleryStats;
-    revoked: CeleryStats;
-  }>('/celery-stats/').then((response) => response.data);
+  celeryStatsRetrieve().then(
+    (response) =>
+      response.data as {
+        active: CeleryStats;
+        scheduled: CeleryStats;
+        reserved: CeleryStats;
+        revoked: CeleryStats;
+      },
+  );
 
 export const CeleryInfoPage = () => {
   const { isLoading, error, data } = useQuery(['CeleryInfoPage'], () =>

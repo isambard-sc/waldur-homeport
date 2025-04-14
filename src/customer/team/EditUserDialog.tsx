@@ -1,18 +1,19 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  customersAddUser,
+  customersDeleteUser,
+  customersUpdateUser,
+  CustomerUser,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { FormContainer } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import {
-  addCustomerUser,
-  deleteCustomerUser,
-  updateCustomerUser,
-} from '@waldur/permissions/api';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { Role } from '@waldur/permissions/types';
 import { getCustomerRoles } from '@waldur/permissions/utils';
 import { ExpirationTimeGroup } from '@waldur/project/team/ExpirationTimeGroup';
@@ -21,7 +22,6 @@ import { showErrorResponse } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
 
-import { NestedCustomerPermission } from './types';
 import { UserGroup } from './UserGroup';
 
 const FORM_ID = 'EditUserDialog';
@@ -32,7 +32,7 @@ interface EditUserDialogFormData {
 }
 
 interface EditUserDialogResolve {
-  customer: NestedCustomerPermission;
+  customer: CustomerUser;
   refetch;
 }
 
@@ -47,25 +47,31 @@ const savePermissions = async (
 ) => {
   if (resolve.customer) {
     if (resolve.customer.role_name === formData.role.name) {
-      await updateCustomerUser({
-        customer: customer.uuid,
-        user: resolve.customer.uuid,
-        role: formData.role.name,
-        expiration_time: formData.expiration_time,
+      await customersUpdateUser({
+        path: { uuid: customer.uuid },
+        body: {
+          user: resolve.customer.uuid,
+          role: formData.role.name,
+          expiration_time: formData.expiration_time,
+        },
       });
     } else {
       if (resolve.customer.role_name) {
-        await deleteCustomerUser({
-          customer: customer.uuid,
-          user: resolve.customer.uuid,
-          role: resolve.customer.role_name,
+        await customersDeleteUser({
+          path: { uuid: customer.uuid },
+          body: {
+            user: resolve.customer.uuid,
+            role: resolve.customer.role_name,
+          },
         });
       }
-      await addCustomerUser({
-        customer: customer.uuid,
-        user: resolve.customer.uuid,
-        role: formData.role.name,
-        expiration_time: formData.expiration_time,
+      await customersAddUser({
+        path: { uuid: customer.uuid },
+        body: {
+          user: resolve.customer.uuid,
+          role: formData.role.name,
+          expiration_time: formData.expiration_time,
+        },
       });
     }
   }
@@ -104,22 +110,23 @@ export const EditUserDialog = connect(
 
     return (
       <form onSubmit={handleSubmit(saveUser)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Edit organization member')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Edit organization member')}
+          footer={
+            <>
+              <CloseDialogButton />
+              <SubmitButton submitting={submitting}>
+                {translate('Save')}
+              </SubmitButton>
+            </>
+          }
+        >
           <FormContainer submitting={submitting}>
             <UserGroup permission={resolve.customer} />
             <RoleGroup types={['customer']} />
             <ExpirationTimeGroup disabled={submitting} />
           </FormContainer>
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton submitting={submitting}>
-            {translate('Save')}
-          </SubmitButton>
-          <CloseDialogButton />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

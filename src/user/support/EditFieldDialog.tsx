@@ -10,7 +10,7 @@ import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { EditUserProps } from '../types';
 
@@ -46,7 +46,7 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
       initialValues={pick(resolve.user, resolve.name)}
       render={({ handleSubmit, submitting, invalid, dirty }) => (
         <form onSubmit={handleSubmit}>
-          <MetronicModalDialog
+          <ModalDialog
             headerLess
             footer={
               <>
@@ -89,7 +89,7 @@ export const EditFieldDialog: React.FC<EditFieldDialogProps> = ({
                 />
               </FormGroup>
             ) : null}
-          </MetronicModalDialog>
+          </ModalDialog>
         </form>
       )}
     />

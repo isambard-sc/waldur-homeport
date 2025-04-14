@@ -4,17 +4,18 @@ import Avatar from '@waldur/core/Avatar';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
-import { InvitationCancelButton } from '@waldur/invitations/actions/InvitationCancelButton';
-import { InvitationSendButton } from '@waldur/invitations/actions/InvitationSendButton';
+import { InvitationActions } from '@waldur/invitations/InvitationActions';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
-import { RoleField } from '@waldur/invitations/RoleField';
 import Table from '@waldur/table/Table';
+import { RoleField } from '@waldur/user/affiliations/RoleField';
 
 export const InvitationsList: FunctionComponent<{
   table;
   hideRole;
   cardBordered?;
-}> = ({ table, hideRole, cardBordered }) => {
+  hasActionBar?;
+  fullWidth?;
+}> = ({ table, hideRole, cardBordered, hasActionBar, fullWidth }) => {
   return (
     <Table
       {...table}
@@ -24,9 +25,9 @@ export const InvitationsList: FunctionComponent<{
           render: ({ row }) => (
             <div className="d-flex align-items-center gap-1">
               <Avatar
-                className="symbol symbol-25px"
+                className="symbol symbol-32px symbol-circle"
                 name={row?.email}
-                size={25}
+                size={32}
               />
               {row.email}
               <CopyToClipboardButton value={row.email} />
@@ -38,7 +39,7 @@ export const InvitationsList: FunctionComponent<{
           ? undefined
           : {
               title: translate('Role'),
-              render: ({ row }) => <RoleField invitation={row} />,
+              render: RoleField,
             },
         {
           title: translate('Status'),
@@ -56,16 +57,16 @@ export const InvitationsList: FunctionComponent<{
           render: ({ row }) => formatDate(row.expires),
         },
       ].filter(Boolean)}
-      rowActions={({ row }) => (
-        <>
-          <InvitationSendButton row={row} refetch={table.fetch} />
-          <InvitationCancelButton row={row} refetch={table.fetch} />
-        </>
+      rowActions={({ row, fetch }) => (
+        <InvitationActions invitation={row} refetch={fetch} />
       )}
       title={translate('Invitations')}
       verboseName={translate('invitations')}
       cardBordered={cardBordered}
+      hasActionBar={hasActionBar}
       hasQuery={true}
+      fullWidth={fullWidth}
+      minHeight="auto"
       expandableRow={InvitationExpandableRow}
     />
   );

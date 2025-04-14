@@ -1,8 +1,8 @@
-import { Modal } from 'react-bootstrap';
 import { reduxForm } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { useSaml2 } from './hooks';
 import { ProviderField } from './ProviderField';
@@ -17,24 +17,23 @@ export const AuthSaml2Dialog = reduxForm({
         handleSaml2Login(formData.provider.url),
       )}
     >
-      <Modal.Header>
-        <Modal.Title>
-          {translate('Please search for your organization')}
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Please search for your organization')}
+        footer={
+          <>
+            <CloseDialogButton />
+            <button
+              disabled={invalid || submitting || pristine}
+              type="submit"
+              className="btn btn-success"
+            >
+              {translate('Login')}
+            </button>
+          </>
+        }
+      >
         <ProviderField />
-      </Modal.Body>
-      <Modal.Footer>
-        <button
-          disabled={invalid || submitting || pristine}
-          type="submit"
-          className="btn btn-success"
-        >
-          {translate('Login')}
-        </button>
-        <CloseDialogButton />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

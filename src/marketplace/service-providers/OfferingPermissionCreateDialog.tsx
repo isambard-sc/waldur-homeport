@@ -1,22 +1,22 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsAddUser } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { FormContainer } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { DateTimeField } from '@waldur/form/DateTimeField';
 import { translate } from '@waldur/i18n';
-import { offeringsAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { providerOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { addOfferingPermission } from '@waldur/permissions/api';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { showErrorResponse } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { usersAutocomplete } from '../../customer/team/api';
+import { usersAutocomplete } from '../../customer/team/utils';
 
 export const OfferingPermissionCreateDialog = reduxForm<
   {},
@@ -29,11 +29,13 @@ export const OfferingPermissionCreateDialog = reduxForm<
   const saveUser = useCallback(
     async (formData) => {
       try {
-        await addOfferingPermission({
-          role: RoleEnum.OFFERING_MANAGER,
-          offering: formData.offering.uuid,
-          user: formData.user.uuid,
-          expiration_time: formData.expiration_time,
+        await marketplaceProviderOfferingsAddUser({
+          path: { uuid: formData.offering.uuid },
+          body: {
+            role: RoleEnum.OFFERING_MANAGER,
+            user: formData.user.uuid,
+            expiration_time: formData.expiration_time,
+          },
         });
         dispatch(closeModalDialog());
         await fetch();
@@ -47,10 +49,17 @@ export const OfferingPermissionCreateDialog = reduxForm<
   );
   return (
     <form onSubmit={handleSubmit(saveUser)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Grant permission')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Grant permission')}
+        footer={
+          <>
+            <CloseDialogButton />
+            <SubmitButton submitting={submitting}>
+              {translate('Submit')}
+            </SubmitButton>
+          </>
+        }
+      >
         <FormContainer submitting={submitting}>
           <AsyncSelectField
             name="user"
@@ -67,7 +76,7 @@ export const OfferingPermissionCreateDialog = reduxForm<
             label={translate('Offering')}
             placeholder={translate('Select offering...')}
             loadOptions={(query, prevOptions, page) =>
-              offeringsAutocomplete(
+              providerOfferingsAutocomplete(
                 { name: query, shared: true, customer: customer.url },
                 prevOptions,
                 page,
@@ -82,13 +91,7 @@ export const OfferingPermissionCreateDialog = reduxForm<
             component={DateTimeField}
           />
         </FormContainer>
-      </Modal.Body>
-      <Modal.Footer>
-        <CloseDialogButton />
-        <SubmitButton submitting={submitting}>
-          {translate('Submit')}
-        </SubmitButton>
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

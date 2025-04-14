@@ -2,11 +2,13 @@ import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Customer, CustomersListData } from 'waldur-js-client';
 
 import { OrganizationsFilter } from '@waldur/administration/organizations/OrganizationsFilter';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { OrganizationCard } from '@waldur/customer/list/OrganizationCard';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
+import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
@@ -17,13 +19,14 @@ import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { SLUG_COLUMN } from '@waldur/table/slug';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { CUSTOMERS_FILTER_FORM_ID } from '../constants';
 
-import { OrganizationNameField } from './OrganizationNameField';
+import { OrganizationExpandableRow } from './OrganizationExpandableRow';
 
 const mapStateToFilter = createSelector(
   getFormValues(CUSTOMERS_FILTER_FORM_ID),
@@ -35,10 +38,6 @@ const mapStateToFilter = createSelector(
     }
     if (filterValues?.is_service_provider) {
       filter.is_service_provider = filterValues.is_service_provider.value;
-    }
-    if (filterValues?.organization_group_type) {
-      filter.organization_group_type_uuid =
-        filterValues.organization_group_type.map((option) => option.uuid);
     }
     if (filterValues?.organization_group) {
       filter.organization_group_uuid = filterValues.organization_group.uuid;
@@ -52,17 +51,17 @@ const mapStateToFilter = createSelector(
   },
 );
 
-const mandatoryFields = [
+const mandatoryFields: CustomersListData['query']['field'] = [
   // Grid view
   'uuid',
   'name',
   'email',
   'image',
   'created',
-  'resource_count',
   'customer_credit',
   'billing_price_estimate',
   'organization_groups',
+  'url', // Expand view - to create project
 ];
 
 export const OrganizationsList: FunctionComponent = () => {
@@ -84,12 +83,14 @@ export const OrganizationsList: FunctionComponent = () => {
   const onClickDetails = (row) =>
     syncResourceFilters({ organization: row, project: null });
 
-  const columns = [
+  const columns: Array<Column<Customer>> = [
     {
       title: translate('Organization'),
       orderField: 'name',
       render: ({ row }) => (
-        <OrganizationNameField row={row} onClick={() => onClickDetails(row)} />
+        <OrganizationLink uuid={row.uuid} onClick={() => onClickDetails(row)}>
+          {row.name}
+        </OrganizationLink>
       ),
       keys: ['name'],
       id: 'organization',
@@ -269,7 +270,7 @@ export const OrganizationsList: FunctionComponent = () => {
       filter: 'is_service_provider',
       id: 'is_service_provider',
     },
-    SLUG_COLUMN,
+    SLUG_COLUMN as Column<Customer>,
   ];
 
   if (
@@ -300,7 +301,7 @@ export const OrganizationsList: FunctionComponent = () => {
       gridSize={{ md: 6, xl: 4 }}
       gridItem={({ row }) => (
         <OrganizationCard
-          organization={row}
+          organization={row as any}
           onClickDetails={() => onClickDetails(row)}
         />
       )}
@@ -312,6 +313,8 @@ export const OrganizationsList: FunctionComponent = () => {
       tableActions={<OrganizationCreateButton />}
       filters={<OrganizationsFilter />}
       hasOptionalColumns
+      expandableRowClassName="py-2 pe-2"
+      expandableRow={OrganizationExpandableRow}
     />
   );
 };

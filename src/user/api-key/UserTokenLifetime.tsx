@@ -1,6 +1,8 @@
 import { Question } from '@phosphor-icons/react';
 import React, { useState } from 'react';
 import { Card, Col, Form, Row } from 'react-bootstrap';
+import { usersPartialUpdate } from 'waldur-js-client';
+import { User } from 'waldur-js-client';
 
 import { Tip } from '@waldur/core/Tooltip';
 import { SubmitButton } from '@waldur/form';
@@ -9,9 +11,6 @@ import { translate } from '@waldur/i18n';
 import { SecretField } from '@waldur/marketplace/common/SecretField';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { useNotify } from '@waldur/store/hooks';
-import { UserDetails } from '@waldur/workspace/types';
-
-import { updateUser } from '../support/api';
 
 const TOKEN_OPTIONS = [
   { label: translate('{count} minutes', { count: 10 }), value: 600 },
@@ -23,7 +22,7 @@ const TOKEN_OPTIONS = [
 ];
 
 interface UserEditTokenComponentProps {
-  user: UserDetails;
+  user: User;
 }
 
 export const UserTokenLifetime: React.FC<UserEditTokenComponentProps> = (
@@ -39,8 +38,11 @@ export const UserTokenLifetime: React.FC<UserEditTokenComponentProps> = (
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-      await updateUser(props.user.uuid, {
-        token_lifetime: tokenLifetime.value,
+      await usersPartialUpdate({
+        path: { uuid: props.user.uuid },
+        body: {
+          token_lifetime: tokenLifetime.value,
+        },
       });
       showSuccess(translate('User has been updated'));
     } catch (error) {

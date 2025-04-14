@@ -91,7 +91,7 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
   <button
     type="button"
-    className="text-btn text-grey-400 text-hover-grey-500 lh-0 ps-2"
+    className="text-btn text-gray-400 text-hover-gray-500 lh-0 ps-2"
     onClick={onClick}
   >
     <X weight="bold" size={size} />

@@ -1,13 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { useAsync } from 'react-use';
-import { getFormValues } from 'redux-form';
+import { billingTotalCostRetrieve } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
+import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
+import { ServiceProvider } from '@waldur/marketplace/types';
 import { type RootState } from '@waldur/store/reducers';
+import { selectFiltersStorage } from '@waldur/table/selectors';
+import { FilterItem } from '@waldur/table/types';
 
-import * as api from './api';
 import { TotalCostField } from './TotalCostField';
 
 interface CustomerFilterData {
@@ -23,38 +26,51 @@ interface CustomerFilterData {
       month: number;
     };
   };
+  provider?: ServiceProvider;
 }
 
 interface CustomerListComponentProps {
-  customerListFilter: CustomerFilterData;
+  customerListFilter: FilterItem[];
 }
 
 const loadData = async (filter: CustomerFilterData) => {
   if (!filter || !filter.accounting_period) {
     return { total: 0 };
   }
-  const params = {
-    accounting_is_running: filter.accounting_is_running
-      ? filter.accounting_is_running.value
-      : undefined,
-    ...filter.accounting_period.value,
-  };
-  const data = await api.getTotal({ params });
+  const response = await billingTotalCostRetrieve({
+    query: {
+      customer_uuid: filter.provider?.customer_uuid,
+      accounting_is_running: filter.accounting_is_running
+        ? filter.accounting_is_running.value
+        : undefined,
+      ...filter.accounting_period.value,
+    },
+  });
   // VAT is not included only when accounting mode is activated
   if (ENV.accountingMode === 'accounting') {
-    return { total: data.price };
+    return { total: response.data.price };
   } else {
-    return { total: data.total };
+    return { total: response.data.total };
   }
 };
 
 const TotalCostComponent: React.FC<CustomerListComponentProps> = (props) => {
   const { loading, error, value } = useAsync(
-    () => loadData(props.customerListFilter),
+    () =>
+      loadData(
+        (props.customerListFilter || []).reduce(
+          (acc, filter) => Object.assign(acc, { [filter.name]: filter.value }),
+          {},
+        ) as CustomerFilterData,
+      ),
     [props.customerListFilter],
   );
   if (loading) {
-    return <>{translate('Loading')}</>;
+    return (
+      <>
+        {translate('Loading total cost')} <LoadingSpinnerIcon />
+      </>
+    );
   }
   if (error) {
     return <>{translate('Unable to load data.')}</>;
@@ -63,7 +79,7 @@ const TotalCostComponent: React.FC<CustomerListComponentProps> = (props) => {
 };
 
 const mapStateToProps = (state: RootState) => ({
-  customerListFilter: getFormValues('customerListFilter')(state),
+  customerListFilter: selectFiltersStorage(state, 'customerList'),
 });
 
 export const TotalCostContainer = connect(mapStateToProps)(TotalCostComponent);

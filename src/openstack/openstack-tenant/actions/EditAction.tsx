@@ -19,6 +19,6 @@ export const EditAction = ({ resource, refetch }) => (
     modalComponent={EditDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<PencilSimple />}
+    iconNode={<PencilSimple weight="bold" />}
   />
 );

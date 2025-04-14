@@ -1,3 +1,5 @@
+import { IdentityProvider } from 'waldur-js-client';
+
 interface SAML2AuthConfiguration {
   ENABLE_SINGLE_LOGOUT: boolean;
   ALLOW_TO_SELECT_IDENTITY_PROVIDER: boolean;
@@ -19,14 +21,13 @@ interface ValimoAuthConfiguration {
 
 interface CoreConfiguration {
   INVITATION_USE_WEBHOOKS: boolean;
+  DEFAULT_IDP: Pick<IdentityProvider, 'provider' | 'auth_url' | 'client_id'>;
   ANONYMOUS_USER_CAN_VIEW_OFFERINGS: boolean;
   ENABLE_RESOURCE_END_DATE: boolean;
-  DEFAULT_IDP: { provider: string; auth_url: string; client_id: string };
   MATOMO_URL_BASE: string;
   MATOMO_SITE_ID: number;
   MASTERMIND_URL: string;
   BRAND_COLOR: string;
-  BRAND_LABEL_COLOR: string;
   HERO_LINK_URL: string;
   HERO_LINK_LABEL: string;
   HERO_IMAGE: string;
@@ -42,7 +43,6 @@ interface CoreConfiguration {
   HOMEPORT_SENTRY_TRACES_SAMPLE_RATE: number;
   HOMEPORT_URL: string;
   INVITATION_CIVIL_NUMBER_LABEL: string;
-  INVITATION_TAX_NUMBER_LABEL: string;
   SHORT_PAGE_TITLE: string;
   FULL_PAGE_TITLE: string;
   USER_MANDATORY_FIELDS: string[];
@@ -69,6 +69,9 @@ interface CoreConfiguration {
   LANGUAGE_CHOICES: string[];
   DISABLE_DARK_THEME: boolean;
   USER_TABLE_COLUMNS: string;
+  FREEIPA_USERNAME_PREFIX?: string;
+  FREEIPA_ENABLED?: boolean;
+  KEYCLOAK_ICON: string;
 }
 
 interface OpenStackConfiguration {
@@ -98,11 +101,6 @@ interface VMWareConfiguration {
   BASIC_MODE: boolean;
 }
 
-interface FreeIPAConfiguration {
-  USERNAME_PREFIX: string;
-  ENABLED: boolean;
-}
-
 interface SupportConfiguration {
   ENABLED: boolean;
   DISPLAY_REQUEST_TYPE: boolean;
@@ -119,5 +117,4 @@ export interface PluginConfiguration {
   WALDUR_MARKETPLACE_OPENSTACK: Partial<MarketplaceOpenStackTenantConfiguration>;
   WALDUR_RANCHER: RancherConfiguration;
   WALDUR_VMWARE: Partial<VMWareConfiguration>;
-  WALDUR_FREEIPA: Partial<FreeIPAConfiguration>;
 }

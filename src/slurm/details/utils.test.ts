@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-import * as marketplaceApi from '@waldur/marketplace/common/api';
-import { ComponentUsage } from '@waldur/marketplace/resources/usage/types';
-import * as slurmApi from '@waldur/slurm/details/api';
+import {
+  marketplaceComponentUsagesList,
+  slurmAllocationUserUsageList,
+} from 'waldur-js-client';
 
 import componentUsages from './fixtures/component-usages.json';
 import userUsages from './fixtures/user-usages.json';
 import { loadCharts } from './utils';
 
-vi.mock('@waldur/slurm/details/api');
+vi.mock('waldur-js-client');
 vi.mock('@waldur/marketplace/common/api');
 
 describe('SLURM allocation usage chart formatter', () => {
@@ -22,10 +22,12 @@ describe('SLURM allocation usage chart formatter', () => {
 
   beforeEach(() => {
     vi.setSystemTime(new Date(2020, 6, 1));
-    vi.mocked(slurmApi).getAllocationUserUsages.mockResolvedValue(userUsages);
-    vi.mocked(marketplaceApi).getComponentUsages.mockResolvedValue(
-      componentUsages as ComponentUsage[],
-    );
+    vi.mocked(slurmAllocationUserUsageList).mockResolvedValue({
+      data: userUsages,
+    } as any);
+    vi.mocked(marketplaceComponentUsagesList).mockResolvedValue({
+      data: componentUsages,
+    } as any);
   });
 
   it('parses data and returns eChart option correctly', async () => {

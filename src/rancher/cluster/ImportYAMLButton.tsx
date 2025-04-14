@@ -28,7 +28,7 @@ export const ImportYAMLButton: FunctionComponent<{ cluster_id }> = ({
           }),
         )
       }
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
     />
   );
 };

@@ -1,6 +1,6 @@
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { formatFilesize } from '@waldur/core/utils';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { FileDownloader } from './FileDownloader';
 import { ImageFetcher } from './ImageFetcher';
@@ -11,7 +11,7 @@ export const AttachmentModal = ({
 }: {
   resolve: { attachment: Attachment };
 }) => (
-  <MetronicModalDialog
+  <ModalDialog
     title={attachment.file_name}
     subtitle={
       formatFilesize(attachment.file_size, 'B') +
@@ -28,5 +28,5 @@ export const AttachmentModal = ({
     closeButton
   >
     <ImageFetcher url={attachment.file} name={attachment.file_name} />
-  </MetronicModalDialog>
+  </ModalDialog>
 );

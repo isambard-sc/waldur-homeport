@@ -47,7 +47,7 @@ export const ProviderOfferingUserUpdateButton: FC<{
             }),
           )
         }
-        iconNode={<Pencil />}
+        iconNode={<Pencil weight="bold" />}
       />
     )
   );

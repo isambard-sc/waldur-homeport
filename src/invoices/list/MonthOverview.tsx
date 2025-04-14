@@ -2,7 +2,7 @@ import { ArrowDown, ArrowUp, Minus } from '@phosphor-icons/react';
 import { FunctionComponent, useMemo } from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { parseDate } from '@waldur/core/dateUtils';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { Link } from '@waldur/core/Link';
@@ -56,7 +56,9 @@ export const MonthOverview: FunctionComponent<MonthOverviewProps> = ({
 
   const date = useMemo(() => {
     if (invoice) {
-      return parseDate(formatPeriod(invoice)).toFormat('LLLL yyyy');
+      return parseDate(
+        formatPeriod({ year: invoice.year, month: invoice.month }),
+      ).toFormat('LLLL yyyy');
     }
   }, [invoice]);
 
@@ -131,7 +133,7 @@ export const MonthOverview: FunctionComponent<MonthOverviewProps> = ({
                     uuid: customer.uuid,
                     invoice_uuid: invoice.uuid,
                   }}
-                  className="btn btn-light btn-sm"
+                  className="btn btn-outline btn-outline-default btn-sm"
                 >
                   {translate('Details')}
                 </Link>

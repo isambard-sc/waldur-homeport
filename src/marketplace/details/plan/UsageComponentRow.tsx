@@ -1,10 +1,12 @@
-import { Question } from '@phosphor-icons/react';
-import React, { useCallback } from 'react';
+import { PlusMinus } from '@phosphor-icons/react';
+import { FC, useCallback } from 'react';
+import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
-import { defaultCurrency } from '@waldur/core/formatCurrency';
+import { ENV } from '@waldur/core/config';
+import { defaultCurrency, formatCurrency } from '@waldur/core/formatCurrency';
 import { lazyComponent } from '@waldur/core/lazyComponent';
-import { Tip } from '@waldur/core/Tooltip';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 
@@ -22,7 +24,7 @@ interface UsageComponentRowProps {
   hidePrices?: boolean;
 }
 
-export const UsageComponentRow: React.FC<UsageComponentRowProps> = (props) => {
+export const UsageComponentRow: FC<UsageComponentRowProps> = (props) => {
   const dispatch = useDispatch();
   const onClick = useCallback(
     () =>
@@ -39,31 +41,17 @@ export const UsageComponentRow: React.FC<UsageComponentRowProps> = (props) => {
     [dispatch, props],
   );
 
+  const perPeriod = !props.period
+    ? ''
+    : props.period === 'annual'
+      ? ' /year'
+      : ' /mo';
+
   return (
-    <tr>
-      <th>
-        {props.offeringComponent.name}
-        <Tip
-          label={props.offeringComponent.type}
-          id={`componentTypeTooltip-${props.offeringComponent.type}`}
-          className="mx-1"
-        >
-          {' '}
-          <Question />
-        </Tip>
-        <span className="fw-normal fst-italic">
-          (
-          {props.offeringComponent.measured_unit
-            ? translate('{price} per {unit}', {
-                price: defaultCurrency(props.offeringComponent.price),
-                unit: props.offeringComponent.measured_unit,
-              })
-            : defaultCurrency(props.offeringComponent.price)}
-          )
-        </span>
-      </th>
-      <td>
-        {props.offeringComponent.limit_amount !== null && (
+    <FormTable.Item
+      label={props.offeringComponent.name}
+      tooltip={
+        props.offeringComponent.limit_amount !== null && (
           // limit_period options: total, month, annual
           <>
             {props.offeringComponent.limit_period === 'total' &&
@@ -82,25 +70,37 @@ export const UsageComponentRow: React.FC<UsageComponentRowProps> = (props) => {
                 unit: props.offeringComponent.measured_unit,
               })}
           </>
-        )}
-      </td>
-      <td>{translate('Usage based')}</td>
-      {!props.hidePrices ? (
-        <>
-          <td className="text-center" width="20px">
-            =
-          </td>
-          <td className="estimate">
-            <button
-              type="button"
-              className="text-link fst-italic"
-              onClick={onClick}
-            >
-              {translate('Estimate')}
-            </button>
-          </td>
-        </>
-      ) : null}
-    </tr>
+        )
+      }
+      description={
+        translate('Cost') +
+        ': ' +
+        (props.offeringComponent.measured_unit
+          ? translate('{price} per {unit}', {
+              price: defaultCurrency(props.offeringComponent.price),
+              unit: props.offeringComponent.measured_unit,
+            })
+          : defaultCurrency(props.offeringComponent.price))
+      }
+      value={translate('Usage based')}
+      actions={
+        !props.hidePrices && (
+          <>
+            <div>
+              {translate('Total')}
+              {': '}
+              {formatCurrency(0, ENV.plugins.WALDUR_CORE.CURRENCY_NAME, 4)}
+              {perPeriod}
+            </div>
+            <div className="estimate">
+              <Button variant="link" onClick={onClick} className="p-0">
+                <PlusMinus size={16} weight="bold" className="me-2" />
+                {translate('Calculate price')}
+              </Button>
+            </div>
+          </>
+        )
+      }
+    />
   );
 };

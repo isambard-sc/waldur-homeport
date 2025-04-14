@@ -23,7 +23,7 @@ export const TableDisplayModeButton = (
           props.setDisplayMode(props.mode === 'grid' ? 'table' : 'grid')
         }
       >
-        <span className="svg-icon svg-icon-1">
+        <span className="svg-icon svg-icon-2">
           {props.mode === 'grid' ? (
             <List weight="bold" />
           ) : (

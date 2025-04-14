@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import * as AuthService from '@waldur/auth/AuthService';
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { Link } from '@waldur/core/Link';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -51,7 +51,7 @@ export const FooterLinks = () => {
   }, []);
 
   return (
-    <ul className="menu menu-primary fw-bold order-1" data-kt-menu="true">
+    <ul className="menu menu-brand fw-bold order-1" data-kt-menu="true">
       {!AuthService.isAuthenticated() && (
         <>
           {isFeatureVisible(
@@ -66,11 +66,16 @@ export const FooterLinks = () => {
               </Link>
             </li>
           )}
-          <li className="menu-item" data-kt-menu-trigger="click">
-            <Link className="menu-link px-2" state="public.marketplace-landing">
-              {translate('Explore marketplace')}
-            </Link>
-          </li>
+          {ENV.plugins.WALDUR_CORE.ANONYMOUS_USER_CAN_VIEW_OFFERINGS && (
+            <li className="menu-item" data-kt-menu-trigger="click">
+              <Link
+                className="menu-link px-2"
+                state="public.marketplace-landing"
+              >
+                {translate('Explore marketplace')}
+              </Link>
+            </li>
+          )}
         </>
       )}
       <li className="menu-item" data-kt-menu-trigger="click">

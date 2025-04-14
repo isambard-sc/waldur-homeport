@@ -19,6 +19,7 @@ describe('Rancher application provision utils', () => {
   describe('subquestions', () => {
     it('shows subquestions if condition is met', () => {
       const parsed = parseQuestions(MySQL as Question[]);
+      // @ts-ignore
       const visible = parseVisibleQuestions(parsed, { defaultImage: false });
       expect(
         visible.find((question) => question.variable === 'image'),
@@ -27,6 +28,7 @@ describe('Rancher application provision utils', () => {
 
     it('hides subquestions if condition is not met', () => {
       const parsed = parseQuestions(MySQL as Question[]);
+      // @ts-ignore
       const visible = parseVisibleQuestions(parsed, { defaultImage: true });
       expect(
         visible.find((question) => question.variable === 'image'),

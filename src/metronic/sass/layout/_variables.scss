@@ -8,7 +8,7 @@ $root-font-size-lg: 13px; // Root font size for tablet mode
 $root-font-size-md: 12px; // Root font size for mobile mode
 
 // Page bg
-$page-bg: if(isDarkMode(), #172219, $gray-100) !default;
+$page-bg: $gray-50 !default;
 
 // Content border radius
 $content-border-radius: 1.5rem !default;
@@ -24,36 +24,32 @@ $content-spacing: (
 // Header
 $header-config: (
   // Default Mode
-  default:
-    (
+  default: (
       outer-height: (
         desktop: 65px,
         tablet-and-mobile: 55px,
       ),
       // Height - border width
-      height:
-        (
+      height: (
           desktop: 64px,
           tablet-and-mobile: 54px,
         ),
-      bg-color: if(isDarkMode(), #253629, $white),
+      bg-color: $body-bg,
       border-bottom: 1px solid $border-color,
     ),
   // Fixed Mode
-  fixed:
-    (
+  fixed: (
       outer-height: (
         desktop: 65px,
         tablet-and-mobile: 55px,
       ),
       // Height - border width
-      height:
-        (
+      height: (
           desktop: 64px,
           tablet-and-mobile: 54px,
         ),
       z-index: 100,
-      bg-color: if(isDarkMode(), #253629, $white),
+      bg-color: $body-bg,
       border-bottom: 1px solid $border-color,
       box-shadow: none,
     )
@@ -67,7 +63,7 @@ $toolbar-config: (
     tablet-and-mobile: 60px,
   ),
   padding: 0.5rem 0,
-  bg-color: if(isDarkMode(), #213025, $white),
+  bg-color: $body-bg,
   box-shadow: none,
   border-top: 1px solid $border-color,
   border-bottom: 1px solid $border-color,
@@ -96,12 +92,15 @@ $aside-config: (
   // Aside box shadow
   box-shadow: none,
   // Minimized hover box shadow
-  minimized-hover-box-shadow:
-    if(isDarkMode(), none, 5px 0px 10px rgba(70, 78, 95, 0.075)),
+  minimized-hover-box-shadow: if(
+      isDarkMode(),
+      none,
+      5px 0px 10px rgba(70, 78, 95, 0.075)
+    ),
 ) !default;
 
 // Footer
 $footer-config: (
-  bg-color: if(isDarkMode(), #1a261d, $white),
+  bg-color: $body-bg,
   border-top: 1px solid $border-color,
 ) !default;

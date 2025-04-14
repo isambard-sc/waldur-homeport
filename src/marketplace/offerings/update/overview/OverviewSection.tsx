@@ -1,19 +1,18 @@
 import { Check, X } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { Card, Table } from 'react-bootstrap';
 
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { Tip } from '@waldur/core/Tooltip';
+import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { REMOTE_OFFERING_TYPE } from '@waldur/marketplace-remote/constants';
 
-import { RefreshButton } from '../components/RefreshButton';
 import { OfferingSectionProps } from '../types';
 
 import { EditGettingStartedButton } from './EditGettingStartedButton';
 import { EditOverviewButton } from './EditOverviewButton';
 import { OfferingLocationButton } from './OfferingLocationButton';
-import { OfferingLogoButton } from './OfferingLogoButton';
+import { OfferingMediaButton } from './OfferingMediaButton';
 import { SetAccessPolicyButton } from './SetAccessPolicyButton';
 import { Attribute } from './types';
 
@@ -24,174 +23,216 @@ const attributes: Attribute[] = [
     type: 'string',
     maxLength: 150,
     required: true,
+    description: translate(
+      "Enter the offering's name as it will appear to users.",
+    ),
+    requiredMsg: translate('Offering name is required.'),
   },
   {
     key: 'description',
     title: translate('Description'),
     type: 'html',
+    description: translate('Provide a brief overview of the offering.'),
   },
   {
     key: 'full_description',
     title: translate('Full description'),
     type: 'html',
+    description: translate(
+      'Add a detailed explanation of what the offering includes.',
+    ),
   },
   {
     key: 'terms_of_service',
     title: translate('Terms of service'),
     type: 'html',
+    description: translate(
+      'Specify the terms users must agree to when accessing the offering.',
+    ),
   },
   {
     key: 'privacy_policy_link',
     title: translate('Privacy policy link'),
     type: 'string',
     maxLength: 200,
+    description: translate(
+      'Add a link to your privacy policy for this offering.',
+    ),
   },
   {
     key: 'terms_of_service_link',
     title: translate('Terms of service link'),
     type: 'string',
     maxLength: 200,
+    description: translate('Add a link to the full terms of service.'),
   },
   {
     key: 'access_url',
     title: translate('Access URL'),
     type: 'string',
     maxLength: 200,
+    description: translate(
+      'Provide the URL users will use to access the offering.',
+    ),
   },
   {
     key: 'slug',
     title: translate('Slug'),
     type: 'string',
     maxLength: 50,
+    description: translate(
+      'A POSIX-friendly unique identifier for the offering.',
+    ),
   },
 ];
 
 export const OverviewSection: FC<OfferingSectionProps> = (props) => {
   return (
-    <Card className="card-bordered">
-      <Card.Header>
-        <Card.Title className="h5">
-          <span className="me-2">{translate('General')}</span>
-          <RefreshButton refetch={props.refetch} loading={props.loading} />
-        </Card.Title>
-      </Card.Header>
-      <Card.Body>
-        <Table bordered={true} hover={true} responsive={true}>
-          <tbody>
-            {attributes.map((attribute, attributeIndex) => (
-              <tr key={attributeIndex}>
-                <td className="col-md-3">{attribute.title}</td>
-                <td className="col-md-9">
-                  {attribute.type === 'html' ? (
-                    <FormattedHtml html={props.offering[attribute.key]} />
-                  ) : (
-                    props.offering[attribute.key] || 'N/A'
-                  )}
-                </td>
-                <td className="row-actions">
-                  <div>
-                    {props.offering.type === REMOTE_OFFERING_TYPE ? (
-                      <Tip
-                        label={translate(
-                          'Field is synchronised from the remote offering',
-                        )}
-                        id="remote-offering-tip"
-                      >
-                        <EditOverviewButton
-                          offering={props.offering}
-                          refetch={props.refetch}
-                          attribute={attribute}
-                          disabled={true}
-                        />
-                      </Tip>
-                    ) : (
-                      <EditOverviewButton
-                        offering={props.offering}
-                        refetch={props.refetch}
-                        attribute={attribute}
-                      />
+    <FormTable.Card
+      title={translate('General')}
+      loading={props.loading}
+      refetch={props.refetch}
+    >
+      <FormTable>
+        {attributes.map((attribute, attributeIndex) => (
+          <FormTable.Item
+            key={attributeIndex}
+            label={attribute.title}
+            value={
+              attribute.type === 'html' ? (
+                <FormattedHtml html={props.offering[attribute.key]} />
+              ) : (
+                props.offering[attribute.key] || 'N/A'
+              )
+            }
+            description={attribute.description}
+            actions={
+              <>
+                {props.offering.type === REMOTE_OFFERING_TYPE ? (
+                  <Tip
+                    label={translate(
+                      'Field is synchronised from the remote offering',
                     )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            <tr>
-              <td className="col-md-3">{translate('Location')}</td>
-              <td className="col-md-9">
-                {props.offering.latitude && props.offering.longitude ? (
-                  <Check weight="bold" className="text-info" />
+                    id={`remote-offering-tip-${attribute.key}`}
+                  >
+                    <EditOverviewButton
+                      offering={props.offering}
+                      refetch={props.refetch}
+                      attribute={attribute}
+                      disabled={true}
+                    />
+                  </Tip>
                 ) : (
-                  <X weight="bold" className="text-danger" />
+                  <EditOverviewButton
+                    offering={props.offering}
+                    refetch={props.refetch}
+                    attribute={attribute}
+                  />
                 )}
-              </td>
-              <td className="row-actions">
-                <div>
-                  <OfferingLocationButton
-                    offering={props.offering}
-                    refetch={props.refetch}
-                  />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="col-md-3">{translate('Access policies')}</td>
-              <td className="col-md-9">
-                {props.offering.organization_groups.length > 0
-                  ? props.offering.organization_groups
-                      .map(({ name }) => name)
-                      .join(', ')
-                  : 'N/A'}
-              </td>
-              <td className="row-actions">
-                <div>
-                  <SetAccessPolicyButton
-                    offering={props.offering}
-                    refetch={props.refetch}
-                  />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="col-md-3">{translate('Logo')}</td>
-              <td className="col-md-9">
-                {props.offering.thumbnail ? (
-                  <Check weight="bold" className="text-info" />
-                ) : (
-                  <X weight="bold" className="text-danger" />
-                )}
-              </td>
-              <td className="row-actions">
-                <div>
-                  <OfferingLogoButton
-                    offering={props.offering}
-                    refetch={props.refetch}
-                  />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="col-md-3">
-                {translate('Getting started instructions')}
-              </td>
-              <td className="col-md-9">
-                {props.offering.getting_started ? (
-                  <Check weight="bold" className="text-info" />
-                ) : (
-                  <X weight="bold" className="text-danger" />
-                )}
-              </td>
-              <td className="row-actions">
-                <div>
-                  <EditGettingStartedButton
-                    offering={props.offering}
-                    refetch={props.refetch}
-                  />
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      </Card.Body>
-    </Card>
+              </>
+            }
+            warnTooltip={attribute.required && attribute.requiredMsg}
+          />
+        ))}
+        <FormTable.Item
+          key="location"
+          label={translate('Location')}
+          value={
+            props.offering.latitude && props.offering.longitude ? (
+              <Check weight="bold" className="text-info" />
+            ) : (
+              <X weight="bold" className="text-danger" />
+            )
+          }
+          description={translate('Specify where the offering is hosted.')}
+          actions={
+            <OfferingLocationButton
+              offering={props.offering}
+              refetch={props.refetch}
+            />
+          }
+        />
+        <FormTable.Item
+          key="access_policies"
+          label={translate('Access policies')}
+          value={
+            props.offering.organization_groups.length > 0
+              ? props.offering.organization_groups
+                  .map(({ name }) => name)
+                  .join(', ')
+              : 'N/A'
+          }
+          description={translate(
+            'Define the organization groups that are allowed to access the offering.',
+          )}
+          actions={
+            <SetAccessPolicyButton
+              offering={props.offering}
+              refetch={props.refetch}
+            />
+          }
+        />
+        <FormTable.Item
+          key="logo"
+          label={translate('Logo')}
+          value={
+            props.offering.thumbnail ? (
+              <Check weight="bold" className="text-info" />
+            ) : (
+              <X weight="bold" className="text-danger" />
+            )
+          }
+          description={translate(
+            'Upload an image to represent the offering visually.',
+          )}
+          actions={
+            <OfferingMediaButton
+              offering={props.offering}
+              refetch={props.refetch}
+              mediaType="thumbnail"
+            />
+          }
+        />
+        <FormTable.Item
+          key="image"
+          label={translate('Image')}
+          value={
+            props.offering.image ? (
+              <Check weight="bold" className="text-info" />
+            ) : (
+              <X weight="bold" className="text-danger" />
+            )
+          }
+          description={translate('Upload a background image for the offering.')}
+          actions={
+            <OfferingMediaButton
+              offering={props.offering}
+              refetch={props.refetch}
+              mediaType="image"
+            />
+          }
+        />
+        <FormTable.Item
+          key="getting_started"
+          label={translate('Getting started instructions')}
+          value={
+            props.offering.getting_started ? (
+              <Check weight="bold" className="text-info" />
+            ) : (
+              <X weight="bold" className="text-danger" />
+            )
+          }
+          description={translate(
+            'Provide steps to help users begin using the offering.',
+          )}
+          actions={
+            <EditGettingStartedButton
+              offering={props.offering}
+              refetch={props.refetch}
+            />
+          }
+        />
+      </FormTable>
+    </FormTable.Card>
   );
 };

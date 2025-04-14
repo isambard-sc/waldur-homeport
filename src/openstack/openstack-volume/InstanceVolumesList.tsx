@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackVolume, OpenstackVolumesListData } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -17,7 +18,7 @@ import { AttachVolumeAction } from '../openstack-instance/actions/AttachVolumeAc
 export const InstanceVolumesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackVolumesListData['query']>(
     () => ({
       instance_uuid: resourceScope.uuid,
     }),
@@ -30,7 +31,7 @@ export const InstanceVolumesList: FunctionComponent<{ resourceScope }> = ({
   });
 
   return (
-    <Table
+    <Table<OpenStackVolume>
       {...props}
       columns={[
         {
@@ -62,6 +63,7 @@ export const InstanceVolumesList: FunctionComponent<{ resourceScope }> = ({
       tableActions={
         <AttachVolumeAction resource={resourceScope} refetch={props.fetch} />
       }
+      title={translate('Volumes')}
       verboseName={translate('volumes')}
       rowActions={({ row }) => (
         <ModalActionsRouter

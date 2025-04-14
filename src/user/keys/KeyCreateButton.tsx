@@ -15,7 +15,7 @@ export const KeyCreateButton: FunctionComponent = () => {
     <ActionButton
       title={translate('Add key')}
       action={openFormDialog}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
     />
   );

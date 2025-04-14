@@ -4,13 +4,13 @@ import { reduxForm } from 'redux-form';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { CostPolicyForm } from './CostPolicyForm';
 import { CostPolicyFormData, CostPolicyType } from './types';
 
 interface CostPolicyFormDialogProps {
-  onSubmit(formData: CostPolicyFormData): void;
+  submitFn(formData: CostPolicyFormData): void;
   type: CostPolicyType;
   formId: string;
   initialValues?: any;
@@ -28,8 +28,8 @@ export const CostPolicyFormDialog = connect(
     const isEdit = Boolean(props.initialValues);
 
     return (
-      <form onSubmit={props.handleSubmit(props.onSubmit)}>
-        <MetronicModalDialog
+      <form onSubmit={props.handleSubmit(props.submitFn)}>
+        <ModalDialog
           title={isEdit ? translate('Edit policy') : translate('New policy')}
           footer={
             <>
@@ -44,7 +44,7 @@ export const CostPolicyFormDialog = connect(
           }
         >
           <CostPolicyForm {...props} isEdit={isEdit} />
-        </MetronicModalDialog>
+        </ModalDialog>
       </form>
     );
   }),

@@ -6,6 +6,7 @@ import * as AuthService from './auth/AuthService';
 import { cleanObject } from './core/utils';
 import { setPrevParams, setPrevState } from './error/utils';
 import { isFeatureVisible } from './features/connect';
+import { MarketplaceFeatures } from './FeaturesEnums';
 import { tryAcceptInvitation } from './invitations/tryAcceptInvitation';
 import { closeModalDialog } from './modal/actions';
 import { router } from './router';
@@ -45,6 +46,7 @@ export function attachTransitions() {
       }
     },
   );
+
   // If state parent is `auth` and user does not have authentication token,
   // he should be redirected to login page.
 
@@ -53,15 +55,23 @@ export function attachTransitions() {
       to: (state) =>
         state.data && state.data.auth && !AuthService.isAuthenticated(),
     },
-    (transition) =>
-      transition.router.stateService.target(
-        'login',
-        {
-          toState: transition.to().name,
-          toParams: cleanObject(transition.params()),
-        },
-        { location: 'replace' },
-      ),
+    (transition) => {
+      // If `catalogue_only` feature is enabled, user should be redirected to marketplace landing page.
+      if (isFeatureVisible(MarketplaceFeatures.catalogue_only)) {
+        return transition.router.stateService.target(
+          'public.marketplace-landing',
+        );
+      } else {
+        return transition.router.stateService.target(
+          'login',
+          {
+            toState: transition.to().name,
+            toParams: cleanObject(transition.params()),
+          },
+          { location: 'replace' },
+        );
+      }
+    },
   );
   // If state data has `anonymous` flag and user has authentication token,
   // he is redirected to dashboard.
@@ -88,6 +98,36 @@ export function attachTransitions() {
         transition.options().custom?.fallbackState || 'errorPage.notFound',
       ),
   );
+
+  // Check resolvers before entering to a state
+  router.transitionService.onBefore({}, (transition) => {
+    const toState = transition.to();
+
+    const getAllStates = (state) => {
+      const states = [];
+      while (state) {
+        states.push(state);
+        state = state.parent
+          ? transition.router.stateRegistry.get(state.parent)
+          : null;
+      }
+      return states;
+    };
+
+    // Get all parent states
+    const states = getAllStates(toState);
+
+    // check need for fetchCustomer
+    const needsCustomer = states.some((state) =>
+      Array.isArray(state.resolve)
+        ? state.resolve?.some((resolver) => resolver.token === 'fetchCustomer')
+        : false,
+    );
+
+    if (!needsCustomer) return;
+
+    return transition.injector().getAsync('fetchCustomer');
+  });
 
   router.transitionService.onStart(
     {

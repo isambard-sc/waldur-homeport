@@ -1,19 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
+import { marketplaceCategoriesList } from 'waldur-js-client';
 
-import { getCategories } from '@waldur/marketplace/common/api';
-import { ANONYMOUS_CONFIG } from '@waldur/table/api';
+import { getAllPages } from '@waldur/core/api';
 
-export const useOfferingCategories = (anonymous = false) => {
+export const useOfferingCategories = () => {
   const { data: categories } = useQuery(
     ['ResourcesMenu', 'Categories'],
     () =>
-      getCategories({
-        params: {
-          field: ['uuid', 'title', 'group'],
-          has_offerings: true,
-        },
-        ...(anonymous ? ANONYMOUS_CONFIG : {}),
-      }),
+      getAllPages((page) =>
+        marketplaceCategoriesList({
+          query: {
+            page,
+            field: ['uuid', 'title', 'group'],
+          },
+        }),
+      ),
     { refetchOnWindowFocus: false },
   );
   return categories;

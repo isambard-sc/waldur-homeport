@@ -1,5 +1,6 @@
+import { marketplaceRobotAccountsDestroy } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
-import { deleteRobotAccount } from '@waldur/marketplace/common/api';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ResourceDeleteButton } from '@waldur/resource/actions/ResourceDeleteButton';
@@ -17,7 +18,9 @@ export const RobotAccountDeleteButton = ({ row, refetch }) => {
   }
   return (
     <ResourceDeleteButton
-      apiFunction={() => deleteRobotAccount(row.uuid)}
+      apiFunction={() =>
+        marketplaceRobotAccountsDestroy({ path: { uuid: row.uuid } })
+      }
       resourceType={translate('robot account')}
       refetch={refetch}
     />

@@ -6,12 +6,9 @@ import {
 import { mount, ReactWrapper } from 'enzyme';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { OpenStackFloatingIp, OpenStackInstance } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import {
-  FloatingIp,
-  OpenStackInstance,
-} from '@waldur/openstack/openstack-instance/types';
 
 import { UpdateFloatingIpsDialog } from './UpdateFloatingIpsDialog';
 
@@ -49,7 +46,7 @@ export const fakeFloatingIPs = [
     url: '/api/openstack-floating-ips/44ececd11e674287abc87b2cdf503948/',
     address: '172.17.65.0',
   },
-] as unknown as FloatingIp[];
+] as unknown as OpenStackFloatingIp[];
 
 type DialogWrapperType = ReactWrapper<typeof UpdateFloatingIpsDialog>;
 

@@ -1,15 +1,13 @@
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
 import { translate } from '@waldur/i18n';
 import {
-  CustomerStep,
+  DetailsOverviewStep,
   PlanStep,
-  ProjectStep,
 } from '@waldur/marketplace/deploy/steps/constants';
 import { FormCloudStep } from '@waldur/marketplace/deploy/steps/FormCloudStep';
 import { FormFinalConfigurationStep } from '@waldur/marketplace/deploy/steps/FormFinalConfigurationStep';
 import { OfferingConfigurationFormStep } from '@waldur/marketplace/deploy/types';
-import { FormSSHPublicKeysStep } from '@waldur/openstack/openstack-instance/deploy/FormSSHPublicKeysStep';
 
 import { MARKETPLACE_RANCHER } from './constants';
 import { FormDataStorageStep } from './FormDataStorageStep';
@@ -17,13 +15,13 @@ import { FormNetworkStep } from './FormNetworkStep';
 import { FormNodesStep } from './FormNodesStep';
 import { FormOptionalServicesStep } from './FormOptionalServicesStep';
 import { FormRancherSecurityGroupsStep } from './FormRancherSecurityGroupsStep';
+import { FormSSHPublicKeysStep } from './FormSSHPublicKeysStep';
 import { FormSystemStorageStep } from './FormSystemStorageStep';
 import { FormTenantStep } from './FormTenantStep';
 import { getRancherMountPointChoices, rancherClusterName } from './utils';
 
 export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
-  CustomerStep,
-  ProjectStep,
+  DetailsOverviewStep,
   PlanStep,
   {
     label: translate('Management offering'),

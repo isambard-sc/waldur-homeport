@@ -1,13 +1,11 @@
 import { SubmissionError } from 'redux-form';
+import { projectCreditsCreate } from 'waldur-js-client';
 
 import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
 import { useNotify } from '@waldur/store/hooks';
-
-import { createProjectCredit } from './api';
-import { ProjectCreditFormData } from './types';
 
 const ProjectCreditFormDialog = lazyComponent(() =>
   import('./ProjectCreditFormDialog').then((module) => ({
@@ -23,12 +21,13 @@ export const ProjectCreateCreditButton = ({ refetch }) => {
       size: 'lg',
       formId: 'ProjectCreditCreateForm',
       onSubmit: async (formData) => {
-        const payload: ProjectCreditFormData = {
-          ...formData,
-          project: formData.project.url,
-        };
         try {
-          await createProjectCredit(payload);
+          await projectCreditsCreate({
+            body: {
+              ...formData,
+              project: formData.project.url,
+            },
+          });
           closeDialog();
           refetch();
           showSuccess(translate('Credit has been created.'));

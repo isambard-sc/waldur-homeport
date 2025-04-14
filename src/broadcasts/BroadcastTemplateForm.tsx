@@ -1,6 +1,3 @@
-import { Modal } from 'react-bootstrap';
-
-import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { required } from '@waldur/core/validators';
 import { FormContainer, StringField, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -11,7 +8,7 @@ export const BroadcastTemplateForm = ({
   submitting: boolean;
 }) => {
   return (
-    <Modal.Body className="scroll-y mx-5 mx-xl-15 my-7">
+    <div className="scroll-y">
       <FormContainer submitting={submitting}>
         <StringField
           name="name"
@@ -32,10 +29,7 @@ export const BroadcastTemplateForm = ({
           required={true}
           validate={required}
         />
-        <div className="mb-5 text-end">
-          <SubmitButton submitting={submitting} label={translate('Save')} />
-        </div>
       </FormContainer>
-    </Modal.Body>
+    </div>
   );
 };

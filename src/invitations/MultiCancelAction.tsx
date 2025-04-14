@@ -1,6 +1,7 @@
 import { Prohibit } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { userInvitationsCancel } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
@@ -8,7 +9,6 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 import { InvitationPolicyService } from './actions/InvitationPolicyService';
-import { InvitationService } from './InvitationService';
 
 const isAnyDisabled = (user, customer, project, rows) => {
   return rows.some((invitation) => {
@@ -63,12 +63,12 @@ export const MultiCancelAction = ({ rows, refetch }) => {
 
   const callback = () => {
     try {
-      Promise.all(rows.map((row) => InvitationService.cancel(row.uuid))).then(
-        () => {
-          refetch();
-          dispatch(showSuccess(translate('Invitations have been cancelled.')));
-        },
-      );
+      Promise.all(
+        rows.map((row) => userInvitationsCancel({ path: { uuid: row.uuid } })),
+      ).then(() => {
+        refetch();
+        dispatch(showSuccess(translate('Invitations have been cancelled.')));
+      });
     } catch (e) {
       dispatch(
         showErrorResponse(e, translate('Unable to cancel invitations.')),
@@ -80,7 +80,7 @@ export const MultiCancelAction = ({ rows, refetch }) => {
     <ActionItem
       title={translate('Cancel')}
       action={callback}
-      iconNode={<Prohibit />}
+      iconNode={<Prohibit weight="bold" />}
       disabled={disabled}
       tooltip={tooltip}
     />

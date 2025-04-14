@@ -26,7 +26,7 @@ interface PageBarContextModel {
 }
 
 interface PageBarProviderProps {
-  scrollTrackSide?: 'top' | 'bottom';
+  scrollTrackSide?: 'top' | 'bottom' | 'area';
   /** Distance from top or bottom to detect sections - in px */
   scrollOffset?: number;
 }
@@ -42,7 +42,7 @@ export const PageBarContext = createContext<PageBarContextModel>({
 export const PageBarProvider: FC<PropsWithChildren<PageBarProviderProps>> = ({
   children,
   scrollOffset = 100,
-  scrollTrackSide = 'bottom',
+  scrollTrackSide = 'area',
 }) => {
   const [tabs, setTabs] = useState<PageBarTab[]>([]);
 

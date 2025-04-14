@@ -1,14 +1,16 @@
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceProviderOfferingsUpdateLocation,
+  Offering,
+} from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { translate } from '@waldur/i18n';
 import { GeolocationPoint } from '@waldur/map/types';
-import { updateOfferingLocation } from '@waldur/marketplace/common/api';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
-import { User } from '@waldur/workspace/types';
 
 import { ARCHIVED } from '../../store/constants';
 
@@ -18,8 +20,14 @@ const SetLocationDialog = lazyComponent(() =>
   })),
 );
 
-export const OfferingLocationButton = ({ offering, refetch }) => {
-  const user = useUser() as User;
+export const OfferingLocationButton = ({
+  offering,
+  refetch,
+}: {
+  offering: Offering;
+  refetch;
+}) => {
+  const user = useUser();
   const dispatch = useDispatch();
   const callback = () =>
     dispatch(
@@ -31,7 +39,10 @@ export const OfferingLocationButton = ({ offering, refetch }) => {
           },
           setLocationFn: async (formData: GeolocationPoint) => {
             try {
-              await updateOfferingLocation(offering.uuid, formData);
+              await marketplaceProviderOfferingsUpdateLocation({
+                path: { uuid: offering.uuid },
+                body: formData,
+              });
               dispatch(
                 showSuccess(translate('Location has been saved successfully.')),
               );

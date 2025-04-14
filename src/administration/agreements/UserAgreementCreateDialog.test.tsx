@@ -1,14 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, beforeEach, afterEach, it, expect, vi } from 'vitest';
+import { userAgreementsCreate } from 'waldur-js-client';
 
-import { post } from '@waldur/core/api';
 import { useModal } from '@waldur/modal/hooks';
 import { useNotify } from '@waldur/store/hooks';
 
 import { UserAgreementCreateDialog } from './UserAgreementCreateDialog';
 
-vi.mock('@waldur/core/api');
+vi.mock('waldur-js-client');
 vi.mock('@waldur/store/hooks');
 vi.mock('@waldur/modal/hooks');
 vi.mock('@waldur/i18n', () => ({
@@ -36,7 +36,7 @@ describe('UserAgreementCreateDialog', () => {
   });
 
   it('submits the form successfully', async () => {
-    vi.mocked(post);
+    vi.mocked(userAgreementsCreate);
     render(
       <UserAgreementCreateDialog resolve={{ refetch: mockResolveRefetch }} />,
     );
@@ -51,9 +51,11 @@ describe('UserAgreementCreateDialog', () => {
     await userEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
-      expect(post).toHaveBeenCalledWith('/user-agreements/', {
-        agreement_type: 'PP',
-        content: 'Test agreement content',
+      expect(userAgreementsCreate).toHaveBeenCalledWith({
+        body: {
+          agreement_type: 'PP',
+          content: 'Test agreement content',
+        },
       });
       expect(mockShowSuccess).toHaveBeenCalledWith(
         'User agreement has been created',

@@ -17,7 +17,7 @@ const validators = [validateState('OK')];
 export const CreateDiskAction: FC<{ resource }> = ({ resource }) => (
   <DialogActionButton
     title={translate('Create disk')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     modalComponent={CreateDiskDialog}
     resource={resource}
     validators={validators}

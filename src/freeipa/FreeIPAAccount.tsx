@@ -2,15 +2,15 @@ import React from 'react';
 import { Card, Col, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useAsyncFn, useEffectOnce } from 'react-use';
+import { freeipaProfilesList } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { router } from '@waldur/router';
 import { showError } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
 
-import { getProfile } from './api';
 import { FreeIPAAccountCreate } from './FreeIPAAccountCreate';
 import { FreeIPAAccountEdit } from './FreeIPAAccountEdit';
 import { SyncProfile } from './SyncProfile';
@@ -19,13 +19,19 @@ export const FreeIpaAccount = () => {
   const user = useUser();
   const dispatch = useDispatch();
 
-  if (!ENV.plugins.WALDUR_FREEIPA?.ENABLED) {
+  if (!ENV.plugins.WALDUR_CORE.FREEIPA_ENABLED) {
     dispatch(showError(translate('FreeIPA extension is disabled.')));
     router.stateService.go('errorPage.notFound');
   }
 
   const [{ loading: isLoading, error, value: profile }, refreshProfile] =
-    useAsyncFn(() => getProfile(user.uuid), [user.uuid]);
+    useAsyncFn(
+      () =>
+        freeipaProfilesList({ query: { user: user.uuid } }).then(
+          (r) => r.data[0],
+        ),
+      [user.uuid],
+    );
 
   useEffectOnce(() => {
     refreshProfile();

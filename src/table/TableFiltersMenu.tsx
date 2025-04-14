@@ -315,7 +315,7 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
             data-kt-menu-placement="bottom-start"
             data-cy="table-add-filter-button"
           >
-            <Plus size={28} />
+            <Plus weight="bold" size={28} />
           </Button>
           <div
             ref={menuEl}

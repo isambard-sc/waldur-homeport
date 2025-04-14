@@ -1,8 +1,8 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceProviderResourcesSubmitReport } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { submitReport } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
@@ -16,8 +16,11 @@ export const SubmitReportDialog: FC<ActionDialogProps> = ({
     <ResourceActionDialog
       submitForm={async (formData) => {
         try {
-          await submitReport(resource.uuid, {
-            report: formData.report ? JSON.parse(formData.report) : undefined,
+          await marketplaceProviderResourcesSubmitReport({
+            path: { uuid: resource.uuid },
+            body: {
+              report: formData.report ? JSON.parse(formData.report) : undefined,
+            },
           });
           dispatch(showSuccess(translate('Report has been submitted')));
           if (refetch) {

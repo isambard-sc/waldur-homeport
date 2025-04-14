@@ -1,20 +1,18 @@
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
-
-import { translate } from '@waldur/i18n';
 import {
-  Category,
   CategoryColumn,
-  CategoryGroup,
-} from '@waldur/marketplace/types';
+  CategoryColumnRequest,
+  marketplaceCategoryColumnsCreate,
+  marketplaceCategoryColumnsList,
+  marketplaceCategoryColumnsUpdate,
+} from 'waldur-js-client';
+
+import { getAllPages } from '@waldur/core/api';
+import { translate } from '@waldur/i18n';
+import { Category, CategoryGroup } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-
-import {
-  createCategoryColumn,
-  getCategoryColumns,
-  updateCategoryColumn,
-} from './admin/api';
 
 export const countSelectedFilters = (filterValues) => {
   const selectedFilters = [];
@@ -105,23 +103,30 @@ interface FormData {
   columns: CategoryColumn[];
 }
 
-async function loadData(categoryUUID: string) {
-  const params = { category_uuid: categoryUUID };
-  const columns = await getCategoryColumns(params);
-  return { columns };
-}
-
 export const useCategoryColumnsEditor = (category: Category) => {
-  const asyncState = useAsync(() => loadData(category.uuid), [category.uuid]);
+  const asyncState = useAsync(
+    () =>
+      getAllPages((page) =>
+        marketplaceCategoryColumnsList({
+          query: { page, category_uuid: category.uuid },
+        }),
+      ),
+    [category.uuid],
+  );
   const dispatch = useDispatch();
 
   const submitRequest = async (formData: FormData) => {
     try {
       const columnRequests = formData.columns.map((column: CategoryColumn) => {
         if (column.uuid) {
-          return updateCategoryColumn(column.uuid, column);
+          return marketplaceCategoryColumnsUpdate({
+            path: { uuid: column.uuid },
+            body: column as CategoryColumnRequest,
+          });
         } else {
-          return createCategoryColumn({ ...column, category: category.url });
+          return marketplaceCategoryColumnsCreate({
+            body: { ...column, category: category.url },
+          });
         }
       });
 
@@ -144,9 +149,7 @@ export const useCategoryColumnsEditor = (category: Category) => {
     }
   };
 
-  const initialValues = asyncState.value
-    ? { columns: asyncState.value.columns }
-    : { columns: [] };
+  const initialValues = { columns: asyncState.value || [] };
 
   return {
     asyncState,

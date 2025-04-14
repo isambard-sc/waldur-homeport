@@ -136,10 +136,6 @@
         "description": "Render list of users in support workspace."
       },
       {
-        "key": "shared_providers",
-        "description": "Render overview of shared marketplace service providers in support workspace."
-      },
-      {
         "key": "resource_usage",
         "description": "Enable resource usage overview charts in support workspace."
       },
@@ -174,20 +170,8 @@
         "description": "Do not allow user to grant multiple roles in the same project or organization using invitation."
       },
       {
-        "key": "show_tax_number",
-        "description": "Show tax number field in invitation creation form."
-      },
-      {
-        "key": "tax_number_required",
-        "description": "Make tax number field mandatory in invitation creation form."
-      },
-      {
         "key": "civil_number_required",
         "description": "Make civil number field mandatory in invitation creation form."
-      },
-      {
-        "key": "require_user_details",
-        "description": "Render \"Show user details\" button in invitation creation form."
       },
       {
         "key": "show_group_invitations",

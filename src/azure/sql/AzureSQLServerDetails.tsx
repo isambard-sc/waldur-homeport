@@ -11,9 +11,14 @@ export const AzureSQLServerDetails: FunctionComponent<OrderDetailsProps> = (
   const { attributes } = props.order;
   return (
     <>
-      <Field label={translate('Admin username')}>{attributes.username}</Field>
+      <Field label={translate('Admin username')}>
+        {attributes['username']}
+      </Field>
       <Field label={translate('Admin password')}>
-        <SecretValueField className="max-w-300" value={attributes.password} />
+        <SecretValueField
+          className="max-w-300"
+          value={attributes['password']}
+        />
       </Field>
     </>
   );

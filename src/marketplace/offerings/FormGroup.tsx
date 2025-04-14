@@ -9,25 +9,42 @@ interface FormGroupProps {
   description?: ReactNode;
   required?: boolean;
   controlId?: string;
+  quickAction?: ReactNode;
+  spaceless?: boolean;
 }
 
 export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => (
-  <Form.Group className="mb-7" controlId={props.controlId}>
+  <Form.Group
+    className={props.spaceless ? undefined : 'mb-7'}
+    controlId={props.controlId}
+  >
     {props.label ? (
       <>
-        <Form.Label className="fs-6 fw-semibold form-label mt-3">
-          {props.description && (
-            <Tip id="form-field-tooltip" label={props.description}>
-              <Question />{' '}
-            </Tip>
+        <div className="d-flex align-items-end">
+          <Form.Label className="fs-6 fw-semibold form-label mt-3">
+            {props.description && (
+              <Tip id="form-field-tooltip" label={props.description}>
+                <Question />{' '}
+              </Tip>
+            )}
+            {props.label}
+            {props.required && <span className="text-danger"> *</span>}
+          </Form.Label>
+          {props.quickAction && (
+            <div className="ms-auto">{props.quickAction}</div>
           )}
-          {props.label}
-          {props.required && <span className="text-danger"> *</span>}
-        </Form.Label>
+        </div>
         <div>{props.children}</div>
       </>
     ) : (
-      <div>{props.children}</div>
+      <>
+        {props.quickAction && (
+          <div className="d-flex align-items-end">
+            <div className="ms-auto">{props.quickAction}</div>
+          </div>
+        )}
+        <div>{props.children}</div>
+      </>
     )}
   </Form.Group>
 );

@@ -1,29 +1,33 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { openstackVolumesAttach, openstackVolumesList } from 'waldur-js-client';
+import { OpenStackVolume } from 'waldur-js-client';
 
-import { getAll } from '@waldur/core/api';
+import { getAllPages } from '@waldur/core/api';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { attachVolume } from '@waldur/openstack/api';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
-import { Volume } from '@waldur/resource/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 
 const getAttachableVolumes = (instanceId, query) =>
-  getAll('/openstack-volumes/', {
-    params: {
-      name: query,
-      attach_instance_uuid: instanceId,
-      o: 'name',
-      runtime_state: 'available',
-    },
-  }).then((options) => ({
+  getAllPages((page) =>
+    openstackVolumesList({
+      query: {
+        page,
+        name: query,
+        attach_instance_uuid: instanceId,
+        // @ts-ignore
+        o: ['name'],
+        runtime_state: 'available',
+      },
+    }),
+  ).then((options) => ({
     options,
   }));
 
-const getOptionLabel = (option: Volume) =>
+const getOptionLabel = (option: OpenStackVolume) =>
   `${option.name} (${formatFilesize(option.size)}, ${
     option.type_name || 'default type'
   })`;
@@ -46,7 +50,10 @@ export const AttachVolumeDialog: FC<ActionDialogProps> = ({
       ]}
       submitForm={async (formData) => {
         try {
-          await attachVolume(formData.volume.uuid, resource.url);
+          await openstackVolumesAttach({
+            path: { uuid: formData.volume.uuid },
+            body: { instance: resource.url },
+          });
           dispatch(showSuccess(translate('Attach has been scheduled.')));
           dispatch(closeModalDialog());
           if (refetch) {

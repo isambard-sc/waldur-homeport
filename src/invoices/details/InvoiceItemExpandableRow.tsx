@@ -7,7 +7,7 @@ import { translate } from '@waldur/i18n';
 import { PriceTooltip } from '@waldur/price/PriceTooltip';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
-import { Invoice, InvoiceTableItem } from '../types';
+import { Invoice, InvoiceItem, InvoiceTableItem } from '../types';
 
 import { InvoiceItemActions } from './InvoiceItemActions';
 import { ResourceLimitPeriodsTable } from './ResourceLimitPeriodsTable';
@@ -15,8 +15,10 @@ import { ResourceLimitPeriodsTable } from './ResourceLimitPeriodsTable';
 interface OwnProps {
   row: InvoiceTableItem;
   invoice: Invoice;
+  items: InvoiceItem[];
   showPrice?: boolean;
   showVat?: boolean;
+  filterCompensationItems?: boolean;
   refresh;
 }
 
@@ -45,9 +47,10 @@ export const InvoiceItemExpandableRow: FC<OwnProps> = (props) => {
               </tr>
             </thead>
             <tbody>
-              {props.row.items.map((item, i) => (
+              {props.items.map((item, i) => (
                 <tr key={i}>
                   <td>
+                    {item.credit && translate('Credit compensation.')}{' '}
                     {item.details.offering_component_name}
                     {item.article_code && (
                       <small className="d-block">
@@ -77,7 +80,7 @@ export const InvoiceItemExpandableRow: FC<OwnProps> = (props) => {
                         <WarningCircle
                           weight="bold"
                           size={16}
-                          className="text-grey-400"
+                          className="text-gray-400"
                         />
                       </td>
                     </OverlayTrigger>

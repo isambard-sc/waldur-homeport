@@ -2,6 +2,7 @@ import { ArrowsClockwise } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
+import { MarketplaceCategoriesListData } from 'waldur-js-client';
 
 import { Image } from '@waldur/core/Image';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
@@ -18,8 +19,8 @@ import { useTable } from '@waldur/table/useTable';
 import { CategoryCreateButton } from './CategoryCreateButton';
 import { CategoryRowActions } from './CategoryRowActions';
 
-const categoryFields = {
-  fields: ['uuid', 'title', 'description', 'icon', 'offering_count', 'group'],
+const categoryFields: MarketplaceCategoriesListData['query'] = {
+  field: ['uuid', 'title', 'description', 'icon', 'offering_count', 'group'],
 };
 
 export const AdminCategoriesPage: FunctionComponent = () => {

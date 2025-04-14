@@ -1,7 +1,8 @@
 import { useAsync } from 'react-use';
 import { reduxForm } from 'redux-form';
+import { openstackTenantsList } from 'waldur-js-client';
 
-import { getAll } from '@waldur/core/api';
+import { getAllPages } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 
@@ -10,7 +11,9 @@ import { VmOverviewFilter } from './VmOverviewFilter';
 
 const VmOverviewFilterComponent = (props) => {
   const { error, value, loading } = useAsync(async () => {
-    const serviceProviders = await getAll('/openstack-tenants/');
+    const serviceProviders = await getAllPages((page) =>
+      openstackTenantsList({ query: { page } }),
+    );
     return formatServiceProviders(serviceProviders);
   }, []);
   if (loading) {

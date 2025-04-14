@@ -14,7 +14,10 @@
     ],
     "ONLY_STAFF_MANAGES_SERVICES": false,
     "USER_MANDATORY_FIELDS": ["full_name", "email"],
-    "LANGUAGE_CHOICES": "en,it,de,es,et,fr,ar"
+    "LANGUAGE_CHOICES": "en,it,de,es,et,fr,ar",
+    "DEFAULT_IDP": "",
+    "FREEIPA_ENABLED": true,
+    "FREEIPA_USERNAME_PREFIX": "waldur_"
   },
   "WALDUR_AUTH_SOCIAL": {},
   "WALDUR_OPENSTACK": {
@@ -29,10 +32,6 @@
     "ALLOW_TO_SELECT_IDENTITY_PROVIDER": true,
     "IDENTITY_PROVIDER_LABEL": null,
     "IDENTITY_PROVIDER_URL": null
-  },
-  "WALDUR_FREEIPA": {
-    "ENABLED": true,
-    "USERNAME_PREFIX": "waldur_"
   },
   "WALDUR_SUPPORT": {
     "ENABLED": true

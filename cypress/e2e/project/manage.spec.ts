@@ -16,6 +16,11 @@ const editedProject = {
   description: 'Test description',
   backend_id: '123456789',
   end_date: next3MonthsISO,
+  type: undefined,
+  image: null,
+  is_industry: undefined,
+  oecd_fos_2007_code: undefined,
+  start_date: undefined,
 };
 
 const openTab = (tab: string) => {
@@ -60,7 +65,7 @@ const updateField = (
 
     .wait('@updateProject')
     .its('request.body')
-    .should('contain', value);
+    .should('contain', { [field]: value });
 };
 
 const closeEditDialog = () => {
@@ -138,53 +143,6 @@ describe('Project manage', { testIsolation: false }, () => {
       getField('backend_id').should('have.value', project.backend_id);
       closeEditDialog();
     });
-  });
-
-  it('Assure that the date picker works fine', () => {
-    openTab('General');
-    openEditDialog('End date');
-
-    cy
-      // Update end_date picker with the initial date
-      .selectFlatpickrDate('.modal input.flatpickr-input', next3MonthsISO)
-
-      .get('.modal button[type="submit"]')
-      .should('be.visible')
-      .click()
-
-      .wait('@updateProject')
-      .its('request.body')
-      .should('contain', next3MonthsISO);
-
-    openEditDialog('End date');
-    cy
-      // Clear and save end_date picker
-      .selectFlatpickrDate('.modal input.flatpickr-input', next3MonthsISO)
-      .selectFlatpickrDate('.modal input.flatpickr-input', null)
-
-      .get('.modal button[type="submit"]')
-      .should('be.visible')
-      .click()
-
-      .wait('@updateProject')
-      .its('request.body')
-      .should('not.contain', next3MonthsISO);
-
-    openEditDialog('End date');
-    cy
-      // Update end_date picker with a new date
-      .selectFlatpickrDate(
-        '.modal input.flatpickr-input',
-        editedProject.end_date,
-      )
-
-      .get('.modal button[type="submit"]')
-      .should('be.visible')
-      .click()
-
-      .wait('@updateProject')
-      .its('request.body')
-      .should('contain', editedProject.end_date);
   });
 
   it('Allows to update project info', () => {

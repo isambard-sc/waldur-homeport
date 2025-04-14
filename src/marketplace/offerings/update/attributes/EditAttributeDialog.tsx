@@ -1,12 +1,12 @@
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceProviderOfferingsUpdateAttributes } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { updateOfferingAttributes } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { formatAttribute } from '../../store/utils';
@@ -36,12 +36,15 @@ export const EditAttributeDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
 
     const submitRequest = async (formData: FormData) => {
       try {
-        await updateOfferingAttributes(resolve.offering.uuid, {
-          ...resolve.offering.attributes,
-          [resolve.attribute.key]: formatAttribute(
-            resolve.attribute,
-            formData.value,
-          ),
+        await marketplaceProviderOfferingsUpdateAttributes({
+          path: { uuid: resolve.offering.uuid },
+          body: {
+            ...resolve.offering.attributes,
+            [resolve.attribute.key]: formatAttribute(
+              resolve.attribute,
+              formData.value,
+            ),
+          },
         });
         if (resolve.refetch) {
           await resolve.refetch();
@@ -57,10 +60,19 @@ export const EditAttributeDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
 
     return (
       <form onSubmit={handleSubmit(submitRequest)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Edit attribute')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Edit attribute')}
+          footer={
+            <>
+              <CloseDialogButton />
+              <SubmitButton
+                disabled={invalid}
+                submitting={submitting}
+                label={translate('Save')}
+              />
+            </>
+          }
+        >
           <p>
             <strong>{translate('Section')}:</strong> {resolve.section.title}
           </p>
@@ -70,15 +82,7 @@ export const EditAttributeDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
           <p>
             <AttributeCell attribute={resolve.attribute} />
           </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <CloseDialogButton />
-          <SubmitButton
-            disabled={invalid}
-            submitting={submitting}
-            label={translate('Save')}
-          />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

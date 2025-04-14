@@ -6,7 +6,7 @@ import { VirtualMachineMultiAction } from './VirtualMachineMultiAction';
 
 export const MultiStartAction = ({ rows, refetch }) => (
   <VirtualMachineMultiAction
-    iconNode={<Play />}
+    iconNode={<Play weight="bold" />}
     rows={rows}
     refetch={refetch}
     {...getProps()}

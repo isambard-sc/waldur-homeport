@@ -1,11 +1,13 @@
-import { Clock } from '@phosphor-icons/react';
+import { CalendarBlank } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  marketplaceProviderResourcesSetEndDateByProvider,
+  Resource,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { updateResourceEndDateByProvider } from '@waldur/marketplace/common/api';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -36,7 +38,11 @@ export const EditResourceEndDateByProviderAction = ({
         resolve: {
           resource,
           refetch,
-          updateEndDate: updateResourceEndDateByProvider,
+          updateEndDate: (uuid, end_date) =>
+            marketplaceProviderResourcesSetEndDateByProvider({
+              path: { uuid },
+              body: { end_date },
+            }),
         },
         size: 'md',
       }),
@@ -53,7 +59,7 @@ export const EditResourceEndDateByProviderAction = ({
     <ActionItem
       title={translate('Set termination date')}
       action={callback}
-      iconNode={<Clock />}
+      iconNode={<CalendarBlank weight="bold" />}
     />
   ) : null;
 };

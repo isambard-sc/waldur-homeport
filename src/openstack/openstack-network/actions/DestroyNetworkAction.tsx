@@ -1,15 +1,16 @@
-import { destroyNetwork } from '@waldur/openstack/api';
+import { openstackNetworksDestroy } from 'waldur-js-client';
+
 import { validateState } from '@waldur/resource/actions/base';
 import { DestroyActionItem } from '@waldur/resource/actions/DestroyActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-const validators = [validateState('OK', 'Erred')];
+const validators = [validateState('OK', 'ERRED')];
 
 export const DestroyNetworkAction: ActionItemType = ({ resource, refetch }) => (
   <DestroyActionItem
     validators={validators}
     resource={resource}
-    apiMethod={destroyNetwork}
+    apiMethod={(id) => openstackNetworksDestroy({ path: { uuid: id } })}
     refetch={refetch}
   />
 );

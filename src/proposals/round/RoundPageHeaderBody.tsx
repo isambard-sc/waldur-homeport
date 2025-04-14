@@ -1,11 +1,12 @@
+import { ProtectedRound } from 'waldur-js-client';
+
 import { formatDateTime, formatRelativeWithHour } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 
-import { Round } from '../types';
 import { getRoundStatus } from '../utils';
 
 interface RoundPageHeaderBodyProps {
-  round: Round;
+  round: ProtectedRound;
 }
 
 export const RoundPageHeaderBody = (props: RoundPageHeaderBodyProps) => {

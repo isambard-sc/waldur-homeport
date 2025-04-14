@@ -14,7 +14,12 @@ import { TableFilterItem } from '@waldur/table/TableFilterItem';
 import { PROVIDER_OFFERINGS_FORM_ID } from './constants';
 
 const getFiltersFromParams = (params) => {
-  if (!params?.state) return params;
+  if (!params?.state) {
+    return {
+      ...params,
+      state: getStates().filter((state) => state.value !== 'Archived'),
+    };
+  }
   return {
     ...params,
     state: getStates().filter((state) => params.state.includes(state.value)),

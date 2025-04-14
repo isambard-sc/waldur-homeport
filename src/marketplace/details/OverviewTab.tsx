@@ -1,11 +1,11 @@
 import { ChatCircleText } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
+import { PublicOfferingDetails } from 'waldur-js-client';
 
 import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { translate } from '@waldur/i18n';
 import { LeafletMap } from '@waldur/map/LeafletMap';
-import { Offering } from '@waldur/marketplace/types';
 
 const DemoButton: FunctionComponent = () => (
   <button className="btn btn-outline btn-success btn-sm">
@@ -17,7 +17,7 @@ const DemoButton: FunctionComponent = () => (
 );
 
 interface OverviewTabProps {
-  offering: Offering;
+  offering: PublicOfferingDetails;
 }
 
 export const OverviewTab: FunctionComponent<OverviewTabProps> = (props) => {

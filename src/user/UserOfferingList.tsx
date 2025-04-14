@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { User } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -6,10 +7,9 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { useUser } from '@waldur/workspace/hooks';
-import { UserDetails } from '@waldur/workspace/types';
 
 interface OwnProps {
-  user?: UserDetails;
+  user?: User;
   hasActionBar?: boolean;
 }
 

@@ -1,14 +1,15 @@
 import { FC } from 'react';
+import { PluginComponent } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { Category, Offering, PluginMetadata } from '@waldur/marketplace/types';
+import { Category, Offering } from '@waldur/marketplace/types';
 
 interface OwnProps {
   data: {
     offering: Offering;
     category: Category;
-    components: PluginMetadata['components'];
+    components: PluginComponent[];
   };
   refetch;
   isLoading;

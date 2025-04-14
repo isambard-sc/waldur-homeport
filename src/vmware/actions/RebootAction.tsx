@@ -1,4 +1,5 @@
 import { ArrowClockwise } from '@phosphor-icons/react';
+import { vmwareVirtualMachineRebootGuest } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
@@ -8,8 +9,6 @@ import {
 } from '@waldur/resource/actions/base';
 import { ActionItemType } from '@waldur/resource/actions/types';
 
-import { rebootVirtualMachine } from '../api';
-
 const validators = [validateState('OK'), validateRuntimeState('POWERED_ON')];
 
 export const RebootAction: ActionItemType = ({ resource, refetch }) => (
@@ -17,8 +16,8 @@ export const RebootAction: ActionItemType = ({ resource, refetch }) => (
     title={translate('Reboot')}
     resource={resource}
     validators={validators}
-    apiMethod={rebootVirtualMachine}
+    apiMethod={(id) => vmwareVirtualMachineRebootGuest({ path: { uuid: id } })}
     refetch={refetch}
-    iconNode={<ArrowClockwise />}
+    iconNode={<ArrowClockwise weight="bold" />}
   />
 );

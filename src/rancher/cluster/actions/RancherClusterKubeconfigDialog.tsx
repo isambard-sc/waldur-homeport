@@ -1,12 +1,12 @@
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
+import { rancherClustersKubeconfigFileRetrieve } from 'waldur-js-client';
 
 import { CopyToClipboard } from '@waldur/core/CopyToClipboard';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { getKubeconfigFile } from '@waldur/rancher/api';
 
 const KubeconfigFilePanel = (props) => {
   return (
@@ -31,7 +31,9 @@ export const RancherClusterKubeconfigDialog: FunctionComponent<any> = (
   props,
 ) => {
   const { loading, error, value } = useAsync(() =>
-    getKubeconfigFile(props.resolve.resource.uuid),
+    rancherClustersKubeconfigFileRetrieve({
+      path: { uuid: props.resolve.resource.uuid },
+    }).then((r) => r.data),
   );
   return (
     <ModalDialog

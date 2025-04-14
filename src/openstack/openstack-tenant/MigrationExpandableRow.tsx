@@ -1,15 +1,11 @@
 import { FC } from 'react';
+import { MigrationDetails } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
 export const MigrationExpandableRow: FC<{
-  row: {
-    mappings: {
-      subnets: { src_cidr; dst_cidr }[];
-      volume_types: { src_type_uuid; dst_type_uuid }[];
-    };
-  };
+  row: MigrationDetails;
 }> = ({ row }) => (
   <ExpandableContainer>
     {row.mappings?.subnets?.length > 0 ? (

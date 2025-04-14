@@ -2,13 +2,12 @@ import { Trash } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { Field } from 'redux-form';
+import { marketplaceCategoryColumnsDestroy } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { FormField } from '@waldur/openstack/openstack-security-groups/rule-editor/FormField';
 import { useNotify } from '@waldur/store/hooks';
-
-import { deleteCategoryColumn } from './api';
 
 export const ColumnRow = ({ column, fields, index }) => {
   const dispatch = useDispatch();
@@ -35,7 +34,7 @@ export const ColumnRow = ({ column, fields, index }) => {
       return;
     }
     try {
-      await deleteCategoryColumn(column.uuid);
+      await marketplaceCategoryColumnsDestroy({ path: { uuid: column.uuid } });
       fields.remove(index);
       showSuccess(translate('Column has been removed successfully.'));
     } catch (e) {

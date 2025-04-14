@@ -1,6 +1,6 @@
-import { Attribute } from '@waldur/marketplace/types';
+import { NestedAttribute } from 'waldur-js-client';
 
-export const ListAttribute: Attribute = {
+export const ListAttribute: NestedAttribute = {
   key: 'node_information_cpu',
   title: 'CPU model',
   type: 'list',
@@ -24,13 +24,14 @@ export const ListAttribute: Attribute = {
   ],
 };
 
-export const BooleanAttribute: Attribute = {
+export const BooleanAttribute: NestedAttribute = {
   key: 'iske_certified',
   title: 'ISKE certified',
   type: 'boolean',
+  options: [],
 };
 
-export const ChoiceAttribute: Attribute = {
+export const ChoiceAttribute: NestedAttribute = {
   key: 'node_information_gpu',
   title: 'GPU model',
   type: 'choice',
@@ -50,8 +51,9 @@ export const ChoiceAttribute: Attribute = {
   ],
 };
 
-export const StringAttribute: Attribute = {
+export const StringAttribute: NestedAttribute = {
   key: 'home_path',
   title: 'ISKE certified',
   type: 'string',
+  options: [],
 };

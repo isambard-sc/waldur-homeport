@@ -7,7 +7,7 @@ import { translate } from '@waldur/i18n';
 import { StepCardPlaceholder } from '@waldur/marketplace/deploy/steps/StepCardPlaceholder';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { loadSecurityGroups } from '@waldur/openstack/api';
-import { FormSecurityGroupsStep } from '@waldur/openstack/openstack-instance/deploy/FormSecurityGroupsStep';
+import { FormSecurityGroupsField } from '@waldur/openstack/openstack-instance/deploy/FormSecurityGroupsField';
 
 import { formTenantSelector } from './utils';
 
@@ -35,20 +35,23 @@ export const FormRancherSecurityGroupsStep = (props: FormStepProps) => {
     }
   }, [props.change, defaultItems]);
 
-  return tenant ? (
-    <FormSecurityGroupsStep {...props} offering={props.offering} />
-  ) : (
+  return (
     <VStepperFormStepCard
       title={translate('Security groups')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
     >
-      <StepCardPlaceholder>
-        {translate('Please select a tenant first')}
-      </StepCardPlaceholder>
+      {tenant ? (
+        <FormSecurityGroupsField
+          offering={props.offering}
+          change={props.change}
+        />
+      ) : (
+        <StepCardPlaceholder>
+          {translate('Please select a tenant first')}
+        </StepCardPlaceholder>
+      )}
     </VStepperFormStepCard>
   );
 };

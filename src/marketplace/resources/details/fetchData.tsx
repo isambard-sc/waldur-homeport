@@ -1,3 +1,10 @@
+import {
+  marketplaceResourcesDetailsRetrieve,
+  marketplaceResourcesOfferingRetrieve,
+  PublicOfferingDetails,
+  Resource,
+} from 'waldur-js-client';
+
 import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -11,9 +18,6 @@ import { hasSupport } from '@waldur/issues/hooks';
 import {
   countLexisLinks,
   countRobotAccounts,
-  getResource,
-  getResourceDetails,
-  getResourceOffering,
 } from '@waldur/marketplace/common/api';
 import { PageBarTab } from '@waldur/navigation/types';
 import { INSTANCE_TYPE, TENANT_TYPE } from '@waldur/openstack/constants';
@@ -27,9 +31,19 @@ export const getResourceTabs = ({
   scope,
   lexisLinksCount,
   robotAccountsCount,
+}: {
+  resource: Resource;
+  offering: PublicOfferingDetails;
+  scope;
+  lexisLinksCount;
+  robotAccountsCount;
 }) => {
   // Generate tabs
-  const tabs: PageBarTab[] = [];
+  const tabs: PageBarTab<{
+    resource: Resource;
+    resourceScope;
+    offering: PublicOfferingDetails;
+  }>[] = [];
 
   const endpoints = getResourceAccessEndpoints(resource, offering);
   if (offering.getting_started || endpoints.length > 0) {
@@ -101,7 +115,7 @@ export const getResourceTabs = ({
   }
 
   if (scope) {
-    tabs.push(...getTabs(scope.resource_type));
+    tabs.push(...(getTabs(scope.resource_type) as any));
   }
 
   if (lexisLinksCount) {
@@ -226,16 +240,33 @@ export const getResourceTabs = ({
       ),
     });
   }
+  // @ts-ignore
+  if (resource.report?.length > 0) {
+    tabs.push({
+      key: 'report',
+      title: translate('Report'),
+      component: lazyComponent(() =>
+        import('./ShowReportCard').then((module) => ({
+          default: module.ShowReportCard,
+        })),
+      ),
+    });
+  }
   return tabs;
 };
 
-export const fetchData = async (resourceId) => {
-  const resource = await getResource(resourceId);
+export const fetchData = async (resource: Resource) => {
   let scope;
   if (resource.scope) {
-    scope = await getResourceDetails(resourceId);
+    scope = (
+      await marketplaceResourcesDetailsRetrieve({
+        path: { uuid: resource.uuid },
+      })
+    ).data;
   }
-  const offering = await getResourceOffering(resource.uuid);
+  const offering = await marketplaceResourcesOfferingRetrieve({
+    path: { uuid: resource.uuid },
+  }).then((response) => response.data);
   const components = offering.components;
 
   let lexisLinksCount = 0;
@@ -249,7 +280,6 @@ export const fetchData = async (resourceId) => {
   });
 
   return {
-    resource,
     scope,
     components,
     offering,

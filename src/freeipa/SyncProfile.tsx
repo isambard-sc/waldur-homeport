@@ -2,12 +2,11 @@ import { ArrowsClockwise } from '@phosphor-icons/react';
 import { useCallback, FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { freeipaProfilesUpdateSshKeys } from 'waldur-js-client';
 
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-
-import { syncProfile } from './api';
 
 export const SyncProfile: FunctionComponent<{
   profile;
@@ -18,8 +17,10 @@ export const SyncProfile: FunctionComponent<{
   const callback = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await syncProfile(profile.uuid);
-      if (response.status === 204) {
+      const result = await freeipaProfilesUpdateSshKeys({
+        path: { uuid: profile.uuid },
+      });
+      if (result.response.status === 204) {
         dispatch(
           showSuccess(
             translate('Your FreeIPA has been removed in FreeIPA server.'),

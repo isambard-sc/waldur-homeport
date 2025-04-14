@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { getFormSyncErrors, isValid } from 'redux-form';
+import { getFormSyncErrors, isValid, getFormSubmitErrors } from 'redux-form';
 
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
@@ -72,15 +72,6 @@ export const generateSystemImageChoices = (data: any[]) => {
   return _choices;
 };
 
-export const scrollToView = (viewId: string) => {
-  const el = document.getElementById(viewId);
-  window.scroll({
-    behavior: 'smooth',
-    left: 0,
-    top: el.offsetTop - 130,
-  });
-};
-
 export const hasStepWithField = (
   steps: OfferingConfigurationFormStep[],
   field: string,
@@ -106,3 +97,6 @@ export const formIsValidSelector = (state: RootState) =>
 
 export const formErrorsSelector = (state: RootState) =>
   getFormSyncErrors(ORDER_FORM_ID)(state) as any;
+
+export const formSubmitErrorsSelector = (state: RootState) =>
+  getFormSubmitErrors(ORDER_FORM_ID)(state) as any;

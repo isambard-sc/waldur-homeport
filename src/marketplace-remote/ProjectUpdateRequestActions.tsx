@@ -1,12 +1,19 @@
-import { ReviewActions } from '@waldur/marketplace-remote/ReviewActions';
+import {
+  marketplaceProjectUpdateRequestsApprove,
+  marketplaceProjectUpdateRequestsReject,
+} from 'waldur-js-client';
 
-import { approveProjectUpdateRequest, rejectProjectUpdateRequest } from './api';
+import { ReviewActions } from '@waldur/marketplace-remote/ReviewActions';
 
 export const ProjectUpdateRequestActions = ({ request, refetch }) => (
   <ReviewActions
     request={request}
     refetch={refetch}
-    approveMethod={approveProjectUpdateRequest}
-    rejectMethod={rejectProjectUpdateRequest}
+    approveMethod={(uuid) =>
+      marketplaceProjectUpdateRequestsApprove({ path: { uuid } })
+    }
+    rejectMethod={(uuid) =>
+      marketplaceProjectUpdateRequestsReject({ path: { uuid } })
+    }
   />
 );

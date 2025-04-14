@@ -37,12 +37,10 @@ export const FormSystemStorageStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('System storage')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       loading={isLoading}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
     >
       {nodes?.length ? (
         <FormNodeStorageTable volumeTypeChoices={data?.volumeTypeChoices}>

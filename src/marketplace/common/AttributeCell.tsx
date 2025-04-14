@@ -1,15 +1,10 @@
 import { Check, X } from '@phosphor-icons/react';
 import React from 'react';
-
-import { FormattedHtml } from '@waldur/core/FormattedHtml';
-
-import { Attribute } from '../types';
-
-import { SecretField } from './SecretField';
+import { NestedAttribute } from 'waldur-js-client';
 
 interface AttributeCellProps {
   value: string | string[] | number | boolean | undefined;
-  attr: Attribute;
+  attr: NestedAttribute;
 }
 
 export const AttributeCell: React.FC<AttributeCellProps> = ({
@@ -52,15 +47,6 @@ export const AttributeCell: React.FC<AttributeCellProps> = ({
       const option = attr.options.find((item) => item.key === value);
       return <>{option ? option.title : 'N/A'}</>;
     }
-
-    case 'password': {
-      return (
-        <>{typeof value === 'string' ? <SecretField value={value} /> : 'N/A'}</>
-      );
-    }
-
-    case 'html':
-      return <FormattedHtml html={value.toString()} />;
 
     default:
       return <>{value === undefined ? 'N/A' : value}</>;

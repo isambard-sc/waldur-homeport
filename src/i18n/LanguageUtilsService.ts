@@ -1,7 +1,6 @@
-import Axios from 'axios';
 import { Settings } from 'luxon';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { LanguageOption } from '@waldur/core/types';
 
 import { getLanguageKey, setLanguageKey } from './LanguageStorage';
@@ -25,7 +24,6 @@ class LanguageUtilsServiceClass {
       this.dictionary = mod.default;
     });
     Settings.defaultLocale = language.code;
-    Axios.defaults.headers['Accept-Language'] = language.code;
   }
 
   checkLanguage() {

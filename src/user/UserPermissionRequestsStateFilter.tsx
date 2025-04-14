@@ -6,11 +6,7 @@ import {
   Select,
 } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
-
-interface Option {
-  value: string;
-  label: string;
-}
+import { Option } from '@waldur/marketplace/common/registry';
 
 export const getStates = (): Option[] => [
   { value: 'pending', label: translate('Pending') },

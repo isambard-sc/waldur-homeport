@@ -1,11 +1,10 @@
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { marketplaceResourcesMoveResource, Resource } from 'waldur-js-client';
 
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { moveResource } from '@waldur/marketplace/common/api';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -26,7 +25,15 @@ const PureMultiMoveDialog: FunctionComponent<any> = (props) => {
   const submitRequest = (formData: FormData) => {
     Promise.all(
       props.resolve.rows.map((row) =>
-        moveResource(row.uuid, formData.project.url),
+        marketplaceResourcesMoveResource({
+          path: { uuid: row.uuid },
+          // @ts-ignore
+          body: {
+            project: {
+              url: formData.project.url,
+            },
+          },
+        }),
       ),
     ).then(() => {
       props.resolve.refetch();

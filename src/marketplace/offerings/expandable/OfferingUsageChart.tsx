@@ -2,11 +2,12 @@ import { DateTime } from 'luxon';
 import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
 import { useAsync } from 'react-use';
+import { marketplaceProviderOfferingsComponentStatsList } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { generateColors } from '@waldur/core/generateColors';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { getProviderOfferingComponentStats } from '@waldur/marketplace/offerings/expandable/api';
 import { ResourceUsageTabs } from '@waldur/marketplace/resources/usage/ResourceUsageTabs';
 import { Offering } from '@waldur/marketplace/types';
 
@@ -21,18 +22,23 @@ export const OfferingUsageChart: FunctionComponent<OfferingUsageChartProps> = ({
     loading,
     error,
     value: usages,
-  } = useAsync(async () => {
-    const usages = await getProviderOfferingComponentStats(offering.uuid, {
-      params: {
-        start: DateTime.now()
-          .minus({ months: 12 })
-          .startOf('month')
-          .toFormat('yyyy-MM'),
-        end: DateTime.now().endOf('month').toFormat('yyyy-MM'),
-      },
-    });
-    return usages;
-  }, [offering]);
+  } = useAsync(
+    () =>
+      getAllPages((page) =>
+        marketplaceProviderOfferingsComponentStatsList({
+          path: { uuid: offering.uuid },
+          query: {
+            page,
+            start: DateTime.now()
+              .minus({ months: 12 })
+              .startOf('month')
+              .toFormat('yyyy-MM'),
+            end: DateTime.now().endOf('month').toFormat('yyyy-MM'),
+          },
+        }),
+      ),
+    [offering],
+  );
 
   return (
     <Card className="card-bordered mb-10">
@@ -52,7 +58,7 @@ export const OfferingUsageChart: FunctionComponent<OfferingUsageChartProps> = ({
         ) : (
           <ResourceUsageTabs
             components={offering.components}
-            usages={usages}
+            usages={usages as any}
             months={12}
             colors={generateColors(offering.components.length, {
               colorStart: 0.25,

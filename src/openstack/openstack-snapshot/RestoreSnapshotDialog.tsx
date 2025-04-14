@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { openstackSnapshotsRestore } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { restoreSnapshot } from '@waldur/openstack/api';
 import {
   createLatinNameField,
   createDescriptionField,
@@ -25,7 +25,10 @@ export const RestoreSnapshotDialog: FC<ActionDialogProps> = ({
       }}
       submitForm={async (formData) => {
         try {
-          await restoreSnapshot(resource.uuid, formData);
+          await openstackSnapshotsRestore({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(
             showSuccess(translate('Volume snapshot has been restored.')),
           );

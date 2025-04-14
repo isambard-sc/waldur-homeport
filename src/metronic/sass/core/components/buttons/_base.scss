@@ -39,7 +39,7 @@
     border-radius: 0;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    color: $primary;
+    color: $brand;
     font-weight: $btn-font-weight;
     box-shadow: none !important;
     text-align: left;
@@ -106,8 +106,8 @@
     line-height: 0;
   }
   &.btn-icon-right {
-    .svg-icon,
-    i {
+    .svg-icon:last-child,
+    i:last-child {
       margin: 0;
       margin-left: 0.35rem;
     }

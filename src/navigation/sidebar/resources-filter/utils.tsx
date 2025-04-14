@@ -11,6 +11,7 @@ import {
   PROJECT_RESOURCES_ALL_FILTER_FORM_ID,
 } from '@waldur/marketplace/resources/list/constants';
 import { applyFilters, setFilter } from '@waldur/table/actions';
+import { selectFiltersStorage } from '@waldur/table/selectors';
 import { TableSidebarFilterValues } from '@waldur/table/TableFilterItem';
 
 import { useOfferingCategories } from '../utils';
@@ -149,4 +150,12 @@ export const useOrganizationAndProjectFiltersForResources = (
   );
 
   return { syncResourceFilters };
+};
+
+export const sidebarResourcesFilterSelector = (state: any) => {
+  const filters = selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID);
+  if (!filters?.length) return null;
+  const project = filters.find((item) => item.name === 'project');
+  const organization = filters.find((item) => item.name === 'organization');
+  return { project: project?.value, organization: organization?.value };
 };

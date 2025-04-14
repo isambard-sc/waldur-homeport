@@ -3,17 +3,15 @@ import { useRouter } from '@uirouter/react';
 import { useCallback } from 'react';
 import { Card, Col, Form, Row, Stack } from 'react-bootstrap';
 import { useAsync } from 'react-use';
+import { usersList, versionRetrieve } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
-import { fixURL } from '@waldur/core/api';
+import { getIconUrl, parseSelectData } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SymbolsGroup } from '@waldur/customer/dashboard/SymbolsGroup';
 import { DashboardHeroLogo } from '@waldur/dashboard/hero/DashboardHeroLogo';
 import { translate } from '@waldur/i18n';
-import { getUsers } from '@waldur/marketplace/common/api';
 import { getRoleFilterOptions } from '@waldur/user/support/utils';
-
-import { getVersion } from '../api';
 
 interface AdministrationProfileProps {
   healthy: boolean;
@@ -26,19 +24,28 @@ export const AdministrationProfile = ({
 }: AdministrationProfileProps) => {
   const router = useRouter();
 
-  const image = fixURL('/icons/login_logo/');
+  const image = getIconUrl('login_logo');
   const website = ENV.plugins.WALDUR_CORE.HOMEPORT_URL;
   const email = ENV.plugins.WALDUR_CORE.SITE_EMAIL;
   const phone = ENV.plugins.WALDUR_CORE.SITE_PHONE;
 
-  const { data: version } = useQuery(['version'], () => getVersion(), {
-    staleTime: Infinity,
-  });
+  const { data: version } = useQuery(
+    ['version'],
+    () => versionRetrieve().then((r) => r.data),
+    {
+      staleTime: Infinity,
+    },
+  );
 
   const { value, loading } = useAsync(() => {
     const promises = [
-      !supportOnly && getUsers({ page: 1, page_size: 6, is_staff: true }),
-      getUsers({ page: 1, page_size: 6, is_support: true }),
+      !supportOnly &&
+        usersList({ query: { page: 1, page_size: 6, is_staff: true } }).then(
+          parseSelectData,
+        ),
+      usersList({ query: { page: 1, page_size: 6, is_support: true } }).then(
+        parseSelectData,
+      ),
     ];
     return Promise.all(promises);
   });

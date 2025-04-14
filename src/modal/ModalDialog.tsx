@@ -4,7 +4,7 @@ import { Modal } from 'react-bootstrap';
 
 import Bg from '@waldur/navigation/header/search/Background.svg';
 
-export interface ModalDialogProps {
+interface ModalDialogProps {
   title?: ReactNode;
   subtitle?: ReactNode;
   iconNode?: ReactNode;
@@ -41,6 +41,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
         closeButton={closeButton}
         className={classNames(
           headerClassName,
+          'without-border pb-0',
           !title && 'without-border',
           iconNode && 'has-icon',
         )}
@@ -62,15 +63,21 @@ export const ModalDialog: FC<ModalDialogProps> = ({
           )}
           <Modal.Title className="fw-bold">{title}</Modal.Title>
           {subtitle && (
-            <h6 className="text-grey-500 fw-normal mt-2">{subtitle}</h6>
+            <h6 className="text-gray-500 fw-normal mt-2">{subtitle}</h6>
           )}
         </div>
         {actions}
       </Modal.Header>
     )}
-    <Modal.Body className={bodyClassName}>{children}</Modal.Body>
+    <Modal.Body className={classNames(bodyClassName, 'border-0')}>
+      {children}
+    </Modal.Body>
     {footer && (
-      <Modal.Footer className={footerClassName}>{footer}</Modal.Footer>
+      <Modal.Footer
+        className={classNames(footerClassName, 'border-0 pt-0 gap-2')}
+      >
+        {footer}
+      </Modal.Footer>
     )}
   </div>
 );

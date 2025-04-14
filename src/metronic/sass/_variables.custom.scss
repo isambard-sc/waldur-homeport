@@ -7,23 +7,23 @@
 // Theme colors
 // Primary base
 $primary-25: if(isDarkMode(), #103000, #fafcf9);
-$primary-50: if(isDarkMode(), #1a261d, #f1f7ef);
-$primary-100: if(isDarkMode(), #2b3d2f, #e6f0e3);
-$primary-200: if(isDarkMode(), #405448, #c3dabb);
-$primary-300: if(isDarkMode(), #5d806b, #97bf89);
-$primary-400: if(isDarkMode(), #5d806b, #6ca359);
-$primary-500: if(isDarkMode(), #5d806b, #398500);
-$primary-600: if(isDarkMode(), #6f977f, #307300);
-$primary-700: if(isDarkMode(), #adcba2, #286100);
-$primary-800: if(isDarkMode(), #f1f7ef, #1f5000);
-$primary-900: if(isDarkMode(), #ffffff, #174000);
-$primary-950: if(isDarkMode(), #ffffff, #103000);
+$primary-50: if(isDarkMode(), #174000, #f1f7ef);
+$primary-100: if(isDarkMode(), #1f5000, #e6f0e3);
+$primary-200: if(isDarkMode(), #286100, #c3dabb);
+$primary-300: if(isDarkMode(), #307300, #97bf89);
+$primary-400: if(isDarkMode(), #398500, #6ca359);
+$primary-500: if(isDarkMode(), #6ca359, #398500);
+$primary-600: if(isDarkMode(), #97bf89, #307300);
+$primary-700: if(isDarkMode(), #c3dabb, #286100);
+$primary-800: if(isDarkMode(), #e6f0e3, #1f5000);
+$primary-900: if(isDarkMode(), #f1f7ef, #174000);
+$primary-950: if(isDarkMode(), #fafcf9, #103000);
 
 // Primary
-$primary: if(isDarkMode(), #78bf69, $primary-600);
-$primary-active: if(isDarkMode(), #53a642, $primary-700);
+$primary: if(isDarkMode(), $primary-300, $primary-600);
+$primary-active: if(isDarkMode(), $primary-200, $primary-700);
 $primary-light: if(isDarkMode(), #214729, $primary-50);
-$primary-inverse: if(isDarkMode(), #172219, #ffffff);
+$primary-inverse: if(isDarkMode(), #fff, #fff);
 
 // Secondary
 $secondary: $primary-50 !default;
@@ -35,60 +35,128 @@ $secondary-dark-inverse: $primary-800 !default;
 
 // Light/Gray
 $gray-50: if(isDarkMode(), #161b26, #f9fafb) !default; // Custom variable
-$grey-200: if(isDarkMode(), #333741, #e4e7ec) !default; // Custom variable
+$gray-200: if(isDarkMode(), #333741, #e4e7ec) !default; // Custom variable
+$gray-500: if(isDarkMode(), #94969c, #667085) !default; // Custom variable
 $gray-700: if(isDarkMode(), #ececed, #344054) !default;
 
+// Transparent White
+$white-1: #fff1;
+$white-2: #fff2;
+$white-3: #fff3;
+$white-6: #fff6;
+$white-8: #fff8;
+
+// Brand
+$brand-50: if(isDarkMode(), var(--waldur-brand-900), var(--waldur-brand-50));
+$brand-200: if(isDarkMode(), var(--waldur-brand-700), var(--waldur-brand-200));
+$brand-500: if(isDarkMode(), var(--waldur-brand-400), var(--waldur-brand-500));
+$brand-700: if(isDarkMode(), var(--waldur-brand-200), var(--waldur-brand-700));
+$brand-200-rgb: if(
+  isDarkMode(),
+  var(--waldur-brand-700-rgb),
+  var(--waldur-brand-200-rgb)
+);
+$brand-300-rgb: if(
+  isDarkMode(),
+  var(--waldur-brand-600-rgb),
+  var(--waldur-brand-300-rgb)
+);
+$brand-700-rgb: if(
+  isDarkMode(),
+  var(--waldur-brand-200-rgb),
+  var(--waldur-brand-700-rgb)
+);
+
 // Success
-$success-50: #ecfdf3;
-$success-200: #a6f4c5;
-$success-500: #12b76a;
-$success-600: #039855;
-$success-700: #027a48;
-$success: if(isDarkMode(), #53a642, $success-600);
+$success-50: if(isDarkMode(), #054f31, #ecfdf3);
+$success-200: if(isDarkMode(), #027a48, #a6f4c5);
+$success-300: if(isDarkMode(), #039855, #6ce9a6);
+$success-400: if(isDarkMode(), #12b76a, #32d583);
+$success-500: if(isDarkMode(), #32d583, #12b76a);
+$success-600: if(isDarkMode(), #6ce9a6, #039855);
+$success-700: if(isDarkMode(), #a6f4c5, #027a48);
+$success-900: if(isDarkMode(), #ecfdf3, #054f31);
+$success: $success-600;
 $success-active: if(isDarkMode(), #22c100, $success-700);
 $success-light: if(isDarkMode(), #1c3238, $success-50);
 $success-inverse: #ffffff;
 
 // Info
-$info-50: #f4f3ff;
-$info-200: #d9d6fe;
-$info-300: #bdb4fe;
-$info-500: #7a5af8;
-$info-600: #6938ef;
-$info-700: #5925dc;
-$info: if(isDarkMode(), $info-300, $info-600);
+$info-50: if(isDarkMode(), #3e1c96, #f4f3ff);
+$info-200: if(isDarkMode(), #5925dc, #d9d6fe);
+$info-300: if(isDarkMode(), #6938ef, #bdb4fe);
+$info-400: if(isDarkMode(), #7a5af8, #9b8afb);
+$info-500: if(isDarkMode(), #9b8afb, #7a5af8);
+$info-600: if(isDarkMode(), #bdb4fe, #6938ef);
+$info-700: if(isDarkMode(), #d9d6fe, #5925dc);
+$info-900: if(isDarkMode(), #f4f3ff, #3e1c96);
+$info: $info-600;
 $info-active: if(isDarkMode(), #7337ee, $info-700);
 $info-light: if(isDarkMode(), #2f264f, $info-50);
 $info-inverse: #ffffff;
 
 // Danger
-$danger-50: #fef3f2 !default;
-$danger-200: #fecdca !default;
-$danger-500: #f04438 !default;
-$danger-600: #d92d20 !default;
-$danger-700: #b42318 !default;
-$danger: if(isDarkMode(), #ff7e39, $danger-600);
+$danger-50: if(isDarkMode(), #7a271a, #fef3f2) !default;
+$danger-200: if(isDarkMode(), #b42318, #fecdca) !default;
+$danger-300: if(isDarkMode(), #d92d20, #fda29b) !default;
+$danger-400: if(isDarkMode(), #f04438, #f97066) !default;
+$danger-500: if(isDarkMode(), #f97066, #f04438) !default;
+$danger-600: if(isDarkMode(), #fda29b, #d92d20) !default;
+$danger-700: if(isDarkMode(), #fecdca, #b42318) !default;
+$danger-900: if(isDarkMode(), #fef3f2, #7a271a) !default;
+$danger: $danger-600;
 $danger-active: if(isDarkMode(), #f5641e, $danger-700);
 $danger-light: if(isDarkMode(), #3a2434, $danger-50);
 $danger-inverse: #ffffff;
 
 // Warning
-$warning-50: #fffaeb !default;
-$warning-200: #fedf89 !default;
-$warning-500: #f79009 !default;
-$warning-600: #dc6803 !default;
-$warning-700: #b54708 !default;
-$warning: if(isDarkMode(), #ffa800, $warning-600);
+$warning-50: if(isDarkMode(), #7a2e0e, #fffaeb) !default;
+$warning-200: if(isDarkMode(), #b54708, #fedf89) !default;
+$warning-300: if(isDarkMode(), #dc6803, #fec84b) !default;
+$warning-400: if(isDarkMode(), #f79009, #fdb022) !default;
+$warning-500: if(isDarkMode(), #fdb022, #f79009) !default;
+$warning-600: if(isDarkMode(), #fec84b, #dc6803) !default;
+$warning-700: if(isDarkMode(), #fedf89, #b54708) !default;
+$warning-900: if(isDarkMode(), #fffaeb, #7a2e0e) !default;
+$warning: $warning-600;
 $warning-active: if(isDarkMode(), #ee9d01, $warning-700);
 $warning-light: if(isDarkMode(), #392f28, $warning-50);
 $warning-inverse: #ffffff;
+
+// Custom colors
+// Pink
+$pink-50: if(isDarkMode(), #851651, #fdf2fa) !default;
+$pink-200: if(isDarkMode(), #c11574, #fcceee) !default;
+$pink-300: if(isDarkMode(), #dd2590, #faa7e0) !default;
+$pink-500: if(isDarkMode(), #f670c7, #ee46bc) !default;
+$pink-600: if(isDarkMode(), #faa7e0, #dd2590) !default;
+$pink-700: if(isDarkMode(), #fcceee, #c11574) !default;
+$pink-900: if(isDarkMode(), #fdf2fa, #851651) !default;
+
+// Blue
+$blue-50: if(isDarkMode(), #194185, #eff8ff) !default;
+$blue-200: if(isDarkMode(), #175cd3, #b2ddff) !default;
+$blue-300: if(isDarkMode(), #1570ef, #84caff) !default;
+$blue-500: if(isDarkMode(), #53b1fd, #2e90fa) !default;
+$blue-600: if(isDarkMode(), #84caff, #1570ef) !default;
+$blue-700: if(isDarkMode(), #b2ddff, #175cd3) !default;
+$blue-900: if(isDarkMode(), #eff8ff, #194185) !default;
+
+// Teal
+$teal-50: if(isDarkMode(), #134e48, #f0fdf9) !default;
+$teal-200: if(isDarkMode(), #107569, #99f6e0) !default;
+$teal-300: if(isDarkMode(), #0e9384, #5fe9d0) !default;
+$teal-500: if(isDarkMode(), #2ed3b7, #15b79e) !default;
+$teal-600: if(isDarkMode(), #5fe9d0, #0e9384) !default;
+$teal-700: if(isDarkMode(), #99f6e0, #107569) !default;
+$teal-900: if(isDarkMode(), #f0fdf9, #134e48) !default;
 
 $dropdown-item-padding-x: 16px;
 $dropdown-item-padding-y: 10px;
 $dropdown-link-hover-color: $gray-700;
 $dropdown-link-hover-bg: $gray-50;
 $dropdown-link-active-color: $gray-700;
-$dropdown-link-active-bg: $grey-200;
+$dropdown-link-active-bg: $gray-200;
 
 // Dark colors
 $theme-dark-colors: (
@@ -100,15 +168,72 @@ $theme-dark-inverse-colors: (
   'secondary': $secondary-dark-inverse,
 ) !default; // Custom variable
 
+// 50 colors
+$theme-50-colors: (
+  'brand': $brand-50,
+  'gray': $gray-50,
+  'primary': $primary-50,
+  'secondary': $secondary-light,
+  'light': $gray-50,
+  'success': $success-50,
+  'info': $info-50,
+  'warning': $warning-50,
+  'danger': $danger-50,
+  // custom colors
+  'pink': $pink-50,
+  'blue': $blue-50,
+  'teal': $teal-50,
+) !default; // Custom variable
+
 // 200 colors
 $theme-200-colors: (
+  'brand': $brand-200,
+  'gray': $gray-200,
   'primary': $primary-200,
   'secondary': $secondary-active,
-  'light': $grey-200,
+  'light': $gray-200,
   'success': $success-200,
   'info': $info-200,
   'warning': $warning-200,
   'danger': $danger-200,
+  // custom colors
+  'pink': $pink-200,
+  'blue': $blue-200,
+  'teal': $teal-200,
+) !default; // Custom variable
+
+// 500 colors
+$theme-500-colors: (
+  'brand': $brand-500,
+  'gray': $gray-500,
+  'primary': $primary-500,
+  'secondary': $secondary-dark,
+  'light': $gray-500,
+  'success': $success-500,
+  'info': $info-500,
+  'warning': $warning-500,
+  'danger': $danger-500,
+  // custom colors
+  'pink': $pink-500,
+  'blue': $blue-500,
+  'teal': $teal-500,
+) !default; // Custom variable
+
+// 700 colors
+$theme-700-colors: (
+  'brand': $brand-700,
+  'gray': $gray-700,
+  'primary': $primary-700,
+  'secondary': $secondary-dark,
+  'light': $gray-700,
+  'success': $success-700,
+  'info': $info-700,
+  'warning': $warning-700,
+  'danger': $danger-700,
+  // custom colors
+  'pink': $pink-700,
+  'blue': $blue-700,
+  'teal': $teal-700,
 ) !default; // Custom variable
 
 // Card
@@ -117,12 +242,27 @@ $card-px: 1.85rem !default;
 
 // Buttons + Forms
 //
-$input-btn-padding-y-sm: 0.195rem !default;
+$input-btn-padding-y-sm: 0.39rem !default;
 
 $btn-padding-y-sm: $input-btn-padding-y-sm !default;
-$btn-padding-x-sm: 0.62rem !default;
+$btn-padding-x-sm: 0.54rem !default;
 
 $btn-disabled-opacity: 1 !default;
+
+// Check & Radio
+$form-check-input-width: 1.539rem !default;
+$form-check-input-width-sm: 1.231rem !default;
+$form-check-input-bg-size: 70% 70% !default;
+$form-check-input-border-radius: 0.287em !default;
+$form-check-input-focus-box-shadow: 0 0 0 4px rgba($brand-300-rgb, 0.25) !default;
+$form-check-input-checked-bg-color: $brand-50 !default;
+$form-check-input-indeterminate-bg-color: $brand-50 !default;
+
+// Switch
+$form-switch-width: 3.386rem !default;
+$form-switch-height: 1.85rem !default; // Custom variable
+$form-switch-width-sm: 2.77rem !default; // Custom variable
+$form-switch-height-sm: 1.54rem !default; // Custom variable
 
 // Modals
 
@@ -136,6 +276,7 @@ $modal-sm: 400px !default;
 $badge-font-size: 1.08rem !default;
 $badge-font-size-sm: 0.92rem !default;
 $badge-font-size-lg: 1.08rem !default;
+$badge-font-weight: 500 !default;
 $badge-padding-y: 0.285em !default;
 $badge-padding-y-sm: 0.34em !default; // Custom variable
 $badge-padding-y-lg: 0.43em !default; // Custom variable

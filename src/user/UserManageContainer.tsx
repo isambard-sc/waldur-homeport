@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import { usersRetrieve } from 'waldur-js-client';
 
 import { usePermissionView } from '@waldur/auth/PermissionLayout';
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -14,9 +14,7 @@ import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { IBreadcrumbItem, PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { UserProfileHero } from '@waldur/user/dashboard/UserProfileHero';
-import { getUser } from '@waldur/user/support/api';
-import { getUser as getUserSelecor } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { CompleteYourProfileBanner } from './CompleteYourProfileBanner';
 import { UsersService } from './UsersService';
@@ -52,17 +50,17 @@ export const UserManageContainer = ({ isPersonal }) => {
   } = useCurrentStateAndParams();
 
   const { data, isLoading, error, refetch } = useQuery(
-    ['UserDetails', user_uuid],
-    () => (isPersonal ? null : getUser(user_uuid)),
+    ['User', user_uuid],
+    () => (isPersonal ? null : usersRetrieve({ path: { uuid: user_uuid } })),
     {
       staleTime: 3 * 60 * 1000,
       refetchOnWindowFocus: false,
     },
   );
 
-  const currentUser = useSelector(getUserSelecor) as UserDetails;
+  const currentUser = useUser();
 
-  const user = isPersonal ? currentUser : data;
+  const user = isPersonal ? currentUser : data?.data;
 
   const breadcrumbItems = useMemo<IBreadcrumbItem[]>(() => {
     return [

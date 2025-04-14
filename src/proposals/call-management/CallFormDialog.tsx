@@ -3,6 +3,11 @@ import { useRouter } from '@uirouter/react';
 import React, { useEffect } from 'react';
 import { connect, useSelector } from 'react-redux';
 import { SubmissionError, reduxForm } from 'redux-form';
+import {
+  callManagingOrganisationsList,
+  proposalProtectedCallsCreate,
+  proposalProtectedCallsPartialUpdate,
+} from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -19,11 +24,10 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { createCall, getCallManagingOrganization, updateCall } from '../api';
-
 interface FormData {
   name: string;
   description: string;
+  manager: string;
 }
 
 export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
@@ -43,7 +47,10 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
       refetch,
     } = useQuery(
       ['CallManagingOrganizations', customer.uuid],
-      () => getCallManagingOrganization(customer.uuid),
+      () =>
+        callManagingOrganisationsList({
+          query: { customer_uuid: customer.uuid },
+        }).then((response) => response.data[0]),
       {
         staleTime: 60 * 1000,
       },
@@ -60,9 +67,12 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
       (values: FormData, dispatch) => {
         let action;
         if (isEdit) {
-          action = updateCall(values, props.resolve.call.uuid);
+          action = proposalProtectedCallsPartialUpdate({
+            body: values,
+            path: { uuid: props.resolve.call.uuid },
+          });
         } else {
-          action = createCall(values);
+          action = proposalProtectedCallsCreate({ body: values });
         }
 
         return action

@@ -2,10 +2,11 @@ import { FunctionComponent, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { InjectedFormProps, reduxForm } from 'redux-form';
+import { paymentsPartialUpdate } from 'waldur-js-client';
 
+import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
-import * as api from '@waldur/customer/payments/api';
 import { EDIT_PAYMENT_FORM_ID } from '@waldur/customer/payments/constants';
 import { PaymentProofRenderer } from '@waldur/customer/payments/PaymentProofRenderer';
 import {
@@ -39,10 +40,14 @@ const PaymentUpdateDialog: FunctionComponent<
 
   const submitRequest = async (formData) => {
     try {
-      await api.updatePayment(props.resolve.uuid, {
-        date_of_payment: formatDate(formData.date_of_payment),
-        sum: formData.sum,
-        proof: formData.proof,
+      await paymentsPartialUpdate({
+        path: { uuid: props.resolve.uuid },
+        body: {
+          date_of_payment: formatDate(formData.date_of_payment),
+          sum: formData.sum,
+          proof: fileSerializer(formData.proof),
+        },
+        ...formDataOptions,
       });
       dispatch(showSuccess(translate('Payment has been updated.')));
       dispatch(closeModalDialog());

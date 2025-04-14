@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { MarketplaceProviderOfferingsListData } from 'waldur-js-client';
 
 import { BaseOfferingsList } from '../list/OfferingsList';
 import { getStates } from '../list/OfferingStateFilter';
@@ -15,7 +16,7 @@ import {
 export const mapStateToFilter = createSelector(
   getFormValues(ADMIN_OFFERINGS_FILTER_FORM_ID),
   (filterValues: any) => {
-    const filter: Record<string, any> = {};
+    const filter: MarketplaceProviderOfferingsListData['query'] = {};
     if (filterValues?.organization) {
       filter.customer_uuid = filterValues.organization.uuid;
     }

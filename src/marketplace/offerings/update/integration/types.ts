@@ -1,7 +1,7 @@
 import React from 'react';
+import { ProviderOfferingDetails } from 'waldur-js-client';
 
 import { FormTableItemProps } from '@waldur/form/FormTable';
-import { Offering } from '@waldur/marketplace/types';
 
 export interface ScriptEditorProps {
   offering;
@@ -23,20 +23,20 @@ export interface EditOfferingProps
   title?: string;
   scope: any;
   name: string;
-  callback(formData, dispatch): Promise<any>;
+  callback(formData): Promise<any>;
   fieldComponent: React.ComponentType;
   hideLabel?: boolean;
   fieldProps?: Record<string, any>;
 }
 
 export interface OfferingEditPanelProps {
-  offering: Offering;
+  offering: ProviderOfferingDetails;
   refetch(): Promise<any>;
   loading?: boolean;
 }
 
 export interface OfferingEditPanelFormProps {
-  offering: Offering;
-  callback(formData, dispatch): Promise<any>;
+  offering: ProviderOfferingDetails;
+  callback(formData): Promise<any>;
   title?: string;
 }

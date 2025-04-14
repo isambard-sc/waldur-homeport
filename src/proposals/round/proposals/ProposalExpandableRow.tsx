@@ -41,7 +41,7 @@ export const ProposalExpandableRow: React.FC<ProposalExpandableRowProps> = ({
       {...tableProps}
       columns={columns}
       rowActions={ProposalReviewsDetailButton}
-      hasActionBar={false}
+      title={translate('Reviews')}
     />
   );
 };

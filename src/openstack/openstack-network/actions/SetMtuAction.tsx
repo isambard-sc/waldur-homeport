@@ -19,6 +19,6 @@ export const SetMtuAction: ActionItemType = ({ resource, refetch }) => (
     modalComponent={SetMtuDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<BracketsSquare />}
+    iconNode={<BracketsSquare weight="bold" />}
   />
 );

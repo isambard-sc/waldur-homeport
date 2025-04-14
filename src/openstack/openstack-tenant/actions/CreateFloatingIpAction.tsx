@@ -1,8 +1,8 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { FC } from 'react';
+import { openstackTenantsCreateFloatingIp } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { createFloatingIp } from '@waldur/openstack/api';
 import { OpenStackTenant } from '@waldur/openstack/openstack-tenant/types';
 import { AsyncActionButton } from '@waldur/resource/actions/AsyncActionButton';
 import { validateState } from '@waldur/resource/actions/base';
@@ -26,10 +26,10 @@ export const CreateFloatingIpAction: FC<TenantActionProps> = ({
 }) => (
   <AsyncActionButton
     title={translate('Create')}
-    iconNode={<PlusCircle />}
+    iconNode={<PlusCircle weight="bold" />}
     resource={resource}
     validators={validators}
-    apiMethod={createFloatingIp}
+    apiMethod={(uuid) => openstackTenantsCreateFloatingIp({ path: { uuid } })}
     refetch={refetch}
   />
 );

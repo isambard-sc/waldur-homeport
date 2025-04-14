@@ -4,17 +4,17 @@ xdescribe('Public resources (Report usage)', () => {
       .mockChecklists()
       .setToken()
 
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .intercept('GET', '/api/customers/895e38d197e748459189f19285119edf/', {
         fixture: 'marketplace/anderson_and_sons.json',
       })
-      .intercept('GET', '/api/customers/', {
+      .intercept('GET', '/api/customers/**', {
         fixture: 'customers/alice_bob_web.json',
       })
       .intercept('GET', '/api/marketplace-public-offerings/', {
         fixture: 'marketplace/report_usage_offerings.json',
       })
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
       .intercept(
@@ -33,7 +33,7 @@ xdescribe('Public resources (Report usage)', () => {
         '/api/customer-permissions-reviews/?customer_uuid=**&is_pending=true',
         [],
       )
-      .intercept('POST', '/api/marketplace-component-usages/set_usage/', [])
+      .intercept('POST', '/api/marketplace-component-usages/set_usage/**', [])
       .log('Visit Marketplace Public Resources view')
       .visit(
         '/organizations/895e38d197e748459189f19285119edf/marketplace-public-resources/',

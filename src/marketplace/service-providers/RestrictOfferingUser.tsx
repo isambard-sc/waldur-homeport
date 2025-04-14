@@ -1,9 +1,9 @@
 import { Check, Prohibit } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceOfferingUsersUpdateRestricted } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateOfferingUserRestrictionStatus } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -26,8 +26,11 @@ export const RestrictOfferingUserButton: FC<{
       return;
     }
     try {
-      await updateOfferingUserRestrictionStatus(props.row.uuid, {
-        is_restricted: !props.row.is_restricted,
+      await marketplaceOfferingUsersUpdateRestricted({
+        path: { uuid: props.row.uuid },
+        body: {
+          is_restricted: !props.row.is_restricted,
+        },
       });
       dispatch(showSuccess(translate('Restriction status has been updated.')));
       await props.refetch();
@@ -48,7 +51,13 @@ export const RestrictOfferingUserButton: FC<{
           ? translate('Unrestrict')
           : translate('Restrict')
       }
-      iconNode={props.row.is_restricted ? <Check /> : <Prohibit />}
+      iconNode={
+        props.row.is_restricted ? (
+          <Check weight="bold" />
+        ) : (
+          <Prohibit weight="bold" />
+        )
+      }
     />
   );
 };

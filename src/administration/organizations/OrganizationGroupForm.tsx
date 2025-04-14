@@ -1,6 +1,10 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { Field, Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+import {
+  organizationGroupsCreate,
+  organizationGroupsUpdate,
+} from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { FormGroup, SubmitButton } from '@waldur/form';
@@ -10,7 +14,7 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { createOrganizationGroup, updateOrganizationGroup } from './api';
+import { SelectOrganizationGroupField } from './SelectOrganizationGroupField';
 
 interface FormData {
   name: string;
@@ -21,12 +25,15 @@ export const OrganizationGroupForm = ({ resolve }) => {
   const dispatch = useDispatch();
 
   const onSubmit = async (values: FormData) => {
-    values['type'] = values['type']?.uuid;
+    values['parent'] = values['parent']?.url;
     try {
       if (isEdit) {
-        await updateOrganizationGroup(resolve.organizationGroup.uuid, values);
+        await organizationGroupsUpdate({
+          path: { uuid: resolve.organizationGroup.uuid },
+          body: values,
+        });
       } else {
-        await createOrganizationGroup(values);
+        await organizationGroupsCreate({ body: values });
       }
       resolve.refetch();
       dispatch(
@@ -56,6 +63,7 @@ export const OrganizationGroupForm = ({ resolve }) => {
         resolve.organizationGroup
           ? {
               name: resolve.organizationGroup.name,
+              parent: resolve.organizationGroup.parent,
             }
           : undefined
       }
@@ -88,6 +96,15 @@ export const OrganizationGroupForm = ({ resolve }) => {
               validate={required}
             >
               <StringField />
+            </Field>
+            <Field
+              name="parent"
+              component={FormGroup as any}
+              label={translate('Parent group')}
+            >
+              <SelectOrganizationGroupField
+                currentOrganizationGroup={resolve.organizationGroup}
+              />
             </Field>
           </ModalDialog>
         </form>

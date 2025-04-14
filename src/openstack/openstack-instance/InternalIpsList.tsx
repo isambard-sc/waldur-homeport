@@ -1,8 +1,11 @@
 import { FunctionComponent, useCallback } from 'react';
+import {
+  OpenStackInstance,
+  openstackInstancesRetrieve,
+} from 'waldur-js-client';
+import { OpenStackNestedPort } from 'waldur-js-client';
 
-import { getById } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
-import { VirtualMachine, Port } from '@waldur/resource/types';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
@@ -10,16 +13,16 @@ import { UpdateInternalIpsAction } from './actions/update-internal-ips/UpdateInt
 import { SetAllowedAddressPairsButton } from './SetAllowedAddressPairsButton';
 import { formatAddressList } from './utils';
 
-export const InternalIpsList: FunctionComponent<{ resourceScope; refetch }> = ({
-  resourceScope,
-  refetch,
-}) => {
+export const InternalIpsList: FunctionComponent<{
+  resourceScope: OpenStackInstance;
+  refetch;
+}> = ({ resourceScope, refetch }) => {
   const fetchData = useCallback(
     () =>
-      getById<VirtualMachine>('/openstack-instances/', resourceScope.uuid).then(
+      openstackInstancesRetrieve({ path: { uuid: resourceScope.uuid } }).then(
         (vm) => ({
-          rows: vm.ports,
-          resultCount: vm.ports.length,
+          rows: vm.data.ports,
+          resultCount: vm.data.ports.length,
         }),
       ),
     [resourceScope],
@@ -29,7 +32,7 @@ export const InternalIpsList: FunctionComponent<{ resourceScope; refetch }> = ({
     fetchData,
   });
   return (
-    <Table<Port>
+    <Table<OpenStackNestedPort>
       {...props}
       columns={[
         {
@@ -55,6 +58,7 @@ export const InternalIpsList: FunctionComponent<{ resourceScope; refetch }> = ({
           ),
         },
       ]}
+      title={translate('Ports')}
       verboseName={translate('ports')}
       tableActions={
         <UpdateInternalIpsAction

@@ -1,16 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
+import {
+  marketplaceOrdersRetrieve,
+  marketplacePluginsList,
+  marketplacePublicOfferingsRetrieve,
+} from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import * as api from '@waldur/marketplace/common/api';
+
+import { Offering } from '../types';
 
 import { OrderDetails } from './details/OrderDetails';
 
-async function loadOrder(order_uuid) {
-  const order = await api.getOrder(order_uuid);
-  const offering = await api.getPublicOffering(order.offering_uuid);
-  const plugins = await api.getPlugins();
+async function loadOrder(order_uuid: string) {
+  const order = await marketplaceOrdersRetrieve({
+    path: { uuid: order_uuid },
+  }).then((response) => response.data);
+
+  const offering = (await marketplacePublicOfferingsRetrieve({
+    path: { uuid: order.offering_uuid },
+  }).then((response) => response.data)) as Offering;
+
+  const plugins = await marketplacePluginsList().then(
+    (response) => response.data,
+  );
+
   const limits = plugins.find(
     (plugin) => plugin.offering_type === offering.type,
   ).available_limits;

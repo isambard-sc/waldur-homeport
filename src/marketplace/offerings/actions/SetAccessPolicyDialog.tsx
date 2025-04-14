@@ -1,35 +1,49 @@
 import { FunctionComponent } from 'react';
-import { useAsync } from 'react-use';
+import { Customer } from 'waldur-js-client';
 
+import { OrganizationGroupCreateButton } from '@waldur/administration/organizations/OrganizationGroupCreateButton';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { getAllOrganizationGroups } from '@waldur/marketplace/common/api';
+import { useOrganizationGroups } from '@waldur/marketplace/common/utils';
 import { SetAccessPolicyDialogForm } from '@waldur/marketplace/offerings/actions/SetAccessPolicyDialogForm';
 import { Offering, Plan } from '@waldur/marketplace/types';
+import { NoResult } from '@waldur/navigation/header/search/NoResult';
 
 interface SetAccessPolicyDialogProps {
-  resolve: { offering?: Offering; plan?: Plan; refetch: any; customer: any };
+  resolve: {
+    plan?: Plan;
+    offering?: Offering;
+    customer?: Customer;
+    refetch: any;
+  };
 }
 
 export const SetAccessPolicyDialog: FunctionComponent<
   SetAccessPolicyDialogProps
 > = ({ resolve }) => {
   const {
-    loading,
-    error,
-    value: organizationGroups,
-  } = useAsync(async () => await getAllOrganizationGroups(), [resolve]);
-  return loading ? (
+    data: organizationGroups,
+    isLoading,
+    isError,
+    refetch: refetchGroups,
+  } = useOrganizationGroups();
+
+  return isLoading ? (
     <LoadingSpinner />
-  ) : error ? (
+  ) : isError ? (
     <>{translate('Unable to load organization groups.')}</>
-  ) : (
+  ) : organizationGroups.length > 0 ? (
     <SetAccessPolicyDialogForm
       organizationGroups={organizationGroups}
-      offering={resolve.offering}
-      plan={resolve.plan}
-      customer={resolve.customer}
-      refetch={resolve.refetch}
+      {...resolve}
+    />
+  ) : (
+    <NoResult
+      title={translate('No organization groups found')}
+      message={translate(
+        'No organization groups are currently defined. Please create groups to configure access policies.',
+      )}
+      actions={<OrganizationGroupCreateButton refetch={refetchGroups} />}
     />
   );
 };

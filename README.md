@@ -8,7 +8,21 @@ It uses yarn for dependency management and Vite as module bundler.
 - Linux Ubuntu, OS X or Windows Subsystem for Linux 2 with Ubuntu
 - 2 GB of RAM and 2 GB of storage
 
-## Installation
+## Installation via Dev Containers
+
+If you use VS Code or GitHub Codespaces, you can quickly set up a development environment using Dev Containers. This method provides a consistent, pre-configured environment with all necessary dependencies.
+
+Prerequisites for Dev Containers are:
+
+- [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) installed
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for local development)
+- Git
+
+After cloning repository, when prompted "Reopen in Container", click on it. Alternatively, you can press Ctrl+Shift+P, type "Dev Containers: Reopen in Container" and press Enter.
+
+VS Code will build the dev container and set up the environment automatically. Once the container is built and running, you'll have a fully configured development environment ready to use.
+
+## Manual installation
 
 1. Update system and install basic dependencies. Example for Linux Ubuntu:
 

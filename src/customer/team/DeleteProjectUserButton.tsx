@@ -1,17 +1,19 @@
 import { Trash } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  CustomerUser,
+  NestedProjectPermission,
+  projectsDeleteUser,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { deleteProjectUser } from '@waldur/permissions/api';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { NestedCustomerPermission, NestedProjectPermission } from './types';
-
 interface DeleteProjectUserButtonProps {
-  customer: NestedCustomerPermission;
+  customer: CustomerUser;
   project: NestedProjectPermission;
   refetch(): void;
 }
@@ -35,10 +37,12 @@ export const DeleteProjectUserButton: React.FC<
     }
 
     try {
-      await deleteProjectUser({
-        project: project.uuid,
-        user: customer.uuid,
-        role: project.role_name,
+      await projectsDeleteUser({
+        path: { uuid: project.uuid },
+        body: {
+          user: customer.uuid,
+          role: project.role_name,
+        },
       });
       refetch();
       dispatch(showSuccess(translate('Team member has been removed.')));

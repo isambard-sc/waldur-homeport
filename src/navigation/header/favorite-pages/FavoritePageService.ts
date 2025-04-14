@@ -7,24 +7,25 @@ import {
 import { isMatch, pickBy, uniqueId } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import {
+  marketplaceCategoriesRetrieve,
+  marketplaceProviderOfferingsRetrieve,
+  marketplacePublicOfferingsRetrieve,
+  Offering,
+  Resource,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import {
-  getCategory,
-  getProviderOffering,
-  getPublicOffering,
-} from '@waldur/marketplace/common/api';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { getTitle } from '@waldur/navigation/title';
 import { isDescendantOf } from '@waldur/navigation/useTabs';
 import store from '@waldur/store/store';
+import { useUser } from '@waldur/workspace/hooks';
 import {
   getCustomer,
   getProject,
   getResource,
-  getUser,
 } from '@waldur/workspace/selectors';
-import { Customer, Project, UserDetails } from '@waldur/workspace/types';
+import { Customer, Project, User } from '@waldur/workspace/types';
 
 const FAVORITE_PAGES_KEY = 'waldur/favorite/pages';
 
@@ -39,7 +40,7 @@ interface FavoritePage {
 
 interface FavoritePageContext {
   customer?: Customer;
-  user?: UserDetails;
+  user?: User;
   project?: Project;
   resource?: Resource;
 }
@@ -92,9 +93,10 @@ const getDataForFavoritePage = async (
   let image;
   const newParams = params ? { ...params } : {};
   if (state.name.startsWith('marketplace-offering') && params.offering_uuid) {
-    const offering = await getProviderOffering(params.offering_uuid, {
-      params: { field: ['name', 'customer_name', 'thumbnail'] },
-    });
+    const offering = (await marketplaceProviderOfferingsRetrieve({
+      path: { uuid: params.offering_uuid },
+      query: { field: ['name', 'customer_name', 'thumbnail'] },
+    }).then((response) => response.data)) as Offering;
     title = offering.customer_name;
     subtitle = offering.name;
     image = offering.thumbnail;
@@ -102,9 +104,13 @@ const getDataForFavoritePage = async (
     state.name === 'public-offering.marketplace-public-offering' &&
     params.uuid
   ) {
-    const offering = await getPublicOffering(params.offering_uuid, {
-      params: { field: ['name', 'customer_name', 'thumbnail'] },
-    });
+    const offering = await marketplacePublicOfferingsRetrieve({
+      path: { uuid: params.offering_uuid },
+      query: {
+        field: ['name', 'customer_name', 'thumbnail'],
+      },
+    }).then((response) => response.data);
+
     title = offering.customer_name;
     subtitle = offering.name;
     image = offering.thumbnail;
@@ -115,9 +121,10 @@ const getDataForFavoritePage = async (
       )) &&
     params.category_uuid
   ) {
-    const category = await getCategory(params.category_uuid, {
-      params: { field: ['title', 'icon'] },
-    });
+    const category = await marketplaceCategoriesRetrieve({
+      path: { uuid: params.category_uuid },
+      query: { field: ['title', 'icon'] },
+    }).then((response) => response.data);
     subtitle = category.title;
     image = category.icon;
     if (state.name === 'category-resources') {
@@ -174,7 +181,7 @@ export const useFavoritePages = () => {
   const { state, params } = useCurrentStateAndParams();
   const pageTitle = useSelector(getTitle);
 
-  const user = useSelector(getUser) as UserDetails;
+  const user = useUser();
   const customer = useSelector(getCustomer);
   const project = useSelector(getProject);
   const resource = useSelector(getResource);

@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 
+import { Panel } from '@waldur/core/Panel';
 import { ProgressSteps as MainProgressSteps } from '@waldur/core/ProgressSteps';
 import { translate } from '@waldur/i18n';
 import { Proposal } from '@waldur/proposals/types';
@@ -11,32 +12,24 @@ interface ProgressStepsProps {
 }
 
 const getSortedSteps = (proposal: Proposal) => [
-  {
-    label: translate('Submission'),
-    state: ['draft'],
-  },
-  {
-    label: translate('Verify team'),
-    state: ['team_verification'],
-  },
+  proposal.state === 'canceled'
+    ? {
+        label: translate('Canceled'),
+        state: ['canceled'],
+        variant: 'danger',
+      }
+    : {
+        label: translate('Submission'),
+        state: ['draft'],
+      },
   {
     label: translate('Review'),
     state: ['in_review', 'submitted'],
   },
   {
-    label: translate('Updates'),
-    state: ['in_revision'],
+    label: translate('Decision'),
+    state: ['accepted', 'rejected'],
   },
-  proposal.state === 'rejected'
-    ? {
-        label: translate('Rejected'),
-        state: ['rejected'],
-        variant: 'danger',
-      }
-    : {
-        label: translate('Accepted'),
-        state: ['accepted'],
-      },
 ];
 
 const getSteps = (proposal: Proposal) => {
@@ -61,6 +54,12 @@ export const ProgressSteps: FC<ProgressStepsProps> = ({
 }) => {
   const steps = useMemo(() => getSteps(proposal), [proposal]);
   return (
-    <MainProgressSteps steps={steps} bgClass={bgClass} className={className} />
+    <Panel cardBordered className="overflow-hidden">
+      <MainProgressSteps
+        steps={steps}
+        bgClass={bgClass}
+        className={className}
+      />
+    </Panel>
   );
 };

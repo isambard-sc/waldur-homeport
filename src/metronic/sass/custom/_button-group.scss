@@ -14,6 +14,9 @@
   }
 }
 
-.dropdown-toggle.no-arrow::after {
-  content: none;
+.dropdown-toggle.no-arrow {
+  &::before,
+  &::after {
+    content: none;
+  }
 }

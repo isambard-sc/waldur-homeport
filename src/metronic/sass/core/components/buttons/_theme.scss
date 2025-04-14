@@ -4,6 +4,11 @@
 
 // Theme colors
 @each $name, $value in $theme-colors {
+  @if ($name == primary) {
+    $value: $brand;
+  } @else if ($name == secondary) {
+    $value: $brand-50;
+  }
   // Base
   .btn.btn-#{$name} {
     $color: theme-inverse-color($name);
@@ -154,6 +159,9 @@
 
 // Theme text colors
 @each $name, $value in $theme-text-colors {
+  @if ($name == primary) {
+    $value: $brand;
+  }
   @if ($btn-extended-variants == true or $name == primary or $name == muted) {
     // Text and icon colors
     .btn.btn-color-#{$name} {
@@ -313,7 +321,7 @@
 
   $color-active: null;
   $icon-color-active: null;
-  $border-color-active: $primary;
+  $border-color-active: $brand;
   $bg-color-active: null;
 
   @include button-custom-variant(
@@ -335,13 +343,13 @@
 
   $color: $light-inverse;
   $icon-color: $light-inverse;
-  $border-color: $grey-300;
+  $border-color: $gray-300;
   $bg-color: null;
 
-  $color-active: $primary;
-  $icon-color-active: $primary;
-  $border-color-active: $primary;
-  $bg-color-active: $primary-light;
+  $color-active: $brand;
+  $icon-color-active: $brand;
+  $border-color-active: $brand;
+  $bg-color-active: $brand-light;
 
   @include button-custom-variant(
     $color,
@@ -358,20 +366,20 @@
 // Outline default style (Tertairy style)
 .btn.btn-outline {
   &.btn-outline-default {
-    $color: if(isDarkMode(), $primary-800, $gray-700);
-    $icon-color: if(isDarkMode(), $primary-800, $gray-700);
-    $border-color: if(isDarkMode(), $primary-300, $grey-300);
-    $bg-color: $body-bg;
+    $color: $gray-700;
+    $icon-color: $gray-700;
+    $border-color: if(isDarkMode(), $gray-200, $gray-300);
+    $bg-color: if(isDarkMode(), $gray-50, $body-bg);
 
-    $color-active: if(isDarkMode(), $primary-800, $gray-700);
-    $icon-color-active: if(isDarkMode(), $primary-800, $gray-700);
-    $border-color-active: if(isDarkMode(), $primary-300, $grey-300);
-    $bg-color-active: if(isDarkMode(), $primary-50, $gray-50);
+    $color-active: $gray-700;
+    $icon-color-active: $gray-700;
+    $border-color-active: if(isDarkMode(), $gray-200, $gray-300);
+    $bg-color-active: if(isDarkMode(), $gray-100, $gray-50);
 
-    $color-dark: if(isDarkMode(), $primary-800, $gray-700);
-    $icon-color-dark: if(isDarkMode(), $primary-800, $gray-700);
-    $border-color-dark: if(isDarkMode(), $primary-500, $grey-500);
-    $bg-color-dark: if(isDarkMode(), $primary-100, $gray-100);
+    $color-dark: $gray-700;
+    $icon-color-dark: $gray-700;
+    $border-color-dark: $gray-500;
+    $bg-color-dark: $gray-100;
 
     $bg-color-disabled: $gray-100;
 
@@ -413,12 +421,12 @@
 
     $color-active: $gray-700;
     $icon-color-active: $gray-700;
-    $border-color-active: $grey-300;
+    $border-color-active: $gray-300;
     $bg-color-active: $gray-50;
 
     $color-dark: $gray-700;
     $icon-color-dark: $gray-700;
-    $border-color-dark: $grey-500;
+    $border-color-dark: $gray-500;
     $bg-color-dark: $gray-100;
 
     @include button-custom-variant(

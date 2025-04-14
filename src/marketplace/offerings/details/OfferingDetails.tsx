@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
+import { PlanUsageResponse } from 'waldur-js-client';
 
 import { Category, Offering } from '@waldur/marketplace/types';
 import { useToolbarActions } from '@waldur/navigation/context';
-import { PlanUsageRow } from '@waldur/reporting/plan-usage/types';
 
 import { OFFERING_CUSTOMERS_LIST_FILTER } from '../expandable/constants';
 
@@ -11,7 +11,7 @@ import { ConnectionStatusIndicator } from './ConnectionStatusIndicator';
 interface OfferingDetailsProps {
   offering: Offering;
   category: Category;
-  plansUsage: PlanUsageRow[];
+  plansUsage: PlanUsageResponse[];
   refetch(): void;
   tabSpec;
 }

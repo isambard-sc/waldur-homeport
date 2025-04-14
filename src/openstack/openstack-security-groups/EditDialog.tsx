@@ -1,7 +1,10 @@
 import { FC } from 'react';
+import {
+  openstackSecurityGroupsUpdate,
+  OpenStackSecurityGroupUpdateRequest,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateSecurityGroup } from '@waldur/openstack/api';
 import {
   createNameField,
   createDescriptionField,
@@ -20,7 +23,12 @@ export const EditDialog: FC<ActionDialogProps> = ({
         name: resource.name,
         description: resource.description,
       }}
-      updateResource={updateSecurityGroup}
+      updateResource={(uuid, formData: OpenStackSecurityGroupUpdateRequest) =>
+        openstackSecurityGroupsUpdate({
+          path: { uuid },
+          body: formData,
+        })
+      }
       refetch={refetch}
       verboseName={translate('security group')}
     />

@@ -1,5 +1,6 @@
 import { PlusCircle } from '@phosphor-icons/react';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
+import { ButtonVariant } from 'react-bootstrap/esm/types';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -9,6 +10,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionButton } from '@waldur/table/ActionButton';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { Customer } from '@waldur/workspace/types';
 
 const ProjectCreateDialog = lazyComponent(() =>
   import('./ProjectCreateDialog').then((module) => ({
@@ -16,8 +18,27 @@ const ProjectCreateDialog = lazyComponent(() =>
   })),
 );
 
-export const ProjectCreateButton: FC<{ refetch? }> = ({ refetch }) => {
-  const customer = useSelector(getCustomer);
+interface ProjectCreateButtonProps {
+  customer: Customer;
+  variant?: ButtonVariant;
+  size?: 'sm' | 'lg';
+  title?: string;
+  iconNode?: ReactNode;
+  refetch?;
+  className?: string;
+}
+
+export const ProjectCreateButton: FC<ProjectCreateButtonProps> = ({
+  customer: _customer,
+  title = translate('Add'),
+  variant = 'primary',
+  iconNode,
+  size,
+  refetch,
+  className,
+}) => {
+  const currentCustomer = useSelector(getCustomer);
+  const customer = _customer || currentCustomer;
   const user = useSelector(getUser);
   const disabled =
     !customer ||
@@ -26,9 +47,13 @@ export const ProjectCreateButton: FC<{ refetch? }> = ({ refetch }) => {
       customerId: customer.uuid,
     });
   const dispatch = useDispatch();
+
   return (
     <ActionButton
-      title={translate('Add')}
+      title={title}
+      size={size}
+      variant={variant}
+      className={className}
       action={() =>
         dispatch(
           openModalDialog(ProjectCreateDialog, {
@@ -40,14 +65,15 @@ export const ProjectCreateButton: FC<{ refetch? }> = ({ refetch }) => {
         )
       }
       tooltip={
-        disabled
-          ? translate(
-              "You don't have enough privileges to perform this operation.",
-            )
-          : undefined
+        !customer
+          ? translate('There is no active organization')
+          : disabled
+            ? translate(
+                "You don't have enough privileges to perform this operation.",
+              )
+            : undefined
       }
-      iconNode={<PlusCircle />}
-      variant="primary"
+      iconNode={iconNode || <PlusCircle weight="bold" />}
       disabled={disabled}
     />
   );

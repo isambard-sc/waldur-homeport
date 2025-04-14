@@ -2,14 +2,14 @@ import { Trash } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
 import { FunctionComponent, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import { IssueTypeEnum, supportIssuesCreate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { CancelButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { createIssue } from '@waldur/issues/api';
 import { ISSUE_IDS } from '@waldur/issues/types/constants';
 import { useModal } from '@waldur/modal/hooks';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
 
 interface UserRemovalMessageDialogProps {
@@ -30,12 +30,14 @@ export const UserRemovalMessageDialog: FunctionComponent<
   const [reason, setReason] = useState('');
   const handleSubmit = async () => {
     try {
-      const issue = await createIssue({
-        type: ISSUE_IDS.CHANGE_REQUEST,
-        description: reason,
-        summary: translate('Account deletion'),
-        is_reported_manually: true,
-      });
+      const issue = await supportIssuesCreate({
+        body: {
+          type: ISSUE_IDS.CHANGE_REQUEST as IssueTypeEnum,
+          description: reason,
+          summary: translate('Account deletion'),
+          is_reported_manually: true,
+        },
+      }).then((response) => response.data);
       showSuccess(translate('Request for account deletion has been created.'));
       router.stateService.go('support.detail', { uuid: issue.uuid });
       closeDialog();
@@ -51,14 +53,14 @@ export const UserRemovalMessageDialog: FunctionComponent<
         handleSubmit();
       }}
     >
-      <MetronicModalDialog
+      <ModalDialog
         title={translate('Account deletion')}
         subtitle={translate(
           'Why would you want to go away? Help us become better please!',
         )}
         iconNode={<Trash weight="bold" />}
         iconColor="danger"
-        bodyClassName="text-grey-500 pt-2"
+        bodyClassName="text-gray-500 pt-2"
         footer={
           <>
             <Button
@@ -83,16 +85,16 @@ export const UserRemovalMessageDialog: FunctionComponent<
             onChange={(event) => setReason(event.target.value)}
           />
         </Form.Group>
-      </MetronicModalDialog>
+      </ModalDialog>
     </form>
   ) : (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('Request account removal for {userName}.', {
         userName,
       })}
       iconNode={<Trash weight="bold" />}
       iconColor="danger"
-      bodyClassName="text-grey-500 pt-2"
+      bodyClassName="text-gray-500 pt-2"
       footer={<CancelButton label={translate('OK')} />}
     >
       <p>
@@ -105,6 +107,6 @@ export const UserRemovalMessageDialog: FunctionComponent<
           'Please note that request should specify user name and provide a reason.',
         )}
       </p>
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

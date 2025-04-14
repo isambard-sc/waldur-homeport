@@ -18,7 +18,7 @@ type NetworkChoices = Pick<BackupFormChoices, 'subnets' | 'floatingIps'>;
 const AddButton = ({ onClick, disabled }) => (
   <Button variant="default" onClick={onClick} disabled={disabled}>
     <span className="svg-icon svg-icon-2">
-      <Plus />
+      <Plus weight="bold" />
     </span>{' '}
     {translate('Add')}
   </Button>

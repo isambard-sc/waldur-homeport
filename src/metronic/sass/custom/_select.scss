@@ -5,17 +5,18 @@
       border-color: $gray-300;
       font-size: 1.2rem;
       font-weight: 400;
+      background-color: if(isDarkMode(), $gray-25, $white);
 
       &--is-focused,
       &--is-focused:hover {
-        border-color: $primary-300;
-        box-shadow: 0 0 0 4px rgba($primary-300, 0.25);
+        border-color: $brand-300;
+        box-shadow: 0 0 0 4px rgba($brand-300-rgb, 0.25);
       }
 
       &--is-disabled {
-        background-color: if(isDarkMode(), $primary-100, $gray-200);
+        background-color: if(isDarkMode(), $gray-100, $gray-200);
         .metronic-select__placeholder {
-          color: if(isDarkMode(), $primary-300, $gray-700);
+          color: if(isDarkMode(), $gray-300, $gray-700);
         }
       }
     }
@@ -59,13 +60,41 @@
 
       .badge {
         color: $gray-700;
-        border: 1px solid $grey-200;
+        border: 1px solid $gray-200;
         background-color: transparent;
         padding: 4px 8px;
         display: flex;
         align-items: center;
         font-size: $font-size-lg;
         font-weight: 500;
+      }
+    }
+  }
+
+  &.select-sm {
+    .metronic-select {
+      &__control {
+        min-height: 28px;
+        font-size: $font-size-lg;
+        line-height: 1;
+      }
+
+      &__value-container {
+        padding-top: 0.35rem;
+        padding-bottom: 0.35rem;
+        padding-left: 8px;
+        padding-right: 0;
+      }
+      &__input-container {
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+
+      &__dropdown-indicator {
+        padding: 0;
+        margin-right: 8px;
       }
     }
   }
@@ -114,9 +143,7 @@
             width: 16px;
             height: 16px;
             content: ' ';
-            background-image: escape-svg(
-              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><rect width='256' height='256' fill='none'/><polyline points='40 144 96 200 224 72' fill='none' stroke='#{$primary}' stroke-linecap='round' stroke-linejoin='round' stroke-width='24'/></svg>")
-            );
+            background-image: escape-svg(var(--checkbox-bg));
             background-repeat: no-repeat;
             background-position: 50%;
             background-color: transparent;

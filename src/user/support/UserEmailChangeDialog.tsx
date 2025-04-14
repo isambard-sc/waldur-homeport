@@ -1,22 +1,22 @@
 import { FunctionComponent } from 'react';
 import { Form } from 'react-bootstrap';
+import { User } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
-import { UserDetails } from '@waldur/workspace/types';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { useEmailChange } from './useEmailChange';
 
 export const UserEmailChangeDialog: FunctionComponent<{
-  resolve: { user: UserDetails; isProtected };
+  resolve: { user: User; isProtected };
 }> = ({ resolve: { user, isProtected } }) => {
   const { handleSubmit, cancelRequest, submitting, email, setEmail } =
     useEmailChange(user);
 
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('Email')}
       subtitle={translate(
         'Provide an email address for communication and recovery',
@@ -68,6 +68,6 @@ export const UserEmailChangeDialog: FunctionComponent<{
           {translate('Synchronized from identity provider')}
         </Form.Text>
       )}
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };

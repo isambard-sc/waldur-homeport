@@ -1,13 +1,11 @@
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { UserManageContainer } from '@waldur/user/UserManageContainer';
-import { getUser } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
+import { useUser } from '@waldur/workspace/hooks';
 
 export const PersonalManageContainer: FunctionComponent = () => {
-  const user = useSelector(getUser) as UserDetails;
+  const user = useUser();
   if (!user) {
     return <LoadingSpinner />;
   }

@@ -1,10 +1,10 @@
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import { lexisLinksCreate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { createLexisLink } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -22,7 +22,7 @@ export const CreateLexisLinkDialog = reduxForm<
     try {
       const resource_url = `${ENV.apiEndpoint}api/marketplace-resources/${resource.marketplace_resource_uuid}/`;
 
-      await createLexisLink({ resource: resource_url });
+      await lexisLinksCreate({ body: { resource: resource_url } });
       dispatch(
         showSuccess(
           translate('LEXIS link creation request has been submitted.'),

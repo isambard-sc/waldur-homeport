@@ -1,4 +1,9 @@
 import { FunctionComponent, useMemo } from 'react';
+import {
+  ComponentUsage,
+  ComponentUserUsage,
+  OfferingComponent,
+} from 'waldur-js-client';
 
 import { generateColors } from '@waldur/core/generateColors';
 import { ResourceMetaInfo } from '@waldur/marketplace/resources/usage/ResourceMetaInfo';
@@ -6,17 +11,17 @@ import { ResourceUsageTabs } from '@waldur/marketplace/resources/usage/ResourceU
 
 interface ResourceUsageTabsContainerProps {
   resource: {
-    name: string;
-    resource_uuid: string;
-    offering_uuid: string;
+    name?: string;
+    resource_uuid?: string;
+    offering_uuid?: string;
     customer_name?: string;
     project_name?: string;
     backend_id?: string;
   };
   data: {
-    components: any;
-    usages: any;
-    userUsages: any;
+    components: OfferingComponent[];
+    usages: ComponentUsage[];
+    userUsages: ComponentUserUsage[];
   };
   months?: number;
   hideHeader?: boolean;
@@ -27,17 +32,17 @@ interface ResourceUsageTabsContainerProps {
 export const ResourceUsageTabsContainer: FunctionComponent<
   ResourceUsageTabsContainerProps
 > = ({ resource, data, months, hideHeader, displayMode, users }) => {
-  const userUsages = useMemo(
-    () =>
+  const userUsages = useMemo(() => {
+    const records =
       users?.length && data?.userUsages
         ? data.userUsages.filter((usage) =>
             users.some(
               (user) => usage.username === user.offering_user_username,
             ),
           )
-        : data?.userUsages,
-    [data, users],
-  );
+        : data?.userUsages;
+    return (records || []).sort((a, b) => a.username.localeCompare(b.username));
+  }, [data, users]);
 
   return (
     <>
@@ -54,7 +59,6 @@ export const ResourceUsageTabsContainer: FunctionComponent<
           useEndAsStart: true,
         })}
         displayMode={displayMode}
-        hasExport
       />
     </>
   );

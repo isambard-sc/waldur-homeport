@@ -1,4 +1,8 @@
 import { FunctionComponent, useMemo } from 'react';
+import {
+  OpenStackInstance,
+  OpenstackInstancesListData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { AddResourceButton } from '@waldur/marketplace/resources/actions/AddResourceButton';
@@ -17,7 +21,7 @@ import { INSTANCE_TYPE } from '../constants';
 export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackInstancesListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
       field: [
@@ -39,7 +43,6 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
         'cores',
         'ram',
         'start_time',
-        'resource_state',
         'volumes',
         'security_groups',
         'backend_id',
@@ -57,7 +60,7 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<OpenStackInstance>
       {...props}
       columns={[
         {
@@ -82,6 +85,7 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => <ResourceState resource={row} />,
         },
       ]}
+      title={translate('Instances')}
       verboseName={translate('instances')}
       tableActions={
         <AddResourceButton

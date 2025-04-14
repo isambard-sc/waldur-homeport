@@ -1,13 +1,14 @@
+import { UsersThree } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
-import { AddButton } from '@waldur/core/AddButton';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
@@ -61,9 +62,16 @@ export const GroupInvitationCreateButton: FC<{
       permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
       customerId: customer.uuid,
     });
+
+  if (ENV.plugins.WALDUR_CORE.INVITATION_USE_WEBHOOKS) {
+    return null;
+  }
+
   return (
-    <AddButton
+    <ActionItem
+      title={translate('Group invitation')}
       action={callback}
+      iconNode={<UsersThree weight="bold" />}
       disabled={!canManage}
       tooltip={!canManage && translate('You can not create group invitations.')}
     />

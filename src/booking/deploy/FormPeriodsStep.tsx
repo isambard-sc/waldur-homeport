@@ -5,13 +5,13 @@ import { DateTime, Duration } from 'luxon';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { Field, FieldArray } from 'redux-form';
+import { marketplaceBookingsList } from 'waldur-js-client';
 
 import { parseDate } from '@waldur/core/dateUtils';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 
-import { getOfferingBookedItems } from '../api';
 import { BookingProps } from '../types';
 import {
   createAvailabilitySlots,
@@ -158,7 +158,7 @@ const renderScheduleRows = ({
       ))}
       <Button variant="light" className="text-nowrap" onClick={addRow}>
         <span className="svg-icon svg-icon-2">
-          <Plus />
+          <Plus weight="bold" />
         </span>
         {translate('Add time period')}
       </Button>
@@ -169,25 +169,26 @@ const renderScheduleRows = ({
 export const FormPeriodsStep = (props: FormStepProps) => {
   const { isLoading, data: bookedItems } = useQuery(
     ['bookedItems', props.offering.uuid],
-    () => getOfferingBookedItems(props.offering.uuid),
+    () =>
+      marketplaceBookingsList({ path: { uuid: props.offering.uuid } }).then(
+        (r) => r.data,
+      ),
     { staleTime: 3 * 60 * 1000 },
   );
 
   return (
     <VStepperFormStepCard
       title={translate('Periods')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       loading={isLoading}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
     >
       <FieldArray
         name="attributes.schedules"
         component={renderScheduleRows}
         rerenderOnEveryChange
-        availableSchedules={props.offering.attributes.schedules || []}
+        availableSchedules={props.offering.attributes['schedules'] || []}
         bookedItems={bookedItems}
       />
     </VStepperFormStepCard>

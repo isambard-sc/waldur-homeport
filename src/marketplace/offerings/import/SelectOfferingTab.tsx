@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { groupBy } from 'lodash-es';
 import { useDispatch, useSelector } from 'react-redux';
 import { change } from 'redux-form';
+import { remoteWaldurApiSharedOfferings } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { FormContainer, SelectField } from '@waldur/form';
@@ -11,7 +12,6 @@ import { getLabel } from '@waldur/marketplace/common/registry';
 import { Offering } from '@waldur/marketplace/types';
 import { Field } from '@waldur/resource/summary';
 
-import { loadRemoteOfferings } from './api';
 import { OFFERING_IMPORT_FORM_ID } from './constants';
 import { ErredRemoteConnection } from './ErredRemoteConnection';
 import { importOfferingSelector } from './selectors';
@@ -22,7 +22,7 @@ export const SelectOfferingTab = () => {
     isLoading,
     error,
     data: offerings,
-  } = useQuery<Offering[], any>(
+  } = useQuery(
     [
       'RemoteOfferings',
       formData?.api_url,
@@ -35,12 +35,14 @@ export const SelectOfferingTab = () => {
           new Error(translate('Please check the credentials again.')),
         );
       }
-      return loadRemoteOfferings(
-        formData.api_url,
-        formData.token,
-        formData.customer?.uuid,
-      ).then((offerings) =>
-        offerings.map((offering) => ({
+      return remoteWaldurApiSharedOfferings({
+        query: { customer_uuid: formData.customer?.uuid },
+        body: {
+          api_url: formData.api_url,
+          token: formData.token,
+        },
+      }).then((response) =>
+        response.data.map((offering) => ({
           ...offering,
           type_label: getLabel(offering.type),
         })),

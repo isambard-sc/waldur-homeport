@@ -1,6 +1,7 @@
 import { Eye } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import { ProviderOfferingDetails } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -15,7 +16,11 @@ const PreviewOfferingDialog = lazyComponent(() =>
     default: module.PreviewOfferingDialog,
   })),
 );
-export const PreviewOfferingButton = ({ row }) => {
+export const PreviewOfferingButton = ({
+  row,
+}: {
+  row: ProviderOfferingDetails;
+}) => {
   const dispatch = useDispatch();
 
   if (![ACTIVE, PAUSED].includes(row.state)) {
@@ -37,7 +42,7 @@ export const PreviewOfferingButton = ({ row }) => {
       }}
     >
       <span className="svg-icon svg-icon-2">
-        <Eye />
+        <Eye weight="bold" />
       </span>
       {translate('Preview order form')}
     </Dropdown.Item>

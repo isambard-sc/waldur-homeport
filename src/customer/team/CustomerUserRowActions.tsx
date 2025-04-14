@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { CustomerUser } from 'waldur-js-client';
 
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 import { UserDetailsButton } from '@waldur/user/UserDetailsButton';
@@ -9,7 +10,7 @@ import { UserRemoveButton } from './UserRemoveButton';
 
 interface CustomerUserRowActionsProps {
   refetch;
-  row;
+  row: CustomerUser;
 }
 
 export const CustomerUserRowActions: FunctionComponent<

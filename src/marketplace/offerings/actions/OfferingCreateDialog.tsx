@@ -1,7 +1,12 @@
+import { PlusCircle } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  BillingUnit,
+  marketplaceProviderOfferingsCreate,
+} from 'waldur-js-client';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -13,13 +18,10 @@ import {
   SubmitButton,
 } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import {
-  createProviderOffering,
-  getCategories,
-} from '@waldur/marketplace/common/api';
+import { getCategories } from '@waldur/marketplace/common/api';
 import { getCreatableOfferings } from '@waldur/marketplace/common/registry';
-import { Category } from '@waldur/marketplace/types';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getCustomer } from '@waldur/workspace/selectors';
@@ -36,7 +38,7 @@ export const OfferingCreateDialog = reduxForm<
   const { data, isLoading, error, refetch } = useQuery(
     ['OfferingCreateDialog'],
     async () => {
-      const categories: Category[] = await getCategories();
+      const categories = await getCategories();
       const offeringTypes = getCreatableOfferings();
       return { categories, offeringTypes };
     },
@@ -46,12 +48,21 @@ export const OfferingCreateDialog = reduxForm<
   const dispatch = useDispatch();
   const router = useRouter();
   const saveOffering = async (formData: OfferingCreateFormData) => {
+    // create a default plan while creating offering [WAL-7969]
+    const plan_payload = {
+      name: 'Default',
+      unit: 'month' as BillingUnit,
+    };
+
     try {
-      const response = await createProviderOffering({
-        name: formData.name,
-        customer: customer.url,
-        category: formData.category.url,
-        type: formData.type.value,
+      const response = await marketplaceProviderOfferingsCreate({
+        body: {
+          name: formData.name,
+          customer: customer.url,
+          category: formData.category.url,
+          type: formData.type.value,
+          plans: [plan_payload],
+        },
       });
       dispatch(showSuccess(translate('Offering has been created.')));
       if (fetch) {
@@ -79,7 +90,21 @@ export const OfferingCreateDialog = reduxForm<
   }
   return (
     <form onSubmit={handleSubmit(saveOffering)}>
-      <ModalDialog title={translate('New offering')}>
+      <ModalDialog
+        title={translate('New offering')}
+        footer={
+          <>
+            <CloseDialogButton />
+            <SubmitButton
+              submitting={submitting}
+              disabled={invalid}
+              label={translate('Create')}
+            />
+          </>
+        }
+        iconNode={<PlusCircle weight="bold" />}
+        iconColor="success"
+      >
         <FormContainer submitting={submitting}>
           <StringField
             name="name"
@@ -105,14 +130,9 @@ export const OfferingCreateDialog = reduxForm<
             options={data.offeringTypes}
             isClearable={false}
             validate={required}
+            spaceless
           />
         </FormContainer>
-        <SubmitButton
-          className="btn btn-primary btn-sm me-2"
-          submitting={submitting}
-          disabled={invalid}
-          label={translate('Create')}
-        />
       </ModalDialog>
     </form>
   );

@@ -1,16 +1,16 @@
 import { FunctionComponent } from 'react';
 import { Form } from 'react-bootstrap';
+import { User } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { formatJsx, translate } from '@waldur/i18n';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { useUpdateUser } from './useUpdateUser';
 
 interface TermsOfServiceCheckboxProps {
-  user: UserDetails;
+  user: User;
 }
 
 export const TermsOfServiceCheckbox: FunctionComponent<

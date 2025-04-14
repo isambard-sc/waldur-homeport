@@ -118,7 +118,7 @@ const FieldsListGroup = ({ fields, components }: ComponentLimitsFieldProps) => {
         <div>
           <Button variant="light" className="btn-icon" onClick={addRow}>
             <span className="svg-icon svg-icon-2">
-              <PlusCircle />
+              <PlusCircle weight="bold" />
             </span>
           </Button>
         </div>

@@ -3,15 +3,15 @@ xdescribe('Customer creation dialog', () => {
     cy.mockUser()
       .mockCustomer()
       .mockChecklists()
-      .intercept('OPTIONS', '/api/customers/', {
+      .intercept('OPTIONS', '/api/customers/**', {
         fixture: 'customers/countries.json',
       })
-      .intercept('POST', '/api/customers/', { fixture: 'customers/alice.json' })
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('POST', '/api/customers/**', { fixture: 'customers/alice.json' })
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .intercept('GET', '/api/daily-quotas/', { nc_user_count: [] })
-      .intercept('GET', '/api/marketplace-category-component-usages/', [])
-      .intercept('GET', '/api/marketplace-resources/', [])
-      .intercept('GET', '/api/marketplace-public-offerings/', [])
+      .intercept('GET', '/api/marketplace-category-component-usages/**', [])
+      .intercept('GET', '/api/marketplace-resources/**', [])
+      .intercept('GET', '/api/marketplace-public-offerings/**', [])
       .setToken()
       .visit('/profile/')
       .waitForSpinner()

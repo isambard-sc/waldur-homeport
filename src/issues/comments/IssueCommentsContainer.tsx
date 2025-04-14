@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { Issue } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { type RootState } from '@waldur/store/reducers';
-
-import { Issue } from '../list/types';
 
 import * as actions from './actions';
 import { IssueCommentButton } from './IssueCommentButton';

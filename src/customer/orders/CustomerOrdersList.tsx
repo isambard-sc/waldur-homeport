@@ -2,9 +2,11 @@ import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { MarketplaceOrdersListData } from 'waldur-js-client';
 
 import { CustomerOrdersListFilter } from '@waldur/marketplace/orders/list/MarketplaceOrdersListFilter';
 import { OrdersTableComponent } from '@waldur/marketplace/orders/list/OrdersTableComponent';
+import { RootState } from '@waldur/store/reducers';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import {
@@ -13,7 +15,9 @@ import {
 } from '../constants';
 
 export const CustomerOrdersList: FunctionComponent = () => {
-  const filter = useSelector(mapStateToFilter);
+  const filter = useSelector<RootState, MarketplaceOrdersListData['query']>(
+    mapStateToFilter,
+  );
 
   return (
     <OrdersTableComponent
@@ -29,7 +33,7 @@ const mapStateToFilter = createSelector(
   getCustomer,
   getFormValues(CUSTOMER_ORDERS_LIST_FILTER_FORM_ID),
   (customer, filterValues: any) => {
-    const filter: Record<string, string> = {};
+    const filter: MarketplaceOrdersListData['query'] = {};
     if (customer) {
       filter.customer_uuid = customer.uuid;
     }

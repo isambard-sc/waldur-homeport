@@ -1,10 +1,10 @@
 import { LinkBreak } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
+import { rancherNodesUnlinkOpenstack } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { unlinkInstance } from '@waldur/rancher/api';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionItemType } from '@waldur/resource/actions/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -27,7 +27,7 @@ export const UnlinkAction: ActionItemType = ({ resource, refetch }) => {
     }
 
     try {
-      await unlinkInstance(resource.uuid);
+      await rancherNodesUnlinkOpenstack({ path: { uuid: resource.uuid } });
       dispatch(
         showSuccess(
           translate('OpenStack instance has been unlinked from Rancher node.'),
@@ -44,7 +44,7 @@ export const UnlinkAction: ActionItemType = ({ resource, refetch }) => {
   };
   if (
     resource.instance !== null &&
-    user.is_staff &&
+    user?.is_staff &&
     !ENV.plugins.WALDUR_RANCHER.READ_ONLY_MODE
   ) {
     return (
@@ -52,7 +52,7 @@ export const UnlinkAction: ActionItemType = ({ resource, refetch }) => {
         title={translate('Unlink instance')}
         action={callback}
         staff
-        iconNode={<LinkBreak />}
+        iconNode={<LinkBreak weight="bold" />}
       />
     );
   }

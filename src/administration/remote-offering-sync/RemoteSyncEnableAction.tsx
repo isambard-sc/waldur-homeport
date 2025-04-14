@@ -1,12 +1,12 @@
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
+import { marketplaceRemoteSynchronisationsPartialUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { activateRemoteSync } from './api';
 import { RemoteSyncActionProps } from './types';
 
 export const RemoteSyncEnableAction = (props: RemoteSyncActionProps) => {
@@ -14,7 +14,12 @@ export const RemoteSyncEnableAction = (props: RemoteSyncActionProps) => {
 
   const { mutate, isLoading } = useMutation(async () => {
     try {
-      await activateRemoteSync(!props.row.is_active, props.row.uuid);
+      await marketplaceRemoteSynchronisationsPartialUpdate({
+        path: { uuid: props.row.uuid },
+        body: {
+          is_active: !props.row.is_active,
+        },
+      });
       dispatch(
         showSuccess(
           props.row.is_active
@@ -39,7 +44,13 @@ export const RemoteSyncEnableAction = (props: RemoteSyncActionProps) => {
     <ActionItem
       title={props.row.is_active ? translate('Disable') : translate('Enable')}
       action={mutate}
-      iconNode={props.row.is_active ? <XCircle /> : <CheckCircle />}
+      iconNode={
+        props.row.is_active ? (
+          <XCircle weight="bold" />
+        ) : (
+          <CheckCircle weight="bold" />
+        )
+      }
       disabled={isLoading}
     />
   );

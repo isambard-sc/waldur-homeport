@@ -1,18 +1,24 @@
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { useAsync } from 'react-use';
+import {
+  rancherCatalogsRetrieve,
+  rancherClustersRetrieve,
+} from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 
-import { getCluster, getCatalog } from '../api';
-
 import { CatalogTemplatesList } from './CatalogTemplateList';
 
 const loadData = async (clusterUuid: string, catalogUuid: string) => {
-  const cluster = await getCluster(clusterUuid);
-  const catalog = await getCatalog(catalogUuid);
+  const cluster = await rancherClustersRetrieve({
+    path: { uuid: clusterUuid },
+  }).then((response) => response.data);
+  const catalog = await rancherCatalogsRetrieve({
+    path: { uuid: catalogUuid },
+  }).then((response) => response.data);
   return { cluster, catalog };
 };
 

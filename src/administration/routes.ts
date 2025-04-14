@@ -57,6 +57,17 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-service-desk',
+    parent: 'admin',
+    abstract: true,
+    component: UIView,
+    url: '',
+    data: {
+      breadcrumb: () => translate('Service desk'),
+    },
+  },
+
+  {
     name: 'admin-accounts',
     parent: 'admin',
     abstract: true,
@@ -138,16 +149,32 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'admin-service-desk',
-    url: 'service-desk/',
-    parent: 'admin-settings',
+    name: 'admin-integration-settings',
+    url: 'integration-settings/',
+    parent: 'admin-service-desk',
     component: lazyComponent(() =>
       import('./service-desk/AdministrationServiceDesk').then((module) => ({
         default: module.AdministrationServiceDesk,
       })),
     ),
     data: {
-      breadcrumb: () => translate('Service desk'),
+      breadcrumb: () => translate('Integration settings'),
+    },
+  },
+
+  {
+    name: 'admin-issue-templates',
+    url: 'issue-templates/',
+    parent: 'admin-service-desk',
+    component: lazyComponent(() =>
+      import(
+        './service-desk/issue-templates/AdministrationIssueTemplatesList'
+      ).then((module) => ({
+        default: module.AdministrationIssueTemplatesList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Issue templates'),
     },
   },
 

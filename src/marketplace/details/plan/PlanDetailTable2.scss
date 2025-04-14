@@ -1,46 +1,32 @@
 .plan-details-container {
-  table.table-details {
+  table.form-table {
     th,
     td {
-      padding-top: 2px;
+      padding-top: 16px;
+      padding-bottom: 16px;
     }
 
-    th {
+    .title {
+      color: var(--bs-gray-700);
+    }
+    .description {
+      color: var(--bs-gray-600);
+    }
+    .value {
+      color: var(--bs-gray-500);
+    }
+    .col-actions {
+      color: var(--bs-gray-500);
       font-weight: 500;
-    }
 
-    td {
-      padding-left: 0.6rem;
-
-      &.estimate {
-        min-width: 130px;
-        width: 20%;
-      }
-
-      &.control {
-        padding-left: 0;
+      .form-check-label {
+        color: var(--bs-gray-700);
+        font-size: 14px;
+        font-weight: 400;
       }
     }
-
-    tr.separator-space {
-      td {
-        padding-bottom: 3rem;
-      }
-    }
-
-    tr.total {
-      th,
-      td {
-        font-weight: 600;
-        padding-top: 1rem;
-      }
-
-      &.total-final {
-        th,
-        td {
-          font-size: 1.25rem;
-        }
-      }
+    tr:not(.total) .col-actions {
+      text-align: start;
     }
   }
 }

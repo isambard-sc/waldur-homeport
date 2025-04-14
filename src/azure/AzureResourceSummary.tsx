@@ -1,10 +1,16 @@
+import {
+  AzureSqlDatabase,
+  AzureSqlServer,
+  AzureVirtualMachine,
+} from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
 import { Field, ResourceSummaryProps } from '@waldur/resource/summary';
 
-import { AzureResource } from './types';
-
-export function PureAzureResourceSummary<R extends AzureResource = any>(
-  props: ResourceSummaryProps<R>,
+export function PureAzureResourceSummary(
+  props: ResourceSummaryProps<
+    AzureVirtualMachine | AzureSqlDatabase | AzureSqlServer
+  >,
 ) {
   const { resource } = props;
   return (

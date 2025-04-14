@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { openstackInstancesBackup } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { createBackup } from '@waldur/openstack/api';
 import {
   createLatinNameField,
   createDescriptionField,
@@ -37,7 +37,10 @@ export const CreateBackupDialog: FC<ActionDialogProps> = ({
       }}
       submitForm={async (formData) => {
         try {
-          await createBackup(resource.uuid, formData);
+          await openstackInstancesBackup({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(showSuccess(translate('VM snapshot has been created.')));
           dispatch(closeModalDialog());
           if (refetch) {

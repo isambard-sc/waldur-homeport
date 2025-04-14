@@ -1,24 +1,31 @@
-import { FunctionComponent } from 'react';
+import { useRouter } from '@uirouter/react';
+import { FunctionComponent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { CustomersUsersListData, CustomerUser } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
 import Avatar from '@waldur/core/Avatar';
+import { ENV } from '@waldur/core/config';
 import { formatDate } from '@waldur/core/dateUtils';
 import { CUSTOMER_USERS_LIST_FILTER_FORM_ID } from '@waldur/customer/team/constants';
 import { CustomerUsersListExpandableRow } from '@waldur/customer/team/CustomerUsersListExpandableRow';
 import { translate } from '@waldur/i18n';
+import { useTeamTableTabs } from '@waldur/invitations/tabs';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { exportRoleField } from '@waldur/user/affiliations/RolePopover';
-import { getCustomer } from '@waldur/workspace/selectors';
+import {
+  getCustomer,
+  isOwnerOrStaff as isOwnerOrStaffSelector,
+} from '@waldur/workspace/selectors';
 
+import { CustomerPermissionsLogButton } from './CustomerPermissionsLogButton';
 import { CustomerUserRowActions } from './CustomerUserRowActions';
-import { UserAddButton } from './UserAddButton';
+import { TeamDropdownActions } from './TeamDropdownActions';
 
 export const renderRoleExpirationDate = (row) => {
   return row.expiration_time
@@ -29,7 +36,7 @@ export const renderRoleExpirationDate = (row) => {
 const mapStateToFilter = createSelector(
   getFormValues(CUSTOMER_USERS_LIST_FILTER_FORM_ID),
   (filterValues: any) => {
-    const filter: Record<string, string | boolean> = {
+    const filter: CustomersUsersListData['query'] = {
       o: 'concatenated_name',
     };
     if (filterValues) {
@@ -46,7 +53,7 @@ const mapStateToFilter = createSelector(
   },
 );
 
-const mandatoryFields = [
+const mandatoryFields: CustomersUsersListData['query']['field'] = [
   // Required for actions and expandable view
   'uuid',
   'email',
@@ -69,9 +76,21 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
     filter,
     mandatoryFields,
   });
+
+  // The "Team" page contains several other pages. We have to check the access permissions to this page here.
+  const router = useRouter();
+  const isOwnerOrStaff = useSelector(isOwnerOrStaffSelector);
+  useEffect(() => {
+    if (!isOwnerOrStaff) {
+      router.stateService.go('organization-invitations');
+    }
+  }, []);
+
+  const tableTabs = useTeamTableTabs();
+
   return (
-    <Table
-      title={translate('Team members')}
+    <Table<CustomerUser>
+      title={translate('Team')}
       {...props}
       filters={filters}
       columns={[
@@ -83,14 +102,15 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
                 <img
                   src={row.image}
                   alt={row.username}
-                  width={25}
-                  height={25}
+                  width={32}
+                  height={32}
+                  className="rounded-circle"
                 />
               ) : (
                 <Avatar
-                  className="symbol symbol-25px"
+                  className="symbol symbol-32px symbol-circle"
                   name={row.full_name}
-                  size={25}
+                  size={32}
                 />
               )}
               <p className="mb-0">{row.full_name || DASH_ESCAPE_CODE}</p>
@@ -99,6 +119,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
           export: 'full_name',
           id: 'member',
           keys: ['full_name', 'username', 'image'],
+          copyField: (row) => row.full_name,
         },
         {
           title: translate('Email'),
@@ -106,6 +127,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
           export: 'email',
           id: 'email',
           keys: ['email'],
+          copyField: (row) => row.email,
         },
         {
           title: translate('Username'),
@@ -135,6 +157,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
           keys: ['expiration_time'],
         },
       ]}
+      tabs={tableTabs}
       verboseName={translate('team members')}
       hasQuery={true}
       enableExport
@@ -145,7 +168,12 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
         <CustomerUsersListExpandableRow row={row} refetch={props.fetch} />
       )}
       expandableRowClassName="p-0 ps-12"
-      tableActions={<UserAddButton refetch={props.fetch} />}
+      tableActions={
+        <>
+          <CustomerPermissionsLogButton />
+          <TeamDropdownActions refetch={props.fetch} />
+        </>
+      }
       hasOptionalColumns
     />
   );

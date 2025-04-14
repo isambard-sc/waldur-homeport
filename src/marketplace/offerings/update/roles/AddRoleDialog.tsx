@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
+import { marketplaceOfferingUserRolesCreate } from 'waldur-js-client';
 
 import { required } from '@waldur/core/validators';
 import { StringField, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { createOfferingRole } from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { FormGroup } from '../../FormGroup';
@@ -21,7 +21,12 @@ export const AddRoleDialog = reduxForm<{}, { resolve: { offering; refetch } }>({
   const update = useCallback(
     async (formData) => {
       try {
-        await createOfferingRole(props.resolve.offering.url, formData.name);
+        await marketplaceOfferingUserRolesCreate({
+          body: {
+            offering: props.resolve.offering.url,
+            name: formData.name,
+          },
+        });
         dispatch(showSuccess(translate('Role has been added successfully.')));
         if (props.resolve.refetch) await props.resolve.refetch();
         dispatch(closeModalDialog());
@@ -34,21 +39,20 @@ export const AddRoleDialog = reduxForm<{}, { resolve: { offering; refetch } }>({
 
   return (
     <form onSubmit={props.handleSubmit(update)}>
-      <Modal.Header>
-        <Modal.Title>{translate('Add role')}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
+      <ModalDialog
+        title={translate('Add role')}
+        footer={
+          <SubmitButton
+            disabled={props.invalid}
+            submitting={props.submitting}
+            label={translate('Create')}
+          />
+        }
+      >
         <FormGroup label={translate('Name')} required={true}>
           <Field name="name" validate={required} component={StringField} />
         </FormGroup>
-      </Modal.Body>
-      <Modal.Footer>
-        <SubmitButton
-          disabled={props.invalid}
-          submitting={props.submitting}
-          label={translate('Create')}
-        />
-      </Modal.Footer>
+      </ModalDialog>
     </form>
   );
 });

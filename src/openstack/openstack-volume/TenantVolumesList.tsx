@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackVolume, OpenstackVolumesListData } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -19,7 +20,7 @@ import { formatInstance } from './OpenStackVolumeSummary';
 export const TenantVolumesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackVolumesListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
     }),
@@ -34,7 +35,7 @@ export const TenantVolumesList: FunctionComponent<{ resourceScope }> = ({
   });
 
   return (
-    <Table
+    <Table<OpenStackVolume>
       {...props}
       columns={[
         {
@@ -70,6 +71,7 @@ export const TenantVolumesList: FunctionComponent<{ resourceScope }> = ({
           offeringType={VOLUME_TYPE}
         />
       }
+      title={translate('Volumes')}
       verboseName={translate('volumes')}
       expandableRow={({ row }) => <ResourceSummary resource={row} />}
       rowActions={({ row }) => (

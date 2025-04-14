@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Form } from 'react-bootstrap';
 import { reduxForm, FormSection } from 'redux-form';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 

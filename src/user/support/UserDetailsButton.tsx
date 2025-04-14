@@ -19,7 +19,7 @@ export const UserDetailsButton: FunctionComponent<{ row }> = ({ row }) => {
     <ActionItem
       title={translate('Details')}
       size="sm"
-      iconNode={<Eye />}
+      iconNode={<Eye weight="bold" />}
       action={() =>
         dispatch(
           openModalDialog(UserDetailsDialog, {

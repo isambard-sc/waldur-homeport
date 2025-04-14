@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
+import { Project } from 'waldur-js-client';
 
-import { Customer, Project } from '@waldur/workspace/types';
+import { Customer } from '@waldur/workspace/types';
 
 export interface IssueFormData {
   type: any;
@@ -12,26 +13,6 @@ export interface IssueFormData {
   customer?: Customer;
   project?: Project;
   resource?: any;
-}
-
-export interface IssueRequestPayload {
-  type: string;
-  summary: string;
-  description: string;
-  is_reported_manually?: boolean;
-  customer?: string;
-  project?: string;
-  resource?: string;
-  template?: string;
-  caller?: string;
-  assignee?: string;
-  priority?: string;
-}
-
-export interface IssueResponse {
-  url: string;
-  key: string;
-  uuid: string;
 }
 
 export interface IssueTypeOption {

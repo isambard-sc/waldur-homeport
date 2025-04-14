@@ -11,10 +11,10 @@ interface CommentSectionProps {
   reviews?: ProposalReview[];
   valueField: string;
   commentField: string;
-  label: string;
-  tooltip: string;
-  floating?: boolean;
+  label?: string;
+  tooltip?: string;
   inline?: boolean;
+  spaceless?: boolean;
   onAddCommentClick?;
 }
 
@@ -24,8 +24,8 @@ export const CommentSection: FC<PropsWithChildren<CommentSectionProps>> = ({
   commentField,
   label,
   tooltip,
-  floating,
   inline,
+  spaceless,
   onAddCommentClick,
   reviews,
   children,
@@ -34,21 +34,23 @@ export const CommentSection: FC<PropsWithChildren<CommentSectionProps>> = ({
     <ReadOnlyFormControl
       label={label}
       value={proposal[valueField]}
-      floating={floating}
       inline={inline}
+      spaceless={spaceless}
       tooltip={tooltip}
       actions={
         onAddCommentClick && (
           <AddCommentButton
             review={reviews?.[0]}
             onClick={() => onAddCommentClick({ commentField, label })}
-            className={floating ? '' : 'mt-11'}
+            className={inline ? 'mt-n3' : 'mt-8'}
           />
         )
       }
     >
       {children}
     </ReadOnlyFormControl>
-    <FieldReviewComments reviews={reviews} fieldName={commentField} />
+    <div className={onAddCommentClick ? 'me-15' : undefined}>
+      <FieldReviewComments reviews={reviews} fieldName={commentField} />
+    </div>
   </>
 );

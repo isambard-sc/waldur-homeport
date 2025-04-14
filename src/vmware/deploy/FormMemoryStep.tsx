@@ -27,13 +27,10 @@ export const FormMemoryStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Memory')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
-      helpText={translate('Memory size in GiB')}
       loading={isLoading}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
     >
       <Field
         name="limits.ram"
@@ -42,6 +39,7 @@ export const FormMemoryStep = (props: FormStepProps) => {
         validate={ramValidator}
         parse={parseIntField}
         format={formatIntField}
+        tooltip={translate('Memory size in GiB')}
       >
         <SliderNumberField
           unit={translate('GB')}

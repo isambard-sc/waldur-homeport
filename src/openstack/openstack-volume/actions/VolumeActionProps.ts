@@ -1,6 +1,6 @@
-import { Volume } from '@waldur/resource/types';
+import { OpenStackVolume } from 'waldur-js-client';
 
 export interface VolumeActionProps {
-  resource: Volume;
+  resource: OpenStackVolume;
   refetch?;
 }

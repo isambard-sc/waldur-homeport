@@ -3,11 +3,12 @@ import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { formValueSelector } from 'redux-form';
+import { invoicesGrowthRetrieve } from 'waldur-js-client';
 
+import { ENV } from '@waldur/core/config';
 import { EChart } from '@waldur/core/EChart';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
-import { getGrowthChartData } from '@waldur/invoices/api';
 import { GROWTH_FILTER_ID } from '@waldur/invoices/constants';
 import { type RootState } from '@waldur/store/reducers';
 
@@ -26,10 +27,16 @@ export const GrowthChart: FunctionComponent = () => {
     data: option,
   } = useQuery(
     ['growth-chart', accountRunningState?.value],
-    async ({ signal }) =>
-      await getGrowthChartData(accountRunningState?.value, { signal }).then(
-        formatGrowthChart,
-      ),
+    async ({ signal }) => {
+      const response = await invoicesGrowthRetrieve({
+        query: {
+          accounting_is_running: accountRunningState?.value,
+          accounting_mode: ENV.accountingMode,
+        },
+        signal,
+      });
+      return formatGrowthChart(response.data);
+    },
   );
   if (loading) {
     return <LoadingSpinner />;

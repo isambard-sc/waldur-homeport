@@ -1,6 +1,6 @@
 import { ArrowClockwise } from '@phosphor-icons/react';
+import { azureVirtualmachinesRestart } from 'waldur-js-client';
 
-import { restartVirtualMachine } from '@waldur/azure/api';
 import { translate } from '@waldur/i18n';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
 import {
@@ -16,8 +16,8 @@ export const RestartAction: ActionItemType = ({ resource, refetch }) => (
     title={translate('Restart')}
     resource={resource}
     validators={validators}
-    apiMethod={restartVirtualMachine}
+    apiMethod={(id) => azureVirtualmachinesRestart({ path: { uuid: id } })}
     refetch={refetch}
-    iconNode={<ArrowClockwise />}
+    iconNode={<ArrowClockwise weight="bold" />}
   />
 );

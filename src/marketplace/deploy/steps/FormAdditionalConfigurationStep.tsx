@@ -1,17 +1,26 @@
-import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
+import classNames from 'classnames';
+import { useSelector } from 'react-redux';
+
+import { AccordionCard } from '@waldur/core/AccordionCard';
+import { Tip } from '@waldur/core/Tooltip';
 import { OptionsForm } from '@waldur/marketplace/common/OptionsForm';
 
 import { FormStepProps } from '../types';
+import { formCustomerSelector } from '../utils';
 
-export const FormAdditionalConfigurationStep = (props: FormStepProps) => (
-  <VStepperFormStepCard
-    title={props.title}
-    step={props.step}
-    id={props.id}
-    completed={props.observed}
-    disabled={props.disabled}
-    required={props.required}
-  >
-    <OptionsForm options={props.offering.options} />
-  </VStepperFormStepCard>
-);
+export const FormAdditionalConfigurationStep = (props: FormStepProps) => {
+  const customer = useSelector(formCustomerSelector);
+  return (
+    <Tip id={`tip-${props.id}`} label={props.disabledTooltip}>
+      <AccordionCard
+        title={props.title}
+        id={props.id}
+        className={classNames('step-card', props.disabled && 'step-disabled')}
+        defaultOpen
+      >
+        {props.disabled && <div className="step-blocker" />}
+        <OptionsForm options={props.offering.options} customer={customer} />
+      </AccordionCard>
+    </Tip>
+  );
+};

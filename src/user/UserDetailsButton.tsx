@@ -34,7 +34,7 @@ export const UserDetailsButton: React.FC<UserDetailsButtonProps> = ({
     <RowActionButton
       action={callback}
       title={translate('Details')}
-      iconNode={<Eye />}
+      iconNode={<Eye weight="bold" />}
       size="sm"
     />
   );

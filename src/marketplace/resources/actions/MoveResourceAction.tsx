@@ -33,7 +33,7 @@ export const MoveResourceAction: ActionItemType = ({ resource, refetch }) => {
       title={translate('Move')}
       action={callback}
       staff
-      iconNode={<ArrowsOutCardinal />}
+      iconNode={<ArrowsOutCardinal weight="bold" />}
     />
   ) : null;
 };

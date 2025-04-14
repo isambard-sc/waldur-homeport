@@ -1,12 +1,12 @@
 import React from 'react';
+import { CustomerDetails as CustomerDetailsType } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { Customer } from '@waldur/workspace/types';
 
 import { formatPhone } from './utils';
 
 interface CustomerDetailsProps {
-  customer: Customer;
+  customer: CustomerDetailsType;
 }
 
 export const CustomerDetails: React.FC<CustomerDetailsProps> = ({

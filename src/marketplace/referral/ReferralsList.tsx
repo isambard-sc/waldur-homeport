@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { REFERRALS_TABLE } from '@waldur/marketplace/referral/constants';

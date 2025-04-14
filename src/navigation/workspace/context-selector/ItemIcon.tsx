@@ -15,7 +15,6 @@ export const ItemIcon = ({ item, circle = false, className = '' }) =>
       <ImagePlaceholder
         width="40px"
         height="40px"
-        backgroundColor="#F1F7EF"
         circle={circle}
         className="fs-7"
       >

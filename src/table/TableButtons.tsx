@@ -141,9 +141,7 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
             />
           )}
           {/* Optional columns */}
-          {props.hasOptionalColumns && props.mode === 'table' && (
-            <TableColumnButton {...props} />
-          )}
+          {props.hasOptionalColumns && <TableColumnButton {...props} />}
           {/* Main actions */}
           {showExportInDropdown ? (
             <TableMoreActions actions={dropdownActions} />

@@ -1,5 +1,6 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import { Field, reduxForm } from 'redux-form';
+import { Project } from 'waldur-js-client';
 
 import {
   getInitialValues,
@@ -10,9 +11,11 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { REACT_SELECT_TABLE_FILTER } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { OfferingAutocomplete } from '@waldur/marketplace/offerings/details/OfferingAutocomplete';
+import { parentOfferingFilter } from '@waldur/marketplace/offerings/utils';
 import { OrganizationAutocomplete } from '@waldur/marketplace/orders/OrganizationAutocomplete';
 import { PROJECT_RESOURCES_ALL_FILTER_FORM_ID } from '@waldur/marketplace/resources/list/constants';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
+import { Customer } from '@waldur/workspace/types';
 
 import { CategoryFilter } from './CategoryFilter';
 import { ProjectFilter } from './ProjectFilter';
@@ -22,6 +25,8 @@ import { RuntimeStateFilter } from './RuntimeStateFilter';
 interface ProjectResourcesAllFilterProps {
   hasProjectFilter?: boolean;
   hasCustomerFilter?: boolean;
+  customer?: Customer;
+  project?: Project;
   change?: any;
   initialValues?: any;
 }
@@ -30,6 +35,15 @@ const PureProjectResourcesAllFilter: FunctionComponent<
   ProjectResourcesAllFilterProps
 > = (props) => {
   useSyncInitialFiltersToURL(props.initialValues);
+
+  const offeringFilter = useMemo(
+    () => ({
+      project_uuid: props.project?.uuid,
+      allowed_customer_uuid: props.customer?.uuid,
+    }),
+    [props.project, props.customer],
+  );
+
   return (
     <>
       <TableFilterItem
@@ -40,6 +54,18 @@ const PureProjectResourcesAllFilter: FunctionComponent<
         <OfferingAutocomplete
           providerOfferings={false}
           reactSelectProps={REACT_SELECT_TABLE_FILTER}
+          offeringFilter={offeringFilter}
+        />
+      </TableFilterItem>
+      <TableFilterItem
+        title={translate('Parent offering')}
+        name="parent_offering"
+        badgeValue={(value) => `${value?.category_title} / ${value?.name}`}
+      >
+        <OfferingAutocomplete
+          reactSelectProps={REACT_SELECT_TABLE_FILTER}
+          offeringFilter={parentOfferingFilter}
+          name="parent_offering"
         />
       </TableFilterItem>
       <TableFilterItem
@@ -47,7 +73,7 @@ const PureProjectResourcesAllFilter: FunctionComponent<
         name="category"
         badgeValue={(value) => value?.title}
       >
-        <CategoryFilter />
+        <CategoryFilter project={props.project} customer={props.customer} />
       </TableFilterItem>
       {props.hasCustomerFilter ? (
         <TableFilterItem

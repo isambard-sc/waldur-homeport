@@ -1,22 +1,21 @@
 import { Eye } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { Issue } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { formatRelative, formatDateTime } from '@waldur/core/dateUtils';
 import { ExternalLink } from '@waldur/core/ExternalLink';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { Field } from '@waldur/resource/summary';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
-
-import { Issue } from './list/types';
 
 const IssueInfoDialog = ({ issue }: { issue: Issue }) => {
   const staffOrSupport = useSelector(isStaffOrSupport);
   return (
-    <MetronicModalDialog
+    <ModalDialog
       title={translate('Info')}
       closeButton
       bodyClassName="d-flex flex-column gap-1"
@@ -130,7 +129,7 @@ const IssueInfoDialog = ({ issue }: { issue: Issue }) => {
         })}
         labelClass="mw-200px"
       />
-    </MetronicModalDialog>
+    </ModalDialog>
   );
 };
 

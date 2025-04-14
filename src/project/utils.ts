@@ -1,79 +1,137 @@
-import { defaultCurrency } from '@waldur/core/formatCurrency';
-import { getProjectCostPolicies } from '@waldur/customer/cost-policies/api';
-import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
-import { formatCostChart, getTeamSizeChart } from '@waldur/dashboard/api';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import {
-  getLineChartOptions,
-  getLineChartOptionsWithAxis,
-} from '@waldur/dashboard/chart';
+  invoiceItemsCostsList,
+  marketplaceProjectEstimatedCostPoliciesList,
+  projectCreditsList,
+} from 'waldur-js-client';
+
+import { defaultCurrency } from '@waldur/core/formatCurrency';
+import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
+import { getLineChartOptions } from '@waldur/dashboard/chart';
+import {
+  formatProjectCostChart,
+  getTeamSizeChart,
+  getCreditChartAndOptions,
+  getCostChartAndOptions,
+} from '@waldur/dashboard/utils';
 import { translate } from '@waldur/i18n';
-import { Category } from '@waldur/marketplace/types';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { Project, User } from '@waldur/workspace/types';
 
-import { fetchLast12MonthProjectCosts } from './api';
-import { ProjectCounterResourceItem } from './types';
-
-export async function loadChart(project: Project, withAxis = false) {
+async function getProjectCostData(project: Project) {
   const [invoices, costPolicies] = await Promise.all([
-    fetchLast12MonthProjectCosts(project.uuid),
-    getProjectCostPolicies({
-      scope_uuid: project.uuid,
-      page: 1,
-      page_size: 3,
-    }),
+    invoiceItemsCostsList({
+      query: {
+        project_uuid: project.uuid,
+        page: 1,
+        page_size: 12,
+      },
+    }).then((response) => response.data),
+    marketplaceProjectEstimatedCostPoliciesList({
+      query: {
+        scope_uuid: project.uuid,
+        page: 1,
+        page_size: 3,
+      },
+    }).then((response) => response.data),
   ]);
-  const chart = formatCostChart(invoices);
+  return { invoices, costPolicies };
+}
+
+export function useProjectCostChart(project: Project) {
+  const { data, isLoading, error, refetch } = useQuery(
+    ['ProjectCostData', project?.uuid],
+    () => (project ? getProjectCostData(project) : null),
+    {
+      staleTime: 5 * 60 * 1000,
+    },
+  );
+
+  const chartData = useMemo(() => {
+    if (!data) return { chart: null, options: null };
+    const chart = formatProjectCostChart(data.invoices);
+
+    const hlines = (data.costPolicies || []).map((item) => {
+      const limitCost = defaultCurrency(item.limit_cost);
+      const projectCredit = item.project_credit
+        ? defaultCurrency(item.project_credit)
+        : null;
+
+      const totalCost = item.limit_cost + (item.project_credit || 0);
+      const totalCostFormatted = defaultCurrency(totalCost);
+      const action = getCostPolicyActionOptions().find(
+        (option) => option.value === item.actions,
+      )?.label;
+
+      const label = projectCredit
+        ? `Policy: ${action}\n${translate('Sum')}: ${totalCostFormatted}, ${translate('Limit')}: ${limitCost}, ${translate('Credit')}: ${projectCredit}`
+        : `Policy: ${action}\n${translate('Limit')}: ${limitCost}`;
+
+      return {
+        label,
+        value: totalCost,
+      };
+    });
+
+    return getCostChartAndOptions(chart, hlines);
+  }, [data]);
+
   return {
-    chart,
-    options: !withAxis
-      ? getLineChartOptions(
-          chart,
-          (costPolicies || []).map((item) => {
-            const limitCost = defaultCurrency(item.limit_cost);
-            const projectCredit = item.project_credit
-              ? defaultCurrency(item.project_credit)
-              : null;
-
-            const totalCost = item.limit_cost + (item.project_credit || 0);
-            const totalCostFormatted = defaultCurrency(totalCost);
-            const action = getCostPolicyActionOptions().find(
-              (option) => option.value === item.actions,
-            )?.label;
-
-            const label = projectCredit
-              ? `Policy: ${action}\n${translate('Sum')}: ${totalCostFormatted}, ${translate('Limit')}: ${limitCost}, ${translate('Credit')}: ${projectCredit}`
-              : `Policy: ${action}\n${translate('Limit')}: ${limitCost}`;
-
-            return {
-              label,
-              value: totalCost,
-            };
-          }),
-        )
-      : getLineChartOptionsWithAxis(chart),
+    isLoading,
+    error,
+    refetch,
+    chart: chartData?.chart,
+    options: chartData?.options,
   };
 }
 
-export const parseProjectCounters = (
-  categories: Category[],
-  counters: object,
-): ProjectCounterResourceItem[] => {
-  return categories
-    .map((category) => ({
-      label: category.title,
-      value: counters[category.uuid],
-    }))
-    .filter((row) => row.value);
-};
+export function useProjectCreditChart(project: Project) {
+  const {
+    data: costData,
+    isLoading: isCostLoading,
+    error: costError,
+    refetch: refetchCost,
+  } = useQuery(
+    ['ProjectCostData', project.uuid],
+    () => getProjectCostData(project),
+    {
+      staleTime: 5 * 60 * 1000,
+    },
+  );
 
-export const combineProjectCounterRows = (
-  rows: ProjectCounterResourceItem[],
-): ProjectCounterResourceItem[] =>
-  rows
-    .filter((item) => item.value)
-    .sort((a, b) => a.label.localeCompare(b.label));
+  const {
+    data: creditData,
+    isLoading: isCreditLoading,
+    error: creditError,
+    refetch: refetchCredit,
+  } = useQuery(
+    ['ProjectCreditData', project?.uuid],
+    () =>
+      projectCreditsList({
+        query: { project_uuid: project?.uuid },
+      }).then((response) => response.data.length > 0 && response.data[0]),
+    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
+  );
+
+  const chartData = useMemo(() => {
+    if (!costData || !creditData) return { chart: null, options: null };
+    return getCreditChartAndOptions(costData.invoices, creditData?.value);
+  }, [costData, creditData]);
+
+  return {
+    credit: creditData,
+    isLoading: isCostLoading || isCreditLoading,
+    error: costError || creditError,
+    refetch: () => {
+      refetchCost();
+      refetchCredit();
+    },
+    chart: chartData.chart,
+    options: chartData.options,
+  };
+}
 
 export const getProjectTeamChart = async (project: Project) => {
   const chart = await getTeamSizeChart(project);
@@ -95,3 +153,16 @@ export const canEditProject = (user: User, context: { customer?; project? }) =>
     permission: PermissionEnum.UPDATE_PROJECT,
     projectId: context?.project?.uuid,
   });
+
+export const PROJECT_TEAM_TABLE_TABS = [
+  {
+    key: 'users',
+    title: translate('Active'),
+    state: 'project-users',
+  },
+  {
+    key: 'project-invitations',
+    title: translate('Invitations'),
+    state: 'project-invitations',
+  },
+];

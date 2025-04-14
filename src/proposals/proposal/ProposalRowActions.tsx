@@ -1,6 +1,10 @@
-import { ChatText, Check, Eye, X } from '@phosphor-icons/react';
+import { ChatText, CheckCircle, Eye, XCircle } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+  proposalProposalsApprove,
+  proposalProposalsReject,
+} from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -10,8 +14,6 @@ import { router } from '@waldur/router';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 import { isStaff as isStaffSelector } from '@waldur/workspace/selectors';
-
-import { forceApproveProposal, rejectProposal } from '../api';
 
 const CreateReviewDialog = lazyComponent(() =>
   import('./create-review/CreateReviewDialog').then((module) => ({
@@ -28,11 +30,9 @@ const linkToProposalDetails = (proposalUuid, callManagerUuid) =>
 
 export const ProposalRowActions = ({ row, refetch }) => {
   const isStaff = useSelector(isStaffSelector);
-  const isRejectButtonDisabled = ![
-    'submitted',
-    'in_review',
-    'in_revision',
-  ].includes(row.state);
+  const isRejectButtonDisabled = !['submitted', 'in_review'].includes(
+    row.state,
+  );
 
   const dispatch = useDispatch();
 
@@ -47,7 +47,7 @@ export const ProposalRowActions = ({ row, refetch }) => {
     [dispatch],
   );
 
-  const handleRejectProposal = async (proposalUuid) => {
+  const handleRejectProposal = async (proposalUuid: string) => {
     await waitForConfirmation(
       dispatch,
       translate('Confirmation'),
@@ -56,7 +56,7 @@ export const ProposalRowActions = ({ row, refetch }) => {
       }),
     );
     try {
-      await rejectProposal(proposalUuid);
+      await proposalProposalsReject({ path: { uuid: proposalUuid } });
       dispatch(showSuccess(translate('Proposal has been rejected.')));
       refetch();
     } catch (error) {
@@ -65,16 +65,20 @@ export const ProposalRowActions = ({ row, refetch }) => {
       );
     }
   };
-  const handleForceApproveProposal = async (proposalUuid) => {
+  const handleApproveProposal = async (proposalUuid: string) => {
     await waitForConfirmation(
       dispatch,
       translate('Confirmation'),
-      translate('Are you sure you want to approve the proposal: {name}?', {
-        name: row.name,
-      }),
+      translate(
+        'Are you sure you want to approve the proposal {name} in state {state}?',
+        {
+          name: row.name,
+          state: row.state,
+        },
+      ),
     );
     try {
-      await forceApproveProposal(proposalUuid);
+      await proposalProposalsApprove({ path: { uuid: proposalUuid } });
       dispatch(showSuccess(translate('Proposal has been approved.')));
       refetch();
     } catch (error) {
@@ -85,33 +89,33 @@ export const ProposalRowActions = ({ row, refetch }) => {
   };
   return (
     <ActionsDropdownComponent>
+      <ActionItem
+        title={translate('View')}
+        action={() => linkToProposalDetails(row.uuid, row.call_manager_uuid)}
+        iconNode={<Eye weight="bold" />}
+      />
       {isStaff && (
         <ActionItem
           title={translate('Create review')}
           action={() => openCreateReviewDialog(row)}
-          iconNode={<ChatText />}
+          iconNode={<ChatText weight="bold" />}
         />
       )}
-      <ActionItem
-        title={translate('View')}
-        action={() => linkToProposalDetails(row.uuid, row.call_manager_uuid)}
-        iconNode={<Eye />}
-      />
       {!isRejectButtonDisabled && (
         <>
           <ActionItem
-            title={translate('Reject')}
-            action={() => handleRejectProposal(row.uuid)}
-            iconNode={<X />}
+            title={translate('Approve')}
+            action={() => handleApproveProposal(row.uuid)}
+            iconNode={<CheckCircle weight="bold" />}
             disabled={isRejectButtonDisabled}
-            className="text-danger"
           />
           <ActionItem
-            title={translate('Force approve')}
-            action={() => handleForceApproveProposal(row.uuid)}
-            iconNode={<Check />}
+            title={translate('Reject')}
+            action={() => handleRejectProposal(row.uuid)}
+            iconNode={<XCircle weight="bold" />}
             disabled={isRejectButtonDisabled}
             className="text-danger"
+            iconColor="danger"
           />
         </>
       )}

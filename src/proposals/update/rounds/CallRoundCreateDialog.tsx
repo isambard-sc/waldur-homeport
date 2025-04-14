@@ -1,13 +1,17 @@
 import { DateTime } from 'luxon';
 import { FC, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  proposalProtectedCallsRoundsSet,
+  ProtectedRoundRequest,
+} from 'waldur-js-client';
 
 import { parseDate } from '@waldur/core/dateUtils';
+import { ProgressStep } from '@waldur/core/ProgressSteps';
 import { WizardFormContainer } from '@waldur/form/WizardFormContainer';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { createCallRound } from '@waldur/proposals/api';
-import { RoundFormData, Call } from '@waldur/proposals/types';
+import { Call } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { WizardFormFirstPage } from './WizardFormFirstPage';
@@ -27,13 +31,25 @@ const WizardForms = [
   WizardFormThirdPage,
 ];
 
-const steps = [
-  translate('Submission'),
-  translate('Review'),
-  translate('Allocation'),
+const steps: ProgressStep[] = [
+  {
+    key: 'submission',
+    label: translate('Submission'),
+    completed: false,
+  },
+  {
+    key: 'review',
+    label: translate('Review'),
+    completed: false,
+  },
+  {
+    key: 'allocation',
+    label: translate('Allocation'),
+    completed: false,
+  },
 ];
 
-const validate = (values: RoundFormData) => {
+const validate = (values: ProtectedRoundRequest) => {
   const errors: any = {};
   if (parseDate(values.start_time) > parseDate(values.cutoff_time)) {
     errors.cutoff_time = translate('Cutoff date must be after start date');
@@ -46,13 +62,15 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
 ) => {
   const dispatch = useDispatch();
   const createRound = useCallback(
-    async (formData: RoundFormData, _dispatch, formProps) => {
+    async (formData: ProtectedRoundRequest, _dispatch, formProps) => {
       try {
-        await createCallRound(props.resolve.call.uuid, formData).then(() => {
-          formProps.destroy();
-          dispatch(closeModalDialog());
-          props.resolve.refetch();
+        await proposalProtectedCallsRoundsSet({
+          path: { uuid: props.resolve.call.uuid },
+          body: formData,
         });
+        formProps.destroy();
+        dispatch(closeModalDialog());
+        props.resolve.refetch();
         dispatch(showSuccess(translate('Round has been created.')));
       } catch (e) {
         dispatch(showErrorResponse(e));

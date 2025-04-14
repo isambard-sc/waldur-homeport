@@ -1,11 +1,11 @@
 import { Transition } from '@uirouter/react';
+import { customerCreditsList } from 'waldur-js-client';
 
-import { getCustomer } from '@waldur/project/api';
 import { router } from '@waldur/router';
 import store from '@waldur/store/store';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 
-import { getCustomerCredit } from '../credits/api';
+import { getCustomer } from '../utils';
 
 export async function fetchCustomer(transition: Transition) {
   const customerId = transition.params()?.uuid;
@@ -14,7 +14,9 @@ export async function fetchCustomer(transition: Transition) {
   } else {
     try {
       const currentCustomer = await getCustomer(customerId);
-      const credit = await getCustomerCredit(currentCustomer?.uuid);
+      const credit = await customerCreditsList({
+        query: { customer_uuid: currentCustomer?.uuid },
+      }).then((r) => r.data[0]);
       Object.assign(currentCustomer, { credit });
       store.dispatch(setCurrentCustomer(currentCustomer));
     } catch {

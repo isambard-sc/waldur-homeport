@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import Markdown from 'markdown-to-jsx';
 import { FunctionComponent } from 'react';
+import { userAgreementsList } from 'waldur-js-client';
 
 import { LoadingSpinner } from '../core/LoadingSpinner';
 import { translate } from '../i18n';
 
-import { getUserAgreement } from './api';
-
 interface TemplateComponentProps {
-  agreement_type: string;
+  agreement_type: 'PP' | 'TOS';
   title: string;
 }
 
@@ -19,10 +18,12 @@ export const UserAgreementComponent: FunctionComponent<
     isLoading: loading,
     error,
     data: option,
-  } = useQuery(
-    ['userAgreementData'],
-    async () => await getUserAgreement(props.agreement_type),
-  );
+  } = useQuery(['userAgreementData'], async () => {
+    const response = await userAgreementsList({
+      query: { agreement_type: props.agreement_type },
+    });
+    return response.data[0];
+  });
   if (loading) {
     return <LoadingSpinner />;
   }

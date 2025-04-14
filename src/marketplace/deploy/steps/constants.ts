@@ -1,31 +1,22 @@
 import { translate } from '@waldur/i18n';
 
-import { FormCustomerStep } from './FormCustomerStep';
+import { FormDetailsOverviewStep } from './FormDetailsOverviewStep';
 import { FormPlanStep } from './FormPlanStep';
-import { FormProjectStep } from './FormProjectStep';
 
-export const ProjectStep = {
-  label: translate('Project'),
-  id: 'step-project',
-  fields: ['project'],
+export const DetailsOverviewStep = {
+  label: translate('Details overview'),
+  id: 'step-general',
+  fields: ['customer', 'project'],
   required: true,
-  requiredFields: ['project'],
-  component: FormProjectStep,
-};
-
-export const CustomerStep = {
-  label: translate('Customer'),
-  id: 'step-customer',
-  fields: ['customer'],
-  required: true,
-  requiredFields: ['customer'],
-  component: FormCustomerStep,
+  requiredFields: ['customer', 'project'],
+  component: FormDetailsOverviewStep,
 };
 
 export const PlanStep = {
   label: translate('Plan'),
   id: 'step-plan',
-  fields: ['plan'],
+  // plan_entries is not a field, it's is for identifying server-side errors related to plan entries.
+  fields: ['plan', 'plan_entries'],
   required: true,
   requiredFields: ['plan'],
   component: FormPlanStep,

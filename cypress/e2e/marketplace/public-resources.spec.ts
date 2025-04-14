@@ -7,7 +7,7 @@ describe('Public resources', () => {
       .intercept('GET', '/api/customers/**/counters/', {
         fixture: 'marketplace/counters.json',
       })
-      .intercept('GET', '/api/marketplace-orders/', [])
+      .intercept('GET', '/api/marketplace-orders/**', [])
       .intercept('GET', '/api/customers/0b5e658068664999ba7f1de44e20766c/', {
         fixture: 'marketplace/anderson_and_sons.json',
       })
@@ -17,7 +17,7 @@ describe('Public resources', () => {
       .intercept('GET', '/api/marketplace-public-offerings/', {
         fixture: 'marketplace/offerings.json',
       })
-      .intercept('GET', '/api/marketplace-categories/', {
+      .intercept('GET', '/api/marketplace-categories/**', {
         fixture: 'marketplace/categories.json',
       })
       .intercept('GET', '/api/marketplace-resources/', {

@@ -1,15 +1,20 @@
 import { useQuery } from '@tanstack/react-query';
 import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
+import {
+  proposalProtectedCallsRetrieve,
+  proposalProtectedCallsRoundsRetrieve,
+} from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
+import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
 import { useTitle } from '@waldur/navigation/title';
 import { IBreadcrumbItem, PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 
-import { getProtectedCall, getProtectedCallRound } from '../api';
+import { Call } from '../types';
 
 import { RoundPageHero } from './RoundPageHero';
 
@@ -80,7 +85,10 @@ export const RoundUIView = () => {
     isRefetching,
   } = useQuery(
     ['CallRound', call_uuid, round_uuid],
-    () => getProtectedCallRound(call_uuid, round_uuid),
+    () =>
+      proposalProtectedCallsRoundsRetrieve({
+        path: { uuid: call_uuid, obj_uuid: round_uuid },
+      }).then((response) => response.data),
     {
       refetchOnWindowFocus: false,
     },
@@ -90,9 +98,16 @@ export const RoundUIView = () => {
     data: call,
     isLoading: isLoadingCall,
     error: errorCall,
-  } = useQuery(['RoundCall', call_uuid], () => getProtectedCall(call_uuid), {
-    refetchOnWindowFocus: false,
-  });
+  } = useQuery(
+    ['RoundCall', call_uuid],
+    () =>
+      proposalProtectedCallsRetrieve({ path: { uuid: call_uuid } }).then(
+        (r) => r.data as any as Call,
+      ),
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
 
   useTitle(round ? round.name : translate('Call round'));
 
@@ -105,7 +120,7 @@ export const RoundUIView = () => {
     round && call ? <RoundPageHero call={call} round={round} /> : null,
     [round, call],
   );
-
+  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
   const breadcrumbItems = useMemo<IBreadcrumbItem[]>(
     () =>
       !(round && call)
@@ -116,14 +131,10 @@ export const RoundUIView = () => {
               text: translate('Organizations'),
               to: 'organizations',
             },
-            {
-              key: 'organization.dashboard',
-              text: call.customer_name,
-              to: 'organization.dashboard',
-              params: { uuid: call.customer_uuid },
-              ellipsis: 'xl',
-              maxLength: 11,
-            },
+            getOrganizationBreadcrumbItem({
+              uuid: call.customer_uuid,
+              name: call.customer_name,
+            }),
             {
               key: 'call-list',
               text: translate('Calls for proposals'),

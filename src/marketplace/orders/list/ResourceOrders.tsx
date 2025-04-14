@@ -1,13 +1,14 @@
 import { FunctionComponent, useMemo } from 'react';
+import { MarketplaceResourcesListData, Resource } from 'waldur-js-client';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { OrderDetailsLink } from '@waldur/marketplace/orders/details/OrderDetailsLink';
 import { IssueLinkRenderer } from '@waldur/marketplace/orders/list/IssueLinkRenderer';
-import { Resource } from '@waldur/marketplace/resources/types';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { ResourceOrderRowActions } from '../actions/ResourceOrdersRowActions';
@@ -23,10 +24,10 @@ interface ResourceOrdersProps {
 export const ResourceOrders: FunctionComponent<ResourceOrdersProps> = (
   props,
 ) => {
-  const filter = useMemo(
+  const filter = useMemo<MarketplaceResourcesListData['query']>(
     () => ({
       resource_uuid: props.resource.uuid,
-      o: '-created',
+      o: ['-created'],
     }),
     [props.resource.uuid],
   );
@@ -35,7 +36,7 @@ export const ResourceOrders: FunctionComponent<ResourceOrdersProps> = (
     fetchData: createFetcher('marketplace-orders'),
     filter,
   });
-  const columns = [
+  const columns: Column<Resource>[] = [
     {
       title: translate('ID'),
       render: ({ row }) => (

@@ -12,31 +12,26 @@ export const OFFERING_IMPORT_STEPS: ProgressStep[] = [
     key: 'Credentials',
     label: translate('Connect to remote waldur'),
     completed: false,
-    variant: 'primary',
   },
   {
     key: 'Organization',
     label: translate('Select organization'),
     completed: false,
-    variant: 'primary',
   },
   {
     key: 'Offering',
     label: translate('Choose offerings'),
     completed: false,
-    variant: 'primary',
   },
   {
     key: 'Category',
     label: translate('Map categories'),
     completed: false,
-    variant: 'primary',
   },
   {
     key: 'Review',
     label: translate('Review and confirm'),
     completed: false,
-    variant: 'primary',
   },
 ];
 

@@ -2,8 +2,9 @@ import { pick } from 'lodash-es';
 import { useCallback } from 'react';
 import { connect } from 'react-redux';
 import { SubmissionError, reduxForm } from 'redux-form';
+import { proposalProtectedCallsPartialUpdate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
 import { SelectField, SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
@@ -16,7 +17,6 @@ import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RoleEnum } from '@waldur/permissions/enums';
 import { Role } from '@waldur/permissions/types';
 import { getProjectRoles } from '@waldur/permissions/utils';
-import { updateCall } from '@waldur/proposals/api';
 import { EDIT_CALL_GENERAL_FORM_ID } from '@waldur/proposals/constants';
 import { EditCallProps } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -48,13 +48,13 @@ export const EditGeneralInfoDialog = connect<
   })((props) => {
     const processRequest = useCallback(
       (values: FormData, dispatch) => {
-        return updateCall(
-          {
+        return proposalProtectedCallsPartialUpdate({
+          path: { uuid: props.resolve.call.uuid },
+          body: {
             ...values,
             default_project_role: values.default_project_role?.uuid,
           },
-          props.resolve.call.uuid,
-        )
+        })
           .then(() => {
             props.resolve.refetch();
             dispatch(showSuccess(translate('The call has been updated.')));

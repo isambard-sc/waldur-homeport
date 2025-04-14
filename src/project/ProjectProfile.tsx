@@ -2,6 +2,7 @@ import { Factory } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { Project } from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
@@ -11,7 +12,6 @@ import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { isOwnerOrStaff as isOwnerOrStaffSelector } from '@waldur/workspace/selectors';
-import { Project } from '@waldur/workspace/types';
 
 export const ProjectProfile = ({ project }: { project: Project }) => {
   const isOwnerOrStaff = useSelector(isOwnerOrStaffSelector);

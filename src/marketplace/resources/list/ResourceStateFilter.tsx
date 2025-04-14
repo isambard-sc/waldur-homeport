@@ -1,6 +1,7 @@
 import { FunctionComponent } from 'react';
 import { Props as SelectProps } from 'react-select';
 import { Field } from 'redux-form';
+import { ResourceState } from 'waldur-js-client';
 
 import {
   REACT_MULTI_SELECT_TABLE_FILTER,
@@ -8,7 +9,7 @@ import {
 } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 
-export const getStates = () => [
+export const getStates = (): Array<{ value: ResourceState; label: string }> => [
   { value: 'Creating', label: translate('Creating') },
   { value: 'OK', label: translate('OK') },
   { value: 'Erred', label: translate('Erred') },

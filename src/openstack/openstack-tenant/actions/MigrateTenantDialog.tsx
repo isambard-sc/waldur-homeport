@@ -3,6 +3,11 @@ import { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Field, FieldArray, formValueSelector, reduxForm } from 'redux-form';
+import {
+  Offering,
+  openstackMigrationsCreate,
+  openstackNetworksList,
+} from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { FormGroup, SelectField, SubmitButton } from '@waldur/form';
@@ -10,14 +15,14 @@ import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { InputField } from '@waldur/form/InputField';
 import { translate } from '@waldur/i18n';
-import { offeringsAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { publicOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { createMigration, loadVolumeTypes } from '@waldur/openstack/api';
+import { loadVolumeTypes } from '@waldur/openstack/api';
 import { TENANT_TYPE } from '@waldur/openstack/constants';
 import { RESOURCE_ACTION_FORM } from '@waldur/resource/actions/constants';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { type RootState } from '@waldur/store/reducers';
 
 import { SubnetsTable } from './SubnetsTable';
@@ -25,7 +30,8 @@ import { VolumeTypesTable } from './VolumeTypesTable';
 
 const selector = formValueSelector(RESOURCE_ACTION_FORM);
 
-const offeringSelector = (state: RootState) => selector(state, 'offering');
+const offeringSelector = (state: RootState): Offering =>
+  selector(state, 'offering');
 
 export const MigrateTenantDialog = connect<
   {},
@@ -49,20 +55,24 @@ export const MigrateTenantDialog = connect<
 
       const submitForm = async (formData) => {
         try {
-          await createMigration({
-            src_resource: resource.marketplace_resource_uuid,
-            dst_offering: formData.offering.uuid,
-            dst_plan: formData.plan.uuid,
-            mappings: {
-              volume_types: formData.volumeTypes?.map((type) => ({
-                src_type_uuid: type.source.uuid,
-                dst_type_uuid: type.destination.uuid,
-              })),
-              subnets: formData.subnets?.map((type) => ({
-                src_cidr: type.source,
-                dst_cidr: type.destination,
-              })),
-              skip_connection_extnet: formData.skip_connection_extnet,
+          await openstackMigrationsCreate({
+            body: {
+              name: formData.name,
+              src_resource: resource.marketplace_resource_uuid,
+              dst_offering: formData.offering.uuid,
+              dst_plan: formData.plan.uuid,
+              mappings: {
+                volume_types: formData.volumeTypes?.map((type) => ({
+                  src_type_uuid: type.source.uuid,
+                  dst_type_uuid: type.destination.uuid,
+                })),
+                subnets: formData.subnets?.map((type) => ({
+                  src_cidr: type.source,
+                  dst_cidr: type.destination,
+                })),
+                skip_connection_extnet: formData.skip_connection_extnet,
+                networks: formData.networks?.map(({ value }) => value),
+              },
             },
           });
           dispatch(
@@ -99,7 +109,15 @@ export const MigrateTenantDialog = connect<
           const destinationVolumeTypes = await loadVolumeTypes({
             settings_uuid: offering.scope_uuid,
           });
-          return { sourceVolumeTypes, destinationVolumeTypes };
+          const networks = (
+            await openstackNetworksList({
+              query: {
+                tenant_uuid: resource.uuid,
+                field: ['name', 'uuid'],
+              },
+            })
+          ).data.map(({ uuid, name }) => ({ label: name, value: uuid }));
+          return { sourceVolumeTypes, destinationVolumeTypes, networks };
         },
       );
 
@@ -130,15 +148,15 @@ export const MigrateTenantDialog = connect<
             >
               <AsyncSelectField
                 loadOptions={(query, prevOptions, currentPage) =>
-                  offeringsAutocomplete(
+                  publicOfferingsAutocomplete(
                     {
                       name: query,
-                      type: TENANT_TYPE,
+                      type: [TENANT_TYPE],
                       allowed_customer_uuid: resource.customer_uuid,
                     },
                     prevOptions,
                     currentPage,
-                    false,
+                    // @ts-ignore
                     ['name', 'uuid', 'customer_name', 'plans', 'scope_uuid'],
                   )
                 }
@@ -176,6 +194,16 @@ export const MigrateTenantDialog = connect<
                         options={queryResult.data}
                       />
                     </Form.Group>
+                    <Field
+                      name="networks"
+                      label={translate('Networks')}
+                      component={FormGroup}
+                    >
+                      <SelectField
+                        options={queryResult.data.networks}
+                        isMulti
+                      />
+                    </Field>
                     <Form.Group>
                       <Form.Label>{translate('Subnets')}</Form.Label>
                       <FieldArray name="subnets" component={SubnetsTable} />

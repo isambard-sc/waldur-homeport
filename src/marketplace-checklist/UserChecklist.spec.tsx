@@ -19,7 +19,7 @@ import { UserChecklist } from './UserChecklist';
 
 const apiMock = vi.mocked(api);
 
-vi.mock('@waldur/configs/default', () => ({
+vi.mock('@waldur/core/config', () => ({
   ENV: 'localhost',
 }));
 

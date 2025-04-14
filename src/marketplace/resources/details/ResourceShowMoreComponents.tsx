@@ -1,8 +1,8 @@
 import { useDispatch } from 'react-redux';
+import { Resource } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { Limits } from '@waldur/marketplace/common/types';
 import { OfferingComponent } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 
@@ -22,7 +22,7 @@ export const ResourceShowMoreComponents = ({
   resource,
   components,
 }: {
-  resource: { current_usages: Limits; limits: Limits; limit_usage: Limits };
+  resource: Pick<Resource, 'current_usages' | 'limits' | 'limit_usage'>;
   components: OfferingComponent[];
 }) => {
   const dispatch = useDispatch();

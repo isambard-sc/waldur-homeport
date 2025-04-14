@@ -15,7 +15,7 @@ interface OpenConsoleLogActionItemProps<T> {
   validators?: ActionValidator<T>[];
 }
 
-export const OpenConsoleLogActionItem: <T extends { uuid: string }>(
+export const OpenConsoleLogActionItem: <T extends { uuid?: string }>(
   props: OpenConsoleLogActionItemProps<T>,
 ) => ReactElement = ({ resource, apiMethod, validators }) => {
   const dispatch = useDispatch();
@@ -40,7 +40,7 @@ export const OpenConsoleLogActionItem: <T extends { uuid: string }>(
     <ActionItem
       title={translate('Show console log')}
       action={callback}
-      iconNode={<CodeBlock />}
+      iconNode={<CodeBlock weight="bold" />}
       {...validationState}
     />
   );

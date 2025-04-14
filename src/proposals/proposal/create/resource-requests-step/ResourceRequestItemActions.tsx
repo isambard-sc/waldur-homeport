@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { proposalProposalsResourcesDestroy } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { openModalDialog, waitForConfirmation } from '@waldur/modal/actions';
-import { removeProposalResource } from '@waldur/proposals/api';
 import { Proposal, ProposalResource } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RowActionButton } from '@waldur/table/ActionButton';
@@ -57,7 +57,9 @@ export const ResourceRequestItemActions = ({
       return;
     }
     try {
-      await removeProposalResource(proposal.uuid, row.uuid);
+      await proposalProposalsResourcesDestroy({
+        path: { uuid: proposal.uuid, obj_uuid: row.uuid },
+      });
       refetch && refetch();
       dispatch(showSuccess(translate('Resource request has been deleted.')));
     } catch (response) {

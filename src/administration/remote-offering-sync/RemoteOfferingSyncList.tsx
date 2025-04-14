@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { RemoteSynchronisation } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -11,9 +12,8 @@ import { useTable } from '@waldur/table/useTable';
 import { RemoteSyncCreateButton } from './RemoteSyncCreateButton';
 import { RemoteSyncExpandableRow } from './RemoteSyncExpandableRow';
 import { RemoteSyncRowActions } from './RemoteSyncRowActions';
-import { RemoteSync } from './types';
 
-const mandatoryFields = [
+const mandatoryFields: Array<keyof RemoteSynchronisation> = [
   'uuid',
   'api_url',
   'token',
@@ -37,7 +37,7 @@ export const RemoteOfferingSyncList: FunctionComponent = () => {
   });
 
   return (
-    <Table<RemoteSync>
+    <Table<RemoteSynchronisation>
       {...tableProps}
       columns={[
         {

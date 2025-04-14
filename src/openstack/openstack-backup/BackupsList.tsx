@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { OpenStackBackup } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -18,7 +19,6 @@ export const BackupsList: FunctionComponent<{ resourceScope }> = ({
   const filter = useMemo(() => {
     const fields = {
       [INSTANCE_TYPE]: 'instance',
-      'OpenStack.BackupSchedule': 'backup_schedule',
     };
     const { resource_type, url } = resourceScope;
     const field = fields[resource_type];
@@ -34,7 +34,7 @@ export const BackupsList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<OpenStackBackup>
       {...props}
       columns={[
         {
@@ -65,6 +65,7 @@ export const BackupsList: FunctionComponent<{ resourceScope }> = ({
           ),
         },
       ]}
+      title={translate('VM snapshots')}
       verboseName={translate('VM snapshots')}
       hasQuery={false}
       tableActions={<CreateBackupAction resource={resourceScope} />}

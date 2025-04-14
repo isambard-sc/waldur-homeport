@@ -1,14 +1,12 @@
 import { Trash } from '@phosphor-icons/react';
 import { useState, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import { AccessSubnet, accessSubnetsDestroy } from 'waldur-js-client';
 
 import { translate, formatJsxTemplate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
-
-import { removeAccessSubnet } from './api';
-import { AccessSubnet } from './types';
 
 interface AccessSubnetDeleteButtonProps {
   row: AccessSubnet;
@@ -38,7 +36,7 @@ export const AccessSubnetDeleteButton = (
     }
     setRemoving(true);
     try {
-      await removeAccessSubnet(props.row.uuid);
+      await accessSubnetsDestroy({ path: { uuid: props.row.uuid } });
       props.refetch();
       dispatch(showSuccess(translate('Access subnet has been removed.')));
     } catch (e) {
@@ -50,13 +48,13 @@ export const AccessSubnetDeleteButton = (
   }, [dispatch, props]);
 
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Remove')}
       action={openDialog}
-      variant="outline-danger"
-      pending={removing}
+      disabled={removing}
       iconNode={<Trash />}
-      size="sm"
+      className="text-danger"
+      iconColor="danger"
     />
   );
 };

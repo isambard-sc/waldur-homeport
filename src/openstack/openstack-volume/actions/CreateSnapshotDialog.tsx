@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { openstackVolumesSnapshot } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { createSnapshot } from '@waldur/openstack/api';
 import {
   createLatinNameField,
   createDescriptionField,
@@ -37,7 +37,10 @@ export const CreateSnapshotDialog: FC<ActionDialogProps> = ({
       }}
       submitForm={async (formData) => {
         try {
-          await createSnapshot(resource.uuid, formData);
+          await openstackVolumesSnapshot({
+            path: { uuid: resource.uuid },
+            body: formData,
+          });
           dispatch(showSuccess(translate('Volume snapshot has been created.')));
           dispatch(closeModalDialog());
           if (refetch) {

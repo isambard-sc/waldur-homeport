@@ -1,8 +1,8 @@
 import { ArrowsClockwise } from '@phosphor-icons/react';
 import { FC } from 'react';
+import { openstackTenantsPullFloatingIps } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { pullTenantFloatingIps } from '@waldur/openstack/api';
 import { AsyncActionButton } from '@waldur/resource/actions/AsyncActionButton';
 import { validateState } from '@waldur/resource/actions/base';
 
@@ -16,6 +16,6 @@ export const PullFloatingIpsAction: FC<TenantActionProps> = ({ resource }) => (
     iconNode={<ArrowsClockwise />}
     resource={resource}
     validators={validators}
-    apiMethod={pullTenantFloatingIps}
+    apiMethod={(uuid) => openstackTenantsPullFloatingIps({ path: { uuid } })}
   />
 );

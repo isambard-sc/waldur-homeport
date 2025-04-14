@@ -5,7 +5,7 @@ import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 import { VOLUME_TYPE } from '../constants';
 
 const CheckoutSummary = lazyComponent(() =>
-  import('./deploy/CheckoutSummary').then((module) => ({
+  import('../openstack-instance/deploy/CheckoutSummary').then((module) => ({
     default: module.CheckoutSummary,
   })),
 );

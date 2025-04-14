@@ -1,9 +1,9 @@
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { openstackNetworksSetMtu } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { setNetworkMtu } from '@waldur/openstack/api';
 import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
 import { ActionDialogProps } from '@waldur/resource/actions/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
@@ -29,7 +29,10 @@ export const SetMtuDialog: FC<ActionDialogProps> = ({
       }}
       submitForm={async (formData) => {
         try {
-          await setNetworkMtu(resource.uuid, formData.mtu);
+          await openstackNetworksSetMtu({
+            path: { uuid: resource.uuid },
+            body: { mtu: formData.mtu },
+          });
           dispatch(showSuccess(translate('Network MTU has been updated.')));
           dispatch(closeModalDialog());
           if (refetch) {

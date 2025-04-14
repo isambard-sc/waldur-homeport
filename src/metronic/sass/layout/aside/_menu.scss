@@ -58,19 +58,19 @@
 
 // Dark aside colors
 $dark-title: $gray-800;
-$dark-icon: $grey-600;
+$dark-icon: $gray-600;
 $dark-arrow: $gray-600;
 $dark-arrow-state: $gray-800;
 $dark-bg-hover: $gray-50;
 $dark-bg-active: $gray-100;
-$dark-bg-subitem: $grey-200;
-$dark-bg-subitem-2: $grey-300;
+$dark-bg-subitem: $gray-200;
+$dark-bg-subitem-2: $gray-300;
 $dark-badge-color: $gray-300;
 $dark-badge-bg: $gray-800;
-$dark-badge-border: $grey-400;
+$dark-badge-border: $gray-400;
 $dark-accordion-active: $gray-100;
-$dark-sub-accordion-active: $grey-200;
-$dark-footer-separator: $grey-300;
+$dark-sub-accordion-active: $gray-200;
+$dark-footer-separator: $gray-300;
 
 $asides: (
   dark: (
@@ -86,26 +86,56 @@ $asides: (
     badge-bg: if(isDarkMode(), $dark-badge-bg, $primary-50),
     badge-border: if(isDarkMode(), $dark-badge-border, $primary-300),
     accordion-active: if(isDarkMode(), $dark-accordion-active, $primary-800),
-    sub-accordion-active:
-      if(isDarkMode(), $dark-sub-accordion-active, $primary-700),
+    sub-accordion-active: if(
+        isDarkMode(),
+        $dark-sub-accordion-active,
+        $primary-700
+      ),
     footer-separator: if(isDarkMode(), $dark-footer-separator, $primary-700),
   ),
   light: (
     title: if(isDarkMode(), $dark-title, $gray-700),
-    icon: if(isDarkMode(), $dark-icon, $grey-500),
-    arrow: if(isDarkMode(), $dark-arrow, $grey-400),
-    arrow-state: if(isDarkMode(), $dark-arrow-state, $grey-500),
+    icon: if(isDarkMode(), $dark-icon, $gray-500),
+    arrow: if(isDarkMode(), $dark-arrow, $gray-400),
+    arrow-state: if(isDarkMode(), $dark-arrow-state, $gray-500),
     bg-hover: if(isDarkMode(), $dark-bg-hover, $gray-50),
     bg-active: if(isDarkMode(), $dark-bg-active, $gray-100),
-    bg-subitem: if(isDarkMode(), $dark-bg-subitem, $grey-200),
-    bg-subitem-2: if(isDarkMode(), $dark-bg-subitem-2, $grey-300),
+    bg-subitem: if(isDarkMode(), $dark-bg-subitem, $gray-200),
+    bg-subitem-2: if(isDarkMode(), $dark-bg-subitem-2, $gray-300),
     badge-color: if(isDarkMode(), $dark-badge-color, $gray-200),
     badge-bg: if(isDarkMode(), $dark-badge-bg, $gray-700),
-    badge-border: if(isDarkMode(), $dark-badge-border, $grey-300),
+    badge-border: if(isDarkMode(), $dark-badge-border, $gray-300),
     accordion-active: if(isDarkMode(), $dark-accordion-active, $gray-100),
-    sub-accordion-active:
-      if(isDarkMode(), $dark-sub-accordion-active, $grey-200),
-    footer-separator: if(isDarkMode(), $dark-footer-separator, $grey-200),
+    sub-accordion-active: if(
+        isDarkMode(),
+        $dark-sub-accordion-active,
+        $gray-200
+      ),
+    footer-separator: if(isDarkMode(), $dark-footer-separator, $gray-200),
+  ),
+  accent: (
+    title: if(isDarkMode(), $dark-title, $white),
+    icon: if(isDarkMode(), $dark-icon, $white),
+    arrow: if(isDarkMode(), $dark-arrow, $white-8),
+    arrow-state: if(isDarkMode(), $dark-arrow-state, $white),
+    bg-hover: if(isDarkMode(), $dark-bg-hover, $white-1),
+    bg-active: if(isDarkMode(), $dark-bg-active, $white-2),
+    bg-subitem: if(isDarkMode(), $dark-bg-subitem, $white-3),
+    bg-subitem-2: if(
+        isDarkMode(),
+        $dark-bg-subitem-2,
+        var(--waldur-brand-color)
+      ),
+    badge-color: if(isDarkMode(), $dark-badge-color, $white),
+    badge-bg: if(isDarkMode(), $dark-badge-bg, var(--waldur-brand-color)),
+    badge-border: if(
+        isDarkMode(),
+        $dark-badge-border,
+        var(--waldur-brand-color)
+      ),
+    accordion-active: if(isDarkMode(), $dark-accordion-active, $white-2),
+    sub-accordion-active: if(isDarkMode(), $dark-sub-accordion-active, $white-3),
+    footer-separator: if(isDarkMode(), $dark-footer-separator, $white-6),
   ),
 );
 
@@ -114,7 +144,7 @@ $asides: (
     .menu {
       .menu-item {
         .menu-section {
-          color: #253629 !important;
+          color: $gray-950 !important;
         }
 
         $title-color: get($value, title);
@@ -234,56 +264,17 @@ $asides: (
   }
 }
 
-.aside-accent .menu .menu-item {
-  .menu-link {
-    color: white;
-    .menu-title,
-    .menu-icon {
-      color: white;
-      .svg-icon {
-        @include svg-icon-color(white);
-      }
-    }
-    .menu-badge {
-      .text-btn {
-        color: white;
-      }
-    }
-  }
-  &.here > .menu-link,
-  :hover {
-    transition: none;
-    color: var(--waldur-aside-bg-color) !important;
-    background-color: white;
-
-    .menu-title,
-    .menu-icon {
-      transition: none;
-      color: var(--waldur-aside-bg-color) !important;
-      .svg-icon {
-        @include svg-icon-color(var(--waldur-aside-bg-color), true);
-      }
-    }
-
-    .menu-badge {
-      .text-btn {
-        color: var(--waldur-aside-bg-color) !important;
-      }
-    }
-  }
-
-  &.menu-accordion.hover {
-    background: white;
-    .menu-title,
-    .menu-icon {
-      color: var(--waldur-aside-bg-color) !important;
-      .svg-icon {
-        @include svg-icon-color(var(--waldur-aside-bg-color), true);
-      }
-    }
-    .menu-badge {
-      .badge {
-        color: var(--waldur-aside-bg-color) !important;
+// Customization for accent theme
+.aside-accent {
+  .menu {
+    .menu-item {
+      .menu-badge {
+        // Outline badge
+        .badge.badge-inverse {
+          color: if(isDarkMode(), $dark-badge-bg, $white);
+          background-color: transparent;
+          border-color: if(isDarkMode(), $dark-badge-border, $white);
+        }
       }
     }
   }

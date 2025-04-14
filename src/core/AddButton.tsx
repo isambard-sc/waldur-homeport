@@ -14,7 +14,7 @@ export const AddButton = (props: AddButtonProps) => {
   return (
     <ActionButton
       title={translate('Add')}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
       variant="primary"
       {...props}
     />

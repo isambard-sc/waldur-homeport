@@ -1,10 +1,10 @@
 import { StateDeclaration as BaseStateDeclaration } from '@uirouter/core';
 import { UIView } from '@uirouter/react';
 import { ComponentType, LazyExoticComponent } from 'react';
+import { RoleDetails } from 'waldur-js-client';
 
 import { PluginConfiguration } from '@waldur/auth/types';
 import { FeaturesEnum } from '@waldur/FeaturesEnums';
-import { Role } from '@waldur/permissions/types';
 
 interface DataDeclaration {
   /** State is disabled as long as its feature is disabled */
@@ -53,7 +53,7 @@ export interface ApplicationConfigurationOptions {
   pageSize: number;
   buildId: string;
   accountingMode: 'billing' | 'accounting';
-  roles: Role[];
+  roles: RoleDetails[];
   /**
     Provide exclude file types for issue attachments uploading
     Based on https://github.com/okonet/attr-accept

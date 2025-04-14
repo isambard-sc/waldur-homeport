@@ -3,6 +3,7 @@ import { uniqueId } from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { Notification } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
@@ -48,7 +49,7 @@ export const NotificationList = () => {
     return row.templates.some((template) => template.is_content_overridden);
   };
   return (
-    <Table
+    <Table<Notification>
       {...tableProps}
       columns={[
         {

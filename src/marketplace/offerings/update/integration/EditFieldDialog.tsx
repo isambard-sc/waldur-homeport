@@ -1,14 +1,14 @@
 import { get, pick } from 'lodash-es';
 import { useCallback, useEffect } from 'react';
 import { connect, useDispatch } from 'react-redux';
-import { Field, SubmissionError, change, reduxForm } from 'redux-form';
+import { Field, change, reduxForm } from 'redux-form';
 
 import { SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { MetronicModalDialog } from '@waldur/modal/MetronicModalDialog';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 
 import { EDIT_INTEGRATION_FORM_ID } from './constants';
 import { EditOfferingProps } from './types';
@@ -41,23 +41,16 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditOfferingProps }>(
 
     const processRequest = useCallback(
       (values: FormData, dispatch) => {
-        return props.resolve
-          .callback(values, dispatch)
-          .then(() => {
-            dispatch(closeModalDialog());
-          })
-          .catch((e) => {
-            if (e.response && e.response.status === 400) {
-              throw new SubmissionError(e.response.data);
-            }
-          });
+        return props.resolve.callback(values).then(() => {
+          dispatch(closeModalDialog());
+        });
       },
       [props.resolve.callback],
     );
 
     return (
       <form onSubmit={props.handleSubmit(processRequest)}>
-        <MetronicModalDialog
+        <ModalDialog
           title={props.resolve.title}
           subtitle={props.resolve.description}
           headerLess={!props.resolve.title}
@@ -82,10 +75,11 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditOfferingProps }>(
               label={props.resolve.label}
               hideLabel={props.resolve.hideLabel}
               tooltip={props.resolve.warnTooltip}
+              required={props.resolve.required}
               {...props.resolve.fieldProps}
             />
           </FormContainer>
-        </MetronicModalDialog>
+        </ModalDialog>
       </form>
     );
   }),

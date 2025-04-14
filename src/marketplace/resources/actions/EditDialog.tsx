@@ -1,7 +1,7 @@
 import { FC } from 'react';
+import { marketplaceResourcesPartialUpdate } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { updateResource } from '@waldur/marketplace/common/api';
 import {
   createNameField,
   createDescriptionField,
@@ -19,7 +19,12 @@ export const EditDialog: FC<ActionDialogProps> = ({
       name: resource.name,
       description: resource.description,
     }}
-    updateResource={updateResource}
+    updateResource={(uuid, { name, description }) =>
+      marketplaceResourcesPartialUpdate({
+        path: { uuid },
+        body: { name, description },
+      })
+    }
     verboseName={translate('resource')}
     refetch={refetch}
   />

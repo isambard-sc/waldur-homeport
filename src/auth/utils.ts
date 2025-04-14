@@ -1,21 +1,6 @@
-import Qs from 'qs';
+import { IdentityProvider } from 'waldur-js-client';
 
-import { EDUTEAMS_IDP } from './providers/constants';
+import { ENV } from '@waldur/core/config';
 
-const getStateId = () =>
-  encodeURIComponent(Math.random().toString(36).substring(2));
-
-export const getRedirectUri = (provider) =>
-  `${document.baseURI}oauth_login_completed/${provider}/`;
-
-export const getOauthURL = (provider) =>
-  `${provider.auth_url}?${Qs.stringify({
-    response_type: 'code',
-    client_id: provider.client_id,
-    redirect_uri: getRedirectUri(provider.provider),
-    scope:
-      provider.provider === EDUTEAMS_IDP
-        ? 'openid profile email eduperson_assurance ssh_public_key'
-        : 'openid',
-    state: getStateId(),
-  })}`;
+export const getOauthURL = (provider: Pick<IdentityProvider, 'provider'>) =>
+  `${ENV.apiEndpoint}api-auth/${provider.provider}/init/`;

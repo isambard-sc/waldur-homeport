@@ -2,19 +2,35 @@ import { FunctionComponent, useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { useAsync } from 'react-use';
+import { invoicesList } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { getCustomer } from '@waldur/workspace/selectors';
-
-import { fetchLatestInvoices } from '../api';
 
 import { MonthOverview } from './MonthOverview';
 
 export const OverviewLastMonths: FunctionComponent = () => {
   const customer = useSelector(getCustomer);
   const { loading, error, value } = useAsync(() =>
-    fetchLatestInvoices(customer, 2),
+    invoicesList({
+      query: {
+        page: 1,
+        page_size: 2,
+        customer: customer.url,
+        field: [
+          'uuid',
+          'items',
+          'month',
+          'year',
+          'invoice_date',
+          'state',
+          'price',
+          'total',
+          'tax',
+        ],
+      },
+    }).then((response) => response.data),
   );
 
   const lastMonthTotalCompare: -1 | 0 | 1 = useMemo(() => {

@@ -1,4 +1,8 @@
 import { FunctionComponent, useMemo } from 'react';
+import {
+  OpenStackSnapshot,
+  OpenstackSnapshotsListData,
+} from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { formatFilesize } from '@waldur/core/utils';
@@ -13,7 +17,7 @@ import { useTable } from '@waldur/table/useTable';
 export const TenantSnapshotsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo(
+  const filter = useMemo<OpenstackSnapshotsListData['query']>(
     () => ({
       tenant_uuid: resourceScope.uuid,
     }),
@@ -25,7 +29,7 @@ export const TenantSnapshotsList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<OpenStackSnapshot>
       {...props}
       columns={[
         {
@@ -58,6 +62,7 @@ export const TenantSnapshotsList: FunctionComponent<{ resourceScope }> = ({
           ),
         },
       ]}
+      title={translate('Snapshots')}
       verboseName={translate('snapshots')}
       hasQuery={false}
     />

@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { bookingResourcesAccept } from 'waldur-js-client';
 
-import { acceptBooking } from '@waldur/booking/api';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -29,7 +29,7 @@ export const AcceptBookingButton: FC<AcceptBookingButtonProps> = ({
   const acceptRequest = async () => {
     try {
       setIsAccepting(true);
-      await acceptBooking(resourceUuid);
+      await bookingResourcesAccept({ path: { uuid: resourceUuid } });
       setIsAccepting(false);
       if (refetch) refetch();
       dispatch(showSuccess(translate('Booking has been accepted.')));

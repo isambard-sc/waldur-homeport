@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { getUser } from '@waldur/workspace/selectors';
 
 const PaymentUpdateDialogContainer = lazyComponent(() =>
@@ -13,11 +13,11 @@ const PaymentUpdateDialogContainer = lazyComponent(() =>
   })),
 );
 
-export const EditPaymentButton = ({ payment }) => {
+export const EditPaymentButton = ({ row: payment }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   return (
-    <ActionButton
+    <ActionItem
       title={translate('Edit')}
       action={() =>
         dispatch(
@@ -27,7 +27,7 @@ export const EditPaymentButton = ({ payment }) => {
           }),
         )
       }
-      iconNode={<PencilSimple />}
+      iconNode={<PencilSimple weight="bold" />}
       disabled={!user.is_staff}
       tooltip={
         !user.is_staff

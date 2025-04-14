@@ -1,20 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, Col, Row } from 'react-bootstrap';
+import { overrideSettingsRetrieve } from 'waldur-js-client';
 
 import {
   EDUTEAMS_IDP,
+  FREEIPA_IDP,
   KEYCLOAK_IDP,
   LOCAL_IDP,
   SAML2_IDP,
+  SETTINGS_FREEIPA_GROUP_NAME,
   TARA_IDP,
 } from '@waldur/auth/providers/constants';
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
+import { SettingsDescription } from '@waldur/SettingsDescription';
 
 import { getIdentityProviders } from '../api';
-import { getDBSettings } from '../settings/api';
 import { SettingsCard } from '../settings/SettingsCard';
 
 import { ProviderCard } from './ProviderCard';
@@ -41,7 +44,7 @@ export const IdentityProvidersList = () => {
     error: settingsError,
     refetch: refetchSettings,
   } = useQuery(['AdministrationUserSettings'], () =>
-    getDBSettings().then((response) => response.data),
+    overrideSettingsRetrieve().then((response) => response.data),
   );
   if (isProvidersLoading || isSettingsLoading) return <LoadingSpinner />;
   if (providersError || settingsError) {
@@ -140,6 +143,30 @@ export const IdentityProvidersList = () => {
                 type={SAML2_IDP}
                 refetch={refetchProviders}
                 editable={false}
+              />
+            </Col>
+            <Col xs={12} md={6} xl={4} className="mb-6">
+              <ProviderCard
+                title="FreeIPA"
+                description={translate(
+                  'FreeIPA is an integrated security information management solution.',
+                )}
+                provider={{
+                  is_active: settingsData['FREEIPA_ENABLED'],
+                  ...(
+                    SettingsDescription.find((group) =>
+                      group.description.includes(SETTINGS_FREEIPA_GROUP_NAME),
+                    ).items || []
+                  ).reduce(
+                    (acc, item) =>
+                      Object.assign(acc, {
+                        [item.key]: settingsData[item.key] ?? item.default,
+                      }),
+                    {},
+                  ),
+                }}
+                type={FREEIPA_IDP}
+                refetch={refetchSettings}
               />
             </Col>
           </Row>

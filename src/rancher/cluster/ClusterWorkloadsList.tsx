@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { RancherWorkload } from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -23,7 +24,7 @@ export const ClusterWorkloadsList: FunctionComponent<{ resourceScope }> = ({
     filter,
   });
   return (
-    <Table
+    <Table<RancherWorkload>
       {...props}
       columns={[
         {

@@ -2,28 +2,38 @@ import { ArrowsClockwise } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
+import {
+  bookingResourcesList,
+  BookingResourcesListData,
+} from 'waldur-js-client';
 
-import { getBookingsList } from '@waldur/booking/api';
 import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { getBookingFilterOptionStates } from '@waldur/booking/utils';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { orderByFilter } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
+
+import { BookingResource } from '../types';
 
 import { BookingResourcesCalendar } from './BookingResourcesCalendar';
 
 async function loadBookingOfferings(offeringUuid: string) {
-  return await getBookingsList({
-    offering_uuid: offeringUuid,
-    offering_type: OFFERING_TYPE_BOOKING,
-    state: [
-      getBookingFilterOptionStates()[0],
-      getBookingFilterOptionStates()[1],
-    ].map(({ value }) => value),
-    o: orderByFilter({ field: 'created', mode: 'desc' }),
-  });
+  return (
+    await bookingResourcesList({
+      query: {
+        offering_uuid: offeringUuid,
+        offering_type: OFFERING_TYPE_BOOKING,
+        state: [
+          getBookingFilterOptionStates()[0],
+          getBookingFilterOptionStates()[1],
+        ].map(
+          ({ value }) => value,
+        ) as BookingResourcesListData['query']['state'],
+        o: ['-created'],
+      },
+    })
+  ).data as any as BookingResource[];
 }
 
 interface OfferingBookingResourcesCalendarContainerProps {

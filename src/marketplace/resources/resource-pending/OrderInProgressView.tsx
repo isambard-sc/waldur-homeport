@@ -1,6 +1,7 @@
 import { Info } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Button, Card } from 'react-bootstrap';
+import { Resource } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { ProgressSteps } from '@waldur/core/ProgressSteps';
@@ -8,8 +9,6 @@ import { translate } from '@waldur/i18n';
 import { OrderConsumerActions } from '@waldur/marketplace/orders/actions/OrderConsumerActions';
 import { OrderProviderActions } from '@waldur/marketplace/orders/actions/OrderProviderActions';
 import { OrderDetailsLink } from '@waldur/marketplace/orders/details/OrderDetailsLink';
-
-import { Resource } from '../types';
 
 interface OrderInProgressViewProps {
   resource: Resource;
@@ -106,7 +105,7 @@ const getSteps = (resource: Resource) => {
               : translate('Resource successfully updated'),
         ],
     completed: isStep4Completed,
-    variant: order.state === 'done' ? 'success' : 'danger',
+    variant: order.state === 'done' ? 'primary' : 'danger',
   });
   return steps;
 };
@@ -121,7 +120,7 @@ export const OrderInProgressView: FC<OrderInProgressViewProps> = ({
   const steps = getSteps(resource);
   return (
     <div className="container-fluid mt-6">
-      <Card className="card-bordered border-grey-300 border-dashed border-1 overflow-hidden">
+      <Card className="card-bordered border-gray-300 border-dashed border-1 overflow-hidden">
         <Card.Body className="d-flex flex-column flex-sm-row align-items-center gap-4">
           <ProgressSteps
             steps={steps}

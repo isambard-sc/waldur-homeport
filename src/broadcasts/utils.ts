@@ -1,8 +1,6 @@
-import {
-  BroadcastFormData,
-  BroadcastRequestData,
-  BroadcastResponseData,
-} from './types';
+import { BroadcastMessage } from 'waldur-js-client';
+
+import { BroadcastFormData, BroadcastRequestData } from './types';
 
 export const serializeBroadcast = (
   formData: BroadcastFormData,
@@ -18,12 +16,12 @@ export const serializeBroadcast = (
 });
 
 export const parseBroadcast = (
-  broadcast: BroadcastResponseData,
+  broadcast: BroadcastMessage,
 ): BroadcastFormData => ({
   subject: broadcast.subject,
   body: broadcast.body,
-  offerings: broadcast.query.offerings,
-  customers: broadcast.query.customers,
-  all_users: broadcast.query.all_users,
+  offerings: broadcast.query['offerings'],
+  customers: broadcast.query['customers'],
+  all_users: broadcast.query['all_users'],
   send_at: broadcast.send_at,
 });

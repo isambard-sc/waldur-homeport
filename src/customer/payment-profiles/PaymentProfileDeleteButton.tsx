@@ -1,14 +1,15 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
+import { paymentProfilesDestroy } from 'waldur-js-client';
 
-import * as api from '@waldur/customer/payment-profiles/api';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog, waitForConfirmation } from '@waldur/modal/actions';
-import { getCustomer as getCustomerApi } from '@waldur/project/api';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
-import { RowActionButton } from '@waldur/table/ActionButton';
 import { setCurrentCustomer } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
+
+import { getCustomer as getCustomerApi } from '../utils';
 
 export const PaymentProfileDeleteButton = (props) => {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ export const PaymentProfileDeleteButton = (props) => {
     }
 
     try {
-      await api.deletePaymentProfile(props.profile.uuid);
+      await paymentProfilesDestroy({ path: { uuid: props.row.uuid } });
       dispatch(showSuccess(translate('Payment profile has been removed.')));
       dispatch(closeModalDialog());
       await props.refetch();
@@ -42,11 +43,12 @@ export const PaymentProfileDeleteButton = (props) => {
     }
   };
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Delete')}
       action={openDialog}
-      iconNode={<Trash />}
-      size="sm"
+      iconNode={<Trash weight="bold" />}
+      className="text-danger"
+      iconColor="danger"
       {...props.tooltipAndDisabledAttributes}
     />
   );

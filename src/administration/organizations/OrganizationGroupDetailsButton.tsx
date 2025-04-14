@@ -1,10 +1,10 @@
 import { Eye } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { OrganizationGroup } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { OrganizationGroup } from '@waldur/marketplace/types';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
@@ -32,7 +32,7 @@ export const OrganizationGroupDetailsButton: FunctionComponent<
   return (
     <ActionItem
       title={translate('Details')}
-      iconNode={<Eye />}
+      iconNode={<Eye weight="bold" />}
       action={() => dispatch(openOrganizationGroupsDialog(props.row))}
       size="sm"
     />

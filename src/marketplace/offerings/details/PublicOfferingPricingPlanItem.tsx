@@ -1,101 +1,27 @@
-import classNames from 'classnames';
 import { FC } from 'react';
+import { BasePublicPlan, PublicOfferingDetails } from 'waldur-js-client';
 
-import { defaultCurrency } from '@waldur/core/formatCurrency';
-import { FormattedHtml } from '@waldur/core/FormattedHtml';
-import { Link } from '@waldur/core/Link';
-import { translate } from '@waldur/i18n';
-import { PlanDetailsList } from '@waldur/marketplace/details/plan/PlanDetailsList';
-import { combinePrices } from '@waldur/marketplace/details/plan/utils';
-import { Offering, Plan } from '@waldur/marketplace/types';
-import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
-
-import { PricingPlanDetailsList } from './PublicOfferingPricingPlanDetailsList';
+import { Panel } from '@waldur/core/Panel';
+import { PlanDescriptionButton } from '@waldur/marketplace/details/plan/PlanDescriptionButton';
+import { PlanDetailsTable2 } from '@waldur/marketplace/details/plan/PlanDetailsTable2';
 
 interface PricingPlanItemProps {
-  offering: Offering;
-  plan: Plan;
-  canDeploy?: boolean;
-  singlePlan?: boolean;
+  offering: PublicOfferingDetails;
+  plan: BasePublicPlan;
 }
 
 export const PublicOfferingPricingPlanItem: FC<PricingPlanItemProps> = ({
   offering,
   plan,
-  canDeploy = true,
-  singlePlan = false,
 }) => {
-  // TODO: fix this later
-  const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
-  const recommended = false;
-  const { total: totalPrice } = combinePrices(plan, null, null, offering);
-
   return (
-    <div
-      className={classNames('pricing-plan bg-gray-100 min-w-200px', {
-        recommended: recommended,
-        'single-plan': singlePlan,
-      })}
+    <Panel
+      title={plan.name}
+      titleClassName="fw-normal"
+      actions={<PlanDescriptionButton planDescription={plan.description} />}
+      cardBordered
     >
-      {recommended && (
-        <div className="recommended">
-          <span className="bg-dark text-light">{translate('Recommended')}</span>
-        </div>
-      )}
-      <h4
-        className={classNames(
-          'pricing-plan-title',
-          recommended ? 'bg-primary text-white' : 'bg-body text-dark',
-        )}
-      >
-        {plan.name}
-      </h4>
-      <div className="pricing-plan-info">
-        <p className="description fs-7 text-muted">
-          <FormattedHtml html={plan.description} />
-        </p>
-        <div className="m-4">
-          <h5 className="text-nowrap">
-            Base: {defaultCurrency(totalPrice)}
-            <small className="text-muted">/mo</small>
-          </h5>
-          <hr />
-          <PlanDetailsList
-            offering={offering}
-            plan={plan}
-            formGroupClassName="plan-components form-group row"
-            columnClassName="col-sm-12"
-          />
-          <hr />
-          <em className="text-muted">Setup Fee: $0</em>
-        </div>
-        <div className="mx-2">
-          <Link
-            state={canDeploy ? 'marketplace-offering-public' : ''}
-            params={{ offering_uuid: offering.uuid }}
-            className={classNames(
-              'btn w-100',
-              recommended ? 'btn-primary' : 'btn-dark',
-              { disabled: !canDeploy },
-            )}
-          >
-            {translate('Deploy')}
-          </Link>
-        </div>
-      </div>
-      {showExperimentalUiComponents && (
-        <div className="pricing-plan-details bg-body">
-          <PricingPlanDetailsList
-            items={[
-              { title: 'Component 1', value: '12GB' },
-              { title: 'Component 2', value: '3vCPU' },
-              { title: 'SLA', value: '24/7 - 12 hour' },
-              { title: 'Support', value: 'Chat' },
-              { title: 'Modules', value: 'Basic, Homeport, Mastermind' },
-            ]}
-          />
-        </div>
-      )}
-    </div>
+      <PlanDetailsTable2 offering={offering} plan={plan} />
+    </Panel>
   );
 };

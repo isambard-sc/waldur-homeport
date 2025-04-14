@@ -1,11 +1,16 @@
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import {
+  AdminAnnouncement,
+  AdminAnnouncementsListData,
+} from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { AnnouncementFilter } from './AnnouncementFilter';
@@ -39,7 +44,7 @@ const renderStatus = ({ row }) => (
 const filtersSelector = createSelector(
   getFormValues('AdminAnnouncementsFilter'),
   (filterValues: any) => {
-    const result: Record<string, any> = {};
+    const result: AdminAnnouncementsListData['query'] = {};
     if (filterValues?.type) {
       result.type = filterValues.type.value;
     }
@@ -58,7 +63,7 @@ export const AnnouncementsList = () => {
     filter,
     queryField: 'description',
   });
-  const columns = [
+  const columns: Column<AdminAnnouncement>[] = [
     {
       title: 'Announcement',
       render: ({ row }) => row.description,
@@ -106,7 +111,7 @@ export const AnnouncementsList = () => {
     },
   ];
   return (
-    <Table
+    <Table<AdminAnnouncement>
       {...tableProps}
       columns={columns}
       hasQuery

@@ -1,15 +1,15 @@
 import { useCallback } from 'react';
-import { Modal } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
+import {
+  marketplaceProviderOfferingsUpdateOptions,
+  marketplaceProviderOfferingsUpdateResourceOptions,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import {
-  updateOfferingOptions,
-  updateOfferingResourceOptions,
-} from '@waldur/marketplace/common/api';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { formatOption } from '../../store/utils';
@@ -46,12 +46,18 @@ export const EditOptionDialog = connect<{}, {}, { resolve: { option } }>(
         };
         try {
           if (props.resolve.type === 'options') {
-            await updateOfferingOptions(props.resolve.offering.uuid, {
-              options: newOptions,
+            await marketplaceProviderOfferingsUpdateOptions({
+              path: { uuid: props.resolve.offering.uuid },
+              body: {
+                options: newOptions,
+              },
             });
           } else if (props.resolve.type === 'resource_options') {
-            await updateOfferingResourceOptions(props.resolve.offering.uuid, {
-              resource_options: newOptions,
+            await marketplaceProviderOfferingsUpdateResourceOptions({
+              path: { uuid: props.resolve.offering.uuid },
+              body: {
+                resource_options: newOptions,
+              },
             });
           }
           dispatch(
@@ -70,19 +76,19 @@ export const EditOptionDialog = connect<{}, {}, { resolve: { option } }>(
 
     return (
       <form onSubmit={props.handleSubmit(update)}>
-        <Modal.Header>
-          <Modal.Title>{translate('Edit option')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+        <ModalDialog
+          title={translate('Edit option')}
+          footer={
+            <SubmitButton
+              disabled={props.invalid}
+              submitting={props.submitting}
+              label={translate('Save')}
+            />
+          }
+          closeButton
+        >
           <OptionForm resourceType={props.resolve.type} />
-        </Modal.Body>
-        <Modal.Footer>
-          <SubmitButton
-            disabled={props.invalid}
-            submitting={props.submitting}
-            label={translate('Save')}
-          />
-        </Modal.Footer>
+        </ModalDialog>
       </form>
     );
   }),

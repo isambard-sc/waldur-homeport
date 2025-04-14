@@ -1,3 +1,11 @@
+const openAddDialog = () => {
+  cy.contains('button', 'Add')
+    .click()
+    .get('.card-header .dropdown-menu .dropdown-item')
+    .contains('Group invitation')
+    .click();
+};
+
 describe('Group invitations', () => {
   beforeEach(() => {
     cy.mockChecklists()
@@ -32,6 +40,7 @@ describe('Group invitations', () => {
         },
       )
       .intercept('POST', '/api/user-group-invitations/', {
+        statusCode: 201,
         fixture: 'group-invitations/user-group-invitations-post.json',
       })
       .intercept(
@@ -45,7 +54,7 @@ describe('Group invitations', () => {
         '/organizations/895e38d197e748459189f19285119edf/group-invitations/',
       )
       .waitForPage()
-      .get('.card-title')
+      .get('.table-tabs .nav-link')
       .contains('Group invitations');
   });
 
@@ -60,73 +69,76 @@ describe('Group invitations', () => {
   });
 
   it('Should open modal when Create group invitation button is clicked', () => {
-    cy.contains('button', 'Add')
-      .click()
-      .get('.modal-title')
-      .should('be.visible');
+    openAddDialog();
+    cy.get('.modal .modal-header .modal-title').should('exist');
   });
 
   it('Should close modal when cancel button is clicked', () => {
-    cy.contains('button', 'Add')
+    openAddDialog();
+    cy.get('.modal .modal-header .btn-close')
+      .should('be.visible')
       .click()
-      .get('.modal-footer')
-      .contains('button', 'Cancel')
-      .click()
-      .get('.modal-title')
+      .get('.modal .modal-header .modal-title')
       .should('not.exist');
   });
 
   it('Should invitation works correctly using role (Organization owner)', () => {
-    cy.contains('button', 'Add')
-      .click()
-      .get('label')
+    openAddDialog();
+    cy.get('label')
       .selectRole('Organization owner')
-      .get('.modal-footer > .btn-primary')
+      .get('.modal .modal-body')
+      .contains('button', 'Generate link')
       .click()
       .get('[role="alert"]')
       .should('be.visible');
   });
 
   it('Should invitation works correctly using role (Project manager)', () => {
-    cy.contains('button', 'Add')
-      .click()
-      .selectRole('Project manager')
-      .openDropdownByLabel('Project*')
+    openAddDialog();
+    cy.selectRole('Project manager')
+      .openDropdownByLabel('Project')
       .selectTheFirstOptionOfDropdown()
-      .get('.modal-footer > .btn-primary')
+      .get('.modal .modal-body')
+      .contains('button', 'Generate link')
       .click()
       .get('[role="alert"]')
       .should('be.visible');
   });
 
   it('Should invitation works correctly using role (System administrator)', () => {
-    cy.contains('button', 'Add')
-      .click()
-      .selectRole('System administrator')
-      .openDropdownByLabel('Project*')
+    openAddDialog();
+    cy.selectRole('System administrator')
+      .openDropdownByLabel('Project')
       .selectTheFirstOptionOfDropdown()
-      .get('.modal-footer > .btn-primary')
+      .get('.modal .modal-body')
+      .contains('button', 'Generate link')
       .click()
       .get('[role="alert"]')
       .should('be.visible');
   });
 
   it('Should invitation works correctly using role (Project member)', () => {
-    cy.contains('button', 'Add')
-      .click()
-      .selectRole('Project member')
-      .openDropdownByLabel('Project*')
+    openAddDialog();
+    cy.selectRole('Project member')
+      .openDropdownByLabel('Project')
       .selectTheFirstOptionOfDropdown()
-      .get('.modal-footer > .btn-primary')
+      .get('.modal .modal-body')
+      .contains('button', 'Generate link')
       .click()
       .get('[role="alert"]')
       .should('be.visible');
   });
 
   it('Should cancel invitation works properly', () => {
-    cy.contains('button', 'Cancel')
+    cy.get('td .dropstart')
+      .first()
+      .find('button.dropdown-toggle')
       .click()
-      .get('.modal-footer .btn-primary:contains("Yes")')
+      .get('body > .dropdown-menu .dropdown-item')
+      .contains('Cancel')
+      .click({ force: true });
+
+    cy.get('.modal-footer .btn:contains("Unsent")')
       .click()
       .get('[role="alert"]')
       .should('be.visible');

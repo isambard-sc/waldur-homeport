@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { takeEvery } from 'redux-saga/effects';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { type RootState } from '@waldur/store/reducers';
 
 export const SET_TITLE = 'waldur/navigation/SET_TITLE';

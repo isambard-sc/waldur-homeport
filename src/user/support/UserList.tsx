@@ -3,8 +3,9 @@ import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { User, UsersListData } from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { Tip } from '@waldur/core/Tooltip';
@@ -20,7 +21,6 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
-import { User } from '@waldur/workspace/types';
 
 import { UserDetailsButton } from './UserDetailsButton';
 import { UserFilter } from './UserFilter';
@@ -31,13 +31,15 @@ const renderFieldOrDash = (field) => {
   return field ? field : DASH_ESCAPE_CODE;
 };
 
-const PhoneNumberField = ({ row }) => (
+const PhoneNumberField = ({ row }: { row: User }) => (
   <>{renderFieldOrDash(row.phone_number)}</>
 );
 
-const EmailField = ({ row }) => <>{renderFieldOrDash(row.email)}</>;
+const EmailField = ({ row }: { row: User }) => (
+  <>{renderFieldOrDash(row.email)}</>
+);
 
-const FullNameField = ({ row }) => (
+const FullNameField = ({ row }: { row: User }) => (
   <Link
     state="admin-user-user-manage"
     params={{ user_uuid: row.uuid }}
@@ -45,19 +47,19 @@ const FullNameField = ({ row }) => (
   />
 );
 
-const OrganizationField = ({ row }) => (
+const OrganizationField = ({ row }: { row: User }) => (
   <>{renderFieldOrDash(row.organization)}</>
 );
 
-const StaffStatusField = ({ row }) => {
+const StaffStatusField = ({ row }: { row: User }) => {
   return <BooleanField value={row.is_staff} />;
 };
 
-const UserStatusField = ({ row }) => {
+const UserStatusField = ({ row }: { row: User }) => {
   return <BooleanField value={row.is_active} />;
 };
 
-const OrganizationRolesField = ({ row }) => {
+const OrganizationRolesField = ({ row }: { row: User }) => {
   const permissions = row.permissions?.filter(
     ({ scope_type }) => scope_type === 'customer',
   );
@@ -79,7 +81,7 @@ const OrganizationRolesField = ({ row }) => {
   }
 };
 
-const ProjectRolesField = ({ row }) => {
+const ProjectRolesField = ({ row }: { row: User }) => {
   const permissions = row.permissions?.filter(
     ({ scope_type }) => scope_type === 'project',
   );
@@ -104,7 +106,7 @@ const ProjectRolesField = ({ row }) => {
   }
 };
 
-const SupportStatusField = ({ row }) => {
+const SupportStatusField = ({ row }: { row: User }) => {
   return <BooleanField value={row.is_support} />;
 };
 
@@ -117,7 +119,7 @@ const renderListOrDash = (list) => {
     </>
   );
 };
-const RowActions = ({ row }) => {
+const RowActions = ({ row }: { row: User }) => {
   return (
     <ActionsDropdown
       row={row}
@@ -159,7 +161,7 @@ const DEFAULT_ENABLED_COLUMNS = [
   'is_active',
 ];
 
-const mandatoryFields = [
+const mandatoryFields: UsersListData['query']['field'] = [
   'uuid',
   // UserDetailsButton
   'full_name',
@@ -180,6 +182,7 @@ const mandatoryFields = [
   'is_active',
   'url',
   'permissions',
+  'has_active_session',
 ];
 
 export const UserList: FunctionComponent = () => {
@@ -192,13 +195,14 @@ export const UserList: FunctionComponent = () => {
     mandatoryFields,
   });
 
-  const columns: Column[] = [
+  const columns: Column<User>[] = [
     {
       title: translate('Full name'),
       render: FullNameField,
       orderField: 'full_name',
       keys: ['full_name'],
       id: 'full_name',
+      copyField: (row) => row.full_name,
     },
     {
       title: translate('Email'),
@@ -206,6 +210,7 @@ export const UserList: FunctionComponent = () => {
       orderField: 'email',
       keys: ['email'],
       id: 'email',
+      copyField: (row) => row.email,
     },
     {
       title: translate('Phone number'),

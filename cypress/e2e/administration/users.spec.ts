@@ -5,8 +5,8 @@ describe('Users', () => {
       .intercept('GET', '/api/configuration/', {
         fixture: 'support/configuration.json',
       })
-      .intercept('GET', '/api/events/', [])
-      .intercept('GET', '/api/roles/', { fixture: 'roles.json' })
+      .intercept('GET', '/api/events/**', [])
+      .intercept('GET', '/api/roles/**', { fixture: 'roles.json' })
 
       .intercept('GET', '/api/users/me/', {
         fixture: 'support/me.json',
@@ -76,6 +76,11 @@ describe('Users', () => {
         },
         { fixture: 'support/user-search-by-name.json' },
       );
+
+    cy.intercept('GET', '/api/marketplace-categories/**', [])
+      .intercept('GET', '/api/marketplace-category-groups/**', [])
+      .intercept('GET', '/api/marketplace-global-categories/**', [])
+      .intercept('GET', '/api/admin-announcements/**', []);
 
     cy.fixture('support/user-search-by-name.json')
       .then((users) => {

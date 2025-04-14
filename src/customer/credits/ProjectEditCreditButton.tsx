@@ -1,14 +1,13 @@
 import { PencilSimple } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
 import { SubmissionError } from 'redux-form';
+import { projectCreditsUpdate } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
 import { useNotify } from '@waldur/store/hooks';
 
-import { updateProjectCredit } from './api';
-import { ProjectCreditFormData } from './types';
 import { getCreditInitialValues } from './utils';
 
 const ProjectCreditFormDialog = lazyComponent(() =>
@@ -33,13 +32,15 @@ export const ProjectEditCreditButton = ({ row, refetch }) => {
         },
         ...getCreditInitialValues(row),
       },
-      onSubmit: async (formData) => {
-        const payload: ProjectCreditFormData = {
-          ...formData,
-          project: formData.project.url,
-        };
+      submitFn: async (formData) => {
         try {
-          await updateProjectCredit(row.uuid, payload);
+          await projectCreditsUpdate({
+            path: { uuid: row.uuid },
+            body: {
+              ...formData,
+              project: formData.project.url,
+            },
+          });
           closeDialog();
           refetch();
           showSuccess(translate('Credit has been updated.'));

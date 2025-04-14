@@ -19,31 +19,35 @@ import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 
+import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableFilterContext } from './FilterContextProvider';
-import { TableProps } from './types';
+import { PinnedColumns, TableProps } from './types';
 import { getId } from './utils';
 
-type TableBodyProps = Pick<
-  TableProps,
-  | 'rows'
-  | 'columns'
-  | 'rowClass'
-  | 'rowKey'
-  | 'expandableRow'
-  | 'expandableRowClassName'
-  | 'rowActions'
-  | 'enableMultiSelect'
-  | 'selectRow'
-  | 'selectedRows'
-  | 'toggleRow'
-  | 'toggled'
-  | 'fetch'
-  | 'fieldType'
-  | 'fieldName'
-  | 'validate'
-  | 'columnPositions'
-  | 'hasOptionalColumns'
->;
+interface TableBodyProps
+  extends Pick<
+    TableProps,
+    | 'rows'
+    | 'columns'
+    | 'rowClass'
+    | 'rowKey'
+    | 'expandableRow'
+    | 'expandableRowClassName'
+    | 'rowActions'
+    | 'enableMultiSelect'
+    | 'selectRow'
+    | 'selectedRows'
+    | 'toggleRow'
+    | 'toggled'
+    | 'fetch'
+    | 'fieldType'
+    | 'fieldName'
+    | 'validate'
+    | 'columnPositions'
+    | 'hasOptionalColumns'
+  > {
+  pinnedColumns?: PinnedColumns;
+}
 
 interface TableCellsProps {
   row;
@@ -70,6 +74,7 @@ const InlineFilterButton = ({ column, row }) => {
   return (
     <>
       <button
+        type="button"
         className="inline-filter text-btn"
         data-kt-menu-trigger="click"
         data-kt-menu-placement="bottom"
@@ -216,6 +221,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
   validate,
   columnPositions,
   hasOptionalColumns,
+  pinnedColumns = {},
 }) => {
   const columnsMap = useMemo(
     () =>
@@ -227,16 +233,8 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
   );
 
   const trClick = useCallback(
-    (row, index, e) => {
+    (row, index) => {
       if (!expandableRow) return;
-      // prevent expandable row to toggle when clicking on inner clickable elements
-      const el = e.target as HTMLElement;
-      if (
-        el.onclick ||
-        el instanceof HTMLInputElement ||
-        el.closest('button, a')
-      )
-        return;
       toggleRow(getId(row, index));
     },
     [toggleRow],
@@ -297,7 +295,16 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
           ) || undefined
         }
         onClick={(event) => {
-          trClick(row, rowIndex, event);
+          // prevent checkbox and expandable row to toggle when clicking on inner clickable elements
+          const el = event.target as HTMLElement;
+          if (
+            el.onclick ||
+            el instanceof HTMLInputElement ||
+            el.closest('button, a')
+          )
+            return;
+
+          trClick(row, rowIndex);
           if (fieldProps) {
             onChangeField(row, fieldProps.input);
           }
@@ -322,7 +329,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
                   <FormCheck
                     name={fieldProps.input.name}
                     type={fieldType}
-                    className="form-check form-check-custom form-check-sm"
+                    className="form-check form-check-custom"
                     checked={isChecked}
                     onChange={() => onChangeField(row, fieldProps.input)}
                     onClick={(e) => e.stopPropagation()}
@@ -354,8 +361,16 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
           hasOptionalColumns={hasOptionalColumns}
         />
         {rowActions && (
-          <td className="row-actions">
-            <div>{React.createElement(rowActions, { row, fetch })}</div>
+          <td
+            className={classNames(
+              'row-actions',
+              COLUMN_ACTIONS_KEY in pinnedColumns && 'pinned',
+              pinnedColumns[COLUMN_ACTIONS_KEY] && 'is-floating',
+            )}
+          >
+            <div aria-hidden="true">
+              {React.createElement(rowActions, { row, fetch })}
+            </div>
           </td>
         )}
       </tr>

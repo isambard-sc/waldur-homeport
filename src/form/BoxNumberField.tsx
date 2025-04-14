@@ -64,7 +64,7 @@ export const BoxNumberField: FunctionComponent<BoxNumberFieldProps> = (
           disabled={props.disabled}
         >
           <span className="svg-icon svg-icon-2">
-            <Plus />
+            <Plus weight="bold" />
           </span>
         </Button>
       </div>

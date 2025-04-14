@@ -7,7 +7,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useEffectOnce } from 'react-use';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { router } from '@waldur/router';
 import store from '@waldur/store/store';
@@ -25,7 +25,7 @@ const isChild = (parent, child) =>
 const isChildOf = (parentName: string, state: StateDeclaration) =>
   state.name.startsWith(`${state.parent}.`) ||
   state.name.startsWith(`${parentName}.`) ||
-  state.parent === parentName;
+  (parentName && state.parent === parentName);
 
 export const isDescendantOf = (parentName: string, state: StateDeclaration) =>
   isChildOf(parentName, state) ||
@@ -36,6 +36,7 @@ const stateToTab = (state: StateDeclaration) => ({
   title: state.data.breadcrumb(),
   to: state.name,
   params: {},
+  redirectTo: state.redirectTo,
 });
 
 const sortStates = (states: StateDeclaration[]) => {

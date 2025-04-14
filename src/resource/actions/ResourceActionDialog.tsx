@@ -5,7 +5,6 @@ import { Tip } from '@waldur/core/Tooltip';
 import { SelectField, StringField, TextField } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
-import { CronField } from '@waldur/form/CronField';
 import { DateTimeField } from '@waldur/form/DateTimeField';
 import { MonacoField } from '@waldur/form/MonacoField';
 import { NumberField } from '@waldur/form/NumberField';
@@ -73,8 +72,6 @@ export const ResourceActionDialog = reduxForm<{}, ResourceActionDialogOwnProps>(
       return <DateTimeField {...props} />;
     } else if (field.type === 'timezone') {
       return <TimezoneField {...props} />;
-    } else if (field.type === 'crontab') {
-      return <CronField {...props} />;
     } else if (field.type === 'integer') {
       return (
         <NumberField {...props} min={field.minValue} max={field.maxValue} />

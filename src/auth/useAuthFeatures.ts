@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 
 export const useAuthFeatures = () => {
   const methods = useMemo<Record<string, boolean>>(
@@ -42,3 +42,5 @@ export const useAuthFeatures = () => {
     enableSeperator: enableSeparator,
   };
 };
+
+export type AuthFeatures = ReturnType<typeof useAuthFeatures>;

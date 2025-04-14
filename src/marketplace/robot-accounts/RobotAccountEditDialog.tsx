@@ -1,5 +1,6 @@
+import { marketplaceRobotAccountsPartialUpdate } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
-import { updateRobotAccount } from '@waldur/marketplace/common/api';
 import { UpdateResourceDialog } from '@waldur/resource/actions/UpdateResourceDialog';
 
 import {
@@ -21,11 +22,14 @@ export const RobotAccountEditDialog = ({ resolve: { resource, refetch } }) => {
         responsible_user: resource.responsible_user,
       }}
       updateResource={(id, formData: RobotAccountFormData) =>
-        updateRobotAccount(id, {
-          ...formData,
-          keys: formData.keys ? formData.keys.trim().split(/\r?\n/) : [],
-          users: formData.users?.map(({ url }) => url),
-          responsible_user: formData.responsible_user?.url || '',
+        marketplaceRobotAccountsPartialUpdate({
+          path: { uuid: id },
+          body: {
+            ...formData,
+            keys: formData.keys ? formData.keys.trim().split(/\r?\n/) : [],
+            users: formData.users?.map(({ url }) => url),
+            responsible_user: formData.responsible_user?.url || '',
+          },
         })
       }
       verboseName={translate('robot account')}

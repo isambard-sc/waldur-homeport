@@ -1,9 +1,9 @@
 import { LinkBreak } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { marketplaceResourcesUnlink } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { unlinkResource } from '@waldur/marketplace/common/api';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
@@ -44,7 +44,9 @@ export const UnlinkActionItem: FC<{ resource }> = ({ resource }) => {
     }
 
     try {
-      await unlinkResource(resource.marketplace_resource_uuid);
+      await marketplaceResourcesUnlink({
+        path: { uuid: resource.marketplace_resource_uuid },
+      });
       dispatch(showSuccess(translate('Resource has been unlinked.')));
     } catch (e) {
       dispatch(showErrorResponse(e, translate('Unable to unlink resource.')));
@@ -56,7 +58,8 @@ export const UnlinkActionItem: FC<{ resource }> = ({ resource }) => {
       action={callback}
       className="text-danger"
       staff
-      iconNode={<LinkBreak />}
+      iconNode={<LinkBreak weight="bold" />}
+      iconColor="danger"
     />
   );
 };

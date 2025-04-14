@@ -1,10 +1,10 @@
 import { Card } from 'react-bootstrap';
+import { OrderDetails as OrderResponse } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { DetailsField } from '@waldur/marketplace/common/DetailsField';
 import { PlanDescriptionButton } from '@waldur/marketplace/details/plan/PlanDescriptionButton';
 import { PlanDetailsTable } from '@waldur/marketplace/details/plan/PlanDetailsTable';
-import { OrderResponse } from '@waldur/marketplace/orders/types';
 import { Offering } from '@waldur/marketplace/types';
 import { NoResult } from '@waldur/navigation/header/search/NoResult';
 

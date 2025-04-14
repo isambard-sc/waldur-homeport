@@ -1,22 +1,24 @@
+import { useMutation } from '@tanstack/react-query';
 import { get } from 'lodash-es';
 import { createRef, FC, useCallback, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { change, getFormValues } from 'redux-form';
+import {
+  proposalProposalsAttachDocument,
+  proposalProposalsSubmit,
+  proposalProposalsUpdateProjectDetails,
+  ProposalReview,
+} from 'waldur-js-client';
 
+import { formDataOptions } from '@waldur/core/api';
 import { isEmpty } from '@waldur/core/utils';
 import { Form } from '@waldur/form/Form';
 import { SidebarLayout } from '@waldur/form/SidebarLayout';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import {
-  attachDocument,
-  switchProposalToTeamVerification,
-  updateProposalProjectDetails,
-} from '@waldur/proposals/api';
 import { PROPOSAL_UPDATE_SUBMISSION_FORM_ID } from '@waldur/proposals/constants';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { ProposalHeader } from './ProposalHeader';
 import { ProposalSidebar } from './ProposalSidebar';
 import { createProposalSteps } from './steps';
 
@@ -25,20 +27,37 @@ const formDataSelector = (state) =>
 
 const attachDocuments = async (proposal_uuid, supporting_documentation) => {
   if (supporting_documentation) {
-    const files = Object.values(supporting_documentation);
+    const files: File[] = Object.values(supporting_documentation);
     if (files && files.length > 0) {
       await Promise.all(
-        Array.from(files).map((file) => attachDocument(proposal_uuid, file)),
+        Array.from(files).map((file) =>
+          proposalProposalsAttachDocument({
+            path: { uuid: proposal_uuid },
+            body: { file },
+            ...formDataOptions,
+          }),
+        ),
       );
     }
   }
 };
 
-export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
-  proposal,
-  reviews,
-  refetch,
-}) => {
+const validate = (values) => {
+  const errors: Record<string, any> = {};
+  if (!values.users || values.users?.length === 0) {
+    errors.users = 'At least one user is required';
+  }
+  if (!values.resources || values.resources?.length === 0) {
+    errors.resources = 'At least one resource is required';
+  }
+  return errors;
+};
+
+export const ProposalSubmissionStep: FC<{
+  proposal;
+  reviews?: ProposalReview[];
+  refetch;
+}> = ({ proposal, reviews, refetch }) => {
   const dispatch = useDispatch();
   const initialValues = useMemo(
     () => ({
@@ -50,6 +69,7 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
       project_is_confidential: proposal.project_is_confidential,
       duration_in_days: proposal.duration_in_days,
       resources: [],
+      users: [],
     }),
     [proposal],
   );
@@ -62,64 +82,59 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
     (_, i) => stepRefs.current[i] ?? createRef(),
   );
 
-  const submitForm = useCallback(
-    async (formData) => {
-      try {
-        await updateProposalProjectDetails(formData, proposal_uuid);
-        await attachDocuments(proposal_uuid, formData.supporting_documentation);
-        dispatch(showSuccess(translate('Proposal updated successfully')));
-        // clear formData.supporting_documentation from redux-form store to prevent file upload on next submit/switchToTeam
-        dispatch(
-          change(
-            PROPOSAL_UPDATE_SUBMISSION_FORM_ID,
-            'supporting_documentation',
-            {},
-          ),
-        );
+  const formData = useSelector(formDataSelector);
 
-        refetch();
+  const { mutate: saveAsDraft, isLoading: isSaving } = useMutation(async () => {
+    try {
+      await proposalProposalsUpdateProjectDetails({
+        path: { uuid: proposal_uuid },
+        body: formData,
+      });
+      await attachDocuments(proposal_uuid, formData.supporting_documentation);
+      dispatch(showSuccess(translate('Proposal updated successfully')));
+      // clear formData.supporting_documentation from redux-form store to prevent file upload on next submit/switchToTeam
+      dispatch(
+        change(
+          PROPOSAL_UPDATE_SUBMISSION_FORM_ID,
+          'supporting_documentation',
+          {},
+        ),
+      );
+      refetch && refetch();
+    } catch (error) {
+      dispatch(showErrorResponse(error, translate('Something went wrong')));
+    }
+  });
+
+  const submitForm = useCallback(
+    async (formValues, dispatch) => {
+      try {
+        await waitForConfirmation(
+          dispatch,
+          translate('Confirmation'),
+          translate('Are you sure you want to submit the proposal?'),
+        );
+      } catch {
+        return;
+      }
+      try {
+        await proposalProposalsUpdateProjectDetails({
+          path: { uuid: proposal_uuid },
+          body: formValues,
+        });
+        await attachDocuments(
+          proposal_uuid,
+          formValues.supporting_documentation,
+        );
+        await proposalProposalsSubmit({ path: { uuid: proposal_uuid } });
+        refetch && refetch();
+        dispatch(showSuccess(translate('Proposal submitted successfully')));
       } catch (error) {
         dispatch(showErrorResponse(error, translate('Something went wrong')));
       }
     },
-    [proposal_uuid, dispatch],
+    [proposal, proposal_uuid],
   );
-  const formData = useSelector(formDataSelector);
-
-  const switchToTeamCallback = async () => {
-    try {
-      await waitForConfirmation(
-        dispatch,
-        translate('Confirmation'),
-        <>
-          {translate(
-            'Are you sure you want to send the proposal to team verification step?',
-          )}
-          <br />{' '}
-          <small className="text-danger">
-            {translate(
-              'NB! After clicking Yes, you will not be able to edit the proposal!',
-            )}
-          </small>
-        </>,
-      );
-    } catch {
-      return;
-    }
-    try {
-      await updateProposalProjectDetails(formData, proposal_uuid);
-      await attachDocuments(proposal_uuid, formData.supporting_documentation);
-      await switchProposalToTeamVerification(proposal_uuid);
-      await refetch();
-      dispatch(
-        showSuccess(
-          translate('Proposal has been switched to team verification step.'),
-        ),
-      );
-    } catch (error) {
-      dispatch(showErrorResponse(error, translate('Something went wrong')));
-    }
-  };
 
   const completedSteps = useMemo(() => {
     const result = stepRefs.current.map(() => false);
@@ -143,19 +158,16 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
       form={PROPOSAL_UPDATE_SUBMISSION_FORM_ID}
       onSubmit={submitForm}
       initialValues={initialValues}
+      validate={validate}
     >
       {(formProps) => (
         <SidebarLayout.Container>
           <SidebarLayout.Body>
-            <ProposalHeader proposal={proposal} />
-
             {formSteps.map((step, i) => (
               <div ref={stepRefs.current[i]} key={step.id}>
                 <step.component
-                  step={i + 1}
                   id={step.id}
                   title={step.label}
-                  observed={completedSteps[i]}
                   params={{
                     proposal,
                     refetch,
@@ -166,11 +178,13 @@ export const ProposalSubmissionStep: FC<{ proposal; reviews?; refetch }> = ({
               </div>
             ))}
           </SidebarLayout.Body>
-          <SidebarLayout.Sidebar>
+
+          <SidebarLayout.Sidebar transparent>
             <ProposalSidebar
               steps={formSteps}
-              switchToTeam={switchToTeamCallback}
-              canSwitchToTeam={proposal.state === 'draft'}
+              saveAsDraft={saveAsDraft}
+              isSaving={isSaving}
+              editable={proposal.state === 'draft'}
               submitting={formProps.submitting}
               completedSteps={completedSteps}
             />

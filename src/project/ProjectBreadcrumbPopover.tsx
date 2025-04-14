@@ -1,4 +1,3 @@
-import { fixURL } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { BreadcrumbDropdown } from '@waldur/navigation/header/breadcrumb/BreadcrumbDropdown';
 import { useFavoritePages } from '@waldur/navigation/header/favorite-pages/FavoritePageService';
@@ -30,7 +29,7 @@ export const ProjectBreadcrumbPopover = ({ project, close }) => {
 
   return (
     <BreadcrumbDropdown
-      api={fixURL('/projects/')}
+      api="/projects/"
       queryField="query"
       params={{
         customer: project.customer_uuid,

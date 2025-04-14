@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
+import { OrderSummaryButton } from '@waldur/marketplace/details/OrderSummaryButton';
 import { PlanDescriptionButton } from '@waldur/marketplace/details/plan/PlanDescriptionButton';
 import { PlanDetailsTable2 } from '@waldur/marketplace/details/plan/PlanDetailsTable2';
 import { PlanSelectField } from '@waldur/marketplace/details/plan/PlanSelectField';
@@ -20,13 +21,20 @@ export const FormPlanStep = (props: FormStepProps) => {
   return (
     <VStepperFormStepCard
       title={translate('Plan')}
-      step={props.step}
       id={props.id}
-      completed={props.observed}
       disabled={props.disabled}
-      required={props.required}
+      disabledTooltip={props.disabledTooltip}
+      actions={
+        !props.previewMode && (
+          <OrderSummaryButton
+            offering={props.offering}
+            className="ms-auto"
+            disabled={props.disabled}
+          />
+        )
+      }
     >
-      <div className="d-flex gap-6 pb-6 border-bottom mb-7">
+      <div className="d-flex gap-6 mb-5">
         <div className="flex-grow-1">
           <PlanSelectField plans={plans} />
         </div>

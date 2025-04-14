@@ -7,9 +7,6 @@ export const getIsDeleting = (state: RootState, props) =>
   !!state.issues.comments.deleting[props.comment.uuid];
 export const getIsLoading = (state: RootState) => state.issues.comments.loading;
 export const getIssue = (state: RootState) => state.issues.comments.issue;
-export const getIsUiDisabled = (state: RootState) =>
-  state.issues.comments.uiDisabled;
-export const getUser = (state: RootState) => state.workspace.user;
 
 export const getCommentsSelector = createSelector(getComments, (comments) =>
   [...comments].sort(

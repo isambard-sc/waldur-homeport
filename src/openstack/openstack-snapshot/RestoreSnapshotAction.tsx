@@ -24,6 +24,6 @@ export const RestoreSnapshotAction: ActionItemType = ({
     modalComponent={RestoreSnapshotDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<ClockClockwise />}
+    iconNode={<ClockClockwise weight="bold" />}
   />
 );

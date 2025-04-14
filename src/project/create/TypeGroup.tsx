@@ -1,5 +1,6 @@
 import { Field } from 'react-final-form';
 import { useAsync } from 'react-use';
+import { projectTypesList } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -8,13 +9,15 @@ import { SelectField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 
-import { loadProjectTypes } from '../api';
-
 export const TypeGroup = ({ create }: { create?: boolean }) => {
   if (create && !isFeatureVisible(ProjectFeatures.show_type_in_create_dialog)) {
     return null;
   }
-  const { loading, error, value: projectTypes } = useAsync(loadProjectTypes);
+  const {
+    loading,
+    error,
+    value: projectTypes,
+  } = useAsync(async () => (await projectTypesList()).data);
   return loading ? (
     <LoadingSpinner />
   ) : error ? (

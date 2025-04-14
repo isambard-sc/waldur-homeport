@@ -1,17 +1,21 @@
 import { FC, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
+import {
+  proposalProtectedCallsRoundsUpdate,
+  ProtectedRound,
+  ProtectedRoundRequest,
+} from 'waldur-js-client';
 
 import { WizardFormContainer } from '@waldur/form/WizardFormContainer';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { updateCallRound } from '@waldur/proposals/api';
-import { RoundFormData, Call, Round } from '@waldur/proposals/types';
+import { Call } from '@waldur/proposals/types';
 import { WizardFormSecondPage } from '@waldur/proposals/update/rounds/WizardFormSecondPage';
 import { getRoundInitialValues } from '@waldur/proposals/utils';
 
 interface EditRoundReviewDialogProps {
   resolve: {
-    round: Round;
+    round: ProtectedRound;
     call: Call;
     refetch(): void;
   };
@@ -26,16 +30,17 @@ export const EditRoundReviewDialog: FC<EditRoundReviewDialogProps> = (
   );
   const dispatch = useDispatch();
   const submit = useCallback(
-    (formData: RoundFormData, _dispatch, formProps) => {
-      const updatedRound = {
-        ...initialValues,
-        ...formData,
-      };
-      return updateCallRound(
-        props.resolve.call.uuid,
-        props.resolve.round.uuid,
-        updatedRound,
-      ).then(() => {
+    (formData: ProtectedRoundRequest, _dispatch, formProps) => {
+      return proposalProtectedCallsRoundsUpdate({
+        path: {
+          uuid: props.resolve.call.uuid,
+          obj_uuid: props.resolve.round.uuid,
+        },
+        body: {
+          ...initialValues,
+          ...formData,
+        },
+      }).then(() => {
         formProps.destroy();
         dispatch(closeModalDialog());
         props.resolve.refetch();
@@ -50,7 +55,7 @@ export const EditRoundReviewDialog: FC<EditRoundReviewDialogProps> = (
       title={translate('Edit round review')}
       onSubmit={submit}
       submitLabel={translate('Edit')}
-      steps={[translate('Review')]}
+      steps={[{ key: 'review', label: translate('Review'), completed: false }]}
       wizardForms={[WizardFormSecondPage]}
       initialValues={{
         review_strategy: initialValues.review_strategy,

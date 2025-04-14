@@ -13,6 +13,7 @@ import { CustomerMembersColumn } from './CustomerMembersColumn';
 import { CustomerNameColumn } from './CustomerNameColumn';
 import { OrganizationProjectsExpandable } from './OrganizationProjectsExpandable';
 import { ProjectsCountColumn } from './ProjectsCountColumn';
+import { PROVIDER_CUSTOMERS_TABLE_TABS } from './utils';
 
 const ProviderOrganizationsListComponent = ({ provider }) => {
   const tableProps = useTable({
@@ -55,6 +56,7 @@ const ProviderOrganizationsListComponent = ({ provider }) => {
     <Table
       {...tableProps}
       columns={columns}
+      tabs={PROVIDER_CUSTOMERS_TABLE_TABS}
       verboseName={translate('Organizations')}
       showPageSizeSelector={true}
       expandableRow={ExpandableRow}

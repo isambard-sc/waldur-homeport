@@ -1,23 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
 import { formValueSelector } from 'redux-form';
+import {
+  marketplacePublicOfferingsRetrieve,
+  OpenStackFlavor,
+  OpenStackSubNet,
+  PublicOfferingDetails,
+  RancherCluster,
+  rancherClusterTemplatesList,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/configs/default';
+import { getAllPages } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
-import { Offering } from '@waldur/marketplace/types';
 import {
   loadFlavors,
+  loadSecurityGroups,
   loadSubnets,
   loadVolumeTypes,
-  loadSecurityGroups,
 } from '@waldur/openstack/api';
-import { Flavor, Subnet } from '@waldur/openstack/openstack-instance/types';
 import {
   formatVolumeTypeChoices,
   getDefaultVolumeType,
 } from '@waldur/openstack/openstack-instance/utils';
-import { listClusterTemplates } from '@waldur/rancher/api';
-import { Cluster, NodeField } from '@waldur/rancher/types';
+import { NodeField } from '@waldur/rancher/types';
 import { formatFlavor } from '@waldur/resource/utils';
 import { type RootState } from '@waldur/store/reducers';
 
@@ -28,21 +34,24 @@ export const rancherClusterName = (value: string) =>
     ? translate('Name must consist of lower case alphanumeric characters.')
     : undefined;
 
-const formatSubnetOption = (subnet: Subnet) => ({
+const formatSubnetOption = (subnet: OpenStackSubNet) => ({
   label: `${subnet.network_name} / ${subnet.name} (${subnet.cidr})`,
   value: subnet.url,
 });
 
-const formatFlavorOption = (flavor: Flavor) => ({
+const formatFlavorOption = (flavor: OpenStackFlavor) => ({
   ...flavor,
   label: `${flavor.name} (${formatFlavor(flavor)})`,
   value: flavor.url,
 });
 
-export const filterFlavors = (tenant_uuid: string, offering: Offering) => {
+export const filterFlavors = (
+  tenant_uuid: string,
+  offering: PublicOfferingDetails,
+) => {
   return loadFlavors({
     tenant_uuid,
-    name_iregex: offering.plugin_options?.flavors_regex,
+    name_iregex: offering.plugin_options.flavors_regex,
   }).then((data) => data.map(formatFlavorOption));
 };
 
@@ -57,13 +66,18 @@ export const getRancherMountPointChoices = () => {
   }));
 };
 
-export const loadData = async (cluster: Cluster, offering: Offering) => {
+export const loadNodeCreateData = async (cluster: RancherCluster) => {
+  const offering = await marketplacePublicOfferingsRetrieve({
+    path: { uuid: cluster.marketplace_offering_uuid },
+  }).then((response) => response.data);
   const flavors = await filterFlavors(cluster.tenant_uuid, offering);
   const subnets = await formatSubnets(cluster.tenant_uuid);
   const volumeTypes = await loadVolumeTypes({
     tenant_uuid: cluster.tenant_uuid,
   });
-  const templates = await listClusterTemplates();
+  const templates = await getAllPages((page) =>
+    rancherClusterTemplatesList({ query: { page } }),
+  );
   const volumeTypeChoices = formatVolumeTypeChoices(volumeTypes);
   const defaultVolumeType = getDefaultVolumeType(volumeTypeChoices);
   const securityGroups = await loadSecurityGroups({

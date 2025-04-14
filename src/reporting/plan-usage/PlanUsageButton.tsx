@@ -1,12 +1,11 @@
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { PlanUsageResponse } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { RowActionButton } from '@waldur/table/ActionButton';
-
-import type { PlanUsageRowProps } from './types';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 const PlanUsageDialog = lazyComponent(() =>
   import('./PlanUsageDialog').then((module) => ({
@@ -14,12 +13,12 @@ const PlanUsageDialog = lazyComponent(() =>
   })),
 );
 
-export const PlanUsageButton: FunctionComponent<PlanUsageRowProps> = (
+export const PlanUsageButton: FunctionComponent<{ row: PlanUsageResponse }> = (
   props,
 ) => {
   const dispatch = useDispatch();
   return (
-    <RowActionButton
+    <ActionItem
       title={translate('Show chart')}
       disabled={props.row.limit === null}
       tooltip={
@@ -32,7 +31,6 @@ export const PlanUsageButton: FunctionComponent<PlanUsageRowProps> = (
           }),
         )
       }
-      size="sm"
     />
   );
 };

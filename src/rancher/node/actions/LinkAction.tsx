@@ -1,7 +1,7 @@
 import { LinkSimple } from '@phosphor-icons/react';
 import { useSelector } from 'react-redux';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
@@ -26,7 +26,7 @@ export const LinkAction: ActionItemType = ({ resource, refetch }) => {
         resource={resource}
         extraResolve={{ refetch }}
         staff
-        iconNode={<LinkSimple />}
+        iconNode={<LinkSimple weight="bold" />}
       />
     );
   }

@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Col, Row } from 'react-bootstrap';
+import { MarketplaceProviderOfferingsListData } from 'waldur-js-client';
 
+import { count } from '@waldur/core/api';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { StatisticsCard } from '@waldur/core/StatisticsCard';
@@ -14,17 +16,16 @@ export const AdminStatistics = () => {
     async () => {
       // Order is important
       const promises = [
-        api.getCustomersCount(),
-        api.getProjectsCount(),
-        api.getUsersCount(),
-        api.getCategoriesCount(),
-        api.getProviderOfferingsCount({
-          params: { shared: 'True', state: ['Active', 'Paused'] },
-        }),
+        count(`/api/customers/`),
+        count(`/api/projects/`),
+        count(`/api/users/`),
+        count(`/api/marketplace-categories/`),
+        count(`/api/marketplace-provider-offerings/`, {
+          shared: true,
+          state: ['Active', 'Paused'],
+        } satisfies MarketplaceProviderOfferingsListData['query']),
         api.getResourcesCount({
-          params: {
-            state: ['Creating', 'OK', 'Erred', 'Updating', 'Terminating'],
-          },
+          state: ['Creating', 'OK', 'Erred', 'Updating', 'Terminating'],
         }),
       ];
       const [

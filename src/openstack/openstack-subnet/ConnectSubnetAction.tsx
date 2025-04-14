@@ -1,7 +1,7 @@
 import { PlugsConnected } from '@phosphor-icons/react';
+import { openstackSubnetsConnect } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { connectSubnet } from '@waldur/openstack/api';
 import { AsyncActionItem } from '@waldur/resource/actions/AsyncActionItem';
 import { validateState } from '@waldur/resource/actions/base';
 import { ActionItemType } from '@waldur/resource/actions/types';
@@ -9,10 +9,10 @@ import { ActionItemType } from '@waldur/resource/actions/types';
 export const ConnectSubnetAction: ActionItemType = ({ resource, refetch }) => (
   <AsyncActionItem
     title={translate('Connect subnet')}
-    apiMethod={connectSubnet}
+    apiMethod={(uuid: string) => openstackSubnetsConnect({ path: { uuid } })}
     resource={resource}
     validators={[validateState('OK')]}
     refetch={refetch}
-    iconNode={<PlugsConnected />}
+    iconNode={<PlugsConnected weight="bold" />}
   />
 );

@@ -21,6 +21,6 @@ export const CreateSubnetAction: ActionItemType = ({ resource, refetch }) => (
     modalComponent={CreateSubnetDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<PlusSquare />}
+    iconNode={<PlusSquare weight="bold" />}
   />
 );

@@ -1,10 +1,11 @@
-import { fixURL } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { BreadcrumbDropdown } from '@waldur/navigation/header/breadcrumb/BreadcrumbDropdown';
 import { useFavoritePages } from '@waldur/navigation/header/favorite-pages/FavoritePageService';
 import { SearchItem } from '@waldur/navigation/header/search/SearchItem';
 
 import { ServiceProvider } from '../types';
+
+import { getStates } from './list/OfferingStateFilter';
 
 const OfferingRow = ({
   row,
@@ -46,11 +47,18 @@ export const OfferingBreadcrumbPopover = ({
 
   return (
     <BreadcrumbDropdown
-      api={fixURL(`/marketplace-service-providers/${provider.uuid}/offerings/`)}
+      api={`/marketplace-service-providers/${provider.uuid}/offerings/`}
       queryField="name"
       params={{
         field: ['name', 'uuid', 'category_title', 'thumbnail'],
       }}
+      filters={[
+        {
+          field: 'state',
+          label: translate('Status'),
+          options: getStates(),
+        },
+      ]}
       RowComponent={({ row }) => (
         <OfferingRow
           row={row}
@@ -61,7 +69,6 @@ export const OfferingBreadcrumbPopover = ({
           close={close}
         />
       )}
-      placeholder={translate('Type in name of offering') + '...'}
       emptyMessage={translate('There are no offerings.')}
     />
   );

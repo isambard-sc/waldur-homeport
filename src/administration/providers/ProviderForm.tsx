@@ -82,5 +82,12 @@ export const ProviderForm = () => (
         label={translate('Enable post logout redirect')}
       />
     </Form.Group>
+    <Form.Group className="mb-7">
+      <Field
+        name="enable_pkce"
+        component={AwesomeCheckboxField as any}
+        label={translate('Enable PKCE')}
+      />
+    </Form.Group>
   </>
 );

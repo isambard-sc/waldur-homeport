@@ -10,8 +10,7 @@
 
   &.tooltip-auto-width {
     .tooltip-inner {
-      white-space: nowrap;
-      max-width: none;
+      max-width: inherit;
     }
   }
 

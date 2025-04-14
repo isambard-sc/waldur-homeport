@@ -74,7 +74,7 @@ export const SliderNumberField: FunctionComponent<SliderNumberFieldProps> = (
             disabled={props.disabled}
           >
             <span className="svg-icon svg-icon-2">
-              <Plus />
+              <Plus weight="bold" />
             </span>
           </Button>
           <Button

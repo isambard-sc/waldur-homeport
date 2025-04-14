@@ -1,6 +1,6 @@
 import { UIView } from '@uirouter/react';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { UserFeatures } from '@waldur/FeaturesEnums';
@@ -20,8 +20,8 @@ export const states: StateDeclaration[] = [
       title: () => UsersService.getCachedUser()?.full_name,
     },
     component: lazyComponent(() =>
-      import('./UserDetails').then((module) => ({
-        default: module.UserDetails,
+      import('./UserDetailsPage').then((module) => ({
+        default: module.UserDetailsPage,
       })),
     ),
   },
@@ -67,8 +67,10 @@ export const states: StateDeclaration[] = [
     name: 'profile.issues',
     url: 'issues/',
     component: lazyComponent(() =>
-      import('./UserIssuesList').then((module) => ({
-        default: module.UserIssuesList,
+      import(
+        '@waldur/navigation/header/quick-issue-drawer/UserIssuesTable'
+      ).then((module) => ({
+        default: module.UserIssuesTable,
       })),
     ),
     data: {
@@ -139,7 +141,7 @@ export const states: StateDeclaration[] = [
     parent: 'profile-credentials',
     data: {
       breadcrumb: () => translate('FreeIPA account'),
-      permissions: [() => ENV.plugins.WALDUR_FREEIPA?.ENABLED],
+      permissions: [() => ENV.plugins.WALDUR_CORE.FREEIPA_ENABLED],
     },
   },
   {

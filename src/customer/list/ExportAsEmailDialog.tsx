@@ -1,38 +1,37 @@
 import { PlusCircle, Trash } from '@phosphor-icons/react';
 import { DateTime } from 'luxon';
-import { Col, Form, Modal, Row } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useAsync } from 'react-use';
 import { Field, FieldArray, reduxForm } from 'redux-form';
+import {
+  invoiceSendFinancialReportByMail,
+  invoicesList,
+} from 'waldur-js-client';
 
-import { getList } from '@waldur/core/api';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { AccountingPeriodField } from '@waldur/customer/list/AccountingPeriodField';
 import { getOptions } from '@waldur/customer/list/AccountingRunningField';
-import { sendFinancialReport } from '@waldur/customer/list/api';
 import { EXPORT_AS_EMAIL_FORM_ID } from '@waldur/customer/list/constants';
 import { makeAccountingPeriods } from '@waldur/customer/list/utils';
 import { SubmitButton } from '@waldur/form';
 import { EmailField } from '@waldur/form/EmailField';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
+import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-interface Invoice {
-  year: number;
-  month: number;
-}
-
-const getInvoices = (params) => getList<Invoice>('/invoices/', params);
-
 async function oldestInvoice() {
-  const params = {
-    page_size: 1,
-    o: ['year', 'month'].join(','),
-    field: ['year', 'month'],
-  };
-  const response = await getInvoices(params);
+  const response = (
+    await invoicesList({
+      query: {
+        page_size: 1,
+        o: ['year', 'month'],
+        field: ['year', 'month'],
+      },
+    })
+  ).data;
   if (response.length === 1) {
     const invoice = response[0];
     return DateTime.fromObject({
@@ -67,30 +66,38 @@ export const ExportAsEmailDialog = reduxForm<{}, any>({
     return <>{translate('Unable to load financial overview.')}</>;
   }
 
-  const submit = (formData: any) => {
-    const payload = {
-      emails: formData.emails || [],
-      month: formData.accounting_period
-        ? formData.accounting_period.value.month || null
-        : null,
-      year: formData.accounting_period
-        ? formData.accounting_period.value.year || null
-        : null,
-    };
-
-    sendFinancialReport(payload)
-      .then(() => {
-        dispatch(showSuccess(translate('Report has been sent')));
-        dispatch(closeModalDialog());
-      })
-      .catch((error) => {
-        dispatch(showErrorResponse(error, translate('Something went wrong')));
+  const submit = async (formData: any) => {
+    try {
+      await invoiceSendFinancialReportByMail({
+        body: {
+          emails: formData.emails || [],
+          month: formData.accounting_period
+            ? formData.accounting_period.value.month || null
+            : null,
+          year: formData.accounting_period
+            ? formData.accounting_period.value.year || null
+            : null,
+        },
       });
+      dispatch(showSuccess(translate('Report has been sent')));
+      dispatch(closeModalDialog());
+    } catch (error) {
+      dispatch(showErrorResponse(error, translate('Something went wrong')));
+    }
   };
 
   return (
     <form onSubmit={handleSubmit(submit)}>
-      <Modal.Body className="p-12">
+      <ModalDialog
+        title={translate('Send report')}
+        footer={
+          <SubmitButton
+            submitting={submitting}
+            label={translate('Send report')}
+          />
+        }
+        closeButton
+      >
         <Row>
           <Col md={12} lg={8} className="d-flex flex-column">
             <div>
@@ -102,15 +109,10 @@ export const ExportAsEmailDialog = reduxForm<{}, any>({
               <AccountingPeriodField options={data.accountingPeriods} />
             </div>
 
-            <div className="mt-4">
-              <SubmitButton
-                submitting={submitting}
-                label={translate('Send report')}
-              />
-            </div>
+            <div className="mt-4" />
           </Col>
         </Row>
-      </Modal.Body>
+      </ModalDialog>
     </form>
   );
 });
@@ -146,7 +148,7 @@ const renderEmails = ({ fields }: any) => (
         <ActionButton
           title={translate('Add email')}
           action={() => fields.push()}
-          iconNode={<PlusCircle />}
+          iconNode={<PlusCircle weight="bold" />}
           variant="primary"
         />
       </Col>

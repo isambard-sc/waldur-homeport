@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import { Col, Row } from 'react-bootstrap';
 
 import { Link } from '@waldur/core/Link';
+import { Field } from '@waldur/resource/summary';
 
 interface ExpandableEventFieldProps {
   label: string;
@@ -20,10 +20,5 @@ export const ExpandableEventField: FunctionComponent<
   if (props.state) {
     value = <Link state={props.state} params={props.params} label={value} />;
   }
-  return (
-    <Row className="mb-1 field-row">
-      <Col sm={3}>{props.label}</Col>
-      <Col sm={9}>{value}</Col>
-    </Row>
-  );
+  return <Field label={props.label}>{value}</Field>;
 };

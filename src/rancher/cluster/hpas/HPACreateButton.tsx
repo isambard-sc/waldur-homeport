@@ -1,6 +1,7 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
+import { RancherCluster } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -16,16 +17,16 @@ const HPACreateDialog = lazyComponent(() =>
 const createHPADialog = (cluster) =>
   openModalDialog(HPACreateDialog, { resolve: { cluster } });
 
-export const HPACreateButton: FunctionComponent<{ cluster }> = ({
-  cluster,
-}) => {
+export const HPACreateButton: FunctionComponent<{
+  cluster: RancherCluster;
+}> = ({ cluster }) => {
   const dispatch = useDispatch();
   const callback = () => dispatch(createHPADialog(cluster));
   return (
     <ActionButton
       title={translate('Create')}
       action={callback}
-      iconNode={<PlusCircle />}
+      iconNode={<PlusCircle weight="bold" />}
     />
   );
 };

@@ -1,10 +1,10 @@
 import { Trash } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
-
 import {
-  deleteOfferingCostPolicy,
-  deleteOfferingUsagePolicy,
-} from '@waldur/customer/cost-policies/api';
+  marketplaceOfferingEstimatedCostPoliciesDestroy,
+  marketplaceOfferingUsagePoliciesDestroy,
+} from 'waldur-js-client';
+
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { showErrorResponse } from '@waldur/store/notify';
@@ -37,17 +37,20 @@ export const PolicyDeleteButton = ({
     } catch {
       return;
     }
-    const action =
-      type === 'usage'
-        ? deleteOfferingUsagePolicy(row.uuid)
-        : deleteOfferingCostPolicy(row.uuid);
-    action
-      .then(() => {
-        refetch();
-      })
-      .catch((e) => {
-        dispatch(showErrorResponse(e, translate('Unable to delete policy.')));
-      });
+    try {
+      if (type === 'usage') {
+        await marketplaceOfferingUsagePoliciesDestroy({
+          path: { uuid: row.uuid },
+        });
+      } else {
+        await marketplaceOfferingEstimatedCostPoliciesDestroy({
+          path: { uuid: row.uuid },
+        });
+      }
+      refetch();
+    } catch (e) {
+      dispatch(showErrorResponse(e, translate('Unable to delete policy.')));
+    }
   };
   return (
     <RowActionButton

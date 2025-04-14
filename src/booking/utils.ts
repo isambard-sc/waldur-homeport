@@ -3,15 +3,11 @@ import { Duration } from 'luxon';
 
 import { parseDate } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
+import { Option } from '@waldur/marketplace/common/registry';
 
 import { BookedItem, BookingProps, EventInput } from './types';
 
-interface BookingFilterStateOption {
-  value: string;
-  label: string;
-}
-
-export const getBookingFilterOptionStates = (): BookingFilterStateOption[] => [
+export const getBookingFilterOptionStates = (): Option[] => [
   { value: 'Creating', label: translate('Unconfirmed') },
   { value: 'OK', label: translate('Accepted') },
   { value: 'Terminated', label: translate('Rejected') },

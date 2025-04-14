@@ -1,7 +1,7 @@
 import { Form, Field } from 'react-final-form';
+import { userAgreementsCreate } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
-import { post } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
 import { SelectField, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -16,9 +16,11 @@ export const UserAgreementCreateDialog = ({ resolve }) => {
 
   const onSubmit = async (formValues) => {
     try {
-      await post('/user-agreements/', {
-        agreement_type: formValues.agreement_type.value,
-        content: formValues.content,
+      await userAgreementsCreate({
+        body: {
+          agreement_type: formValues.agreement_type.value,
+          content: formValues.content,
+        },
       });
       showSuccess(translate('User agreement has been created'));
       closeDialog();

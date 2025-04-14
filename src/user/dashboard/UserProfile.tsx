@@ -2,12 +2,12 @@ import { At, MapPinLine, PhoneCall, UserSquare } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
+import { User } from 'waldur-js-client';
 
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
-import { UserDetails } from '@waldur/workspace/types';
 
 import { formatUserIsActive } from '../support/utils';
 
@@ -15,7 +15,7 @@ export const UserProfile = ({
   user,
   className,
 }: {
-  user: UserDetails;
+  user: User;
   className?: string;
 }) => {
   const showStatus = useSelector(isStaffOrSupport);
@@ -50,7 +50,7 @@ export const UserProfile = ({
     >
       <Stack
         direction="horizontal"
-        className="flex-wrap text-grey-500 lh-1"
+        className="flex-wrap text-gray-500 lh-1"
         gap={5}
       >
         {user.job_title && (

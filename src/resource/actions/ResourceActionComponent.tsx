@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Dropdown } from 'react-bootstrap';
+import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
 import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
@@ -22,6 +23,7 @@ interface ResourceActionComponentProps {
   marketplaceResource?: any;
   refetch?(): void;
   labeled?: boolean;
+  drop?: DropDirection;
 }
 
 export const ResourceActionComponent: FunctionComponent<
@@ -33,6 +35,7 @@ export const ResourceActionComponent: FunctionComponent<
       labeled={props.labeled}
       onToggle={props.onToggle}
       disabled={props.disabled}
+      drop={props.drop}
     >
       {props.open ? (
         props.loading ? (

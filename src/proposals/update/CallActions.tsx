@@ -1,17 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
 import { FC, useCallback } from 'react';
 import { DropdownButton, Dropdown, Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import {
+  proposalProtectedCallsActivate,
+  proposalProtectedCallsArchive,
+} from 'waldur-js-client';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { RoleEnum } from '@waldur/permissions/enums';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { getAllCallUsers, updateCallState } from '../api';
-import { CALL_REVIEWERS_QUERY_KEY } from '../constants';
 import { Call } from '../types';
 import { getCallStateActions } from '../utils';
 
@@ -26,14 +25,7 @@ export const CallActions: FC<CallActionsProps> = ({
   refetch,
   className,
 }) => {
-  const { data: reviewers, isLoading: isLoadingReviewers } = useQuery(
-    [CALL_REVIEWERS_QUERY_KEY, call.uuid],
-    () => getAllCallUsers(call.uuid, RoleEnum.CALL_REVIEWER),
-    { staleTime: 3 * 60 * 1000 },
-  );
-
   const dispatch = useDispatch();
-  const hasReviewers = reviewers?.length > 0;
   const hasRounds = call.rounds.length > 0;
 
   const editCallState = useCallback(
@@ -46,7 +38,11 @@ export const CallActions: FC<CallActionsProps> = ({
             action: label.toLowerCase(),
           }),
         );
-        await updateCallState(state, call.uuid);
+        if (state === 'activate') {
+          proposalProtectedCallsActivate({ path: { uuid: call.uuid } });
+        } else if (state === 'archive') {
+          proposalProtectedCallsArchive({ path: { uuid: call.uuid } });
+        }
         dispatch(showSuccess(translate('Call state updated.')));
         refetch();
       } catch (er) {
@@ -61,13 +57,7 @@ export const CallActions: FC<CallActionsProps> = ({
 
   const tooltipMessage = !hasRounds
     ? translate('Call must have a round to be activated.')
-    : !hasReviewers
-      ? translate('Call must have reviewers to be activated.')
-      : null;
-
-  if (isLoadingReviewers) {
-    return <LoadingSpinner />;
-  }
+    : null;
 
   if (call.state === 'draft') {
     return (
@@ -75,8 +65,7 @@ export const CallActions: FC<CallActionsProps> = ({
         {getCallStateActions()
           .filter((state) => state.value !== call.state)
           .map((state, i) => {
-            const isDisabled =
-              state.action === 'activate' && (!hasRounds || !hasReviewers);
+            const isDisabled = state.action === 'activate' && !hasRounds;
 
             return (
               <Tip
@@ -106,7 +95,7 @@ export const CallActions: FC<CallActionsProps> = ({
           variant="primary"
           onClick={() => editCallState('activate', translate('Activate'))}
           className={className}
-          disabled={!hasRounds || !hasReviewers}
+          disabled={!hasRounds}
         >
           {translate('Activate')}
         </Button>

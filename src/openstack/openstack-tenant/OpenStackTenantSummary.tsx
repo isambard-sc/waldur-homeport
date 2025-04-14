@@ -1,7 +1,7 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 import { Badge, Col, Container, Row } from 'react-bootstrap';
 
-import { ENV } from '@waldur/configs/default';
+import { ENV } from '@waldur/core/config';
 import { ExternalLink } from '@waldur/core/ExternalLink';
 import { translate } from '@waldur/i18n';
 import openstackIcon from '@waldur/images/appstore/icon-openstack.png';

@@ -204,7 +204,7 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
         ))}
         <Button variant="light" className="text-nowrap" onClick={addRow}>
           <span className="svg-icon svg-icon-2">
-            <PlusCircle />
+            <PlusCircle weight="bold" />
           </span>
           {translate('Add time period')}
         </Button>
