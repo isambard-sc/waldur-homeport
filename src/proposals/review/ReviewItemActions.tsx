@@ -1,4 +1,4 @@
-import { ArrowBendDoubleUpLeft, FileSearch } from '@phosphor-icons/react';
+import { ArrowBendDoubleUpLeft, FileMagnifyingGlass } from '@phosphor-icons/react';
 
 import { translate } from '@waldur/i18n';
 import { ProposalReview } from '@waldur/proposals/types';
@@ -22,7 +22,7 @@ export const ReviewItemAction = ({ row, refetch }: ReviewItemActionProps) => {
       <ActionItem
         title={translate('Start review')}
         action={accept}
-        iconNode={<FileSearch weight="bold" />}
+        iconNode={<FileMagnifyingGlass weight="bold" />}
         disabled={isAccepting || isRejecting}
       />
       <ActionItem
