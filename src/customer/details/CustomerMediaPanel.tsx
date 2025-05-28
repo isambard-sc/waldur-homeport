@@ -46,7 +46,7 @@ export const CustomerMediaPanel = connect<{}, {}, CustomerEditPanelProps>(
                   alt={abbreviation}
                   initialValue={props.customer.image}
                   max={2 * 1024 * 1024} // 2MB
-                  size={65}
+                  size={64}
                   extraActions={({ isChanged, isTooLarge }) =>
                     isChanged || props.submitting ? (
                       <Button

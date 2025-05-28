@@ -17,8 +17,8 @@ import BaseWindowedSelect from 'react-windowed-select';
 import { BaseFieldProps } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
-import CheckboxIcon from '@waldur/table/Checkbox.svg';
 import CheckboxEmptyIcon from '@waldur/table/CheckboxEmpty.svg';
+import CheckboxFillIcon from '@waldur/table/CheckboxFill.svg';
 import { RemoveFilterBadgeButton } from '@waldur/table/TableFilterItem';
 import { useTheme } from '@waldur/theme/useTheme';
 
@@ -63,8 +63,13 @@ export const FilterSelectControl = ({ children, ...props }: ControlProps) => (
 export const MultiSelectOption = (props) => {
   return (
     <components.Option {...props}>
-      <span className="svg-icon svg-icon-4 svg-icon-transparent">
-        {props.isSelected ? <CheckboxIcon /> : <CheckboxEmptyIcon />}
+      <span
+        className={
+          'svg-icon svg-icon-4 ' +
+          (props.isSelected ? 'svg-icon-primary' : 'svg-icon-transparent')
+        }
+      >
+        {props.isSelected ? <CheckboxFillIcon /> : <CheckboxEmptyIcon />}
       </span>
       <label>{props.label}</label>
     </components.Option>
@@ -128,6 +133,12 @@ export const REACT_SELECT_TABLE_FILTER: Partial<SelectProps> = {
     ClearIndicator: FilterSelectClearIndicator,
   },
   ...REACT_SELECT_MENU_NO_PORTALING,
+  styles: {
+    menuList: (baseStyles) => ({
+      ...baseStyles,
+      height: '175px',
+    }),
+  },
 };
 
 export const REACT_MULTI_SELECT_TABLE_FILTER: Partial<SelectProps> = {

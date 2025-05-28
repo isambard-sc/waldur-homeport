@@ -20,6 +20,7 @@ const mockRows = [
 const defaultProps = {
   columns: mockColumns as any,
   rows: mockRows,
+  toggled: {},
   columnPositions: ['name', 'email'],
   toggleFilterMenu: vi.fn(),
 };

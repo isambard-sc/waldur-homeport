@@ -136,6 +136,7 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
     {
       title: translate('Parent offering'),
       render: ({ row }) => row.parent_offering_name || 'N/A',
+      filter: 'parent_offering',
       id: 'parent_offering',
       keys: ['parent_offering_name'],
       optional: true,
@@ -169,7 +170,7 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       render: ({ row }) => CategoryColumnField({ row, column }),
       id: `category-${column.index}`,
       keys: ['backend_metadata', `category-${column.index}`],
-      export: (row) => CategoryColumnField({ row, column }),
+      export: (row) => CategoryColumnField({ row, column, for_export: true }),
     });
   });
   columns.push({
@@ -214,6 +215,14 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
       id: 'created',
       keys: ['created'],
       export: (row) => formatDateTime(row.created),
+    },
+    {
+      title: translate('Termination date'),
+      render: ({ row }) =>
+        row.end_date ? formatDateTime(row.end_date) : 'N/A',
+      id: 'end_date',
+      keys: ['end_date'],
+      optional: !isFeatureVisible(MarketplaceFeatures.show_resource_end_date),
     },
     SLUG_COLUMN,
   );

@@ -50,6 +50,7 @@ export const CallDocumentsCard = ({ call, rowActions, tableActions }) => {
     <Table
       {...tableProps}
       columns={columns}
+      title={translate('Documents')}
       verboseName={translate('Documents')}
       tableActions={tableActions}
       rowActions={rowActions}

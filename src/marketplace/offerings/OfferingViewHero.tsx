@@ -9,7 +9,7 @@ import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
-import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
+import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 import { isDescendantOf } from '@waldur/navigation/useTabs';
@@ -143,7 +143,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
           </Nav>
         </Tab.Container>
       )}
-      <PublicDashboardHero2
+      <PublicDashboardHero
         hideQuickSection
         cardBordered
         mobileBottomActions
@@ -151,6 +151,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
         logoSize={100}
         logoAlt={offering.name}
         logoTooltip={offering.category_title}
+        logoCircle
         title={
           <>
             <div className="d-flex flex-wrap align-items-center gap-2 mb-1">
@@ -213,7 +214,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
             <td className="text-muted">{getLabel(offering.type)}</td>
           </tr>
         </Table>
-      </PublicDashboardHero2>
+      </PublicDashboardHero>
     </div>
   );
 };

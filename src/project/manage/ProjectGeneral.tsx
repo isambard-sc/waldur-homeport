@@ -26,11 +26,17 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
       },
       {
         label: translate('Start date'),
+        description: translate(
+          'Date when invitations are sent and resource orders processed.',
+        ),
         key: 'start_date',
         value: project.start_date || 'N/A',
       },
       {
         label: translate('End date'),
+        description: translate(
+          'Date when termination orders are created; project is removed if resources are already terminated.',
+        ),
         key: 'end_date',
         value: project.end_date || 'N/A',
       },
@@ -53,6 +59,7 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
             <FormTable.Item
               key={row.key}
               label={row.label}
+              description={row.description}
               value={row.value}
               actions={<FieldEditButton project={project} name={row.key} />}
             />

@@ -10,6 +10,6 @@ export interface Rule {
   description?: string;
 }
 
-export interface FormData {
+export interface SecurityGroupRulesFormData {
   rules: Rule[];
 }

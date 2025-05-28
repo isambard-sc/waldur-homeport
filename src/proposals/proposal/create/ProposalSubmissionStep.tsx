@@ -21,6 +21,7 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { ProposalSidebar } from './ProposalSidebar';
 import { createProposalSteps } from './steps';
+import { useProposalDecisionActions } from './utils';
 
 const formDataSelector = (state) =>
   (getFormValues(PROPOSAL_UPDATE_SUBMISSION_FORM_ID)(state) || {}) as any;
@@ -136,6 +137,12 @@ export const ProposalSubmissionStep: FC<{
     [proposal, proposal_uuid],
   );
 
+  const {
+    canPerformDecisionActions,
+    handleApproveProposal,
+    handleRejectProposal,
+  } = useProposalDecisionActions(proposal, refetch);
+
   const completedSteps = useMemo(() => {
     const result = stepRefs.current.map(() => false);
     stepRefs.current.forEach((_, i) => {
@@ -187,6 +194,9 @@ export const ProposalSubmissionStep: FC<{
               editable={proposal.state === 'draft'}
               submitting={formProps.submitting}
               completedSteps={completedSteps}
+              canPerformDecisionActions={canPerformDecisionActions}
+              handleApproveProposal={handleApproveProposal}
+              handleRejectProposal={handleRejectProposal}
             />
           </SidebarLayout.Sidebar>
         </SidebarLayout.Container>

@@ -1,4 +1,5 @@
 import { DotsThree, Question, WarningCircle } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash-es';
 import {
   FunctionComponent,
@@ -9,8 +10,20 @@ import {
 } from 'react';
 import { Dropdown, Nav, Tab } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { Field, getFormSyncErrors, InjectedFormProps } from 'redux-form';
+import {
+  Field,
+  formValueSelector,
+  getFormSyncErrors,
+  InjectedFormProps,
+} from 'redux-form';
+import {
+  ComponentUserUsage,
+  marketplaceComponentUserUsagesList,
+  marketplaceOfferingUsersList,
+} from 'waldur-js-client';
 
+import { parseDate } from '@waldur/core/dateUtils';
+import { LoadingErred } from '@waldur/core/LoadingErred';
 import { Tip } from '@waldur/core/Tooltip';
 import { required } from '@waldur/core/validators';
 import {
@@ -18,6 +31,7 @@ import {
   FormContainer,
   NumberField,
   SelectField,
+  StringField,
   TextField,
 } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
@@ -26,6 +40,7 @@ import { OfferingComponent } from '@waldur/marketplace/types';
 import { HeaderButtonBullet } from '@waldur/navigation/header/HeaderButtonBullet';
 import { type RootState } from '@waldur/store/reducers';
 
+import { getPeriodRange } from './api';
 import { UsageReportContext } from './types';
 import { getBillingTypeLabel } from './utils';
 
@@ -99,6 +114,81 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
     handleWindowResize();
   }, [errors]);
 
+  const isUserUsage = props.params.userUsage;
+
+  const user = useSelector((state) =>
+    formValueSelector(props.form)(state, 'user'),
+  );
+
+  const {
+    data: team,
+    isLoading: teamIsLoading,
+    error: teamError,
+    refetch: refetchTeam,
+  } = useQuery(
+    ['OfferingUsers', props.params.offering_uuid],
+    () =>
+      isUserUsage
+        ? marketplaceOfferingUsersList({
+            query: {
+              offering_uuid: props.params.offering_uuid,
+              field: ['uuid', 'url', 'user_full_name', 'username'],
+            },
+          }).then((r) => r.data)
+        : null,
+    { staleTime: 3 * 60 * 1000 },
+  );
+
+  const { data: userUsages } = useQuery(
+    ['ComponentUserUsage', props.params.resource_uuid, user?.username],
+    () => {
+      if (!isUserUsage || !user) return null;
+
+      const { start, end } = getPeriodRange(props.periods[0].value);
+      return marketplaceComponentUserUsagesList({
+        query: {
+          resource_uuid: props.params.resource_uuid,
+          ...(end
+            ? { date_after: start.toISODate(), date_before: end.toISODate() }
+            : { date_after: start.toISODate() }),
+          field: ['uuid', 'usage', 'user', 'component_type', 'modified'],
+        },
+      }).then((r) => r.data);
+    },
+  );
+
+  // Set last recorded user usages as components amount
+  useEffect(() => {
+    if (!userUsages?.length || !user) return;
+
+    props.components.forEach((component) => {
+      let recentUserRecord: ComponentUserUsage;
+      userUsages.forEach((record) => {
+        if (
+          record.user === user.url &&
+          component.type === record.component_type
+        ) {
+          if (!recentUserRecord) recentUserRecord = record;
+          else if (
+            parseDate(record.modified).toMillis() >
+            parseDate(recentUserRecord.modified).toMillis()
+          ) {
+            recentUserRecord = record;
+          }
+        }
+      });
+
+      props.change(
+        `components.${component.type}.amount`,
+        recentUserRecord?.usage ?? 0,
+      );
+    });
+  }, [userUsages, props.change, props.components, user]);
+
+  const onChangeUser = (newUser) => {
+    props.change('username', newUser?.username);
+  };
+
   return (
     <form onSubmit={props.handleSubmit(props.submitReport)}>
       <div className="text-gray-500 mb-4">
@@ -136,6 +226,36 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
           </FormContainer>
         ) : (
           <StaticPlanField />
+        )}
+      </div>
+      {/* Render User and Username for User usage report */}
+      <div className="text-gray-500 mb-4">
+        {isUserUsage && (
+          <FormContainer submitting={props.submitting}>
+            {teamError ? (
+              <LoadingErred loadData={refetchTeam} />
+            ) : (
+              <SelectField
+                name="user"
+                label={translate('User')}
+                options={team}
+                getOptionValue={(option) => option.uuid}
+                getOptionLabel={(option) => option.user_full_name}
+                onChange={onChangeUser}
+                isLoading={teamIsLoading}
+                isClearable
+                placeholder={translate('Select team member')}
+              />
+            )}
+            <StringField
+              name="username"
+              label={translate('Username')}
+              placeholder={translate('Enter username(s)')}
+              required={true}
+              validate={required}
+              readOnly={Boolean(user)}
+            />
+          </FormContainer>
         )}
       </div>
       {props.components.length > 0 && (

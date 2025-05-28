@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { InvoiceCost, invoicesList } from 'waldur-js-client';
+import {
+  ComponentsUsageStats,
+  InvoiceCost,
+  invoicesList,
+} from 'waldur-js-client';
 
 import { getLineChartOptions } from '@waldur/dashboard/chart';
 import { Scope } from '@waldur/dashboard/types';
@@ -102,4 +106,24 @@ export const useCustomerTeamChart = (customer) => {
   );
 
   return { ...chartData, isLoading, error, refetch };
+};
+
+export const filterComponentsWithUsage = (data: ComponentsUsageStats) => {
+  if (!data || !data.components || !data.components.length) {
+    return data;
+  }
+
+  const filteredComponents = data.components.filter((component) => {
+    const usageValue =
+      component.billing_type === 'limit'
+        ? component.limit_usage
+        : component.usage;
+
+    return usageValue > 0;
+  });
+
+  return {
+    ...data,
+    components: filteredComponents,
+  };
 };

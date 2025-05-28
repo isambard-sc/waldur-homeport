@@ -16,22 +16,30 @@ import { getCustomer, getProject } from '@waldur/workspace/selectors';
 interface UserRemoveButtonProps {
   row: GenericPermission;
   refetch(): void;
+  projectUuid?;
+  customerUuid?;
 }
 
 export const UserRemoveButton: React.FC<UserRemoveButtonProps> = ({
   row: permission,
   refetch,
+  projectUuid,
+  customerUuid,
 }) => {
   const dispatch = useDispatch();
   const user = useUser();
   const project = useSelector(getProject);
   const customer = useSelector(getCustomer);
 
+  const hasContext = projectUuid || customerUuid;
+  const projectId = hasContext ? projectUuid : project?.uuid;
+  const customerId = hasContext ? customerUuid : customer?.uuid;
+
   if (
     !hasPermission(user, {
       permission: PermissionEnum.DELETE_PROJECT_PERMISSION,
-      customerId: customer.uuid,
-      projectId: project.uuid,
+      customerId,
+      projectId,
     })
   ) {
     return null;

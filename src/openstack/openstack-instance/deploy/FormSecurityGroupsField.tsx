@@ -2,14 +2,13 @@ import { Eye, WarningCircle } from '@phosphor-icons/react';
 import { useCallback, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { formValueSelector } from 'redux-form';
 import { OpenStackSecurityGroup } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
+import { orderFormSelector } from '@waldur/marketplace/deploy/selectors';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
-import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
@@ -51,7 +50,7 @@ const ShowSecurityGroupsButton = (props: ShowSecurityGroupsButtonProps) => {
 
 const ShowPreviewButton = () => {
   const securityGroups = useSelector((state) =>
-    formValueSelector(ORDER_FORM_ID)(state, 'attributes.security_groups'),
+    orderFormSelector(state, 'attributes.security_groups'),
   );
   const dispatch = useDispatch();
   const callback = useCallback(() => {

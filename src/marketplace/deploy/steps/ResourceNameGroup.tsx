@@ -9,7 +9,8 @@ import { Tip } from '@waldur/core/Tooltip';
 import { getNameFieldValidators } from '@waldur/core/validators';
 import { FormGroup, StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { orderProjectSelector } from '@waldur/marketplace/details/utils';
+
+import { orderProjectSelector } from '../selectors';
 
 const ResourceNameField = (props) => {
   const project = useSelector(orderProjectSelector);

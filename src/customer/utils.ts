@@ -1,4 +1,8 @@
-import { customersRetrieve } from 'waldur-js-client';
+import {
+  customersRetrieve,
+  CustomersRetrieveData,
+  Options,
+} from 'waldur-js-client';
 
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import {
@@ -12,5 +16,11 @@ export const userHasCustomerPermission = (permission) => (state) =>
     permission,
   });
 
-export const getCustomer = (customerId: string) =>
-  customersRetrieve({ path: { uuid: customerId } }).then((r) => r.data);
+export const getCustomer = (
+  customerId: string,
+  field: Options<CustomersRetrieveData, false>['query']['field'] = null,
+) =>
+  customersRetrieve({
+    path: { uuid: customerId },
+    ...(field ? { query: { field } } : {}),
+  }).then((r) => r.data);

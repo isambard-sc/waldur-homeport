@@ -81,7 +81,11 @@ export const SummaryResourcesTable: FC<OwnProps> = ({ scope, context }) => {
   );
   const tableProps = useTable({
     table:
-      context === 'organization' ? 'OrganizationResources' : 'ProjectResources',
+      (context === 'organization'
+        ? 'OrganizationResources'
+        : 'ProjectResources') +
+      '-' +
+      scope.uuid,
     fetchData: createFetcher('marketplace-resources'),
     filter,
     mandatoryFields,

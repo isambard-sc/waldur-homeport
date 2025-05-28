@@ -15,6 +15,8 @@ import {
   getCreditChartAndOptions,
   getCostChartAndOptions,
 } from '@waldur/dashboard/utils';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { InvitationsFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -164,5 +166,10 @@ export const PROJECT_TEAM_TABLE_TABS = [
     key: 'project-invitations',
     title: translate('Invitations'),
     state: 'project-invitations',
+  },
+  isFeatureVisible(InvitationsFeatures.show_service_accounts) && {
+    key: 'project-service-accounts',
+    title: translate('Service accounts'),
+    state: 'project-service-accounts',
   },
 ];

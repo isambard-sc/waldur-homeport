@@ -51,8 +51,7 @@ export const ResourceUsageTabs: FunctionComponent<ResourceUsageTabsProps> = (
           {props.displayMode === 'table' ? (
             <ResourceUsageTable
               offeringComponent={component}
-              usages={props.usages}
-              userUsages={props.userUsages}
+              resource={props.resource}
             />
           ) : (
             <div style={{ display: 'flex', justifyContent: 'center' }}>

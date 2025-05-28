@@ -14,6 +14,7 @@ interface RowProps {
   value: string;
   description?: string;
   requiredMsg?: string | null;
+  disabled?: boolean;
   protected?: boolean;
   protectedMsg?: string;
   name: string;
@@ -52,6 +53,7 @@ export const UserEditRow = (props: RowProps) => {
       description={props.description}
       value={props.value || '—'}
       warnTooltip={props.requiredMsg}
+      disabled={props.disabled}
       actions={
         props.actions || (
           <ActionButton
@@ -59,7 +61,7 @@ export const UserEditRow = (props: RowProps) => {
             iconNode={<PencilSimple weight="bold" />}
             variant="secondary"
             className="btn-sm btn-icon"
-            disabled={props.protected}
+            disabled={props.protected || props.disabled}
             tooltip={tooltip}
             data-testid={`user-edit-row-${props.name}`}
           />

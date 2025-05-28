@@ -5,7 +5,6 @@ import {
   Resource,
 } from 'waldur-js-client';
 
-import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
@@ -42,13 +41,8 @@ export const EditResourceEndDateByStaffAction = ({
               body: { end_date },
             }),
         },
-        size: 'md',
       }),
     );
-
-  if (!ENV.plugins.WALDUR_CORE.ENABLE_RESOURCE_END_DATE) {
-    return null;
-  }
 
   return isStaff ? (
     <ActionItem

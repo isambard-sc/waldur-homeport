@@ -205,6 +205,14 @@ export const UserList: FunctionComponent = () => {
       copyField: (row) => row.full_name,
     },
     {
+      title: translate('Username'),
+      render: ({ row }) => renderFieldOrDash(row.username),
+      copyField: (row) => row.username,
+      keys: ['username'],
+      id: 'username',
+      optional: !isFeatureVisible(UserFeatures.show_username),
+    },
+    {
       title: translate('Email'),
       render: EmailField,
       orderField: 'email',
@@ -304,12 +312,6 @@ export const UserList: FunctionComponent = () => {
       export: (row) => formatDateTime(row.agreement_date),
     },
     {
-      title: translate('Username'),
-      render: ({ row }) => renderFieldOrDash(row.username),
-      keys: ['username'],
-      id: 'username',
-    },
-    {
       title: translate('UUID'),
       render: ({ row }) => <>{row.uuid}</>,
       keys: ['uuid'],
@@ -370,7 +372,9 @@ export const UserList: FunctionComponent = () => {
     : DEFAULT_ENABLED_COLUMNS;
   if (enabledColumns) {
     columns.forEach((column) => {
-      column.optional = !enabledColumns.includes(column.id);
+      if (column.id !== 'username') {
+        column.optional = !enabledColumns.includes(column.id);
+      }
     });
   }
 

@@ -10,11 +10,6 @@ import { translate } from '@waldur/i18n';
 
 import { validateIPv4 } from '../utils';
 
-export interface StaticRoute {
-  destination: string;
-  nexthop: string;
-}
-
 const validateFixedIPs = (fixedIps: string[]) => (value) => {
   if (fixedIps.includes(value)) {
     return translate('IP address is already used by router.');

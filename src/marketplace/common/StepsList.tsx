@@ -10,7 +10,7 @@ interface StepsListProps {
 }
 
 export const StepsList: FC<StepsListProps> = (props) => {
-  const steps = useMemo<ProgressStep[]>(() => {
+  const steps = useMemo((): ProgressStep[] => {
     const currentIndex = props.steps.findIndex(
       (step) => step.label === props.value.label,
     );

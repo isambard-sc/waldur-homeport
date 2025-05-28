@@ -20,13 +20,15 @@ import { pickOverview } from './utils';
 
 const formValuesSelector = getFormValues(GETTING_STARTED_FORM_ID);
 
-export const EditGettingStartedDialog = connect(
-  (_, ownProps: { resolve: EditOfferingProps }) => ({
-    initialValues: {
-      template: ownProps.resolve.offering.getting_started,
-    },
-  }),
-)(
+export const EditGettingStartedDialog = connect<
+  {},
+  {},
+  { resolve: EditOfferingProps }
+>((_, ownProps) => ({
+  initialValues: {
+    template: ownProps.resolve.offering.getting_started,
+  },
+}))(
   reduxForm<{}, { resolve: EditOfferingProps }>({
     form: GETTING_STARTED_FORM_ID,
   })((props) => {

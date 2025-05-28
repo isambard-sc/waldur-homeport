@@ -42,7 +42,7 @@ const serializeDataVolume = ({ size, ...volumeRest }) => ({
 
 const serializeNode = (cluster: RancherCluster, formData) => ({
   cluster: cluster.url,
-  roles: formData.roles.filter((role) => role),
+  role: formData.role,
   subnet: formData.attributes.subnet,
   flavor: formData.flavor.url,
   system_volume_size: formData.system_volume_size * 1024,

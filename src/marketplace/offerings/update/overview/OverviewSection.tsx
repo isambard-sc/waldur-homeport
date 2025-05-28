@@ -92,6 +92,7 @@ export const OverviewSection: FC<OfferingSectionProps> = (props) => {
       title={translate('General')}
       loading={props.loading}
       refetch={props.refetch}
+      className="card-bordered"
     >
       <FormTable>
         {attributes.map((attribute, attributeIndex) => (

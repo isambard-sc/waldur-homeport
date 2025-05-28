@@ -20,6 +20,7 @@ export const DateField: FunctionComponent<any> = (props) => {
           defaultDate: props.defaultDate,
           monthSelectorType: 'static',
           inline: props.inline,
+          allowInvalidPreload: true,
         }}
         value={
           props.input.value && typeof props.input.value === 'string'

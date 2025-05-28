@@ -77,7 +77,7 @@ export const UsageCard = ({ resource }) => {
           ) : usersFilterOptions.length > 0 ? (
             <Select
               getOptionValue={(option) => option.uuid}
-              getOptionLabel={(option) => option.full_name}
+              getOptionLabel={(option) => option.full_name || option.username}
               value={users}
               isMulti
               placeholder={translate('All users')}

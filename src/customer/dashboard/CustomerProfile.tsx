@@ -1,7 +1,7 @@
 import { At, DeviceMobile, Hexagon, Hash } from '@phosphor-icons/react';
 import { Col, Row, Stack } from 'react-bootstrap';
 
-import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
+import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
 import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
 import { ProviderOfferingPermissions } from '@waldur/marketplace/service-providers/dashboard/ProviderOfferingPermissions';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
@@ -18,7 +18,7 @@ export const CustomerProfile = ({
   customer,
   fromServiceProvider,
 }: CustomerProfileProps) => (
-  <PublicDashboardHero2
+  <PublicDashboardHero
     hideQuickSection
     logo={customer.image}
     logoAlt={getItemAbbreviation(customer)}
@@ -81,5 +81,5 @@ export const CustomerProfile = ({
         </Col>
       </Row>
     ) : null}
-  </PublicDashboardHero2>
+  </PublicDashboardHero>
 );

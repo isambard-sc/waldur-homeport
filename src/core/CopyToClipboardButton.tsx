@@ -12,6 +12,7 @@ interface OwnProps {
   size?: number;
   className?: string;
   buttonClassName?: string;
+  onlyButton?: boolean;
 }
 
 export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
@@ -19,12 +20,14 @@ export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
   className,
   buttonClassName,
   size,
+  onlyButton,
 }) => {
   const dispatch = useDispatch();
 
   const onClick = useCallback(
     (event) => {
       event.stopPropagation();
+      event.preventDefault();
       navigator.clipboard.writeText(value).then(() => {
         dispatch(showSuccess(translate('Text has been copied')));
       });
@@ -32,17 +35,26 @@ export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
     [dispatch, value],
   );
 
-  return (
-    <div className={classNames('my-1', className)}>
-      <button
-        className={classNames('text-btn', buttonClassName)}
-        type="button"
-        onClick={(e) => onClick(e)}
+  const CopyButton = () => (
+    <button
+      className={classNames('text-btn', buttonClassName)}
+      type="button"
+      onClick={(e) => onClick(e)}
+    >
+      <Tip
+        label={translate('Copy to clipboard')}
+        id={'copyToClipboard-' + value}
       >
-        <Tip label={translate('Copy to clipboard')} id="copyToClipboard">
-          <Copy weight="bold" size={size} />
-        </Tip>
-      </button>
+        <Copy weight="bold" size={size} />
+      </Tip>
+    </button>
+  );
+
+  return onlyButton ? (
+    <CopyButton />
+  ) : (
+    <div className={classNames('my-1', className)}>
+      <CopyButton />
     </div>
   );
 };

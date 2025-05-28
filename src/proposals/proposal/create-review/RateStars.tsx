@@ -19,6 +19,7 @@ export const RateStars: FC<RateStarsProps> = ({
   className,
 }) => (
   <ReactStars
+    key={`stars-${value}`}
     count={5}
     size={size}
     edit={false}

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   screen,
   render,
@@ -48,9 +49,12 @@ const mockData = {
 
 const renderDialog = (props) => {
   const store = createActionStore();
+  const queryClient = new QueryClient();
   render(
     <Provider store={store}>
-      <ResourceCreateUsageDialog {...props} />
+      <QueryClientProvider client={queryClient}>
+        <ResourceCreateUsageDialog {...props} />
+      </QueryClientProvider>
     </Provider>,
   );
 };

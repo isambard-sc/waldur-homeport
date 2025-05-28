@@ -27,6 +27,8 @@ interface TableFilterItem {
   showValueBadge?: boolean;
   hideRemoveButton?: boolean;
   onApply?({ title, name, value }): void;
+  /** Set to `false` to show "Apply" and "Cancel" buttons */
+  instantApply?: boolean;
 }
 
 const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
@@ -264,6 +266,7 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
       }
     else return value;
   },
+  instantApply = true,
   ...props
 }) => {
   const {
@@ -363,6 +366,12 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     setShown(isShown);
   }, [isShown]);
 
+  useEffect(() => {
+    if (isShown && instantApply) {
+      onApply();
+    }
+  }, [itemValue]);
+
   return (
     <div
       id={`filter-item-${props.name}`}
@@ -387,25 +396,29 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
             {shown && props.children}
           </div>
         </div>
-        <div className="separator" />
-        <div className="menu-item">
-          {shown && (
-            <div className="menu-content filter-footer pb-0">
-              <div className="d-flex gap-4">
-                <Button
-                  variant="outline"
-                  className="btn-outline-default flex-grow-1 w-50"
-                  onClick={() => MenuComponent.hideDropdowns(null)}
-                >
-                  {translate('Cancel')}
-                </Button>
-                <Button className="flex-grow-1 w-50" onClick={onApply}>
-                  {translate('Apply')}
-                </Button>
-              </div>
+        {!instantApply && (
+          <>
+            <div className="separator" />
+            <div className="menu-item">
+              {shown && (
+                <div className="menu-content filter-footer pb-0">
+                  <div className="d-flex gap-4">
+                    <Button
+                      variant="outline"
+                      className="btn-outline-default flex-grow-1 w-50"
+                      onClick={() => MenuComponent.hideDropdowns(null)}
+                    >
+                      {translate('Cancel')}
+                    </Button>
+                    <Button className="flex-grow-1 w-50" onClick={onApply}>
+                      {translate('Apply')}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

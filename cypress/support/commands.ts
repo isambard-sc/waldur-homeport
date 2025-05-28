@@ -110,7 +110,7 @@ Cypress.Commands.add('selectTheFirstOptionOfDropdown', () => {
 
 Cypress.Commands.add(
   'selectTableFilter',
-  (label, value, apply = true, type = false) => {
+  (label, value, apply = false, type = false) => {
     cy.acceptCookies();
     cy.get('.card-table button.btn-toggle-filters').should('exist').click();
     let filterType: 'select' | 'checkbox' = 'select';

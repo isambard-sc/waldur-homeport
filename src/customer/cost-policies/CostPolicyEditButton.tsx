@@ -3,7 +3,9 @@ import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   marketplaceCustomerEstimatedCostPoliciesUpdate,
+  MarketplaceCustomerEstimatedCostPoliciesUpdateData,
   marketplaceProjectEstimatedCostPoliciesUpdate,
+  MarketplaceProjectEstimatedCostPoliciesUpdateData,
 } from 'waldur-js-client';
 import { Project } from 'waldur-js-client';
 
@@ -13,7 +15,7 @@ import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { Customer } from '@waldur/workspace/types';
 
-import { CostPolicyFormData, CostPolicyType, PolicyPeriod } from './types';
+import { CostPolicyType, PolicyPeriod } from './types';
 import { getCostPolicyActionOptions } from './utils';
 
 const CostPolicyFormDialog = lazyComponent(() =>
@@ -44,7 +46,9 @@ const submit = (
             notify_external_user: formData.options?.notify_external_user,
           }
         : {};
-    const data: CostPolicyFormData = {
+    const data:
+      | MarketplaceProjectEstimatedCostPoliciesUpdateData['body']
+      | MarketplaceCustomerEstimatedCostPoliciesUpdateData['body'] = {
       scope: scope.url,
       actions: formData.actions.value,
       limit_cost: formData.limit_cost,

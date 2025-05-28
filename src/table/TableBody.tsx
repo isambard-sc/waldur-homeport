@@ -323,7 +323,7 @@ export const TableBody: FunctionComponent<TableBodyProps> = ({
                         id={`tableErrorTip-${rowIndex}`}
                         className="error-mark"
                       >
-                        <WarningCircle />
+                        <WarningCircle weight="bold" />
                       </Tip>
                     )}
                   <FormCheck

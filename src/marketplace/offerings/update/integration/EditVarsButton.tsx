@@ -8,6 +8,7 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
 import { ENVIRON_FORM_ID } from './constants';
+import { EditVarsDialogOwnProps } from './EditVarsDialog';
 
 const EditVarsDialog = lazyComponent(() =>
   import('./EditVarsDialog').then((module) => ({
@@ -15,10 +16,9 @@ const EditVarsDialog = lazyComponent(() =>
   })),
 );
 
-export const EditVarsButton: FunctionComponent<{
-  offering;
-  refetch;
-}> = ({ offering, refetch }) => {
+export const EditVarsButton: FunctionComponent<
+  EditVarsDialogOwnProps['resolve']
+> = ({ offering, refetch }) => {
   const dispatch = useDispatch();
   const callback = () => {
     dispatch(

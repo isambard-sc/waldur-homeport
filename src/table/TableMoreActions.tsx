@@ -23,6 +23,7 @@ export const TableMoreActions: FunctionComponent<TableMoreActionsProps> = ({
       <Button
         variant="active-light-primary"
         className="btn-icon btn-text-gray-500 no-arrow"
+        size="lg"
         data-kt-menu-trigger="click"
         data-kt-menu-placement="bottom-end"
         data-kt-menu-attach="parent"

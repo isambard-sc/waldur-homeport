@@ -17,8 +17,8 @@ import { useTable } from '@waldur/table/useTable';
 export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo<OpenstackServerGroupsListData['query']>(
-    () => ({
+  const filter = useMemo(
+    (): OpenstackServerGroupsListData['query'] => ({
       tenant_uuid: resourceScope.uuid,
     }),
     [resourceScope],

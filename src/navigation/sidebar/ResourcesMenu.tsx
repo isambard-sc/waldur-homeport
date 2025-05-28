@@ -118,9 +118,7 @@ export const ResourcesMenu = ({ user }) => {
   const resourcesFilters = useSelector((state: any) =>
     selectFiltersStorage(state, ALL_RESOURCES_TABLE_ID),
   );
-  const query = useMemo<
-    MarketplaceGlobalCategoriesRetrieveData['query']
-  >(() => {
+  const query = useMemo(() => {
     if (!resourcesFilters) return undefined;
     const project = resourcesFilters.find((item) => item.name === 'project');
     const organization = resourcesFilters.find(
@@ -129,7 +127,7 @@ export const ResourcesMenu = ({ user }) => {
     return {
       project_uuid: project?.value?.uuid,
       customer_uuid: organization?.value?.uuid,
-    };
+    } satisfies MarketplaceGlobalCategoriesRetrieveData['query'];
   }, [resourcesFilters]);
 
   // We will clean counters on impersonation (on change user)

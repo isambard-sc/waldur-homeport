@@ -42,7 +42,7 @@ export const AwesomeCheckboxField: FunctionComponent<
       checked={input.value}
       onChange={(e: React.ChangeEvent<any>) => input.onChange(e.target.checked)}
       data-testid={props['data-testid']}
-      disabled={props.disabled}
+      disabled={props.readOnly || props.disabled}
     />
     {(tooltip || label || help_text) && (
       <label className="form-check-label">

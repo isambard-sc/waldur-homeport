@@ -5,13 +5,18 @@ import { translate } from '@waldur/i18n';
 import { useModal } from '@waldur/modal/hooks';
 import { ActionButton } from '@waldur/table/ActionButton';
 
+import { AccessSubnetFormProps } from './AccessSubnetForm';
+
 const AccessSubnetForm = lazyComponent(() =>
   import('./AccessSubnetForm').then((module) => ({
     default: module.AccessSubnetForm,
   })),
 );
 
-export const AccessSubnetCreateButton = ({ refetch, customer_url }) => {
+export const AccessSubnetCreateButton = ({
+  refetch,
+  customer_url,
+}: AccessSubnetFormProps) => {
   const { openDialog } = useModal();
   return (
     <ActionButton
@@ -20,7 +25,7 @@ export const AccessSubnetCreateButton = ({ refetch, customer_url }) => {
         openDialog(AccessSubnetForm, {
           refetch,
           customer_url,
-          size: 'md',
+          size: 'lg',
         })
       }
       iconNode={<PlusCircle weight="bold" />}

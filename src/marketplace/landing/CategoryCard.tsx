@@ -3,6 +3,7 @@ import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
 import { CategoryGroup } from 'waldur-js-client';
 
+import Avatar from '@waldur/core/Avatar';
 import { wrapTooltip } from '@waldur/table/ActionButton';
 
 import { Category } from '../types';
@@ -19,7 +20,12 @@ export const CategoryCard: FunctionComponent<CategoryCardProps> = (props) => (
     <Card.Body>
       <div className={'category-thumb' + (!props.item.icon ? ' no-image' : '')}>
         {props.item.icon ? (
-          <img src={props.item.icon} alt="category logo" />
+          <Avatar
+            name={props.item.title}
+            src={props.item.icon}
+            circle
+            size={40}
+          />
         ) : (
           <Cube weight="bold" size={20} />
         )}

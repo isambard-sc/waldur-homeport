@@ -20,9 +20,11 @@ import { CreditUsageFilter } from './CreditUsageFilter';
 
 interface CreditUsageDialogProps {
   creditUuid: string;
+  scope: 'customer' | 'project';
   customerUuid?: string;
   projectUuid?: string;
   customerName?: string;
+  projectName?: string;
 }
 
 interface CreditUsageFilterValues {
@@ -78,8 +80,9 @@ export const CreditUsageDialog: FC<CreditUsageDialogProps> = (props) => {
     queryField: 'query',
   });
 
-  const title = translate('{customerName} credit usage history', {
-    customerName: props.customerName,
+  const title = translate('{scopeName} credit usage history', {
+    scopeName:
+      props.scope === 'customer' ? props.customerName : props.projectName,
   });
 
   useEffect(() => {

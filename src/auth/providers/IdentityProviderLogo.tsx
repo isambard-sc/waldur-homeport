@@ -45,7 +45,7 @@ const LogoMap = {
   waldur: WaldurLogo,
 };
 
-export const IdentityProviderLogo = ({ name }) => {
+export const IdentityProviderLogo = ({ name, maxHeight = undefined }) => {
   const Logo = LogoMap[name] || LogoMap.waldur;
-  return <Logo style={{ width: '100%', maxHeight: 40 }} />;
+  return <Logo style={{ width: '100%', maxHeight }} />;
 };

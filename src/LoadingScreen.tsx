@@ -37,6 +37,7 @@ export const LoadingScreen: FunctionComponent<{
 
                 {show && (
                   <Modal show={show} onHide={() => setShow(false)}>
+                    {/* @ts-ignore */}
                     <ErrorTraceDialog error={error} />
                   </Modal>
                 )}

@@ -163,16 +163,19 @@ const getTabs = (offering: Offering): PageBarTab[] => {
     {
       title: translate('Policy'),
       key: 'policy',
+      defaultKey: 'cost-policy',
       children: [
         {
           key: 'cost-policy',
           title: translate('Cost policy'),
           component: OfferingCostPolicies,
+          visible: false,
         },
         {
           key: 'usage-policy',
           title: translate('Usage policy'),
           component: OfferingUsagePolicies,
+          visible: false,
         },
       ],
     },

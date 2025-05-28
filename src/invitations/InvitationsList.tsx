@@ -5,6 +5,7 @@ import { getFormValues } from 'redux-form';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { CustomerPermissionsLogButton } from '@waldur/customer/team/CustomerPermissionsLogButton';
+import { useTeamTableTabs } from '@waldur/customer/team/tabs';
 import { TeamDropdownActions } from '@waldur/customer/team/TeamDropdownActions';
 import { translate } from '@waldur/i18n';
 import { InvitationExpandableRow } from '@waldur/invitations/InvitationExpandableRow';
@@ -20,7 +21,6 @@ import { InvitationActions } from './InvitationActions';
 import { InvitationsFilter } from './InvitationsFilter';
 import { InvitationsMultiSelectActions } from './InvitationsMultiSelectActions';
 import { formatInvitationState } from './InvitationStateFilter';
-import { useTeamTableTabs } from './tabs';
 
 export const InvitationsList: FunctionComponent = () => {
   useTitle(translate('Invitations'));

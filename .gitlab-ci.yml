@@ -107,11 +107,10 @@ Run unit tests:
   coverage: /All\sfiles.*?\s+(\d+.\d+)/
   artifacts:
     when: always
+    paths:
+      - junit.xml
     reports:
       junit: junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage/cobertura-coverage.xml
 
 Run E2E tests:
   image:

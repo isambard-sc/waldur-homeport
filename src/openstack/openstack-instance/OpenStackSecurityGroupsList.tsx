@@ -21,10 +21,10 @@ export const OpenStackSecurityGroupsList: FunctionComponent<OwnProps> = (
   props,
 ) => {
   return (
-    <Card className="card card-table full-width card-bordered">
+    <Card className="card card-table card-bordered">
       <Card.Header>
         <Card.Title>
-          {translate('Security groups details')}
+          <span className="me-2">{translate('Security groups details')}</span>
           <RefreshButton refetch={props.refetch} loading={props.isLoading} />
         </Card.Title>
         <div className="card-toolbar">

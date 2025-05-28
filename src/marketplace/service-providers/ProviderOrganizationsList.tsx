@@ -47,7 +47,11 @@ const ProviderOrganizationsListComponent = ({ provider }) => {
   ];
   const ExpandableRow = useCallback(
     ({ row }) => (
-      <OrganizationProjectsExpandable row={row} provider_uuid={provider.uuid} />
+      <OrganizationProjectsExpandable
+        row={row}
+        provider_uuid={provider.uuid}
+        provider_customer_uuid={provider.customer_uuid}
+      />
     ),
     [provider],
   );

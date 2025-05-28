@@ -54,7 +54,7 @@ export const TablePagination: FunctionComponent<TablePaginationProps> = (
             {props.hasRows && props.resultCount > props.pageSize && (
               <Pagination
                 totalPages={totalPages}
-                currentPage={props.currentPage}
+                currentPage={Math.min(props.currentPage, totalPages)}
                 onChange={props.gotoPage}
                 hideFirstAndLastPageLinks
                 hidePreviousAndNextPageLinks

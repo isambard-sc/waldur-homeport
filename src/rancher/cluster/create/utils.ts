@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { formValueSelector } from 'redux-form';
 import {
   marketplacePublicOfferingsRetrieve,
   OpenStackFlavor,
@@ -12,7 +11,7 @@ import {
 import { getAllPages } from '@waldur/core/api';
 import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
-import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
+import { orderFormSelector } from '@waldur/marketplace/deploy/selectors';
 import {
   loadFlavors,
   loadSecurityGroups,
@@ -125,7 +124,7 @@ export const getDataVolumes = (nodeIndex, allValues) => {
 };
 
 export const formTenantSelector = (state: RootState) =>
-  formValueSelector(ORDER_FORM_ID)(state, 'attributes.tenant');
+  orderFormSelector(state, 'attributes.tenant');
 
 export const formNodesSelector = (state: RootState): NodeField[] =>
-  formValueSelector(ORDER_FORM_ID)(state, 'attributes.nodes');
+  orderFormSelector(state, 'attributes.nodes');

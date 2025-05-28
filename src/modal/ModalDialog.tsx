@@ -15,9 +15,14 @@ interface ModalDialogProps {
   bodyClassName?: string;
   headerClassName?: string;
   footerClassName?: string;
+  hasFooterPadding?: boolean;
   children?: ReactNode;
   headerLess?: boolean;
   actions?: ReactNode;
+  /** Extra node will be placed between header and body of the modal */
+  extra?: ReactNode;
+  extraClassName?: string;
+  onHide?(): void;
 }
 
 export const ModalDialog: FC<ModalDialogProps> = ({
@@ -32,13 +37,18 @@ export const ModalDialog: FC<ModalDialogProps> = ({
   bodyClassName,
   headerClassName,
   footerClassName,
+  hasFooterPadding,
   headerLess,
   actions,
+  extra,
+  extraClassName,
+  onHide,
 }) => (
   <div className={className}>
     {!headerLess && (
       <Modal.Header
         closeButton={closeButton}
+        onHide={onHide}
         className={classNames(
           headerClassName,
           'without-border pb-0',
@@ -63,10 +73,15 @@ export const ModalDialog: FC<ModalDialogProps> = ({
           )}
           <Modal.Title className="fw-bold">{title}</Modal.Title>
           {subtitle && (
-            <h6 className="text-gray-500 fw-normal mt-2">{subtitle}</h6>
+            <h6 className="text-gray-500 fw-normal mt-2 lh-base">{subtitle}</h6>
           )}
         </div>
         {actions}
+      </Modal.Header>
+    )}
+    {Boolean(extra) && (
+      <Modal.Header className={classNames('without-border', extraClassName)}>
+        {extra}
       </Modal.Header>
     )}
     <Modal.Body className={classNames(bodyClassName, 'border-0')}>
@@ -74,7 +89,11 @@ export const ModalDialog: FC<ModalDialogProps> = ({
     </Modal.Body>
     {footer && (
       <Modal.Footer
-        className={classNames(footerClassName, 'border-0 pt-0 gap-2')}
+        className={classNames(
+          footerClassName,
+          !hasFooterPadding && 'pt-0',
+          'border-0 gap-2',
+        )}
       >
         {footer}
       </Modal.Footer>

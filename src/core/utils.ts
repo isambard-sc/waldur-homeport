@@ -1,5 +1,4 @@
 import { ENV } from '@waldur/core/config';
-import { translate } from '@waldur/i18n';
 import { PhoneNumber } from '@waldur/workspace/types';
 
 export function wait(amount = 0) {
@@ -67,9 +66,6 @@ export const formatPhoneNumber = (phoneNumber: PhoneNumber) => {
   if (typeof phoneNumber === 'string') return phoneNumber;
   return phoneNumber.country_code + '-' + phoneNumber.national_number;
 };
-
-export const formatYesNo = (value) =>
-  value === true ? translate('Yes') : translate('No');
 
 export const listToDict = (key, value) => (list) => {
   const dict = {};

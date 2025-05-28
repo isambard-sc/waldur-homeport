@@ -19,6 +19,7 @@ import { useOfferingAccountingTableTabs } from '../utils';
 
 import { AddPlanButton } from './AddPlanButton';
 import { PlanActions } from './PlanActions';
+import { PlanExpandableRow } from './PlanExpandableRow';
 
 export const PlansSection: FC<OfferingSectionProps> = (props) => {
   const user = useSelector(getUser);
@@ -103,6 +104,9 @@ export const PlansSection: FC<OfferingSectionProps> = (props) => {
           refetch={tableProps.fetch}
           user={user}
         />
+      )}
+      expandableRow={({ row }) => (
+        <PlanExpandableRow row={row} components={props.offering.components} />
       )}
     />
   );

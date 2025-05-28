@@ -4,8 +4,7 @@ import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 import { MarketplaceCategoriesListData } from 'waldur-js-client';
 
-import { Image } from '@waldur/core/Image';
-import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
+import Avatar from '@waldur/core/Avatar';
 import { Link } from '@waldur/core/Link';
 import { truncate } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -49,11 +48,7 @@ export const AdminCategoriesPage: FunctionComponent = () => {
           render: ({ row }) => (
             <>
               <div className="d-inline-block align-middle me-2">
-                {row.icon ? (
-                  <Image src={row.icon} size={30} isContain />
-                ) : (
-                  <ImagePlaceholder width="30px" height="30px" />
-                )}
+                <Avatar name={row.title} src={row.icon} circle />
               </div>
               <CategoryLink item={row}>{row.title}</CategoryLink>
             </>

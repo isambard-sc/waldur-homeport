@@ -7,6 +7,7 @@ import { format } from '@waldur/core/ErrorMessageFormatter';
 import { required } from '@waldur/core/validators';
 import { SubmitButton } from '@waldur/form';
 import { Select } from '@waldur/form/AsyncSelectField';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
 import { organizationAutocomplete } from '@waldur/marketplace/common/autocompletes';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
@@ -25,7 +26,8 @@ export const MoveProjectDialog: FunctionComponent<{
         await projectsMoveProject({
           path: { uuid: project.uuid },
           body: {
-            customer: formData.organization.organization.url,
+            customer: formData.organization.url,
+            preserve_permissions: formData.preserve_permissions,
           },
         });
         dispatch(
@@ -52,6 +54,7 @@ export const MoveProjectDialog: FunctionComponent<{
   return (
     <Form
       onSubmit={onSubmit}
+      initialValues={{ preserve_permissions: false }}
       render={({ handleSubmit, submitting, invalid }) => (
         <form onSubmit={handleSubmit}>
           <ModalDialog
@@ -85,6 +88,16 @@ export const MoveProjectDialog: FunctionComponent<{
                 getOptionValue={(option) => option.url}
                 noOptionsMessage={() => translate('No organizations')}
                 isDisabled={submitting}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Field
+                component={AwesomeCheckboxField as any}
+                name="preserve_permissions"
+                label={translate('Preserve project permissions')}
+                description={translate(
+                  'Keep existing project permissions when moving to a new organization',
+                )}
               />
             </FormGroup>
           </ModalDialog>

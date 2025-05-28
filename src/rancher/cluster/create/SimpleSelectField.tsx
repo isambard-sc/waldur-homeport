@@ -1,11 +1,11 @@
 import { FunctionComponent } from 'react';
 
 import { FieldError } from '@waldur/form';
-import { SelectControl } from '@waldur/form/SelectControl';
+import { Select } from '@waldur/form/themed-select';
 
 export const SimpleSelectField: FunctionComponent<any> = (props) => (
   <>
-    <SelectControl
+    <Select
       value={props.options.filter(({ value }) => value === props.input.value)}
       onChange={({ value }) => props.input.onChange(value)}
       options={props.options}

@@ -17,8 +17,8 @@ import { translate } from '@waldur/i18n';
 import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { getProject } from '@waldur/workspace/selectors';
 
+import { orderProjectSelector } from '../selectors';
 import { FormStepProps } from '../types';
-import { formProjectSelector } from '../utils';
 
 import { BoxRadioField } from './BoxRadioField';
 import { StepCardTabs, TabSpec } from './StepCardTabs';
@@ -60,7 +60,7 @@ export const FormCloudStep = (props: FormStepProps) => {
 
   const initialOffering = useRef(props.offering);
   const initialProjectUuid = useRef(currentProject?.uuid);
-  const project = useSelector(formProjectSelector);
+  const project = useSelector(orderProjectSelector);
 
   const context = useInfiniteQuery<any, any, DataPage>(
     ['deploy-offerings', project?.uuid, props.params?.type],

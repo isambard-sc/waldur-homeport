@@ -48,7 +48,7 @@ export const CatalogDeleteButton: FunctionComponent<{ catalog; refetch }> = ({
     <RowActionButton
       title={translate('Delete')}
       action={callback}
-      iconNode={<Trash />}
+      iconNode={<Trash weight="bold" />}
       size="sm"
       pending={removing}
     />

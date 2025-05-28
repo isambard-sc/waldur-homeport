@@ -16,7 +16,7 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
-import { MarkdownField } from '@waldur/form/MarkdownField';
+import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -138,7 +138,7 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
             />
           }
         >
-          <FormContainer submitting={props.submitting}>
+          <FormContainer submitting={props.submitting} className="size-lg">
             <StringField
               label={translate('Name')}
               name="name"
@@ -146,11 +146,12 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
               validate={required}
             />
             {isEdit && (
-              <MarkdownField
-                label={translate('Description')}
+              <MarkdownEditor
                 name="description"
-                required={false}
-                verticalLayout
+                required
+                autoFocus
+                hideLabel
+                spaceless
               />
             )}
             {isEdit && isFeatureVisible(MarketplaceFeatures.call_only) && (

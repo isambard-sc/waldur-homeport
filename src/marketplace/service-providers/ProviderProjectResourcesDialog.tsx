@@ -9,7 +9,7 @@ import { ProviderProjectResourcesList } from './ProviderProjectResourcesList';
 interface ProviderProjectResourcesDialogProps {
   resolve: {
     project_uuid;
-    provider_uuid;
+    provider_customer_uuid;
   };
 }
 

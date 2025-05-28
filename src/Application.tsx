@@ -14,6 +14,7 @@ import { ErrorMessage } from './ErrorMessage';
 import { LoadingScreen } from './LoadingScreen';
 import { LayoutProvider } from './metronic/layout/core';
 import { MasterInit } from './metronic/layout/MasterInit';
+import { ConfirmModalRoot } from './modal/ConfirmModalRoot';
 import { NotificationContainer } from './NotificationContainer';
 import { router } from './router';
 import { states } from './states';
@@ -48,6 +49,7 @@ export const Application: FunctionComponent = () => {
               <ThemeProvider>
                 <NotificationContainer />
                 <ModalRoot />
+                <ConfirmModalRoot />
                 <DrawerRoot />
                 <UIView />
                 <MasterInit />

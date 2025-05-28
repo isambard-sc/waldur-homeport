@@ -50,11 +50,7 @@ const CategoryListItem: FunctionComponent<
             <img src={item.icon} alt="category" />
           </div>
         ) : (
-          <ImagePlaceholder
-            width="40px"
-            height="40px"
-            backgroundColor="#e2e2e2"
-          />
+          <ImagePlaceholder width="40px" height="40px" />
         )}
         <h5 className="title lh-1 mb-0">{truncate(item.title)}</h5>
         {item.offering_count > 0 && (

@@ -91,9 +91,5 @@ const FieldsListGroup = ({ fields }: BaseFieldArrayProps<any>) => {
 };
 
 export const OpenStackExternalIpsField = () => (
-  <FieldArray
-    name="secret_options.ipv4_external_ip_mapping"
-    component={FieldsListGroup}
-    rerenderOnEveryChange
-  />
+  <FieldArray name="value" component={FieldsListGroup} rerenderOnEveryChange />
 );

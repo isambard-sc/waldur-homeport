@@ -14,6 +14,8 @@ import { Badge } from '@waldur/core/Badge';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { BackendIdTip } from '@waldur/core/Tooltip';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ExpandableResourceSummary } from '@waldur/marketplace/resources/list/ExpandableResourceSummary';
 import { ResourceMultiSelectAction } from '@waldur/marketplace/resources/mass-actions/ResourceMultiSelectAction';
@@ -246,6 +248,17 @@ const TableComponent: FunctionComponent<any> = (props) => {
       keys: ['created'],
     },
     {
+      title: translate('Termination date'),
+      render: ({ row }) =>
+        row.end_date ? formatDateTime(row.end_date) : 'N/A',
+      orderField: 'end_date',
+      id: 'end_date',
+      keys: ['end_date'],
+      optional: !isFeatureVisible(MarketplaceFeatures.show_resource_end_date),
+      export: (row) => row.end_date,
+      exportKeys: ['end_date'],
+    },
+    {
       title: translate('State'),
       render: ({ row }) => <ResourceStateField resource={row} outline pill />,
       filter: 'state',
@@ -351,6 +364,7 @@ const mandatoryFields: MarketplaceProviderResourcesListData['query']['field'] =
     'slug', // SetSlugAction
     'end_date', // EditResourceEndDateByProviderAction, EditResourceEndDateByStaffAction
     'resource_type', // TerminateAction
+    'end_date',
   ];
 
 export const ProviderResourcesList: React.ComponentType<any> = () => {

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 import { User } from 'waldur-js-client';
 
 import { StateIndicator } from '@waldur/core/StateIndicator';
-import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
+import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
 
@@ -24,7 +24,7 @@ export const UserProfile = ({
     [user],
   );
   return (
-    <PublicDashboardHero2
+    <PublicDashboardHero
       hideQuickSection
       logo={user.image}
       logoAlt={abbreviation}
@@ -78,6 +78,6 @@ export const UserProfile = ({
           </span>
         )}
       </Stack>
-    </PublicDashboardHero2>
+    </PublicDashboardHero>
   );
 };

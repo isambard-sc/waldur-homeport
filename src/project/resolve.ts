@@ -20,7 +20,22 @@ export function loadProject(transition: Transition) {
       const project = await projectsRetrieve({
         path: { uuid: transition.params().uuid },
       });
-      const customer = await getCustomer(project.data.customer_uuid);
+      const customer = await getCustomer(project.data.customer_uuid, [
+        'url',
+        'uuid',
+        'created',
+        'display_name',
+        'image',
+        'blocked',
+        'archived',
+        'projects_count',
+        'users_count',
+        'name',
+        'native_name',
+        'abbreviation',
+        'customer_credit',
+        'is_service_provider',
+      ]);
       store.dispatch(setCurrentCustomer(customer));
       store.dispatch(setCurrentProject(project.data as unknown as Project));
     } catch (error) {

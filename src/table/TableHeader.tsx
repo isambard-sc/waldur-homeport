@@ -1,6 +1,7 @@
+import { CaretDown } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { FC, useEffect, useMemo, useRef } from 'react';
-import { FormCheck } from 'react-bootstrap';
+import { FC, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Button, FormCheck } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
 
@@ -9,6 +10,7 @@ import './TableHeader.scss';
 import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableFiltersMenu } from './TableFiltersMenu';
 import { TableProps, Column, Sorting, PinnedColumns } from './types';
+import { getId } from './utils';
 
 interface TableHeaderProps {
   columns: Column[];
@@ -20,6 +22,8 @@ interface TableHeaderProps {
   enableMultiSelect?: boolean;
   onSelectAllRows?(rows: any[]): void;
   selectedRows?: any[];
+  toggled?: TableProps['toggled'];
+  toggleRow?: TableProps['toggleRow'];
   fieldType?: TableProps['fieldType'];
   activeColumns?: Record<string, boolean>;
   filters?: TableProps['filters'];
@@ -145,6 +149,8 @@ export const TableHeader: FC<TableHeaderProps> = ({
   enableMultiSelect,
   onSelectAllRows,
   selectedRows,
+  toggled,
+  toggleRow,
   fieldType,
   filters,
   filtersStorage,
@@ -173,6 +179,25 @@ export const TableHeader: FC<TableHeaderProps> = ({
     }
   }, [refCheck?.current, isAllSelected, selectedRows]);
 
+  const toggledAll = useMemo(() => {
+    if (!expandableRow) return false;
+    const toggledRows = Object.values(toggled);
+    return toggledRows.length === rows.length && toggledRows.every(Boolean);
+  }, [toggled, rows]);
+
+  const toggleAll = useCallback(() => {
+    if (toggledAll) {
+      rows.forEach((row, i) => {
+        toggleRow(getId(row, i));
+      });
+    } else {
+      rows.forEach((row, i) => {
+        const rowId = getId(row, i);
+        if (!toggled[rowId]) toggleRow(rowId);
+      });
+    }
+  }, [rows, toggledAll, toggled, toggleRow]);
+
   return (
     <thead>
       <tr className="text-start text-muted fw-bolder fs-7 gs-0 align-middle">
@@ -189,7 +214,17 @@ export const TableHeader: FC<TableHeaderProps> = ({
             />
           </th>
         ) : null}
-        {expandableRow && <th style={{ width: '10px' }} />}
+        {expandableRow && (
+          <th data-testid="all-rows-expander" style={{ width: '10px' }}>
+            <Button
+              variant="flush"
+              className={classNames('btn-no-focus', toggledAll ? 'active' : '')}
+              onClick={toggleAll}
+            >
+              <CaretDown size={20} weight="bold" className="rotate-180" />
+            </Button>
+          </th>
+        )}
         {hasOptionalColumns
           ? columnPositions
               .filter((id) => columnMap[id])

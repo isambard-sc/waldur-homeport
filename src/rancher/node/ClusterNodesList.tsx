@@ -9,15 +9,16 @@ import { ResourceState } from '@waldur/resource/state/ResourceState';
 import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
+import { TableWithPortal } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { CreateNodeAction } from '../cluster/actions/CreateNodeAction';
 
 import { NodeRoleField } from './NodeRoleField';
 
-export const ClusterNodesList: FunctionComponent<{
-  resourceScope: RancherCluster;
-}> = ({ resourceScope }) => {
+export const ClusterNodesList: FunctionComponent<
+  TableWithPortal<{ resourceScope: RancherCluster }>
+> = ({ resourceScope, portal }) => {
   const filter = useMemo(
     () => ({
       cluster_uuid: resourceScope.uuid,
@@ -29,6 +30,7 @@ export const ClusterNodesList: FunctionComponent<{
     fetchData: createFetcher('rancher-nodes'),
     filter,
   });
+
   return (
     <Table<RancherNode>
       {...props}
@@ -66,11 +68,16 @@ export const ClusterNodesList: FunctionComponent<{
         },
       ]}
       verboseName={translate('Kubernetes nodes')}
+      showPageSizeSelector
       tableActions={<CreateNodeAction resource={resourceScope} />}
       rowActions={({ row }) => (
         <ActionButtonResource url={row.url} refetch={props.fetch} />
       )}
       expandableRow={({ row }) => <ResourceSummary resource={row} />}
+      portal={portal}
+      hasActionBar={false}
+      cardBordered={false}
+      fullWidth
     />
   );
 };

@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
+import { KeysListData } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
@@ -15,7 +16,7 @@ import { keysListTable } from '@waldur/user/keys/constants';
 import { getUser } from '@waldur/workspace/selectors';
 
 const filtersSelector = createSelector(getUser, (user) => {
-  const result: Record<string, any> = {};
+  const result: KeysListData['query'] = {};
   if (user) {
     result.user_uuid = user.uuid;
   }

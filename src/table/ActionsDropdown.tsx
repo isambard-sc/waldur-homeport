@@ -18,6 +18,7 @@ interface ActionsDropdownProps {
   actions?: DropdownActionItemType[];
   row?: any;
   refetch?(): void;
+  data?: Record<string, any>;
 }
 
 interface TableDropdownToggleProps {
@@ -26,6 +27,7 @@ interface TableDropdownToggleProps {
   labeled?: boolean;
   variant?: Variant;
   className?: string;
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export const TableDropdownToggle = ({
@@ -34,11 +36,12 @@ export const TableDropdownToggle = ({
   labeled = false,
   variant = 'outline btn-outline-default',
   className = 'min-w-100px w-100',
+  size = 'sm',
 }: TableDropdownToggleProps) => {
   return labeled ? (
     <Dropdown.Toggle
       variant={variant}
-      size="sm"
+      size={size === 'md' ? undefined : size}
       className={className + ' btn-icon-right no-arrow'}
       disabled={disabled}
     >
@@ -52,7 +55,7 @@ export const TableDropdownToggle = ({
       variant="active-light"
       className="btn-icon no-arrow"
       disabled={disabled}
-      size="sm"
+      size={size === 'md' ? undefined : size}
     >
       <DotsThreeVertical size={22} weight="bold" />
     </Dropdown.Toggle>
@@ -64,7 +67,9 @@ const PortalDropdown = ({ children }) => {
 };
 
 export const ActionsDropdownComponent: FunctionComponent<
-  PropsWithChildren<DropdownProps & TableDropdownToggleProps>
+  PropsWithChildren<DropdownProps & TableDropdownToggleProps> & {
+    menuStyle?: React.CSSProperties;
+  }
 > = ({
   onToggle,
   disabled,
@@ -73,6 +78,8 @@ export const ActionsDropdownComponent: FunctionComponent<
   labeled,
   variant,
   className,
+  menuStyle,
+  size,
   ...rest
 }) => (
   <Dropdown onToggle={onToggle} drop="start" align="end" {...rest}>
@@ -82,6 +89,7 @@ export const ActionsDropdownComponent: FunctionComponent<
       disabled={disabled}
       variant={variant}
       className={className}
+      size={size}
     />
     <PortalDropdown>
       <Dropdown.Menu
@@ -99,6 +107,7 @@ export const ActionsDropdownComponent: FunctionComponent<
                 ],
               }
         }
+        style={menuStyle}
       >
         {children}
       </Dropdown.Menu>
@@ -116,6 +125,7 @@ export const ActionsDropdown: FunctionComponent<
   children,
   row,
   refetch,
+  data = {},
   ...rest
 }) => (
   <ActionsDropdownComponent {...rest}>
@@ -134,7 +144,12 @@ export const ActionsDropdown: FunctionComponent<
       ) : actions ? (
         <>
           {actions.map((ActionComponent, index) => (
-            <ActionComponent key={index} row={row} refetch={refetch} />
+            <ActionComponent
+              key={index}
+              row={row}
+              refetch={refetch}
+              {...data}
+            />
           ))}
         </>
       ) : (

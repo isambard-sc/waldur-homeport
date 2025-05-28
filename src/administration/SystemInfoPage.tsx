@@ -7,7 +7,7 @@ import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 
 const DatabaseStats = ({ data }: { data: TableSize[] }) => (
-  <Card className="card-bordered card-table full-width">
+  <Card className="card-bordered card-table">
     <Card.Header>
       <Card.Title>{translate('Top 10 largest database tables')}</Card.Title>
     </Card.Header>

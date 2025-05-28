@@ -24,8 +24,8 @@ export const BackendHealthStatusDialog: FunctionComponent = () => {
           <RefreshButton refetch={reFetch} loading={loading} />
         </>
       }
-      className="card card-table full-width"
-      bodyClassName="card-body pb-0 min-h-275px"
+      className="card card-table"
+      bodyClassName="card-body pb-0 min-h-275px pt-4"
       footerClassName="border-0"
       footer={<CloseDialogButton label={translate('Done')} />}
     >

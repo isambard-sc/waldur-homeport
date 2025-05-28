@@ -4,8 +4,7 @@ import { Fragment, useCallback } from 'react';
 import { Button, Form, FormCheck } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { arrayPush, arrayRemoveAll, Field, FieldArray } from 'redux-form';
-import { rancherClusterTemplatesList } from 'waldur-js-client';
-import { OpenStackFlavor } from 'waldur-js-client';
+import { OpenStackFlavor, rancherClusterTemplatesList } from 'waldur-js-client';
 
 import { getAllPages } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
@@ -13,13 +12,17 @@ import { FormGroup, SelectField, StringField } from '@waldur/form';
 import { BoxNumberField } from '@waldur/form/BoxNumberField';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
+import {
+  formatIntField,
+  parseIntField,
+} from '@waldur/marketplace/common/utils';
 import { StepCardPlaceholder } from '@waldur/marketplace/deploy/steps/StepCardPlaceholder';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
 import { waitForConfirmation } from '@waldur/modal/actions';
 
 import { NODES_FIELD_ARRAY } from './constants';
-import { LonghornWorkerWarning } from './LonghornWorkerWarning';
+import { RANCHER_NODE_ROLES } from './RANCHER_NODE_ROLES';
 import {
   filterFlavors,
   formTenantSelector,
@@ -27,12 +30,6 @@ import {
 } from './utils';
 
 import './FormNodesStep.scss';
-
-const nodeRoles = [
-  { name: 'etcd', label: translate('etcd') },
-  { name: 'controlplane', label: translate('Control plane') },
-  { name: 'worker', label: translate('Worker') },
-];
 
 const filterFlavor = (node, flavor) => {
   if (node.min_ram) {
@@ -124,6 +121,8 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                             required={true}
                             min={1}
                             max={100}
+                            parse={parseIntField}
+                            format={formatIntField}
                           />
                         </td>
                         <td>
@@ -141,7 +140,7 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                             name={`${node}.roles`}
                             groupName={`${node}.roles`}
                             component={CheckboxGroup}
-                            options={nodeRoles}
+                            options={RANCHER_NODE_ROLES}
                             groupClassName="d-flex justify-content-around node-roles"
                             validate={required}
                           />
@@ -158,13 +157,6 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                           </Button>
                         </td>
                       </tr>
-                      {typeof index === 'number' ? (
-                        <tr>
-                          <td colSpan={7}>
-                            <LonghornWorkerWarning nodeIndex={index} />
-                          </td>
-                        </tr>
-                      ) : null}
                     </Fragment>
                   );
                 })}

@@ -16,6 +16,7 @@ const UserEmailChangeDialog = lazyComponent(() =>
 interface ChangeEmailButtonProps {
   user: User;
   protected?: boolean;
+  disabled?: boolean;
 }
 
 export const ChangeEmailButton: FunctionComponent<ChangeEmailButtonProps> = (
@@ -36,6 +37,7 @@ export const ChangeEmailButton: FunctionComponent<ChangeEmailButtonProps> = (
       action={openChangeEmailDialog}
       variant="secondary"
       className="btn-sm btn-icon"
+      disabled={props.disabled}
     />
   );
 };

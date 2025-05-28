@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
 import { FormLabel } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { Field } from 'redux-form';
 import { openstackImagesList } from 'waldur-js-client';
 
@@ -16,9 +15,6 @@ import { translate } from '@waldur/i18n';
 import { BoxRadioField } from '@waldur/marketplace/deploy/steps/BoxRadioField';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { generateSystemImageChoices } from '@waldur/marketplace/deploy/utils';
-import { flavorValidator } from '@waldur/openstack/openstack-instance/utils';
-
-import { formFlavorSelector } from './utils';
 
 export const FormImageStep = (props: FormStepProps) => {
   const [query, setQuery] = useState('');
@@ -48,16 +44,6 @@ export const FormImageStep = (props: FormStepProps) => {
   );
 
   const choices = useMemo(() => generateSystemImageChoices(data), [data]);
-
-  const flavor = useSelector(formFlavorSelector);
-  const onChangeImage = useCallback(
-    (value) => {
-      if (flavor && flavorValidator({ image: value }, flavor)) {
-        props.change('attributes.flavor', undefined);
-      }
-    },
-    [flavor, props.change],
-  );
 
   return (
     <VStepperFormStepCard
@@ -94,7 +80,6 @@ export const FormImageStep = (props: FormStepProps) => {
           choices={choices}
           vertical
           required
-          onChange={onChangeImage}
         />
       )}
     </VStepperFormStepCard>

@@ -76,11 +76,7 @@ const OfferingListItem: FunctionComponent<{
             </div>
           ) : (
             <div className="symbol">
-              <ImagePlaceholder
-                width="40px"
-                height="40px"
-                backgroundColor="#e2e2e2"
-              >
+              <ImagePlaceholder width="40px" height="40px">
                 {abbreviation && (
                   <div className="symbol-label fs-6 fw-bold">
                     {abbreviation}

@@ -11,13 +11,14 @@ import { ResourceStateField } from '../resources/list/ResourceStateField';
 
 export const ProviderProjectResourcesList: FunctionComponent<{
   project_uuid;
-  provider_uuid;
+  provider_customer_uuid;
 }> = (ownProps) => {
   const filter = useMemo(
     () => ({
       project_uuid: ownProps.project_uuid,
-      provider_uuid: ownProps.provider_uuid,
+      provider_uuid: ownProps.provider_customer_uuid,
       state: ['OK', 'Erred', 'Creating', 'Updating', 'Terminating'],
+      offering_shared: true,
     }),
     [ownProps],
   );

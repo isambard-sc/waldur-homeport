@@ -30,14 +30,16 @@ import { ProjectCreditFormData } from './types';
 interface ProjectCreditFormDialogProps {
   formId: string;
   submitFn(formData: ProjectCreditFormData): void;
-  initialValues: any;
+  initialValues?: any;
 }
 
-export const ProjectCreditFormDialog = connect(
-  (_, ownProps: ProjectCreditFormDialogProps) => ({
-    form: ownProps.formId,
-  }),
-)(
+export const ProjectCreditFormDialog = connect<
+  {},
+  {},
+  ProjectCreditFormDialogProps
+>((_, ownProps: ProjectCreditFormDialogProps) => ({
+  form: ownProps.formId,
+}))(
   reduxForm<ProjectCreditFormData, ProjectCreditFormDialogProps>({
     destroyOnUnmount: true,
   })((props) => {

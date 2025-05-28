@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
+import { MarketplacePublicOfferingsListData } from 'waldur-js-client';
 
 import { ENV } from '@waldur/core/config';
 import { Link } from '@waldur/core/Link';
@@ -21,7 +22,7 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 const mapStateToFilter = createSelector(
   getFormValues(PUBLIC_OFFERINGS_FILTER_FORM_ID),
   (filters: any) => {
-    const result: Record<string, any> = {};
+    const result: MarketplacePublicOfferingsListData['query'] = {};
 
     if (filters) {
       if (filters.state) {

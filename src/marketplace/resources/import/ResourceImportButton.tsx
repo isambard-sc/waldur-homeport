@@ -7,17 +7,15 @@ import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { ActionButton } from '@waldur/table/ActionButton';
 
+import { ImportDialogProps } from './types';
+
 const ResourceImportDialog = lazyComponent(() =>
   import('./ResourceImportDialog').then((module) => ({
     default: module.ResourceImportDialog,
   })),
 );
 
-interface ResourceImportButtonProps {
-  category_uuid?: string;
-}
-
-export const ResourceImportButton: React.FC<ResourceImportButtonProps> = (
+export const ResourceImportButton: React.FC<ImportDialogProps['resolve']> = (
   props,
 ) => {
   const dispatch = useDispatch();

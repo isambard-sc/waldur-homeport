@@ -71,6 +71,7 @@ export const MigrateTenantDialog = connect<
                   dst_cidr: type.destination,
                 })),
                 skip_connection_extnet: formData.skip_connection_extnet,
+                sync_instance_ports: formData.sync_instance_ports,
                 networks: formData.networks?.map(({ value }) => value),
               },
             },
@@ -114,6 +115,7 @@ export const MigrateTenantDialog = connect<
               query: {
                 tenant_uuid: resource.uuid,
                 field: ['name', 'uuid'],
+                direct_only: true,
               },
             })
           ).data.map(({ uuid, name }) => ({ label: name, value: uuid }));
@@ -214,6 +216,13 @@ export const MigrateTenantDialog = connect<
                 <Field
                   name="skip_connection_extnet"
                   label={translate('Skip connection to external network')}
+                  component={FormGroup}
+                >
+                  <AwesomeCheckboxField />
+                </Field>
+                <Field
+                  name="sync_instance_ports"
+                  label={translate('Copy ports connected to instances')}
                   component={FormGroup}
                 >
                   <AwesomeCheckboxField />

@@ -20,20 +20,22 @@ interface ExportDialogProps {
   resolve: {
     table: string;
     format: ExportFormat;
-    ownProps?: any;
+    ownProps?: Partial<TableState>;
   };
 }
 
-export const ExportDialog = connect<{}, {}, ExportDialogProps>(
-  (state: RootState, ownProps) => ({
-    initialValues: {
-      format: ownProps.resolve?.format,
-      withFilters: true,
-      allPages: true,
-    },
-    tableState: state.tables[ownProps.resolve.table],
-  }),
-)(
+export const ExportDialog = connect<
+  { tableState: TableState },
+  {},
+  ExportDialogProps
+>((state: RootState, ownProps) => ({
+  initialValues: {
+    format: ownProps.resolve?.format,
+    withFilters: true,
+    allPages: true,
+  },
+  tableState: state.tables[ownProps.resolve.table],
+}))(
   reduxForm<ExportConfig, ExportDialogProps & { tableState: TableState }>({
     form: 'tableExportForm',
   })((props) => {

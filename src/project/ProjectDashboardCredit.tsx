@@ -1,15 +1,24 @@
+import { Eye } from '@phosphor-icons/react';
 import { Col } from 'react-bootstrap';
 import { Project } from 'waldur-js-client';
 
 import { EChart } from '@waldur/core/EChart';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
 import { WidgetCard } from '@waldur/dashboard/WidgetCard';
 import { translate } from '@waldur/i18n';
+import { useModal } from '@waldur/modal/hooks';
 
 import { useProjectCreditChart } from './utils';
+
+const FilteredEventsDialog = lazyComponent(() =>
+  import('@waldur/customer/credits/CreditUsageDialog').then((module) => ({
+    default: module.CreditUsageDialog,
+  })),
+);
 
 export const ProjectDashboardCredit = ({
   project,
@@ -20,6 +29,17 @@ export const ProjectDashboardCredit = ({
 }) => {
   const { credit, chart, options, error, isLoading, refetch } =
     useProjectCreditChart(project);
+
+  const { openDialog } = useModal();
+  const viewDetails = () => {
+    openDialog(FilteredEventsDialog, {
+      size: 'xl',
+      creditUuid: credit.uuid,
+      projectUuid: project.uuid,
+      projectName: project.name,
+      scope: 'project',
+    });
+  };
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -45,9 +65,16 @@ export const ProjectDashboardCredit = ({
             </small>
           </>
         }
+        actions={[
+          {
+            label: translate('Details'),
+            icon: <Eye />,
+            callback: viewDetails,
+          },
+        ]}
         className="h-100"
       >
-        <EChart options={options} />
+        <EChart options={options} height="130px" />
       </WidgetCard>
     </Col>
   );

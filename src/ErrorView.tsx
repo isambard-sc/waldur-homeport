@@ -23,7 +23,7 @@ interface ErrorViewProps {
 export const ErrorView: FC<ErrorViewProps> = ({ error }) => {
   const dispatch = useDispatch();
   const openErrorTraceDialog = () =>
-    dispatch(openModalDialog(ErrorTraceDialog, { error }));
+    dispatch(openModalDialog(ErrorTraceDialog, { error } as any));
 
   return (
     <div className="search-error">

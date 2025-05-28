@@ -20,8 +20,8 @@ import { SecurityGroupRulesList } from './SecurityGroupRulesList';
 export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo<OpenstackSecurityGroupsListData['query']>(
-    () => ({
+  const filter = useMemo(
+    (): OpenstackSecurityGroupsListData['query'] => ({
       tenant_uuid: resourceScope.uuid,
       field: [
         'name',

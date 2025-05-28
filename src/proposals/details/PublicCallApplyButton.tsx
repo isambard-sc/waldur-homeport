@@ -2,6 +2,7 @@ import { FC, useCallback, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/types';
 import { useDispatch } from 'react-redux';
+import { ProtectedRound } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -14,6 +15,8 @@ import { getRoundsWithStatus } from '../utils';
 
 interface PublicCallApplyButtonProps {
   call: Call;
+  /** Preferred round */
+  round?: ProtectedRound;
   title?: string;
   variant?: Variant;
   className?: string;
@@ -27,6 +30,7 @@ const ProposalCreateDialog = lazyComponent(() =>
 
 export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
   call,
+  round,
   title = translate('Apply to round'),
   variant = 'primary',
   className,
@@ -34,6 +38,12 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
   const activeRound =
     call.state == 'active' &&
     useMemo(() => {
+      if (round) {
+        if (round.status === 'open') {
+          return round;
+        }
+        return null;
+      }
       const items = getRoundsWithStatus(call.rounds);
       const first = items[0];
       if (
@@ -43,7 +53,7 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
         return first;
       }
       return null;
-    }, [call]);
+    }, [call, round]);
 
   const dispatch = useDispatch();
   const openAddProposalDialog = useCallback(
@@ -56,8 +66,8 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
       } else if (activeRound) {
         dispatch(
           openModalDialog(ProposalCreateDialog, {
-            resolve: { call, round: activeRound },
-            size: 'md',
+            resolve: { call, round_uuid: activeRound.uuid },
+            size: 'lg',
           }),
         );
       }

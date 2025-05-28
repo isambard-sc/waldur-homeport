@@ -120,11 +120,9 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = (props) => {
                 />
                 <div className="form-check form-check-custom form-check-sm d-block">
                   <input
-                    {...input}
                     className="form-check-input flex-shrink-0"
                     type="radio"
                     checked={isChecked}
-                    value={selectedVersions[index]?.value}
                     onChange={() => onChange(selectedVersions[index].value)}
                     {...rest}
                   />
@@ -165,11 +163,9 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = (props) => {
                 )}
               </div>
               <input
-                {...input}
                 className="form-check-input"
                 type="radio"
                 checked={isChecked}
-                value={selectedVersions[index]?.value}
                 hidden
                 onChange={() => onChange(selectedVersions[index].value)}
                 {...rest}

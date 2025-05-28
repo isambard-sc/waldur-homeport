@@ -24,11 +24,7 @@ export const InvitationsList: FunctionComponent<{
           title: translate('Email'),
           render: ({ row }) => (
             <div className="d-flex align-items-center gap-1">
-              <Avatar
-                className="symbol symbol-32px symbol-circle"
-                name={row?.email}
-                size={32}
-              />
+              <Avatar name={row?.email} circle />
               {row.email}
               <CopyToClipboardButton value={row.email} />
             </div>

@@ -16,7 +16,7 @@ export const CompleteYourProfileBanner = () => (
           <strong>{translate('Complete your profile.')}</strong>{' '}
           <span className="text-gray-500">
             {translate(
-              'Please ensure that all your mandatory profile information is complete.',
+              'To ensure full access to all Waldur features and services please update your profile information to avoid any disruption in service.',
             )}
           </span>
         </p>

@@ -1,17 +1,22 @@
 import { debounce } from 'lodash-es';
 import { useCallback, useMemo } from 'react';
-import { OpenStackFlavor } from 'waldur-js-client';
+import { useSelector } from 'react-redux';
+import { OpenStackFlavor, OpenStackImage } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { required } from '@waldur/core/validators';
 import { FilterBox } from '@waldur/form/FilterBox';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
+import { DeployFormData } from '@waldur/marketplace/common/types';
+import { orderFormSelector } from '@waldur/marketplace/deploy/selectors';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 import { QuotaUsageBarChart } from '@waldur/quotas/QuotaUsageBarChart';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
+
+import { calculateSystemVolumeSize, flavorValidator } from '../utils';
 
 import { FormAbstractVolumeFields } from './FormAbstractVolumeFields';
 import { getOfferingLimit, useQuotasData } from './utils';
@@ -49,9 +54,18 @@ export const FormHardwareConfigurationStep = (props: FormStepProps) => {
   );
 
   const exceeds = useCallback(
-    (value: OpenStackFlavor) => {
+    (value: OpenStackFlavor, formData: DeployFormData) => {
       if (!value || !limit) return undefined;
       const errors = [];
+
+      if (
+        formData.attributes?.image &&
+        flavorValidator({ image: formData.attributes?.image }, value)
+      ) {
+        errors.push(
+          translate("The image's minimum RAM is over the flavor RAM"),
+        );
+      }
 
       if ((value.cores || 0) + (vcpuQuota.usage || 0) > limit.vcpu) {
         errors.push(translate('The CPU quota is over the limit'));
@@ -63,6 +77,23 @@ export const FormHardwareConfigurationStep = (props: FormStepProps) => {
     },
     [limit, vcpuQuota.usage, ramQuota.usage],
   );
+
+  const image = useSelector((state) =>
+    orderFormSelector(state, 'attributes.image'),
+  ) as OpenStackImage;
+
+  const flavor = useSelector((state) =>
+    orderFormSelector(state, 'attributes.flavor'),
+  ) as OpenStackFlavor;
+
+  const minSystemVolumeSize = useMemo(() => {
+    const minSize = calculateSystemVolumeSize({
+      image,
+      flavor,
+      system_volume_size: 0,
+    });
+    return minSize || 0;
+  }, [image, flavor]);
 
   return (
     <VStepperFormStepCard
@@ -115,6 +146,7 @@ export const FormHardwareConfigurationStep = (props: FormStepProps) => {
         verboseName={translate('flavors')}
         hasActionBar={false}
         cardBordered={false}
+        fullWidth
         className="mt-n5 border-bottom"
         minHeight="auto"
         hoverable
@@ -131,6 +163,7 @@ export const FormHardwareConfigurationStep = (props: FormStepProps) => {
           typeField="attributes.system_volume_type"
           sizeField="attributes.system_volume_size"
           optional={false}
+          minSize={minSystemVolumeSize}
         />
       </div>
 

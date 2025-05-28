@@ -21,8 +21,8 @@ import { INSTANCE_TYPE } from '../constants';
 export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
 }) => {
-  const filter = useMemo<OpenstackInstancesListData['query']>(
-    () => ({
+  const filter = useMemo(
+    (): OpenstackInstancesListData['query'] => ({
       tenant_uuid: resourceScope.uuid,
       field: [
         'uuid',

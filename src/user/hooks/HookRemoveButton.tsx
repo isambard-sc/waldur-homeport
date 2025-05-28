@@ -10,11 +10,11 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 interface HookRemoveButtonProps {
   refetch();
-  hook;
+  row;
 }
 
 export const HookRemoveButton: FC<HookRemoveButtonProps> = ({
-  hook,
+  row: hook,
   refetch,
 }) => {
   const [removing, setRemoving] = useState(false);

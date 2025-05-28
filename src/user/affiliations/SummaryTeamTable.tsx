@@ -3,6 +3,8 @@ import { Project } from 'waldur-js-client';
 
 import Avatar from '@waldur/core/Avatar';
 import { renderRoleExpirationDate } from '@waldur/customer/team/CustomerUsersList';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
@@ -48,7 +50,10 @@ interface OwnProps {
 
 export const SummaryTeamTable: FC<OwnProps> = ({ scope, context }) => {
   const props = useTable({
-    table: context === 'organization' ? 'customer-users' : 'project-users',
+    table:
+      (context === 'organization' ? 'customer-users' : 'project-users') +
+      '-' +
+      scope.uuid,
     fetchData:
       context === 'organization'
         ? createFetcher(`customers/${scope.uuid}/users`)
@@ -70,21 +75,11 @@ export const SummaryTeamTable: FC<OwnProps> = ({ scope, context }) => {
           title: translate('Member'),
           render: ({ row }) => (
             <div className="content-wrapper gap-2">
-              {getValue(row, 'image') ? (
-                <img
-                  src={getValue(row, 'image')}
-                  alt={getValue(row, 'username')}
-                  width={32}
-                  height={32}
-                  className="rounded-circle"
-                />
-              ) : (
-                <Avatar
-                  className="symbol symbol-32px symbol-circle"
-                  name={getValue(row, 'full_name')}
-                  size={32}
-                />
-              )}
+              <Avatar
+                src={getValue(row, 'image')}
+                name={getValue(row, 'full_name')}
+                circle
+              />
               <p className="mb-0">
                 {getValue(row, 'full_name') || DASH_ESCAPE_CODE}
               </p>
@@ -94,6 +89,12 @@ export const SummaryTeamTable: FC<OwnProps> = ({ scope, context }) => {
           orderField:
             (context === 'organization' && 'concatenated_name') ||
             (context === 'project' && 'full_name'),
+        },
+        isFeatureVisible(UserFeatures.show_username) && {
+          title: translate('Username'),
+          render: ({ row }) => getValue(row, 'username'),
+          copyField: (row) => getValue(row, 'username'),
+          className: 'w-25',
         },
         {
           title: translate('Email'),

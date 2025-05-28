@@ -23,7 +23,7 @@ const PermissionRequestActionDialog = lazyComponent(() =>
 const openPermissionRequestActionDialog = (resolve) =>
   openModalDialog(PermissionRequestActionDialog, {
     resolve,
-    size: 'md',
+    size: 'lg',
   });
 
 export const UserPermissionRequestApproveButton: FunctionComponent<

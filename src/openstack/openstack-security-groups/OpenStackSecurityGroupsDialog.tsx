@@ -71,8 +71,8 @@ export const OpenStackSecurityGroupsDialog = (
 ) => (
   <ModalDialog
     title={translate('Security groups details')}
-    className="card card-table full-width"
-    bodyClassName="card-body"
+    className="card card-table"
+    bodyClassName="card-body pt-4"
   >
     {props.resolve.securityGroups.length === 0 &&
       translate('Instance does not have any security groups yet.')}

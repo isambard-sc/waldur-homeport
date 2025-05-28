@@ -147,6 +147,7 @@ interface FormTableProps {
 }
 
 const TABLE_GY_SPACE_REGEX = /(?<=\s|^)(g[y]?-([1-9]\d*))( ?)(?=\s|$)/;
+const TABLE_GX_SPACE_REGEX = /(?<=\s|^)(g[x]?-([1-9]\d*))( ?)(?=\s|$)/;
 
 const FormTable: FC<PropsWithChildren<FormTableProps>> & {
   Item: FC<FormTableItemProps>;
@@ -162,6 +163,7 @@ const FormTable: FC<PropsWithChildren<FormTableProps>> & {
         props.detailsMode && 'details-mode',
         props.alignTop && 'align-top',
         !TABLE_GY_SPACE_REGEX.test(props.className) && 'gy-base',
+        !TABLE_GX_SPACE_REGEX.test(props.className) && 'gx-5',
         props.className,
       )}
     >

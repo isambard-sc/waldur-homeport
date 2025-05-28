@@ -11,6 +11,7 @@ export const TableFilterButton = ({ onClick, hasFilter = false }) => {
       <Button
         variant="outline-default"
         className="btn-outline btn-icon btn-toggle-filters position-relative"
+        size="lg"
         onClick={onClick}
       >
         <span className="svg-icon svg-icon-2">

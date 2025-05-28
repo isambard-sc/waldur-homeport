@@ -10,7 +10,10 @@ import { OpenPortalOffering } from '@waldur/openportal/marketplace';
 import { OpenStackTenantOffering } from '@waldur/openstack/marketplace';
 import { OpenStackInstanceOffering } from '@waldur/openstack/openstack-instance/marketplace';
 import { OpenStackVolumeOffering } from '@waldur/openstack/openstack-volume/marketplace';
-import { RancherOffering } from '@waldur/rancher/cluster/create/marketplace';
+import {
+  ManagedRancherOffering,
+  RancherOffering,
+} from '@waldur/rancher/cluster/create/marketplace';
 import { SlurmOffering, SlurmRemoteOffering } from '@waldur/slurm/marketplace';
 import { BasicOffering, SupportOffering } from '@waldur/support/marketplace';
 import { vmWareOffering } from '@waldur/vmware/marketplace';
@@ -131,6 +134,20 @@ export function getPluginOptionsForm(offeringType: string) {
   );
 }
 
+export function getPluginOptionsSerializer(offeringType: string) {
+  return (
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
+    REGISTRY[offeringType].pluginOptionsSerializer
+  );
+}
+
+export function getSecretOptionsSerializer(offeringType: string) {
+  return (
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
+    REGISTRY[offeringType].secretOptionsSerializer
+  );
+}
+
 export function getSecretOptionsForm(offeringType: string) {
   return (
     Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
@@ -195,6 +212,7 @@ registerOfferingType(OpenStackTenantOffering);
 registerOfferingType(OpenStackInstanceOffering);
 registerOfferingType(OpenStackVolumeOffering);
 registerOfferingType(RancherOffering);
+registerOfferingType(ManagedRancherOffering);
 registerOfferingType(SlurmOffering);
 registerOfferingType(SlurmRemoteOffering);
 registerOfferingType(SupportOffering);

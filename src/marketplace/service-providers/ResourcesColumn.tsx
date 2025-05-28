@@ -10,7 +10,7 @@ const ProviderProjectResourcesDialog = lazyComponent(() =>
   })),
 );
 
-export const ResourcesColumn = ({ row, provider_uuid }) => {
+export const ResourcesColumn = ({ row, provider_customer_uuid }) => {
   const dispatch = useDispatch();
 
   return (
@@ -21,7 +21,7 @@ export const ResourcesColumn = ({ row, provider_uuid }) => {
           openModalDialog(ProviderProjectResourcesDialog, {
             resolve: {
               project_uuid: row.uuid,
-              provider_uuid,
+              provider_customer_uuid,
             },
             size: 'lg',
           }),

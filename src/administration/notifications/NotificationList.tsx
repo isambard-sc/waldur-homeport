@@ -2,7 +2,6 @@ import { PencilSimple, Question } from '@phosphor-icons/react';
 import { uniqueId } from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
-import { createSelector } from 'reselect';
 import { Notification } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -17,28 +16,8 @@ import { NotificationActions } from './NotificationActions';
 import { NotificationExpandableRow } from './NotificationExpandableRow';
 import { NotificationFilter } from './NotificationFilter';
 
-const mapStateToFilter = createSelector(
-  getFormValues('notificationFilter'),
-  (filters: any) => {
-    const result: Record<string, any> = {};
-    if (filters?.is_overridden === true) {
-      return {
-        ...filters,
-        is_overridden: true,
-      };
-    }
-    if (filters?.is_overridden === false) {
-      return {
-        ...filters,
-        is_overridden: false,
-      };
-    }
-    return result;
-  },
-);
-
 export const NotificationList = () => {
-  const filter = useSelector(mapStateToFilter);
+  const filter = useSelector(getFormValues('notificationFilter'));
   const tableProps = useTable({
     table: 'notification',
     fetchData: createFetcher('notification-messages'),

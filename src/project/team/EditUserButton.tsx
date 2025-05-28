@@ -18,22 +18,30 @@ const EditUserDialog = lazyComponent(() =>
 interface EditUserButtonProps {
   row: GenericPermission;
   refetch;
+  projectUuid?;
+  customerUuid?;
 }
 
 export const EditUserButton: React.FC<EditUserButtonProps> = ({
   row: permission,
   refetch,
+  projectUuid,
+  customerUuid,
 }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const project = useSelector(getProject);
   const customer = useSelector(getCustomer);
 
+  const hasContext = projectUuid || customerUuid;
+  const projectId = hasContext ? projectUuid : project?.uuid;
+  const customerId = hasContext ? customerUuid : customer?.uuid;
+
   if (
     !hasPermission(user, {
       permission: PermissionEnum.UPDATE_PROJECT_PERMISSION,
-      customerId: customer.uuid,
-      projectId: project.uuid,
+      customerId,
+      projectId,
     })
   ) {
     return null;

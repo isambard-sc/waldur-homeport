@@ -18,7 +18,7 @@ export const UserDropdownMenu: FunctionComponent = () => {
   return (
     <>
       <div
-        className="btn btn-active-light d-flex align-items-center bg-hover-light py-2 px-2 px-md-3"
+        className="btn btn-active-light d-flex align-items-center gap-2 bg-hover-light py-2 px-2 px-md-3"
         data-kt-menu-trigger="click"
         data-kt-menu-attach="parent"
         data-kt-menu-placement="bottom"
@@ -27,18 +27,9 @@ export const UserDropdownMenu: FunctionComponent = () => {
       >
         <div className="cursor-pointer symbol symbol-30px symbol-md-40px justify-content-center">
           {!user ? (
-            <ImagePlaceholder width="40px" height="40px" />
-          ) : user.image ? (
-            <div
-              className="symbol-label"
-              style={{ backgroundImage: `url(${user.image})` }}
-            />
+            <ImagePlaceholder width="40px" height="40px" circle />
           ) : (
-            <Avatar
-              className="symbol symbol-40px"
-              name={user.full_name}
-              size={40}
-            />
+            <Avatar src={user.image} name={user.full_name} size={40} circle />
           )}
         </div>
         <div className="d-none d-md-flex flex-column align-items-center justify-content-center me-2 mt-2">
@@ -67,17 +58,13 @@ export const UserDropdownMenu: FunctionComponent = () => {
           <div className="menu-content d-flex align-items-center px-3">
             <div className="symbol symbol-50px me-5">
               {!user ? (
-                <ImagePlaceholder width="40px" height="40px" />
-              ) : user.image ? (
-                <div
-                  className="symbol-label"
-                  style={{ backgroundImage: `url(${user.image})` }}
-                />
+                <ImagePlaceholder width="40px" height="40px" circle />
               ) : (
                 <Avatar
-                  className="symbol symbol-40px"
+                  src={user.image}
                   name={user.full_name}
                   size={40}
+                  circle
                 />
               )}
             </div>

@@ -1,7 +1,7 @@
+import Markdown from 'markdown-to-jsx';
 import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
 
-import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { translate } from '@waldur/i18n';
 import { Category, Offering } from '@waldur/marketplace/types';
 
@@ -23,9 +23,7 @@ export const PublicOfferingInfo: FunctionComponent<PublicOfferingInfoProps> = ({
         <PublicOfferingCardTitle>
           {translate('Description')}
         </PublicOfferingCardTitle>
-        <FormattedHtml
-          html={offering.full_description || offering.description}
-        />
+        <Markdown>{offering.full_description || offering.description}</Markdown>
         <PublicOfferingAttributesCard offering={offering} category={category} />
       </Card.Body>
     </Card>

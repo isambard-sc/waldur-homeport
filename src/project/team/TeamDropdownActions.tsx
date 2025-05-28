@@ -2,6 +2,7 @@ import { CaretDown, PlusCircle } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
 import { Project } from 'waldur-js-client';
 
+import { ServiceAccountCreateButton } from '@waldur/customer/service-accounts/ServiceAccountCreateAction';
 import { translate } from '@waldur/i18n';
 import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
 
@@ -35,6 +36,11 @@ export const TeamDropdownActions = ({
           enableBulkUpload={true}
         />
         <AddUserButton project={project} refetch={refetch} />
+        <ServiceAccountCreateButton
+          context="project"
+          scope={project}
+          refetch={refetch}
+        />
       </Dropdown.Menu>
     </Dropdown>
   );

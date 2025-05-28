@@ -21,10 +21,9 @@ import { ProposalDetails } from '../ProposalDetails';
 import { ProgressSteps } from './ProgressSteps';
 import { ProposalHeader } from './ProposalHeader';
 import { ProposalSubmissionStep } from './ProposalSubmissionStep';
+import { useProposalDecisionActions } from './utils';
 
 export const ProposalManagePage = () => {
-  useTitle(translate('Update proposal'));
-
   const {
     params: { proposal_uuid },
   } = useCurrentStateAndParams();
@@ -44,6 +43,13 @@ export const ProposalManagePage = () => {
       refetchOnWindowFocus: false,
     },
   );
+
+  const title =
+    proposal?.state === 'draft'
+      ? translate('Update proposal')
+      : translate('View proposal');
+  useTitle(title);
+
   const user = useSelector(getUser);
 
   const hasPermissionToSubmit =
@@ -60,6 +66,11 @@ export const ProposalManagePage = () => {
     { refetchOnWindowFocus: false },
   );
 
+  const { canPerformDecisionActions } = useProposalDecisionActions(
+    proposal || ({} as Proposal),
+    refetch,
+  );
+
   if (isLoading || isLoadingReviews) {
     return <LoadingSpinner />;
   } else if (error) {
@@ -74,7 +85,8 @@ export const ProposalManagePage = () => {
           <ProgressSteps proposal={proposal} bgClass="bg-body" />
         </div>
       </SidebarLayout.Header>
-      {proposal.state === 'draft' && hasPermissionToSubmit ? (
+      {(proposal.state === 'draft' && hasPermissionToSubmit) ||
+      canPerformDecisionActions ? (
         <ProposalSubmissionStep
           proposal={proposal}
           refetch={refetch}

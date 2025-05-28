@@ -13,6 +13,12 @@ const OpenStackRouterSummary = lazyComponent(() =>
   })),
 );
 
+const OpenstackPortSummary = lazyComponent(() =>
+  import('./OpenstackPortSummary').then((module) => ({
+    default: module.OpenstackPortSummary,
+  })),
+);
+
 export const OpenStackTenantSummaryConfiguration: ResourceSummaryConfiguration =
   {
     type: 'OpenStack.Tenant',
@@ -25,3 +31,8 @@ export const OpenStackRouterSummaryConfiguration: ResourceSummaryConfiguration =
     type: 'OpenStack.Router',
     component: OpenStackRouterSummary,
   };
+
+export const OpenStackPortSummaryConfiguration: ResourceSummaryConfiguration = {
+  type: 'OpenStack.Port',
+  component: OpenstackPortSummary,
+};

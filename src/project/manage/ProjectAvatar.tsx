@@ -58,7 +58,7 @@ export const ProjectAvatar = ({ project }: { project: Project }) => {
                   alt={abbreviation}
                   initialValue={project.image}
                   max={2 * 1024 * 1024} // 2MB
-                  size={65}
+                  size={64}
                   extraActions={({ isChanged, isTooLarge }) =>
                     isChanged || submitting ? (
                       <Button

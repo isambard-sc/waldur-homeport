@@ -5,6 +5,8 @@ import { UserRoleDetails } from 'waldur-js-client';
 
 import Avatar from '@waldur/core/Avatar';
 import { renderRoleExpirationDate } from '@waldur/customer/team/CustomerUsersList';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
@@ -18,6 +20,7 @@ import { PROJECT_TEAM_TABLE_TABS } from '../utils';
 
 import { ProjectPermisionActions } from './ProjectPermisionActions';
 import { ProjectPermissionsLogButton } from './ProjectPermissionsLogButton';
+import { ProjectUsersBulkRemoveButton } from './ProjectUsersBulkRemoveButton';
 import { ProjectUsersListFilter } from './ProjectUsersListFilter';
 import { TeamDropdownActions } from './TeamDropdownActions';
 
@@ -46,17 +49,19 @@ const mapStateToFilter = createSelector(
 
 export const ProjectUsersList = ({
   hideTabs = false,
-  projectId,
+  projectUuid,
+  customerUuid,
 }: {
   hideTabs?: boolean;
-  projectId?: string;
+  projectUuid?: string;
+  customerUuid?: string;
 }) => {
   const filter = useSelector(mapStateToFilter);
   const project = useSelector(getProject);
   const tableProps = useTable({
     table: 'project-users',
     fetchData: createFetcher(
-      `projects/${project?.uuid || projectId}/list_users`,
+      `projects/${project?.uuid || projectUuid}/list_users`,
     ),
     queryField: 'search_string',
     filter,
@@ -71,21 +76,7 @@ export const ProjectUsersList = ({
           title: translate('Member'),
           render: ({ row }) => (
             <div className="d-flex align-items-center gap-1">
-              {row.user_image ? (
-                <img
-                  src={row.user_image}
-                  alt={row.user_username}
-                  width={32}
-                  height={32}
-                  className="rounded-circle"
-                />
-              ) : (
-                <Avatar
-                  className="symbol symbol-32px symbol-circle"
-                  name={row.user_full_name}
-                  size={32}
-                />
-              )}
+              <Avatar name={row.user_full_name} src={row.user_image} circle />
               {row.user_full_name || DASH_ESCAPE_CODE}
             </div>
           ),
@@ -103,10 +94,12 @@ export const ProjectUsersList = ({
         {
           title: translate('Username'),
           render: ({ row }) => row.user_username,
+          copyField: (row) => row.user_username,
           id: 'user_username',
           keys: ['user_username'],
-          optional: true,
+          optional: !isFeatureVisible(UserFeatures.show_username),
         },
+
         {
           title: translate('Role in project'),
           render: RoleField,
@@ -125,12 +118,12 @@ export const ProjectUsersList = ({
       hasQuery={true}
       tableActions={
         <>
-          <ProjectPermissionsLogButton projectId={projectId} />
+          <ProjectPermissionsLogButton projectId={projectUuid} />
           <TeamDropdownActions
             project={
               project ||
               ({
-                uuid: projectId,
+                uuid: projectUuid,
               } as any)
             }
             refetch={tableProps.fetch}
@@ -139,9 +132,18 @@ export const ProjectUsersList = ({
       }
       title={translate('Team')}
       verboseName={translate('Team members')}
-      rowActions={ProjectPermisionActions}
+      rowActions={({ row, fetch }) => (
+        <ProjectPermisionActions
+          row={row}
+          fetch={fetch}
+          projectUuid={projectUuid}
+          customerUuid={customerUuid}
+        />
+      )}
       filters={<ProjectUsersListFilter />}
       hasOptionalColumns
+      enableMultiSelect
+      multiSelectActions={ProjectUsersBulkRemoveButton}
     />
   );
 };

@@ -50,7 +50,7 @@ export const IssueCreateForm = reduxForm<IssueFormData, OwnProps>({
   return (
     <form onSubmit={handleSubmit(onCreateIssue)}>
       <ModalDialog
-        title={translate('Create request')}
+        title={translate('Create support request')}
         subtitle={translate(
           'Use this modal to describe your problem or request, so our support team can assist you.',
         )}

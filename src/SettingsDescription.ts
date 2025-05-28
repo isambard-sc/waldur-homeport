@@ -36,6 +36,12 @@ export const SettingsDescription = [
         default: 'https://example.com/',
         type: 'string',
       },
+      {
+        key: 'RANCHER_USERNAME_INPUT_LABEL',
+        description: translate('Label for the username field in Rancher external user resource access management.'),
+        default: 'Username',
+        type: 'string',
+      },
     ],
   },
   {
@@ -122,12 +128,6 @@ export const SettingsDescription = [
         key: 'ENABLE_STALE_RESOURCE_NOTIFICATIONS',
         description: translate('Enable reminders to owners about resources of shared offerings that have not generated any cost for the last 3 months.'),
         default: false,
-        type: 'boolean',
-      },
-      {
-        key: 'ENABLE_RESOURCE_END_DATE',
-        description: translate('Allow to view and update resource end date.'),
-        default: true,
         type: 'boolean',
       },
     ],

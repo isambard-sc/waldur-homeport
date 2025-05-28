@@ -13,7 +13,6 @@ import { MARKETPLACE_RANCHER } from './constants';
 import { FormDataStorageStep } from './FormDataStorageStep';
 import { FormNetworkStep } from './FormNetworkStep';
 import { FormNodesStep } from './FormNodesStep';
-import { FormOptionalServicesStep } from './FormOptionalServicesStep';
 import { FormRancherSecurityGroupsStep } from './FormRancherSecurityGroupsStep';
 import { FormSSHPublicKeysStep } from './FormSSHPublicKeysStep';
 import { FormSystemStorageStep } from './FormSystemStorageStep';
@@ -87,13 +86,6 @@ export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
     fields: ['attributes.security_groups'],
     required: false,
     component: FormRancherSecurityGroupsStep,
-  },
-  {
-    label: translate('Optional'),
-    id: 'step-optional-services',
-    fields: ['attributes.install_longhorn'],
-    required: false,
-    component: FormOptionalServicesStep,
   },
   {
     label: translate('Final configuration'),

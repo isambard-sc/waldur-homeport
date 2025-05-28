@@ -13,7 +13,7 @@ const CreditUsageDialog = lazyComponent(() =>
   })),
 );
 
-export const CreditUsageButton = ({ row }) => {
+export const CreditUsageButton = ({ row, scope }) => {
   const dispatch = useDispatch();
   const openDialog = useCallback(
     () =>
@@ -27,6 +27,7 @@ export const CreditUsageButton = ({ row }) => {
                 customerUuid: row.customer_uuid,
                 customerName: row.customer_name,
               }),
+          scope,
         }),
       ),
     [dispatch, row],

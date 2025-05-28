@@ -1,7 +1,7 @@
 import { PlusCircle } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
 import { Form } from 'react-final-form';
-import { projectsCreate } from 'waldur-js-client';
+import { projectCreditsCreate, projectsCreate } from 'waldur-js-client';
 
 import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { formatDate } from '@waldur/core/dateUtils';
@@ -14,6 +14,7 @@ import { useNotify } from '@waldur/store/hooks';
 import { Customer } from '@waldur/workspace/types';
 
 import { ProjectShortNameGroup } from './ProjectShortNameGroup';
+import { CreditGroup } from './CreditGroup';
 import { DescriptionGroup } from './DescriptionGroup';
 import { EndDateGroup } from './EndDateGroup';
 import { ImageGroup } from './ImageGroup';
@@ -40,6 +41,7 @@ interface ProjectFormData {
   oecd_fos_2007_code?: { value: string };
   is_industry: boolean;
   image?: File | Blob;
+  project_credit?: string;
 }
 
 export const ProjectCreateDialog = ({
@@ -71,6 +73,21 @@ export const ProjectCreateDialog = ({
         },
         ...formDataOptions,
       });
+      if (!response.error && formData.project_credit) {
+        try {
+          await projectCreditsCreate({
+            body: {
+              project: response.data.url,
+              value: formData.project_credit,
+            },
+          });
+        } catch (e) {
+          showErrorResponse(
+            e,
+            translate('Error while assigning credit to the project.'),
+          );
+        }
+      }
       if (refetch) {
         await refetch();
       }
@@ -119,6 +136,7 @@ export const ProjectCreateDialog = ({
               <TypeGroup create />
               <StartDateGroup create />
               <EndDateGroup create />
+              <CreditGroup customer={values?.customer || customer} />
               <ImageGroup create />
             </div>
           </ModalDialog>

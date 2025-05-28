@@ -8,6 +8,10 @@ export const CreditActions = ({ row, fetch }) => (
   <ActionsDropdown
     row={row}
     refetch={fetch}
-    actions={[EditCreditButton, CreditUsageButton, DeleteCreditButton]}
+    actions={[
+      EditCreditButton,
+      (props) => <CreditUsageButton {...props} row={row} scope="customer" />,
+      DeleteCreditButton,
+    ]}
   />
 );

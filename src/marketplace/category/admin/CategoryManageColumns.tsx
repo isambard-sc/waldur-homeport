@@ -14,22 +14,16 @@ const CategoryManageColumnsDialog = lazyComponent(() =>
   })),
 );
 
-export const CategoryManageColumns = ({
-  row,
-  refetch,
-}: {
-  row: Category;
-  refetch;
-}) => {
+export const CategoryManageColumns = ({ row }: { row: Category }) => {
   const dispatch = useDispatch();
   const openFormDialog = useCallback(() => {
     dispatch(
       openModalDialog(CategoryManageColumnsDialog, {
-        resolve: { category: row, refetch },
+        resolve: { category: row },
         size: 'xl',
       }),
     );
-  }, [dispatch, refetch]);
+  }, [dispatch]);
 
   return (
     <ActionItem

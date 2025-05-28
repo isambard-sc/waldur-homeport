@@ -2,7 +2,6 @@ import { CalendarBlank } from '@phosphor-icons/react';
 import { useSelector, useDispatch } from 'react-redux';
 import { marketplaceResourcesPartialUpdate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
@@ -19,9 +18,12 @@ const EditResourceEndDateDialog = lazyComponent(() =>
 );
 
 export const EditResourceEndDateAction: ActionItemType = ({
+  marketplaceResource,
   resource,
   refetch,
 }) => {
+  const _resource = marketplaceResource || resource;
+
   const dispatch = useDispatch();
   const user = useSelector(getUser);
 
@@ -29,7 +31,7 @@ export const EditResourceEndDateAction: ActionItemType = ({
     dispatch(
       openModalDialog(EditResourceEndDateDialog, {
         resolve: {
-          resource,
+          resource: _resource,
           refetch,
           updateEndDate: (uuid, end_date) =>
             marketplaceResourcesPartialUpdate({
@@ -37,18 +39,17 @@ export const EditResourceEndDateAction: ActionItemType = ({
               body: { end_date },
             }),
         },
-        size: 'md',
       }),
     );
-
-  if (!ENV.plugins.WALDUR_CORE.ENABLE_RESOURCE_END_DATE) {
-    return null;
-  }
 
   if (
     !hasPermission(user, {
       permission: PermissionEnum.SET_RESOURCE_END_DATE,
-      customerId: resource.offering_customer_uuid,
+      customerId: _resource.offering_customer_uuid,
+    }) &&
+    !hasPermission(user, {
+      permission: PermissionEnum.SET_RESOURCE_END_DATE,
+      customerId: _resource.customer_uuid,
     })
   ) {
     return null;

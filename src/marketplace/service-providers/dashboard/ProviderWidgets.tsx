@@ -158,7 +158,9 @@ export const ProviderWidgets = ({ provider }) => {
 
   const { loading, error, value } = useAsync(
     () =>
-      marketplaceServiceProvidersStatRetrieve(provider.uuid).then((res) => {
+      marketplaceServiceProvidersStatRetrieve({
+        path: { uuid: provider.uuid },
+      }).then((res) => {
         const widgets = generateWidgetsData(res.data);
         if (!showExperimentalUiComponents) {
           return widgets.filter(

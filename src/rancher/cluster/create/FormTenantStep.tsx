@@ -9,8 +9,8 @@ import { required } from '@waldur/core/validators';
 import { FormGroup, SelectField } from '@waldur/form';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
+import { orderCustomerSelector } from '@waldur/marketplace/deploy/selectors';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
-import { orderCustomerSelector } from '@waldur/marketplace/details/utils';
 
 export const FormTenantStep = (props: FormStepProps) => {
   const customer = useSelector(orderCustomerSelector);

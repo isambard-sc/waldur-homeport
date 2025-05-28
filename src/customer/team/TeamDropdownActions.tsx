@@ -1,9 +1,13 @@
 import { CaretDown, PlusCircle } from '@phosphor-icons/react';
 import { Dropdown } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 
 import { translate } from '@waldur/i18n';
 import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
 import { GroupInvitationCreateButton } from '@waldur/invitations/actions/GroupInvitationCreateButton';
+import { getCustomer } from '@waldur/workspace/selectors';
+
+import { ServiceAccountCreateButton } from '../service-accounts/ServiceAccountCreateAction';
 
 import { UserAddButton } from './UserAddButton';
 
@@ -12,6 +16,8 @@ interface TeamDropdownActionsProps {
 }
 
 export const TeamDropdownActions = ({ refetch }: TeamDropdownActionsProps) => {
+  const customer = useSelector(getCustomer);
+
   return (
     <Dropdown placement="bottom-end">
       <Dropdown.Toggle variant="primary" className="no-arrow btn-icon-right">
@@ -31,6 +37,11 @@ export const TeamDropdownActions = ({ refetch }: TeamDropdownActionsProps) => {
         />
         <GroupInvitationCreateButton refetch={refetch} />
         <UserAddButton refetch={refetch} />
+        <ServiceAccountCreateButton
+          context="customer"
+          scope={customer}
+          refetch={refetch}
+        />
       </Dropdown.Menu>
     </Dropdown>
   );

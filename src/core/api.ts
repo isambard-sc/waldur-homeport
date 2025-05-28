@@ -18,9 +18,9 @@ export function initApiClient() {
   const headers = {
     Accept: 'application/json',
   };
-  if (getImpersonatedUserUuid()) {
-    headers['X-IMPERSONATED-USER-UUID'] = getImpersonatedUserUuid();
-  }
+
+  headers['X-IMPERSONATED-USER-UUID'] = getImpersonatedUserUuid();
+
   if (getLanguageKey()) {
     headers['Accept-Language'] = getLanguageKey();
   }

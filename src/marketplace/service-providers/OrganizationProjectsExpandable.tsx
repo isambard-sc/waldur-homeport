@@ -9,7 +9,11 @@ import { useTable } from '@waldur/table/useTable';
 
 import { ResourcesColumn } from './ResourcesColumn';
 
-export const OrganizationProjectsExpandable = ({ row, provider_uuid }) => {
+export const OrganizationProjectsExpandable = ({
+  row,
+  provider_uuid,
+  provider_customer_uuid,
+}) => {
   const tableOptions = useMemo(
     () => ({
       table: `OrganizationProjects-${row.uuid}`,
@@ -46,7 +50,10 @@ export const OrganizationProjectsExpandable = ({ row, provider_uuid }) => {
         {
           title: translate('Resources'),
           render: ({ row }) => (
-            <ResourcesColumn row={row} provider_uuid={provider_uuid} />
+            <ResourcesColumn
+              row={row}
+              provider_customer_uuid={provider_customer_uuid}
+            />
           ),
         },
         {

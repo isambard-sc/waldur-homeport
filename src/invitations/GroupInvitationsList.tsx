@@ -21,7 +21,7 @@ import { RoleField } from '@waldur/user/affiliations/RoleField';
 import { exportRoleField } from '@waldur/user/affiliations/RolePopover';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { useTeamTableTabs } from './tabs';
+import { useTeamTableTabs } from '../customer/team/tabs';
 
 const mapStateToFilter = createSelector(
   getCustomer,

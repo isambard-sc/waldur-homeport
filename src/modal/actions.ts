@@ -15,14 +15,17 @@ export interface AppModalProps extends ModalProps {
 export const openModalDialog = <P = any>(
   modalComponent: React.ComponentType<P>,
   modalProps?: P & AppModalProps,
+  type: 'SHOW_MODAL' | 'SHOW_CONFIRM' = 'SHOW_MODAL',
 ) => ({
-  type: 'SHOW_MODAL',
+  type,
   modalComponent,
   modalProps,
 });
 
-export const closeModalDialog = () => ({
-  type: 'HIDE_MODAL',
+export const closeModalDialog = (
+  type: 'HIDE_MODAL' | 'HIDE_CONFIRM' = 'HIDE_MODAL',
+) => ({
+  type,
 });
 
 export const waitForConfirmation = (
@@ -53,6 +56,7 @@ export const waitForConfirmation = (
     openModalDialog(
       options.forDeletion ? DeleteConfirmationDialog : ConfirmationDialog,
       options.forDeletion ? { size: 'sm', ...params } : params,
+      'SHOW_CONFIRM',
     ),
   );
   return deferred.promise;

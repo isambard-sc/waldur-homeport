@@ -11,6 +11,8 @@ export const DeleteAction = ({ project, refetch }) => {
   return (
     <ActionItem
       title={translate('Delete')}
+      className="text-danger"
+      iconColor="danger"
       action={callback}
       disabled={!canDelete}
       iconNode={<Trash weight="bold" />}

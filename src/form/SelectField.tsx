@@ -9,20 +9,15 @@ export const SelectField: FunctionComponent<any> = (props) => {
     <Select
       {...rest}
       name={input.name}
-      {...(props.creatable
-        ? {}
-        : {
-            value:
-              (simpleValue || typeof input.value !== 'object') && options
-                ? props.isMulti
-                  ? options.filter((option) =>
-                      input.value.includes(getOptionValue(option)),
-                    )
-                  : options.filter(
-                      (option) => getOptionValue(option) === input.value,
-                    )
-                : input.value,
-          })}
+      value={
+        (simpleValue || typeof input.value !== 'object') && options
+          ? props.isMulti
+            ? options.filter((option) =>
+                input.value.includes(getOptionValue(option)),
+              )
+            : options.filter((option) => getOptionValue(option) === input.value)
+          : input.value
+      }
       onChange={(newValue: any) =>
         simpleValue
           ? input.onChange(

@@ -81,7 +81,7 @@ export const TeamWidget: FC<TeamWidgetProps> = ({
           : null
       }
       right={
-        <Col xs="auto" className="d-flex gap-3">
+        <Col xs="auto" className="d-flex align-items-center gap-3">
           {isLoading ? (
             <LoadingSpinner />
           ) : error ? (

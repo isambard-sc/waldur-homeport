@@ -6,6 +6,7 @@ import { compose } from 'redux';
 import { Field, FieldArray, reduxForm } from 'redux-form';
 import {
   OpenStackAllowedAddressPairRequest,
+  OpenStackInstance,
   openstackInstancesUpdateAllowedAddressPairs,
 } from 'waldur-js-client';
 
@@ -27,9 +28,7 @@ interface OwnProps {
     port: {
       allowed_address_pairs: OpenStackAllowedAddressPairRequest[];
     };
-    instance: {
-      url: string;
-    };
+    instance: OpenStackInstance;
   };
 }
 

@@ -26,12 +26,12 @@ const OfferingListItem: FC<{ row: Offering }> = ({ row }) => {
       <div className="d-flex text-dark bg-hover-primary-50 align-items-center px-4 py-2">
         <div className="flex-shrink-0 me-4">
           {row.thumbnail ? (
-            <Image src={row.thumbnail} size={25} circle />
+            <Image src={row.thumbnail} size={24} circle />
           ) : (
             <div className="symbol">
               <ImagePlaceholder
-                width="25px"
-                height="25px"
+                width="24px"
+                height="24px"
                 circle
                 className="fs-8"
               >

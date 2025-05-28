@@ -6,7 +6,7 @@ import { Project } from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
-import { PublicDashboardHero2 } from '@waldur/dashboard/hero/PublicDashboardHero2';
+import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
@@ -18,7 +18,7 @@ export const ProjectProfile = ({ project }: { project: Project }) => {
   const abbreviation = useMemo(() => getItemAbbreviation(project), [project]);
 
   return (
-    <PublicDashboardHero2
+    <PublicDashboardHero
       hideQuickSection
       logo={project.image}
       logoAlt={abbreviation}
@@ -64,6 +64,6 @@ export const ProjectProfile = ({ project }: { project: Project }) => {
           </span>
         )}
       </Stack>
-    </PublicDashboardHero2>
+    </PublicDashboardHero>
   );
 };

@@ -39,7 +39,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   },
 }) => {
   const dispatch = useDispatch();
-  const closeDialog = () => dispatch(closeModalDialog());
+  const closeDialog = () => dispatch(closeModalDialog('HIDE_CONFIRM'));
 
   const handleSubmit = () => {
     deferred.resolve();
@@ -61,14 +61,14 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         <>
           <Button
             variant="outline btn-outline-default"
-            className="flex-equal"
+            className="flex-equal px-3"
             onClick={handleCancel}
           >
             {negativeButton}
           </Button>
           <Button
             variant={positiveButtonVariant}
-            className="flex-equal"
+            className="flex-equal px-3"
             onClick={handleSubmit}
           >
             {positiveButton}

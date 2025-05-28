@@ -4,7 +4,11 @@ import { ENV } from '@waldur/core/config';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { isFeatureVisible } from '@waldur/features/connect';
-import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
+import {
+  CustomerFeatures,
+  InvitationsFeatures,
+  MarketplaceFeatures,
+} from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
 import { hasSupport } from '@waldur/issues/hooks';
@@ -202,6 +206,22 @@ export const states: StateDeclaration[] = [
       skipBreadcrumb: true,
       breadcrumb: () => translate('Reviews'),
       feature: CustomerFeatures.show_permission_reviews,
+    },
+  },
+
+  {
+    name: 'organization-service-accounts',
+    url: 'service-accounts/',
+    component: lazyComponent(() =>
+      import('./service-accounts/ServiceAccountsList').then((module) => ({
+        default: module.OrganizationServiceAccountsList,
+      })),
+    ),
+    parent: 'organization-team',
+    data: {
+      skipBreadcrumb: true,
+      breadcrumb: () => translate('Service accounts'),
+      feature: InvitationsFeatures.show_service_accounts,
     },
   },
 

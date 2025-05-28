@@ -11,8 +11,7 @@ import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 export const RequestActionDialog: FunctionComponent<{
   resolve: { offering; offeringRequestMode };
-  close;
-}> = ({ resolve: { offering, offeringRequestMode }, close }) => {
+}> = ({ resolve: { offering, offeringRequestMode } }) => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
   const user = useSelector(getUser);

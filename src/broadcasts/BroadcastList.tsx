@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { BroadcastMessage } from 'waldur-js-client';
+import { BroadcastMessage, BroadcastMessagesListData } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
@@ -12,7 +12,7 @@ import { BroadcastCreateButton } from './BroadcastCreateButton';
 import { BroadcastExpandableRow } from './BroadcastExpandableRow';
 import { BroadcastsRowActions } from './BroadcastsRowActions';
 
-const mandatoryFields = [
+const mandatoryFields: BroadcastMessagesListData['query']['field'] = [
   'uuid',
   'author_full_name',
   'subject',

@@ -10,7 +10,7 @@ export const ProjectCreditActions = ({ row, fetch }) => (
     refetch={fetch}
     actions={[
       ProjectEditCreditButton,
-      CreditUsageButton,
+      (props) => <CreditUsageButton {...props} row={row} scope="project" />,
       ProjectDeleteCreditButton,
     ]}
   />

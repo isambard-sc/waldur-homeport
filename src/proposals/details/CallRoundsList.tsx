@@ -53,9 +53,9 @@ export const CallRoundsList: FC<CallRoundsListProps> = (props) => {
           ),
         },
       ]}
-      verboseName={translate('rounds')}
+      title={translate('Rounds')}
+      verboseName={translate('Rounds')}
       expandableRow={RoundExpandableRow}
-      hasActionBar={false}
     />
   );
 };
