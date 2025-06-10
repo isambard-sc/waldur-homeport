@@ -46,17 +46,17 @@ const fields: OfferingEditField[] = [
   {
     label: translate('Default account'),
     key: 'service_attributes.default_account',
-    description: translate('Default OpenPortal account for user'),
+    description: translate('Default SLURM account for user'),
     component: StringField,
     fieldProps: { required: true, validate: required },
   },
 ];
 
-export const OpenPortalForm: FunctionComponent<OfferingEditPanelFormProps> = (
+export const SlurmForm: FunctionComponent<OfferingEditPanelFormProps> = (
   props,
 ) => <DefaultOfferingEditPanel fields={fields} {...props} />;
 
-export const OpenPortalRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
+export const SlurmRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
   props,
 ) => (
   <>
