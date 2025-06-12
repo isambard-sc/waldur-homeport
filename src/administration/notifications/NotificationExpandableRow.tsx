@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 
@@ -23,7 +23,7 @@ export const NotificationExpandableRow: FunctionComponent<{
                   <div>
                     {template.path}
                     <span className="svg-icon svg-icon-5 ms-3">
-                      <PencilSimple />
+                      <PencilSimpleIcon />
                     </span>
                   </div>
                 ) : (

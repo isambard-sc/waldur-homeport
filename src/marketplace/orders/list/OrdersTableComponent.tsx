@@ -63,6 +63,7 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
           label={row.attributes['name'] || row.uuid}
         />
       ),
+
       keys: ['attributes'],
       id: 'name',
       copyField: (row) => row.attributes['name'],
@@ -82,6 +83,7 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
       keys: ['created_by_full_name', 'created_by_username'] as Array<
         keyof OrderDetails
       >,
+
       id: 'created_by',
       export: (row) => row.created_by_full_name || row.created_by_username,
     },

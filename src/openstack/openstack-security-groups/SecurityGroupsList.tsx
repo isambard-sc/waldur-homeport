@@ -94,6 +94,7 @@ export const SecurityGroupsList: FunctionComponent<{ resourceScope }> = ({
             resource={resourceScope}
             refetch={props.fetch}
           />
+
           <PullSecurityGroupsAction resource={resourceScope} />
         </ButtonGroup>
       }

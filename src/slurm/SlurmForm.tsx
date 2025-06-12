@@ -69,6 +69,7 @@ export const SlurmRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
         </div>
       }
     />
+
     <FormTable.Item
       label={translate('Offering UUID')}
       value={

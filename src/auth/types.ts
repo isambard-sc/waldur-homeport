@@ -87,12 +87,9 @@ interface MarketplaceOpenStackTenantConfiguration {
 }
 
 interface RancherConfiguration {
-  ROLE_REQUIREMENT: Record<string, { CPU: number; RAM: number }>;
-  MOUNT_POINT_CHOICES: string[];
-  MOUNT_POINT_MIN_SIZE: number;
   SYSTEM_VOLUME_MIN_SIZE: number;
   READ_ONLY_MODE: boolean;
-  MOUNT_POINT_CHOICE_IS_MANDATORY: boolean;
+  DISABLE_AUTOMANAGEMENT_OF_USERS: boolean;
   DISABLE_SSH_KEY_INJECTION: boolean;
   DISABLE_DATA_VOLUME_CREATION: boolean;
 }

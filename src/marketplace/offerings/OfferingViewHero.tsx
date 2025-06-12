@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { FC, useMemo } from 'react';
 import { Nav, Tab, Table } from 'react-bootstrap';
@@ -102,7 +102,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
                     className="d-flex align-items-center text-center min-w-60px opacity-50"
                   >
                     {translate('Public')}
-                    <Question size={18} className="ms-1" />
+                    <QuestionIcon size={18} className="ms-1" />
                   </Nav.Link>
                 </Tip>
               </Nav.Item>
@@ -161,6 +161,7 @@ export const OfferingViewHero: FC<OfferingViewHeroProps> = (props) => {
                 className="text-hover-primary cursor-pointer"
                 size={20}
               />
+
               <OfferingStateField
                 offering={offering}
                 mode="outline"

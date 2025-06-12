@@ -1,5 +1,4 @@
-import { UserPlus } from '@phosphor-icons/react';
-import { useMemo } from 'react';
+import { UserPlusIcon } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { formValueSelector, reduxForm } from 'redux-form';
 import {
@@ -41,6 +40,7 @@ import { Project, User } from '@waldur/workspace/types';
 import { ExpirationTimeGroup } from './ExpirationTimeGroup';
 import { RoleGroup } from './RoleGroup';
 import { UserListOptionInline } from './UserListOptionInline';
+import { hasCurrentCustomerPermission } from './utils';
 
 const FORM_ID = 'AddUserDialog';
 const FIELD_ID = 'showAllUsers';
@@ -118,14 +118,7 @@ export const AddUserDialog = reduxForm<
   const currentUser = useUser() as User;
   const currentProject = useSelector(getProject);
   const currentCustomer = useSelector(getCustomer);
-  const hasCustomerPermission = useMemo(
-    () =>
-      currentUser.permissions?.find(
-        ({ scope_uuid, scope_type }) =>
-          scope_uuid === currentCustomer.uuid && scope_type === 'customer',
-      ),
-    [currentUser, currentCustomer],
-  );
+  const hasCustomerPermission = useSelector(hasCurrentCustomerPermission);
 
   const loadUsers = async (query, prevOptions, page) => {
     try {
@@ -262,7 +255,7 @@ export const AddUserDialog = reduxForm<
             </SubmitButton>
           </>
         }
-        iconNode={<UserPlus weight="bold" />}
+        iconNode={<UserPlusIcon weight="bold" />}
         iconColor="success"
       >
         <FormContainer submitting={submitting}>
@@ -278,6 +271,7 @@ export const AddUserDialog = reduxForm<
             required={true}
             validate={[required]}
           />
+
           {currentUser.is_staff && (
             <AwesomeCheckboxField
               hideLabel
@@ -297,6 +291,7 @@ export const AddUserDialog = reduxForm<
                 : [level]
             }
           />
+
           {level === 'customer' && role?.content_type === 'project' && (
             <OrganizationProjectSelectField />
           )}

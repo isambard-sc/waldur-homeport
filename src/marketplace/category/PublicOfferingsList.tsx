@@ -99,6 +99,7 @@ export const PublicOfferingsList: FunctionComponent<{
           {row.name}
         </Link>
       ),
+
       copyField: (row) => row.name,
       orderField: 'name',
       id: 'name',

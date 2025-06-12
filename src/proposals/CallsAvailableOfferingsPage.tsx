@@ -52,6 +52,7 @@ export const CallsAvailableOfferingsPage: FunctionComponent = () => {
         title={translate('Available offerings')}
         context="calls"
       />
+
       <div className="container-fluid mt-20 mb-10">
         <Table
           title={translate('Available offerings')}
@@ -67,6 +68,7 @@ export const CallsAvailableOfferingsPage: FunctionComponent = () => {
                   label={row.name}
                 />
               ),
+
               copyField: (row) => row.name,
             },
             {

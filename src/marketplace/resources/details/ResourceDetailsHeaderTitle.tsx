@@ -25,6 +25,7 @@ export const ResourceDetailsHeaderTitle: FunctionComponent<
           className="text-hover-primary cursor-pointer"
           size={20}
         />
+
         <ResourceStateField
           resource={resource}
           pill
@@ -32,6 +33,7 @@ export const ResourceDetailsHeaderTitle: FunctionComponent<
           hasBullet
           size="sm"
         />
+
         <ResourceBackendState resource={resource} />
         <ResourceFlags resource={resource} />
       </div>

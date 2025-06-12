@@ -1,4 +1,4 @@
-import { ArrowsClockwise } from '@phosphor-icons/react';
+import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -71,7 +71,7 @@ export const MultiPullAction = ({ rows, refetch }) => {
       title={translate('Synchronise')}
       action={callback}
       disabled={validResources.length !== rows.length}
-      iconNode={<ArrowsClockwise weight="bold" />}
+      iconNode={<ArrowsClockwiseIcon weight="bold" />}
     />
   );
 };

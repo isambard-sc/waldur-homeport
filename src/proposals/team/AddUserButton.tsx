@@ -1,4 +1,4 @@
-import { UserPlus } from '@phosphor-icons/react';
+import { UserPlusIcon } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -39,7 +39,7 @@ export const AddUserButton: React.FC<AddUserDialogProps> = (props) => {
             }),
           )
         }
-        iconNode={<UserPlus weight="bold" />}
+        iconNode={<UserPlusIcon weight="bold" />}
       />
     )
   );

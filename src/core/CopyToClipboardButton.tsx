@@ -1,4 +1,4 @@
-import { Copy } from '@phosphor-icons/react';
+import { CopyIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { useCallback, FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
@@ -45,7 +45,7 @@ export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
         label={translate('Copy to clipboard')}
         id={'copyToClipboard-' + value}
       >
-        <Copy weight="bold" size={size} />
+        <CopyIcon weight="bold" size={size} />
       </Tip>
     </button>
   );

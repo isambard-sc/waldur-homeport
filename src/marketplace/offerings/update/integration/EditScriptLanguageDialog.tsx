@@ -24,6 +24,10 @@ const PROGRAMMING_LANGUAGE_CHOICES = [
     label: 'Bash',
     value: 'shell',
   },
+  {
+    label: 'Ansible Playbook',
+    value: 'ansible',
+  },
 ];
 
 export const EditScriptLanguageDialog = connect<{}, {}, OwnProps>(

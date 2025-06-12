@@ -17,7 +17,7 @@ import { FormRancherSecurityGroupsStep } from './FormRancherSecurityGroupsStep';
 import { FormSSHPublicKeysStep } from './FormSSHPublicKeysStep';
 import { FormSystemStorageStep } from './FormSystemStorageStep';
 import { FormTenantStep } from './FormTenantStep';
-import { getRancherMountPointChoices, rancherClusterName } from './utils';
+import { rancherClusterName } from './utils';
 
 export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
   DetailsOverviewStep,
@@ -60,9 +60,7 @@ export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
     fields: ['attributes.data_volume_type', 'attributes.data_volume_size'],
     required: false,
     component: FormDataStorageStep,
-    isActive: () =>
-      getRancherMountPointChoices().length > 0 &&
-      !ENV.plugins.WALDUR_RANCHER.DISABLE_DATA_VOLUME_CREATION,
+    isActive: () => !ENV.plugins.WALDUR_RANCHER.DISABLE_DATA_VOLUME_CREATION,
   },
   {
     label: translate('SSH public key'),

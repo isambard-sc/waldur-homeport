@@ -1,4 +1,4 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -57,7 +57,7 @@ const OfferingListItem: FC<{ row: Offering }> = ({ row }) => {
                 className="btn btn-active-secondary btn-icon btn-icon-gray-700 btn-sm"
               >
                 <span className="svg-icon svg-icon-2">
-                  <PlusCircle weight="bold" />
+                  <PlusCircleIcon weight="bold" />
                 </span>
               </OfferingLink>
             </Tip>
@@ -83,6 +83,7 @@ export const OfferingsSearchBox = () => {
       'state',
       'paused_reason',
     ];
+
     return {
       o: '-created',
       state: ['Active', 'Paused'],

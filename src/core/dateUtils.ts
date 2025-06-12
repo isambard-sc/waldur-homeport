@@ -28,12 +28,17 @@ export const parseDate = (value: DateInput) => {
   }
 };
 
-/** @example 1982-05-25 */
-export const formatDate: DateFormatter = (date) => parseDate(date).toISODate();
+/** @example 2027-02-26 */
+export const formatISODate: DateFormatter = (date) =>
+  parseDate(date).toISODate();
 
-/** @example 1982-05-25 14:21 */
+/** @example 26 Feb 2027 */
+export const formatDate: DateFormatter = (date) =>
+  parseDate(date).toLocaleString(DateTime.DATE_MED);
+
+/** @example 26 Feb 2027 14:00 */
 export const formatDateTime: DateFormatter = (date) =>
-  parseDate(date).toFormat('yyyy-MM-dd T');
+  parseDate(date).toLocaleString(DateTime.DATETIME_MED);
 
 /** @example 14:21 */
 export const formatTime: DateFormatter = (date) =>

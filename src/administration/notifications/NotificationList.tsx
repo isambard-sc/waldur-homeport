@@ -1,4 +1,4 @@
-import { PencilSimple, Question } from '@phosphor-icons/react';
+import { PencilSimpleIcon, QuestionIcon } from '@phosphor-icons/react';
 import { uniqueId } from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
@@ -38,7 +38,7 @@ export const NotificationList = () => {
               {row.key}
               {hasOverriddenTemplate(row) && (
                 <span className="svg-icon svg-icon-5 ms-3">
-                  <PencilSimple />
+                  <PencilSimpleIcon />
                 </span>
               )}
               {row.description && (
@@ -47,11 +47,12 @@ export const NotificationList = () => {
                   className="ms-2"
                   id={uniqueId('descriptionTip')}
                 >
-                  <Question />
+                  <QuestionIcon />
                 </Tip>
               )}
             </>
           ),
+
           export: 'key',
         },
         {

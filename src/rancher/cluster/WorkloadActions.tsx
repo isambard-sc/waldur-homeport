@@ -1,4 +1,4 @@
-import { Swap, Trash } from '@phosphor-icons/react';
+import { SwapIcon, TrashIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAsyncFn } from 'react-use';
@@ -35,7 +35,7 @@ export const WorkloadActions: FunctionComponent<{ workload }> = ({
         {
           positiveButton: translate('Redeploy'),
           negativeButton: translate('Cancel'),
-          iconNode: <Swap weight="bold" />,
+          iconNode: <SwapIcon weight="bold" />,
         },
       );
     } catch {
@@ -83,16 +83,18 @@ export const WorkloadActions: FunctionComponent<{ workload }> = ({
         resource={workload}
         disabled={disabled}
       />
+
       <ActionItem
         title={translate('Redeploy')}
         action={redeployCallback}
-        iconNode={<Swap weight="bold" />}
+        iconNode={<SwapIcon weight="bold" />}
         disabled={disabled}
       />
+
       <ActionItem
         title={translate('Delete')}
         action={deleteCallback}
-        iconNode={<Trash weight="bold" />}
+        iconNode={<TrashIcon weight="bold" />}
         disabled={disabled}
         className="text-danger"
         iconColor="danger"

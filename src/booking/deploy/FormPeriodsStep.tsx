@@ -1,4 +1,4 @@
-import { Plus, X } from '@phosphor-icons/react';
+import { PlusIcon, XIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { uniqueId } from 'lodash-es';
 import { DateTime, Duration } from 'luxon';
@@ -119,7 +119,7 @@ const renderScheduleRows = ({
               onClick={() => fields.remove(index)}
             >
               <span className="svg-icon svg-icon-2">
-                <X weight="bold" />
+                <XIcon weight="bold" />
               </span>
             </Button>
           </div>
@@ -158,7 +158,7 @@ const renderScheduleRows = ({
       ))}
       <Button variant="light" className="text-nowrap" onClick={addRow}>
         <span className="svg-icon svg-icon-2">
-          <Plus weight="bold" />
+          <PlusIcon weight="bold" />
         </span>
         {translate('Add time period')}
       </Button>
@@ -167,14 +167,16 @@ const renderScheduleRows = ({
 };
 
 export const FormPeriodsStep = (props: FormStepProps) => {
-  const { isLoading, data: bookedItems } = useQuery(
-    ['bookedItems', props.offering.uuid],
-    () =>
+  const { isLoading, data: bookedItems } = useQuery({
+    queryKey: ['bookedItems', props.offering.uuid],
+
+    queryFn: () =>
       marketplaceBookingsList({ path: { uuid: props.offering.uuid } }).then(
         (r) => r.data,
       ),
-    { staleTime: 3 * 60 * 1000 },
-  );
+
+    staleTime: 3 * 60 * 1000,
+  });
 
   return (
     <VStepperFormStepCard

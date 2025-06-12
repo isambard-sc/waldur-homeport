@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
@@ -71,7 +71,7 @@ const OrganizationRolesField = ({ row }: { row: User }) => {
           label={formatRole(permission.role_name)}
           id="customer-role"
         >
-          {permission.scope_name} <Question />
+          {permission.scope_name} <QuestionIcon />
         </Tip>
         <br />
       </span>
@@ -96,7 +96,7 @@ const ProjectRolesField = ({ row }: { row: User }) => {
           })}
           id="project-role"
         >
-          {permission.scope_name} <Question />
+          {permission.scope_name} <QuestionIcon />
         </Tip>
         <br />
       </span>

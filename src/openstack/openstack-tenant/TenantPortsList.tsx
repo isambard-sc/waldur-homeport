@@ -44,6 +44,7 @@ export const TenantPortsList: FunctionComponent<{ resourceScope }> = ({
         'security_groups',
         'project_uuid',
       ],
+
       o: ['network_name'],
     }),
     [resourceScope],

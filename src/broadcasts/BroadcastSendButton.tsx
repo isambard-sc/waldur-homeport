@@ -1,4 +1,4 @@
-import { Share } from '@phosphor-icons/react';
+import { ShareIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { broadcastMessagesSend } from 'waldur-js-client';
 
@@ -22,7 +22,7 @@ export const BroadcastSendButton = ({ row, refetch }) => {
     <ActionItem
       action={callback}
       title={translate('Send')}
-      iconNode={<Share weight="bold" />}
+      iconNode={<ShareIcon weight="bold" />}
       size="sm"
     />
   );

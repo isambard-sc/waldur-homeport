@@ -1,4 +1,4 @@
-import { DotsThreeVertical } from '@phosphor-icons/react';
+import { DotsThreeVerticalIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, PropsWithChildren, ReactNode } from 'react';
 import { Card, Col, Dropdown, Row } from 'react-bootstrap';
@@ -64,7 +64,7 @@ export const WidgetCard: FC<PropsWithChildren<WidgetCardProps>> = ({
                   bsPrefix="btn-icon"
                   className="h-25px w-25px"
                 >
-                  <DotsThreeVertical
+                  <DotsThreeVerticalIcon
                     size={20}
                     weight="bold"
                     className="text-gray-400"

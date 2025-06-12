@@ -25,16 +25,19 @@ export const OrdersListExpandableRow: FunctionComponent<{
       label={translate('Offering')}
       value={<OrderNameField row={order} />}
     />
+
     <Field
       label={translate('Resource')}
       value={<ResourceNameField row={order} />}
     />
+
     <Field label={translate('Type')} value={<OrderTypeCell row={order} />} />
     <Field label={translate('State')} value={<OrderStateCell row={order} />} />
     <Field
       label={translate('Plan')}
       value={renderFieldOrDash(order.plan_name)}
     />
+
     <Field
       label={translate('Actions')}
       value={<OrderProviderActions order={order} />}

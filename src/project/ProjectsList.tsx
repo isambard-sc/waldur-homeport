@@ -18,6 +18,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
 
 import { ProjectCreateButton } from './create/ProjectCreateButton';
+import { ProjectImportButton } from './import/ProjectImportButton';
 import { ProjectCostField } from './ProjectCostField';
 import { ProjectLink } from './ProjectLink';
 
@@ -32,6 +33,13 @@ interface ProjectsListProps extends Partial<TableProps> {
   customer?: Customer;
   optionalColumns?: ('description' | 'created')[];
 }
+
+const TableActions = ({ customer, refetch }) => (
+  <>
+    <ProjectImportButton customer={customer} refetch={refetch} />
+    <ProjectCreateButton customer={customer} refetch={refetch} />
+  </>
+);
 
 export const ProjectsList: FC<ProjectsListProps> = ({
   customer,
@@ -86,6 +94,7 @@ export const ProjectsList: FC<ProjectsListProps> = ({
       render: ({ row }) => (
         <>{row.start_date ? formatDate(row.start_date) : DASH_ESCAPE_CODE}</>
       ),
+
       orderField: 'start_date',
       export: false,
       id: 'start_date',
@@ -97,12 +106,14 @@ export const ProjectsList: FC<ProjectsListProps> = ({
       render: ({ row }) => (
         <>{row.end_date ? formatDate(row.end_date) : DASH_ESCAPE_CODE}</>
       ),
+
       orderField: 'end_date',
       export: false,
       id: 'end_date',
       keys: ['end_date'],
     },
   ];
+
   if (isFeatureVisible(ProjectFeatures.estimated_cost)) {
     columns.push({
       title: translate('Estimated cost'),
@@ -123,7 +134,10 @@ export const ProjectsList: FC<ProjectsListProps> = ({
       hasQuery={true}
       showPageSizeSelector={true}
       tableActions={
-        <ProjectCreateButton customer={customer} refetch={tableProps.fetch} />
+        <TableActions
+          customer={customer || currentCustomer}
+          refetch={tableProps.fetch}
+        />
       }
       rowActions={({ row }) => (
         <ProjectsListActions project={row} refetch={tableProps.fetch} />

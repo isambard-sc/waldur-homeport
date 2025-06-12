@@ -1,4 +1,4 @@
-import { LinkBreak } from '@phosphor-icons/react';
+import { LinkBreakIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { marketplaceResourcesUnlink } from 'waldur-js-client';
@@ -58,7 +58,7 @@ export const UnlinkActionItem: FC<{ resource }> = ({ resource }) => {
       action={callback}
       className="text-danger"
       staff
-      iconNode={<LinkBreak weight="bold" />}
+      iconNode={<LinkBreakIcon weight="bold" />}
       iconColor="danger"
     />
   );

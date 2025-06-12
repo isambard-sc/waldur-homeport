@@ -1,4 +1,4 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { PlusCircleIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { OpenStackRouter } from 'waldur-js-client';
 
@@ -24,7 +24,7 @@ export const AddRouterInterfaceButton: ActionItemType<OpenStackRouter> = ({
   return (
     <ActionItem
       title={translate('Add router interface')}
-      iconNode={<PlusCircle weight="bold" />}
+      iconNode={<PlusCircleIcon weight="bold" />}
       action={openDialog}
     />
   );

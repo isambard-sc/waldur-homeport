@@ -1,4 +1,4 @@
-import { LinkBreak } from '@phosphor-icons/react';
+import { LinkBreakIcon } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { rancherNodesUnlinkOpenstack } from 'waldur-js-client';
 
@@ -52,7 +52,7 @@ export const UnlinkAction: ActionItemType = ({ resource, refetch }) => {
         title={translate('Unlink instance')}
         action={callback}
         staff
-        iconNode={<LinkBreak weight="bold" />}
+        iconNode={<LinkBreakIcon weight="bold" />}
       />
     );
   }

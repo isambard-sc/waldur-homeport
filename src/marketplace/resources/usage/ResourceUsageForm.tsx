@@ -1,4 +1,8 @@
-import { DotsThree, Question, WarningCircle } from '@phosphor-icons/react';
+import {
+  DotsThreeIcon,
+  QuestionIcon,
+  WarningCircleIcon,
+} from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash-es';
 import {
@@ -125,9 +129,10 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
     isLoading: teamIsLoading,
     error: teamError,
     refetch: refetchTeam,
-  } = useQuery(
-    ['OfferingUsers', props.params.offering_uuid],
-    () =>
+  } = useQuery({
+    queryKey: ['OfferingUsers', props.params.offering_uuid],
+
+    queryFn: () =>
       isUserUsage
         ? marketplaceOfferingUsersList({
             query: {
@@ -136,12 +141,18 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
             },
           }).then((r) => r.data)
         : null,
-    { staleTime: 3 * 60 * 1000 },
-  );
 
-  const { data: userUsages } = useQuery(
-    ['ComponentUserUsage', props.params.resource_uuid, user?.username],
-    () => {
+    staleTime: 3 * 60 * 1000,
+  });
+
+  const { data: userUsages } = useQuery({
+    queryKey: [
+      'ComponentUserUsage',
+      props.params.resource_uuid,
+      user?.username,
+    ],
+
+    queryFn: () => {
       if (!isUserUsage || !user) return null;
 
       const { start, end } = getPeriodRange(props.periods[0].value);
@@ -155,7 +166,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
         },
       }).then((r) => r.data);
     },
-  );
+  });
 
   // Set last recorded user usages as components amount
   useEffect(() => {
@@ -285,7 +296,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                           }
                           autoWidth
                         >
-                          <WarningCircle
+                          <WarningCircleIcon
                             size={18}
                             weight="bold"
                             className="text-danger me-1"
@@ -301,7 +312,11 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                             : getBillingTypeLabel(component.billing_type)
                         }
                       >
-                        <Question size={18} weight="bold" className="ms-1" />
+                        <QuestionIcon
+                          size={18}
+                          weight="bold"
+                          className="ms-1"
+                        />
                       </Tip>
                     </Nav.Link>
                   </Nav.Item>
@@ -316,7 +331,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                       variant="active-light-primary"
                       className="btn-icon btn-text-gray-500 no-arrow w-35px h-35px"
                     >
-                      <DotsThree size={22} weight="bold" />
+                      <DotsThreeIcon size={22} weight="bold" />
                       {wrappedComponents.some((comp) =>
                         Boolean(errors.components?.[comp.type]),
                       ) && (
@@ -346,7 +361,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                                 }
                                 autoWidth
                               >
-                                <WarningCircle
+                                <WarningCircleIcon
                                   size={18}
                                   weight="bold"
                                   className="text-danger me-1"
@@ -360,7 +375,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                                 component.billing_type,
                               )}
                             >
-                              <Question size={18} className="ms-1" />
+                              <QuestionIcon size={18} className="ms-1" />
                             </Tip>
                           </Dropdown.Item>
                         ))}

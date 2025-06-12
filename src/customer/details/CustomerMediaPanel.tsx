@@ -1,4 +1,4 @@
-import { UploadSimple } from '@phosphor-icons/react';
+import { UploadSimpleIcon } from '@phosphor-icons/react';
 import { useEffect, useMemo } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
@@ -58,7 +58,7 @@ export const CustomerMediaPanel = connect<{}, {}, CustomerEditPanelProps>(
                       >
                         {translate('Save')}
                         <span className="svg-icon svg-icon-5">
-                          <UploadSimple />
+                          <UploadSimpleIcon />
                         </span>
                       </Button>
                     ) : null

@@ -34,6 +34,7 @@ export const CreditGroup = ({ customer }: { customer: Customer }) => {
         placeholder={defaultCurrency(0)}
         customer={customer}
       />
+
       <Form.Text className="text-muted">
         {translate(
           'Credits available for this organization: {customer_credit}',

@@ -51,6 +51,7 @@ export const ClusterUsersList: FunctionComponent<
               )}
             </>
           ),
+
           export: false,
         },
         {
@@ -64,6 +65,7 @@ export const ClusterUsersList: FunctionComponent<
               )}
             </>
           ),
+
           export: false,
         },
         {
@@ -71,6 +73,7 @@ export const ClusterUsersList: FunctionComponent<
           render: ({ row }) => (
             <>{row.is_active ? translate('Yes') : translate('No')}</>
           ),
+
           export: false,
         },
       ]}

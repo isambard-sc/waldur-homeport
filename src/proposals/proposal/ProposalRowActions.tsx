@@ -1,4 +1,8 @@
-import { ChatText, CheckCircle, XCircle } from '@phosphor-icons/react';
+import {
+  ChatTextIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -51,7 +55,7 @@ export const ProposalRowActions = ({ row, refetch }) => {
         <ActionItem
           title={translate('Create review')}
           action={() => openCreateReviewDialog(row)}
-          iconNode={<ChatText weight="bold" />}
+          iconNode={<ChatTextIcon weight="bold" />}
         />
       )}
       {canPerformDecisionActions && (
@@ -59,13 +63,14 @@ export const ProposalRowActions = ({ row, refetch }) => {
           <ActionItem
             title={translate('Approve')}
             action={handleApproveProposal}
-            iconNode={<CheckCircle weight="bold" />}
+            iconNode={<CheckCircleIcon weight="bold" />}
             disabled={!canPerformDecisionActions}
           />
+
           <ActionItem
             title={translate('Reject')}
             action={handleRejectProposal}
-            iconNode={<XCircle weight="bold" />}
+            iconNode={<XCircleIcon weight="bold" />}
             disabled={!canPerformDecisionActions}
             className="text-danger"
             iconColor="danger"

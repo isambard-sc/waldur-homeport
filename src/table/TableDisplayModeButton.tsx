@@ -1,4 +1,4 @@
-import { List, GridFour } from '@phosphor-icons/react';
+import { ListIcon, GridFourIcon } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -26,9 +26,9 @@ export const TableDisplayModeButton = (
       >
         <span className="svg-icon svg-icon-2">
           {props.mode === 'grid' ? (
-            <List weight="bold" />
+            <ListIcon weight="bold" />
           ) : (
-            <GridFour weight="bold" />
+            <GridFourIcon weight="bold" />
           )}
         </span>
       </Button>

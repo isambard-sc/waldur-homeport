@@ -19,6 +19,7 @@ const RowActions = ({ row, refetch, project }) => {
         project={project}
         refetch={refetch}
       />
+
       <DeleteProjectUserButton
         customer={row}
         project={project}

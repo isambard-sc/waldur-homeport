@@ -139,6 +139,7 @@ export const CustomerList: FunctionComponent<{
     ({ row }) => (
       <CustomerExpandableRow row={row} providerUUID={filter?.provider_uuid} />
     ),
+
     [filter],
   );
 

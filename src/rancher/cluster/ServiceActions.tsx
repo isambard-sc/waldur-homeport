@@ -19,6 +19,7 @@ export const ServiceActions: FC<{ row; fetch }> = ({ row, fetch }) => {
         yamlUpdate={rancherServicesYamlUpdate}
         resource={row}
       />
+
       <ResourceDeleteButton
         apiFunction={() => rancherServicesDestroy({ path: { uuid: row.uuid } })}
         resourceType={translate('Service')}

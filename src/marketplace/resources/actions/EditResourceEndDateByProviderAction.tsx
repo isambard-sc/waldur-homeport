@@ -1,4 +1,4 @@
-import { CalendarBlank } from '@phosphor-icons/react';
+import { CalendarBlankIcon } from '@phosphor-icons/react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   marketplaceProviderResourcesSetEndDateByProvider,
@@ -53,7 +53,7 @@ export const EditResourceEndDateByProviderAction = ({
     <ActionItem
       title={translate('Set termination date')}
       action={callback}
-      iconNode={<CalendarBlank weight="bold" />}
+      iconNode={<CalendarBlankIcon weight="bold" />}
     />
   ) : null;
 };

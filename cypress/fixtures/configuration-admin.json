@@ -16,7 +16,9 @@
       "estimated_cost": true,
       "events": true,
       "oecd_fos_2007_code": false,
-      "show_industry_flag": false
+      "show_industry_flag": false,
+      "show_start_date_in_create_dialog": true,
+      "show_end_date_in_create_dialog": true
     },
     "user": {
       "preferred_language": false,

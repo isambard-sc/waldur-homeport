@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 import { connect } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
@@ -70,11 +70,13 @@ export const ExportDialog = connect<
               isClearable={false}
               validate={required}
             />
+
             <AwesomeCheckboxField
               name="withFilters"
               label={translate('Apply table filters')}
               hideLabel
             />
+
             <AwesomeCheckboxField
               name="allPages"
               label={
@@ -87,7 +89,7 @@ export const ExportDialog = connect<
                     className="ms-2"
                     id="tip-export-table-all-page"
                   >
-                    <Question size={20} />
+                    <QuestionIcon size={20} />
                   </Tip>
                 </>
               }

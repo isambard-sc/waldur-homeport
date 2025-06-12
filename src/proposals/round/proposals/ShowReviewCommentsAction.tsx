@@ -1,4 +1,4 @@
-import { Eye, Info } from '@phosphor-icons/react';
+import { EyeIcon, InfoIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { ProposalReview } from 'waldur-js-client';
 
@@ -21,7 +21,7 @@ const ShowReviewCommentsDialog = ({
         reviewer: review.reviewer_full_name,
       })}
       closeButton
-      iconNode={<Info weight="bold" />}
+      iconNode={<InfoIcon weight="bold" />}
     >
       <FormTable hideActions alignTop detailsMode>
         {review.summary_private_comment && (
@@ -120,7 +120,7 @@ export const ShowReviewCommentsAction = (props) => {
   return (
     <ActionItem
       action={handleShowComments}
-      iconNode={<Eye />}
+      iconNode={<EyeIcon />}
       title={translate('Show reviewer comments')}
       disabled={!showActionItem}
       tooltip={!showActionItem && translate('No comments available')}

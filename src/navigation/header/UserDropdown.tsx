@@ -49,13 +49,13 @@ export const UserDropdownMenu: FunctionComponent = () => {
         </div>
       </div>
       <div
-        className="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg menu-state-primary fw-bold py-4 fs-6 w-275px"
+        className="menu-dropdown-default menu menu-sub menu-sub-dropdown menu-column menu-gray-600 menu-state-bg-gray fw-bold py-4 fs-6 w-275px"
         data-kt-menu="true"
         data-popper-placement="bottom-end"
         data-cy="user-dropdown-menu"
       >
         <div className="menu-item px-3">
-          <div className="menu-content d-flex align-items-center px-3">
+          <div className="menu-content d-flex align-items-center px-2">
             <div className="symbol symbol-50px me-5">
               {!user ? (
                 <ImagePlaceholder width="40px" height="40px" circle />
@@ -92,7 +92,7 @@ export const UserDropdownMenu: FunctionComponent = () => {
         {user ? (
           <UserDropdownMenuItems />
         ) : (
-          <div className="d-grid gap-2 px-6">
+          <div className="d-grid gap-2 px-5">
             <Link
               state="login"
               className="btn btn-light btn-color-dark btn-active-color-dark"
@@ -107,10 +107,10 @@ export const UserDropdownMenu: FunctionComponent = () => {
         <LanguageSelectorDropdown />
 
         {user && (
-          <div className="menu-item px-5" data-kt-menu-trigger="click">
+          <div className="menu-item" data-kt-menu-trigger="click">
             <Link
               state="logout"
-              className="menu-link px-5"
+              className="menu-link"
               aria-hidden="true"
               label={translate('Log out')}
             />

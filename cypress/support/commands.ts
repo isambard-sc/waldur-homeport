@@ -33,6 +33,7 @@ declare global {
       waitForSpinner(): Chainable;
       waitForPage(): Chainable;
       acceptCookies(): Chainable;
+      setAcceptCookies(): Chainable;
     }
   }
 }
@@ -74,8 +75,18 @@ Cypress.Commands.add('waitForPage', () => {
 });
 
 Cypress.Commands.add('acceptCookies', () => {
-  cy.get('button.acceptcookies').should(($el) => {
-    if ($el) $el.trigger('click');
+  cy.get('body').then(($body) => {
+    const $alert = $body.find('.cookiealert');
+    if ($alert.length) {
+      cy.wrap($alert).contains('button', 'Accept').click();
+    }
+  });
+});
+
+Cypress.Commands.add('setAcceptCookies', () => {
+  // Set cookies as accepted
+  cy.window().then((win) => {
+    win.localStorage.setItem('waldur/cookies/consent', 'true');
   });
 });
 
@@ -296,6 +307,8 @@ Cypress.Commands.add('mockUser', (userName) => {
     .intercept('GET', '/api/marketplace-category-groups/**', [])
     .intercept('GET', '/api/marketplace-global-categories/**', [])
     .intercept('GET', '/api/admin-announcements/**', []);
+
+  cy.setAcceptCookies();
 });
 
 Cypress.Commands.add('mockCustomer', () => {

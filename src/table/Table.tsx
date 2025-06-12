@@ -1,4 +1,4 @@
-import { X } from '@phosphor-icons/react';
+import { XIcon } from '@phosphor-icons/react';
 import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
 import { debounce, isEqual } from 'lodash-es';
@@ -397,7 +397,7 @@ class TableClass<RowType = any> extends React.Component<TableProps<RowType>> {
                   size="sm"
                   onClick={this.props.resetSelection}
                 >
-                  <X weight="bold" />
+                  <XIcon weight="bold" />
                 </Button>
                 <span>
                   ({this.props.selectedRows?.length}) {translate('Selected')}

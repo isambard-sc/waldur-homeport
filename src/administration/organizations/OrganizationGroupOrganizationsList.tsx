@@ -38,6 +38,7 @@ export const OrganizationGroupOrganizationsList: FunctionComponent<any> = (
           label={row.name}
         />
       ),
+
       export: 'name',
     },
     {

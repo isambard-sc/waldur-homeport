@@ -1,12 +1,12 @@
 import {
-  ArrowClockwise,
-  ArrowSquareOut,
-  Check,
-  Key,
-  Keyboard,
-  Play,
-  Sliders,
-  User,
+  ArrowClockwiseIcon,
+  ArrowSquareOutIcon,
+  CheckIcon,
+  KeyIcon,
+  KeyboardIcon,
+  PlayIcon,
+  SlidersIcon,
+  UserIcon,
 } from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC, useMemo, useState } from 'react';
@@ -130,9 +130,10 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
           isDisabled={submitting || executing}
           className={isSmallScr ? 'w-250px' : 'w-300px'}
         />
+
         <Button onClick={onSave} disabled={submitting || executing || !dirty}>
           <span className="svg-icon svg-icon-2">
-            <Check weight="bold" />
+            <CheckIcon weight="bold" />
           </span>
           {isSmallScr ? translate('Save') : translate('Save script')}
         </Button>
@@ -142,7 +143,7 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
           disabled={submitting || !dirty}
         >
           <span className="svg-icon svg-icon-2">
-            <ArrowClockwise weight="bold" />
+            <ArrowClockwiseIcon weight="bold" />
           </span>
           {isSmallScr ? translate('Reset') : translate('Reset to saved')}
         </Button>
@@ -156,7 +157,7 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
             {executing ? (
               <LoadingSpinnerIcon className="me-1" />
             ) : (
-              <Play weight="bold" />
+              <PlayIcon weight="bold" />
             )}
           </span>
           {isSmallScr ? translate('Dry run') : translate('Dry run script')}
@@ -181,6 +182,7 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
           className="border-bottom"
           autoFocus
         />
+
         {filteredEnvItems.map((option) => {
           return (
             <DropdownItem
@@ -195,7 +197,7 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
               {option.type === 'link' ? (
                 <>
                   <span>{option.label}</span>
-                  <ArrowSquareOut
+                  <ArrowSquareOutIcon
                     weight="bold"
                     size={20}
                     className="text-muted"
@@ -206,13 +208,13 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
                   <span>
                     <span className="svg-icon svg-icon-2">
                       {option.type === 'environ' ? (
-                        <Key weight="bold" />
+                        <KeyIcon weight="bold" />
                       ) : option.type === 'options' ? (
-                        <Keyboard weight="bold" />
+                        <KeyboardIcon weight="bold" />
                       ) : option.type === 'roles' ? (
-                        <User weight="bold" />
+                        <UserIcon weight="bold" />
                       ) : (
-                        <Sliders weight="bold" />
+                        <SlidersIcon weight="bold" />
                       )}
                     </span>
                     <span>{option.label}</span>

@@ -1,4 +1,4 @@
-import { Eye } from '@phosphor-icons/react';
+import { EyeIcon } from '@phosphor-icons/react';
 import { Col } from 'react-bootstrap';
 import { Project } from 'waldur-js-client';
 
@@ -68,7 +68,7 @@ export const ProjectDashboardCredit = ({
         actions={[
           {
             label: translate('Details'),
-            icon: <Eye />,
+            icon: <EyeIcon />,
             callback: viewDetails,
           },
         ]}

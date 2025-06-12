@@ -94,13 +94,14 @@ export const CategoryResourcesList: FunctionComponent<OwnProps> = (
     fetchData: createFetcher('marketplace-resources'),
     filter,
     queryField: 'query',
-    onApplyFilter: (filters) => {
+    onApplyFilter: (filters, firstFetch) => {
       const organization = filters.find((item) => item.name === 'organization');
       const project = filters.find((item) => item.name === 'project');
       const formValues = {
         organization: organization?.value,
         project: project?.value,
       };
+      if (firstFetch && !organization?.value && !project?.value) return;
       syncResourceFilters(formValues);
     },
     mandatoryFields: resourcesListRequiredFields(),

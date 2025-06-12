@@ -1,4 +1,8 @@
-import { CaretDown, DotsThreeVertical, Spinner } from '@phosphor-icons/react';
+import {
+  CaretDownIcon,
+  DotsThreeVerticalIcon,
+  SpinnerIcon,
+} from '@phosphor-icons/react';
 import { FunctionComponent, PropsWithChildren } from 'react';
 import { Dropdown, DropdownProps } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';
@@ -47,7 +51,7 @@ export const TableDropdownToggle = ({
     >
       {label || translate('Actions')}
       <span className="svg-icon svg-icon-4 rotate-180">
-        <CaretDown weight="bold" />
+        <CaretDownIcon weight="bold" />
       </span>
     </Dropdown.Toggle>
   ) : (
@@ -57,7 +61,7 @@ export const TableDropdownToggle = ({
       disabled={disabled}
       size={size === 'md' ? undefined : size}
     >
-      <DotsThreeVertical size={22} weight="bold" />
+      <DotsThreeVerticalIcon size={22} weight="bold" />
     </Dropdown.Toggle>
   );
 };
@@ -91,6 +95,7 @@ export const ActionsDropdownComponent: FunctionComponent<
       className={className}
       size={size}
     />
+
     <PortalDropdown>
       <Dropdown.Menu
         popperConfig={
@@ -132,7 +137,7 @@ export const ActionsDropdown: FunctionComponent<
     {open ? (
       loading ? (
         <Dropdown.Item eventKey="1">
-          <Spinner size={20} className="animation-spin me-2" />
+          <SpinnerIcon size={20} className="animation-spin me-2" />
           {translate('Loading actions')}
         </Dropdown.Item>
       ) : error ? (

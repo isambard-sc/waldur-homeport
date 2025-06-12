@@ -49,6 +49,7 @@ const InvitationsListComponent: FunctionComponent = () => {
               <CopyToClipboardButton value={row.email} />
             </div>
           ),
+
           orderField: 'email',
         },
         {

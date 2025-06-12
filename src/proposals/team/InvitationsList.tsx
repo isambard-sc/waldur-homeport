@@ -29,6 +29,7 @@ export const InvitationsList: FunctionComponent<{
               <CopyToClipboardButton value={row.email} />
             </div>
           ),
+
           orderField: 'email',
         },
         hideRole

@@ -49,6 +49,7 @@ export const ServiceAccountsTableComponent: FC<
                     row={{ uuid: row.project_uuid, name: row.project_name }}
                   />
                 ),
+
               export: getContextKey(context),
               orderField: getContextKey(context),
             } as any)
@@ -72,6 +73,7 @@ export const ServiceAccountsTableComponent: FC<
               <CopyToClipboardButton value={row.email} />
             </div>
           ),
+
           orderField: 'email',
           export: 'email',
         },
@@ -86,6 +88,15 @@ export const ServiceAccountsTableComponent: FC<
       hasQuery={true}
       enableExport
       expandableRow={ServiceAccountExpandableRow}
+      rowActions={({ row }) => (
+        <ServiceAccountActions
+          context={context}
+          scope={scope}
+          row={row}
+          refetch={tableProps.fetch}
+          admin={!scope}
+        />
+      )}
       {...tableProps}
     />
   );
@@ -134,14 +145,6 @@ export const ServiceAccountsList: FC<ServiceAccountsProps> = ({
           </>
         )
       }
-      rowActions={({ row }) => (
-        <ServiceAccountActions
-          context={context}
-          scope={scope}
-          row={row}
-          refetch={tableProps.fetch}
-        />
-      )}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { ArrowsClockwise, CaretRight } from '@phosphor-icons/react';
+import { ArrowsClockwiseIcon, CaretRightIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FunctionComponent, PropsWithChildren, useContext } from 'react';
 import {
@@ -21,6 +21,7 @@ const EmptyCategoryListPlaceholder: FunctionComponent = () => (
     {translate('There are no categories.')}
   </div>
 );
+
 interface CategoryListItemProps {
   item: Category;
   onClick;
@@ -79,7 +80,7 @@ function CustomToggle({ item, eventKey }) {
       active={activeEventKey === eventKey}
     >
       <span className="svg-icon svg-icon-3 text-gray-700 rotate-90">
-        <CaretRight />
+        <CaretRightIcon />
       </span>
     </CategoryListItem>
   );
@@ -131,7 +132,7 @@ export const CategoriesPanel: FunctionComponent<{
         </h6>
         {loading && (
           <span className="animation-spin text-gray-700 lh-1">
-            <ArrowsClockwise size={16} />
+            <ArrowsClockwiseIcon size={16} />
           </span>
         )}
       </div>

@@ -54,6 +54,7 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => (
             <ResourceRowActions resource={row} refetch={props.fetch} />
           ),
+
           className: 'col-sm-2',
         },
       ]}
@@ -67,6 +68,7 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
             resource={resourceScope}
             refetch={props.fetch}
           />
+
           <CreateServerGroupAction
             resource={resourceScope}
             refetch={props.fetch}

@@ -66,6 +66,7 @@ export const UserReviewsList: FC = () => {
           render: ({ row }) => (
             <span className="text-gray-700 fw-bold">{row.proposal_name}</span>
           ),
+
           keys: ['proposal_name'],
           id: 'proposal',
         },

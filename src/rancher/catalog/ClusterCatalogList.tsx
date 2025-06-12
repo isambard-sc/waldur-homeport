@@ -41,6 +41,7 @@ export const ClusterCatalogList: FunctionComponent<
               label={row.name}
             />
           ),
+
           copyField: (row) => row.name,
           export: 'name',
         },

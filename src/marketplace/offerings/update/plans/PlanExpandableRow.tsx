@@ -1,4 +1,4 @@
-import { Info } from '@phosphor-icons/react';
+import { InfoIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { OfferingComponent } from 'waldur-js-client';
 
@@ -36,7 +36,7 @@ export const PlanExpandableRow: FC<OwnProps> = (props) => {
                       label={component.type}
                       placement="right"
                     >
-                      <Info weight="bold" />
+                      <InfoIcon weight="bold" />
                     </Tip>
                   </td>
                   <td>{props.row.prices[component.type]}</td>

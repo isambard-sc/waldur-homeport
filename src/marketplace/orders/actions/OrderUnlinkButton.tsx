@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { marketplaceOrdersUnlink } from 'waldur-js-client';
@@ -34,7 +34,7 @@ export const OrderUnlinkButton = ({ row, refetch }) => {
       title={translate('Unlink')}
       className="text-danger"
       action={callback}
-      iconNode={<Trash weight="bold" />}
+      iconNode={<TrashIcon weight="bold" />}
       iconColor="danger"
     />
   );

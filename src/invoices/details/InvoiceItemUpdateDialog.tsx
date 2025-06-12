@@ -27,6 +27,7 @@ export const InvoiceItemUpdateDialog = ({
       type: 'integer',
     },
   ];
+
   if (resource.billing_type === 'fixed') {
     fields.push({
       name: 'start',

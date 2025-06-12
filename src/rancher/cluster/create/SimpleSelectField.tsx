@@ -11,6 +11,7 @@ export const SimpleSelectField: FunctionComponent<any> = (props) => (
       options={props.options}
       isClearable={false}
     />
+
     {props.meta.touched && <FieldError error={props.meta.error} />}
   </>
 );

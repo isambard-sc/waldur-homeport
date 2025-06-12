@@ -33,32 +33,35 @@ export const CustomerDashboard: FunctionComponent = () => {
     isLoading: isAggregateLimitLoading,
     error: aggregateLimitError,
     refetch: aggregateLimitRefetch,
-  } = useQuery(
-    ['customer-stats', customer?.uuid],
-    () =>
+  } = useQuery({
+    queryKey: ['customer-stats', customer?.uuid],
+
+    queryFn: () =>
       customersStatsRetrieve({ path: { uuid: customer?.uuid } }).then(
         (r) => r.data,
       ),
-    { refetchOnWindowFocus: false, staleTime: 60 * 1000 },
-  );
+
+    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000,
+  });
 
   const {
     data: aggregateLimitDataForCurrentMonth,
     isLoading: isAggregateLimitLoadingForCurrentMonth,
     error: aggregateLimitErrorForCurrentMonth,
     refetch: aggregateLimitRefetchForCurrentMonth,
-  } = useQuery(
-    ['customer-stats', customer?.uuid, 'current-month'],
-    () =>
+  } = useQuery({
+    queryKey: ['customer-stats', customer?.uuid, 'current-month'],
+
+    queryFn: () =>
       customersStatsRetrieve({
         path: { uuid: customer?.uuid },
         query: { for_current_month: true },
       }).then((r) => r.data),
-    {
-      refetchOnWindowFocus: false,
-      staleTime: 60 * 1000,
-    },
-  );
+
+    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000,
+  });
 
   const currentMonthFilteredData = filterComponentsWithUsage(
     aggregateLimitDataForCurrentMonth,
@@ -110,7 +113,7 @@ export const CustomerDashboard: FunctionComponent = () => {
             </Col>
           )}
           <Col xs={12}>
-            <ProjectsList />
+            <ProjectsList customer={customer} />
           </Col>
         </Row>
       )}

@@ -1,4 +1,4 @@
-import { XCircle } from '@phosphor-icons/react';
+import { XCircleIcon } from '@phosphor-icons/react';
 import { Resource } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
@@ -15,7 +15,7 @@ export const ResourceBackendState = ({ resource }: { resource: Resource }) => {
       label={translate('Backend state') + ': ' + translate('Erred')}
     >
       <Badge variant="danger" outline pill onlyIcon size="sm">
-        <XCircle weight="bold" size={12} />
+        <XCircleIcon weight="bold" size={12} />
       </Badge>
     </Tip>
   );

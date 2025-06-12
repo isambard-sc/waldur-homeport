@@ -1,4 +1,4 @@
-import { Eye, WarningOctagon } from '@phosphor-icons/react';
+import { EyeIcon, WarningOctagonIcon } from '@phosphor-icons/react';
 import { Col } from 'react-bootstrap';
 
 import { EChart } from '@waldur/core/EChart';
@@ -71,7 +71,7 @@ export const CustomerDashboardCredit = ({
                 label={translate('Credit is overallocated')}
                 className="ms-2"
               >
-                <WarningOctagon
+                <WarningOctagonIcon
                   className="text-warning"
                   weight="bold"
                   size={16}
@@ -83,7 +83,7 @@ export const CustomerDashboardCredit = ({
         actions={[
           {
             label: translate('Details'),
-            icon: <Eye />,
+            icon: <EyeIcon />,
             callback: viewDetails,
           },
         ]}

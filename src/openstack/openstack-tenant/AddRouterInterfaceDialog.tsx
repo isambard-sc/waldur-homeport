@@ -27,9 +27,10 @@ export const AddRouterInterfaceDialog = ({ resolve: { router } }) => {
   const dispatch = useDispatch();
   const type = useSelector(typeSelector);
 
-  const query = useQuery(
-    ['AddRouterInterface', router.tenant_uuid],
-    async () => {
+  const query = useQuery({
+    queryKey: ['AddRouterInterface', router.tenant_uuid],
+
+    queryFn: async () => {
       const subnets = (
         await openstackSubnetsList({
           query: { tenant_uuid: router.tenant_uuid },
@@ -48,7 +49,7 @@ export const AddRouterInterfaceDialog = ({ resolve: { router } }) => {
       ).data;
       return { subnets, ports };
     },
-  );
+  });
 
   const fields = useMemo(
     () =>

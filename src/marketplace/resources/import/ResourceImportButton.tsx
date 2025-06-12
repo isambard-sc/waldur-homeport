@@ -1,4 +1,4 @@
-import { DownloadSimple } from '@phosphor-icons/react';
+import { DownloadSimpleIcon } from '@phosphor-icons/react';
 import React from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -33,7 +33,7 @@ export const ResourceImportButton: React.FC<ImportDialogProps['resolve']> = (
     <ActionButton
       title={translate('Import')}
       action={openDialog}
-      iconNode={<DownloadSimple weight="bold" />}
+      iconNode={<DownloadSimpleIcon weight="bold" />}
     />
   );
 };

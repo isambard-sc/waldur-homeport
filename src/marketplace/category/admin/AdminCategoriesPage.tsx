@@ -1,4 +1,4 @@
-import { ArrowsClockwise } from '@phosphor-icons/react';
+import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
@@ -28,7 +28,9 @@ export const AdminCategoriesPage: FunctionComponent = () => {
     isLoading: loadingGroups,
     error: errorGroups,
     refetch,
-  } = useQuery(['MarketplaceCategoryGroups'], () => getCategoryGroups(), {
+  } = useQuery({
+    queryKey: ['MarketplaceCategoryGroups'],
+    queryFn: () => getCategoryGroups(),
     staleTime: 30 * 1000,
   });
 
@@ -61,7 +63,7 @@ export const AdminCategoriesPage: FunctionComponent = () => {
               if (loadingGroups) {
                 return (
                   <span className="svg-icon svg-icon-4 animation-spin me-2">
-                    <ArrowsClockwise />
+                    <ArrowsClockwiseIcon />
                   </span>
                 );
               } else if (errorGroups) {
@@ -77,7 +79,7 @@ export const AdminCategoriesPage: FunctionComponent = () => {
                       onClick={() => refetch()}
                     >
                       <span className="svg-icon svg-icon-4 me-2">
-                        <ArrowsClockwise />
+                        <ArrowsClockwiseIcon />
                       </span>
                     </Button>
                   </>

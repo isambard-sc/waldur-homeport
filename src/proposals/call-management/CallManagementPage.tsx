@@ -62,6 +62,7 @@ export const CallManagementPage: FunctionComponent = () => {
               label={row.name}
             />
           ),
+
           copyField: (row) => row.name,
         },
         {

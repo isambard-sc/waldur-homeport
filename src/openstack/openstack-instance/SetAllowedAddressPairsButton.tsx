@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 import { OpenStackInstance } from 'waldur-js-client';
@@ -32,7 +32,7 @@ export const SetAllowedAddressPairsButton: FunctionComponent<{
   return (
     <ActionItem
       title={translate('Set allowed address pairs')}
-      iconNode={<PencilSimple weight="bold" />}
+      iconNode={<PencilSimpleIcon weight="bold" />}
       action={openDialog}
     />
   );

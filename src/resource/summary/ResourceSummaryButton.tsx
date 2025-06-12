@@ -1,4 +1,4 @@
-import { Eye } from '@phosphor-icons/react';
+import { EyeIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
@@ -27,7 +27,7 @@ export const ResourceSummaryAction: ActionItemType = ({ resource }) => {
     <ActionItem
       title={translate('Details')}
       action={showDetailsModal}
-      iconNode={<Eye weight="bold" />}
+      iconNode={<EyeIcon weight="bold" />}
     />
   );
 };

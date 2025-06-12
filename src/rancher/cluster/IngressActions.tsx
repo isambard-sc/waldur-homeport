@@ -19,6 +19,7 @@ export const IngressActions: FC<{ row; fetch }> = ({ row, fetch }) => {
         yamlUpdate={rancherIngressesYamlUpdate}
         resource={row}
       />
+
       <ResourceDeleteButton
         apiFunction={() =>
           rancherIngressesDestroy({ path: { uuid: row.uuid } })

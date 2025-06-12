@@ -80,6 +80,7 @@ export const ViewYAMLDialog = reduxForm<
         height={400}
         options={{ scrollBeyondLastLine: false }}
       />
+
       {value && (
         <>
           <CopyToClipboard value={value} textButton className="my-2" />{' '}

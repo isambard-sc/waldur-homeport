@@ -40,6 +40,7 @@ const CallColumns = [
         label={row.name}
       />
     ),
+
     copyField: (row) => row.name,
   },
   {

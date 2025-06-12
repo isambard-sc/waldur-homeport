@@ -1,4 +1,4 @@
-import { Eye, Question } from '@phosphor-icons/react';
+import { EyeIcon, QuestionIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -129,7 +129,7 @@ export const AggregateLimitWidget = ({
         id="aggregate-limit-tooltip"
         label={translate('You are viewing the chart in log scale mode.')}
       >
-        <Question />
+        <QuestionIcon />
       </Tip>
     </>
   );
@@ -142,7 +142,7 @@ export const AggregateLimitWidget = ({
   const actions = [
     {
       label: translate('Details'),
-      icon: <Eye />,
+      icon: <EyeIcon />,
       callback: viewDetails,
     },
   ];

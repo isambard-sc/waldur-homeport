@@ -1,4 +1,4 @@
-import { PencilSimple, Trash, X } from '@phosphor-icons/react';
+import { PencilSimpleIcon, TrashIcon, XIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import {
   ComponentType,
@@ -116,7 +116,7 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
           >
             {translate('Change')}
             <span className="svg-icon svg-icon-5">
-              <PencilSimple weight="bold" />
+              <PencilSimpleIcon weight="bold" />
             </span>
             <input
               ref={inputRef}
@@ -138,7 +138,7 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
           >
             {translate('Cancel')}
             <span className="svg-icon svg-icon-5">
-              <X weight="bold" />
+              <XIcon weight="bold" />
             </span>
           </Button>
           <Button
@@ -151,7 +151,7 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
           >
             {translate('Remove')}
             <span className="svg-icon svg-icon-5">
-              <Trash />
+              <TrashIcon />
             </span>
           </Button>
           {props.extraActions

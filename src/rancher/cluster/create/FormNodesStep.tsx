@@ -1,10 +1,10 @@
-import { Plus, X } from '@phosphor-icons/react';
+import { PlusIcon, XIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback } from 'react';
 import { Button, Form, FormCheck } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { arrayPush, arrayRemoveAll, Field, FieldArray } from 'redux-form';
-import { OpenStackFlavor, rancherClusterTemplatesList } from 'waldur-js-client';
+import { rancherClusterTemplatesList } from 'waldur-js-client';
 
 import { getAllPages } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
@@ -152,7 +152,7 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                             onClick={() => fields.remove(index)}
                           >
                             <span className="svg-icon svg-icon-2">
-                              <X weight="bold" />
+                              <XIcon weight="bold" />
                             </span>
                           </Button>
                         </td>
@@ -167,7 +167,7 @@ const renderNodeRows = ({ fields, flavors }: any) => {
       )}
       <Button variant="light" className="text-nowrap" onClick={addRow}>
         <span className="svg-icon svg-icon-2">
-          <Plus weight="bold" />
+          <PlusIcon weight="bold" />
         </span>
         {translate('Add')}
       </Button>
@@ -180,20 +180,24 @@ export const FormNodesStep = (props: FormStepProps) => {
   const tenant = useSelector(formTenantSelector);
 
   const { data: volumeData } = useVolumeDataLoader(tenant);
-  const { data: templates, isLoading: templateLoading } = useQuery(
-    ['nodes-step-templates'],
-    () =>
+  const { data: templates, isLoading: templateLoading } = useQuery({
+    queryKey: ['nodes-step-templates'],
+
+    queryFn: () =>
       getAllPages((page) => rancherClusterTemplatesList({ query: { page } })),
-    { staleTime: 3 * 60 * 1000 },
-  );
-  const { data: flavors, isLoading } = useQuery<{}, {}, OpenStackFlavor[]>(
-    ['nodes-step-flavors', tenant?.url, props.offering.uuid],
-    () =>
+
+    staleTime: 3 * 60 * 1000,
+  });
+  const { data: flavors, isLoading } = useQuery({
+    queryKey: ['nodes-step-flavors', tenant?.url, props.offering.uuid],
+
+    queryFn: () =>
       tenant && props.offering
         ? filterFlavors(tenant.uuid, props.offering)
         : [],
-    { staleTime: 3 * 60 * 1000 },
-  );
+
+    staleTime: 3 * 60 * 1000,
+  });
 
   const onSelectTemplate = useCallback(
     (template) => {

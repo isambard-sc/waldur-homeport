@@ -1,4 +1,4 @@
-import { FunnelSimple } from '@phosphor-icons/react';
+import { FunnelSimpleIcon } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
 
 import { Tip } from '@waldur/core/Tooltip';
@@ -15,7 +15,7 @@ export const TableFilterButton = ({ onClick, hasFilter = false }) => {
         onClick={onClick}
       >
         <span className="svg-icon svg-icon-2">
-          <FunnelSimple weight="bold" />
+          <FunnelSimpleIcon weight="bold" />
         </span>
         {hasFilter && (
           <HeaderButtonBullet size={8} blink={false} className="me-n2" />

@@ -1,4 +1,9 @@
-import { At, MapPinLine, PhoneCall, UserSquare } from '@phosphor-icons/react';
+import {
+  AtIcon,
+  MapPinLineIcon,
+  PhoneCallIcon,
+  UserSquareIcon,
+} from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
@@ -55,25 +60,25 @@ export const UserProfile = ({
       >
         {user.job_title && (
           <span className="text-nowrap">
-            <UserSquare size={18} weight="duotone" className="me-1" />
+            <UserSquareIcon size={18} weight="duotone" className="me-1" />
             {user.job_title}
           </span>
         )}
         {user.organization && (
           <span className="text-nowrap">
-            <MapPinLine size={18} weight="duotone" className="me-1" />
+            <MapPinLineIcon size={18} weight="duotone" className="me-1" />
             {user.organization}
           </span>
         )}
         {user.email && (
           <span className="text-nowrap">
-            <At size={18} weight="duotone" className="me-1" />
+            <AtIcon size={18} weight="duotone" className="me-1" />
             {user.email}
           </span>
         )}
         {user.phone_number && (
           <span className="text-nowrap">
-            <PhoneCall size={18} weight="duotone" className="me-1" />
+            <PhoneCallIcon size={18} weight="duotone" className="me-1" />
             {user.phone_number}
           </span>
         )}

@@ -1,14 +1,15 @@
-import Markdown from 'markdown-to-jsx';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { UserAgreement } from 'waldur-js-client';
+
+import { SafeMarkdown } from '@waldur/core/SafeMarkdown';
 
 export const UserAgreementsExpandableRow: FunctionComponent<{
   row: UserAgreement;
 }> = ({ row }) => (
   <Row>
     <Col sm={8}>
-      <Markdown>{row.content}</Markdown>
+      <SafeMarkdown text={row.content} />
     </Col>
   </Row>
 );

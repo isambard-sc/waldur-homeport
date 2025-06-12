@@ -1,4 +1,4 @@
-import { UserList } from '@phosphor-icons/react';
+import { UserListIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { Resource } from 'waldur-js-client';
 
@@ -57,7 +57,7 @@ export const ReportUserUsageAction = ({ resource }: { resource: Resource }) => {
   return (
     <ActionItem
       title={translate('User usage report')}
-      iconNode={<UserList weight="bold" />}
+      iconNode={<UserListIcon weight="bold" />}
       action={() =>
         callback({
           offering_uuid: resource.offering_uuid,

@@ -70,6 +70,7 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
       render: ({ row }) => (
         <CopyToClipboardContainer value={row.fingerprint_sha256} />
       ),
+
       export: 'fingerprint_sha256',
     },
     {

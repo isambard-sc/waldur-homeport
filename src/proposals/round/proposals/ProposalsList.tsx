@@ -45,6 +45,7 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
               label={row.name}
             />
           ),
+
           copyField: (row) => row.name,
         },
         {

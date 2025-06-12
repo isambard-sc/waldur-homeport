@@ -1,4 +1,4 @@
-import { Factory } from '@phosphor-icons/react';
+import { FactoryIcon } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
@@ -30,7 +30,7 @@ export const ProjectProfile = ({ project }: { project: Project }) => {
             {isFeatureVisible(ProjectFeatures.show_industry_flag) &&
               project.is_industry && (
                 <span className="svg-icon svg-icon-3 me-3">
-                  <Factory />
+                  <FactoryIcon />
                 </span>
               )}
             {project.name}

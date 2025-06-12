@@ -1,4 +1,8 @@
-import { ArrowsInSimple, PauseCircle, XCircle } from '@phosphor-icons/react';
+import {
+  ArrowsInSimpleIcon,
+  PauseCircleIcon,
+  XCircleIcon,
+} from '@phosphor-icons/react';
 import { Resource } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
@@ -8,13 +12,19 @@ export const ResourceFlags = ({ resource }: { resource: Resource }) => {
   return (
     <>
       {resource.restrict_member_access && (
-        <Badge leftIcon={<XCircle />} variant="danger" outline pill size="sm">
+        <Badge
+          leftIcon={<XCircleIcon />}
+          variant="danger"
+          outline
+          pill
+          size="sm"
+        >
           {translate('Access restricted')}
         </Badge>
       )}
       {resource.paused && (
         <Badge
-          leftIcon={<PauseCircle />}
+          leftIcon={<PauseCircleIcon />}
           variant="danger"
           outline
           pill
@@ -25,7 +35,7 @@ export const ResourceFlags = ({ resource }: { resource: Resource }) => {
       )}
       {resource.downscaled && (
         <Badge
-          leftIcon={<ArrowsInSimple />}
+          leftIcon={<ArrowsInSimpleIcon />}
           variant="danger"
           outline
           pill

@@ -58,6 +58,7 @@ export const AddProposalDialog = reduxForm<
               variant="outline btn-outline-default"
               className="flex-equal"
             />
+
             <SubmitButton
               disabled={props.invalid}
               submitting={props.submitting}

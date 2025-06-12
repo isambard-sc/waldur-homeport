@@ -45,6 +45,7 @@ export const ProviderTeamPage = () => {
       render: ({ row }) => renderRoleExpirationDate(row),
     },
   ];
+
   return (
     <Table<GenericPermission>
       {...tableProps}

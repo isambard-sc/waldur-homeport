@@ -130,6 +130,12 @@ export const SettingsDescription = [
         default: false,
         type: 'boolean',
       },
+      {
+        key: 'ENABLE_MOCK_SERVICE_ACCOUNT_BACKEND',
+        description: translate('Enable mock returns for the service account service'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
   {
@@ -319,6 +325,18 @@ export const SettingsDescription = [
       {
         key: 'HERO_IMAGE',
         description: translate('The image rendered at hero section of HomePort landing page.'),
+        default: '',
+        type: 'image_field',
+      },
+      {
+        key: 'MARKETPLACE_HERO_IMAGE',
+        description: translate('The image rendered at hero section of Marketplace landing page. Please, use a wide image (min. 1920×600px) with no text or logos. Keep the center area clean, and choose a darker image for dark mode or a brighter image for light mode.'),
+        default: '',
+        type: 'image_field',
+      },
+      {
+        key: 'CALL_MANAGEMENT_HERO_IMAGE',
+        description: translate('The image rendered at hero section of Call Management landing page. Please, use a wide image (min. 1920×600px) with no text or logos. Keep the center area clean, and choose a darker image for dark mode or a brighter image for light mode.'),
         default: '',
         type: 'image_field',
       },

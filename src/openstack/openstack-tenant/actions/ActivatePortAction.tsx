@@ -1,4 +1,4 @@
-import { Power } from '@phosphor-icons/react';
+import { PowerIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -67,7 +67,7 @@ export const ActivatePortAction: ActionItemType<OpenStackPort> = ({
       tooltip={tooltip}
       disabled={disabled}
       action={callback}
-      iconNode={<Power weight="bold" />}
+      iconNode={<PowerIcon weight="bold" />}
     />
   );
 };

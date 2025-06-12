@@ -26,6 +26,7 @@ interface Context {
     | 'old_cost_estimate'
     | 'new_cost_estimate'
   >;
+
   user: string;
   approved?: string;
   components: OfferingComponent[];

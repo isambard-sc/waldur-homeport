@@ -24,11 +24,14 @@ export const InvitationConfirmDialog: FunctionComponent<{
   const router = useRouter();
 
   const user = useSelector(getUser);
-  const asyncResult = useQuery(['invitation', token], () =>
-    userInvitationsDetailsRetrieve({ path: { uuid: token } }).then(
-      (response) => response.data,
-    ),
-  );
+  const asyncResult = useQuery({
+    queryKey: ['invitation', token],
+
+    queryFn: () =>
+      userInvitationsDetailsRetrieve({ path: { uuid: token } }).then(
+        (response) => response.data,
+      ),
+  });
   const invitation = asyncResult.data;
 
   const close = useCallback(() => dispatch(closeModalDialog()), [dispatch]);

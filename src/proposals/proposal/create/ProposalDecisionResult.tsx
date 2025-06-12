@@ -1,4 +1,4 @@
-import { CheckCircle, Eye, XCircle } from '@phosphor-icons/react';
+import { CheckCircleIcon, EyeIcon, XCircleIcon } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -42,11 +42,12 @@ export const ProposalDecisionResult: FC<ProposalDecisionResultProps> = ({
           <div className="d-flex align-items-center">
             <RadarIcon
               IconComponent={
-                proposal.state === 'accepted' ? CheckCircle : XCircle
+                proposal.state === 'accepted' ? CheckCircleIcon : XCircleIcon
               }
               className="me-2"
               variant={proposal.state === 'accepted' ? 'success' : 'danger'}
             />
+
             <p className="mb-0 fw-bold fs-6">
               {proposal.state === 'accepted'
                 ? translate('Your proposal has been successfully accepted.')
@@ -73,7 +74,7 @@ export const ProposalDecisionResult: FC<ProposalDecisionResultProps> = ({
               }
             >
               <span className="svg-icon svg-icon-2">
-                <Eye weight="bold" />
+                <EyeIcon weight="bold" />
               </span>
               {translate('More details')}
             </Button>

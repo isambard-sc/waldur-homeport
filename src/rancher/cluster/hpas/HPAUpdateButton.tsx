@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -23,7 +23,7 @@ export const HPAUpdateButton: FunctionComponent<{ hpa }> = ({ hpa }) => {
     <ActionItem
       title={translate('Edit')}
       action={callback}
-      iconNode={<PencilSimple weight="bold" />}
+      iconNode={<PencilSimpleIcon weight="bold" />}
     />
   );
 };

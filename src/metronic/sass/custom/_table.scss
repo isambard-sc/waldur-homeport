@@ -138,18 +138,19 @@
         top: 50%;
         transform: translateY(-50%);
         transition: opacity 0.15s linear;
-        background: rgba($light, 0.75);
-        padding: 0.2rem 0.5rem;
-        border-radius: 5px;
+        background: rgba($gray-50, 0.75);
+        width: 32px;
+        height: 32px;
+        border: none;
 
         svg {
-          color: $gray-400;
+          color: $gray-600;
         }
         &:hover {
-          background: $light;
+          background: $gray-50;
 
           svg {
-            color: $gray-500;
+            color: $gray-700;
           }
         }
       }

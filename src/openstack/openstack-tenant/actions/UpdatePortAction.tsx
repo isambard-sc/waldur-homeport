@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -17,7 +17,7 @@ const validators = [validateState('OK')];
 export const UpdatePortAction: ActionItemType = ({ resource, refetch }) => (
   <DialogActionItem
     title={translate('Update IP')}
-    iconNode={<PencilSimple weight="bold" />}
+    iconNode={<PencilSimpleIcon weight="bold" />}
     modalComponent={UpdatePortDialog}
     resource={resource}
     validators={validators}

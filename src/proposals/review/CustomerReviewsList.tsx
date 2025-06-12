@@ -79,6 +79,7 @@ export const CustomerReviewsList: FC<{}> = () => {
               label={row.call_name}
             />
           ),
+
           filter: 'call',
           inlineFilter: (row) => ({ name: row.call_name, uuid: row.call_uuid }),
           keys: ['call_name'],

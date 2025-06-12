@@ -98,7 +98,6 @@ export const CreateNodeDialog = reduxForm<FormData, OwnProps>({
             <SubnetGroup options={state.value.subnets} />
             <NodeStorageGroup
               volumeTypes={state.value.volumeTypes}
-              mountPoints={state.value.mountPoints}
               defaultVolumeType={state.value.defaultVolumeType}
               sm={{ span: 9, offset: 3 }}
             />

@@ -1,8 +1,8 @@
 import {
-  ArrowClockwise,
-  Buildings,
-  ClipboardText,
-  SquaresFour,
+  ArrowClockwiseIcon,
+  BuildingsIcon,
+  ClipboardTextIcon,
+  SquaresFourIcon,
 } from '@phosphor-icons/react';
 
 import { Link } from '@waldur/core/Link';
@@ -27,14 +27,22 @@ export const RecentSearchItem = ({ item }) => {
       }}
     >
       {item.type === 'organization' ? (
-        <Buildings size={22} weight="bold" className="text-gray-700 me-4" />
+        <BuildingsIcon size={22} weight="bold" className="text-gray-700 me-4" />
       ) : item.type === 'project' ? (
-        <ClipboardText size={22} weight="bold" className="text-gray-700 me-4" />
+        <ClipboardTextIcon
+          size={22}
+          weight="bold"
+          className="text-gray-700 me-4"
+        />
       ) : (
-        <SquaresFour size={22} weight="bold" className="text-gray-700 me-4" />
+        <SquaresFourIcon
+          size={22}
+          weight="bold"
+          className="text-gray-700 me-4"
+        />
       )}
       <span className="fs-6 fw-semibold flex-grow-1">{item.title}</span>
-      <ArrowClockwise size={20} className="text-dark" />
+      <ArrowClockwiseIcon size={20} className="text-dark" />
     </Link>
   );
 };

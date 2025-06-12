@@ -101,6 +101,7 @@ const PageHero = ({ data, isRefetching }) => (
           isLoading={isRefetching}
           size="sm"
         />
+
         <OrderActionsButton order={data.order} loadData={data.refetch} />
       </div>
     }

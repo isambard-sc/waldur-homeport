@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { openstackPortsUnlink } from 'waldur-js-client';
 
@@ -28,7 +28,7 @@ export const UnlinkPortAction: ActionItemType = ({ resource, refetch }) => {
       title={translate('Unlink')}
       className="text-danger"
       action={callback}
-      iconNode={<Trash weight="bold" />}
+      iconNode={<TrashIcon weight="bold" />}
       iconColor="danger"
       staff
     />

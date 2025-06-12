@@ -1,4 +1,4 @@
-import { MagnifyingGlass, X } from '@phosphor-icons/react';
+import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { uniqueId } from 'lodash-es';
 import { FC } from 'react';
@@ -45,7 +45,7 @@ export const FilterSelectClearIndicator = (props: ClearIndicatorProps) => {
       <div
         style={{ padding: '0px 5px', marginRight: '7px', cursor: 'pointer' }}
       >
-        <X size={20} weight="bold" className="text-gray-500" />
+        <XIcon size={20} weight="bold" className="text-gray-500" />
       </div>
     </div>
   );
@@ -54,7 +54,11 @@ export const FilterSelectClearIndicator = (props: ClearIndicatorProps) => {
 export const FilterSelectControl = ({ children, ...props }: ControlProps) => (
   <components.Control {...props}>
     {!(props.hasValue && props.selectProps.components.SingleValue) && (
-      <MagnifyingGlass size={20} weight="bold" className="text-gray-500 ms-3" />
+      <MagnifyingGlassIcon
+        size={20}
+        weight="bold"
+        className="text-gray-500 ms-3"
+      />
     )}
     {children}
   </components.Control>

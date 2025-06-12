@@ -1,6 +1,7 @@
 import { FC } from 'react';
 
 import { NumberField, StringField } from '@waldur/form';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { CommaSeparatedListField } from '@waldur/form/CommaSeparatedListField';
 import { translate } from '@waldur/i18n';
 import {
@@ -81,6 +82,14 @@ const openStackFields: OfferingEditField[] = [
     ),
     key: 'service_attributes.dns_nameservers',
     component: CommaSeparatedListField,
+  },
+  {
+    label: translate('Allow live volume resize'),
+    description: translate(
+      'Allow live volume resize of system and data volumes',
+    ),
+    key: 'service_attributes.live_resize_of_volumes_enabled',
+    component: AwesomeCheckboxField,
   },
 ];
 

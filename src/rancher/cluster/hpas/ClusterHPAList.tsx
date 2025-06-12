@@ -28,6 +28,7 @@ const RowActions = ({ row, yamlRetrieve, yamlUpdate }) => (
       yamlUpdate={yamlUpdate}
       resource={row}
     />
+
     <HPAUpdateButton hpa={row} />
     <HPADeleteButton hpa={row} />
   </ActionsDropdownComponent>

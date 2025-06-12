@@ -1,4 +1,4 @@
-import { UploadSimple } from '@phosphor-icons/react';
+import { UploadSimpleIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
@@ -56,7 +56,7 @@ export const UserEditAvatarFormItem: React.FC<OwnProps> = ({
               >
                 {translate('Save')}
                 <span className="svg-icon svg-icon-5">
-                  <UploadSimple />
+                  <UploadSimpleIcon />
                 </span>
               </Button>
             ) : null

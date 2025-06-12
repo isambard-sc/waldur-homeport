@@ -15,6 +15,7 @@ interface ModalDialogProps {
   bodyClassName?: string;
   headerClassName?: string;
   footerClassName?: string;
+  hasHeaderPadding?: boolean;
   hasFooterPadding?: boolean;
   children?: ReactNode;
   headerLess?: boolean;
@@ -37,6 +38,7 @@ export const ModalDialog: FC<ModalDialogProps> = ({
   bodyClassName,
   headerClassName,
   footerClassName,
+  hasHeaderPadding,
   hasFooterPadding,
   headerLess,
   actions,
@@ -51,7 +53,8 @@ export const ModalDialog: FC<ModalDialogProps> = ({
         onHide={onHide}
         className={classNames(
           headerClassName,
-          'without-border pb-0',
+          'without-border',
+          !hasHeaderPadding && 'pb-0',
           !title && 'without-border',
           iconNode && 'has-icon',
         )}

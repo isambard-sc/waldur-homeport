@@ -23,6 +23,7 @@ export const UserSecretOptionsForm: FunctionComponent<
             ?.service_provider_can_create_offering_user,
       },
     ],
+
     [props.offering.plugin_options],
   );
   return <DefaultOfferingEditPanel fields={fields} {...props} />;

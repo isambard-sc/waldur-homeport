@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import {
   cloneElement,
@@ -74,7 +74,7 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
     <Form.Label className={classNames({ required })}>
       {tooltip && !tooltipEnd && (
         <Tip id={'form-field-tooltip-' + input.name} label={tooltip}>
-          <Question weight="bold" size={20} className="text-muted" />{' '}
+          <QuestionIcon weight="bold" size={20} className="text-muted" />{' '}
         </Tip>
       )}
       {label}
@@ -102,7 +102,7 @@ export const FormGroup: FC<PropsWithChildren<FormGroupProps>> = (props) => {
               className="align-self-center ms-2"
               label={tooltip}
             >
-              <Question weight="bold" size={20} className="text-muted" />
+              <QuestionIcon weight="bold" size={20} className="text-muted" />
             </Tip>
           )}
         </div>

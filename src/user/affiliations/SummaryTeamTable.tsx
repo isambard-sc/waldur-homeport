@@ -24,6 +24,7 @@ const organizationUserMandatoryFields = [
   'expiration_time',
   'role_name',
 ];
+
 const projectUserMandatoryFields = [
   'uuid',
   'user_uuid',
@@ -80,11 +81,13 @@ export const SummaryTeamTable: FC<OwnProps> = ({ scope, context }) => {
                 name={getValue(row, 'full_name')}
                 circle
               />
+
               <p className="mb-0">
                 {getValue(row, 'full_name') || DASH_ESCAPE_CODE}
               </p>
             </div>
           ),
+
           copyField: (row) => getValue(row, 'full_name'),
           orderField:
             (context === 'organization' && 'concatenated_name') ||
@@ -114,7 +117,7 @@ export const SummaryTeamTable: FC<OwnProps> = ({ scope, context }) => {
           render: ({ row }) => renderRoleExpirationDate(row),
           className: 'w-45px',
         },
-      ]}
+      ].filter(Boolean)}
       verboseName={translate('Team members')}
       hasActionBar={false}
       hoverShadow={false}

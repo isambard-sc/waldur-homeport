@@ -1,4 +1,4 @@
-import { Star } from '@phosphor-icons/react';
+import { StarIcon } from '@phosphor-icons/react';
 import React, { useEffect } from 'react';
 import ReactStars from 'react-rating-stars-component';
 import { Field, reduxForm, InjectedFormProps } from 'redux-form';
@@ -53,8 +53,8 @@ const FormSummaryStep: React.FC<FormSummaryStepProps> = (props) => {
                     size={20}
                     edit={!disabled}
                     isHalf={false}
-                    emptyIcon={<Star weight="fill" />}
-                    filledIcon={<Star weight="fill" />}
+                    emptyIcon={<StarIcon weight="fill" />}
+                    filledIcon={<StarIcon weight="fill" />}
                     color={RATING_STAR_INACTIVE_COLOR}
                     activeColor={RATING_STAR_ACTIVE_COLOR}
                     value={starValue}
@@ -73,6 +73,7 @@ const FormSummaryStep: React.FC<FormSummaryStepProps> = (props) => {
           );
         }}
       />
+
       <Field
         name="summary_public_comment"
         component={FormGroup}

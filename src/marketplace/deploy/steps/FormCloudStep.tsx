@@ -1,4 +1,4 @@
-import { Plus } from '@phosphor-icons/react';
+import { PlusIcon } from '@phosphor-icons/react';
 import { QueryFunction, useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
@@ -34,7 +34,7 @@ const loadData: QueryFunction<DataPage> = async (context) => {
   }
   const result = await marketplacePublicOfferingsList({
     query: {
-      page: context.pageParam,
+      page: context.pageParam as number,
       page_size: 5,
       project_uuid: context.meta.project_uuid as string,
       type: [context.meta.type as string],
@@ -62,18 +62,17 @@ export const FormCloudStep = (props: FormStepProps) => {
   const initialProjectUuid = useRef(currentProject?.uuid);
   const project = useSelector(orderProjectSelector);
 
-  const context = useInfiniteQuery<any, any, DataPage>(
-    ['deploy-offerings', project?.uuid, props.params?.type],
-    loadData,
-    {
-      getNextPageParam: (lastPage) => lastPage.nextPage,
-      staleTime: 3 * 60 * 1000,
-      meta: {
-        project_uuid: project?.uuid,
-        type: props.params?.type,
-      },
+  const context = useInfiniteQuery({
+    queryKey: ['deploy-offerings', project?.uuid, props.params?.type],
+    queryFn: loadData,
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    staleTime: 3 * 60 * 1000,
+    meta: {
+      project_uuid: project?.uuid,
+      type: props.params?.type,
     },
-  );
+  });
 
   const choices = useMemo(() => {
     if (!context.data?.pages?.length) return [];
@@ -167,7 +166,7 @@ export const FormCloudStep = (props: FormStepProps) => {
             <div className="d-flex gap-10 justify-content-end">
               <Button variant="light" className="text-nowrap" size="sm">
                 <span className="svg-icon svg-icon-2">
-                  <Plus weight="bold" />
+                  <PlusIcon weight="bold" />
                 </span>
                 {translate('New cloud')}
               </Button>
@@ -176,7 +175,7 @@ export const FormCloudStep = (props: FormStepProps) => {
         ) : null
       }
     >
-      {context.status === 'loading' ? (
+      {context.status === 'pending' ? (
         <p className="text-center">{translate('Loading')}</p>
       ) : context.status === 'error' ? (
         <p className="text-center">{translate('Error')}</p>
@@ -193,6 +192,7 @@ export const FormCloudStep = (props: FormStepProps) => {
             validate={[required]}
             onChange={onChangeOffering}
           />
+
           <div className="text-center">
             {context.hasNextPage && (
               <div>

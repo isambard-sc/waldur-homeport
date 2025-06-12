@@ -1,4 +1,3 @@
-import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { getFormSyncErrors } from 'redux-form';
@@ -14,9 +13,6 @@ import { PROPOSAL_UPDATE_SUBMISSION_FORM_ID } from '@waldur/proposals/constants'
 
 interface CompletionPageSidebarProps extends SidebarProps {
   saveAsDraft(): void;
-  handleApproveProposal(): void;
-  handleRejectProposal(): void;
-  canPerformDecisionActions: boolean;
   isSaving?: boolean;
   editable?: boolean;
 }
@@ -60,6 +56,7 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
                 : undefined
             }
           />
+
           <Button
             variant="secondary"
             onClick={props.saveAsDraft}
@@ -70,26 +67,6 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
             {translate('Save as draft')}
           </Button>
           <TosNotification />
-        </>
-      )}
-      {props.canPerformDecisionActions && (
-        <>
-          <Button
-            variant="btn btn-icon btn-primary"
-            onClick={props.handleApproveProposal}
-            className="w-100 mt-2"
-          >
-            <CheckCircle className="me-1" />
-            {translate('Accept')}
-          </Button>
-          <Button
-            variant="btn btn-icon btn-light-danger"
-            onClick={props.handleRejectProposal}
-            className="w-100 mt-2"
-          >
-            <XCircle className="me-1" />
-            {translate('Reject')}
-          </Button>
         </>
       )}
     </>

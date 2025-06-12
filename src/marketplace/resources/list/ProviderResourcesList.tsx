@@ -1,4 +1,4 @@
-import { Check, X } from '@phosphor-icons/react';
+import { CheckIcon, XIcon } from '@phosphor-icons/react';
 import React, { FunctionComponent } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -183,15 +183,16 @@ const TableComponent: FunctionComponent<any> = (props) => {
       render: ({ row }) =>
         !row.downscaled ? (
           <Badge variant="danger" outline pill size="sm">
-            <X size={12} className="text-danger me-2" />
+            <XIcon size={12} className="text-danger me-2" />
             {translate('No')}
           </Badge>
         ) : (
           <Badge variant="success" outline pill size="sm">
-            <Check size={12} className="text-success me-2" />
+            <CheckIcon size={12} className="text-success me-2" />
             {translate('Yes')}
           </Badge>
         ),
+
       export: 'downscaled',
       keys: ['downscaled'],
       exportKeys: ['downscaled'],
@@ -203,15 +204,16 @@ const TableComponent: FunctionComponent<any> = (props) => {
       render: ({ row }) =>
         !row.restrict_member_access ? (
           <Badge variant="danger" outline pill size="sm">
-            <X size={12} className="text-danger me-2" />
+            <XIcon size={12} className="text-danger me-2" />
             {translate('No')}
           </Badge>
         ) : (
           <Badge variant="success" outline pill size="sm">
-            <Check size={12} className="text-success me-2" />
+            <CheckIcon size={12} className="text-success me-2" />
             {translate('Yes')}
           </Badge>
         ),
+
       export: 'restrict_member_access',
       keys: ['restrict_member_access'],
       exportKeys: ['restrict_member_access'],
@@ -223,15 +225,16 @@ const TableComponent: FunctionComponent<any> = (props) => {
       render: ({ row }) =>
         !row.paused ? (
           <Badge variant="danger" outline pill size="sm">
-            <X size={12} className="text-danger me-2" />
+            <XIcon size={12} className="text-danger me-2" />
             {translate('No')}
           </Badge>
         ) : (
           <Badge variant="success" outline pill size="sm">
-            <Check size={12} className="text-success me-2" />
+            <CheckIcon size={12} className="text-success me-2" />
             {translate('Yes')}
           </Badge>
         ),
+
       export: 'paused',
       keys: ['paused'],
       exportKeys: ['paused'],

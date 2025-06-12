@@ -56,6 +56,7 @@ export const CreatePageSidebar: FC<CreatePageSidebarProps> = ({
             label={translate('Submit review')}
             variant="primary"
           />
+
           <Button
             variant="danger"
             onClick={reject as any}

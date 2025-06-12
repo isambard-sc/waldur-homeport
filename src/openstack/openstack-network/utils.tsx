@@ -66,6 +66,7 @@ const longToIp = (long: number): IPv4Address => {
       (long >>> 8) & 255,
       long & 255,
     ],
+
     toString() {
       return this.octets.join('.');
     },

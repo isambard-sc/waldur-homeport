@@ -10,7 +10,7 @@ import {
 } from 'redux-form';
 import { Resource } from 'waldur-js-client';
 
-import { formatDate, parseDate } from '@waldur/core/dateUtils';
+import { formatISODate, parseDate } from '@waldur/core/dateUtils';
 import { WarnCard } from '@waldur/core/WarnCard';
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { DateField } from '@waldur/form/DateField';
@@ -56,7 +56,7 @@ const PureEditResourceEndDateDialog: FunctionComponent<
     try {
       await props.resolve.updateEndDate(
         props.resolve.resource.uuid,
-        formData.end_date ? formatDate(formData.end_date) : null,
+        formData.end_date ? formatISODate(formData.end_date) : null,
       );
       dispatch(
         showSuccess(
@@ -119,6 +119,7 @@ const PureEditResourceEndDateDialog: FunctionComponent<
                 : undefined
             }
           />
+
           {exceedsProjectEndDate && (
             <WarnCard
               title={translate('Date conflict')}

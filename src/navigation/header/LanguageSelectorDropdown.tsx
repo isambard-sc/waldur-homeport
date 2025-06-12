@@ -28,12 +28,12 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
 
   return (
     <div
-      className="menu-item px-5"
+      className="menu-item"
       data-kt-menu-trigger="hover"
       data-kt-menu-placement="left-start"
       data-kt-menu-flip="bottom"
     >
-      <div className="menu-link px-5">
+      <div className="menu-link">
         <span className="menu-title position-relative">
           {translate('Language')}
           <span className="d-flex flex-center gap-2 fs-8 rounded bg-light px-3 py-1 position-absolute translate-middle-y top-50 end-0">
@@ -49,7 +49,7 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
       <div className="menu-sub menu-sub-dropdown w-175px py-4">
         {languageChoices.map((language) => (
           <div
-            className="menu-item px-3"
+            className="menu-item"
             key={language.code}
             data-kt-menu-trigger="click"
             aria-hidden="true"
@@ -58,7 +58,7 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
             }}
           >
             <div
-              className={classNames('menu-link d-flex px-5', {
+              className={classNames('menu-link d-flex', {
                 active: language.code === currentLanguage.code,
               })}
             >

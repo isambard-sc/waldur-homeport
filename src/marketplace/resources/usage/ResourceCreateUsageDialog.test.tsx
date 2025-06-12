@@ -39,6 +39,7 @@ const mockData = {
       description: 'Test component',
     },
   ],
+
   periods: [
     {
       label: 'January 2024',

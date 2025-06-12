@@ -31,6 +31,7 @@ export const NumberField: FunctionComponent<NumberFieldProps> = ({
       {...rest}
     />
   );
+
   if (unit || description) {
     return (
       <>

@@ -33,13 +33,11 @@ async function getCustomerCostData(customer: Scope) {
 }
 
 export function useCustomerCostChart(customer: Scope) {
-  const { data, isLoading, error, refetch } = useQuery(
-    ['CustomerCostData', customer.url],
-    () => getCustomerCostData(customer),
-    {
-      staleTime: 5 * 60 * 1000,
-    },
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['CustomerCostData', customer.url],
+    queryFn: () => getCustomerCostData(customer),
+    staleTime: 5 * 60 * 1000,
+  });
 
   const chartData = useMemo(() => {
     if (!data) return { chart: null, options: null };
@@ -57,13 +55,11 @@ export function useCustomerCreditChart(customer: Customer) {
     isLoading,
     error,
     refetch,
-  } = useQuery(
-    ['CustomerCostData', customer.url],
-    () => getCustomerCostData(customer),
-    {
-      staleTime: 5 * 60 * 1000,
-    },
-  );
+  } = useQuery({
+    queryKey: ['CustomerCostData', customer.url],
+    queryFn: () => getCustomerCostData(customer),
+    staleTime: 5 * 60 * 1000,
+  });
 
   const chartData = useMemo(() => {
     if (!customer.credit) return { chart: null, options: null };
@@ -86,13 +82,11 @@ export function useCustomerCreditChart(customer: Customer) {
 }
 
 export const useCustomerTeamChart = (customer) => {
-  const { data, isLoading, error, refetch } = useQuery(
-    ['CustomerTeamChart', customer.url],
-    () => getTeamSizeChart(customer),
-    {
-      staleTime: 5 * 60 * 1000,
-    },
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['CustomerTeamChart', customer.url],
+    queryFn: () => getTeamSizeChart(customer),
+    staleTime: 5 * 60 * 1000,
+  });
 
   const chartData = useMemo(
     () =>

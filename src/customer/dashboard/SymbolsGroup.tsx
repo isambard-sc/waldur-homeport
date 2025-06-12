@@ -23,6 +23,7 @@ const colorClasses = [
   'bg-dark text-inverse-dark',
   'bg-info text-inverse-info',
 ];
+
 const getSymbolColorClass = (index: number) => {
   return colorClasses[index % colorClasses.length];
 };

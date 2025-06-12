@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { keysDestroy } from 'waldur-js-client';
@@ -39,7 +39,7 @@ export const KeyRemoveButton = ({ row, refetch }) => {
       title={translate('Remove')}
       action={action}
       disabled={pending}
-      iconNode={<Trash />}
+      iconNode={<TrashIcon />}
       className="text-danger"
       iconColor="danger"
     />

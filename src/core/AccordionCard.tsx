@@ -1,4 +1,4 @@
-import { CaretDown } from '@phosphor-icons/react';
+import { CaretDownIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, PropsWithChildren, ReactNode, useContext } from 'react';
 import {
@@ -31,7 +31,7 @@ const CustomToggle = ({ eventKey, title, titleClassName }) => {
     >
       <h4 className={classNames('mb-0', titleClassName)}>{title}</h4>
       <div className={'card-toolbar' + (isOpen ? ' active' : '')}>
-        <CaretDown weight="bold" size={20} className="rotate-180" />
+        <CaretDownIcon weight="bold" size={20} className="rotate-180" />
       </div>
     </Card.Header>
   );
@@ -53,6 +53,7 @@ export const AccordionCard: FC<AccordionCardProps> = (props) => {
           title={props.title}
           titleClassName={props.titleClassName}
         />
+
         <Accordion.Collapse eventKey="0">
           <Card.Body>{props.children}</Card.Body>
         </Accordion.Collapse>

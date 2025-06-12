@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import {
   proposalRequestedOfferingsCancel,
@@ -50,7 +50,7 @@ export const CallOfferingDeleteButton = ({
       title={translate('Remove')}
       action={openDialog}
       variant="outline-danger"
-      iconNode={<Trash />}
+      iconNode={<TrashIcon />}
       size="sm"
     />
   );

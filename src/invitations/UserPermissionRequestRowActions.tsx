@@ -29,6 +29,7 @@ export const UserPermissionRequestRowActions: FunctionComponent<
         permissionRequest={row}
         refetch={refetch}
       />
+
       <UserPermissionRequestRejectButton
         permissionRequest={row}
         refetch={refetch}

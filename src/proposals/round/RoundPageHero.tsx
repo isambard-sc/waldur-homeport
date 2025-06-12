@@ -1,4 +1,4 @@
-import { CalendarBlank, Check, X } from '@phosphor-icons/react';
+import { CalendarBlankIcon, CheckIcon, XIcon } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { ProtectedRound } from 'waldur-js-client';
@@ -42,11 +42,11 @@ export const RoundPageHero: FC<RoundPageHeroProps> = ({ round, call }) => {
                 size="sm"
                 leftIcon={
                   status.value === 'scheduled' ? (
-                    <CalendarBlank weight="bold" />
+                    <CalendarBlankIcon weight="bold" />
                   ) : status.value === 'ended' ? (
-                    <X weight="bold" />
+                    <XIcon weight="bold" />
                   ) : (
-                    <Check weight="bold" />
+                    <CheckIcon weight="bold" />
                   )
                 }
               >

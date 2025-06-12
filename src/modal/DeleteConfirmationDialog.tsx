@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import React, { ReactNode } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -38,7 +38,7 @@ export const DeleteConfirmationDialog: React.FC<
   return (
     <ModalDialog
       title={title}
-      iconNode={<Trash weight="bold" />}
+      iconNode={<TrashIcon weight="bold" />}
       iconColor="danger"
       bodyClassName="text-gray-500 pt-2"
       footer={

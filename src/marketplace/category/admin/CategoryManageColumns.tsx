@@ -1,4 +1,4 @@
-import { Wrench } from '@phosphor-icons/react';
+import { WrenchIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -29,7 +29,7 @@ export const CategoryManageColumns = ({ row }: { row: Category }) => {
     <ActionItem
       title={translate('Configure columns')}
       action={openFormDialog}
-      iconNode={<Wrench weight="bold" />}
+      iconNode={<WrenchIcon weight="bold" />}
     />
   );
 };

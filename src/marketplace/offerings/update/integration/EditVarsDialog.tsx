@@ -1,4 +1,4 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { PlusCircleIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { connect, useDispatch } from 'react-redux';
@@ -82,7 +82,7 @@ export const EditVarsDialog = connect<{}, {}, EditVarsDialogOwnProps>(
                   onClick={() => nestedProps.fields.push({})}
                 >
                   <span className="svg-icon svg-icon-2">
-                    <PlusCircle weight="bold" />
+                    <PlusCircleIcon weight="bold" />
                   </span>
                 </Button>
               }

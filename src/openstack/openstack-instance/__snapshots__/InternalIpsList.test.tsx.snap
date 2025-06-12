@@ -89,6 +89,20 @@ exports[`InternalIpsList > renders list 1`] = `
           <table
             class="table align-middle table-row-bordered fs-6 gy-0 gx-2 no-footer"
           >
+            <colgroup>
+              <col
+                style="width: 50%; min-width: 200px;"
+              />
+              <col
+                style="width: 25%; min-width: 150px;"
+              />
+              <col
+                style="width: 25%; min-width: 150px;"
+              />
+              <col
+                style="width: 25%; min-width: 150px;"
+              />
+            </colgroup>
             <thead>
               <tr
                 class="text-start text-muted fw-bolder fs-7 gs-0 align-middle"

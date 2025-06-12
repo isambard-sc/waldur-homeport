@@ -1,4 +1,4 @@
-import { PlusCircle, Question, Trash } from '@phosphor-icons/react';
+import { PlusCircleIcon, QuestionIcon, TrashIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, FormLabel, Row } from 'react-bootstrap';
@@ -28,19 +28,28 @@ import { getDefaultFloatingIps, formatSubnet } from '../utils';
 import { FormSecurityGroupsField } from './FormSecurityGroupsField';
 import { FormSSHPublicKeysField } from './FormSSHPublicKeysField';
 
-export const CustomIpField = ({ parentName, data, autoFocus = false }) => {
+export const CustomIpField = ({
+  parentName,
+  data,
+  autoFocus = false,
+  hasAutoOption = false,
+}) => {
   const options = useMemo(() => {
     const ipRanges = data?.subnet
       ?.allocation_pools as OpenStackSubNetAllocationPool[];
     const customIps = ipRanges?.length
       ? ipRanges.flatMap(({ start, end }) => getIPsInRange(start, end))
       : [];
-    return customIps
+    const opts = customIps
       .map((ip) => ({ label: ip, value: ip }))
       .concat({
         value: 'other',
         label: translate('Other (manual input)'),
       });
+    if (hasAutoOption) {
+      return [{ label: translate('Automatic'), value: false }].concat(opts);
+    }
+    return opts;
   }, [data?.subnet?.allocation_pools]);
 
   const isOutsideAllocationPool = useCallback(
@@ -78,6 +87,7 @@ export const CustomIpField = ({ parentName, data, autoFocus = false }) => {
               fieldProps.input.onChange(opt.value === 'other' ? '' : opt.value);
             }}
           />
+
           <StringField
             placeholder={translate('Enter custom IP')}
             value={fieldProps.input?.value}
@@ -86,6 +96,7 @@ export const CustomIpField = ({ parentName, data, autoFocus = false }) => {
             className="mt-4"
             autoFocus={autoFocus}
           />
+
           {fieldProps.meta.dirty &&
             (fieldProps.meta.error ? (
               <FieldError error={fieldProps.meta.error} />
@@ -96,8 +107,10 @@ export const CustomIpField = ({ parentName, data, autoFocus = false }) => {
             ) : null)}
         </div>
       )}
-      validate={[required, isOutsideRange]}
-      warn={[isOutsideAllocationPool]}
+      validate={
+        selected?.value === false ? undefined : [required, isOutsideRange]
+      }
+      warn={selected?.value === false ? undefined : [isOutsideAllocationPool]}
       required={true}
     />
   );
@@ -142,7 +155,7 @@ export const SubnetValueContainer = (props) => {
           }
         >
           <span className="svg-icon svg-icon-2">
-            <Question weight="bold" />
+            <QuestionIcon weight="bold" />
           </span>
         </Tip>
       </div>
@@ -186,6 +199,7 @@ const renderNetworkRows = ({
       ...getDefaultFloatingIps(),
       ...floatingIps.filter(availableNetworkItemsFilter('floatingIp')),
     ],
+
     [floatingIps, availableNetworkItemsFilter],
   );
 
@@ -267,7 +281,7 @@ const renderNetworkRows = ({
                   onClick={() => fields.remove(index)}
                 >
                   <span className="svg-icon svg-icon-1x">
-                    <Trash weight="bold" />
+                    <TrashIcon weight="bold" />
                   </span>
                 </Button>
               </Col>
@@ -277,6 +291,7 @@ const renderNetworkRows = ({
                     <CustomIpField
                       parentName={network}
                       data={fields.get(index)}
+                      hasAutoOption
                     />
                   </Col>
                 </Col>
@@ -292,7 +307,7 @@ const renderNetworkRows = ({
         onClick={addRow}
       >
         <span className="svg-icon svg-icon-2">
-          <PlusCircle weight="bold" />
+          <PlusCircleIcon weight="bold" />
         </span>{' '}
         {translate('Add subnet')}
       </Button>
@@ -303,9 +318,10 @@ const renderNetworkRows = ({
 export const FormNetworkSecurityStep = (props: FormStepProps) => {
   const [customIpEnabled, setCustomIpEnabled] = useToggle(false);
 
-  const { data, isLoading } = useQuery(
-    ['network-step', props.offering.scope_uuid],
-    () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ['network-step', props.offering.scope_uuid],
+
+    queryFn: () => {
       return Promise.all([
         loadSubnets({ tenant_uuid: props.offering.scope_uuid }),
         loadFloatingIps({
@@ -318,8 +334,9 @@ export const FormNetworkSecurityStep = (props: FormStepProps) => {
         floatingIps,
       }));
     },
-    { staleTime: 3 * 60 * 1000 },
-  );
+
+    staleTime: 3 * 60 * 1000,
+  });
 
   return (
     <VStepperFormStepCard

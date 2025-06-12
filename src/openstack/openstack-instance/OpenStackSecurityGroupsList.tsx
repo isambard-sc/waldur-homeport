@@ -32,6 +32,7 @@ export const OpenStackSecurityGroupsList: FunctionComponent<OwnProps> = (
             resource={props.resourceScope}
             refetch={props.refetch}
           />
+
           <ManageSecurityGroupsButton resource={props.resource} />
         </div>
       </Card.Header>

@@ -45,16 +45,16 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
       isLoading: loadingManager,
       error: errorManager,
       refetch,
-    } = useQuery(
-      ['CallManagingOrganizations', customer.uuid],
-      () =>
+    } = useQuery({
+      queryKey: ['CallManagingOrganizations', customer.uuid],
+
+      queryFn: () =>
         callManagingOrganisationsList({
           query: { customer_uuid: customer.uuid },
         }).then((response) => response.data[0]),
-      {
-        staleTime: 60 * 1000,
-      },
-    );
+
+      staleTime: 60 * 1000,
+    });
     const isEdit = Boolean(props.resolve.call?.uuid);
 
     useEffect(() => {
@@ -145,6 +145,7 @@ export const CallFormDialog = connect<{}, {}, { resolve: { call?; refetch } }>(
               required
               validate={required}
             />
+
             {isEdit && (
               <MarkdownEditor
                 name="description"

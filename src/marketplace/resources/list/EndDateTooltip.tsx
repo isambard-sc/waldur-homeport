@@ -1,4 +1,4 @@
-import { Clock } from '@phosphor-icons/react';
+import { ClockIcon } from '@phosphor-icons/react';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
@@ -17,7 +17,7 @@ export const EndDateTooltip = ({ end_date }) => {
           date: formatDate(end_date),
         })}
       >
-        <Clock />
+        <ClockIcon />
       </Tip>
     </>
   );

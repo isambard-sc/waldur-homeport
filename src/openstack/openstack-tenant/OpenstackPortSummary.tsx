@@ -12,6 +12,7 @@ export const OpenstackPortSummary: FC<ResourceSummaryProps> = ({
       label={translate('Device owner')}
       value={row.device_owner || 'N/A'}
     />
+
     <Field
       label={translate('Allowed address pairs')}
       value={
@@ -20,10 +21,12 @@ export const OpenstackPortSummary: FC<ResourceSummaryProps> = ({
           : 'N/A'
       }
     />
+
     <Field
       label={translate('Port security enabled')}
       value={row.port_security_enabled ? translate('Yes') : translate('No')}
     />
+
     <Field
       label={translate('Security groups')}
       value={

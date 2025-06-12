@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { User } from 'waldur-js-client';
 
@@ -58,7 +58,7 @@ export const UserEditRow = (props: RowProps) => {
         props.actions || (
           <ActionButton
             action={callback}
-            iconNode={<PencilSimple weight="bold" />}
+            iconNode={<PencilSimpleIcon weight="bold" />}
             variant="secondary"
             className="btn-sm btn-icon"
             disabled={props.protected || props.disabled}

@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Tab, Tabs } from 'react-bootstrap';
 
@@ -40,7 +40,7 @@ export const ResourceUsageTabs: FunctionComponent<ResourceUsageTabsProps> = (
                 id={`tab-${index}-tooltip`}
                 label={getBillingTypeLabel(component.billing_type)}
               >
-                <Question size={18} weight="bold" className="text-muted" />
+                <QuestionIcon size={18} weight="bold" className="text-muted" />
               </Tip>{' '}
               {component.name}
             </>

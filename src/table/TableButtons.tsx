@@ -1,4 +1,4 @@
-import { Export } from '@phosphor-icons/react';
+import { ExportIcon } from '@phosphor-icons/react';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
@@ -44,7 +44,7 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
           ? [
               {
                 label: translate('Export'),
-                iconNode: <Export />,
+                iconNode: <ExportIcon />,
                 children: EXPORT_OPTIONS.map(({ value, label }) => ({
                   label: label,
                   action: () => openExportDialog(props.table, value, props),

@@ -23,6 +23,20 @@ export const FeaturesDescription: FeatureSection[] = [
     ],
   },
   {
+    key: 'deployment',
+    description: translate('Waldur deployment settings'),
+    items: [
+      {
+        key: 'enable_cookie_notice',
+        description: translate('Enable cookie notice in marketplace.'),
+      },
+      {
+        key: 'send_metrics',
+        description: translate('Send telemetry metrics.'),
+      },
+    ],
+  },
+  {
     key: 'invitations',
     description: translate('Invitations management'),
     items: [
@@ -101,6 +115,14 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Render estimated cost column in projects list.'),
       },
       {
+        key: 'mandatory_end_date',
+        description: translate('Make the project end date mandatory.'),
+      },
+      {
+        key: 'mandatory_start_date',
+        description: translate('Make the project start date mandatory.'),
+      },
+      {
         key: 'oecd_fos_2007_code',
         description: translate('Enable OECD code.'),
       },
@@ -177,16 +199,6 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'vm_type_overview',
         description: translate('Enable VM type overview in support workspace.'),
-      },
-    ],
-  },
-  {
-    key: 'telemetry',
-    description: translate('Telemetry settings'),
-    items: [
-      {
-        key: 'send_metrics',
-        description: translate('Send telemetry metrics.'),
       },
     ],
   },

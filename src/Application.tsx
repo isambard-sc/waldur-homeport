@@ -1,5 +1,9 @@
 import { ErrorBoundary } from '@sentry/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { UIRouter, UIView } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { Provider } from 'react-redux';
@@ -21,15 +25,13 @@ import { states } from './states';
 import { ThemeProvider } from './theme/ThemeProvider';
 
 export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      onError: (error: any) => {
-        if (error?.response?.status == 404) {
-          router.stateService.go('errorPage.notFound');
-        }
-      },
+  queryCache: new QueryCache({
+    onError: (error: any) => {
+      if (error?.response?.status == 404) {
+        router.stateService.go('errorPage.notFound');
+      }
     },
-  },
+  }),
 });
 
 states.forEach((state) => router.stateRegistry.register(state));

@@ -4,6 +4,7 @@ const MONACO_LANGUAGE_PATH_MAP = {
   python: () => import('monaco-editor/esm/vs/basic-languages/python/python.js'),
   yaml: () => import('monaco-editor/esm/vs/basic-languages/yaml/yaml.js'),
   shell: () => import('monaco-editor/esm/vs/basic-languages/shell/shell.js'),
+  ansible: () => import('monaco-editor/esm/vs/basic-languages/yaml/yaml.js'),
 };
 
 export const MonacoEditor = ({

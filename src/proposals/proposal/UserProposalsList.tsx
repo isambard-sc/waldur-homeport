@@ -75,6 +75,7 @@ export const UserProposalsList: FC = () => {
           label={row.name}
         />
       ),
+
       keys: ['name'],
       id: 'proposal',
     },
@@ -136,6 +137,7 @@ export const UserProposalsList: FC = () => {
             : DASH_ESCAPE_CODE}
         </>
       ),
+
       optional: true,
       keys: ['oecd_fos_2007_code', 'oecd_fos_2007_label'],
       id: 'oecd_fos_code',

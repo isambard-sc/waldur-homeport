@@ -1,4 +1,4 @@
-import { CalendarBlank } from '@phosphor-icons/react';
+import { CalendarBlankIcon } from '@phosphor-icons/react';
 import { useSelector, useDispatch } from 'react-redux';
 import { marketplaceResourcesPartialUpdate } from 'waldur-js-client';
 
@@ -58,7 +58,7 @@ export const EditResourceEndDateAction: ActionItemType = ({
     <ActionItem
       title={translate('Set termination date')}
       action={callback}
-      iconNode={<CalendarBlank weight="bold" />}
+      iconNode={<CalendarBlankIcon weight="bold" />}
     />
   );
 };

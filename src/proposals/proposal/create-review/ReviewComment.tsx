@@ -27,6 +27,7 @@ export const ReviewComment: FC<PropsWithChildren<ReviewCommentProps>> = (
         size={32}
         circle
       />
+
       <div className="fw-semibold">
         <FormLabel className="mb-0">
           {props.title}

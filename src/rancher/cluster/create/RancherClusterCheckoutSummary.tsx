@@ -63,22 +63,27 @@ const PureRancherExtraComponent = (props: ReturnType<typeof getStats>) =>
         label={translate('Total number of nodes')}
         value={props.nodeCount}
       />
+
       <CheckoutPricingRow
         label={translate('Number of agent nodes')}
         value={props.agentCount}
       />
+
       <CheckoutPricingRow
         label={translate('Number of server nodes')}
         value={props.serverCount}
       />
+
       <CheckoutPricingRow
         label={translate('Total CPU')}
         value={props.totalCores}
       />
+
       <CheckoutPricingRow
         label={translate('Total storage')}
         value={props.totalStorage}
       />
+
       <CheckoutPricingRow
         label={translate('Total memory')}
         value={props.totalRam}

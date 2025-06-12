@@ -78,6 +78,18 @@ export const InvoicesEnum = {
   update_of_credit_by_staff: 'update_of_credit_by_staff',
 };
 
+export const Offering_accountingEnum = {
+  marketplace_offering_component_created: 'marketplace_offering_component_created',
+  marketplace_offering_component_deleted: 'marketplace_offering_component_deleted',
+  marketplace_offering_component_updated: 'marketplace_offering_component_updated',
+  marketplace_plan_archived: 'marketplace_plan_archived',
+  marketplace_plan_component_current_price_updated: 'marketplace_plan_component_current_price_updated',
+  marketplace_plan_component_future_price_updated: 'marketplace_plan_component_future_price_updated',
+  marketplace_plan_component_quota_updated: 'marketplace_plan_component_quota_updated',
+  marketplace_plan_created: 'marketplace_plan_created',
+  marketplace_plan_updated: 'marketplace_plan_updated',
+};
+
 export const PermissionsEnum = {
   role_granted: 'role_granted',
   role_revoked: 'role_revoked',

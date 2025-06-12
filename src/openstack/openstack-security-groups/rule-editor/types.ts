@@ -1,6 +1,8 @@
+import { EthernetType } from '@waldur/openstack/types';
+
 export interface Rule {
   port_range?: { min: number; max: number };
-  ethertype: string;
+  ethertype: EthernetType;
   direction: string;
   protocol: string;
   from_port?: number;

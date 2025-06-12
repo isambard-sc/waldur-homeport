@@ -1,4 +1,4 @@
-import { Plus, Trash } from '@phosphor-icons/react';
+import { PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { Button, Table } from 'react-bootstrap';
 import { Field } from 'redux-form';
@@ -37,7 +37,7 @@ const StaticRouteRow = ({ route, nexthopValidator, onRemove }) => (
     <td>
       <Button variant="default" onClick={onRemove} size="sm">
         <span className="svg-icon svg-icon-2">
-          <Trash />
+          <TrashIcon />
         </span>{' '}
         {translate('Remove')}
       </Button>
@@ -48,7 +48,7 @@ const StaticRouteRow = ({ route, nexthopValidator, onRemove }) => (
 const StaticRouteAddButton = ({ onClick }) => (
   <Button variant="default" onClick={onClick} size="sm">
     <span className="svg-icon svg-icon-2">
-      <Plus weight="bold" />
+      <PlusIcon weight="bold" />
     </span>{' '}
     {translate('Add route')}
   </Button>

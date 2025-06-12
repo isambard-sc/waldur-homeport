@@ -35,7 +35,7 @@
     "@phosphor-icons/react": "^2.1.7",
     "@popperjs/core": "~2.10.1",
     "@sentry/react": "^8.55.0",
-    "@tanstack/react-query": "^4.36.1",
+    "@tanstack/react-query": "^5.80.6",
     "@uirouter/react": "^1.0.7",
     "attr-accept": "^1.1.3",
     "bootstrap": "5.1.3",
@@ -88,7 +88,7 @@
     "reselect": "^3.0.1",
     "source-map": "^0.7.4",
     "text-security": "^3.2.1",
-    "waldur-js-client": "^1.0.4-dev.76"
+    "waldur-js-client": "^1.0.4-dev.88"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",

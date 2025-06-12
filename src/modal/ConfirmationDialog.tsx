@@ -1,4 +1,4 @@
-import { WarningCircle } from '@phosphor-icons/react';
+import { WarningCircleIcon } from '@phosphor-icons/react';
 import React, { ReactNode } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -54,7 +54,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   return (
     <ModalDialog
       title={title}
-      iconNode={iconNode || <WarningCircle weight="bold" />}
+      iconNode={iconNode || <WarningCircleIcon weight="bold" />}
       iconColor={type}
       bodyClassName="text-gray-500 pt-2"
       footer={

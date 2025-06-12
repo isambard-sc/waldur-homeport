@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
 import { FunctionComponent, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
@@ -50,7 +50,7 @@ export const DangerActionDialog: FunctionComponent<DangerActionPanelProps> = (
       <ModalDialog
         title={props.dialogTitle}
         subtitle={props.dialogSubtitle}
-        iconNode={<Trash weight="bold" />}
+        iconNode={<TrashIcon weight="bold" />}
         iconColor="danger"
         bodyClassName="text-gray-500 pt-2"
         footer={
@@ -82,7 +82,7 @@ export const DangerActionDialog: FunctionComponent<DangerActionPanelProps> = (
   ) : (
     <ModalDialog
       title={props.dialogTitle}
-      iconNode={<Trash weight="bold" />}
+      iconNode={<TrashIcon weight="bold" />}
       iconColor="danger"
       bodyClassName="text-gray-500 pt-2"
       footer={<CancelButton label={translate('OK')} />}

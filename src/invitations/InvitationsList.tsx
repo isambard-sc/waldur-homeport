@@ -56,6 +56,7 @@ export const InvitationsList: FunctionComponent = () => {
               <CopyToClipboardButton value={row.email} />
             </div>
           ),
+
           orderField: 'email',
           export: (row) => row.email,
         },
@@ -72,6 +73,7 @@ export const InvitationsList: FunctionComponent = () => {
           inlineFilter: (row) => [
             { value: row.state, label: formatInvitationState(row.state) },
           ],
+
           export: (row) => row.state,
         },
         {

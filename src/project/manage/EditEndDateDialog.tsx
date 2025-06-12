@@ -15,7 +15,7 @@ import { Project } from 'waldur-js-client';
 
 import { getAllPages } from '@waldur/core/api';
 import { Badge } from '@waldur/core/Badge';
-import { formatDate, parseDate } from '@waldur/core/dateUtils';
+import { formatDate, formatISODate, parseDate } from '@waldur/core/dateUtils';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SubmitButton } from '@waldur/form';
@@ -112,9 +112,10 @@ const FormModalComponent: FC<
     isFetching,
     error,
     refetch,
-  } = useQuery<Resource[]>(
-    [RESOURCES_QUERY_ID, project.uuid],
-    () => {
+  } = useQuery({
+    queryKey: [RESOURCES_QUERY_ID, project.uuid],
+
+    queryFn: () => {
       if (!project.resources_count) return Promise.resolve(null);
 
       return getAllPages((page) =>
@@ -128,6 +129,7 @@ const FormModalComponent: FC<
               'offering_name',
               'category_title',
             ],
+
             project_uuid: project.uuid,
             state: NON_TERMINATED_STATES,
             has_terminate_date: true,
@@ -135,11 +137,10 @@ const FormModalComponent: FC<
         }),
       );
     },
-    {
-      refetchOnWindowFocus: false,
-      enabled: value.input.value && value.meta.dirty,
-    },
-  );
+
+    refetchOnWindowFocus: false,
+    enabled: !!value.input.value && value.meta.dirty,
+  });
 
   const ignoredResources = useMemo(() => {
     const items: Resource[] = [];
@@ -222,6 +223,7 @@ const FormModalComponent: FC<
               component={DateField}
               minDate={DateTime.now().plus({ days: 1 }).toISO()}
             />
+
             <FormText className="text-gray-700">
               {translate(
                 'Project end date supersedes resource termination date if resource termination date is after the project end date.',
@@ -302,7 +304,7 @@ export const EditEndDateDialog = ({
         const project = await projectsPartialUpdate({
           path: { uuid: resolve.project.uuid },
           body: {
-            [resolve.name]: formatDate(endDate),
+            [resolve.name]: formatISODate(endDate),
           },
         });
         dispatch(setCurrentProject(project.data as any as Project));
@@ -317,7 +319,7 @@ export const EditEndDateDialog = ({
           const promises = selectedResources.map((resource) =>
             marketplaceResourcesPartialUpdate({
               path: { uuid: resource.uuid },
-              body: { end_date: endDate ? formatDate(endDate) : null },
+              body: { end_date: endDate ? formatISODate(endDate) : null },
             }),
           );
           const updatedResources: string[] = [];

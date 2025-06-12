@@ -9,7 +9,11 @@ import { translate } from '@waldur/i18n';
 import { getNativeNameVisible } from '@waldur/store/config';
 import { getShortNameVisible } from '@waldur/store/config';
 import { formatUserStatus } from '@waldur/user/support/utils';
-import { getUser, isStaffOrSupport } from '@waldur/workspace/selectors';
+import {
+  getUser,
+  isStaffOrSupport,
+  isStaff,
+} from '@waldur/workspace/selectors';
 
 import { ChangeEmailButton } from './ChangeEmailButton';
 import { UserEditRow } from './UserEditRow';
@@ -88,6 +92,32 @@ const NativeNameRow = ({ user, disabled, isSelf }) => {
       protected={fieldIsProtected(user, 'native_name')}
     />
   ) : null;
+};
+
+const NotificationsEnabledRow = ({ user, disabled, isSelf }) => {
+  const isStaffUser = useSelector(isStaff);
+  return (
+    <UserEditRow
+      user={user}
+      label={translate('Notifications')}
+      name="notifications_enabled"
+      value={
+        user.notifications_enabled
+          ? translate('Enabled')
+          : translate('Disabled')
+      }
+      disabled={disabled || !isStaffUser}
+      description={
+        isSelf
+          ? translate(
+            'Enable or disable notifications for your account (Staff only)',
+          )
+          : translate(
+            'Enable or disable notifications for this user (Staff only)',
+          )
+      }
+    />
+  );
 };
 
 const PhoneNumberRow = ({ user, disabled, isSelf }) => (
@@ -316,6 +346,11 @@ export const UserEditRows = ({
       <JobTitleRow user={user} isSelf={isSelf} disabled={disabled} />
       <AffiliationsRow user={user} disabled={disabled} />
       <DescriptionRow user={user} isSelf={isSelf} disabled={disabled} />
+      <NotificationsEnabledRow
+        user={user}
+        isSelf={isSelf}
+        disabled={disabled}
+      />
     </>
   );
 };

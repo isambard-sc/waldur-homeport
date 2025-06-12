@@ -9,7 +9,6 @@ import {
 } from 'waldur-js-client';
 
 import { getAllPages } from '@waldur/core/api';
-import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { orderFormSelector } from '@waldur/marketplace/deploy/selectors';
 import {
@@ -57,14 +56,6 @@ export const filterFlavors = (
 export const formatSubnets = (tenant_uuid: string) =>
   loadSubnets({ tenant_uuid }).then((data) => data.map(formatSubnetOption));
 
-export const getRancherMountPointChoices = () => {
-  const mountPoints = ENV.plugins.WALDUR_RANCHER.MOUNT_POINT_CHOICES;
-  return mountPoints.map((choice) => ({
-    label: choice,
-    value: choice,
-  }));
-};
-
 export const loadNodeCreateData = async (cluster: RancherCluster) => {
   const offering = await marketplacePublicOfferingsRetrieve({
     path: { uuid: cluster.marketplace_offering_uuid },
@@ -87,16 +78,16 @@ export const loadNodeCreateData = async (cluster: RancherCluster) => {
     flavors,
     volumeTypes: volumeTypeChoices,
     defaultVolumeType: defaultVolumeType && defaultVolumeType.value,
-    mountPoints: getRancherMountPointChoices(),
     templates,
     securityGroups,
   };
 };
 
 export const useVolumeDataLoader = (tenant) => {
-  return useQuery(
-    ['volumeTypes', tenant],
-    async () => {
+  return useQuery({
+    queryKey: ['volumeTypes', tenant],
+
+    queryFn: async () => {
       const volumeTypes = tenant
         ? await loadVolumeTypes({ tenant: tenant.url })
         : [];
@@ -107,8 +98,9 @@ export const useVolumeDataLoader = (tenant) => {
         defaultVolumeType,
       };
     },
-    { staleTime: 3 * 60 * 1000 },
-  );
+
+    staleTime: 3 * 60 * 1000,
+  });
 };
 
 export const getDataVolumes = (nodeIndex, allValues) => {

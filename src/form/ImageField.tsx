@@ -1,4 +1,8 @@
-import { UploadSimple, Image, ArrowsClockwise } from '@phosphor-icons/react';
+import {
+  UploadSimpleIcon,
+  ImageIcon,
+  ArrowsClockwiseIcon,
+} from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FunctionComponent, useCallback, useEffect, useRef } from 'react';
 
@@ -79,7 +83,7 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
       <div className="imagefield-upload-row">
         <div className="imagefield-avatar-box">
           {!input.value ? (
-            <Image size={32} color="forestgreen" />
+            <ImageIcon size={32} color="forestgreen" />
           ) : (
             <img style={style} ref={previewRef} alt="preview" />
           )}
@@ -96,11 +100,11 @@ export const ImageField: FunctionComponent<ImageFieldProps> = (props) => {
             {input.value ? (
               <>
                 <span>{translate('Replace')}</span>
-                <ArrowsClockwise size={20} />
+                <ArrowsClockwiseIcon size={20} />
               </>
             ) : (
               <>
-                <UploadSimple size={20} />
+                <UploadSimpleIcon size={20} />
                 <span>{translate('Upload')}</span>
               </>
             )}

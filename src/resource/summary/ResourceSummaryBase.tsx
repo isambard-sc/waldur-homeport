@@ -51,6 +51,7 @@ export function ResourceSummaryBase<T extends Resource = Resource>(
         label={translate('Created')}
         value={<CreatedField resource={props.resource} />}
       />
+
       <Field label={translate('Termination date')} value={resource.end_date} />
       <Field
         label={translate('Metadata')}

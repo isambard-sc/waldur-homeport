@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { FC, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
@@ -30,7 +30,7 @@ export const DangerActionPanel: FC<DangerActionPanelProps> = (props) => {
           disabled={!confirm}
         >
           <span className="svg-icon svg-icon-2">
-            <Trash weight="bold" />
+            <TrashIcon weight="bold" />
           </span>
           {props.buttonTitle}
         </Button>

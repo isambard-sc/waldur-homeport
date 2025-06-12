@@ -1,4 +1,4 @@
-import { Question } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 
 import { formatRelative } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
@@ -66,7 +66,7 @@ export const EndDateField = ({ resource }) => {
             />
           ) : resourceTerminationDate && projectEndDate ? (
             <Tip id="end-date-tooltip" label={tooltipContent}>
-              <Question size={15} />
+              <QuestionIcon size={15} />
             </Tip>
           ) : null}
         </span>

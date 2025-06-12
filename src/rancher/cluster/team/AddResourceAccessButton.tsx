@@ -1,7 +1,7 @@
-import { Key } from '@phosphor-icons/react';
+import { KeyIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
-import { RancherCluster } from 'waldur-js-client';
+import { Resource } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -9,7 +9,7 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 
 interface ResourceAccessButtonProps {
-  resource: RancherCluster;
+  resource: Resource;
   refetch;
 }
 
@@ -37,7 +37,7 @@ export const AddResourceAccessButton: FC<ResourceAccessButtonProps> = ({
           }),
         )
       }
-      iconNode={<Key weight="bold" />}
+      iconNode={<KeyIcon weight="bold" />}
     />
   );
 };

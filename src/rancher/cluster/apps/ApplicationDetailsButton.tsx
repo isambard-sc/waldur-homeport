@@ -1,4 +1,4 @@
-import { Eye } from '@phosphor-icons/react';
+import { EyeIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -25,7 +25,7 @@ export const ApplicationDetailsButton: FunctionComponent<any> = (props) => {
     <ActionItem
       title={translate('Details')}
       action={callback}
-      iconNode={<Eye weight="bold" />}
+      iconNode={<EyeIcon weight="bold" />}
     />
   );
 };

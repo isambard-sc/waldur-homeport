@@ -1,4 +1,4 @@
-import { CaretDown, X } from '@phosphor-icons/react';
+import { CaretDownIcon, XIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { isEqual } from 'lodash-es';
 import React, {
@@ -33,13 +33,13 @@ interface TableFilterItem {
 
 const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   badgeValue = (value) => {
-    if (value)
+    if (value) {
       if (value instanceof Array) {
         return value.length;
       } else {
         return 1;
       }
-    else return null;
+    } else return null;
   },
   ...props
 }) => {
@@ -83,8 +83,9 @@ const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
           ) : null
         }
       />
+
       <span className="svg-icon svg-icon-3 rotate-90 ms-2 lh-base">
-        <CaretDown size={20} />
+        <CaretDownIcon size={20} />
       </span>
     </button>
   );
@@ -96,7 +97,7 @@ export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
     className="text-btn text-gray-400 text-hover-gray-500 lh-0 ps-2"
     onClick={onClick}
   >
-    <X weight="bold" size={size} />
+    <XIcon weight="bold" size={size} />
   </button>
 );
 
@@ -168,13 +169,13 @@ export const TableSidebarFilterValues = ({
 
 const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   getValueLabel = (value) => {
-    if (value)
+    if (value) {
       if (Array.isArray(value)) {
         return value.length;
       } else {
         return value?.label || value;
       }
-    else return value;
+    } else return value;
   },
   ...props
 }) => {
@@ -258,13 +259,13 @@ const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 
 const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   getValueLabel = (value) => {
-    if (value)
+    if (value) {
       if (Array.isArray(value)) {
         return value.length;
       } else {
         return value?.label || value;
       }
-    else return value;
+    } else return value;
   },
   instantApply = true,
   ...props

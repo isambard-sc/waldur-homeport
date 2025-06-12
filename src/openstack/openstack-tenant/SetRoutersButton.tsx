@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { OpenStackRouter } from 'waldur-js-client';
 
@@ -29,7 +29,7 @@ export const SetRoutersButton: ActionItemType<OpenStackRouter> = ({
   return (
     <ActionItem
       title={translate('Set static routes')}
-      iconNode={<PencilSimple weight="bold" />}
+      iconNode={<PencilSimpleIcon weight="bold" />}
       action={openDialog}
     />
   );

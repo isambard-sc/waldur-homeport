@@ -1,4 +1,4 @@
-import { Trash } from '@phosphor-icons/react';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { projectsDeleteUser } from 'waldur-js-client';
@@ -92,7 +92,7 @@ export const ProjectUsersBulkRemoveButton = ({ rows, refetch }) => {
     <ActionButton
       title={translate('Remove')}
       action={callback}
-      iconNode={<Trash />}
+      iconNode={<TrashIcon />}
       variant="light-danger"
       tooltip={translate('Remove all selected users from project.')}
       disabled={isRemoving}

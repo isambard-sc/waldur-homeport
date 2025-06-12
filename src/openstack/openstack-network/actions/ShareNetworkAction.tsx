@@ -1,4 +1,4 @@
-import { Share } from '@phosphor-icons/react';
+import { ShareIcon } from '@phosphor-icons/react';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
@@ -21,7 +21,7 @@ export const ShareNetworkAction: ActionItemType = ({ resource, refetch }) => (
     modalComponent={ShareNetworkDialog}
     resource={resource}
     extraResolve={{ refetch }}
-    iconNode={<Share weight="bold" />}
+    iconNode={<ShareIcon weight="bold" />}
     dialogSize="sm"
   />
 );

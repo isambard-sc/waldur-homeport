@@ -28,6 +28,7 @@ export const ActionDialog: React.FC<PropsWithChildren<ActionDialogProps>> = (
           <CloseDialogButton
             className={props.fullButtons ? 'flex-equal' : undefined}
           />
+
           <SubmitButton
             disabled={props.invalid}
             submitting={props.submitting}

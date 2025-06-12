@@ -1,4 +1,4 @@
-import { UploadSimple } from '@phosphor-icons/react';
+import { UploadSimpleIcon } from '@phosphor-icons/react';
 import { useMemo } from 'react';
 import { Button, Card } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
@@ -70,7 +70,7 @@ export const ProjectAvatar = ({ project }: { project: Project }) => {
                       >
                         {translate('Save')}
                         <span className="svg-icon svg-icon-5">
-                          <UploadSimple weight="bold" />
+                          <UploadSimpleIcon weight="bold" />
                         </span>
                       </Button>
                     ) : null

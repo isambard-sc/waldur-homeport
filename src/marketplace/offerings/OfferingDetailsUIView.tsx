@@ -202,27 +202,31 @@ export const OfferingDetailsUIView = ({
     data: offeringData,
     refetch: refetchOffering,
     isRefetching: isRefetchingOffering,
-  } = useQuery(
-    [PROVIDER_OFFERING_DATA_QUERY_KEY, offering_uuid],
-    () => loadOfferingData(offering_uuid),
-    { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
-  );
+  } = useQuery({
+    queryKey: [PROVIDER_OFFERING_DATA_QUERY_KEY, offering_uuid],
+    queryFn: () => loadOfferingData(offering_uuid),
+    refetchOnWindowFocus: false,
+    staleTime: 3 * 60 * 1000,
+  });
   const {
     isLoading: isLoadingPlansUsage,
     error: errorPlansUsage,
     data: plansUsage,
     refetch: refetchPlansUsage,
     isRefetching: isRefetchingPlansUsage,
-  } = useQuery(
-    ['offeringPlansUsage', offering_uuid],
-    () =>
+  } = useQuery({
+    queryKey: ['offeringPlansUsage', offering_uuid],
+
+    queryFn: () =>
       getAllPages((page) =>
         marketplacePlansUsageStatsList({
           query: { page, offering_uuid },
         }),
       ),
-    { refetchOnWindowFocus: false, staleTime: 3 * 60 * 1000 },
-  );
+
+    refetchOnWindowFocus: false,
+    staleTime: 3 * 60 * 1000,
+  });
 
   const refetch = useCallback(() => {
     refetchOffering();
@@ -243,6 +247,7 @@ export const OfferingDetailsUIView = ({
       isLoading={isLoadingOffering}
       error={errorOffering}
     />,
+
     [
       offeringData?.offering,
       refetch,

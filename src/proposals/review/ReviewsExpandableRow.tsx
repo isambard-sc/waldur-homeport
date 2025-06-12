@@ -28,13 +28,11 @@ const loadProposalData = async (proposal_uuid: string) => {
 };
 
 export const ReviewsExpandableRow = ({ row }: { row: ProposalReview }) => {
-  const { data, isLoading, error } = useQuery(
-    ['proposal', row.proposal],
-    () => loadProposalData(row.proposal_uuid),
-    {
-      refetchOnWindowFocus: false,
-    },
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['proposal', row.proposal],
+    queryFn: () => loadProposalData(row.proposal_uuid),
+    refetchOnWindowFocus: false,
+  });
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -49,10 +47,12 @@ export const ReviewsExpandableRow = ({ row }: { row: ProposalReview }) => {
           label={translate('Applicant name')}
           value={data.proposal.created_by_name}
         />
+
         <Field
           label={translate('Submission date')}
           value={formatDateTime(data.proposal.created)}
         />
+
         {data.proposal.project && (
           <Field
             label={translate('Project')}

@@ -1,7 +1,7 @@
-import Markdown from 'markdown-to-jsx';
 import { FC } from 'react';
 import { Card, Table } from 'react-bootstrap';
 
+import { SafeMarkdown } from '@waldur/core/SafeMarkdown';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
@@ -50,7 +50,7 @@ export const CallGeneralSection: FC<CallGeneralSectionProps> = (props) => {
               <td className="col-md-3">{translate('Description')}</td>
               <td className="col-md-9">
                 {props.call.description ? (
-                  <Markdown>{props.call.description}</Markdown>
+                  <SafeMarkdown text={props.call.description} />
                 ) : (
                   'N/A'
                 )}

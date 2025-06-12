@@ -56,6 +56,7 @@ export const ShareNetworkDialog: FC<ActionDialogProps> = ({
             { value: 'access_as_shared', label: translate('Shared') },
             { value: 'access_as_external', label: translate('External') },
           ],
+
           spaceless: true,
         },
       ]}

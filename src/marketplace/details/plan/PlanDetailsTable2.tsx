@@ -1,4 +1,4 @@
-import { WarningCircle } from '@phosphor-icons/react';
+import { WarningCircleIcon } from '@phosphor-icons/react';
 import { FunctionComponent, useMemo, useState } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 import { connect, useSelector } from 'react-redux';
@@ -189,7 +189,7 @@ const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (props) => {
               id="order-plan-errors"
               autoWidth
             >
-              <WarningCircle
+              <WarningCircleIcon
                 size={18}
                 weight="bold"
                 className="ms-2 text-warning mb-1"

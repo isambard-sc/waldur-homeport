@@ -21,7 +21,6 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { ProposalSidebar } from './ProposalSidebar';
 import { createProposalSteps } from './steps';
-import { useProposalDecisionActions } from './utils';
 
 const formDataSelector = (state) =>
   (getFormValues(PROPOSAL_UPDATE_SUBMISSION_FORM_ID)(state) || {}) as any;
@@ -85,26 +84,28 @@ export const ProposalSubmissionStep: FC<{
 
   const formData = useSelector(formDataSelector);
 
-  const { mutate: saveAsDraft, isLoading: isSaving } = useMutation(async () => {
-    try {
-      await proposalProposalsUpdateProjectDetails({
-        path: { uuid: proposal_uuid },
-        body: formData,
-      });
-      await attachDocuments(proposal_uuid, formData.supporting_documentation);
-      dispatch(showSuccess(translate('Proposal updated successfully')));
-      // clear formData.supporting_documentation from redux-form store to prevent file upload on next submit/switchToTeam
-      dispatch(
-        change(
-          PROPOSAL_UPDATE_SUBMISSION_FORM_ID,
-          'supporting_documentation',
-          {},
-        ),
-      );
-      refetch && refetch();
-    } catch (error) {
-      dispatch(showErrorResponse(error, translate('Something went wrong')));
-    }
+  const { mutate: saveAsDraft, isPending: isSaving } = useMutation({
+    mutationFn: async () => {
+      try {
+        await proposalProposalsUpdateProjectDetails({
+          path: { uuid: proposal_uuid },
+          body: formData,
+        });
+        await attachDocuments(proposal_uuid, formData.supporting_documentation);
+        dispatch(showSuccess(translate('Proposal updated successfully')));
+        // clear formData.supporting_documentation from redux-form store to prevent file upload on next submit/switchToTeam
+        dispatch(
+          change(
+            PROPOSAL_UPDATE_SUBMISSION_FORM_ID,
+            'supporting_documentation',
+            {},
+          ),
+        );
+        refetch && refetch();
+      } catch (error) {
+        dispatch(showErrorResponse(error, translate('Something went wrong')));
+      }
+    },
   });
 
   const submitForm = useCallback(
@@ -136,12 +137,6 @@ export const ProposalSubmissionStep: FC<{
     },
     [proposal, proposal_uuid],
   );
-
-  const {
-    canPerformDecisionActions,
-    handleApproveProposal,
-    handleRejectProposal,
-  } = useProposalDecisionActions(proposal, refetch);
 
   const completedSteps = useMemo(() => {
     const result = stepRefs.current.map(() => false);
@@ -194,9 +189,6 @@ export const ProposalSubmissionStep: FC<{
               editable={proposal.state === 'draft'}
               submitting={formProps.submitting}
               completedSteps={completedSteps}
-              canPerformDecisionActions={canPerformDecisionActions}
-              handleApproveProposal={handleApproveProposal}
-              handleRejectProposal={handleRejectProposal}
             />
           </SidebarLayout.Sidebar>
         </SidebarLayout.Container>

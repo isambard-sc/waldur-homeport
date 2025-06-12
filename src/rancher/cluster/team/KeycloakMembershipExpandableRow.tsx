@@ -49,6 +49,7 @@ export const KeycloakMembershipExpandableRow: FC<{
                 {row.group_role}
               </Badge>
             ),
+
             export: 'group_role',
           },
           {
@@ -63,6 +64,7 @@ export const KeycloakMembershipExpandableRow: FC<{
                   {translate('Pending')}
                 </Badge>
               ),
+
             export: 'state',
           },
         ]}

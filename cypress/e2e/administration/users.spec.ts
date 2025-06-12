@@ -1,6 +1,7 @@
 describe('Users', () => {
   beforeEach(() => {
     cy.mockChecklists()
+      .setAcceptCookies()
 
       .intercept('GET', '/api/configuration/', {
         fixture: 'support/configuration.json',

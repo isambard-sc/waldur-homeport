@@ -1,10 +1,10 @@
-import { IconProps } from '@phosphor-icons/react';
+import { Icon } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { ComponentType, CSSProperties, FC } from 'react';
+import { CSSProperties, FC } from 'react';
 import { Variant } from 'react-bootstrap/types';
 
 interface RadarIconProps {
-  IconComponent: ComponentType<IconProps>;
+  IconComponent: Icon;
   variant?: Variant;
   size?: 'sm';
   className?: string;

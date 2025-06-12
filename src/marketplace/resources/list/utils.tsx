@@ -198,6 +198,7 @@ export const getResourceAllListColumns = (
         render: ({ row }) => (
           <BooleanField value={row.restrict_member_access} />
         ),
+
         id: 'restrict_member_access',
         keys: ['restrict_member_access'],
         optional: true,

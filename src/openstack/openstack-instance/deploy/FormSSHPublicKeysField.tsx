@@ -1,4 +1,4 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { PlusCircleIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -68,7 +68,7 @@ export const FormSSHPublicKeysField = ({ change, ...props }: OwnProps) => {
           onClick={openFormDialog}
         >
           <span className="svg-icon svg-icon-2">
-            <PlusCircle weight="bold" />
+            <PlusCircleIcon weight="bold" />
           </span>
           {translate('Create new')}
         </Button>

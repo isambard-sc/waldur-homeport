@@ -1,4 +1,4 @@
-import { Pencil } from '@phosphor-icons/react';
+import { PencilIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { PublicOfferingDetails } from 'waldur-js-client';
@@ -48,7 +48,7 @@ export const ProviderOfferingUserUpdateButton: FC<
             }),
           )
         }
-        iconNode={<Pencil weight="bold" />}
+        iconNode={<PencilIcon weight="bold" />}
       />
     )
   );

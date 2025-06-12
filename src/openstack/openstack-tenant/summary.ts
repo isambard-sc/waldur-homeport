@@ -1,6 +1,8 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { ResourceSummaryConfiguration } from '@waldur/resource/summary/types';
 
+import { OPENSTACK_PORT_TYPE } from '../constants';
+
 const OpenStackTenantSummary = lazyComponent(() =>
   import('./OpenStackTenantSummary').then((module) => ({
     default: module.OpenStackTenantSummary,
@@ -33,6 +35,6 @@ export const OpenStackRouterSummaryConfiguration: ResourceSummaryConfiguration =
   };
 
 export const OpenStackPortSummaryConfiguration: ResourceSummaryConfiguration = {
-  type: 'OpenStack.Port',
+  type: OPENSTACK_PORT_TYPE,
   component: OpenstackPortSummary,
 };

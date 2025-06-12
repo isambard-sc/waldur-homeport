@@ -42,6 +42,7 @@ export const ClusterTemplatesList: FunctionComponent<
               {row.name}
             </Link>
           ),
+
           copyField: (row) => row.name,
           orderField: 'name',
           export: 'name',

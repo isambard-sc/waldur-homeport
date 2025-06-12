@@ -105,6 +105,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
               <p className="mb-0">{row.full_name || DASH_ESCAPE_CODE}</p>
             </div>
           ),
+
           export: 'full_name',
           id: 'member',
           keys: ['full_name', 'username', 'image'],

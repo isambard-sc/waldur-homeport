@@ -1,4 +1,4 @@
-import { PlusCircle } from '@phosphor-icons/react';
+import { PlusCircleIcon } from '@phosphor-icons/react';
 import { reduxForm } from 'redux-form';
 import { marketplaceScreenshotsCreate } from 'waldur-js-client';
 
@@ -48,7 +48,7 @@ export const CreateImageDialog = reduxForm<
     <form onSubmit={props.handleSubmit(submitRequest)}>
       <ModalDialog
         title={translate('Add offering image')}
-        iconNode={<PlusCircle weight="bold" />}
+        iconNode={<PlusCircleIcon weight="bold" />}
         iconColor="success"
         footer={
           <>
@@ -69,6 +69,7 @@ export const CreateImageDialog = reduxForm<
             required
             validate={required}
           />
+
           <StringField
             name="name"
             label={translate('Name')}
@@ -77,6 +78,7 @@ export const CreateImageDialog = reduxForm<
             maxLength={150}
             placeholder={translate('e.g. Image name...')}
           />
+
           <TextField
             name="description"
             label={translate('Description')}

@@ -1,4 +1,4 @@
-import { PencilSimple } from '@phosphor-icons/react';
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import {
@@ -111,6 +111,7 @@ export const CostPolicyEditButton = ({
                     }),
               },
             ],
+
             actions: getCostPolicyActionOptions(type).find(
               (option) => option.value === row.actions,
             ),
@@ -127,7 +128,7 @@ export const CostPolicyEditButton = ({
     <ActionItem
       title={translate('Edit')}
       action={openCostPolicyEditDialog}
-      iconNode={<PencilSimple weight="bold" />}
+      iconNode={<PencilSimpleIcon weight="bold" />}
     />
   );
 };

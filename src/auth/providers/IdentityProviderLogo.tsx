@@ -38,6 +38,7 @@ const LogoMap = {
   [EDUTEAMS_IDP]: (props) => (
     <img src={EduteamsLogo} alt="eduteams" {...props} />
   ),
+
   [FREEIPA_IDP]: (props) => <img src={FreeipaLogo} alt="freeipa" {...props} />,
   [TARA_IDP]: TaraLogo,
   [KEYCLOAK_IDP]: KeycloakLogoComponent,

@@ -1,4 +1,4 @@
-import { UserCirclePlus } from '@phosphor-icons/react';
+import { UserCirclePlusIcon } from '@phosphor-icons/react';
 import { reduxForm } from 'redux-form';
 import { RoleDetails } from 'waldur-js-client';
 
@@ -71,7 +71,7 @@ export const AddUserDialog = reduxForm<
         subtitle={translate(
           'Select a user to assign a role within the project.',
         )}
-        iconNode={<UserCirclePlus weight="bold" />}
+        iconNode={<UserCirclePlusIcon weight="bold" />}
         iconColor="success"
         footer={
           <>
@@ -99,6 +99,7 @@ export const AddUserDialog = reduxForm<
             required={true}
             validate={[required]}
           />
+
           {roles && roles.length === 1 ? null : <RoleGroup types={roleTypes} />}
           <ExpirationTimeGroup />
         </FormContainer>

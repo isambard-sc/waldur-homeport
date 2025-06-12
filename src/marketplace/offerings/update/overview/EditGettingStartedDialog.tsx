@@ -1,4 +1,4 @@
-import { Info } from '@phosphor-icons/react';
+import { InfoIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -86,7 +86,7 @@ export const EditGettingStartedDialog = connect<
                         id="template"
                       >
                         {translate('Template')}
-                        <Info
+                        <InfoIcon
                           size={16}
                           weight="fill"
                           className="text-muted ms-1"
@@ -101,6 +101,7 @@ export const EditGettingStartedDialog = connect<
               xs="auto"
               className="border-end border-gray-300 border-2 mx-5 p-0"
             />
+
             <Col className="pb-20">
               <div className="form-label">{translate('Preview')}</div>
               <CodePreview

@@ -1,4 +1,4 @@
-import { ShieldCheck } from '@phosphor-icons/react';
+import { ShieldCheckIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import {
   OpenStackPort,
@@ -67,7 +67,7 @@ export const TogglePortSecurityAction: ActionItemType<OpenStackPort> = ({
       disabled={disabled}
       action={callback}
       important
-      iconNode={<ShieldCheck weight="bold" />}
+      iconNode={<ShieldCheckIcon weight="bold" />}
     />
   );
 };

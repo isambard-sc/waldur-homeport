@@ -1,4 +1,4 @@
-import { Eye, WarningCircle } from '@phosphor-icons/react';
+import { EyeIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import { useCallback, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -42,7 +42,7 @@ const ShowSecurityGroupsButton = (props: ShowSecurityGroupsButtonProps) => {
       <ActionItem
         title={translate('Show rules')}
         action={callback}
-        iconNode={<Eye weight="bold" />}
+        iconNode={<EyeIcon weight="bold" />}
       />
     </ActionsDropdownComponent>
   );
@@ -70,7 +70,7 @@ const ShowPreviewButton = () => {
       disabled={!securityGroups?.length}
     >
       <span className="svg-icon svg-icon-2">
-        <Eye />
+        <EyeIcon />
       </span>
       {translate('Preview')}
     </Button>
@@ -122,7 +122,7 @@ export const FormSecurityGroupsField = ({
                   )}
                   id="default_security_group_tooltip"
                 >
-                  <WarningCircle
+                  <WarningCircleIcon
                     size={20}
                     weight="bold"
                     className="text-warning"

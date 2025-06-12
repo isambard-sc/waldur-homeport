@@ -20,16 +20,18 @@ export const FormDetailsOverviewStep = (props: FormStepProps) => {
   const project = useSelector(orderProjectSelector);
   const customer = useSelector(orderCustomerSelector);
 
-  const { data: provider } = useQuery(
-    ['DeployDetailsOverview', 'provider', props.offering?.uuid],
-    () =>
+  const { data: provider } = useQuery({
+    queryKey: ['DeployDetailsOverview', 'provider', props.offering?.uuid],
+
+    queryFn: () =>
       props.offering
         ? getServiceProviderByCustomer({
             customer_uuid: props.offering.customer_uuid,
           })
         : null,
-    { staleTime: 5 * 60 * 1000 },
-  );
+
+    staleTime: 5 * 60 * 1000,
+  });
 
   if (props.offering.shared) {
     // Render with organization and project fields

@@ -1,4 +1,3 @@
-import Markdown from 'markdown-to-jsx';
 import { FunctionComponent, useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
@@ -6,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Image } from '@waldur/core/Image';
 import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
+import { SafeMarkdown } from '@waldur/core/SafeMarkdown';
 import { translate } from '@waldur/i18n';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { Field } from '@waldur/resource/summary';
@@ -55,7 +55,7 @@ export const PublicCallExpandableRow: FunctionComponent<{
         <Row>
           <Col xs={12} className="text-dark mb-2">
             {row.description ? (
-              <Markdown>{row.description}</Markdown>
+              <SafeMarkdown text={row.description} />
             ) : (
               <p className="text-muted fst-italic fs-7">
                 {translate('No description')}
@@ -71,6 +71,7 @@ export const PublicCallExpandableRow: FunctionComponent<{
                   value={formatDateTime(activeRound.cutoff_time)}
                   isStuck
                 />
+
                 <Field
                   label={translate('Review strategy')}
                   value={formatRoundReviewStrategy(activeRound.review_strategy)}
@@ -85,6 +86,7 @@ export const PublicCallExpandableRow: FunctionComponent<{
                   )}
                   isStuck
                 />
+
                 <Field
                   label={translate('Allocation strategy')}
                   value={formatRoundAllocationTime(activeRound.allocation_time)}

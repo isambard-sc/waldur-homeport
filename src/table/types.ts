@@ -37,7 +37,7 @@ export interface TableOptionsType<RowType = any> {
   table: string;
   fetchData: (request: TableRequest) => any;
   onFetch?: (rows: RowType[], totalCount: number, firstFetch: boolean) => void;
-  onApplyFilter?: (filters: FilterItem[]) => void;
+  onApplyFilter?: (filters: FilterItem[], firstFetch: boolean) => void;
   staleTime?: number;
   queryField?: string;
   exportFields?: string[] | ((props: any) => string[]);
