@@ -83,6 +83,12 @@ export const InvitationsList: FunctionComponent = () => {
           export: (row) => formatDate(row.created),
         },
         {
+          title: translate('Invited by'),
+          orderField: 'created_by',
+          render: ({ row }) => row.created_by_full_name,
+          export: (row) => row.created_by_full_name,
+        },
+        {
           title: translate('Expires at'),
           orderField: 'expires',
           render: ({ row }) => formatDate(row.expires),

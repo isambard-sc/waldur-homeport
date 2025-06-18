@@ -14,7 +14,9 @@ export const UnlinkPortAction: ActionItemType = ({ resource, refetch }) => {
       await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
-        translate('Are you sure you want to unlink the port?'),
+        translate(
+          'Are you sure you want to unlink the port? Unlinking will only remove object from the database, it will not trigger any cleanup',
+        ),
         { forDeletion: true },
       );
     } catch {

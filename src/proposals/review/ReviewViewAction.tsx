@@ -1,4 +1,4 @@
-import { EyeIcon, PencilIcon } from '@phosphor-icons/react';
+import { EyeIcon, PencilSimpleIcon } from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { translate } from '@waldur/i18n';
@@ -31,7 +31,7 @@ export const ReviewViewAction = ({ row }) => {
     state.name === 'call-management.review-list' ? (
       <EyeIcon weight="bold" />
     ) : (
-      <PencilIcon weight="bold" />
+      <PencilSimpleIcon weight="bold" />
     );
 
   return <ActionItem title={title} action={callback} iconNode={icon} />;

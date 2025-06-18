@@ -18,9 +18,12 @@ export const UnlinkAction: ActionItemType = ({ resource, refetch }) => {
       await waitForConfirmation(
         dispatch,
         translate('Unlink instance'),
-        translate('Do you want to unlink instance {name}?', {
-          name: resource.instance_name,
-        }),
+        translate(
+          'Do you want to unlink instance {name}? Unlinking will only remove object from the database, it will not trigger any cleanup',
+          {
+            name: resource.instance_name,
+          },
+        ),
       );
     } catch {
       return;

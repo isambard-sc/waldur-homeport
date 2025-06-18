@@ -6,11 +6,13 @@ import {
 } from '@phosphor-icons/react';
 
 import { Link } from '@waldur/core/Link';
+import { useModal } from '@waldur/modal/hooks';
 import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
 
 import { getResourceFilterFromSearchItem } from './utils';
 
 export const RecentSearchItem = ({ item }) => {
+  const { closeDialog } = useModal();
   const { syncResourceFilters } =
     useOrganizationAndProjectFiltersForResources();
 
@@ -23,7 +25,7 @@ export const RecentSearchItem = ({ item }) => {
       params={item.params}
       onClick={() => {
         syncResourceFilters(getResourceFilterFromSearchItem(item));
-        close();
+        closeDialog();
       }}
     >
       {item.type === 'organization' ? (

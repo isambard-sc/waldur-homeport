@@ -84,13 +84,7 @@ export const getOfferingBreadcrumbItems = (
       key: 'offering',
       text: offering?.name || '...',
       dropdown: provider
-        ? (close) => (
-            <OfferingBreadcrumbPopover
-              provider={provider}
-              close={close}
-              page={page}
-            />
-          )
+        ? () => <OfferingBreadcrumbPopover provider={provider} page={page} />
         : undefined,
       truncate: true,
       active: true,

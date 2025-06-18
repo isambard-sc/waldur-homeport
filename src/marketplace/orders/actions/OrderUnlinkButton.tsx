@@ -15,7 +15,9 @@ export const OrderUnlinkButton = ({ row, refetch }) => {
       await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
-        translate('Are you sure you want to unlink the order?'),
+        translate(
+          'Are you sure you want to unlink the order? Unlinking will only remove object from the database, it will not trigger any cleanup',
+        ),
       );
     } catch {
       return;

@@ -58,7 +58,7 @@ export const DangerActionDialog: FunctionComponent<DangerActionPanelProps> = (
             <Button
               variant="outline btn-outline-default"
               className="flex-equal"
-              onClick={closeDialog}
+              onClick={() => closeDialog()}
             >
               {translate('Cancel')}
             </Button>

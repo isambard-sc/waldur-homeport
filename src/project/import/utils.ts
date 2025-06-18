@@ -110,7 +110,13 @@ export const parseProjectsAndResourcesFile = (file: File) => {
                   const attributes: Record<string, any> = {};
                   resourceFields.forEach(({ field, idx }) => {
                     const value = parseValue(resourceRow[idx]);
-                    if (String(field).endsWith('_limit')) {
+                    // Set name, description and end_date
+                    if (['name', 'description', 'end_date'].includes(field)) {
+                      if (value) {
+                        attributes[field] = value;
+                        resourceData[field] = value;
+                      }
+                    } else if (String(field).endsWith('_limit')) {
                       // Components
                       limits[field.substring(0, field.lastIndexOf('_limit'))] =
                         value;

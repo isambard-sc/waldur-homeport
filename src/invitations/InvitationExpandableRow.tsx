@@ -17,10 +17,6 @@ export const InvitationExpandableRow: React.FC<{
         value={`${location.origin}/invitation/${row.uuid}/`}
       />
     </p>
-    <p>
-      <b>{translate('Invited by')}: </b>
-      {row.created_by_full_name}
-    </p>
     {row.civil_number && (
       <p>
         <b>{translate('Civil number')}: </b>

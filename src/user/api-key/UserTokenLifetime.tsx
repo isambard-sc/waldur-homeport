@@ -97,7 +97,7 @@ export const UserTokenLifetime: React.FC<UserEditTokenComponentProps> = (
             onChange={(value) => setTokenLifetime(value)}
           />
         </FormGroup>
-        {tokenLifetime.value === null ? (
+        {tokenLifetime?.value === null ? (
           <Form.Group>
             <Form.Text className="text-danger">
               {translate(

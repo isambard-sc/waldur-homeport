@@ -17,7 +17,9 @@ export const UnlinkSecurityGroupAction: ActionItemType = ({
       await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
-        translate('Are you sure you want to unlink the security group?'),
+        translate(
+          'Are you sure you want to unlink the security group? Unlinking will only remove object from the database, it will not trigger any cleanup',
+        ),
         { forDeletion: true },
       );
     } catch {
