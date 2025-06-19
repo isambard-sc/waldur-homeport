@@ -55,6 +55,8 @@ export const UnifiedSidebar = () => {
     }
   }, [router, state, params.resource_uuid]);
 
+  var show_marketplace = false;
+
   if (!user) {
     return null;
   }
@@ -68,21 +70,23 @@ export const UnifiedSidebar = () => {
       <ResourcesMenu user={user} />
       <ReportingMenu />
       <CallPublicMenu />
-      <MenuItem
-        activeState={
-          [
-            'public.marketplace',
-            'public-offering',
-            'marketplace-orders.details',
-          ].some((name) => state.name.startsWith(name))
-            ? state.name
-            : undefined
-        }
-        icon={<ShoppingCartIcon weight="bold" />}
-        title={translate('Marketplace')}
-        state="public.marketplace-landing"
-        child={false}
-      />
+      {show_marketplace ? (
+        <MenuItem
+          activeState={
+            [
+              'public.marketplace',
+              'public-offering',
+              'marketplace-orders.details',
+            ].some((name) => state.name.startsWith(name))
+              ? state.name
+              : undefined
+          }
+          icon={<ShoppingCartIcon weight="bold" />}
+          title={translate('Marketplace')}
+          state="public.marketplace-landing"
+          child={false}
+        />
+      ) : null}
     </Sidebar>
   );
 };

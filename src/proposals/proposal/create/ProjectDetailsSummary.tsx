@@ -6,6 +6,8 @@ import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { ReadOnlyFormControl } from '@waldur/form/ReadOnlyFormControl';
 import { translate } from '@waldur/i18n';
 import { Proposal, ProposalReview } from '@waldur/proposals/types';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { ProjectFeatures } from '@waldur/FeaturesEnums';
 
 import { CommentSection } from './CommentSection';
 import { DocumentationFiles } from './DocumentationFiles';
@@ -79,16 +81,18 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
         />
       </CommentSection>
 
-      <ReadOnlyFormControl
-        label={translate('Research field (OECD code)')}
-        value={proposal.oecd_fos_2007_label || 'N/A'}
-        tooltip={translate('Select the main research field for the project.')}
-        actions={
-          <div style={{ width: 42.5 }}>
-            {/* Dummy spacing to align with other fields. */}
-          </div>
-        }
-      />
+      {isFeatureVisible(ProjectFeatures.oecd_fos_2007_code) ? (
+        <ReadOnlyFormControl
+          label={translate('Research field (OECD code)')}
+          value={proposal.oecd_fos_2007_label || 'N/A'}
+          tooltip={translate('Select the main research field for the project.')}
+          actions={
+            <div style={{ width: 42.5 }}>
+              {/* Dummy spacing to align with other fields. */}
+            </div>
+          }
+        />
+      ) : null}
 
       <CommentSection
         valueField="project_is_confidential"

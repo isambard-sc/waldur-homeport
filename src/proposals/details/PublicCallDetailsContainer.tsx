@@ -45,21 +45,21 @@ const tabs: PageBarTab[] = [
     title: translate('Description'),
     component: CallDescriptionCard,
   },
-  {
+  /*{
     key: 'rounds',
     title: translate('Rounds'),
     component: CallRoundsList,
-  },
+  },*/
   {
     key: 'documents',
     title: translate('Documents'),
     component: CallDocumentsCard,
   },
-  {
+  /*{
     key: 'offerings',
     title: translate('Offerings'),
     component: CallOfferingsCard,
-  },
+  },*/
 ];
 
 const PageHero = ({ call }) =>

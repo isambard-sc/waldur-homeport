@@ -5,5 +5,11 @@
   "Resources": "Resources",
   "Save": "Save",
   "Services": "Services",
-  "Users": "Users"
+  "Users": "Users",
+  "Is the project confidential?": "Does the project involve confidential, sensitive or GDPR-protected information?",
+  "Mark if the project has a civilian purpose.": "Mark if the project involves confidential, sensitive or GDPR-protected information.",
+  "Project for civilian purpose?": "Is the project non-commercial or research only?",
+  "Project has civilian purpose": "Project is non-commercial or research only.",
+  "Project is confidential": "Project involves confidential, sensitive or GDPR-protected information.",
+  "Select if the project proposal contains confidential information.": "Select if the project involves confidential, sensitive or GDPR-protected information."
 }
