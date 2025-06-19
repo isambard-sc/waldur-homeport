@@ -37,7 +37,10 @@ export const RancherNodeSummary = (props: ResourceSummaryProps) => {
         label={translate('CPU')}
         value={
           props.resource.cpu_allocated &&
-          `${props.resource.cpu_allocated} / ${props.resource.cpu_total} cores`
+          translate('{allocated} / {total} cores', {
+            allocated: props.resource.cpu_allocated,
+            total: props.resource.cpu_total,
+          })
         }
       />
 
@@ -45,7 +48,10 @@ export const RancherNodeSummary = (props: ResourceSummaryProps) => {
         label={translate('RAM')}
         value={
           props.resource.ram_total &&
-          `${props.resource.ram_allocated} / ${props.resource.ram_total} GiB`
+          translate('{allocated} / {total} MiB', {
+            allocated: props.resource.ram_allocated,
+            total: props.resource.ram_total,
+          })
         }
       />
 

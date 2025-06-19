@@ -976,7 +976,7 @@
     "message": "Approve private for order"
   },
   "Approve": {
-    "description": "invitations/UserPermissionRequestApproveButton.tsx, marketplace/orders/actions/ApproveByConsumerButton.tsx, marketplace/orders/actions/ApproveByProviderButton.tsx, marketplace-remote/ReviewApproveAction.tsx, proposals/proposal/ProposalRowActions.tsx",
+    "description": "invitations/UserPermissionRequestApproveButton.tsx, marketplace/orders/actions/ApproveByConsumerButton.tsx, marketplace/orders/actions/ApproveByProviderButton.tsx, marketplace/orders/actions/OrdersBulkActions.tsx, marketplace-remote/ReviewApproveAction.tsx, proposals/proposal/ProposalRowActions.tsx",
     "message": "Approve"
   },
   "Approved at": {
@@ -1259,9 +1259,9 @@
     "description": "proposals/update/offerings/WizardFormThirdPage.tsx",
     "message": "Are you sure you want to request {provider} to add {offering} to the {call}?"
   },
-  "Are you sure you want to retry to submit this order?": {
+  "Are you sure you want to retry to submit this order? This will create a new resource, it will not remove current one.": {
     "description": "marketplace/resources/resource-pending/OrderErredView.tsx",
-    "message": "Are you sure you want to retry to submit this order?"
+    "message": "Are you sure you want to retry to submit this order? This will create a new resource, it will not remove current one."
   },
   "Are you sure you want to revoke resource access from {name} user?": {
     "description": "rancher/cluster/team/KeycloakMembershipRowActions.tsx",
@@ -3919,6 +3919,14 @@
     "description": "proposals/proposal/create/resource-requests-step/ResourceRequestFormDialog.tsx",
     "message": "Edit resource request"
   },
+  "Edit reviewer identity visibility for submitters": {
+    "description": "proposals/update/general/CallGeneralSection.tsx",
+    "message": "Edit reviewer identity visibility for submitters"
+  },
+  "Edit reviews visibility for submitters": {
+    "description": "proposals/update/general/CallGeneralSection.tsx",
+    "message": "Edit reviews visibility for submitters"
+  },
   "Edit role description": {
     "description": "administration/roles/RoleDescriptionEditDialog.tsx",
     "message": "Edit role description"
@@ -5784,7 +5792,7 @@
     "message": "Invite by mail"
   },
   "Invited by": {
-    "description": "invitations/InvitationExpandableRow.tsx",
+    "description": "invitations/InvitationsList.tsx, project/team/InvitationsList.tsx",
     "message": "Invited by"
   },
   "Invoice date": {
@@ -7295,6 +7303,10 @@
     "description": "navigation/header/confirmation-drawer/PendingConfirmationContainer.tsx",
     "message": "No pending confirmations"
   },
+  "No pending orders have been selected.": {
+    "description": "marketplace/orders/actions/OrdersBulkActions.tsx",
+    "message": "No pending orders have been selected."
+  },
   "No permissions data.": {
     "description": "administration/organizations/OrganizationExpandableRow.tsx",
     "message": "No permissions data."
@@ -7384,7 +7396,7 @@
     "message": "No {verboseName} found"
   },
   "No": {
-    "description": "administration/remote-offering-sync/RemoteOfferingSyncList.tsx, administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsList.tsx, invoices/details/InvoiceItemsFilter.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/OpenstackPortSummary.tsx, openstack/openstack-tenant/TenantPortsList.tsx, rancher/cluster/users/ClusterUsersList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/support/UserList.tsx",
+    "description": "administration/remote-offering-sync/RemoteOfferingSyncList.tsx, administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, customer/list/ServiceProviderFilter.tsx, invitations/GroupInvitationsList.tsx, invoices/details/InvoiceItemsFilter.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/OpenstackPortSummary.tsx, openstack/openstack-tenant/TenantPortsList.tsx, proposals/update/general/CallGeneralSection.tsx, rancher/cluster/users/ClusterUsersList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/support/UserList.tsx",
     "message": "No"
   },
   "Node disk driver type": {
@@ -9808,7 +9820,7 @@
     "message": "Reject review"
   },
   "Reject": {
-    "description": "invitations/UserPermissionRequestRejectButton.tsx, marketplace/orders/actions/RejectByConsumerButton.tsx, marketplace/orders/actions/RejectByProviderButton.tsx, marketplace-remote/ReviewRejectAction.tsx, proposals/offering-requests/OfferingRequestItemActions.tsx, proposals/proposal/ProposalDetails.tsx, proposals/proposal/ProposalRowActions.tsx",
+    "description": "invitations/UserPermissionRequestRejectButton.tsx, marketplace/orders/actions/OrdersBulkActions.tsx, marketplace/orders/actions/RejectByConsumerButton.tsx, marketplace/orders/actions/RejectByProviderButton.tsx, marketplace-remote/ReviewRejectAction.tsx, proposals/offering-requests/OfferingRequestItemActions.tsx, proposals/proposal/ProposalDetails.tsx, proposals/proposal/ProposalRowActions.tsx",
     "message": "Reject"
   },
   "Rejected proposals": {
@@ -10667,9 +10679,9 @@
     "description": "marketplace-remote/BaseProjectUpdateRequestsList.tsx, marketplace-remote/ProjectUpdateRequestsList.tsx, user/UserPermissionRequestsList.tsx",
     "message": "Reviewed by"
   },
-  "Reviewer {number}": {
-    "description": "proposals/proposal/create-review/FieldReviewComments.tsx",
-    "message": "Reviewer {number}"
+  "Reviewer identity visible to submitters": {
+    "description": "proposals/update/general/CallGeneralSection.tsx",
+    "message": "Reviewer identity visible to submitters"
   },
   "Reviewer": {
     "description": "proposals/proposal/create-review/CreateReviewDialog.tsx, proposals/review/CustomerReviewsList.tsx, proposals/round/proposals/ProposalExpandableRow.tsx",
@@ -10678,6 +10690,10 @@
   "Reviewers": {
     "description": "proposals/round/RoundUIView.tsx, proposals/round/reviewers/RoundReviewersList.tsx, proposals/team/TeamSection.tsx, proposals/update/CallUpdateContainer.tsx",
     "message": "Reviewers"
+  },
+  "Reviews visible to submitters": {
+    "description": "proposals/update/general/CallGeneralSection.tsx",
+    "message": "Reviews visible to submitters"
   },
   "Reviews": {
     "description": "customer/routes.ts, customer/team/tabs.ts, navigation/sidebar/CallPublicMenu.tsx, proposals/review/CustomerReviewsList.tsx, proposals/round/proposals/ProposalExpandableRow.tsx, proposals/routes.ts, proposals/update/rounds/CallRoundsList.tsx",
@@ -14040,7 +14056,7 @@
     "message": "Unable to pause offering."
   },
   "Unable to perform operation.": {
-    "description": "customer/details/CustomerCallManagerPanel.tsx",
+    "description": "customer/details/CustomerCallManagerPanel.tsx, marketplace/orders/actions/OrdersBulkActions.tsx",
     "message": "Unable to perform operation."
   },
   "Unable to perform review.": {
@@ -15792,7 +15808,7 @@
     "message": "Yearly estimate"
   },
   "Yes": {
-    "description": "administration/organizations/OrganizationsFilter.tsx, administration/remote-offering-sync/RemoteOfferingSyncList.tsx, administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, customer/list/ServiceProviderFilter.tsx, customer/service-accounts/ServiceAccountRotateApiKeyAction.tsx, invitations/GroupInvitationsList.tsx, invoices/details/InvoiceItemsFilter.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/OpenstackPortSummary.tsx, openstack/openstack-tenant/TenantPortsList.tsx, proposals/call-management/CallAllFilters.tsx, rancher/cluster/users/ClusterUsersList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/support/UserList.tsx",
+    "description": "administration/organizations/OrganizationsFilter.tsx, administration/remote-offering-sync/RemoteOfferingSyncList.tsx, administration/settings/FieldRow.tsx, core/BooleanBadge.tsx, customer/list/ServiceProviderFilter.tsx, customer/service-accounts/ServiceAccountRotateApiKeyAction.tsx, invitations/GroupInvitationsList.tsx, invoices/details/InvoiceItemsFilter.tsx, marketplace/details/OfferingResourcesFilter.tsx, marketplace/offerings/OfferingViewHero.tsx, marketplace/offerings/admin/AdminOfferingsFilter.tsx, marketplace/offerings/details/policies/PoliciesTable.tsx, marketplace/offerings/update/attributes/utils.tsx, marketplace/resources/list/AllResourcesFilter.tsx, marketplace/resources/list/ProjectResourcesAllFilter.tsx, marketplace/resources/list/ProviderResourcesFilter.tsx, marketplace/resources/list/ProviderResourcesList.tsx, marketplace/resources/options/OptionValue.tsx, marketplace-checklist/AnswerGroup.tsx, marketplace-checklist/AnswersTable.tsx, marketplace-checklist/ChecklistCustomer.tsx, modal/ConfirmationDialog.tsx, openstack/openstack-network/OpenStackNetworkSummary.tsx, openstack/openstack-subnet/OpenStackSubNetSummary.tsx, openstack/openstack-tenant/OpenstackPortSummary.tsx, openstack/openstack-tenant/TenantPortsList.tsx, proposals/call-management/CallAllFilters.tsx, proposals/update/general/CallGeneralSection.tsx, rancher/cluster/users/ClusterUsersList.tsx, user/affiliations/OrganizationsList.tsx, user/affiliations/ProjectsList.tsx, user/affiliations/ProjectsListFilter.tsx, user/support/UserList.tsx",
     "message": "Yes"
   },
   "You agree to the <tos>Terms of Service</tos> and <pp>Privacy policy</pp>.": {
@@ -16451,6 +16467,14 @@
     "description": "marketplace/offerings/details/ConnectionStatusIndicator.tsx",
     "message": "{agent} - {status}. Last request: {time}"
   },
+  "{allocated} / {total} MiB": {
+    "description": "rancher/node/RancherNodeSummary.tsx",
+    "message": "{allocated} / {total} MiB"
+  },
+  "{allocated} / {total} cores": {
+    "description": "rancher/node/RancherNodeSummary.tsx",
+    "message": "{allocated} / {total} cores"
+  },
   "{category} resources": {
     "description": "marketplace/resources/list/CategoryResourcesList.tsx",
     "message": "{category} resources"
@@ -16490,6 +16514,10 @@
   "{count} offerings": {
     "description": "navigation/sidebar/marketplace-popup/CategoriesPanel.tsx",
     "message": "{count} offerings"
+  },
+  "{count} order(s) have been {action}.": {
+    "description": "marketplace/orders/actions/OrdersBulkActions.tsx",
+    "message": "{count} order(s) have been {action}."
   },
   "{count} projects": {
     "description": "marketplace/service-providers/ProjectsCountColumn.tsx",
