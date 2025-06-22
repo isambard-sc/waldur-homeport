@@ -67,7 +67,7 @@ export const LoginColumn = () => {
           ) : data ? (
             <IdentityProviderSelector features={features} providers={data} />
           ) : null}
-          {features.SigninForm && (
+          {(features.SigninForm && themeFeatures.ShowLocalSigninForm) && (
             <LocalLogin enableSeperator={features.enableSeperator} />
           )}
           <UserAuthWarning />

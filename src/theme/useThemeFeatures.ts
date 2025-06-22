@@ -14,6 +14,9 @@ export const useThemeFeatures = () => {
   // and normally confuses users because it will say "You session has expired..."
   const ShowLoginAuthHeader = false;
 
+  // This option controls whether or not to show the local login form
+  const ShowLocalSigninForm = false;
+
   // This option controls whether the Footer items are shown on the login column.
   // These options link to marketplace, calls etc, and may need to be hidden
   // as they should only be visible after login
@@ -38,7 +41,8 @@ export const useThemeFeatures = () => {
 
   return {
     ShowMarketplaceTrigger : ShowMarketplaceTrigger,
-    ShowLoginAuthHeader : ShowLoginAuthHeader,
+    ShowLoginAuthHeader: ShowLoginAuthHeader,
+    ShowLocalSigninForm: ShowLocalSigninForm,
     ShowLoginFooter : ShowLoginFooter,
     ShowSidebarMarketplace: ShowSidebarMarketplace,
     ShowPublicCallRounds: ShowPublicCallRounds,
