@@ -110,7 +110,9 @@ export const OrderErredView: FC<OrderErredViewProps> = ({ resource }) => {
       await waitForConfirmation(
         dispatch,
         translate('Confirmation'),
-        translate('Are you sure you want to retry to submit this order?'),
+        translate(
+          'Are you sure you want to retry to submit this order? This will create a new resource, it will not remove current one.',
+        ),
       );
       try {
         const order = await marketplaceOrdersCreate({

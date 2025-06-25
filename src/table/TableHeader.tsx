@@ -215,7 +215,7 @@ export const TableHeader: FC<TableHeaderProps> = ({
           <col width="10px" />
         ) : null}
         {expandableRow && <col width="10px" />}
-        {Array.from(new Array(colsLen)).map((_, i) => (
+        {Array.from({ length: colsLen }).map((_, i) => (
           <col
             key={i}
             style={{

@@ -1,3 +1,5 @@
+import { ModalAction } from './types';
+
 const initialModalState = {
   modalComponent: null,
   modalProps: {},
@@ -14,7 +16,7 @@ const initialState = {
 };
 
 export const reducer = (state = initialState, action) => {
-  switch (action.type) {
+  switch (action.type satisfies ModalAction) {
     case 'SHOW_MODAL':
       return {
         ...state,

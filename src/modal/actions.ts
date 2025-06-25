@@ -5,7 +5,7 @@ import { createDeferred } from '@waldur/core/utils';
 
 import { ConfirmationDialog } from './ConfirmationDialog';
 import { DeleteConfirmationDialog } from './DeleteConfirmationDialog';
-import { ConfirmationDialogType, DialogSizeType } from './types';
+import { ModalAction, ConfirmationDialogType, DialogSizeType } from './types';
 
 export interface AppModalProps extends ModalProps {
   size?: DialogSizeType;
@@ -15,16 +15,14 @@ export interface AppModalProps extends ModalProps {
 export const openModalDialog = <P = any>(
   modalComponent: React.ComponentType<P>,
   modalProps?: P & AppModalProps,
-  type: 'SHOW_MODAL' | 'SHOW_CONFIRM' = 'SHOW_MODAL',
+  type: ModalAction = 'SHOW_MODAL',
 ) => ({
   type,
   modalComponent,
   modalProps,
 });
 
-export const closeModalDialog = (
-  type: 'HIDE_MODAL' | 'HIDE_CONFIRM' = 'HIDE_MODAL',
-) => ({
+export const closeModalDialog = (type: ModalAction = 'HIDE_MODAL') => ({
   type,
 });
 

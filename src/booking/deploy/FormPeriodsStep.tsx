@@ -7,14 +7,13 @@ import { Button } from 'react-bootstrap';
 import { Field, FieldArray } from 'redux-form';
 import { marketplaceBookingsList } from 'waldur-js-client';
 
-import { parseDate } from '@waldur/core/dateUtils';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 
 import { BookingProps } from '../types';
 import {
-  createAvailabilitySlots,
+  getAvailableRangeOfDates,
   getBookedSlots,
   getDurationOptions,
 } from '../utils';
@@ -31,47 +30,6 @@ const getDurationSlot = (schedules: BookingProps[] = []) => {
     configWithEvent?.extendedProps?.config?.slotDuration ||
     getDurationOptions()[0].value
   );
-};
-
-const getAvailableRangeOfDates = (
-  schedules: BookingProps[],
-  inUseRanges: any[],
-) => {
-  const availableRanges: Array<{ from: DateTime; to: DateTime }> = [];
-
-  const durationSlot = Duration.fromISOTime(getDurationSlot(schedules), {});
-
-  const slots = createAvailabilitySlots(schedules, durationSlot);
-
-  slots.forEach((slot) => {
-    const slotStart = parseDate(slot.start);
-    const isBusy = inUseRanges.some((used) => {
-      if (!used?.start) return false;
-      const usedStart = parseDate(used.start);
-      const usedEnd = parseDate(used.end);
-      return (
-        slotStart.equals(usedStart) ||
-        (slotStart > usedStart && slotStart < usedEnd)
-      );
-    });
-    if (!isBusy) {
-      const existRange = availableRanges.find((range) =>
-        range.to.equals(slotStart),
-      );
-      if (existRange) {
-        existRange.to = existRange.to.plus(durationSlot);
-      } else {
-        availableRanges.push({
-          from: slotStart,
-          to: parseDate(slot.end),
-        });
-      }
-    }
-  });
-  return availableRanges.map((range) => ({
-    from: range.from.toISO(),
-    to: range.to.toISO(),
-  }));
 };
 
 const renderScheduleRows = ({

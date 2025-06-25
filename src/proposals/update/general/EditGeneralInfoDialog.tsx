@@ -7,6 +7,7 @@ import { proposalProtectedCallsPartialUpdate } from 'waldur-js-client';
 import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
 import { SelectField, SubmitButton } from '@waldur/form';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { FormContainer } from '@waldur/form/FormContainer';
 import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { StringField } from '@waldur/form/StringField';
@@ -127,6 +128,14 @@ export const EditGeneralInfoDialog = connect<
                 name="external_url"
                 required
                 validate={required}
+              />
+            )}
+            {(props.resolve.name === 'reviews_visible_to_submitters' ||
+              props.resolve.name ===
+                'reviewer_identity_visible_to_submitters') && (
+              <AwesomeCheckboxField
+                label={props.resolve.title}
+                name={props.resolve.name}
               />
             )}
           </FormContainer>

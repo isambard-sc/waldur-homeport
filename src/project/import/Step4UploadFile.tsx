@@ -60,32 +60,37 @@ const asyncValidate = (values) =>
           }
 
           // Check OECD field
-          if (
-            !_error &&
-            isFeatureVisible(ProjectFeatures.oecd_fos_2007_code) &&
-            ENV.plugins.WALDUR_CORE.OECD_FOS_2007_CODE_MANDATORY
-          ) {
+          if (!_error && isFeatureVisible(ProjectFeatures.oecd_fos_2007_code)) {
+            const isOecdRequired =
+              ENV.plugins.WALDUR_CORE.OECD_FOS_2007_CODE_MANDATORY;
             const oecdIdx = header.indexOf('oecd_fos_2007_code');
-            if (oecdIdx === -1) {
+
+            if (isOecdRequired && oecdIdx === -1) {
               _error = 'oecd';
             }
 
+            let projects;
             if (values.import_type === 'projects_only') {
-              if (results.data.slice(1).some((record) => !record[oecdIdx])) {
-                _error = 'oecd';
-              }
+              projects = results.data.slice(1);
             } else {
               const typeIdx = header.indexOf('type');
-              if (
-                results.data
-                  .slice(1)
-                  .some(
-                    (record) =>
-                      record[typeIdx] === 'project' && !record[oecdIdx],
-                  )
-              ) {
-                _error = 'oecd';
-              }
+              projects = results.data
+                .slice(1)
+                .filter((record) => record[typeIdx] === 'project');
+            }
+
+            if (isOecdRequired && projects.some((record) => !record[oecdIdx])) {
+              _error = 'oecd';
+            }
+
+            if (
+              !_error &&
+              projects.some(
+                (record) =>
+                  record[oecdIdx] && Number.isNaN(Number(record[oecdIdx])),
+              )
+            ) {
+              _error = 'invalid_oecd';
             }
           }
         }
@@ -106,6 +111,8 @@ const asyncValidate = (values) =>
           });
         } else if (_error === 'oecd') {
           reject({ file: translate('OECD code is required for projects.') });
+        } else if (_error === 'invalid_oecd') {
+          reject({ file: translate('OECD code must be a number.') });
         } else {
           // No error
           resolve('');

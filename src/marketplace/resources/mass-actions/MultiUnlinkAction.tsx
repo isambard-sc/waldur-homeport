@@ -14,9 +14,12 @@ export const MultiUnlinkAction = ({ rows, refetch }) => {
       await waitForConfirmation(
         dispatch,
         translate('Perform mass action'),
-        translate('Are you sure you want to unlink {count} resources?', {
-          count: rows.length,
-        }),
+        translate(
+          'Are you sure you want to unlink {count} resources? Unlinking will only remove objects from the database, it will not trigger any cleanup',
+          {
+            count: rows.length,
+          },
+        ),
       );
     } catch {
       return;

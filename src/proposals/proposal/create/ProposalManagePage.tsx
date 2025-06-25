@@ -60,7 +60,11 @@ export const ProposalManagePage = () => {
     queryFn: () =>
       getAllPages((page) =>
         proposalReviewsList({
-          query: { page, proposal_uuid },
+          query: {
+            page,
+            proposal_uuid,
+            state: ['submitted'],
+          },
         }),
       ),
 

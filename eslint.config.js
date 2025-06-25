@@ -105,6 +105,12 @@ export default tseslint
         'import/no-named-as-default': 'error',
         'require-await': 'error',
         'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],
+        'no-restricted-globals': [
+          'error',
+          {
+            name: 'close',
+          },
+        ],
       },
     },
     {

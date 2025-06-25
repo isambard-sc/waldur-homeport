@@ -126,7 +126,7 @@ export const AddUserDialog = reduxForm<
         return await usersAutocomplete({ query }, prevOptions, page);
       }
 
-      if (hasCustomerPermission) {
+      if (hasCustomerPermission || !currentProject) {
         return await customerUsersAutocomplete(
           currentCustomer.uuid,
           { user_keyword: query },
