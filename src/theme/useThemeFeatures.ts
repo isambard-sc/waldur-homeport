@@ -15,7 +15,7 @@ export const useThemeFeatures = () => {
   const ShowLoginAuthHeader = false;
 
   // This option controls whether or not to show the local login form
-  const ShowLocalSigninForm = false;
+  const ShowLocalSigninForm = true;
 
   // This option controls whether the Footer items are shown on the login column.
   // These options link to marketplace, calls etc, and may need to be hidden
