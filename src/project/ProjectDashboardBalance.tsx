@@ -43,7 +43,7 @@ export const ProjectDashboardBalance = ({
 
     warning = (
       <span className="text-danger">
-        {translate('Warning: Your balance is below the estimated cost for this month.')}
+        {translate('Warning: Your estimated balance is now zero. You will not be able to consume any more resources.')}
       </span>
     );
   } else if (estimated_balance < 0.1 * balance) {
