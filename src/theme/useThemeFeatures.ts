@@ -39,6 +39,14 @@ export const useThemeFeatures = () => {
   // to see offerings
   const ShowPublicCallOfferings = false;
 
+  // This option controls whether or not to show anything related to "limits"
+  // in the project and customer dashboards. At the moment, limits confuse
+  // users because they are aggregated acrosss all resources. As we set the
+  // limit to the value of the remaining credits, it can look like the
+  // project budget is N * remaining_credits, where N is the number
+  // of resources deployed in a project.
+  const ShowResourceLimits = false;
+
   return {
     ShowMarketplaceTrigger : ShowMarketplaceTrigger,
     ShowLoginAuthHeader: ShowLoginAuthHeader,
@@ -47,6 +55,7 @@ export const useThemeFeatures = () => {
     ShowSidebarMarketplace: ShowSidebarMarketplace,
     ShowPublicCallRounds: ShowPublicCallRounds,
     ShowPublicCallOfferings: ShowPublicCallOfferings,
+    ShowResourceLimits: ShowResourceLimits,
   };
 };
 
