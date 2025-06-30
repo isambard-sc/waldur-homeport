@@ -4,7 +4,7 @@ import {
   DetailsOverviewStep,
   PlanStep,
 } from '@waldur/marketplace/deploy/steps/constants';
-import { FormFinalConfigurationStep } from '@waldur/marketplace/deploy/steps/FormFinalConfigurationStep';
+import { FormFinalConfigurationStep } from './steps/FormFinalConfigurationStep';
 import { OfferingConfigurationFormStep } from '@waldur/marketplace/deploy/types';
 
 export const deployOfferingSteps: OfferingConfigurationFormStep[] = [
