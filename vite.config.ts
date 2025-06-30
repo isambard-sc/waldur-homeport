@@ -31,6 +31,11 @@ export default defineConfig({
   ],
   build: {
     sourcemap: false,
+    minify: false,
+    terserOptions: {
+      compress: false,
+      mangle: false,
+    },
   },
   test: {
     include: ['**/*.test.ts', '**/*.test.tsx'],

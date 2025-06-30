@@ -319,6 +319,19 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'remote-projects',
+    abstract: true,
+    parent: 'marketplace-provider',
+    component: UIView,
+    url: '',
+    data: {
+      //feature: MarketplaceFeatures.show_remote_project_functionality,
+      breadcrumb: () => translate('Remote projects'),
+      priority: 150,
+    },
+  },
+
+  {
     name: 'marketplace-vendor-offerings',
     url: 'offerings/?{state}',
     component: lazyComponent(() =>
@@ -534,6 +547,21 @@ export const states: StateDeclaration[] = [
     data: {
       feature: MarketplaceFeatures.show_call_management_functionality,
       breadcrumb: () => translate('Requests for offerings'),
+    },
+  },
+
+  {
+    name: 'marketplace-provider-remote-project-requests',
+    url: 'remote-project-requests/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/project-requests/ProjectRequestsList').then(
+        (module) => ({ default: module.ProjectRequestsList }),
+      ),
+    ),
+    parent: 'remote-projects',
+    data: {
+      //feature: MarketplaceFeatures.show_remote_project_functionality,
+      breadcrumb: () => translate('Requests for remote projects'),
     },
   },
 
