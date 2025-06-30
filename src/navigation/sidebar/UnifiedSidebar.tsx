@@ -6,6 +6,7 @@ import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 import { CallPublicMenu } from '@waldur/navigation/sidebar/CallPublicMenu';
 import { useUser } from '@waldur/workspace/hooks';
+import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 
 import { MarketplaceTrigger } from './marketplace-popup/MarketplaceTrigger';
 import { MenuItem } from './MenuItem';
@@ -19,6 +20,8 @@ export const UnifiedSidebar = () => {
   const user = useUser();
   const router = useRouter();
   const { state, params } = useCurrentStateAndParams();
+  const themeFeatures = useThemeFeatures();
+
   useEffect(() => {
     MenuComponent.reinitialization();
     const menuElement = document.querySelector('#kt_aside_menu');
@@ -60,7 +63,7 @@ export const UnifiedSidebar = () => {
   }
   return (
     <Sidebar>
-      {user.is_staff || user.permissions?.length !== 0 ? (
+      {themeFeatures.ShowMarketplaceTrigger && (user.is_staff || user.permissions?.length !== 0) ? (
         <MarketplaceTrigger />
       ) : null}
       <OrganizationsListMenu />
@@ -68,21 +71,23 @@ export const UnifiedSidebar = () => {
       <ResourcesMenu user={user} />
       <ReportingMenu />
       <CallPublicMenu />
-      <MenuItem
-        activeState={
-          [
-            'public.marketplace',
-            'public-offering',
-            'marketplace-orders.details',
-          ].some((name) => state.name.startsWith(name))
-            ? state.name
-            : undefined
-        }
-        icon={<ShoppingCartIcon weight="bold" />}
-        title={translate('Marketplace')}
-        state="public.marketplace-landing"
-        child={false}
-      />
+      {themeFeatures.ShowSidebarMarketPlace ? (
+        <MenuItem
+          activeState={
+            [
+              'public.marketplace',
+              'public-offering',
+              'marketplace-orders.details',
+            ].some((name) => state.name.startsWith(name))
+              ? state.name
+              : undefined
+          }
+          icon={<ShoppingCartIcon weight="bold" />}
+          title={translate('Marketplace')}
+          state="public.marketplace-landing"
+          child={false}
+        />
+      ) : null}
     </Sidebar>
   );
 };

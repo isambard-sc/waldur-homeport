@@ -12,6 +12,7 @@ import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
 import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
+import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 
 import { useCallBreadcrumbItems } from '../utils';
 
@@ -39,28 +40,42 @@ const CallRoundsList = lazyComponent(() =>
   })),
 );
 
-const tabs: PageBarTab[] = [
-  {
+const getTabs = () => {
+
+  const themeFeatures = useThemeFeatures();
+
+  const tabs: PageBarTab[] = [];
+
+  tabs.push({
     key: 'description',
     title: translate('Description'),
     component: CallDescriptionCard,
-  },
-  {
-    key: 'rounds',
-    title: translate('Rounds'),
-    component: CallRoundsList,
-  },
-  {
+  });
+
+  if (themeFeatures.ShowPublicCallRounds) {
+    tabs.push({
+      key: 'rounds',
+      title: translate('Rounds'),
+      component: CallRoundsList,
+    });
+  }
+
+  tabs.push({
     key: 'documents',
     title: translate('Documents'),
     component: CallDocumentsCard,
-  },
-  {
-    key: 'offerings',
-    title: translate('Offerings'),
-    component: CallOfferingsCard,
-  },
-];
+  });
+
+  if (themeFeatures.ShowPublicCallOfferings) {
+    tabs.push({
+      key: 'offerings',
+      title: translate('Offerings'),
+      component: CallOfferingsCard,
+    });
+  }
+
+  return tabs;
+}
 
 const PageHero = ({ call }) =>
   call ? (
@@ -98,6 +113,8 @@ export const PublicCallDetailsContainer: FC = () => {
 
   const breadcrumbItems = useCallBreadcrumbItems(call);
   useBreadcrumbs(breadcrumbItems);
+
+  const tabs = getTabs();
 
   const filteredTabs = useMemo(
     () =>

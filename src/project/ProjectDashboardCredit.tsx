@@ -55,27 +55,25 @@ export const ProjectDashboardCredit = ({
     return null;
   }
   return (
-    <Col md={6} sm={12} className={className} style={COMMON_WIDGET_HEIGHT}>
-      <WidgetCard
-        cardTitle={
-          <>
-            {chart.title}
-            <small className="text-muted fs-7 ms-4 fw-normal">
-              ({translate('Current balance')}: {defaultCurrency(credit.value)})
-            </small>
-          </>
-        }
-        actions={[
-          {
-            label: translate('Details'),
-            icon: <EyeIcon />,
-            callback: viewDetails,
-          },
-        ]}
-        className="h-100"
-      >
-        <EChart options={options} height="130px" />
-      </WidgetCard>
-    </Col>
+    <WidgetCard
+      cardTitle={
+        <>
+          {chart.title}
+          <small className="text-muted fs-7 ms-4 fw-normal">
+            ({translate('Current balance')}: {defaultCurrency(credit.value)})
+          </small>
+        </>
+      }
+      actions={[
+        {
+          label: translate('Details'),
+          icon: <EyeIcon />,
+          callback: viewDetails,
+        },
+      ]}
+      className="h-100"
+    >
+      <EChart options={options} height="130px" />
+    </WidgetCard>
   );
 };

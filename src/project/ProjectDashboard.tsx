@@ -17,9 +17,11 @@ import { useCreateInvitation } from '@waldur/invitations/actions/useCreateInvita
 import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/AggregateLimitWidget';
 import { useUser } from '@waldur/workspace/hooks';
 import { getProject } from '@waldur/workspace/selectors';
+import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { ProjectDashboardCredit } from './ProjectDashboardCredit';
+import { ProjectDashboardBalance } from './ProjectDashboardBalance';
 import { getProjectTeamChart } from './utils';
 
 export const ProjectDashboard: FunctionComponent<{}> = () => {
@@ -79,6 +81,10 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     staleTime: 60 * 1000,
   });
 
+  const theme_features = useThemeFeatures();
+
+  const show_resource_limits = theme_features.ShowResourceLimits;
+
   const currentMonthFilteredData = filterComponentsWithUsage(
     aggregateLimitDataForCurrentMonth,
   );
@@ -89,17 +95,21 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   const shouldShowCurrentMonthWidget =
     currentMonthFilteredData?.components?.length > 0;
 
+
   if (!project || !user) {
     return null;
   }
   return (
     <>
       <Row>
-        {!shouldConcealPrices && (
+        {!shouldConcealPrices && show_resource_limits && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardCostLimits project={project} />
           </Col>
         )}
+        <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+          <ProjectDashboardBalance project={project} className="mb-5" />
+        </Col>
         <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
           <TeamWidget
             api={() =>
@@ -131,31 +141,37 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
           />
         </Col>
       </Row>
+      {show_resource_limits && (
+        <Row>
+          {shouldShowCurrentMonthWidget && (
+            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+              <AggregateLimitWidget
+                project={project}
+                data={currentMonthFilteredData}
+                isLoading={isAggregateLimitLoadingForCurrentMonth}
+                error={aggregateLimitErrorForCurrentMonth}
+                refetch={aggregateLimitRefetchForCurrentMonth}
+                type="monthly"
+              />
+            </Col>
+          )}
+          {shouldShowAggregateLimitWidget && (
+            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+              <AggregateLimitWidget
+                project={project}
+                data={aggregateLimitData}
+                isLoading={isAggregateLimitLoading}
+                error={aggregateLimitError}
+                refetch={aggregateLimitRefetch}
+              />
+            </Col>
+          )}
+        </Row>
+      )}
       <Row>
-        {shouldShowCurrentMonthWidget && (
-          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-            <AggregateLimitWidget
-              project={project}
-              data={currentMonthFilteredData}
-              isLoading={isAggregateLimitLoadingForCurrentMonth}
-              error={aggregateLimitErrorForCurrentMonth}
-              refetch={aggregateLimitRefetchForCurrentMonth}
-              type="monthly"
-            />
-          </Col>
-        )}
-        {shouldShowAggregateLimitWidget && (
-          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-            <AggregateLimitWidget
-              project={project}
-              data={aggregateLimitData}
-              isLoading={isAggregateLimitLoading}
-              error={aggregateLimitError}
-              refetch={aggregateLimitRefetch}
-            />
-          </Col>
-        )}
-        <ProjectDashboardCredit project={project} className="mb-5" />
+        <Col md={12} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+          <ProjectDashboardCredit project={project} className="mb-5" />
+        </Col>
       </Row>
 
       {project.description ? (

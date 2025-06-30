@@ -16,6 +16,7 @@ import { IdentityProviderSelector } from './IdentityProviderSelector';
 import { LocalLogin } from './LocalLogin';
 import { PoweredBy } from './PoweredBy';
 import { useAuthFeatures } from './useAuthFeatures';
+import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 import { UserAuthWarning } from './UserAuthWarning';
 import { getOauthURL } from './utils';
 
@@ -23,6 +24,7 @@ import './LoginColumn.scss';
 
 export const LoginColumn = () => {
   const features = useAuthFeatures();
+  const themeFeatures = useThemeFeatures();
   const imageUrl = getIconUrl('login_logo');
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['IdentityProvidersConfigurations'],
@@ -52,7 +54,9 @@ export const LoginColumn = () => {
               style={{ maxWidth: '100%' }}
             />
           </div>
-          <AuthHeader />
+          {themeFeatures.ShowLoginAuthHeader ? (
+            <AuthHeader />
+          ) : null}
           {isLoading ? (
             <LoadingSpinner />
           ) : error ? (
@@ -63,17 +67,19 @@ export const LoginColumn = () => {
           ) : data ? (
             <IdentityProviderSelector features={features} providers={data} />
           ) : null}
-          {features.SigninForm && (
+          {(features.SigninForm && themeFeatures.ShowLocalSigninForm) && (
             <LocalLogin enableSeperator={features.enableSeperator} />
           )}
           <UserAuthWarning />
           <PoweredBy />
         </div>
       </div>
-      <div className="login-footer">
-        <LanguageSelectorBox />
-        <FooterLinks />
-      </div>
+      {themeFeatures.ShowLoginFooter ? (
+        <div className="login-footer">
+          <LanguageSelectorBox />
+          <FooterLinks />
+        </div>
+      ) : null}
     </div>
   );
 };
