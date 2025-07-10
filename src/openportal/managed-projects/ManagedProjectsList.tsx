@@ -4,7 +4,7 @@ import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 import { Column } from '@waldur/table/types';
 import { useTitle } from '@waldur/navigation/title';
-import { formatDateTime } from '@waldur/core/dateUtils';
+import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
@@ -37,7 +37,7 @@ export const ManagedProjectsList = () => {
     const columns: Array<Column> = [
         {
             title: translate('Project'),
-            orderField: 'details.name',
+            orderField: 'row.details.name',
             render: ({ row }) => (
                 <ManagedProjectLink uuid={row.uuid} onClick={() => onClickDetails(row)}>
                     {row.details.name}
@@ -49,7 +49,7 @@ export const ManagedProjectsList = () => {
         },
         {
             title: translate('Project Class'),
-            orderField: 'details.class',
+            orderField: 'row.details.class',
             render: ({ row }) => (
                 <ProjectClassLink uuid={row.details.class} onClick={() => onClickProjectClassDetails(row.details.class)}>
                     {row.details.class}
@@ -85,7 +85,7 @@ export const ManagedProjectsList = () => {
             render: ({ row }) => (
                 <>
                     {row.details.start_date
-                        ? formatDateTime(row.details.start_date)
+                        ? formatDate(row.details.start_date)
                         : DASH_ESCAPE_CODE}
                 </>
             ),
@@ -98,7 +98,7 @@ export const ManagedProjectsList = () => {
             render: ({ row }) => (
                 <>
                     {row.details.end_date
-                        ? formatDateTime(row.details.end_date)
+                        ? formatDate(row.details.end_date)
                         : DASH_ESCAPE_CODE}
                 </>
             ),
@@ -130,9 +130,7 @@ export const ManagedProjectsList = () => {
             columns={columns}
             verboseName={translate('Managed Projects')}
             title={translate('Managed Projects')}
-            hasQuery={true}
             showPageSizeSelector={true}
-            enableExport={true}
             standalone
             hasOptionalColumns
             expandableRowClassName="py-2 pe-2"
