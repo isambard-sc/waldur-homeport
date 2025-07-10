@@ -1,13 +1,18 @@
 import { FC, useMemo } from 'react';
 import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
+import { useBoolean } from 'react-use';
 
-import { translate } from '@waldur/i18n';
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
 import { ResourceActionsButton as BaseResourceActionsButton } from '@waldur/marketplace/resources/actions/ResourceActionsButton';
 import { getActions } from '@waldur/resource/actions/registry';
-import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
+import { ResourceActionComponent } from '@waldur/resource/actions/ResourceActionComponent';
 
-import { ActionsList } from './actions/ActionsList';
+import {
+  ActionsList,
+  CustomerResourceActions,
+  ProviderActionsList,
+  StaffActions,
+} from './actions/ActionsList';
 import { ActionsLists } from './actions/ActionsLists';
 
 interface ResourceActionsProps {
@@ -25,6 +30,7 @@ export const ResourceActions: FC<ResourceActionsProps> = ({
   drop,
   labeled = false,
 }) => {
+  const [open, onToggle] = useBoolean(false);
   const extraActions = useMemo(() => {
     return getActions(resource.resource_type).filter(
       (action) => !ActionsList.includes(action),
@@ -59,21 +65,18 @@ export const ResourceActions: FC<ResourceActionsProps> = ({
     );
   }
   return (
-    <ActionsDropdownComponent
-      label={translate('Actions')}
+    <ResourceActionComponent
+      open={open}
+      onToggle={onToggle}
+      customerResourceActions={CustomerResourceActions}
+      staffActions={StaffActions}
+      providerResourceActions={ProviderActionsList}
+      extraActions={extraActions}
+      resource={resource}
+      scope={scope}
+      refetch={refetch}
       labeled={labeled}
       drop={drop}
-    >
-      {ActionsList.map((ActionComponent, index) => (
-        <ActionComponent key={index} resource={resource} refetch={refetch} />
-      ))}
-      {extraActions.map((ActionComponent, index) => (
-        <ActionComponent
-          key={index}
-          resource={scope || resource}
-          refetch={refetch}
-        />
-      ))}
-    </ActionsDropdownComponent>
+    />
   );
 };

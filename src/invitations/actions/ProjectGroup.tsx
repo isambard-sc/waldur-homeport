@@ -9,10 +9,11 @@ import { type RootState } from '@waldur/store/reducers';
 
 import { GROUP_INVITATION_CREATE_FORM_ID } from './constants';
 
-export const ProjectGroup: FunctionComponent<{ customer; disabled }> = ({
-  customer,
-  disabled,
-}) => {
+export const ProjectGroup: FunctionComponent<{
+  customer;
+  loading?;
+  disabled;
+}> = ({ customer, loading, disabled }) => {
   const role = useSelector((state: RootState) =>
     formValueSelector(GROUP_INVITATION_CREATE_FORM_ID)(state, 'role'),
   );
@@ -30,6 +31,7 @@ export const ProjectGroup: FunctionComponent<{ customer; disabled }> = ({
       validate={[required]}
       options={customer.projects}
       isDisabled={disabled}
+      isLoading={loading}
       placeholder={translate('Select project')}
       getOptionValue={(option) => option.uuid}
       getOptionLabel={(option) => option.name}

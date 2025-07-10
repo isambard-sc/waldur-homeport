@@ -32,10 +32,12 @@ export const FormAbstractVolumeFields = (
   props: FormStepProps & {
     typeField;
     sizeField;
-    title;
+    typeTitle;
+    sizeTitle;
     helpText?;
-    optional;
+    optional?;
     minSize?: number;
+    hideQuotas?: boolean;
   },
 ) => {
   const [fieldsEnabled, setFieldsEnabled] = useState(!props.optional);
@@ -124,7 +126,7 @@ export const FormAbstractVolumeFields = (
             name={props.typeField}
             component={FormGroup}
             validate={props.optional ? undefined : [required]}
-            label={props.title}
+            label={props.typeTitle}
             required={!props.optional}
             space={5}
             tooltip={props.helpText}
@@ -153,12 +155,13 @@ export const FormAbstractVolumeFields = (
           name={props.sizeField}
           component={FormGroup}
           validate={!fieldsEnabled ? undefined : [required, exceeds]}
-          label={translate('Volume size') + ' (GB)'}
+          label={props.sizeTitle}
           format={formatVolumeSize}
           normalize={(v) => Number(v) * 1024}
           required
           space={5}
           quickAction={
+            !props.hideQuotas &&
             quota && (
               <QuotaUsageBarChart
                 className="capacity-bar mb-2"

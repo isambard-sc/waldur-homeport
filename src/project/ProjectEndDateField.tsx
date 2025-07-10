@@ -45,19 +45,20 @@ export const ProjectEndDateField: FC<{ row: Project }> = ({ row }) => {
   return row.end_date ? (
     <>
       {formatDate(projectEndDate)}
-      {endDates?.length &&
-        endDates.some((date) => parseDate(date) > projectEndDate) && (
-          <WarnTip
-            id={row.uuid}
-            label={translate(
-              "Some of the resources' termination dates are beyond the project end date. Resource termination will begin on the project's end date.",
-            )}
-            hasSpace
-            autoWidth
-            className="w-100"
-            tipClassName="mw-300px"
-          />
-        )}
+      {endDates?.length
+        ? endDates.some((date) => parseDate(date) > projectEndDate) && (
+            <WarnTip
+              id={row.uuid}
+              label={translate(
+                "Some of the resources' termination dates are beyond the project end date. Resource termination will begin on the project's end date.",
+              )}
+              hasSpace
+              autoWidth
+              className="w-100"
+              tipClassName="mw-300px"
+            />
+          )
+        : null}
     </>
   ) : (
     DASH_ESCAPE_CODE

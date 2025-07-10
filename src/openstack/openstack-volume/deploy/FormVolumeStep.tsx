@@ -13,7 +13,8 @@ export const FormVolumeStep = (props: FormStepProps) => (
     <FormAbstractVolumeFields
       typeField="attributes.type"
       sizeField="attributes.size"
-      title={translate('Volume')}
+      typeTitle={translate('Volume type')}
+      sizeTitle={translate('Volume size (GB)')}
       optional={false}
       {...props}
     />

@@ -197,10 +197,6 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Render marketplace plan components pricelist in support workspace.'),
       },
       {
-        key: 'users',
-        description: translate('Render list of users in support workspace.'),
-      },
-      {
         key: 'vm_type_overview',
         description: translate('Enable VM type overview in support workspace.'),
       },

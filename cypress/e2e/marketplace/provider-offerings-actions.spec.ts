@@ -2,7 +2,7 @@ describe('Offerings list actions in Provider dashboard page', () => {
   beforeEach(() => {
     cy.mockUser()
       .setToken()
-      .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/', {
+      .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/?*', {
         fixture: 'customers/alice.json',
       })
       .intercept('GET', 'api/customer-credits/**', {

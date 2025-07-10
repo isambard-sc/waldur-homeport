@@ -1,0 +1,8 @@
+{
+    "fields": [
+        "username",
+        "offering_uuid",
+        "offering_username"
+    ],
+    "data": []
+}

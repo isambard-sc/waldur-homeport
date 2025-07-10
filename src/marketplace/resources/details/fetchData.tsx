@@ -21,7 +21,10 @@ import {
 } from '@waldur/marketplace/common/api';
 import { PageBarTab } from '@waldur/navigation/types';
 import { INSTANCE_TYPE, TENANT_TYPE } from '@waldur/openstack/constants';
-import { MANAGED_RANCHER } from '@waldur/rancher/cluster/create/constants';
+import {
+  MANAGED_RANCHER,
+  MARKETPLACE_RANCHER,
+} from '@waldur/rancher/cluster/create/constants';
 import { getTabs } from '@waldur/resource/tabs/registry';
 import { getResourceAccessEndpoints } from '@waldur/resource/utils';
 import { SLURM_PLUGIN } from '@waldur/slurm/constants';
@@ -43,6 +46,7 @@ export const getResourceTabs = ({
   const tabs: PageBarTab<{
     resource: Resource;
     resourceScope;
+    nestedScope?;
     scope;
     offering: PublicOfferingDetails;
     refetch: () => void;
@@ -115,18 +119,34 @@ export const getResourceTabs = ({
         ),
       });
     }
-  } else if (resource.offering_type === MANAGED_RANCHER && scope) {
+  } else if (
+    [MARKETPLACE_RANCHER, MANAGED_RANCHER].includes(resource.offering_type) &&
+    scope
+  ) {
     tabs.push({
-      key: 'security_groups',
-      title: translate('Security groups'),
+      key: 'dashboard',
+      title: translate('Dashboard'),
       component: lazyComponent(() =>
-        import('@waldur/rancher/cluster/ClusterSecurityGroupsList').then(
+        import('@waldur/rancher/cluster/dashboard/ClusterDashboard').then(
           (module) => ({
-            default: module.ClusterSecurityGroupsList,
+            default: module.ClusterDashboard,
           }),
         ),
       ),
     });
+    if (resource.offering_type === MANAGED_RANCHER) {
+      tabs.push({
+        key: 'security_groups',
+        title: translate('Security groups'),
+        component: lazyComponent(() =>
+          import('@waldur/rancher/cluster/ClusterSecurityGroupsList').then(
+            (module) => ({
+              default: module.ClusterSecurityGroupsList,
+            }),
+          ),
+        ),
+      });
+    }
   }
 
   if (scope) {
@@ -281,7 +301,7 @@ export const getResourceTabs = ({
 };
 
 export const fetchData = async (resource: Resource) => {
-  let scope;
+  let scope, nestedScope;
   if (resource.scope) {
     scope = (
       await marketplaceResourcesDetailsRetrieve({
@@ -289,6 +309,14 @@ export const fetchData = async (resource: Resource) => {
       })
     ).data;
   }
+  if (resource.offering_type === MANAGED_RANCHER) {
+    nestedScope = (
+      await marketplaceResourcesDetailsRetrieve({
+        path: { uuid: scope.uuid },
+      })
+    ).data;
+  }
+
   const offering = await marketplaceResourcesOfferingRetrieve({
     path: { uuid: resource.uuid },
   }).then((response) => response.data);
@@ -306,6 +334,7 @@ export const fetchData = async (resource: Resource) => {
 
   return {
     scope,
+    nestedScope,
     components,
     offering,
     lexisLinksCount,

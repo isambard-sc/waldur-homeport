@@ -125,9 +125,9 @@
         // Add border-top only for the first selected option in a group
         &:not(:first-child) {
           &:not(
-              .metronic-select__option--is-selected
-                + .metronic-select__option--is-selected
-            ) {
+            .metronic-select__option--is-selected
+              + .metronic-select__option--is-selected
+          ) {
             border-top: 1px solid $border-color;
           }
         }

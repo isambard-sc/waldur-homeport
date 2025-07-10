@@ -26,7 +26,11 @@ export const ResourceSummary: FunctionComponent<ResourceSummaryProps> = (
   const hasExtraTabs = Boolean(props.extraTabs?.length);
 
   if (conf?.standalone) {
-    return <SummaryComponent resource={props.resource} />;
+    return (
+      <ExpandableContainer hasMultiSelect={props.hasMultiSelect} asTable>
+        <SummaryComponent resource={props.resource} />
+      </ExpandableContainer>
+    );
   } else {
     return (
       <ExpandableContainer

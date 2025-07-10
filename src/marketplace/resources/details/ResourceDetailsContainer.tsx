@@ -246,6 +246,7 @@ export const ResourceDetailsContainer: FunctionComponent<{}> = () => {
           data={{
             resource,
             resourceScope: data.scope,
+            nestedScope: data.nestedScope,
             offering: data.offering,
           }}
           isLoading={isLoading || isRefetching}

@@ -131,7 +131,7 @@ const fields: OfferingEditField[] = [
   },
   {
     label: translate('Cloud init template for load balancer node'),
-    key: 'plugin_options.managed_rancher_load_balancer_cloud_init_template',
+    key: 'secret_options.managed_rancher_load_balancer_cloud_init_template',
     component: TextField,
   },
   {
@@ -177,6 +177,21 @@ const fields: OfferingEditField[] = [
   {
     label: translate('OpenStack system volume size for worker node'),
     key: 'plugin_options.managed_rancher_worker_system_volume_size_gb',
+    ...VOLUME_SIZE_FIELD,
+  },
+  {
+    label: translate('Maximum number of CPU for cluster tenants'),
+    key: 'plugin_options.managed_rancher_tenant_max_cpu',
+    ...VOLUME_SIZE_FIELD,
+  },
+  {
+    label: translate('Maximum number of RAM for a cluster tenants'),
+    key: 'plugin_options.managed_rancher_tenant_max_ram',
+    ...VOLUME_SIZE_FIELD,
+  },
+  {
+    label: translate('Maximum number of disk space for a cluster tenants'),
+    key: 'plugin_options.managed_rancher_tenant_max_disk',
     ...VOLUME_SIZE_FIELD,
   },
   {

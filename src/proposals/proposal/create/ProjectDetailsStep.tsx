@@ -1,5 +1,7 @@
 import { DownloadSimpleIcon } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { Field } from 'redux-form';
+import { proposalPublicCallsRetrieve } from 'waldur-js-client';
 
 import { ENV } from '@waldur/core/config';
 import { number, required } from '@waldur/core/validators';
@@ -13,7 +15,7 @@ import {
 } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 import { OECD_FOS_2007_CODES } from '@waldur/project/OECD_FOS_2007_CODES';
-import { ProposalReview } from '@waldur/proposals/types';
+import { Call, ProposalReview } from '@waldur/proposals/types';
 import { ActionButton } from '@waldur/table/ActionButton';
 
 import { FieldReviewComments } from '../create-review/FieldReviewComments';
@@ -24,6 +26,20 @@ const isCodeRequired = ENV.plugins.WALDUR_CORE.OECD_FOS_2007_CODE_MANDATORY;
 
 export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
   const reviews: ProposalReview[] = props.params?.reviews;
+
+  const { data: call } = useQuery({
+    queryKey: ['Call', props.params.proposal.call_uuid],
+
+    queryFn: () =>
+      proposalPublicCallsRetrieve({
+        path: { uuid: props.params.proposal.call_uuid },
+        query: { field: ['fixed_duration_in_days'] },
+      }).then(
+        (response) => response.data as Pick<Call, 'fixed_duration_in_days'>,
+      ),
+
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <VStepperFormStepCard
@@ -152,13 +168,20 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         label={translate('Project duration in days')}
         placeholder={translate('Enter number of days') + '...'}
         tooltip={translate(
-          'Expected project duration in days once resources have been granted.',
+          'Expected project duration in days once resources have been granted. {extra_msg}',
+          {
+            extra_msg: call?.fixed_duration_in_days
+              ? translate(
+                  "This field set automatically based on the call's fixed duration.",
+                )
+              : '',
+          },
         )}
         tooltipEnd
         validate={[required, number]}
         required
       >
-        <StringField />
+        <StringField disabled={!!call?.fixed_duration_in_days} />
       </Field>
       <FieldReviewComments
         reviews={reviews}

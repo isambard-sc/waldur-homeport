@@ -1,10 +1,15 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
+import { useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { projectCreditsCreate, projectsCreate } from 'waldur-js-client';
 
 import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { formatISODate } from '@waldur/core/dateUtils';
+import { LoadingErred } from '@waldur/core/LoadingErred';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { getCustomer } from '@waldur/customer/utils';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
@@ -45,12 +50,36 @@ interface ProjectFormData {
 }
 
 export const ProjectCreateDialog = ({
-  customer,
+  customer: _customer,
   refetch,
 }: ProjectCreateDialogProps) => {
   const { showSuccess, showErrorResponse } = useNotify();
   const { closeDialog } = useModal();
   const router = useRouter();
+
+  // Fetch customer's project permissions
+  const {
+    data: projects,
+    isLoading,
+    error,
+    refetch: refetchProjects,
+  } = useQuery({
+    queryKey: ['CustomerProjects', _customer?.uuid],
+    queryFn: () =>
+      !_customer
+        ? null
+        : _customer?.projects
+          ? Promise.resolve(_customer.projects)
+          : getCustomer(_customer.uuid, ['projects']).then(
+              ({ projects }) => projects,
+            ),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const customer = useMemo(
+    () => (_customer ? { ..._customer, projects } : undefined),
+    [_customer, projects],
+  );
 
   const onSubmit = async (formData: ProjectFormData) => {
     try {
@@ -100,6 +129,12 @@ export const ProjectCreateDialog = ({
       showErrorResponse(e, translate('Unable to create project.'));
     }
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  } else if (error) {
+    return <LoadingErred loadData={refetchProjects} />;
+  }
 
   return (
     <Form

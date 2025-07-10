@@ -4,10 +4,7 @@ import { OpenPortalProviderConfig } from '@waldur/openportal/provider';
 import { OpenPortalRemoteProviderConfig } from '@waldur/openportal-remote/provider';
 import { OpenStackProviderConfig } from '@waldur/openstack/provider';
 import { RancherProviderConfig } from '@waldur/rancher/provider';
-import {
-  SlurmProviderConfig,
-  SlurmRemoteProviderConfig,
-} from '@waldur/slurm/provider';
+import { SlurmProviderConfig } from '@waldur/slurm/provider';
 import { VMwareProviderConfig } from '@waldur/vmware/provider';
 
 import { ProviderConfig } from './types';
@@ -39,5 +36,4 @@ register(OpenPortalRemoteProviderConfig);
 register(OpenStackProviderConfig);
 register(RancherProviderConfig);
 register(SlurmProviderConfig);
-register(SlurmRemoteProviderConfig);
 register(VMwareProviderConfig);

@@ -5,7 +5,7 @@ import { required } from '@waldur/core/validators';
 import { SelectField, NumberField, StringField } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
-import { SLURM_REMOTE_PLUGIN } from '@waldur/slurm/constants';
+import { SITE_AGENT_PLUGIN } from '@waldur/slurm/constants';
 
 import { DefaultOfferingEditPanel } from './offerings/update/DefaultOfferingEditPanel';
 import { OfferingEditPanelFormProps } from './offerings/update/integration/types';
@@ -74,7 +74,7 @@ export const UserPluginOptionsForm: FunctionComponent<
             'If true, offering users are created automatically when a user is added to the project with active offering resources or when a new offering resource is created.',
           ),
         },
-        props.offering.type === SLURM_REMOTE_PLUGIN && {
+        props.offering.type === SITE_AGENT_PLUGIN && {
           label: translate('Account name generation policy'),
           key: 'plugin_options.account_name_generation_policy',
           component: SelectField,

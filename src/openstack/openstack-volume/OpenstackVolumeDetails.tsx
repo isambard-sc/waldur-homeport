@@ -26,7 +26,7 @@ export const OpenstackVolumeDetails = (props: OpenstackVolumeDetailsProps) => {
       <Field label={translate('Size')}>
         {formatFilesize(props.order.attributes['size'])}
       </Field>
-      {order.attributes['availability_zone_name'] && (
+      {typeof order.attributes['availability_zone_name'] === 'string' && (
         <Field label={translate('Availability zone')}>
           {order.attributes['availability_zone_name']}
         </Field>

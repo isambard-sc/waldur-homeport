@@ -6,7 +6,6 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import {
   InvitationsFeatures,
   MarketplaceFeatures,
-  SupportFeatures,
 } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { isStaff, isStaffOrSupport } from '@waldur/workspace/selectors';
@@ -261,7 +260,6 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      feature: SupportFeatures.users,
       breadcrumb: () => translate('Users'),
     },
   },
@@ -286,9 +284,6 @@ export const states: StateDeclaration[] = [
         default: module.UserManage,
       })),
     ),
-    data: {
-      feature: SupportFeatures.users,
-    },
   },
   {
     name: 'admin-user-notifications',

@@ -106,7 +106,7 @@ export const UserReviewsList: FC = () => {
       hasQuery={true}
       rowActions={ReviewsRowActions}
       filters={<ReviewsTableFilter />}
-      expandableRow={({ row }) => <ReviewsExpandableRow row={row} />}
+      expandableRow={ReviewsExpandableRow}
       hasOptionalColumns
     />
   );

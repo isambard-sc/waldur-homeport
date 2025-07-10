@@ -1,3 +1,4 @@
+import { useRouter } from '@uirouter/react';
 import { FC, useCallback, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/types';
@@ -9,6 +10,8 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
+import { showInfo } from '@waldur/store/notify';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { Call } from '../types';
 import { getRoundsWithStatus } from '../utils';
@@ -35,6 +38,9 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
   variant = 'primary',
   className,
 }) => {
+  const user = useUser();
+  const router = useRouter();
+  const tooltip = translate('Please log in to submit a proposal.');
   const activeRound =
     call.state == 'active' &&
     useMemo(() => {
@@ -58,6 +64,13 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
   const dispatch = useDispatch();
   const openAddProposalDialog = useCallback(
     (e) => {
+      if (!user) {
+        router.stateService.go('login', {
+          toState: 'calls-for-proposals',
+          toParams: { call_uuid: call.uuid },
+        });
+        dispatch(showInfo(tooltip));
+      }
       if (
         isFeatureVisible(MarketplaceFeatures.call_only) &&
         call.external_url
@@ -84,6 +97,7 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
       variant={variant}
       className={className}
       onClick={openAddProposalDialog}
+      title={!user ? tooltip : undefined}
     >
       {title}
     </Button>

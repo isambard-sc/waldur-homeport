@@ -6,13 +6,13 @@ import { proposalProtectedCallsPartialUpdate } from 'waldur-js-client';
 
 import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
-import { SelectField, SubmitButton } from '@waldur/form';
+import { NumberField, SelectField, SubmitButton } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { FormContainer } from '@waldur/form/FormContainer';
 import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
+import { closeModalDialog, waitForConfirmation } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { RoleEnum } from '@waldur/permissions/enums';
@@ -25,6 +25,7 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 interface FormData {
   name: string;
   description: string;
+  fixed_duration_in_days?: number | null;
   default_project_role: Role;
 }
 
@@ -48,13 +49,33 @@ export const EditGeneralInfoDialog = connect<
     form: EDIT_CALL_GENERAL_FORM_ID,
   })((props) => {
     const processRequest = useCallback(
-      (values: FormData, dispatch) => {
+      async (values: FormData, dispatch) => {
+        if (values.fixed_duration_in_days) {
+          try {
+            await waitForConfirmation(
+              dispatch,
+              translate('Confirmation'),
+              translate(
+                'This will also update durations of connected proposals in Draft or In Review states. Continue?',
+              ),
+            );
+          } catch {
+            return;
+          }
+        }
+        const body: any = {};
+
+        if (props.resolve.name === 'default_project_role') {
+          body.default_project_role = values.default_project_role?.uuid;
+        } else if (props.resolve.name === 'fixed_duration_in_days') {
+          body.fixed_duration_in_days = values.fixed_duration_in_days || null;
+        } else {
+          body[props.resolve.name] = values[props.resolve.name];
+        }
+
         return proposalProtectedCallsPartialUpdate({
           path: { uuid: props.resolve.call.uuid },
-          body: {
-            ...values,
-            default_project_role: values.default_project_role?.uuid,
-          },
+          body,
         })
           .then(() => {
             props.resolve.refetch();
@@ -136,6 +157,14 @@ export const EditGeneralInfoDialog = connect<
               <AwesomeCheckboxField
                 label={props.resolve.title}
                 name={props.resolve.name}
+              />
+            )}
+            {props.resolve.name === 'fixed_duration_in_days' && (
+              <NumberField
+                label={translate(
+                  'Fixed duration for granted projects (in days)',
+                )}
+                name="fixed_duration_in_days"
               />
             )}
           </FormContainer>

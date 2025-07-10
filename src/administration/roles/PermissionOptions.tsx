@@ -390,6 +390,10 @@ export const PermissionOptions = [
         value: 'RESOURCE.MANAGE_USERS',
       },
       {
+        label: translate('Openstack image management for service provider'),
+        value: 'SERVICE_PROVIDER.OPENSTACK_IMAGE_MANAGEMENT',
+      },
+      {
         label: translate('Register service provider'),
         value: 'SERVICE_PROVIDER.REGISTER',
       },

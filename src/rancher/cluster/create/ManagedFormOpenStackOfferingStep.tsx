@@ -22,7 +22,7 @@ export const ManagedFormOpenStackOfferingStep = (props: FormStepProps) => {
         props.offering.plugin_options.openstack_offering_uuid_list.map((uuid) =>
           marketplacePublicOfferingsRetrieve({
             path: { uuid },
-            query: { field: ['name', 'uuid', 'scope_uuid'] },
+            query: { field: ['name', 'uuid', 'scope_uuid', 'type'] },
           }).then((response) => response.data),
         ),
       ),

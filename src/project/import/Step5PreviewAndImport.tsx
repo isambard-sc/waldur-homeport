@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { FormCheck } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { useToggle } from 'react-use';
 import { Offering, Project, Resource } from 'waldur-js-client';
@@ -27,6 +26,7 @@ import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { ProjectPreviewExpandableRow } from './ProjectPreviewExpandableRow';
+import { SkipErrorsCheck } from './SkipErrorsCheck';
 import { parseProjectsAndResourcesFile } from './utils';
 
 interface ImportedProject extends Project {
@@ -55,7 +55,7 @@ export const Step5PreviewAndImport: FC<WizardFormStepProps> = (props) => {
       const _file = acceptedFiles[0];
 
       if (!_file) {
-        dispatch(showError('No file has been imported'));
+        dispatch(showError(translate('No file has been imported')));
         return;
       }
       parseProjectsAndResourcesFile(_file).then((_data) => setData(_data));
@@ -300,13 +300,9 @@ export const Step5PreviewAndImport: FC<WizardFormStepProps> = (props) => {
               }
               footer={
                 Boolean(tooltip && data?.length) && (
-                  <FormCheck
-                    id="confirm-skip-errors"
-                    type="checkbox"
-                    className="form-check-custom form-check-sm border-top pt-3"
+                  <SkipErrorsCheck
                     checked={skipErrors}
                     onChange={setSkipErrors}
-                    label={translate('Skip records with errors')}
                   />
                 )
               }

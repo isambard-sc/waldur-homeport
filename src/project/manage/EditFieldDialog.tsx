@@ -5,6 +5,8 @@ import { projectsPartialUpdate } from 'waldur-js-client';
 import { Project } from 'waldur-js-client';
 
 import { formatISODate } from '@waldur/core/dateUtils';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { useCustomerProjects } from '@waldur/customer/workspace/fetchCustomer';
 import { SubmitButton } from '@waldur/form';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
@@ -39,6 +41,7 @@ const formatValue = (key, value) => {
 export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
+  const { loading: loadingProjects } = useCustomerProjects();
   const { showSuccess, showErrorResponse } = useNotify();
 
   const onSubmit = async (formData: FormData) => {
@@ -95,7 +98,11 @@ export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
                 />
               </FormGroup>
             ) : resolve.name === 'name' ? (
-              <NameGroup customer={customer} />
+              loadingProjects ? (
+                <LoadingSpinner />
+              ) : (
+                <NameGroup customer={customer} />
+              )
             ) : resolve.name === 'description' ? (
               <DescriptionGroup />
             ) : resolve.name === 'is_industry' ? (

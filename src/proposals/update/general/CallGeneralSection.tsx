@@ -103,6 +103,26 @@ export const CallGeneralSection: FC<CallGeneralSectionProps> = (props) => {
             </tr>
             <tr>
               <td className="col-md-3">
+                {translate('Fixed duration for granted projects (in days)')}
+              </td>
+              <td className="col-md-9">
+                {props.call.fixed_duration_in_days || 'N/A'}
+              </td>
+              <td className="row-actions">
+                <div>
+                  <EditGeneralInfoButton
+                    call={props.call}
+                    name="fixed_duration_in_days"
+                    title={translate(
+                      'Edit fixed duration for granted projects (in days)',
+                    )}
+                    refetch={props.refetch}
+                  />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td className="col-md-3">
                 {translate('Reviewer identity visible to submitters')}
               </td>
               <td className="col-md-9">

@@ -1,5 +1,5 @@
-import { formDataBodySerializer, RequestResult } from '@hey-api/client-fetch';
 import Qs from 'qs';
+import { formDataBodySerializer, RequestResult } from 'waldur-js-client';
 import { client } from 'waldur-js-client/client.gen';
 
 import { setRedirect } from '@waldur/auth/AuthRedirectStorage';

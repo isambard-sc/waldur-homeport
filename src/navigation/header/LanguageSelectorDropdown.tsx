@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import { FunctionComponent } from 'react';
 
+import { CountryFlagIcon } from '@waldur/core/CountryFlagIcon';
 import { translate } from '@waldur/i18n';
 import { useLanguageSelector } from '@waldur/i18n/useLanguageSelector';
-import { CountryFlag } from '@waldur/marketplace/common/CountryFlag';
 
 export const LanguageCountry = {
   ar: 'sa',
@@ -38,9 +38,9 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
           {translate('Language')}
           <span className="d-flex flex-center gap-2 fs-8 rounded bg-light px-3 py-1 position-absolute translate-middle-y top-50 end-0">
             {currentLanguage.label}{' '}
-            <CountryFlag
+            <CountryFlagIcon
               countryCode={LanguageCountry[currentLanguage.code]}
-              fontSize={16}
+              size="sm"
             />
           </span>
         </span>
@@ -63,7 +63,7 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
               })}
             >
               <span className="symbol symbol-20px me-4">
-                <CountryFlag countryCode={LanguageCountry[language.code]} />
+                <CountryFlagIcon countryCode={LanguageCountry[language.code]} />
               </span>
               {language.label}
             </div>

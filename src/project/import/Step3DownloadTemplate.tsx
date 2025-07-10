@@ -1,7 +1,5 @@
-import { DownloadSimpleIcon, FileCsvIcon } from '@phosphor-icons/react';
 import Papa from 'papaparse';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from 'react-bootstrap';
 
 import { formatDate } from '@waldur/core/dateUtils';
 import { formatFilesize } from '@waldur/core/utils';
@@ -9,8 +7,7 @@ import { WizardForm, WizardFormStepProps } from '@waldur/form/WizardForm';
 import { translate } from '@waldur/i18n';
 import saveAsCsv from '@waldur/table/exporters/csv';
 
-import '@waldur/form/upload/AttachmentItem.scss';
-
+import { DownloadTemplateItem } from './DownloadTemplateItem';
 import { generateTemplateData } from './utils';
 
 const getTemplateName = (type, organizationName = '') =>
@@ -69,33 +66,11 @@ export const Step3DownloadTemplate: FC<WizardFormStepProps> = (props) => {
                     'Fill the template with your project and resource details, then upload it in the next step.',
                   )}
             </p>
-            <div className="attachment-item mb-6">
-              <div className="attachment-item__thumb">
-                <FileCsvIcon size={20} weight="bold" className="text-muted" />
-              </div>
-              <div className="attachment-item__body fs-6">
-                <button
-                  type="button"
-                  className="fw-bold text-gray-700 lh-1 text-anchor"
-                  onClick={() => onDownloadClick(importType)}
-                >
-                  {getTemplateName(importType, props.data?.customer?.name)}.csv
-                </button>
-                <p className="fs-6 text-muted mb-0">{fileSize}</p>
-              </div>
-              <div>
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="btn-active-icon-primary p-0 btn-icon-right"
-                  onClick={() => onDownloadClick(importType)}
-                >
-                  <span className="svg-icon svg-icon-2">
-                    <DownloadSimpleIcon weight="bold" />
-                  </span>
-                </Button>
-              </div>
-            </div>
+            <DownloadTemplateItem
+              name={getTemplateName(importType, props.data?.customer?.name)}
+              size={fileSize}
+              onClick={() => onDownloadClick(importType)}
+            />
             <p>
               {importType === 'projects_only'
                 ? translate(

@@ -32,9 +32,7 @@ export const ResourceDetailsPage: FC<OwnProps> = (props) => {
 
   return (
     <props.tabSpec.component
-      resource={data.resource}
-      resourceScope={data.resourceScope}
-      offering={data.offering}
+      {...data}
       title={props.tabSpec.title}
       refetch={props.refetch}
     />

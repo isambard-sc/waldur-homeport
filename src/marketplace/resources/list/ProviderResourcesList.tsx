@@ -367,7 +367,6 @@ const mandatoryFields: MarketplaceProviderResourcesListData['query']['field'] =
     'slug', // SetSlugAction
     'end_date', // EditResourceEndDateByProviderAction, EditResourceEndDateByStaffAction
     'resource_type', // TerminateAction
-    'end_date',
   ];
 
 export const ProviderResourcesList: React.ComponentType<any> = () => {
