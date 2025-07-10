@@ -6,6 +6,8 @@ import { fetchResultCount, parseNextPage } from '@waldur/core/api';
 import { Fetcher, TableRequest } from './types';
 
 export const parseResponse = async (url: string, query?, options?) => {
+  console.log(`Fetching data from ${url} with query:`, query);
+
   const result = await client.get({
     url,
     query,
@@ -26,6 +28,10 @@ export const parseResponse = async (url: string, query?, options?) => {
     throw new Error('Unexpected response content type');
   }
   const rows = result.data as any[];
+
+  console.log(`Fetched ${rows.length} rows from ${url} with query:`, query);
+  console.log(rows);
+
   const resultCount = fetchResultCount(result);
   return {
     rows,
@@ -35,6 +41,8 @@ export const parseResponse = async (url: string, query?, options?) => {
 };
 
 export function createFetcher(endpoint: string, options?): Fetcher {
+  console.log(`Creating fetcher for endpoint: ${endpoint}`, options);
+
   return (request: TableRequest) => {
     const { params: optionsParams, ...restOptions } = options || {};
     const { params: requestOptionsParams, ...restRequestOptions } =

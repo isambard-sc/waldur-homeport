@@ -575,7 +575,7 @@ export const states: StateDeclaration[] = [
     parent: 'managed-projects',
     data: {
       //feature: MarketplaceFeatures.show_remote_project_functionality,
-      breadcrumb: () => translate('Requests for managed projects'),
+      breadcrumb: () => translate('Externally managed projects'),
     },
   },
 

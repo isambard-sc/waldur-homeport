@@ -14,16 +14,16 @@ export const ManagedProjectsList = () => {
             {...tableProps}
             columns={[
                 {
-                    title: translate('Name'),
-                    render: ({ row }) => row.name,
+                    title: translate('Identifier'),
+                    render: ({ row }) => row.identifier,
                 },
                 {
-                    title: translate('Description'),
-                    render: ({ row }) => row.description,
+                    title: translate('Details'),
+                    render: ({ row }) => row.details,
                 },
                 {
-                    title: translate('Assigned users count'),
-                    render: ({ row }) => row.users_count,
+                    title: translate('State'),
+                    render: ({ row }) => row.state,
                 },
             ]}
         />
