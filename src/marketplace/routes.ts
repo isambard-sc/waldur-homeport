@@ -319,14 +319,14 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'remote-projects',
+    name: 'managed-projects',
     abstract: true,
     parent: 'marketplace-provider',
     component: UIView,
     url: '',
     data: {
       //feature: MarketplaceFeatures.show_remote_project_functionality,
-      breadcrumb: () => translate('Remote projects'),
+      breadcrumb: () => translate('Managed projects'),
       priority: 150,
     },
   },
@@ -551,17 +551,17 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'marketplace-provider-remote-project-requests',
-    url: 'remote-project-requests/',
+    name: 'marketplace-provider-managed-projects',
+    url: 'managed-projects/',
     component: lazyComponent(() =>
-      import('@waldur/openportal/project-requests/ProjectRequestsList').then(
-        (module) => ({ default: module.ProjectRequestsList }),
+      import('@waldur/openportal/managed-projects/ManagedProjectsList').then(
+        (module) => ({ default: module.ManagedProjectsList }),
       ),
     ),
-    parent: 'remote-projects',
+    parent: 'managed-projects',
     data: {
       //feature: MarketplaceFeatures.show_remote_project_functionality,
-      breadcrumb: () => translate('Requests for remote projects'),
+      breadcrumb: () => translate('Requests for managed projects'),
     },
   },
 
