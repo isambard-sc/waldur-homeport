@@ -11,6 +11,7 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
 import { ManagedProjectLink } from './ManagedProjectLink';
 import { ProjectClassLink } from './ProjectClassLink';
+import { ManagedProjectActions } from './ManagedProjectActions';
 
 
 export const ManagedProjectsList = () => {
@@ -135,6 +136,9 @@ export const ManagedProjectsList = () => {
             hasOptionalColumns
             expandableRowClassName="py-2 pe-2"
             expandableRow={ManagedProjectExpandableRow}
+            rowActions={({ row }) => (
+                <ManagedProjectActions project={row} refetch={tableProps.fetch} />
+            )}
         />
     );
 };
