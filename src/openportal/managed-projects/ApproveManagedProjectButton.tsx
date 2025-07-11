@@ -2,6 +2,7 @@ import { CheckCircleIcon } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { post } from '@waldur/core/api';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
@@ -10,23 +11,14 @@ import { wrapTooltip } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
 export const approveManagedProject = async ({ path }) => {
-    const response = await fetch(`/api/openportal-managed-projects/${path.uuid}/approve/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    if (!response.ok) {
-        throw new Error(`Failed to approve project: ${response.statusText}`);
-    }
-    return response.json();
+    await post(`/openportal-managed-projects/${path.identifier}/approve/`);
 }
 
 export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => {
     const project = row; // Assuming row is the project object
 
     if (!project || !refetch) {
-        console.warn('RejectManagedProjectButton: Missing project or refetch function');
+        console.warn('ApproveManagedProjectButton: Missing project or refetch function');
         return null;
     }
 
@@ -36,7 +28,7 @@ export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => 
         mutationFn: async () => {
             try {
                 await approveManagedProject({
-                    path: { uuid: project.uuid },
+                    path: { identifier: project.identifier },
                 });
                 if (refetch) {
                     await refetch();

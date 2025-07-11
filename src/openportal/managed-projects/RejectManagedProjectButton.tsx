@@ -1,6 +1,7 @@
 import { XCircleIcon } from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
+import { post } from '@waldur/core/api';
 
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
@@ -10,16 +11,7 @@ import { wrapTooltip } from '@waldur/table/ActionButton';
 import { getUser } from '@waldur/workspace/selectors';
 
 export const rejectManagedProject = async ({ path }) => {
-    const response = await fetch(`/api/openportal-managed-projects/${path.uuid}/reject/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    if (!response.ok) {
-        throw new Error(`Failed to reject project: ${response.statusText}`);
-    }
-    return response.json();
+    await post(`/openportal-managed-projects/${path.identifier}/reject/`);
 }
 
 export const RejectManagedProjectButton = ({ row, as, className, refetch }) => {
@@ -36,7 +28,7 @@ export const RejectManagedProjectButton = ({ row, as, className, refetch }) => {
         mutationFn: async () => {
             try {
                 await rejectManagedProject({
-                    path: { uuid: project.uuid },
+                    path: { identifier: project.identifier },
                 });
                 if (refetch) {
                     await refetch();
