@@ -10,10 +10,7 @@ export const ManagedProjectActions = ({
     refetch,
     as,
 }) => {
-    console.log('ManagedProjectActions', project, refetch, as);
-
     if (!project || !refetch) {
-        console.warn('ManagedProjectActions: Missing project or refetch function');
         return null;
     }
 
