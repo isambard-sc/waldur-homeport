@@ -20,19 +20,33 @@ import { ManagedProjectActions } from './ManagedProjectActions';
 
 import { ManagedProjectsFilter } from './ManagedProjectsFilter';
 
+
 const mapStateToFilter = createSelector(
     getFormValues('managedProjectsFilter'),
-    (project, userFilter: any) => {
+    (userFilter: any) => {
+        if (!userFilter) {
+            // If no filter is set, default to pending
+            return { state: ['pending'] };
+        }
+
         const filter = {
             ...userFilter,
             feature: userFilter?.feature?.map((option) => option.value),
         };
-        if (userFilter && isEmpty(userFilter.state)) {
+
+        // Handle state filter
+        if (userFilter.state && Array.isArray(userFilter.state) && userFilter.state.length > 0) {
+            // If state is selected, map to values
+            filter.state = userFilter.state.map((option) => option.value);
+        } else if (isEmpty(userFilter.state)) {
+            // If no state is selected, default to pending
             filter.state = ['pending'];
         }
+
         return filter;
     },
 );
+
 
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');

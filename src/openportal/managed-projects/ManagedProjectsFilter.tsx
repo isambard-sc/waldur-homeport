@@ -57,7 +57,7 @@ const PureManagedProjectsFilter: FunctionComponent = () => (
 export const ManagedProjectsFilter = reduxForm({
     form: 'managedProjectsFilter',
     initialValues: {
-        feature: [choices[0]],
+        state: [choices[0]],
     },
     destroyOnUnmount: false,
 })(PureManagedProjectsFilter);
