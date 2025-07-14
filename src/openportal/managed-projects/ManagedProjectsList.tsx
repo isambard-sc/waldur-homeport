@@ -1,7 +1,12 @@
+import { useSelector } from 'react-redux';
+import { getFormValues, reduxForm } from 'redux-form';
+import { Field } from 'redux-form';
+
 import { translate } from '@waldur/i18n';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
+import { TableFilterItem } from '@waldur/table/TableFilterItem';
 import { Column } from '@waldur/table/types';
 import { useTitle } from '@waldur/navigation/title';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
@@ -13,26 +18,52 @@ import { ManagedProjectLink } from './ManagedProjectLink';
 import { ProjectClassLink } from './ProjectClassLink';
 import { ManagedProjectActions } from './ManagedProjectActions';
 
+const getFilterValues = getFormValues('ManagedProjectsFilterForm');
+
+// Filter component that needs to be decorated with reduxForm
+const ManagedProjectsFilterSetForm = () => (
+    <TableFilterItem title={translate('State')} name="state">
+        <Field
+            name="state"
+            component="select"
+            options={[
+                { value: 'pending', label: translate('Pending') },
+                { value: 'active', label: translate('Active') },
+                { value: 'completed', label: translate('Completed') },
+                { value: 'cancelled', label: translate('Cancelled') },
+                { value: '', label: translate('All States') },
+            ]}
+        />
+    </TableFilterItem>
+);
+
+// Decorate the form component with reduxForm
+const ManagedProjectsFilterSet = reduxForm({
+    form: 'ManagedProjectsFilterForm',
+    initialValues: {
+        state: 'pending', // Set default to pending
+    },
+})(ManagedProjectsFilterSetForm);
 
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
+
+    // Get filter values from redux-form
+    const filter = useSelector(getFilterValues);
 
     const tableProps = useTable({
         table: `ManagedProjectsList`,
         fetchData: createFetcher('openportal-managed-projects'),
         queryField: 'query',
+        filter,
     });
 
     const onClickDetails = (row: any) => {
-        // Handle the click event for project details
         console.log('Clicked on project:', row);
-        // You can navigate to a details page or perform any other action here
     };
 
     const onClickProjectClassDetails = (row: any) => {
-        // Handle the click event for project class details
         console.log('Clicked on project class:', row);
-        // You can navigate to a details page or perform any other action here
     };
 
     const columns: Array<Column> = [
@@ -44,7 +75,6 @@ export const ManagedProjectsList = () => {
                     {row.details.name}
                 </ManagedProjectLink>
             ),
-
             keys: ['name'],
             id: 'managedproject',
         },
@@ -56,7 +86,6 @@ export const ManagedProjectsList = () => {
                     {row.details.class}
                 </ProjectClassLink>
             ),
-
             keys: ['class'],
             id: 'projectclass',
         },
@@ -76,7 +105,6 @@ export const ManagedProjectsList = () => {
                         : DASH_ESCAPE_CODE}
                 </>
             ),
-
             keys: ['created_date'],
             optional: true,
             id: 'created_date',
@@ -140,6 +168,7 @@ export const ManagedProjectsList = () => {
             rowActions={({ row }) => (
                 <ManagedProjectActions project={row} refetch={tableProps.fetch} />
             )}
+            filters={<ManagedProjectsFilterSet />}
         />
     );
 };
