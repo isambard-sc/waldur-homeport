@@ -574,8 +574,23 @@ export const states: StateDeclaration[] = [
     ),
     parent: 'managed-projects',
     data: {
-      //feature: MarketplaceFeatures.show_remote_project_functionality,
+      //feature: MarketplaceFeatures.show_managed_project_functionality,
       breadcrumb: () => translate('Externally managed projects'),
+    },
+  },
+
+  {
+    name: 'marketplace-provider-project-classes',
+    url: 'project-classes/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/project-classes/ProjectClassList').then(
+        (module) => ({ default: module.ProjectClassList }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      //feature: MarketplaceFeatures.show_managed_project_functionality,
+      breadcrumb: () => translate('Available managed project classes'),
     },
   },
 
