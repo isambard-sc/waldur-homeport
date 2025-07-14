@@ -1,55 +1,44 @@
 import { useSelector } from 'react-redux';
-import { getFormValues, reduxForm } from 'redux-form';
-import { Field } from 'redux-form';
+import { getFormValues } from 'redux-form';
+import { createSelector } from 'reselect';
 
 import { translate } from '@waldur/i18n';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
-import { TableFilterItem } from '@waldur/table/TableFilterItem';
 import { Column } from '@waldur/table/types';
 import { useTitle } from '@waldur/navigation/title';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { renderFieldOrDash } from '@waldur/table/utils';
+import { isEmpty } from '@waldur/core/utils';
 
 import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
 import { ManagedProjectLink } from './ManagedProjectLink';
 import { ProjectClassLink } from './ProjectClassLink';
 import { ManagedProjectActions } from './ManagedProjectActions';
 
-const getFilterValues = getFormValues('ManagedProjectsFilterForm');
+import { ManagedProjectsFilter } from './ManagedProjectsFilter';
 
-// Filter component that needs to be decorated with reduxForm
-const ManagedProjectsFilterSetForm = () => (
-    <TableFilterItem title={translate('State')} name="state">
-        <Field
-            name="state"
-            component="select"
-            options={[
-                { value: 'pending', label: translate('Pending') },
-                { value: 'active', label: translate('Active') },
-                { value: 'completed', label: translate('Completed') },
-                { value: 'cancelled', label: translate('Cancelled') },
-                { value: '', label: translate('All States') },
-            ]}
-        />
-    </TableFilterItem>
-);
-
-// Decorate the form component with reduxForm
-const ManagedProjectsFilterSet = reduxForm({
-    form: 'ManagedProjectsFilterForm',
-    initialValues: {
-        state: 'pending', // Set default to pending
+const mapStateToFilter = createSelector(
+    getFormValues('managedProjectsFilter'),
+    (project, userFilter: any) => {
+        const filter = {
+            ...userFilter,
+            feature: userFilter?.feature?.map((option) => option.value),
+        };
+        if (userFilter && isEmpty(userFilter.state)) {
+            filter.state = ['pending'];
+        }
+        return filter;
     },
-})(ManagedProjectsFilterSetForm);
+);
 
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
 
     // Get filter values from redux-form
-    const filter = useSelector(getFilterValues);
+    const filter = useSelector(mapStateToFilter);
 
     const tableProps = useTable({
         table: `ManagedProjectsList`,
@@ -168,7 +157,7 @@ export const ManagedProjectsList = () => {
             rowActions={({ row }) => (
                 <ManagedProjectActions project={row} refetch={tableProps.fetch} />
             )}
-            filters={<ManagedProjectsFilterSet />}
+            filters={<ManagedProjectsFilter />}
         />
     );
 };
