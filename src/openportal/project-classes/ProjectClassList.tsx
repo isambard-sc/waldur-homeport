@@ -22,6 +22,15 @@ const ProjectClassRowActions = ({ row, fetch }) => (
   />
 );
 
+const stringify_customer = (customer: any) => {
+  if (!customer) {
+    return 'Not set';
+  }
+  // customer.url is the URL. Render it as a link, using customer.name as the display text.
+  const url = `/organizations/${customer.uuid}/dashboard/`;
+  return <a key={customer.uuid} href={url} target="_blank" rel="noopener noreferrer">{customer.display_name}</a>;
+}
+
 export const ProjectClassList: FunctionComponent<{}> = () => {
   const props = useTable({
     table: 'project-class',
@@ -38,6 +47,14 @@ export const ProjectClassList: FunctionComponent<{}> = () => {
         {
           title: translate('Portal'),
           render: ({ row }) => renderFieldOrDash(row.portal),
+        },
+        {
+          title: translate('Organization'),
+          render: ({ row }) => stringify_customer(row.customer_data),
+        },
+        {
+          title: translate('Shortname'),
+          render: ({ row }) => renderFieldOrDash(row.shortname),
         },
       ]}
       verboseName={translate('project classes')}
