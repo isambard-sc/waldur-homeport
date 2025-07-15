@@ -54,6 +54,9 @@ const RoleMappingComponent: FunctionComponent<{
     const [mappings, setMappings] = useState<Array<{ key: string; value: any; id: string }>>([]);
     const [initialized, setInitialized] = useState(false);
 
+    console.log('Mappings state:', mappings);
+    console.log('initialized state:', initialized);
+
     // Initialize mappings from value only once
     useEffect(() => {
         if (!initialized) {
@@ -61,7 +64,7 @@ const RoleMappingComponent: FunctionComponent<{
                 const initialMappings = Object.entries(value).map(([key, val], index) => ({
                     key,
                     value: val,
-                    id: `mapping-${index}-${Date.now()}`
+                    id: `mapping-${index}`
                 }));
                 setMappings(initialMappings);
             }
@@ -72,27 +75,33 @@ const RoleMappingComponent: FunctionComponent<{
 
     // Convert mappings array back to dictionary and call onChange
     const updateValue = (newMappings: Array<{ key: string; value: any; id: string }>) => {
+        console.log('updateValue called with:', newMappings);
         setMappings(newMappings);
 
         // Filter out mappings with empty keys or null values
-        const validMappings = newMappings.filter(m => m.key.trim() !== '' && m.value !== null);
+        // const validMappings = newMappings.filter(m => m.key.trim() !== '' && m.value !== null);
+        const validMappings = newMappings;
 
         // Convert to dictionary
-        const dictionary = validMappings.reduce((acc, mapping) => {
+        /*const dictionary = validMappings.reduce((acc, mapping) => {
             acc[mapping.key] = mapping.value;
             return acc;
-        }, {} as Record<string, any>);
+        }, {} as Record<string, any>);*/
 
-        onChange(dictionary);
+        // console.log('calling onChange with dictionary:', dictionary);
+        // onChange(dictionary);
     };
 
     const addMapping = () => {
+        console.log('Adding new mapping');
         const newMapping = {
             key: '',
             value: null,
-            id: `mapping-${mappings.length}-${Date.now()}`
+            id: `mapping-${mappings.length}`
         };
-        updateValue([...mappings, newMapping]);
+        const newMappings = [...mappings, newMapping];
+        console.log('New mappings after addition:', newMappings);
+        updateValue(newMappings);
     };
 
     const removeMapping = (idToRemove: string) => {
@@ -129,12 +138,13 @@ const RoleMappingComponent: FunctionComponent<{
             )}
 
             {mappings.map((mapping, index) => (
-                <div key={mapping.id} className="row mb-3 align-items-end">
+                <div key={`rolemapper-${mapping.id}`} className="row mb-3 align-items-end">
                     <div className="col-md-5">
                         <label className="form-label small">
                             {translate('Remote Role Name')}
                         </label>
                         <input
+                            key={`input-${mapping.id}`}
                             type="text"
                             className="form-control"
                             placeholder={translate('e.g., admin, user, viewer')}
@@ -144,7 +154,7 @@ const RoleMappingComponent: FunctionComponent<{
                         />
                     </div>
 
-                    <div className="col-md-1 text-center">
+                    <div key={`arrow-${mapping.id}`} className="col-md-1 text-center">
                         <span className="text-muted">→</span>
                     </div>
 
@@ -153,6 +163,7 @@ const RoleMappingComponent: FunctionComponent<{
                             {translate('Local Role')}
                         </label>
                         <AsyncPaginate
+                            key={`select-${mapping.id}`}
                             placeholder={translate('Select local role...')}
                             loadOptions={roleAutocomplete}
                             defaultOptions
@@ -170,12 +181,17 @@ const RoleMappingComponent: FunctionComponent<{
 
                     <div className="col-md-1">
                         <button
+                            key={`remove-${mapping.id}`}
                             type="button"
                             className="btn btn-outline-danger btn-sm"
-                            onClick={() => removeMapping(mapping.id)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                removeMapping(mapping.id);
+                            }}
                             title={translate('Remove mapping')}
                         >
-                            <i className="fa fa-trash" />
+                            {translate('Remove')}
                         </button>
                     </div>
                 </div>
@@ -183,29 +199,18 @@ const RoleMappingComponent: FunctionComponent<{
 
             <div className="mt-3">
                 <button
+                    key="add-mapping-button"
                     type="button"
                     className="btn btn-outline-primary btn-sm"
-                    onClick={addMapping}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addMapping();
+                    }}
                 >
-                    <i className="fa fa-plus me-1" />
                     {translate('Add Role Mapping')}
                 </button>
             </div>
-
-            {mappings.length > 0 && (
-                <div className="mt-3">
-                    <small className="text-muted">
-                        {translate('Preview')}: {JSON.stringify(
-                            mappings
-                                .filter(m => m.key.trim() !== '' && m.value !== null)
-                                .reduce((acc, m) => {
-                                    acc[m.key] = m.value?.name || m.value?.description || 'Selected Role';
-                                    return acc;
-                                }, {} as Record<string, string>)
-                        )}
-                    </small>
-                </div>
-            )}
         </div>
     );
 };
