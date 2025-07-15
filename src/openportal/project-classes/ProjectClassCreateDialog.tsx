@@ -28,38 +28,6 @@ const MAX_PROJECTCLASS_LENGTH = 128;
 const MAX_PROJECT_SHORTNAME_LENGTH = 30;
 
 
-export const RoleAutocompleteField: FunctionComponent<{
-    name: string;
-    placeholder?: string;
-    validator?: any;
-    noOptionsMessage?: string;
-    reactSelectProps?: any;
-}> = (props) => (
-    <Field
-        name={props.name}
-        validate={props.validator}
-        component={({ input, meta }) => (
-            <AsyncPaginate
-                placeholder={props.placeholder || translate('Select role...')}
-                loadOptions={roleAutocomplete}
-                defaultOptions
-                getOptionValue={(option) => option.uuid}
-                getOptionLabel={(option) => option.description || option.name}
-                value={input.value}
-                onChange={(value) => input.onChange(value)}
-                onBlur={() => input.onBlur()}
-                noOptionsMessage={() =>
-                    props.noOptionsMessage || translate('No roles found')
-                }
-                isClearable={true}
-                className="metronic-select-container"
-                classNamePrefix="metronic-select"
-                {...props.reactSelectProps}
-            />
-        )}
-    />
-);
-
 export const OrganizationAutocompleteField: FunctionComponent<{
     name: string;
     placeholder?: string;
