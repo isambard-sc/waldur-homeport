@@ -14,7 +14,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { showErrorResponse } from '@waldur/store/notify';
-import { organizationAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { organizationAutocomplete, publicOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
 
 const projectClassCreate = (params) => {
@@ -63,6 +63,41 @@ export const OrganizationAutocompleteField: FunctionComponent<{
     />
 );
 
+export const OfferingAutocompleteField: FunctionComponent<{
+    name: string;
+    placeholder?: string;
+    validator?: any;
+    noOptionsMessage?: string;
+    reactSelectProps?: any;
+}> = (props) => (
+    <Field
+        name={props.name}
+        validate={props.validator}
+        component={({ input, meta }) => (
+            <AsyncPaginate
+                placeholder={props.placeholder || translate('Select offering...')}
+                loadOptions={(query, prevOptions, { currentPage }) =>
+                    publicOfferingsAutocomplete(query, prevOptions, currentPage)
+                }
+                defaultOptions
+                getOptionValue={(option) => option.uuid}
+                getOptionLabel={(option) => option.name}
+                value={input.value}
+                onChange={(value) => input.onChange(value)}
+                onBlur={() => input.onBlur()}
+                noOptionsMessage={() =>
+                    props.noOptionsMessage || translate('No public offerings')
+                }
+                isClearable={true}
+                className="metronic-select-container"
+                classNamePrefix="metronic-select"
+                {...props.reactSelectProps}
+            />
+        )}
+    />
+);
+
+
 export const ProjectClassCreateDialog = ({ resolve }) => {
     const { showErrorResponse, showSuccess } = useNotify();
     const { closeDialog } = useModal();
@@ -75,8 +110,6 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
         customerId: currentCustomer.uuid,
     });
 
-    console.log('Current customer:', currentCustomer);
-    console.log('User:', user);
     if (!canEditCustomer) {
         showErrorResponse(null, translate('You do not have permission to create a project class.'));
         return null;
@@ -91,6 +124,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                     portal: formValues.portal,
                     customer: formValues.customer,
                     shortname: formValues.shortname,
+                    offering: formValues.offering,
                     approval_limit: formValues.approval_limit,
                     max_credit_limit: formValues.max_credit_limit,
                 },
@@ -120,7 +154,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             </div>
                         }
                     >
-                        <FormGroup controlId="name" label={translate('Name')} required>
+                        <FormGroup controlId="name" label={translate('Name of project class')} required>
                             <Field
                                 name="name"
                                 component={StringField as any}
@@ -130,7 +164,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="portal" label={translate('Portal')} required>
+                        <FormGroup controlId="portal" label={translate('Portal from which requests are allowed')} required>
                             <Field
                                 name="portal"
                                 component={StringField as any}
@@ -140,14 +174,14 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="customer" label={translate('Customer')} required>
+                        <FormGroup controlId="customer" label={translate('Organisation into which to deploy projects')} required>
                             <OrganizationAutocompleteField
                                 name="customer"
-                                placeholder={translate('Select customer organisation')}
+                                placeholder={translate('Select organisation')}
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="shortname" label={translate('Shortname Pattern')}>
+                        <FormGroup controlId="shortname" label={translate('Pattern used to generate project shortnames')}>
                             <Field
                                 name="shortname"
                                 component={StringField as any}
@@ -158,7 +192,15 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="approval_limit" label={translate('Approval Limit')}>
+                        <FormGroup controlId="offering" label={translate('Offering to use for projects in this class')}>
+                            <OfferingAutocompleteField
+                                placeholder={translate('Select offering')}
+                                name="offering"
+                                reactSelectProps={{ isClearable: true }}
+                            />
+                        </FormGroup>
+
+                        <FormGroup controlId="approval_limit" label={translate('Credit limit beyond which approval is required')}>
                             <Field
                                 name="approval_limit"
                                 component={NumberField as any}
@@ -169,7 +211,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="max_credit_limit" label={translate('Maximum Credit Limit')}>
+                        <FormGroup controlId="max_credit_limit" label={translate('Maximum credit request limit for projects in this class')}>
                             <Field
                                 name="max_credit_limit"
                                 component={NumberField as any}
