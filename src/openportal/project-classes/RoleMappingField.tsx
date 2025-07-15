@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FunctionComponent } from 'react';
+import React, { useState, useEffect, FunctionComponent, useRef } from 'react';
 import { Field } from 'react-final-form';
 
 import { rolesList } from 'waldur-js-client';
@@ -50,9 +50,15 @@ const RoleMappingComponent: FunctionComponent<{
     onBlur: () => void;
     placeholder?: string;
 }> = ({ value = {}, onChange, onBlur, placeholder }) => {
-    // Convert dictionary to array for easier manipulation
+    // Stored mappings (read-only display)
     const [mappings, setMappings] = useState<Array<{ key: string; value: any; id: string }>>([]);
     const [initialized, setInitialized] = useState(false);
+
+    // Input form state (editable)
+    const [inputKey, setInputKey] = useState('');
+    const [inputValue, setInputValue] = useState(null);
+
+    const idCounterRef = useRef(0);
 
     console.log('Mappings state:', mappings);
     console.log('initialized state:', initialized);
@@ -67,8 +73,8 @@ const RoleMappingComponent: FunctionComponent<{
                     id: `mapping-${index}`
                 }));
                 setMappings(initialMappings);
+                idCounterRef.current = initialMappings.length;
             }
-            // Don't start with empty mapping - let user add if needed
             setInitialized(true);
         }
     }, [value, initialized]);
@@ -78,30 +84,43 @@ const RoleMappingComponent: FunctionComponent<{
         console.log('updateValue called with:', newMappings);
         setMappings(newMappings);
 
-        // Filter out mappings with empty keys or null values
-        // const validMappings = newMappings.filter(m => m.key.trim() !== '' && m.value !== null);
-        const validMappings = newMappings;
-
         // Convert to dictionary
-        /*const dictionary = validMappings.reduce((acc, mapping) => {
+        const dictionary = newMappings.reduce((acc, mapping) => {
             acc[mapping.key] = mapping.value;
             return acc;
-        }, {} as Record<string, any>);*/
+        }, {} as Record<string, any>);
 
-        // console.log('calling onChange with dictionary:', dictionary);
-        // onChange(dictionary);
+        console.log('calling onChange with dictionary:', dictionary);
+        onChange(dictionary);
     };
 
     const addMapping = () => {
         console.log('Adding new mapping');
+
+        // Validate input
+        if (!inputKey.trim() || !inputValue) {
+            return;
+        }
+
+        // Check if key already exists
+        if (mappings.some(m => m.key === inputKey.trim())) {
+            alert(translate('A mapping with this remote role name already exists'));
+            return;
+        }
+
         const newMapping = {
-            key: '',
-            value: null,
-            id: `mapping-${mappings.length}`
+            key: inputKey.trim(),
+            value: inputValue,
+            id: `mapping-${++idCounterRef.current}`
         };
+
         const newMappings = [...mappings, newMapping];
         console.log('New mappings after addition:', newMappings);
         updateValue(newMappings);
+
+        // Clear input form
+        setInputKey('');
+        setInputValue(null);
     };
 
     const removeMapping = (idToRemove: string) => {
@@ -109,19 +128,7 @@ const RoleMappingComponent: FunctionComponent<{
         updateValue(newMappings);
     };
 
-    const updateMappingKey = (id: string, newKey: string) => {
-        const newMappings = mappings.map(m =>
-            m.id === id ? { ...m, key: newKey } : m
-        );
-        updateValue(newMappings);
-    };
-
-    const updateMappingValue = (id: string, newValue: any) => {
-        const newMappings = mappings.map(m =>
-            m.id === id ? { ...m, value: newValue } : m
-        );
-        updateValue(newMappings);
-    };
+    const canAddMapping = inputKey.trim() !== '' && inputValue !== null;
 
     return (
         <div className="role-mapping-container">
@@ -131,30 +138,73 @@ const RoleMappingComponent: FunctionComponent<{
                 </small>
             </div>
 
-            {mappings.length === 0 && (
-                <div className="text-muted mb-3">
-                    {translate('No role mappings configured. Click "Add Role Mapping" to create mappings.')}
+            {/* Display existing mappings (read-only) */}
+            {mappings.length > 0 && (
+                <div className="mb-4">
+                    <h6 className="mb-3">{translate('Configured Role Mappings')}</h6>
+                    {mappings.map((mapping) => (
+                        <div key={mapping.id} className="row mb-2 align-items-center">
+                            <div className="col-md-5">
+                                <div className="form-control-plaintext">
+                                    <strong>{mapping.key}</strong>
+                                </div>
+                            </div>
+
+                            <div className="col-md-1 text-center">
+                                <span className="text-muted">→</span>
+                            </div>
+
+                            <div className="col-md-5">
+                                <div className="form-control-plaintext">
+                                    {mapping.value?.description || mapping.value?.name || 'Selected Role'}
+                                </div>
+                            </div>
+
+                            <div className="col-md-1">
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-danger btn-sm"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        removeMapping(mapping.id);
+                                    }}
+                                    title={translate('Remove mapping')}
+                                >
+                                    <i className="fa fa-trash" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    <hr className="my-4" />
                 </div>
             )}
 
-            {mappings.map((mapping, index) => (
-                <div key={`rolemapper-${mapping.id}`} className="row mb-3 align-items-end">
+            {/* Input form for new mappings */}
+            <div className="mb-3">
+                <h6 className="mb-3">{translate('Add New Role Mapping')}</h6>
+                <div className="row mb-3 align-items-end">
                     <div className="col-md-5">
                         <label className="form-label small">
                             {translate('Remote Role Name')}
                         </label>
                         <input
-                            key={`input-${mapping.id}`}
                             type="text"
                             className="form-control"
                             placeholder={translate('e.g., admin, user, viewer')}
-                            value={mapping.key}
-                            onChange={(e) => updateMappingKey(mapping.id, e.target.value)}
+                            value={inputKey}
+                            onChange={(e) => setInputKey(e.target.value)}
                             onBlur={onBlur}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && canAddMapping) {
+                                    e.preventDefault();
+                                    addMapping();
+                                }
+                            }}
                         />
                     </div>
 
-                    <div key={`arrow-${mapping.id}`} className="col-md-1 text-center">
+                    <div className="col-md-1 text-center">
                         <span className="text-muted">→</span>
                     </div>
 
@@ -163,14 +213,13 @@ const RoleMappingComponent: FunctionComponent<{
                             {translate('Local Role')}
                         </label>
                         <AsyncPaginate
-                            key={`select-${mapping.id}`}
                             placeholder={translate('Select local role...')}
                             loadOptions={roleAutocomplete}
                             defaultOptions
                             getOptionValue={(option) => option.uuid}
                             getOptionLabel={(option) => option.description || option.name}
-                            value={mapping.value}
-                            onChange={(value) => updateMappingValue(mapping.id, value)}
+                            value={inputValue}
+                            onChange={(value) => setInputValue(value)}
                             onBlur={onBlur}
                             noOptionsMessage={() => translate('No roles found')}
                             isClearable={true}
@@ -181,36 +230,35 @@ const RoleMappingComponent: FunctionComponent<{
 
                     <div className="col-md-1">
                         <button
-                            key={`remove-${mapping.id}`}
                             type="button"
-                            className="btn btn-outline-danger btn-sm"
+                            className={`btn btn-sm ${canAddMapping ? 'btn-primary' : 'btn-outline-secondary'}`}
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                removeMapping(mapping.id);
+                                addMapping();
                             }}
-                            title={translate('Remove mapping')}
+                            disabled={!canAddMapping}
+                            title={translate('Add mapping')}
                         >
-                            {translate('Remove')}
+                            <i className="fa fa-plus" />
                         </button>
                     </div>
                 </div>
-            ))}
-
-            <div className="mt-3">
-                <button
-                    key="add-mapping-button"
-                    type="button"
-                    className="btn btn-outline-primary btn-sm"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addMapping();
-                    }}
-                >
-                    {translate('Add Role Mapping')}
-                </button>
             </div>
+
+            {/* Preview */}
+            {mappings.length > 0 && (
+                <div className="mt-3">
+                    <small className="text-muted">
+                        {translate('Preview')}: {JSON.stringify(
+                            mappings.reduce((acc, m) => {
+                                acc[m.key] = m.value?.name || m.value?.description || 'Selected Role';
+                                return acc;
+                            }, {} as Record<string, string>)
+                        )}
+                    </small>
+                </div>
+            )}
         </div>
     );
 };
