@@ -69,6 +69,7 @@ export const OfferingAutocompleteField: FunctionComponent<{
     validator?: any;
     noOptionsMessage?: string;
     reactSelectProps?: any;
+    isMulti?: boolean;
 }> = (props) => (
     <Field
         name={props.name}
@@ -82,13 +83,14 @@ export const OfferingAutocompleteField: FunctionComponent<{
                 defaultOptions
                 getOptionValue={(option) => option.uuid}
                 getOptionLabel={(option) => option.name}
-                value={input.value}
-                onChange={(value) => input.onChange(value)}
+                value={props.isMulti ? (input.value || []) : input.value}
+                onChange={(value) => input.onChange(props.isMulti ? (value || []) : value)}
                 onBlur={() => input.onBlur()}
                 noOptionsMessage={() =>
                     props.noOptionsMessage || translate('No public offerings')
                 }
                 isClearable={true}
+                isMulti={props.isMulti}
                 className="metronic-select-container"
                 classNamePrefix="metronic-select"
                 {...props.reactSelectProps}
@@ -124,7 +126,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                     portal: formValues.portal,
                     customer: formValues.customer,
                     shortname: formValues.shortname,
-                    offering: formValues.offering,
+                    offerings: formValues.offerings,
                     approval_limit: formValues.approval_limit,
                     max_credit_limit: formValues.max_credit_limit,
                 },
@@ -192,11 +194,15 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="offering" label={translate('Offering to use for projects in this class')}>
+                        <FormGroup controlId="offerings" label={translate('Default offerings for new projects')}>
                             <OfferingAutocompleteField
-                                placeholder={translate('Select offering')}
-                                name="offering"
-                                reactSelectProps={{ isClearable: true }}
+                                name="offerings"
+                                placeholder={translate('Select offerings')}
+                                isMulti={true}
+                                reactSelectProps={{
+                                    isClearable: true,
+                                    closeMenuOnSelect: false
+                                }}
                             />
                         </FormGroup>
 
