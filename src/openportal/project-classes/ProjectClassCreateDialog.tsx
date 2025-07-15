@@ -2,6 +2,9 @@ import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 
+import { rolesList } from 'waldur-js-client';
+import { ENV } from '@waldur/core/config';
+import { parseSelectData } from '@waldur/core/api';
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { NumberField, StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -14,6 +17,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { showErrorResponse } from '@waldur/store/notify';
+import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { organizationAutocomplete, publicOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
 
@@ -25,6 +29,55 @@ const projectClassCreate = (params) => {
 const MAX_PORTALIDENTIFIER_LENGTH = 32;
 const MAX_PROJECTCLASS_LENGTH = 128;
 const MAX_PROJECT_SHORTNAME_LENGTH = 30;
+
+const roleAutocomplete = async (query: string, prevOptions, { page }) => {
+    const response = await rolesList({
+        query: {
+            name: query,
+            page: page,
+            page_size: ENV.pageSize,
+            field: ['uuid', 'name', 'description'],
+        },
+    });
+    return returnReactSelectAsyncPaginateObject(
+        parseSelectData(response),
+        prevOptions,
+        page,
+    );
+};
+
+
+export const RoleAutocompleteField: FunctionComponent<{
+    name: string;
+    placeholder?: string;
+    validator?: any;
+    noOptionsMessage?: string;
+    reactSelectProps?: any;
+}> = (props) => (
+    <Field
+        name={props.name}
+        validate={props.validator}
+        component={({ input, meta }) => (
+            <AsyncPaginate
+                placeholder={props.placeholder || translate('Select role...')}
+                loadOptions={roleAutocomplete}
+                defaultOptions
+                getOptionValue={(option) => option.uuid}
+                getOptionLabel={(option) => option.description || option.name}
+                value={input.value}
+                onChange={(value) => input.onChange(value)}
+                onBlur={() => input.onBlur()}
+                noOptionsMessage={() =>
+                    props.noOptionsMessage || translate('No roles found')
+                }
+                isClearable={true}
+                className="metronic-select-container"
+                classNamePrefix="metronic-select"
+                {...props.reactSelectProps}
+            />
+        )}
+    />
+);
 
 export const OrganizationAutocompleteField: FunctionComponent<{
     name: string;
@@ -129,6 +182,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                     offerings: formValues.offerings,
                     approval_limit: formValues.approval_limit,
                     max_credit_limit: formValues.max_credit_limit,
+                    role: formValues.role,
                 },
             });
             showSuccess(translate('Project class has been created'));
@@ -202,6 +256,16 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                                 reactSelectProps={{
                                     isClearable: true,
                                     closeMenuOnSelect: false
+                                }}
+                            />
+                        </FormGroup>
+
+                        <FormGroup controlId="role" label={translate('Default role for users in projects of this class')}>
+                            <RoleAutocompleteField
+                                name="role"
+                                placeholder={translate('Select default role')}
+                                reactSelectProps={{
+                                    isClearable: true,
                                 }}
                             />
                         </FormGroup>
