@@ -1,3 +1,4 @@
+import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 
@@ -11,7 +12,9 @@ import { useNotify } from '@waldur/store/hooks';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
+import { AsyncPaginate } from '@waldur/form/themed-select';
 import { showErrorResponse } from '@waldur/store/notify';
+import { organizationAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
 
 const projectClassCreate = (params) => {
@@ -23,6 +26,42 @@ const MAX_PORTALIDENTIFIER_LENGTH = 32;
 const MAX_PROJECTCLASS_LENGTH = 128;
 const MAX_PROJECT_SHORTNAME_LENGTH = 30;
 
+export const OrganizationAutocompleteField: FunctionComponent<{
+    name: string;
+    placeholder?: string;
+    validator?: any;
+    noOptionsMessage?: string;
+    reactSelectProps?: any;
+}> = (props) => (
+    <Field
+        name={props.name}
+        validate={props.validator}
+        component={({ input, meta }) => (
+            <AsyncPaginate
+                placeholder={props.placeholder || translate('Select organization...')}
+                loadOptions={(query, prevOptions, { page }) =>
+                    organizationAutocomplete(query, prevOptions, page, {
+                        field: ['name', 'uuid', 'abbreviation'],
+                        o: 'name',
+                    })
+                }
+                defaultOptions
+                getOptionValue={(option) => option.uuid}
+                getOptionLabel={(option) => option.name}
+                value={input.value}
+                onChange={(value) => input.onChange(value)}
+                onBlur={() => input.onBlur()}
+                noOptionsMessage={() =>
+                    props.noOptionsMessage || translate('No organizations')
+                }
+                isClearable={true}
+                className="metronic-select-container"
+                classNamePrefix="metronic-select"
+                {...props.reactSelectProps}
+            />
+        )}
+    />
+);
 
 export const ProjectClassCreateDialog = ({ resolve }) => {
     const { showErrorResponse, showSuccess } = useNotify();
@@ -50,7 +89,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                     provider: currentCustomer,
                     name: formValues.name,
                     portal: formValues.portal,
-                    //customer: formValues.customer,
+                    customer: formValues.customer,
                     shortname: formValues.shortname,
                     approval_limit: formValues.approval_limit,
                     max_credit_limit: formValues.max_credit_limit,
@@ -98,6 +137,13 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                                 placeholder={translate('Portal identifier')}
                                 maxLength={MAX_PORTALIDENTIFIER_LENGTH}
                                 required
+                            />
+                        </FormGroup>
+
+                        <FormGroup controlId="customer" label={translate('Customer')} required>
+                            <OrganizationAutocompleteField
+                                name="customer"
+                                placeholder={translate('Select customer organisation')}
                             />
                         </FormGroup>
 
