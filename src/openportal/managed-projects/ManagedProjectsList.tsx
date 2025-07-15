@@ -153,7 +153,6 @@ export const ManagedProjectsList = () => {
             ),
             keys: ['state'],
             id: 'state',
-            optional: true,
         },
     ];
 
