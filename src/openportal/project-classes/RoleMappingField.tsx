@@ -7,6 +7,7 @@ import { parseSelectData } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
+import { showErrorResponse } from '@waldur/store/notify';
 
 
 const roleAutocomplete = async (query: string, prevOptions, { page }) => {
@@ -60,9 +61,6 @@ const RoleMappingComponent: FunctionComponent<{
 
     const idCounterRef = useRef(0);
 
-    console.log('Mappings state:', mappings);
-    console.log('initialized state:', initialized);
-
     // Initialize mappings from value only once
     useEffect(() => {
         if (!initialized) {
@@ -81,7 +79,6 @@ const RoleMappingComponent: FunctionComponent<{
 
     // Convert mappings array back to dictionary and call onChange
     const updateValue = (newMappings: Array<{ key: string; value: any; id: string }>) => {
-        console.log('updateValue called with:', newMappings);
         setMappings(newMappings);
 
         // Convert to dictionary
@@ -90,13 +87,10 @@ const RoleMappingComponent: FunctionComponent<{
             return acc;
         }, {} as Record<string, any>);
 
-        console.log('calling onChange with dictionary:', dictionary);
         onChange(dictionary);
     };
 
     const addMapping = () => {
-        console.log('Adding new mapping');
-
         // Validate input
         if (!inputKey.trim() || !inputValue) {
             return;
@@ -104,7 +98,7 @@ const RoleMappingComponent: FunctionComponent<{
 
         // Check if key already exists
         if (mappings.some(m => m.key === inputKey.trim())) {
-            alert(translate('A mapping with this remote role name already exists'));
+            showErrorResponse(null, translate('A mapping with this remote role name already exists'));
             return;
         }
 
@@ -115,7 +109,6 @@ const RoleMappingComponent: FunctionComponent<{
         };
 
         const newMappings = [...mappings, newMapping];
-        console.log('New mappings after addition:', newMappings);
         updateValue(newMappings);
 
         // Clear input form
@@ -132,16 +125,8 @@ const RoleMappingComponent: FunctionComponent<{
 
     return (
         <div className="role-mapping-container">
-            <div className="mb-2">
-                <small className="text-muted">
-                    {translate('Map remote portal role names to local roles')}
-                </small>
-            </div>
-
-            {/* Display existing mappings (read-only) */}
             {mappings.length > 0 && (
                 <div className="mb-4">
-                    <h6 className="mb-3">{translate('Configured Role Mappings')}</h6>
                     {mappings.map((mapping) => (
                         <div key={mapping.id} className="row mb-2 align-items-center">
                             <div className="col-md-5">
@@ -171,7 +156,7 @@ const RoleMappingComponent: FunctionComponent<{
                                     }}
                                     title={translate('Remove mapping')}
                                 >
-                                    <i className="fa fa-trash" />
+                                    {translate('Remove')}
                                 </button>
                             </div>
                         </div>
@@ -182,7 +167,6 @@ const RoleMappingComponent: FunctionComponent<{
 
             {/* Input form for new mappings */}
             <div className="mb-3">
-                <h6 className="mb-3">{translate('Add New Role Mapping')}</h6>
                 <div className="row mb-3 align-items-end">
                     <div className="col-md-5">
                         <label className="form-label small">
@@ -202,10 +186,6 @@ const RoleMappingComponent: FunctionComponent<{
                                 }
                             }}
                         />
-                    </div>
-
-                    <div className="col-md-1 text-center">
-                        <span className="text-muted">→</span>
                     </div>
 
                     <div className="col-md-5">
@@ -240,25 +220,11 @@ const RoleMappingComponent: FunctionComponent<{
                             disabled={!canAddMapping}
                             title={translate('Add mapping')}
                         >
-                            <i className="fa fa-plus" />
+                            {translate('Add')}
                         </button>
                     </div>
                 </div>
             </div>
-
-            {/* Preview */}
-            {mappings.length > 0 && (
-                <div className="mt-3">
-                    <small className="text-muted">
-                        {translate('Preview')}: {JSON.stringify(
-                            mappings.reduce((acc, m) => {
-                                acc[m.key] = m.value?.name || m.value?.description || 'Selected Role';
-                                return acc;
-                            }, {} as Record<string, string>)
-                        )}
-                    </small>
-                </div>
-            )}
         </div>
     );
 };
