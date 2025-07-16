@@ -124,6 +124,7 @@ const RoleMappingComponent: FunctionComponent<{
         };
 
         newMappings = [newMapping, ...newMappings];
+
         updateValue(newMappings);
 
         // Clear input form
@@ -211,7 +212,7 @@ const RoleMappingComponent: FunctionComponent<{
                             placeholder={translate('Select local role...')}
                             loadOptions={loadRoleOptions}
                             defaultOptions
-                            getOptionValue={(option) => option.uuid}
+                            getOptionValue={(option) => option}
                             getOptionLabel={(option) => option.description || option.name}
                             value={inputValue}
                             onChange={(value) => setInputValue(value)}

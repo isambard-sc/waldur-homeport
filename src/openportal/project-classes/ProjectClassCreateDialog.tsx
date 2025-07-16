@@ -35,28 +35,17 @@ const getCustomerURL = (customer) => {
 }
 
 const projectClassCreate = async (params) => {
-    console.log('Creating project class with params:', params);
-
-    // turn the role mapping into a dictionary of names to role UUIDs
-    if (params.body?.role_mapping) {
-        params.body.role_mapping = Object.fromEntries(
-            Object.entries(params.body.role_mapping).map(([name, role]) => [name, role.url]),
-        );
-    }
-
     const data = {
         provider: getCustomerURL(params.body?.provider),
         name: params.body?.name,
         portal: params.body?.portal,
         customer: getCustomerURL(params.body?.customer),
         shortname: params.body?.shortname,
-        offerings: params.body?.offerings?.map((offering) => offering.url),
+        offerings: params.body?.offerings?.map((offering) => offering.url) || [],
         approval_limit: params.body?.approval_limit,
         max_credit_limit: params.body?.max_credit_limit,
-        role_mapping: params.body?.role_mapping,
+        role_mapping: params.body?.role_mapping || {},
     };
-
-    console.log('Posting data:', data);
 
     await post('/openportal-project-class/', data);
 
