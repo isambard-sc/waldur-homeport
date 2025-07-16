@@ -1,4 +1,3 @@
-import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 
@@ -12,11 +11,11 @@ import { useNotify } from '@waldur/store/hooks';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { AsyncPaginate } from '@waldur/form/themed-select';
 import { showErrorResponse } from '@waldur/store/notify';
-import { organizationAutocomplete, publicOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
 import { RoleMappingField } from './RoleMappingField';
+import { OrganizationAutocompleteField } from './OrganizationAutocompleteField';
+import { OfferingAutocompleteField } from './OfferingAutocompleteField';
 
 const projectClassCreate = (params) => {
     console.log('Creating project class with params:', params);
@@ -26,80 +25,6 @@ const projectClassCreate = (params) => {
 const MAX_PORTALIDENTIFIER_LENGTH = 32;
 const MAX_PROJECTCLASS_LENGTH = 128;
 const MAX_PROJECT_SHORTNAME_LENGTH = 30;
-
-
-export const OrganizationAutocompleteField: FunctionComponent<{
-    name: string;
-    placeholder?: string;
-    validator?: any;
-    noOptionsMessage?: string;
-    reactSelectProps?: any;
-}> = (props) => (
-    <Field
-        name={props.name}
-        validate={props.validator}
-        component={({ input, meta }) => (
-            <AsyncPaginate
-                placeholder={props.placeholder || translate('Select organization...')}
-                loadOptions={(query, prevOptions, { page }) =>
-                    organizationAutocomplete(query, prevOptions, page, {
-                        field: ['name', 'uuid', 'abbreviation'],
-                        o: 'name',
-                    })
-                }
-                defaultOptions
-                getOptionValue={(option) => option.uuid}
-                getOptionLabel={(option) => option.name}
-                value={input.value}
-                onChange={(value) => input.onChange(value)}
-                onBlur={() => input.onBlur()}
-                noOptionsMessage={() =>
-                    props.noOptionsMessage || translate('No organizations')
-                }
-                isClearable={true}
-                className="metronic-select-container"
-                classNamePrefix="metronic-select"
-                {...props.reactSelectProps}
-            />
-        )}
-    />
-);
-
-export const OfferingAutocompleteField: FunctionComponent<{
-    name: string;
-    placeholder?: string;
-    validator?: any;
-    noOptionsMessage?: string;
-    reactSelectProps?: any;
-    isMulti?: boolean;
-}> = (props) => (
-    <Field
-        name={props.name}
-        validate={props.validator}
-        component={({ input, meta }) => (
-            <AsyncPaginate
-                placeholder={props.placeholder || translate('Select offering...')}
-                loadOptions={(query, prevOptions, { currentPage }) =>
-                    publicOfferingsAutocomplete(query, prevOptions, currentPage)
-                }
-                defaultOptions
-                getOptionValue={(option) => option.uuid}
-                getOptionLabel={(option) => option.name}
-                value={props.isMulti ? (input.value || []) : input.value}
-                onChange={(value) => input.onChange(props.isMulti ? (value || []) : value)}
-                onBlur={() => input.onBlur()}
-                noOptionsMessage={() =>
-                    props.noOptionsMessage || translate('No public offerings')
-                }
-                isClearable={true}
-                isMulti={props.isMulti}
-                className="metronic-select-container"
-                classNamePrefix="metronic-select"
-                {...props.reactSelectProps}
-            />
-        )}
-    />
-);
 
 
 export const ProjectClassCreateDialog = ({ resolve }) => {

@@ -1,5 +1,6 @@
-import React, { useState, useEffect, FunctionComponent, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, FunctionComponent, useRef } from 'react';
 import { Field } from 'react-final-form';
+import { debounce } from 'lodash';
 
 import { rolesList } from 'waldur-js-client';
 import { ENV } from '@waldur/core/config';
@@ -7,7 +8,6 @@ import { parseSelectData } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
-import { showErrorResponse } from '@waldur/store/notify';
 
 
 const roleAutocomplete = async (query: string, prevOptions, { page }) => {
@@ -50,18 +50,35 @@ const RoleMappingComponent: FunctionComponent<{
     onChange: (value: Record<string, any>) => void;
     onBlur: () => void;
     placeholder?: string;
-}> = ({ value = {}, onChange, onBlur, placeholder }) => {
-    // Stored mappings (read-only display)
+    debounceMs?: number;
+}> = ({ value = {}, onChange, onBlur, placeholder, debounceMs }) => {
     const [mappings, setMappings] = useState<Array<{ key: string; value: any; id: string }>>([]);
     const [initialized, setInitialized] = useState(false);
 
-    // Input form state (editable)
     const [inputKey, setInputKey] = useState('');
     const [inputValue, setInputValue] = useState(null);
 
     const idCounterRef = useRef(0);
 
-    // Initialize mappings from value only once
+    const debouncedRoleAutocomplete = useMemo(
+        () => debounce(
+            (query: string, prevOptions: any, page: { page: number }, resolve: Function) => {
+                roleAutocomplete(query, prevOptions, page).then(resolve);
+            },
+            debounceMs || 1000
+        ),
+        [debounceMs]
+    );
+
+    const loadRoleOptions = useCallback(
+        (query: string, prevOptions: any, { page }: { page: number }) => {
+            return new Promise((resolve) => {
+                debouncedRoleAutocomplete(query, prevOptions, page, resolve);
+            });
+        },
+        [debouncedRoleAutocomplete]
+    );
+
     useEffect(() => {
         if (!initialized) {
             if (value && Object.keys(value).length > 0) {
@@ -77,11 +94,9 @@ const RoleMappingComponent: FunctionComponent<{
         }
     }, [value, initialized]);
 
-    // Convert mappings array back to dictionary and call onChange
     const updateValue = (newMappings: Array<{ key: string; value: any; id: string }>) => {
         setMappings(newMappings);
 
-        // Convert to dictionary
         const dictionary = newMappings.reduce((acc, mapping) => {
             acc[mapping.key] = mapping.value;
             return acc;
@@ -91,15 +106,15 @@ const RoleMappingComponent: FunctionComponent<{
     };
 
     const addMapping = () => {
-        // Validate input
         if (!inputKey.trim() || !inputValue) {
             return;
         }
 
-        // Check if key already exists
+        let newMappings = [...mappings];
+
+        // Check if key already exists - if it does, remove it
         if (mappings.some(m => m.key === inputKey.trim())) {
-            showErrorResponse(null, translate('A mapping with this remote role name already exists'));
-            return;
+            newMappings = mappings.filter(m => m.key !== inputKey.trim());
         }
 
         const newMapping = {
@@ -108,7 +123,7 @@ const RoleMappingComponent: FunctionComponent<{
             id: `mapping-${++idCounterRef.current}`
         };
 
-        const newMappings = [...mappings, newMapping];
+        newMappings = [newMapping, ...newMappings];
         updateValue(newMappings);
 
         // Clear input form
@@ -194,7 +209,7 @@ const RoleMappingComponent: FunctionComponent<{
                         </label>
                         <AsyncPaginate
                             placeholder={translate('Select local role...')}
-                            loadOptions={roleAutocomplete}
+                            loadOptions={loadRoleOptions}
                             defaultOptions
                             getOptionValue={(option) => option.uuid}
                             getOptionLabel={(option) => option.description || option.name}
