@@ -4,7 +4,7 @@ import { getToken } from '@waldur/auth/TokenStorage';
 import { client } from 'waldur-js-client/client.gen';
 
 
-const fixURL = (endpoint: string) =>
+export const fixURL = (endpoint: string) =>
     endpoint.startsWith('http')
         ? endpoint
         : `${ENV.apiEndpoint}${endpoint.startsWith('/api') ? '' : 'api'}${endpoint}`;
@@ -34,8 +34,6 @@ export async function post(endpoint: string, data?: object) {
 export const deleteProjectClass = async (path: {
     uuid: string;
 }) => {
-    console.log('Deleting project class with params:', path);
-
     client.delete({
         url: `/api/openportal-project-class/${path.uuid}/`,
         path,
