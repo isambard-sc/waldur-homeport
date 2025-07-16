@@ -1,14 +1,17 @@
 import { Field, Form } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
 import { NumberField, StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
-import { closeModalDialog } from '@waldur/modal/actions';
+import { getCustomer, getUser } from '@waldur/workspace/selectors';
+import { PermissionEnum } from '@waldur/permissions/enums';
+import { hasPermission } from '@waldur/permissions/hasPermission';
+import { useModal } from '@waldur/modal/hooks';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { useNotify } from '@waldur/store/hooks';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 
 import { RoleMappingField } from './RoleMappingField';
@@ -42,7 +45,27 @@ interface ProjectClassEditDialogOwnProps {
 export const ProjectClassEditDialog = ({
   resolve,
 }: ProjectClassEditDialogOwnProps) => {
-  const dispatch = useDispatch();
+  const { showErrorResponse, showSuccess } = useNotify();
+  const { closeDialog } = useModal();
+
+  const currentCustomer = useSelector(getCustomer);
+  const user = useSelector(getUser);
+
+  const canEditCustomer = hasPermission(user, {
+    permission: PermissionEnum.UPDATE_CUSTOMER,
+    customerId: currentCustomer.uuid,
+  });
+
+  if (!canEditCustomer) {
+    return (
+      <ModalDialog title={translate('Edit project class')}>
+        <div className="text-danger">
+          {translate('You do not have permission to edit this project class.')}
+        </div>
+      </ModalDialog>
+    );
+  }
+
   const [projectClass, setProjectClass] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,6 +121,7 @@ export const ProjectClassEditDialog = ({
       await projectClassPartialUpdate({
         path: { uuid: formValues.uuid },
         body: {
+          provider: currentCustomer,
           name: formValues.name,
           portal: formValues.portal,
           customer: formValues.customer,
@@ -108,9 +132,9 @@ export const ProjectClassEditDialog = ({
           role_mapping: formValues.role_mapping,
         },
       });
+      showSuccess(translate('Project class has been updated'));
+      closeDialog();
       await resolve.refetch();
-      dispatch(showSuccess(translate('Project class was updated')));
-      dispatch(closeModalDialog());
     } catch (error) {
       showErrorResponse(error, translate('Unable to update the project class.'));
     }

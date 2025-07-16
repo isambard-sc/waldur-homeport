@@ -40,8 +40,13 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
     });
 
     if (!canEditCustomer) {
-        showErrorResponse(null, translate('You do not have permission to create a project class.'));
-        return null;
+        return (
+            <ModalDialog title={translate('Create project class')}>
+                <div className="text-danger">
+                    {translate('You do not have permission to create a project class.')}
+                </div>
+            </ModalDialog>
+        );
     }
 
     const onSubmit = async (formValues) => {
