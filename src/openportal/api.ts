@@ -1,6 +1,7 @@
 
 import { ENV } from '@waldur/core/config';
 import { getToken } from '@waldur/auth/TokenStorage';
+import { client } from 'waldur-js-client/client.gen';
 
 
 const fixURL = (endpoint: string) =>
@@ -27,4 +28,22 @@ export async function post(endpoint: string, data?: object) {
             throw new Error(`Failed call: ${response.text()}`);
         }
     }
+}
+
+
+export const deleteProjectClass = async (path: {
+    uuid: string;
+}) => {
+    console.log('Deleting project class with params:', path);
+
+    client.delete({
+        url: `/api/openportal-project-class/${path.uuid}/`,
+        path,
+        security: [
+            {
+                name: 'Authorization',
+                type: 'apiKey',
+            },
+        ],
+    });
 }
