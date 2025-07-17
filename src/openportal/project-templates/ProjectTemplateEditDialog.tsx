@@ -21,30 +21,30 @@ import { OfferingAutocompleteField } from './OfferingAutocompleteField';
 import { get } from '@waldur/core/api';
 
 const projectClassPartialUpdate = (params) => {
-  console.log('Updating project class with params:', params);
+  console.log('Updating project template with params:', params);
   return null;
 }
 
 const projectClassGet = async (uuid) => {
-  console.log('Fetching project class with uuid:', uuid);
+  console.log('Fetching project template with uuid:', uuid);
 
-  return await get(`/openportal-project-class/${uuid}/`);
+  return await get(`/openportal-project-template/${uuid}/`);
 }
 
 const MAX_PORTALIDENTIFIER_LENGTH = 32;
 const MAX_PROJECTCLASS_LENGTH = 128;
 const MAX_PROJECT_SHORTNAME_LENGTH = 30;
 
-interface ProjectClassEditDialogOwnProps {
+interface ProjectTemplateEditDialogOwnProps {
   resolve: {
     initialValues;
     refetch(): void;
   };
 }
 
-export const ProjectClassEditDialog = ({
+export const ProjectTemplateEditDialog = ({
   resolve,
-}: ProjectClassEditDialogOwnProps) => {
+}: ProjectTemplateEditDialogOwnProps) => {
   const { showErrorResponse, showSuccess } = useNotify();
   const { closeDialog } = useModal();
 
@@ -58,25 +58,25 @@ export const ProjectClassEditDialog = ({
 
   if (!canEditCustomer) {
     return (
-      <ModalDialog title={translate('Edit project class')}>
+      <ModalDialog title={translate('Edit project template')}>
         <div className="text-danger">
-          {translate('You do not have permission to edit this project class.')}
+          {translate('You do not have permission to edit this project template.')}
         </div>
       </ModalDialog>
     );
   }
 
-  const [projectClass, setProjectClass] = useState(null);
+  const [projectClass, setProjectTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchProjectClass = async () => {
+    const fetchProjectTemplate = async () => {
       try {
         setLoading(true);
         const data = await projectClassGet(resolve.initialValues.uuid);
         if (!data) {
-          throw new Error(translate('Project class not found.'));
+          throw new Error(translate('Project template not found.'));
         }
 
         data.customer = data.customer_data;
@@ -84,23 +84,23 @@ export const ProjectClassEditDialog = ({
         data.offerings = data.offerings_data || [];
         data.role_mapping = data.role_mapping_data || {};
 
-        console.log('Fetched project class:', data);
+        console.log('Fetched project template:', data);
 
-        setProjectClass(data);
+        setProjectTemplate(data);
       } catch (err) {
         setError(err);
-        showErrorResponse(err, translate('Unable to fetch project class details.'));
+        showErrorResponse(err, translate('Unable to fetch project template details.'));
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProjectClass();
+    fetchProjectTemplate();
   }, [resolve.initialValues.uuid]);
 
   if (loading) {
     return (
-      <ModalDialog title={translate('Edit project class')}>
+      <ModalDialog title={translate('Edit project template')}>
         <LoadingSpinner />
       </ModalDialog>
     );
@@ -108,9 +108,9 @@ export const ProjectClassEditDialog = ({
 
   if (error || !projectClass) {
     return (
-      <ModalDialog title={translate('Edit project class')}>
+      <ModalDialog title={translate('Edit project template')}>
         <div className="text-danger">
-          {translate('Error loading project class details.')}
+          {translate('Error loading project template details.')}
         </div>
       </ModalDialog>
     );
@@ -132,11 +132,11 @@ export const ProjectClassEditDialog = ({
           role_mapping: formValues.role_mapping,
         },
       });
-      showSuccess(translate('Project class has been updated'));
+      showSuccess(translate('Project template has been updated'));
       closeDialog();
       await resolve.refetch();
     } catch (error) {
-      showErrorResponse(error, translate('Unable to update the project class.'));
+      showErrorResponse(error, translate('Unable to update the project template.'));
     }
   };
 
@@ -147,7 +147,7 @@ export const ProjectClassEditDialog = ({
       render={({ handleSubmit, submitting, invalid }) => (
         <form onSubmit={handleSubmit}>
           <ModalDialog
-            title={translate('Edit project class')}
+            title={translate('Edit project template')}
             footer={
               <div className="mb-5 text-end">
                 <SubmitButton
@@ -158,11 +158,11 @@ export const ProjectClassEditDialog = ({
               </div>
             }
           >
-            <FormGroup controlId="name" label={translate('Name of project class')} required>
+            <FormGroup controlId="name" label={translate('Name of project template')} required>
               <Field
                 name="name"
                 component={StringField as any}
-                placeholder={translate('e.g., my-project-class')}
+                placeholder={translate('e.g., my-project-template')}
                 maxLength={MAX_PROJECTCLASS_LENGTH}
                 required
               />

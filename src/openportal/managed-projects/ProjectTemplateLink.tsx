@@ -9,7 +9,7 @@ interface OwnProps {
     asButton?: boolean;
 }
 
-export const ProjectClassLink: FC<PropsWithChildren<OwnProps>> = ({
+export const ProjectTemplateLink: FC<PropsWithChildren<OwnProps>> = ({
     uuid,
     onClick,
     className,

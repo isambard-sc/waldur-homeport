@@ -16,7 +16,7 @@ export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
                     <strong>Project Name:</strong> {props.row.details.name || 'No name assigned.'}
                 </div>
                 <div>
-                    <strong>Project Class:</strong> {props.row.details.class || 'No class assigned.'}
+                    <strong>Project Template:</strong> {props.row.details.class || 'No class assigned.'}
                 </div>
                 <div>
                     <strong>Description:</strong> {props.row.details.description || 'No description provided.'}

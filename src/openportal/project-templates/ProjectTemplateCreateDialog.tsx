@@ -47,7 +47,7 @@ const projectClassCreate = async (params) => {
         role_mapping: params.body?.role_mapping || {},
     };
 
-    await post('/openportal-project-class/', data);
+    await post('/openportal-project-template/', data);
 
     return null;
 }
@@ -57,7 +57,7 @@ const MAX_PROJECTCLASS_LENGTH = 128;
 const MAX_PROJECT_SHORTNAME_LENGTH = 30;
 
 
-export const ProjectClassCreateDialog = ({ resolve }) => {
+export const ProjectTemplateCreateDialog = ({ resolve }) => {
     const { showErrorResponse, showSuccess } = useNotify();
     const { closeDialog } = useModal();
 
@@ -71,9 +71,9 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
 
     if (!canEditCustomer) {
         return (
-            <ModalDialog title={translate('Create project class')}>
+            <ModalDialog title={translate('Create project template')}>
                 <div className="text-danger">
-                    {translate('You do not have permission to create a project class.')}
+                    {translate('You do not have permission to create a project template.')}
                 </div>
             </ModalDialog>
         );
@@ -94,11 +94,11 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                     role_mapping: formValues.role_mapping,
                 },
             });
-            showSuccess(translate('Project class has been created'));
+            showSuccess(translate('Project template has been created'));
             closeDialog();
             await resolve.refetch();
         } catch (error) {
-            showErrorResponse(error, translate('Unable to create the project class.'));
+            showErrorResponse(error, translate('Unable to create the project template.'));
         }
     };
 
@@ -108,7 +108,7 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
             render={({ handleSubmit, submitting, invalid }) => (
                 <form onSubmit={handleSubmit}>
                     <ModalDialog
-                        title={translate('Create a project class')}
+                        title={translate('Create a project template')}
                         footer={
                             <div className="mb-5 text-end">
                                 <SubmitButton
@@ -119,11 +119,11 @@ export const ProjectClassCreateDialog = ({ resolve }) => {
                             </div>
                         }
                     >
-                        <FormGroup controlId="name" label={translate('Name of project class')} required>
+                        <FormGroup controlId="name" label={translate('Name of project template')} required>
                             <Field
                                 name="name"
                                 component={StringField as any}
-                                placeholder={translate('e.g., my-project-class')}
+                                placeholder={translate('e.g., my-project-template')}
                                 maxLength={MAX_PROJECTCLASS_LENGTH}
                                 required
                             />

@@ -1,10 +1,10 @@
 import { FC } from 'react';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
-import { ProjectClass } from '../types';
+import { ProjectTemplate } from '../types';
 
 interface OwnProps {
-    row: ProjectClass;
+    row: ProjectTemplate;
 }
 
 const stringify = (value: any) => {
@@ -46,7 +46,7 @@ const stringify_offerings = (offerings: any[]) => {
     )).reduce((prev, curr) => [prev, ', ', curr]);
 }
 
-export const ProjectClassExpandableRow: FC<OwnProps> = (props) => {
+export const ProjectTemplateExpandableRow: FC<OwnProps> = (props) => {
     const project = props.row;
 
     if (!project) {

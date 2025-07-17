@@ -31,11 +31,11 @@ export async function post(endpoint: string, data?: object) {
 }
 
 
-export const deleteProjectClass = async (path: {
+export const deleteProjectTemplate = async (path: {
     uuid: string;
 }) => {
     client.delete({
-        url: `/api/openportal-project-class/${path.uuid}/`,
+        url: `/api/openportal-project-template/${path.uuid}/`,
         path,
         security: [
             {

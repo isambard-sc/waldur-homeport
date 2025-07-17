@@ -5,19 +5,19 @@ import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ProjectClassCreateDialog = lazyComponent(() =>
-  import('./ProjectClassCreateDialog').then((module) => ({
-    default: module.ProjectClassCreateDialog,
+const ProjectTemplateCreateDialog = lazyComponent(() =>
+  import('./ProjectTemplateCreateDialog').then((module) => ({
+    default: module.ProjectTemplateCreateDialog,
   })),
 );
 
-export const ProjectClassCreateButton: FunctionComponent<{ refetch }> = ({
+export const ProjectTemplateCreateButton: FunctionComponent<{ refetch }> = ({
   refetch,
 }) => {
   const dispatch = useDispatch();
   const callback = () =>
     dispatch(
-      openModalDialog(ProjectClassCreateDialog, {
+      openModalDialog(ProjectTemplateCreateDialog, {
         dialogClassName: 'modal-dialog-centered',
         resolve: {
           refetch,

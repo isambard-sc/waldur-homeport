@@ -15,7 +15,7 @@ import { isEmpty } from '@waldur/core/utils';
 
 import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
 import { ManagedProjectLink } from './ManagedProjectLink';
-import { ProjectClassLink } from './ProjectClassLink';
+import { ProjectTemplateLink } from './ProjectTemplateLink';
 import { ManagedProjectActions } from './ManagedProjectActions';
 
 import { ManagedProjectsFilter } from './ManagedProjectsFilter';
@@ -65,8 +65,8 @@ export const ManagedProjectsList = () => {
         console.log('Clicked on project:', row);
     };
 
-    const onClickProjectClassDetails = (row: any) => {
-        console.log('Clicked on project class:', row);
+    const onClickProjectTemplateDetails = (row: any) => {
+        console.log('Clicked on project template:', row);
     };
 
     const columns: Array<Column> = [
@@ -82,12 +82,12 @@ export const ManagedProjectsList = () => {
             id: 'managedproject',
         },
         {
-            title: translate('Project Class'),
+            title: translate('Project Template'),
             orderField: 'row.details.class',
             render: ({ row }) => (
-                <ProjectClassLink uuid={row.details.class} onClick={() => onClickProjectClassDetails(row.details.class)}>
+                <ProjectTemplateLink uuid={row.details.class} onClick={() => onClickProjectTemplateDetails(row.details.class)}>
                     {row.details.class}
-                </ProjectClassLink>
+                </ProjectTemplateLink>
             ),
             keys: ['class'],
             id: 'projectclass',

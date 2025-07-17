@@ -7,16 +7,16 @@ import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
 
-import { ProjectClassCreateButton } from './ProjectClassCreateButton';
-import { ProjectClassDeleteButton } from './ProjectClassDeleteButton';
-import { ProjectClassEditButton } from './ProjectClassEditButton';
-import { ProjectClassExpandableRow } from './ProjectClassExpandableRow';
+import { ProjectTemplateCreateButton } from './ProjectTemplateCreateButton';
+import { ProjectTemplateDeleteButton } from './ProjectTemplateDeleteButton';
+import { ProjectTemplateEditButton } from './ProjectTemplateEditButton';
+import { ProjectTemplateExpandableRow } from './ProjectTemplateExpandableRow';
 
-const ProjectClassRowActions = ({ row, fetch }) => (
+const ProjectTemplateRowActions = ({ row, fetch }) => (
   <ActionsDropdown
     row={row}
     refetch={fetch}
-    actions={[ProjectClassEditButton, ProjectClassDeleteButton].filter(
+    actions={[ProjectTemplateEditButton, ProjectTemplateDeleteButton].filter(
       Boolean,
     )}
   />
@@ -31,10 +31,10 @@ const stringify_customer = (customer: any) => {
   return <a key={customer.uuid} href={url} target="_blank" rel="noopener noreferrer">{customer.display_name}</a>;
 }
 
-export const ProjectClassList: FunctionComponent<{}> = () => {
+export const ProjectTemplateList: FunctionComponent<{}> = () => {
   const props = useTable({
-    table: 'project-class',
-    fetchData: createFetcher('openportal-project-class'),
+    table: 'project-template',
+    fetchData: createFetcher('openportal-project-template'),
   });
   return (
     <Table
@@ -57,10 +57,10 @@ export const ProjectClassList: FunctionComponent<{}> = () => {
           render: ({ row }) => renderFieldOrDash(row.shortname),
         },
       ]}
-      verboseName={translate('project classes')}
-      rowActions={ProjectClassRowActions}
-      expandableRow={ProjectClassExpandableRow}
-      tableActions={<ProjectClassCreateButton refetch={props.fetch} />}
+      verboseName={translate('project templatees')}
+      rowActions={ProjectTemplateRowActions}
+      expandableRow={ProjectTemplateExpandableRow}
+      tableActions={<ProjectTemplateCreateButton refetch={props.fetch} />}
     />
   );
 };

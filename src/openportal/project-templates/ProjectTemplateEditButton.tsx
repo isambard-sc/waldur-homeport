@@ -4,17 +4,17 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
 
-const ProjectClassEditDialog = lazyComponent(() =>
-  import('./ProjectClassEditDialog').then((module) => ({
-    default: module.ProjectClassEditDialog,
+const ProjectTemplateEditDialog = lazyComponent(() =>
+  import('./ProjectTemplateEditDialog').then((module) => ({
+    default: module.ProjectTemplateEditDialog,
   })),
 );
 
-export const ProjectClassEditButton = ({ row, refetch }) => {
+export const ProjectTemplateEditButton = ({ row, refetch }) => {
   const dispatch = useDispatch();
   const callback = () =>
     dispatch(
-      openModalDialog(ProjectClassEditDialog, {
+      openModalDialog(ProjectTemplateEditDialog, {
         resolve: {
           initialValues: {
             uuid: row.uuid,

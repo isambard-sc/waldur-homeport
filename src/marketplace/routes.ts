@@ -580,17 +580,17 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'marketplace-provider-project-classes',
-    url: 'project-classes/',
+    name: 'marketplace-provider-project-templates',
+    url: 'project-templates/',
     component: lazyComponent(() =>
-      import('@waldur/openportal/project-classes/ProjectClassList').then(
-        (module) => ({ default: module.ProjectClassList }),
+      import('@waldur/openportal/project-templates/ProjectTemplateList').then(
+        (module) => ({ default: module.ProjectTemplateList }),
       ),
     ),
     parent: 'managed-projects',
     data: {
       //feature: MarketplaceFeatures.show_managed_project_functionality,
-      breadcrumb: () => translate('Available managed project classes'),
+      breadcrumb: () => translate('Available managed project templatees'),
     },
   },
 

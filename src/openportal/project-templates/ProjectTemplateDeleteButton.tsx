@@ -8,9 +8,9 @@ import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { deleteProjectClass } from '../api';
+import { deleteProjectTemplate } from '../api';
 
-export const ProjectClassDeleteButton: FC<{ row; refetch }> = ({
+export const ProjectTemplateDeleteButton: FC<{ row; refetch }> = ({
   row,
   refetch,
 }) => {
@@ -20,20 +20,20 @@ export const ProjectClassDeleteButton: FC<{ row; refetch }> = ({
     try {
       await waitForConfirmation(
         dispatch,
-        translate('Delete project class'),
-        translate('Are you sure you would like to delete this project class?'),
+        translate('Delete project template'),
+        translate('Are you sure you would like to delete this project template?'),
         { forDeletion: true },
       );
     } catch {
       return;
     }
     try {
-      await deleteProjectClass({ uuid: row.uuid });
+      await deleteProjectTemplate({ uuid: row.uuid });
       await refetch();
-      dispatch(showSuccess(translate('Project class has been deleted.')));
+      dispatch(showSuccess(translate('Project template has been deleted.')));
     } catch (e) {
       dispatch(
-        showErrorResponse(e, translate('Unable to delete this project class.')),
+        showErrorResponse(e, translate('Unable to delete this project template.')),
       );
     }
   };
