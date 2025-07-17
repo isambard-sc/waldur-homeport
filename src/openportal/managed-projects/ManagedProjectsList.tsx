@@ -14,8 +14,6 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 import { isEmpty } from '@waldur/core/utils';
 
 import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
-import { ManagedProjectLink } from './ManagedProjectLink';
-import { ProjectTemplateLink } from './ProjectTemplateLink';
 import { ManagedProjectActions } from './ManagedProjectActions';
 
 import { ManagedProjectsFilter } from './ManagedProjectsFilter';
