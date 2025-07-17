@@ -187,14 +187,14 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="max_credit_limit" label={translate('Maximum credit request limit for projects in this class')}>
+                        <FormGroup controlId="max_credit_limit" label={translate('Maximum credit request limit for projects using this template')}>
                             <Field
                                 name="max_credit_limit"
                                 component={NumberField as any}
                                 placeholder={translate('e.g., 10000.00')}
                                 step="0.01"
                                 min="0"
-                                help={translate('Maximum credit limit for projects in this class. Requests beyond this are automatically rejected. Leave empty for no maximum limit, set to 0 to prevent project creation.')}
+                                help={translate('Maximum credit limit for projects using this template. Requests beyond this are automatically rejected. Leave empty for no maximum limit, set to 0 to prevent project creation.')}
                             />
                         </FormGroup>
                     </ModalDialog>

@@ -590,7 +590,7 @@ export const states: StateDeclaration[] = [
     parent: 'managed-projects',
     data: {
       //feature: MarketplaceFeatures.show_managed_project_functionality,
-      breadcrumb: () => translate('Available managed project templatees'),
+      breadcrumb: () => translate('Available managed project project-templates'),
     },
   },
 

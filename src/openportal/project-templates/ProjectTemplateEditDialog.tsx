@@ -82,7 +82,7 @@ export const ProjectTemplateEditDialog = ({
         data.customer = data.customer_data;
         data.provider = data.provider_data;
         data.offerings = data.offerings_data || [];
-        data.role_mapping = data.role_mapping_data || {};
+        // data.role_mapping = data.role_mapping_data || {};
 
         console.log('Fetched project template:', data);
 
@@ -226,14 +226,14 @@ export const ProjectTemplateEditDialog = ({
               />
             </FormGroup>
 
-            <FormGroup controlId="max_credit_limit" label={translate('Maximum credit request limit for projects in this class')}>
+            <FormGroup controlId="max_credit_limit" label={translate('Maximum credit request limit for projects using this template')}>
               <Field
                 name="max_credit_limit"
                 component={NumberField as any}
                 placeholder={translate('e.g., 10000.00')}
                 step="0.01"
                 min="0"
-                help={translate('Maximum credit limit for projects in this class. Requests beyond this are automatically rejected. Leave empty for no maximum limit, set to 0 to prevent project creation.')}
+                help={translate('Maximum credit limit for projects using this template. Requests beyond this are automatically rejected. Leave empty for no maximum limit, set to 0 to prevent project creation.')}
               />
             </FormGroup>
           </ModalDialog>
