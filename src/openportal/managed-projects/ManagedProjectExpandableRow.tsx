@@ -8,17 +8,35 @@ interface OwnProps {
     row: ManagedProject;
 }
 
-const renderProjectLink = (project: any) => {
-    if (!project) {
-        return 'No project assigned.';
+const renderProjectLink = (row: any) => {
+    if (row.project_data) {
+        const project = row.project_data;
+        return <a href={`/projects/${project.uuid}/`}>{project.name || 'Unnamed Project'}</a>;
     }
-    return (<a href={`/projects/${project.uuid}`}>{project.name || 'Unnamed Project'}</a>);
+
+    if (row.project) {
+        const project = row.project;
+        return project;
+    }
+
+    return 'No project assigned';
 };
 
+const renderProjectTemplateLink = (row: any) => {
+    if (row.project_template_data) {
+        const template = row.project_template_data;
+        return template.name;
+    }
+
+    if (row.project_template) {
+        const template = row.project_template;
+        return template;
+    }
+
+    return 'No project template assigned';
+};
 
 export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
-    console.log('Expandable row data:', props.row);
-
     return (
         <ExpandableContainer>
             <div className="overflow-auto" unmountOnExit={true}>
@@ -26,11 +44,10 @@ export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
                     <strong>Project Name:</strong> {props.row.details.name || 'No name assigned.'}
                 </div>
                 <div>
-                    <strong>Project:</strong>
-                    {renderProjectLink(props.row.project_data)}
+                    <strong>Project:</strong> {renderProjectLink(props.row)}
                 </div>
                 <div>
-                    <strong>Project Template:</strong> {props.row.details.class || 'No class assigned.'}
+                    <strong>Project Template:</strong> {renderProjectTemplateLink(props.row)}
                 </div>
                 <div>
                     <strong>Description:</strong> {props.row.details.description || 'No description provided.'}

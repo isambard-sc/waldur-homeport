@@ -47,6 +47,18 @@ const mapStateToFilter = createSelector(
     },
 );
 
+const renderProjectTemplate = (row: any) => {
+    if (row.project_template_data) {
+        return row.project_template_data.name;
+    }
+
+    if (row.details.template) {
+        return row.details.template;
+    }
+
+    return renderFieldOrDash(row.details.class);
+}
+
 
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
@@ -72,7 +84,7 @@ export const ManagedProjectsList = () => {
         {
             title: translate('Project Template'),
             orderField: 'row.details.class',
-            render: ({ row }) => renderFieldOrDash(row.details.class),
+            render: ({ row }) => renderProjectTemplate(row),
             keys: ['project-template'],
             id: 'project-template',
         },
