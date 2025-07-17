@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 
 import { translate } from '@waldur/i18n';
 import { AsyncPaginate } from '@waldur/form/themed-select';
-import { publicOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
+import { providerOfferingsAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
 
 export const OfferingAutocompleteField: FunctionComponent<{
@@ -19,7 +19,7 @@ export const OfferingAutocompleteField: FunctionComponent<{
     const debouncedAutocomplete = useMemo(
         () => debounce(
             (query: string, prevOptions: any, currentPage: number, resolve: Function) => {
-                publicOfferingsAutocomplete(query, prevOptions, currentPage).then(resolve);
+                providerOfferingsAutocomplete(query, prevOptions, currentPage).then(resolve);
             },
             props.debounceMs || 1000
         ),

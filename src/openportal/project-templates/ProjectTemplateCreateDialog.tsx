@@ -12,27 +12,12 @@ import { getCustomer, getUser } from '@waldur/workspace/selectors';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse } from '@waldur/store/notify';
-import { post, fixURL } from '../api';
+import { post } from '../api';
+import { getCustomerURL } from '../utils';
 
 import { RoleMappingField } from './RoleMappingField';
 import { OrganizationAutocompleteField } from './OrganizationAutocompleteField';
 import { OfferingAutocompleteField } from './OfferingAutocompleteField';
-
-const getCustomerURL = (customer) => {
-    if (!customer) {
-        return null;
-    }
-
-    if (customer.url) {
-        return customer.url;
-    }
-
-    if (customer.uuid) {
-        return fixURL(`/customers/${customer.uuid}/`);
-    }
-
-    return null;
-}
 
 const projectClassCreate = async (params) => {
     const data = {

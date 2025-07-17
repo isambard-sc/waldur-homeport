@@ -19,16 +19,32 @@ import { OrganizationAutocompleteField } from './OrganizationAutocompleteField';
 import { OfferingAutocompleteField } from './OfferingAutocompleteField';
 
 import { get } from '@waldur/core/api';
+import { patch } from '../api';
+import { getCustomerURL } from '../utils';
 
-const projectClassPartialUpdate = (params) => {
+
+const projectClassPartialUpdate = async (params) => {
   console.log('Updating project template with params:', params);
-  return null;
-}
 
-const projectClassGet = async (uuid) => {
-  console.log('Fetching project template with uuid:', uuid);
+  const uuid = params.path?.uuid;
 
-  return await get(`/openportal-project-template/${uuid}/`);
+  if (!uuid) {
+    throw new Error(translate('Project template UUID is required for update.'));
+  }
+
+  const data = {
+    provider: getCustomerURL(params.body?.provider),
+    name: params.body?.name,
+    portal: params.body?.portal,
+    customer: getCustomerURL(params.body?.customer),
+    shortname: params.body?.shortname,
+    offerings: params.body?.offerings?.map((offering) => offering.url) || [],
+    approval_limit: params.body?.approval_limit,
+    max_credit_limit: params.body?.max_credit_limit,
+    role_mapping: params.body?.role_mapping || {},
+  };
+
+  await patch(`/openportal-project-template/${uuid}/`, data);
 }
 
 const MAX_PORTALIDENTIFIER_LENGTH = 32;
@@ -74,17 +90,17 @@ export const ProjectTemplateEditDialog = ({
     const fetchProjectTemplate = async () => {
       try {
         setLoading(true);
-        const data = await projectClassGet(resolve.initialValues.uuid);
+        const data = await get(`/openportal-project-template/${resolve.initialValues.uuid}/`);
         if (!data) {
           throw new Error(translate('Project template not found.'));
         }
 
+        // need to use the _data versions of these as they
+        // have been fully-fetched by the serializer,
+        // and we don't want to handle fetching them again from js
         data.customer = data.customer_data;
         data.provider = data.provider_data;
         data.offerings = data.offerings_data || [];
-        // data.role_mapping = data.role_mapping_data || {};
-
-        console.log('Fetched project template:', data);
 
         setProjectTemplate(data);
       } catch (err) {

@@ -31,6 +31,47 @@ export async function post(endpoint: string, data?: object) {
 }
 
 
+export async function put(endpoint: string, data?: object) {
+    const response = await fetch(fixURL(endpoint), {
+        method: 'PUT',
+        body: data ? JSON.stringify(data) : undefined,
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${getToken()}`,
+        },
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error('Unauthorized access.');
+        }
+        else {
+            throw new Error(`Failed call: ${response.text()}`);
+        }
+    }
+}
+
+
+export async function patch(endpoint: string, data?: object) {
+    const response = await fetch(fixURL(endpoint), {
+        method: 'PATCH',
+        body: data ? JSON.stringify(data) : undefined,
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${getToken()}`,
+        },
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error('Unauthorized access.');
+        }
+        else {
+            throw new Error(`Failed call: ${response.text()}`);
+        }
+    }
+}
+
 export const deleteProjectTemplate = async (path: {
     uuid: string;
 }) => {
