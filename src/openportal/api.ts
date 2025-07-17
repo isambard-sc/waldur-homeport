@@ -72,6 +72,21 @@ export async function patch(endpoint: string, data?: object) {
     }
 }
 
+export const deleteManagedProject = async (path: {
+    identifier: string;
+}) => {
+    client.delete({
+        url: `/api/openportal-managed-projects/${path.identifier}/`,
+        path,
+        security: [
+            {
+                name: 'Authorization',
+                type: 'apiKey',
+            },
+        ],
+    });
+}
+
 export const deleteProjectTemplate = async (path: {
     uuid: string;
 }) => {

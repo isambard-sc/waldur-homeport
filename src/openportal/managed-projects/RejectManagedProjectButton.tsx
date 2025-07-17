@@ -12,7 +12,7 @@ import { wrapTooltip } from '@waldur/table/ActionButton';
 export const RejectManagedProjectButton = ({ row, as, className, refetch }) => {
     const project = row; // Assuming row is the project object
 
-    if (!project || !refetch) {
+    if (!project) {
         return null;
     }
 

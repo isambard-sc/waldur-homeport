@@ -8,12 +8,26 @@ interface OwnProps {
     row: ManagedProject;
 }
 
+const renderProjectLink = (project: any) => {
+    if (!project) {
+        return 'No project assigned.';
+    }
+    return (<a href={`/projects/${project.uuid}`}>{project.name || 'Unnamed Project'}</a>);
+};
+
+
 export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
+    console.log('Expandable row data:', props.row);
+
     return (
         <ExpandableContainer>
             <div className="overflow-auto" unmountOnExit={true}>
                 <div>
                     <strong>Project Name:</strong> {props.row.details.name || 'No name assigned.'}
+                </div>
+                <div>
+                    <strong>Project:</strong>
+                    {renderProjectLink(props.row.project_data)}
                 </div>
                 <div>
                     <strong>Project Template:</strong> {props.row.details.class || 'No class assigned.'}

@@ -57,7 +57,7 @@ export const ProjectTemplateList: FunctionComponent<{}> = () => {
           render: ({ row }) => renderFieldOrDash(row.shortname),
         },
       ]}
-      verboseName={translate('project project-templates')}
+      verboseName={translate('Project Templates')}
       rowActions={ProjectTemplateRowActions}
       expandableRow={ProjectTemplateExpandableRow}
       tableActions={<ProjectTemplateCreateButton refetch={props.fetch} />}

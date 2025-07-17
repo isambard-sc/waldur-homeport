@@ -24,8 +24,6 @@ import { getCustomerURL } from '../utils';
 
 
 const projectClassPartialUpdate = async (params) => {
-  console.log('Updating project template with params:', params);
-
   const uuid = params.path?.uuid;
 
   if (!uuid) {

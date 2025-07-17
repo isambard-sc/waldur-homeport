@@ -1,5 +1,6 @@
 import { FC } from 'react';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import { translate } from '@waldur/i18n';
 
 import { ProjectTemplate } from '../types';
 
@@ -22,7 +23,7 @@ const stringify = (value: any) => {
 
 const stringify_customer = (customer: any) => {
     if (!customer) {
-        return 'Not set';
+        return translate('Not set');
     }
     // customer.url is the URL. Render it as a link, using customer.name as the display text.
     const url = `/organizations/${customer.uuid}/dashboard/`;
@@ -31,7 +32,7 @@ const stringify_customer = (customer: any) => {
 
 const stringify_offerings = (offerings: any[]) => {
     if (!offerings || offerings.length === 0) {
-        return 'No offerings';
+        return translate('No offerings');
     }
 
     // offerings.url is the URL. Render these as links, using offering.name
@@ -44,6 +45,17 @@ const stringify_offerings = (offerings: any[]) => {
             {offering.name}
         </a>
     )).reduce((prev, curr) => [prev, ', ', curr]);
+}
+
+const stringify_role_mapping = (role_mapping: any) => {
+    if (!role_mapping || Object.keys(role_mapping).length === 0) {
+        return translate('No role mapping');
+    }
+    return Object.entries(role_mapping).map(([key, value]) => (
+        <div key={key}>
+            &nbsp;&nbsp;{key} : {value.name || value.uuid || translate('Not set')}
+        </div>
+    ));
 }
 
 export const ProjectTemplateExpandableRow: FC<OwnProps> = (props) => {
@@ -78,7 +90,7 @@ export const ProjectTemplateExpandableRow: FC<OwnProps> = (props) => {
                     <strong>Max credit limit:</strong> {stringify(project.max_credit_limit)}
                 </div>
                 <div>
-                    <strong>Role mapping:</strong> {stringify(project.role_mapping)}
+                    <strong>Role mapping:</strong> {stringify_role_mapping(project.role_mapping)}
                 </div>
             </div>
         </ExpandableContainer>

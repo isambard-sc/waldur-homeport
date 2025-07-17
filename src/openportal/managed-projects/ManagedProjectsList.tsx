@@ -61,36 +61,20 @@ export const ManagedProjectsList = () => {
         filter,
     });
 
-    const onClickDetails = (row: any) => {
-        console.log('Clicked on project:', row);
-    };
-
-    const onClickProjectTemplateDetails = (row: any) => {
-        console.log('Clicked on project template:', row);
-    };
-
     const columns: Array<Column> = [
         {
             title: translate('Project'),
             orderField: 'row.details.name',
-            render: ({ row }) => (
-                <ManagedProjectLink uuid={row.uuid} onClick={() => onClickDetails(row)}>
-                    {row.details.name}
-                </ManagedProjectLink>
-            ),
+            render: ({ row }) => renderFieldOrDash(row.details.name),
             keys: ['name'],
             id: 'managedproject',
         },
         {
             title: translate('Project Template'),
             orderField: 'row.details.class',
-            render: ({ row }) => (
-                <ProjectTemplateLink uuid={row.details.class} onClick={() => onClickProjectTemplateDetails(row.details.class)}>
-                    {row.details.class}
-                </ProjectTemplateLink>
-            ),
-            keys: ['class'],
-            id: 'projectclass',
+            render: ({ row }) => renderFieldOrDash(row.details.class),
+            keys: ['project-template'],
+            id: 'project-template',
         },
         {
             title: translate('Description'),
