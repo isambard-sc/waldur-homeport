@@ -5,6 +5,7 @@ import { OpenStackInstance } from 'waldur-js-client';
 import { TableTabsContainer } from '@waldur/customer/list/TableTabsContainer';
 import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
+import { TablePlaceholder } from '@waldur/table/TablePlaceholder';
 
 import { OpenStackSecurityGroupsTable } from '../openstack-security-groups/OpenStackSecurityGroupsDialog';
 
@@ -17,6 +18,16 @@ interface OwnProps {
   refetch?(): void;
   isLoading?: boolean;
 }
+
+const Placeholder = ({ message, refetch }) => (
+  <TablePlaceholder
+    verboseName={translate('Security groups')}
+    emptyMessage={message}
+    clearSearch={null}
+    fetch={refetch}
+    hasRetry
+  />
+);
 
 export const OpenStackSecurityGroupsList: FunctionComponent<OwnProps> = (
   props,
@@ -80,8 +91,14 @@ export const OpenStackSecurityGroupsList: FunctionComponent<OwnProps> = (
         )}
         {activeKey === 'resource' ? (
           <>
-            {props.resourceScope.security_groups.length === 0 &&
-              translate('Instance does not have any security groups yet.')}
+            {props.resourceScope.security_groups.length === 0 && (
+              <Placeholder
+                message={translate(
+                  'Instance does not have any security groups yet.',
+                )}
+                refetch={props.refetch}
+              />
+            )}
             {props.resourceScope.security_groups.length > 0 && (
               <OpenStackSecurityGroupsTable
                 securityGroups={props.resourceScope.security_groups}
@@ -90,8 +107,14 @@ export const OpenStackSecurityGroupsList: FunctionComponent<OwnProps> = (
           </>
         ) : (
           <>
-            {activePortSecurityGroups.length === 0 &&
-              translate('Instance port does not have any security groups yet.')}
+            {activePortSecurityGroups.length === 0 && (
+              <Placeholder
+                message={translate(
+                  'Instance port does not have any security groups yet.',
+                )}
+                refetch={props.refetch}
+              />
+            )}
             {activePortSecurityGroups.length > 0 && (
               <OpenStackSecurityGroupsTable
                 securityGroups={activePortSecurityGroups}

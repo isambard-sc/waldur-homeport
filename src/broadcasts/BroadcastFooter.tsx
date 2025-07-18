@@ -4,27 +4,15 @@ import {
   FloppyDiskIcon,
   ShareIcon,
 } from '@phosphor-icons/react';
-import { useCallback } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { getFormValues } from 'redux-form';
-import {
-  broadcastMessagesCreate,
-  broadcastMessagesSend,
-  broadcastMessagesUpdate,
-} from 'waldur-js-client';
+import { useDispatch } from 'react-redux';
 
-import { formatDate } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
+import { openModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { RootState } from '@waldur/store/reducers';
 
-import { BROADCAST_CREATE_FORM_ID } from './constants';
 import { BroadcastFormData } from './types';
-import { serializeBroadcast } from './utils';
 
 const BroadcastSaveAsTemplateDialog = lazyComponent(() =>
   import('./BroadcastSaveAsTemplateDialog').then((module) => ({
@@ -35,101 +23,34 @@ const BroadcastSaveAsTemplateDialog = lazyComponent(() =>
 export const BroadcastFooter = ({
   step,
   setStep,
-  handleSubmit,
   refetch,
+  form,
   disabled,
-  broadcastId,
+  formValues,
+  uuid,
 }: {
   step;
   setStep;
-  handleSubmit;
   refetch;
+  form;
   disabled;
-  broadcastId?;
+  formValues: BroadcastFormData;
+  uuid?: string;
 }) => {
   const dispatch = useDispatch();
-  const formValues = useSelector<RootState, BroadcastFormData>(
-    getFormValues(BROADCAST_CREATE_FORM_ID) as any,
-  );
 
-  const saveAsTemplate = (broadcastData) =>
+  const saveAsTemplate = () =>
     dispatch(
       openModalDialog(BroadcastSaveAsTemplateDialog, {
         dialogClassName: 'modal-dialog-centered',
         resolve: {
           refetch,
-          broadcastData,
+          broadcastData: formValues,
+          broadcastUuid: uuid, // If we go back to this form, we need to pass uuid
         },
         size: 'lg',
       }),
     );
-  const saveAsDraft = useCallback(
-    async (formData: BroadcastFormData) => {
-      try {
-        if (broadcastId) {
-          await broadcastMessagesUpdate({
-            path: { uuid: broadcastId },
-            body: serializeBroadcast(formData),
-          });
-        } else {
-          await broadcastMessagesCreate({ body: serializeBroadcast(formData) });
-        }
-        await refetch();
-        dispatch(
-          showSuccess(translate('Broadcast has been saved as a draft.')),
-        );
-        dispatch(closeModalDialog());
-      } catch (e) {
-        dispatch(showErrorResponse(e, translate('Unable to save broadcast.')));
-      }
-    },
-    [dispatch, refetch, broadcastId],
-  );
-
-  const saveAndSend = useCallback(
-    async (formData: BroadcastFormData) => {
-      try {
-        let response;
-        if (broadcastId) {
-          response = await broadcastMessagesUpdate({
-            path: { uuid: broadcastId },
-            body: serializeBroadcast(formData),
-          });
-        } else {
-          response = await broadcastMessagesCreate({
-            body: serializeBroadcast(formData),
-          });
-        }
-        if (!formValues.send_at) {
-          await broadcastMessagesSend({ path: { uuid: response.data.uuid } });
-        }
-        await refetch();
-        if (formValues.send_at) {
-          dispatch(
-            showSuccess(
-              translate('This message will be sent on {date}.', {
-                date: formatDate(formValues.send_at),
-              }),
-            ),
-          );
-        } else {
-          dispatch(showSuccess(translate('Broadcast has been sent.')));
-        }
-        dispatch(closeModalDialog());
-      } catch (e) {
-        if (formValues.send_at) {
-          dispatch(
-            showErrorResponse(e, translate('Unable to schedule broadcast.')),
-          );
-        } else {
-          dispatch(
-            showErrorResponse(e, translate('Unable to send broadcast.')),
-          );
-        }
-      }
-    },
-    [dispatch, refetch, broadcastId, formValues],
-  );
 
   return (
     <Modal.Footer className="border-0 pt-0 gap-2">
@@ -137,7 +58,8 @@ export const BroadcastFooter = ({
         <>
           <CloseDialogButton />
           <Button
-            onClick={handleSubmit(saveAsDraft)}
+            type="submit"
+            onClick={() => form.change('action', 'draft')}
             variant="secondary"
             disabled={disabled}
           >
@@ -147,7 +69,7 @@ export const BroadcastFooter = ({
             {translate('Save as draft')}
           </Button>
           <Button
-            onClick={handleSubmit(saveAsTemplate)}
+            onClick={saveAsTemplate}
             variant="secondary"
             disabled={disabled}
           >
@@ -156,7 +78,7 @@ export const BroadcastFooter = ({
             </span>{' '}
             {translate('Save as a template')}
           </Button>
-          <Button onClick={() => setStep(1)}>
+          <Button onClick={() => setStep(1)} disabled={disabled}>
             <span className="svg-icon svg-icon-2">
               <ArrowRightIcon />
             </span>{' '}
@@ -172,8 +94,9 @@ export const BroadcastFooter = ({
             {translate('Back')}
           </Button>
           <Button
-            onClick={handleSubmit(saveAsDraft)}
+            type="submit"
             variant="secondary"
+            onClick={() => form.change('action', 'draft')}
             disabled={disabled}
           >
             <span className="svg-icon svg-icon-2">
@@ -181,7 +104,11 @@ export const BroadcastFooter = ({
             </span>{' '}
             {translate('Save as draft')}
           </Button>
-          <Button disabled={disabled} onClick={handleSubmit(saveAndSend)}>
+          <Button
+            type="submit"
+            onClick={() => form.change('action', 'submit')}
+            disabled={disabled}
+          >
             <span className="svg-icon svg-icon-2">
               <ShareIcon />
             </span>{' '}

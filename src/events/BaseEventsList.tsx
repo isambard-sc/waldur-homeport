@@ -4,6 +4,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import eventsRegistry from '@waldur/events/registry';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
+import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
@@ -44,7 +45,11 @@ export const BaseEventsList: FunctionComponent<Partial<TableProps>> = ({
           render: ({ row }) =>
             row.context.user_full_name ||
             row.context.user_username || <>&mdash;</>,
-          export: 'user',
+          export: (row) =>
+            row.context.user_full_name ||
+            row.context.user_username ||
+            DASH_ESCAPE_CODE,
+          keys: ['context'],
           filter: 'user',
         },
         {

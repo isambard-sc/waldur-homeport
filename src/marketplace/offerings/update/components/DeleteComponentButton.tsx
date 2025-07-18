@@ -1,17 +1,14 @@
-import { useQueryClient } from '@tanstack/react-query';
-import { Button } from 'react-bootstrap';
+import { TrashIcon } from '@phosphor-icons/react';
 import { useDispatch } from 'react-redux';
 import { marketplaceProviderOfferingsRemoveOfferingComponent } from 'waldur-js-client';
 
 import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { PROVIDER_OFFERING_DATA_QUERY_KEY } from '@waldur/marketplace/offerings/constants';
-import { OfferingData } from '@waldur/marketplace/offerings/OfferingEditUIView';
 import { waitForConfirmation } from '@waldur/modal/actions';
+import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-export const DeleteComponentButton = ({ offering, component }) => {
+export const DeleteComponentButton = ({ offering, component, refetch }) => {
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const handler = async () => {
     try {
       await waitForConfirmation(
@@ -19,9 +16,7 @@ export const DeleteComponentButton = ({ offering, component }) => {
         translate('Confirmation'),
         translate(
           'Are you sure you want to delete component {name}?',
-          {
-            name: <b>{component.name}</b>,
-          },
+          { name: <b>{component.name}</b> },
           formatJsxTemplate,
         ),
         { forDeletion: true },
@@ -29,21 +24,13 @@ export const DeleteComponentButton = ({ offering, component }) => {
     } catch {
       return;
     }
-    const newComponents = offering.components.filter(
-      (item) => item.type !== component.type,
-    );
+
     try {
       await marketplaceProviderOfferingsRemoveOfferingComponent({
         path: { uuid: offering.uuid },
         body: { uuid: component.uuid },
       });
-      queryClient.setQueryData<OfferingData>(
-        [PROVIDER_OFFERING_DATA_QUERY_KEY, offering.uuid],
-        (oldData) => ({
-          ...oldData,
-          offering: { ...oldData.offering, components: newComponents },
-        }),
-      );
+      refetch();
       dispatch(showSuccess(translate('Component has been removed.')));
     } catch (error) {
       dispatch(
@@ -52,8 +39,12 @@ export const DeleteComponentButton = ({ offering, component }) => {
     }
   };
   return (
-    <Button className="btn-sm btn-danger" onClick={handler}>
-      {translate('Delete')}
-    </Button>
+    <ActionItem
+      className="text-danger"
+      iconColor="danger"
+      title={translate('Delete')}
+      action={handler}
+      iconNode={<TrashIcon weight="bold" />}
+    />
   );
 };

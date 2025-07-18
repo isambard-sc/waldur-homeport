@@ -4,7 +4,7 @@ import {
   marketplacePublicOfferingsList,
   OpenStackFlavor,
   openstackFlavorsList,
-  openstackVolumeTypesList,
+  openstackVolumeTypesNamesRetrieve,
 } from 'waldur-js-client';
 
 import { parseSelectData } from '@waldur/core/api';
@@ -36,21 +36,22 @@ import { RANCHER_NODE_DISK_DRIVER_OPTIONS } from '@waldur/rancher/RancherProvide
 const VOLUME_TYPE_FIELD: Partial<OfferingEditField> = {
   component: AsyncSelectField,
   fieldProps: {
-    loadOptions: (query, prevOptions, currentPage) =>
-      openstackVolumeTypesList({
-        query: {
-          name: query,
-          page: currentPage,
-        },
-      }).then((response) =>
-        returnReactSelectAsyncPaginateObject(
-          parseSelectData(response),
-          prevOptions,
-          currentPage,
-        ),
-      ),
-    getOptionLabel: ({ name }: OpenStackFlavor) => name,
-    getOptionKey: ({ uuid }: OpenStackFlavor) => uuid,
+    loadOptions: (query) =>
+      openstackVolumeTypesNamesRetrieve().then((response) => {
+        const filtered = response.data.filter((name) => name.includes(query));
+        return {
+          options: filtered.map((name) => ({
+            value: name,
+            name: name,
+          })),
+          hasMore: false,
+          additional: {
+            page: 1,
+          },
+        };
+      }),
+    getOptionLabel: ({ name }) => name,
+    getOptionKey: ({ value }) => value,
   },
 };
 
@@ -60,6 +61,7 @@ const VOLUME_SIZE_FIELD: Partial<OfferingEditField> = {
     required: true,
     validate: required,
     min: 1,
+    max: 1000000,
     parse: parseIntField,
     format: formatIntField,
   },
@@ -185,12 +187,12 @@ const fields: OfferingEditField[] = [
     ...VOLUME_SIZE_FIELD,
   },
   {
-    label: translate('Maximum number of RAM for a cluster tenants'),
+    label: translate('Maximum number of RAM for a cluster tenants (GB)'),
     key: 'plugin_options.managed_rancher_tenant_max_ram',
     ...VOLUME_SIZE_FIELD,
   },
   {
-    label: translate('Maximum number of disk space for a cluster tenants'),
+    label: translate('Maximum number of disk space for a cluster tenants (GB)'),
     key: 'plugin_options.managed_rancher_tenant_max_disk',
     ...VOLUME_SIZE_FIELD,
   },

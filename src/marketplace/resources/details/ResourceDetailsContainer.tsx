@@ -6,6 +6,8 @@ import { marketplaceResourcesRetrieve } from 'waldur-js-client';
 
 import { usePermissionView } from '@waldur/auth/PermissionLayout';
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { ErrorView } from '@waldur/ErrorView';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import {
@@ -231,7 +233,16 @@ export const ResourceDetailsContainer: FunctionComponent<{}> = () => {
   const { tabSpec } = usePageTabsTransmitter(tabs);
 
   if (error) {
-    router.stateService.go('errorPage.notFound');
+    if (error['response']?.status === 404) {
+      router.stateService.go('errorPage.notFound');
+      return null;
+    } else {
+      return <ErrorView error={error} />;
+    }
+  }
+
+  if (isLoading) {
+    return <LoadingSpinner />;
   }
 
   if (!data) return null;

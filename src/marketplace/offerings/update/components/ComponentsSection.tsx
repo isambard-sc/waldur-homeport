@@ -5,6 +5,7 @@ import { showComponentsList } from '@waldur/marketplace/common/registry';
 import { ValidationIcon } from '@waldur/marketplace/common/ValidationIcon';
 import { getBillingTypeLabel } from '@waldur/marketplace/resources/usage/utils';
 import { STORAGE_MODE_OPTIONS, TENANT_TYPE } from '@waldur/openstack/constants';
+import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
@@ -15,6 +16,23 @@ import { AddComponentButton } from './AddComponentButton';
 import { ChangeStorageModeButton } from './ChangeStorageModeButton';
 import { DeleteComponentButton } from './DeleteComponentButton';
 import { EditComponentButton } from './EditComponentButton';
+
+const RowActions = ({ row, refetch, offering }) => {
+  return (
+    <ActionsDropdownComponent>
+      <EditComponentButton
+        offering={offering}
+        refetch={refetch}
+        component={row}
+      />
+      <DeleteComponentButton
+        offering={offering}
+        component={row}
+        refetch={refetch}
+      />
+    </ActionsDropdownComponent>
+  );
+};
 
 export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
   props,
@@ -89,22 +107,16 @@ export const ComponentsSection: FC<OfferingSectionProps & { components }> = (
       verboseName={translate('Components')}
       tableActions={
         <>
-          {!props.components.length && <AddComponentButton {...props} />}
+          {!props.components.length && (
+            <AddComponentButton {...props} refetch={tableProps.fetch} />
+          )}
           {props.offering.type === TENANT_TYPE ? (
             <ChangeStorageModeButton {...props} />
           ) : null}
         </>
       }
-      rowActions={({ row }) => (
-        <>
-          <EditComponentButton
-            offering={props.offering}
-            refetch={tableProps.fetch}
-            component={row}
-          />
-
-          <DeleteComponentButton offering={props.offering} component={row} />
-        </>
+      rowActions={({ row, fetch }) => (
+        <RowActions row={row} refetch={fetch} offering={props.offering} />
       )}
     />
   );

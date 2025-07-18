@@ -4,9 +4,8 @@ import { connect } from 'react-redux';
 import { SubmissionError, reduxForm } from 'redux-form';
 import { proposalProtectedCallsPartialUpdate } from 'waldur-js-client';
 
-import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
-import { NumberField, SelectField, SubmitButton } from '@waldur/form';
+import { NumberField, SubmitButton } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { FormContainer } from '@waldur/form/FormContainer';
 import MarkdownEditor from '@waldur/form/MarkdownEditor';
@@ -15,9 +14,6 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog, waitForConfirmation } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { RoleEnum } from '@waldur/permissions/enums';
-import { Role } from '@waldur/permissions/types';
-import { getProjectRoles } from '@waldur/permissions/utils';
 import { EDIT_CALL_GENERAL_FORM_ID } from '@waldur/proposals/constants';
 import { EditCallProps } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -26,7 +22,6 @@ interface FormData {
   name: string;
   description: string;
   fixed_duration_in_days?: number | null;
-  default_project_role: Role;
 }
 
 export const EditGeneralInfoDialog = connect<
@@ -34,16 +29,7 @@ export const EditGeneralInfoDialog = connect<
   {},
   { resolve: EditCallProps }
 >((_, ownProps) => ({
-  initialValues:
-    ownProps.resolve.name === 'default_project_role'
-      ? {
-          default_project_role:
-            ENV.roles.find(
-              (role) =>
-                role.name == ownProps.resolve.call.default_project_role_name,
-            ) || ENV.roles.find((role) => role.name == RoleEnum.PROJECT_ADMIN),
-        }
-      : pick(ownProps.resolve.call, ownProps.resolve.name),
+  initialValues: pick(ownProps.resolve.call, ownProps.resolve.name),
 }))(
   reduxForm<FormData, { resolve: EditCallProps }>({
     form: EDIT_CALL_GENERAL_FORM_ID,
@@ -65,9 +51,7 @@ export const EditGeneralInfoDialog = connect<
         }
         const body: any = {};
 
-        if (props.resolve.name === 'default_project_role') {
-          body.default_project_role = values.default_project_role?.uuid;
-        } else if (props.resolve.name === 'fixed_duration_in_days') {
+        if (props.resolve.name === 'fixed_duration_in_days') {
           body.fixed_duration_in_days = values.fixed_duration_in_days || null;
         } else {
           body[props.resolve.name] = values[props.resolve.name];
@@ -132,15 +116,6 @@ export const EditGeneralInfoDialog = connect<
                 label={translate('Reference code')}
                 name="reference_code"
                 required={false}
-              />
-            )}
-            {props.resolve.name === 'default_project_role' && (
-              <SelectField
-                label={translate('Default project role')}
-                name="default_project_role"
-                options={getProjectRoles()}
-                getOptionLabel={(role: Role) => role.description || role.name}
-                getOptionValue={({ uuid }) => uuid}
               />
             )}
             {props.resolve.name === 'external_url' && (

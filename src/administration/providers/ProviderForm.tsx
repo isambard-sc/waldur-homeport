@@ -113,6 +113,36 @@ export const ProviderForm = () => (
         component={StringField as any}
       />
     </FormGroup>
+    <FormGroup
+      label={translate('Email field')}
+      description={translate(
+        'The OIDC claim to be used as the value for the email field.',
+      )}
+    >
+      <Field name="attribute_mapping.email" component={StringField as any} />
+    </FormGroup>
+    <FormGroup
+      label={translate('Affiliations field')}
+      description={translate(
+        'The OIDC claim to be used as the value for the affiliations field.',
+      )}
+    >
+      <Field
+        name="attribute_mapping.affiliations"
+        component={StringField as any}
+      />
+    </FormGroup>
+    <FormGroup
+      label={translate('Civil number field')}
+      description={translate(
+        'The OIDC claim to be used as the value for the civil_number field.',
+      )}
+    >
+      <Field
+        name="attribute_mapping.civil_number"
+        component={StringField as any}
+      />
+    </FormGroup>
     <Form.Group className="mb-7">
       <Field
         name="is_active"

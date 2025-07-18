@@ -171,10 +171,7 @@ export const Step5PreviewAndImport: FC<WizardFormStepProps> = (props) => {
     if (!data?.length) {
       return translate('At least one project is required.');
     }
-    const fixMessage = translate(
-      'Please fix (step {step}) or skip records with errors',
-      { step: 3 },
-    );
+    const fixMessage = translate('Please fix data or skip records with errors');
     for (let i = 0; i < data.length; i++) {
       const project = data[i];
       let msg = '';

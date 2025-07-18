@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { FunctionComponent, useCallback, useEffect } from 'react';
+import { Button } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { userInvitationsDetailsRetrieve } from 'waldur-js-client';
 
@@ -45,6 +46,11 @@ export const InvitationConfirmDialog: FunctionComponent<{
     deferred.resolve({ invitation });
   }, [closeDialog, deferred, invitation]);
 
+  const closeButton = useCallback(() => {
+    closeDialog();
+    router.stateService.go('profile.details');
+  }, [closeDialog]);
+
   useEffect(() => {
     if (invitation?.state === 'accepted') {
       const linkProps = getInvitationLinkProps(invitation);
@@ -65,7 +71,11 @@ export const InvitationConfirmDialog: FunctionComponent<{
             dismiss={dismiss}
             closeAcceptingInvitation={closeAcceptingInvitation}
           />
-        ) : null
+        ) : (
+          <Button variant="outline btn-outline-default" onClick={closeButton}>
+            {translate('Close')}
+          </Button>
+        )
       }
     >
       {!user ? null : asyncResult.isLoading ? (

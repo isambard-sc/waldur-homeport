@@ -310,11 +310,13 @@ export const fetchData = async (resource: Resource) => {
     ).data;
   }
   if (resource.offering_type === MANAGED_RANCHER) {
-    nestedScope = (
-      await marketplaceResourcesDetailsRetrieve({
-        path: { uuid: scope.uuid },
-      })
-    ).data;
+    if (scope) {
+      nestedScope = (
+        await marketplaceResourcesDetailsRetrieve({
+          path: { uuid: scope.uuid },
+        })
+      ).data;
+    }
   }
 
   const offering = await marketplaceResourcesOfferingRetrieve({

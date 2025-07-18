@@ -206,20 +206,24 @@ export const TableHeader: FC<TableHeaderProps> = ({
       : columns.filter((column) => column.visible ?? true).length;
   }, [hasOptionalColumns, columnPositions, columnMap, columns]);
 
+  const colWidths = useMemo(() => {
+    if (colsLen <= 1) return { first: 100, other: 0 };
+    const first = Math.min(50, (100 / colsLen) * 2);
+    const remainingWidth = 100 - first;
+    const other = remainingWidth / (colsLen - 1);
+    return { first, other };
+  }, [colsLen]);
+
   return (
     <>
       <colgroup>
-        {fieldType ? (
-          <col width="10px" />
-        ) : enableMultiSelect ? (
-          <col width="10px" />
-        ) : null}
+        {fieldType || enableMultiSelect ? <col width="10px" /> : null}
         {expandableRow && <col width="10px" />}
         {Array.from({ length: colsLen }).map((_, i) => (
           <col
             key={i}
             style={{
-              width: (i === 0 ? (100 / colsLen) * 2 : 100 / colsLen) + '%',
+              width: (i === 0 ? colWidths.first : colWidths.other) + '%',
               minWidth: i === 0 ? 200 : 150,
             }}
           />

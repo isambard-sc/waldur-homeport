@@ -6,6 +6,7 @@ import { Customer, CustomersListData } from 'waldur-js-client';
 
 import { OrganizationsFilter } from '@waldur/administration/organizations/OrganizationsFilter';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
+import { OrganizationImportButton } from '@waldur/customer/import/OrganizationImportButton';
 import { OrganizationCard } from '@waldur/customer/list/OrganizationCard';
 import { OrganizationCreateButton } from '@waldur/customer/list/OrganizationCreateButton';
 import { OrganizationLink } from '@waldur/customer/list/OrganizationLink';
@@ -315,7 +316,12 @@ export const OrganizationsList: FunctionComponent = () => {
       showPageSizeSelector={true}
       enableExport={true}
       standalone
-      tableActions={<OrganizationCreateButton />}
+      tableActions={
+        <>
+          <OrganizationImportButton refetch={props.fetch} />
+          <OrganizationCreateButton />
+        </>
+      }
       filters={<OrganizationsFilter />}
       hasOptionalColumns
       expandableRowClassName="py-2 pe-2"

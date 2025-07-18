@@ -1,44 +1,39 @@
 import { DateTime } from 'luxon';
 import { Col, Modal, Row } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { change, FormName, getFormValues } from 'redux-form';
+import { Field, useForm, useFormState } from 'react-final-form';
 
 import { required } from '@waldur/core/validators';
-import { FormContainer, StringField, TextField } from '@waldur/form';
-import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
+import { Select } from '@waldur/form/AsyncSelectField';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { DateField } from '@waldur/form/DateField';
+import { StringField } from '@waldur/form/StringField';
+import { TextField } from '@waldur/form/TextField';
 import { WizardStepIndicator } from '@waldur/form/WizardStepIndicator';
 import { translate } from '@waldur/i18n';
 import {
   organizationAutocomplete,
   providerOfferingsAutocomplete,
 } from '@waldur/marketplace/common/autocompletes';
-import { RootState } from '@waldur/store/reducers';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 
 import { templateAutocomplete } from './autocomplete';
-import { BROADCAST_CREATE_FORM_ID } from './constants';
 import { RecipientsList } from './RecipientsList';
-import { BroadcastFormData, MessageTemplate } from './types';
+import { MessageTemplate } from './types';
 
-const RecipientsListQuery = ({ form }) => {
-  const query = useSelector(getFormValues(form));
-  return <RecipientsList query={query} />;
+const RecipientsListQuery = () => {
+  const { values } = useFormState();
+  return <RecipientsList query={values} />;
 };
 
 export const BroadcastForm = ({
-  submitting,
   step,
   setStep,
 }: {
-  submitting: boolean;
   step: number;
   setStep(step: number): void;
 }) => {
-  const dispatch = useDispatch();
-  const formValues = useSelector<RootState, BroadcastFormData>(
-    getFormValues(BROADCAST_CREATE_FORM_ID) as any,
-  );
+  const { values: formValues } = useFormState();
+  const form = useForm();
 
   return (
     <>
@@ -48,111 +43,143 @@ export const BroadcastForm = ({
         onSelect={setStep}
       />
 
-      <FormName>
-        {({ form }) => (
-          <Modal.Body className="scroll-y border-0">
-            {step === 0 ? (
-              <FormContainer submitting={submitting} clearOnUnmount={false}>
-                <AsyncSelectField
-                  name="template"
-                  label={translate('Template')}
-                  placeholder={translate('Select template...')}
-                  loadOptions={templateAutocomplete}
-                  onChange={(_, newValue: MessageTemplate) => {
-                    if (newValue) {
-                      if (
-                        formValues &&
-                        ((formValues.subject &&
-                          formValues.subject != newValue.subject) ||
-                          (formValues.body && formValues.body != newValue.body))
-                      ) {
-                        const response = confirm(
-                          'Form is not empty. Selecting template would replace existing message. Are you sure?',
-                        );
-                        if (!response) {
-                          return;
-                        }
+      <Modal.Body className="scroll-y border-0">
+        {step === 0 ? (
+          <div>
+            <FormGroup
+              label={translate('Template')}
+              description={translate('Select a pre-defined template')}
+            >
+              <Field
+                name="template"
+                component={Select as any}
+                placeholder={translate('Select template...')}
+                loadOptions={templateAutocomplete}
+                getOptionLabel={(option) => option.name}
+                getOptionValue={(option) => option.uuid}
+                noOptionsMessage={() => translate('No templates found')}
+                onChange={(newValue: MessageTemplate) => {
+                  if (newValue) {
+                    if (
+                      formValues &&
+                      ((formValues.subject &&
+                        formValues.subject != newValue.subject) ||
+                        (formValues.body && formValues.body != newValue.body))
+                    ) {
+                      const response = confirm(
+                        'Form is not empty. Selecting template would replace existing message. Are you sure?',
+                      );
+                      if (!response) {
+                        return;
                       }
-                      dispatch(change(form, 'subject', newValue.subject));
-                      dispatch(change(form, 'body', newValue.body));
                     }
-                  }}
-                  isClearable={true}
+                    form.change('subject', newValue.subject);
+                    form.change('body', newValue.body);
+                  }
+                }}
+                isClearable={true}
+              />
+            </FormGroup>
+
+            <FormGroup label={translate('Subject')} required>
+              <Field
+                name="subject"
+                component={StringField as any}
+                validate={required}
+              />
+            </FormGroup>
+
+            <FormGroup label={translate('Message')} required>
+              <Field
+                name="body"
+                component={TextField as any}
+                validate={required}
+              />
+            </FormGroup>
+
+            <FormGroup
+              label={translate('Send at')}
+              description={translate(
+                'Schedule the message to be sent at a specific time',
+              )}
+            >
+              <Field
+                name="send_at"
+                component={DateField as any}
+                minDate={DateTime.now().plus({ days: 1 }).toISO()}
+              />
+            </FormGroup>
+          </div>
+        ) : (
+          <Row>
+            <Col
+              sm={4}
+              style={{
+                borderRight: '2px solid #eff2f5',
+                paddingRight: 20,
+                marginRight: 20,
+              }}
+            >
+              <FormGroup>
+                <Field
+                  name="all_users"
+                  component={AwesomeCheckboxField as any}
+                  label={translate('Send message to all users')}
+                  hideLabel={true}
                 />
+              </FormGroup>
 
-                <StringField
-                  name="subject"
-                  label={translate('Subject')}
-                  required={true}
-                  validate={required}
+              <FormGroup
+                label={translate('Offerings')}
+                description={translate('Select specific offerings to target')}
+              >
+                <Field
+                  name="offerings"
+                  component={Select as any}
+                  placeholder={translate('Select offerings...')}
+                  loadOptions={(query, prevOptions, page) =>
+                    providerOfferingsAutocomplete(
+                      { name: query, shared: true },
+                      prevOptions,
+                      page,
+                    )
+                  }
+                  getOptionLabel={(option) => option.name}
+                  getOptionValue={(option) => option.uuid}
+                  noOptionsMessage={() => translate('No offerings found')}
+                  isMulti={true}
                 />
+              </FormGroup>
 
-                <TextField
-                  name="body"
-                  label={translate('Message')}
-                  required={true}
-                  validate={required}
+              <FormGroup
+                label={translate('Organizations')}
+                description={translate(
+                  'Select specific organizations to target',
+                )}
+              >
+                <Field
+                  name="customers"
+                  component={Select as any}
+                  placeholder={translate('Select organizations...')}
+                  loadOptions={(query, prevOptions, page) =>
+                    organizationAutocomplete(query, prevOptions, page, {
+                      field: ['name', 'uuid'],
+                      o: 'name',
+                    })
+                  }
+                  getOptionLabel={(option) => option.name}
+                  getOptionValue={(option) => option.uuid}
+                  noOptionsMessage={() => translate('No organizations found')}
+                  isMulti={true}
                 />
-
-                <DateField
-                  name="send_at"
-                  label={translate('Send at')}
-                  minDate={DateTime.now().plus({ days: 1 }).toISO()}
-                />
-              </FormContainer>
-            ) : (
-              <Row>
-                <Col
-                  sm={4}
-                  style={{
-                    borderRight: '2px solid #eff2f5',
-                    paddingRight: 20,
-                    marginRight: 20,
-                  }}
-                >
-                  <FormContainer submitting={submitting}>
-                    <AwesomeCheckboxField
-                      name="all_users"
-                      label={translate('Send message to all users')}
-                      hideLabel={true}
-                    />
-
-                    <AsyncSelectField
-                      name="offerings"
-                      label={translate('Offerings')}
-                      placeholder={translate('Select offerings...')}
-                      loadOptions={(query, prevOptions, page) =>
-                        providerOfferingsAutocomplete(
-                          { name: query, shared: true },
-                          prevOptions,
-                          page,
-                        )
-                      }
-                      isMulti={true}
-                    />
-
-                    <AsyncSelectField
-                      name="customers"
-                      label={translate('Organizations')}
-                      placeholder={translate('Select organizations...')}
-                      loadOptions={(query, prevOptions, page) =>
-                        organizationAutocomplete(query, prevOptions, page, {
-                          field: ['name', 'uuid'],
-                          o: 'name',
-                        })
-                      }
-                      isMulti={true}
-                    />
-                  </FormContainer>
-                </Col>
-                <Col sm={7}>
-                  <RecipientsListQuery form={form} />
-                </Col>
-              </Row>
-            )}
-          </Modal.Body>
+              </FormGroup>
+            </Col>
+            <Col sm={7}>
+              <RecipientsListQuery />
+            </Col>
+          </Row>
         )}
-      </FormName>
+      </Modal.Body>
     </>
   );
 };

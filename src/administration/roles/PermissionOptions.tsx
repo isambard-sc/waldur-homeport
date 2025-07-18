@@ -51,6 +51,10 @@ export const PermissionOptions = [
         value: 'PROPOSAL.MANAGE_REVIEW',
       },
       {
+        label: translate('Update call'),
+        value: 'CALL.UPDATE',
+      },
+      {
         label: translate('Update permission call'),
         value: 'CALL.UPDATE_PERMISSION',
       },
@@ -184,6 +188,10 @@ export const PermissionOptions = [
       {
         label: translate('Dry run script'),
         value: 'OFFERING.DRY_RUN_SCRIPT',
+      },
+      {
+        label: translate('Manage backend resources'),
+        value: 'OFFERING.MANAGE_BACKEND_RESOURCES',
       },
       {
         label: translate('Manage campaign'),

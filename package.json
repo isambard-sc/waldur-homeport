@@ -88,7 +88,7 @@
     "reselect": "^3.0.1",
     "source-map": "^0.7.4",
     "text-security": "^3.2.1",
-    "waldur-js-client": "^1.0.4-dev.107"
+    "waldur-js-client": "^7.6.10-dev.5"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
@@ -200,7 +200,8 @@
       "*.fixture.ts",
       "*.fixture.tsx",
       "src/EventsEnums.ts",
-      "src/FeaturesEnums.ts"
+      "src/FeaturesEnums.ts",
+      "build.dev/**"
     ]
   },
   "stylelint": {

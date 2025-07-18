@@ -12,7 +12,7 @@ describe('Group invitations', () => {
       .mockUser('admin')
       .setToken()
 
-      .intercept('GET', '/api/customers/895e38d197e748459189f19285119edf/?*', {
+      .intercept('GET', '/api/customers/895e38d197e748459189f19285119edf/', {
         fixture: 'customers/admin_customers.json',
       })
       .intercept(

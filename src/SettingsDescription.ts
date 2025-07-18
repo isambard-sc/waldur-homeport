@@ -235,6 +235,18 @@ export const SettingsDescription = [
         default: '',
         type: 'html_field',
       },
+      {
+        key: 'MAINTENANCE_ANNOUNCEMENT_NOTIFY_BEFORE_MINUTES',
+        description: translate('How many minutes before scheduled maintenance users should be notified.'),
+        default: 60,
+        type: 'integer',
+      },
+      {
+        key: 'MAINTENANCE_ANNOUNCEMENT_NOTIFY_SYSTEM',
+        description: translate('How maintenance notifications are delivered. Choices: AdminAnnouncement or BroadcastMessage.'),
+        default: ['AdminAnnouncement'],
+        type: 'list_field',
+      },
     ],
   },
   {

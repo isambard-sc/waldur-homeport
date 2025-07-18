@@ -12,6 +12,7 @@ import {
 import { Badge } from '@waldur/core/Badge';
 import { Tip } from '@waldur/core/Tooltip';
 import { truncate } from '@waldur/core/utils';
+import { deleteDuplicateRecords } from '@waldur/customer/import/utils';
 import { FieldErrorMessage } from '@waldur/form/FieldError';
 import { WizardForm, WizardFormStepProps } from '@waldur/form/WizardForm';
 import { translate } from '@waldur/i18n';
@@ -205,18 +206,10 @@ export const Step2PreviewAndImport: FC<WizardFormStepProps> = (props) => {
           });
 
           // Delete duplicate records
-          const seen = new Set();
-          let duplicates = 0;
-          const uniqueRows = rows.filter((row) => {
-            if (!row.offering_uuid || !row.user_uuid) return true;
-            const key = `${row.offering_uuid}-${row.user_uuid}`;
-            if (seen.has(key)) {
-              duplicates++;
-              return false;
-            }
-            seen.add(key);
-            return true;
-          });
+          const { duplicates, rows: uniqueRows } = deleteDuplicateRecords(
+            rows,
+            ['offering_uuid', 'user_uuid'],
+          );
 
           if (duplicates) {
             dispatch(

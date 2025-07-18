@@ -6,12 +6,10 @@ import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
-import { FieldError } from '@waldur/form';
-import { AttachmentItem } from '@waldur/form/upload/AttachmentItem';
-import { UploadContainer } from '@waldur/form/upload/UploadContainer';
 import { WizardForm, WizardFormStepProps } from '@waldur/form/WizardForm';
 import { translate } from '@waldur/i18n';
 
+import { TemplateUploaderField } from './TemplateUploaderField';
 import { generateTemplateData } from './utils';
 
 const asyncValidate = (values) =>
@@ -150,34 +148,7 @@ export const Step4UploadFile: FC<WizardFormStepProps> = (props) => {
             <Field
               name="file"
               validate={required}
-              component={({ input: { value, onChange }, meta }) => (
-                <>
-                  <UploadContainer
-                    onDrop={onChange}
-                    message="(CSV)"
-                    accept={{
-                      'application/csv': ['.csv'],
-                      'text/csv': ['.csv'],
-                    }}
-                    multiple={false}
-                    className="mb-6"
-                  />
-
-                  {value?.length > 0 && (
-                    <AttachmentItem
-                      attachment={{
-                        file: value[0],
-                        file_name: value[0].name,
-                        file_size: value[0].size,
-                        mime_type: value[0].type,
-                      }}
-                      iconSize={20}
-                      onDelete={() => onChange([])}
-                    />
-                  )}
-                  <FieldError error={meta.dirty && meta.error} />
-                </>
-              )}
+              component={TemplateUploaderField}
             />
           </div>
         );

@@ -87,6 +87,7 @@ export const Offering_accountingEnum = {
   marketplace_plan_component_future_price_updated: 'marketplace_plan_component_future_price_updated',
   marketplace_plan_component_quota_updated: 'marketplace_plan_component_quota_updated',
   marketplace_plan_created: 'marketplace_plan_created',
+  marketplace_plan_deleted: 'marketplace_plan_deleted',
   marketplace_plan_updated: 'marketplace_plan_updated',
 };
 
@@ -279,7 +280,6 @@ export const SupportEnum = {
 };
 
 export const UsersEnum = {
-  auth_logged_in_with_oauth: 'auth_logged_in_with_oauth',
   auth_logged_in_with_saml2: 'auth_logged_in_with_saml2',
   auth_logged_out_with_saml2: 'auth_logged_out_with_saml2',
   freeipa_profile_created: 'freeipa_profile_created',
@@ -294,7 +294,6 @@ export const UsersEnum = {
   user_activated: 'user_activated',
   user_creation_succeeded: 'user_creation_succeeded',
   user_deactivated: 'user_deactivated',
-  user_deactivated_no_roles: 'user_deactivated_no_roles',
   user_deletion_succeeded: 'user_deletion_succeeded',
   user_details_update_succeeded: 'user_details_update_succeeded',
   user_has_been_created_by_staff: 'user_has_been_created_by_staff',

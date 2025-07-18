@@ -39,5 +39,34 @@
     "offering_type": "Support.OfferingTemplate",
     "components": [],
     "available_limits": []
+  },
+  {
+    "offering_type": "OpenStack.Instance",
+    "components": [],
+    "available_limits": []
+  },
+  {
+    "offering_type": "OpenStack.Tenant",
+    "components": [
+      {
+        "type": "cores",
+        "name": "Cores",
+        "measured_unit": "cores",
+        "billing_type": "limit"
+      },
+      {
+        "type": "ram",
+        "name": "RAM",
+        "measured_unit": "GB",
+        "billing_type": "limit"
+      },
+      {
+        "type": "storage",
+        "name": "Storage",
+        "measured_unit": "GB",
+        "billing_type": "limit"
+      }
+    ],
+    "available_limits": ["ram", "cores", "storage"]
   }
 ]

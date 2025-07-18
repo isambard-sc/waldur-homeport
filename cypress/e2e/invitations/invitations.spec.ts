@@ -90,7 +90,7 @@ describe('Invitations', () => {
         { statusCode: 200 },
       )
 
-      .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/?*', {
+      .intercept('GET', '/api/customers/6983ac22f2bb469189311ab21e493359/', {
         fixture: 'customers/alice.json',
       })
       .intercept(

@@ -1,0 +1,19 @@
+{
+  "fields": [
+    "name",
+    "email",
+    "abbreviation",
+    "address",
+    "postal",
+    "country",
+    "registration_code",
+    "agreement_number",
+    "phone_number",
+    "homepage",
+    "bank_name",
+    "bank_account",
+    "vat_code",
+    "default_tax_percent"
+  ],
+  "data": []
+}

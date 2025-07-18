@@ -1,4 +1,4 @@
-import { reduxForm, SubmissionError } from 'redux-form';
+import { Form } from 'react-final-form';
 
 import { ENV } from '@waldur/core/config';
 import { format } from '@waldur/core/ErrorMessageFormatter';
@@ -16,9 +16,7 @@ interface FormData {
 const signin = async (values: FormData) => {
   // See also: https://github.com/facebook/react/issues/1159#issuecomment-506584346
   if (!values.password || !values.username) {
-    throw new SubmissionError({
-      _error: translate('Please enter username and password.'),
-    });
+    return translate('Please enter username and password.');
   }
   try {
     await AuthService.signin(values.username, values.password);
@@ -26,49 +24,71 @@ const signin = async (values: FormData) => {
   } catch (error) {
     let renderedError;
     try {
-      renderedError = JSON.stringify(format(error));
+      // Check multiple possible error structures
+      if (error?.response?.data?.detail) {
+        renderedError = error.response.data.detail;
+      } else if (error?.data?.detail) {
+        renderedError = error.data.detail;
+      } else if (error?.detail) {
+        renderedError = error.detail;
+      } else if (error?.message) {
+        renderedError = error.message;
+      } else {
+        const formatted = format(error);
+        renderedError =
+          typeof formatted === 'string'
+            ? formatted
+            : formatted?.message || translate('Unknown error');
+      }
     } catch {
       renderedError = translate('Unknown error');
     }
-    throw new SubmissionError({
-      _error: renderedError,
-    });
+    return { _error: renderedError };
   }
 };
 
-const FORM_ID = 'SigninForm';
+export const SigninForm = () => (
+  <Form
+    onSubmit={signin}
+    render={({ handleSubmit, submitting, submitError, submitErrors }) => {
+      const formError = submitErrors?._error || submitError;
+      return (
+        <form className="mb-2" onSubmit={handleSubmit}>
+          <InputGroup
+            fieldName="username"
+            placeholder={translate('Username')}
+            type="text"
+          />
 
-export const SigninForm = reduxForm<FormData>({ form: FORM_ID })(
-  ({ submitting, handleSubmit, error }) => (
-    <form className="mb-2" onSubmit={handleSubmit(signin)}>
-      <InputGroup
-        fieldName="username"
-        placeholder={translate('Username')}
-        type="text"
-      />
+          <InputGroup
+            fieldName="password"
+            placeholder={translate('Password')}
+            type="password"
+          />
 
-      <InputGroup
-        fieldName="password"
-        placeholder={translate('Password')}
-        type="password"
-      />
+          <button
+            type="submit"
+            className="login-submit-button"
+            style={{
+              backgroundColor: ENV.plugins.WALDUR_CORE.BRAND_COLOR,
+            }}
+            disabled={submitting}
+          >
+            {submitting && (
+              <>
+                <LoadingSpinnerIcon className="me-1" />{' '}
+              </>
+            )}
+            {translate('Login')}
+          </button>
 
-      <button
-        type="submit"
-        className="login-submit-button"
-        style={{
-          backgroundColor: ENV.plugins.WALDUR_CORE.BRAND_COLOR,
-        }}
-        disabled={submitting}
-      >
-        {submitting && (
-          <>
-            <LoadingSpinnerIcon className="me-1" />{' '}
-          </>
-        )}
-        {translate('Login')}
-      </button>
-      {error && <p className="text-danger">{error}</p>}
-    </form>
-  ),
+          {formError && (
+            <div className="alert alert-danger mt-3" role="alert">
+              {formError}
+            </div>
+          )}
+        </form>
+      );
+    }}
+  />
 );

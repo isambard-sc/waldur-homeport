@@ -24,6 +24,7 @@ import { CallUpdateHero } from './CallUpdateHero';
 import { CallDocumentsSection } from './documents/CallDocumentsSection';
 import { CallGeneralSection } from './general/CallGeneralSection';
 import { CallOfferingsSection } from './offerings/CallOfferingsSection';
+import { CallRoleMappingsList } from './role-mapping/CallRoleMappingsList';
 import { CallRoundsList } from './rounds/CallRoundsList';
 
 const PageHero = ({ call, refetch }) => (
@@ -107,6 +108,11 @@ const Body = ({ call, refetch, loading }) => {
           key: 'offerings',
           title: translate('Offerings'),
           component: CallOfferingsSection,
+        },
+        {
+          key: 'role_mapping',
+          title: translate('Role mapping'),
+          component: CallRoleMappingsList,
         },
       ].filter(Boolean) as PageBarTab[],
     [call],
