@@ -90,6 +90,12 @@ export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
                 <div>
                     <strong>State:</strong> {props.row.state || 'No state provided.'}
                 </div>
+                <div>
+                    <strong>Reviewed by:</strong> {props.row.reviewed_by_full_name || 'No reviewer yet.'}
+                </div>
+                <div>
+                    <strong>Comment:</strong> {props.row.review_comment || 'No comment provided.'}
+                </div>
             </div>
         </ExpandableContainer>
     );
