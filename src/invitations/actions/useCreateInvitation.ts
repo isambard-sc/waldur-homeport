@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { useCustomerProjects } from '@waldur/customer/workspace/fetchCustomer';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionMap } from '@waldur/permissions/enums';
 import { checkScope } from '@waldur/permissions/hasPermission';
@@ -20,6 +21,7 @@ export const useCreateInvitation = (
 ) => {
   const user = useSelector(getUser);
   const customer = useSelector(getCustomer);
+  const { loading: loadingProjects } = useCustomerProjects();
   const project = useSelector(getProject);
   const dispatch = useDispatch();
   const callback = () =>
@@ -56,5 +58,5 @@ export const useCreateInvitation = (
     [context, user, customer, project],
   );
 
-  return { callback, canInvite };
+  return { callback, canInvite, loadingProjects };
 };

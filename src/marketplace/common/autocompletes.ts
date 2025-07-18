@@ -27,7 +27,7 @@ export const organizationAutocomplete = async (
 ) => {
   const response = await customersList({
     query: {
-      name: query,
+      query,
       page: page,
       page_size: ENV.pageSize,
       ...extraQueryParams,

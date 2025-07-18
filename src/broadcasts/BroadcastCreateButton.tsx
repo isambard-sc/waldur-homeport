@@ -6,8 +6,8 @@ import { lazyComponent } from '@waldur/core/lazyComponent';
 import { openModalDialog } from '@waldur/modal/actions';
 
 const BroadcastCreateDialog = lazyComponent(() =>
-  import('./BroadcastCreateDialog').then((module) => ({
-    default: module.BroadcastCreateDialog,
+  import('./BroadcastFormDialog').then((module) => ({
+    default: module.BroadcastFormDialog,
   })),
 );
 

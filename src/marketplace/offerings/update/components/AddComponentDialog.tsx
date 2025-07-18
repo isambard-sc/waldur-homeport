@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
@@ -6,8 +5,6 @@ import { marketplaceProviderOfferingsCreateOfferingComponent } from 'waldur-js-c
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
-import { PROVIDER_OFFERING_DATA_QUERY_KEY } from '@waldur/marketplace/offerings/constants';
-import { OfferingData } from '@waldur/marketplace/offerings/OfferingEditUIView';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -24,7 +21,6 @@ export const AddComponentDialog = reduxForm<
   form: ADD_COMPONENT_FORM_ID,
 })((props) => {
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const update = useCallback(
     async (formData) => {
       try {
@@ -37,19 +33,7 @@ export const AddComponentDialog = reduxForm<
             translate('Billing component has been created successfully.'),
           ),
         );
-        queryClient.setQueryData<OfferingData>(
-          [PROVIDER_OFFERING_DATA_QUERY_KEY, props.resolve.offering.uuid],
-          (oldData) => ({
-            ...oldData,
-            offering: {
-              ...oldData.offering,
-              components: [
-                ...props.resolve.offering.components,
-                formatComponent(formData),
-              ],
-            },
-          }),
-        );
+        props.resolve.refetch();
         dispatch(closeModalDialog());
       } catch (error) {
         dispatch(

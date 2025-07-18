@@ -11,8 +11,11 @@ export const ResourceTeamDialog = ({ resolve }) => {
     >
       <ProjectUsersList
         hideTabs={true}
-        projectUuid={resolve.resource?.project_uuid}
-        customerUuid={resolve.resource?.customer_uuid}
+        project={{
+          uuid: resolve.resource?.project_uuid,
+          name: resolve.resource?.project_name,
+          customer_uuid: resolve.resource?.customer_uuid,
+        }}
       />
     </ModalDialog>
   );

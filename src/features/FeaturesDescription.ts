@@ -83,6 +83,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Enabled display of call management functionality.'),
       },
       {
+        key: 'show_remote_project_functionality',
+        description: translate('Enabled display of remote project functionality.'),
+      },
+      {
         key: 'show_experimental_ui_components',
         description: translate('Enabled display of experimental or mocked components in marketplace.'),
       },
@@ -191,10 +195,6 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'pricelist',
         description: translate('Render marketplace plan components pricelist in support workspace.'),
-      },
-      {
-        key: 'users',
-        description: translate('Render list of users in support workspace.'),
       },
       {
         key: 'vm_type_overview',

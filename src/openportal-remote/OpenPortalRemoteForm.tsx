@@ -17,9 +17,9 @@ const fields = [
     fieldProps: { required: true, validate: required },
   },
   {
-    label: translate('Project class'),
-    key: 'service_attributes.project_class',
-    description: translate('Name of the OpenPortal Remote Project Class in which remote projects will be created'),
+    label: translate('Project template'),
+    key: 'service_attributes.project_template',
+    description: translate('Name of the OpenPortal Remote Project Template in which remote projects will be created'),
     component: StringField,
     fieldProps: { required: true, validate: required },
   },

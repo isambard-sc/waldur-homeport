@@ -10,6 +10,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { Field } from '@waldur/resource/summary';
+import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 
 const loadProposalData = async (proposal_uuid: string) => {
   const proposal = await proposalProposalsRetrieve({
@@ -41,35 +42,37 @@ export const ReviewsExpandableRow = ({ row }: { row: ProposalReview }) => {
   }
 
   return (
-    <Row>
-      <Col xs={12} md={6}>
-        <Field
-          label={translate('Applicant name')}
-          value={data.proposal.created_by_name}
-        />
-
-        <Field
-          label={translate('Submission date')}
-          value={formatDateTime(data.proposal.created)}
-        />
-
-        {data.proposal.project && (
+    <ExpandableContainer>
+      <Row>
+        <Col xs={12} md={6}>
           <Field
-            label={translate('Project')}
-            value={data.proposal.project_name}
+            label={translate('Applicant name')}
+            value={data.proposal.created_by_name}
           />
-        )}
-        <Field
-          label={translate('Offering')}
-          value={data.offeringNames.join(', ')}
-        />
-      </Col>
-      <Col xs={12} md={6}>
-        <Field
-          label={translate('Project summary')}
-          value={data.proposal.project_summary}
-        />
-      </Col>
-    </Row>
+
+          <Field
+            label={translate('Submission date')}
+            value={formatDateTime(data.proposal.created)}
+          />
+
+          {data.proposal.project && (
+            <Field
+              label={translate('Project')}
+              value={data.proposal.project_name}
+            />
+          )}
+          <Field
+            label={translate('Offering')}
+            value={data.offeringNames.join(', ')}
+          />
+        </Col>
+        <Col xs={12} md={6}>
+          <Field
+            label={translate('Project summary')}
+            value={data.proposal.project_summary}
+          />
+        </Col>
+      </Row>
+    </ExpandableContainer>
   );
 };

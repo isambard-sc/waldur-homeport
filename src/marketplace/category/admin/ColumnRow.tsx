@@ -1,15 +1,16 @@
 import { TrashIcon } from '@phosphor-icons/react';
 import { Button } from 'react-bootstrap';
+import { Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
-import { Field } from 'redux-form';
 import { marketplaceCategoryColumnsDestroy } from 'waldur-js-client';
 
+import { SelectField } from '@waldur/form/SelectField';
+import { StringField } from '@waldur/form/StringField';
 import { formatJsxTemplate, translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { FormField } from '@waldur/openstack/openstack-security-groups/rule-editor/FormField';
 import { useNotify } from '@waldur/store/hooks';
 
-export const ColumnRow = ({ column, fields, index }) => {
+export const ColumnRow = ({ column, fields, index, name }) => {
   const dispatch = useDispatch();
   const { showSuccess, showErrorResponse } = useNotify();
   const onRemove = async () => {
@@ -44,40 +45,51 @@ export const ColumnRow = ({ column, fields, index }) => {
 
   return (
     <tr>
-      <Field
-        name="title"
-        component={FormField}
-        tooltip={translate('Title is rendered as column header')}
-      />
-
-      <Field
-        name="attribute"
-        component={FormField}
-        tooltip={translate('Resource attribute is rendered as table cell')}
-      />
+      <td>
+        <Field
+          name={`${name}.title`}
+          component={StringField as any}
+          placeholder={translate('Title is rendered as column header')}
+        />
+      </td>
 
       <td>
         <Field
-          name="widget"
-          component={FormField}
-          as="select"
-          tooltip={translate(
+          name={`${name}.attribute`}
+          component={StringField as any}
+          placeholder={translate(
+            'Resource attribute is rendered as table cell',
+          )}
+        />
+      </td>
+
+      <td>
+        <Field
+          name={`${name}.widget`}
+          component={SelectField as any}
+          placeholder={translate(
             'Widget field allows to customise table cell rendering',
           )}
-        >
-          <option value="">{translate('None')}</option>
-          <option value="csv">CSV</option>
-          <option value="filesize">{translate('Filesize')}</option>
-          <option value="attached_instance">
-            {translate('Attached instance')}
-          </option>
-        </Field>
+          options={[
+            { value: '', label: translate('None') },
+            { value: 'csv', label: 'CSV' },
+            { value: 'filesize', label: translate('Filesize') },
+            {
+              value: 'attached_instance',
+              label: translate('Attached instance'),
+            },
+          ]}
+          isClearable
+        />
       </td>
-      <Field
-        name="index"
-        component={FormField}
-        tooltip={translate('Index allows to reorder columns')}
-      />
+
+      <td>
+        <Field
+          name={`${name}.index`}
+          component={StringField as any}
+          placeholder={translate('Index allows to reorder columns')}
+        />
+      </td>
 
       <td>
         <Button variant="danger" onClick={onRemove} aria-description="Delete">

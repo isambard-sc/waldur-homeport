@@ -13,7 +13,6 @@ import { DrawerRoot } from '@waldur/drawer/DrawerRoot';
 import { ModalRoot } from '@waldur/modal/ModalRoot';
 import store from '@waldur/store/store';
 
-import { AuthTokenExpirationManager } from './core/AuthTokenExpirationManager';
 import { loadConfig } from './core/bootstrap';
 import { ErrorMessage } from './ErrorMessage';
 import { LoadingScreen } from './LoadingScreen';
@@ -51,7 +50,6 @@ export const Application: FunctionComponent = () => {
             <LayoutProvider>
               <ThemeProvider>
                 <NotificationContainer />
-                <AuthTokenExpirationManager />
                 <ModalRoot />
                 <ConfirmModalRoot />
                 <DrawerRoot />

@@ -10,8 +10,8 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { parseBroadcast } from './utils';
 
 const BroadcastUpdateDialog = lazyComponent(() =>
-  import('./BroadcastUpdateDialog').then((module) => ({
-    default: module.BroadcastUpdateDialog,
+  import('./BroadcastFormDialog').then((module) => ({
+    default: module.BroadcastFormDialog,
   })),
 );
 

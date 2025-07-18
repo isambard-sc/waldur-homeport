@@ -27,7 +27,7 @@ export const CustomerRemovePanel: FunctionComponent = () => {
   const dispatch = useDispatch();
 
   const removeCustomer = () => {
-    const hasProjects = customer.projects.length > 0;
+    const hasProjects = customer.projects_count > 0;
     if (hasProjects) {
       const notification = translate(
         'Before removing organization, please make sure that all projects are removed.',

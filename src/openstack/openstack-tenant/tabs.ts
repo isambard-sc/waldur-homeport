@@ -22,8 +22,8 @@ export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
           key: 'flavors',
           title: translate('Flavors'),
           component: lazyComponent(() =>
-            import('./TenantFlavorsList').then((module) => ({
-              default: module.TenantFlavorsList,
+            import('./TenantFlavorsTable').then((module) => ({
+              default: module.TenantFlavorsTable,
             })),
           ),
         },
@@ -31,8 +31,8 @@ export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
           key: 'images',
           title: translate('Images'),
           component: lazyComponent(() =>
-            import('./TenantImagesList').then((module) => ({
-              default: module.TenantImagesList,
+            import('./TenantImagesTable').then((module) => ({
+              default: module.TenantImagesTable,
             })),
           ),
         },
@@ -132,9 +132,9 @@ export const OpenStackTenantTabConfiguration: ResourceTabsConfiguration = {
           key: 'volume-types',
           title: translate('Volume types'),
           component: lazyComponent(() =>
-            import('../openstack-volume/TenantVolumeTypesList').then(
+            import('../openstack-volume/TenantVolumeTypesTable').then(
               (module) => ({
-                default: module.TenantVolumeTypesList,
+                default: module.TenantVolumeTypesTable,
               }),
             ),
           ),

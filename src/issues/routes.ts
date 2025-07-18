@@ -119,6 +119,20 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'support.access-for-email',
+    url: 'access-for-email/',
+    component: lazyComponent(() =>
+      import('../openportal/AccessForEmail').then((module) => ({
+        default: module.AccessForEmail,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Check user access'),
+      priority: 100,
+    },
+  },
+
+  {
     name: 'support.broadcast-templates',
     url: 'broadcast-templates/',
     component: lazyComponent(() =>

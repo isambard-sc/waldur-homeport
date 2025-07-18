@@ -21,6 +21,7 @@ interface ResourceActionComponentProps {
   resourceTypeActions?: ActionItemType[];
   extraActions?: ActionItemType[];
   resource: any;
+  scope?: any;
   marketplaceResource?: any;
   refetch?(): void;
   labeled?: boolean;
@@ -62,7 +63,7 @@ export const ResourceActionComponent: FunctionComponent<
               extraAndResourceTypeActions.map((ActionComponent, index) => (
                 <ActionComponent
                   key={`resource-${index}`}
-                  resource={props.resource}
+                  resource={props.scope || props.resource}
                   marketplaceResource={props.marketplaceResource}
                   refetch={props.refetch}
                 />
@@ -77,7 +78,11 @@ export const ResourceActionComponent: FunctionComponent<
                   .map((ActionComponent, index) => (
                     <ActionComponent
                       key={`resource-${index}`}
-                      resource={props.resource}
+                      resource={
+                        props.extraActions?.includes(ActionComponent)
+                          ? props.scope || props.resource
+                          : props.resource
+                      }
                       marketplaceResource={props.marketplaceResource}
                       refetch={props.refetch}
                     />

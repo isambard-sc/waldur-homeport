@@ -39,6 +39,11 @@ const mandatoryFields: MarketplaceOrdersListData['query']['field'] = [
   'plan_name',
 ];
 
+const formatName = (row: OrderDetails) =>
+  typeof row.attributes['name'] === 'string' && row.attributes['name']
+    ? row.attributes['name']
+    : row.uuid;
+
 export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
   table,
   filter,
@@ -60,14 +65,14 @@ export const OrdersTableComponent: FC<OrdersTableComponentProps> = ({
         <Link
           state="marketplace-orders.details"
           params={{ order_uuid: row.uuid }}
-          label={row.attributes['name'] || row.uuid}
+          label={formatName(row)}
         />
       ),
 
       keys: ['attributes'],
       id: 'name',
-      copyField: (row) => row.attributes['name'],
-      export: (row) => row.attributes['name'],
+      copyField: formatName,
+      export: formatName,
     },
     {
       title: translate('Created at'),

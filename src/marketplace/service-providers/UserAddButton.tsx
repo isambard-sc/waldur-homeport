@@ -1,13 +1,12 @@
-import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { AddButton } from '@waldur/core/AddButton';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
-import { ActionButton } from '@waldur/table/ActionButton';
 import { getCustomer, getUser } from '@waldur/workspace/selectors';
 
 interface UserAddButtonProps {
@@ -31,7 +30,7 @@ export const UserAddButton: FunctionComponent<UserAddButtonProps> = ({
     customerId: customer.uuid,
   });
   return (
-    <ActionButton
+    <AddButton
       action={() =>
         dispatch(
           openModalDialog(AddUserDialog, {
@@ -41,8 +40,6 @@ export const UserAddButton: FunctionComponent<UserAddButtonProps> = ({
           }),
         )
       }
-      title={translate('Add')}
-      iconNode={<PlusCircleIcon weight="bold" />}
       disabled={!canAddUser}
     />
   );

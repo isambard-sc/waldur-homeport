@@ -1,7 +1,7 @@
 import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react';
 import { useCallback, FunctionComponent } from 'react';
+import { Field } from 'react-final-form';
 import { useToggle } from 'react-use';
-import { Field } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 

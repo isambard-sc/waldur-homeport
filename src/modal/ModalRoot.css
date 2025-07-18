@@ -40,8 +40,10 @@
 .modal-dialog-scrollable
   .modal-content
   *:not(.modal-header):not(.modal-body):not(.modal-footer):not(
-    .modal-header *
-  ):not(.modal-body *):not(.modal-footer *) {
+    .wizard-step-indicator
+  ):not(.modal-header *):not(.modal-body *):not(.modal-footer *):not(
+    .wizard-step-indicator *
+  ) {
   display: flex;
   flex-direction: column;
   overflow: hidden;

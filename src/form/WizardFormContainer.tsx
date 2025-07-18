@@ -10,15 +10,18 @@ import { translate } from '@waldur/i18n';
 interface WizardFormContainerProps {
   form: string;
   title: string;
+  subtitle?: string;
   onSubmit: WizardFormStepProps['onSubmit'];
   submitLabel?: string;
   nextLabel?: string;
   steps: ProgressStep[];
+  hideStepper?: boolean;
   wizardForms: FC<WizardFormStepProps>[];
   initialValues?: any;
   data?: any;
   validate?(values: any): any;
   modalProps?: {
+    headerClassName?: string;
     bodyClassName?: string;
   };
 }
@@ -68,12 +71,14 @@ export const WizardFormContainer: FC<WizardFormContainerProps> = ({
   return createElement(props.wizardForms[step], {
     form,
     title: props.title,
+    subtitle: props.subtitle,
     onSubmit: isLast ? props.onSubmit : nextStep,
     onPrev: prevStep,
     onStep: selectStep,
     submitLabel: _submitLabel,
     step,
     steps: props.steps,
+    hideStepper: props.hideStepper,
     initialValues: props.initialValues,
     data: props.data,
     reinitialize,

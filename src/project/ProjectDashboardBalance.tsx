@@ -66,10 +66,10 @@ export const ProjectDashboardBalance = ({
       <p>
         <ul>
           <li>
-            {translate('Current balance')}: {defaultCurrency(balance)}
+            {translate('Balance at start of month')}: {defaultCurrency(balance)}
           </li>
           <li>
-            {translate('Estimated cost for current month')}: {defaultCurrency(estimate)}
+            {translate('Estimated spend this month')}: {defaultCurrency(estimate)}
           </li>
           <li>
             {translate('Estimated balance at the end of this month')}: {defaultCurrency(estimated_balance)}

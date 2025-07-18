@@ -6,8 +6,11 @@ import { SelectField, FormGroup } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { getCustomer } from '@waldur/workspace/selectors';
 
+import { useCustomerProjects } from '../workspace/fetchCustomer';
+
 export const OrganizationProjectSelectField = ({ disabled = false }) => {
   const currentCustomer = useSelector(getCustomer);
+  const { loading } = useCustomerProjects();
 
   return (
     <Field
@@ -23,6 +26,7 @@ export const OrganizationProjectSelectField = ({ disabled = false }) => {
         getOptionValue={(option) => option.url}
         isClearable={false}
         isDisabled={disabled}
+        isLoading={loading}
       />
     </Field>
   );

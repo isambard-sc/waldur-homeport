@@ -3,7 +3,9 @@ import { Resource } from 'waldur-js-client';
 
 import { ModalActionsRouter } from '@waldur/marketplace/resources/actions/ModalActionsRouter';
 import { ResourceActionsButton as BaseResourceActionsButton } from '@waldur/marketplace/resources/actions/ResourceActionsButton';
+import { MANAGED_RANCHER } from '@waldur/rancher/cluster/create/constants';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
+import { SUPPORT_OFFERING_TYPE } from '@waldur/support/constants';
 
 import { ActionsLists } from '../actions/ActionsLists';
 
@@ -15,7 +17,8 @@ interface ResourceActionsButtonProps {
 export const ResourceActionsButton: FunctionComponent<
   ResourceActionsButtonProps
 > = ({ row, refetch }) =>
-  row.scope === null || row.offering_type === 'Support.OfferingTemplate' ? (
+  row.scope === null ||
+  [SUPPORT_OFFERING_TYPE, MANAGED_RANCHER].includes(row.offering_type) ? (
     <BaseResourceActionsButton
       resource={
         {

@@ -7,6 +7,8 @@ import { FormattedHtml } from '@waldur/core/FormattedHtml';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { TextField } from '@waldur/form';
+import { FormGroup } from '@waldur/form/FormGroup';
+import { validateMaxLength } from '@waldur/form/utils';
 import { translate } from '@waldur/i18n';
 
 export const CustomMessageWrapper = () => {
@@ -40,15 +42,15 @@ export const CustomMessageWrapper = () => {
       )}
       <Field
         name="extra_invitation_text"
-        component={TextField}
-        placeholder={translate('Enter custom message') + '...'}
-      />
-
-      <p className="text-muted mb-0">
-        {translate(
+        component={FormGroup}
+        label={translate('Custom message')}
+        description={translate(
           'You can add a message to be attached to the invitation email the users receive.',
         )}
-      </p>
+        validate={validateMaxLength(250)}
+      >
+        <TextField placeholder={translate('Enter custom message') + '...'} />
+      </Field>
     </div>
   );
 };

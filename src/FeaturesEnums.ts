@@ -25,6 +25,7 @@ export enum MarketplaceFeatures {
   import_resources = 'marketplace.import_resources',
   lexis_links = 'marketplace.lexis_links',
   show_call_management_functionality = 'marketplace.show_call_management_functionality',
+  show_remote_project_functionality = 'marketplace.show_remote_project_functionality',
   show_experimental_ui_components = 'marketplace.show_experimental_ui_components',
   show_resource_end_date = 'marketplace.show_resource_end_date',
 }
@@ -60,7 +61,6 @@ export enum SlurmFeatures {
 export enum SupportFeatures {
   conceal_change_request = 'support.conceal_change_request',
   pricelist = 'support.pricelist',
-  users = 'support.users',
   vm_type_overview = 'support.vm_type_overview',
 }
 

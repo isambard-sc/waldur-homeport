@@ -5,6 +5,7 @@ import { PublicOfferingDetails } from 'waldur-js-client';
 
 import { orderFormAttributesSelector } from '@waldur/marketplace/deploy/selectors';
 import { loadVolumeTypes } from '@waldur/openstack/api';
+import { TENANT_TYPE } from '@waldur/openstack/constants';
 import {
   formatVolumeTypeChoices,
   getDefaultVolumeType,
@@ -17,7 +18,7 @@ export const getOfferingLimit = (
   quotaName: string,
   defaultLimit = Infinity,
 ) => {
-  if (!offering?.quotas?.length) return 0;
+  if (!offering?.quotas?.length) return -1;
   const quota = offering.quotas.find((qouta) => qouta.name === quotaName);
   if (!quota) return defaultLimit;
   return quota.limit;
@@ -46,7 +47,11 @@ export const useVolumeDataLoader = (offering: PublicOfferingDetails) => {
 
     queryFn: async () => {
       const volumeTypes = offering.scope_uuid
-        ? await loadVolumeTypes({ tenant_uuid: offering.scope_uuid })
+        ? await loadVolumeTypes(
+            offering.type === TENANT_TYPE
+              ? { settings_uuid: offering.scope_uuid }
+              : { tenant_uuid: offering.scope_uuid },
+          )
         : [];
       const volumeTypeChoices = formatVolumeTypeChoices(volumeTypes);
       const defaultVolumeType = getDefaultVolumeType(volumeTypeChoices);

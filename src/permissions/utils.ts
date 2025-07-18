@@ -13,6 +13,8 @@ export const getProjectRoles = () => getRoles(['project']);
 
 export const getCustomerRoles = () => getRoles(['customer']);
 
+export const getProposalRoles = () => getRoles(['proposal']);
+
 const ROLE_MAP = {
   owner: RoleEnum.CUSTOMER_OWNER,
   service_manager: RoleEnum.CUSTOMER_MANAGER,

@@ -1019,7 +1019,7 @@ $form-switch-height-lg: 2.75rem !default; // Custom variable
 $form-switch-padding-start: $form-switch-width + 0.5rem !default;
 $form-switch-padding-left: $form-switch-width + 0.5rem !default;
 $form-switch-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color}'/></svg>") !default;
-$form-switch-bg-image-solid: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><defs><filter id='shadow' x='-10%%25' y='-10%%25' width='120%%25' height='120%%25'><feDropShadow dx='0' dy='0.3' stdDeviation='0.5' flood-color='%23101828' flood-opacity='0.1'/></filter></defs><circle r='3' fill='#{$form-switch-color-solid}' filter='url(%23shadow)'/></svg>") !default;
+$form-switch-bg-image-solid: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 8 8"><defs><filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="0.3" stdDeviation="0.5" flood-color="#101828" flood-opacity="0.1"/></filter></defs><circle r="3" fill="#{$form-switch-color-solid}" filter="url(#shadow)"/></svg>') !default;
 $form-switch-border-radius: $form-switch-width !default;
 
 $form-switch-focus-color: $input-focus-border-color !default;

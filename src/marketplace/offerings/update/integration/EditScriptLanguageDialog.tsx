@@ -1,7 +1,10 @@
 import { useCallback } from 'react';
 import { connect } from 'react-redux';
 import { Field, reduxForm } from 'redux-form';
-import { marketplaceProviderOfferingsUpdateIntegration } from 'waldur-js-client';
+import {
+  marketplaceProviderOfferingsUpdateIntegration,
+  MergedSecretOptionsRequest,
+} from 'waldur-js-client';
 
 import { SubmitButton, SelectField, FormGroup } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -52,7 +55,7 @@ export const EditScriptLanguageDialog = connect<{}, {}, OwnProps>(
               secret_options: {
                 ...props.resolve.offering.secret_options,
                 [props.resolve.type]: formData.language,
-              },
+              } as MergedSecretOptionsRequest,
             },
           });
           showSuccess(
@@ -77,7 +80,8 @@ export const EditScriptLanguageDialog = connect<{}, {}, OwnProps>(
         <ModalDialog
           title={props.resolve.label}
           subtitle={translate(
-            'Select the language to be used for the offering %NAME%´s custom scripts',
+            "Select the language to be used for the offering {name}'s custom scripts",
+            { name: props.resolve.offering.name },
           )}
           closeButton
           footer={

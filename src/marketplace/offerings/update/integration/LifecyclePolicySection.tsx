@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { NumberField } from '@waldur/form';
+import { NumberField, StringField } from '@waldur/form';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { DateField } from '@waldur/form/DateField';
 import FormTable from '@waldur/form/FormTable';
@@ -49,6 +49,16 @@ const fields: OfferingEditField[] = [
     label: translate('Supports pausing'),
     key: 'plugin_options.supports_pausing',
     component: AwesomeCheckboxField,
+  },
+  {
+    label: translate('Minimal team count for resource provisioning'),
+    key: 'plugin_options.minimal_team_count_for_provisioning',
+    component: NumberField,
+  },
+  {
+    label: translate('Required team role for resource provisioning'),
+    key: 'plugin_options.required_team_role_for_provisioning',
+    component: StringField,
   },
 ];
 

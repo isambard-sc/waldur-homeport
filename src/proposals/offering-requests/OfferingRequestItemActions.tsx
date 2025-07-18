@@ -101,5 +101,7 @@ export const OfferingRequestItemActions = ({
         size="sm"
       />
     </>
-  ) : null;
+  ) : (
+    'N/A'
+  );
 };

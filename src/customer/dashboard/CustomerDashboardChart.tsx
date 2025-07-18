@@ -31,7 +31,7 @@ export const CustomerDashboardChart: FunctionComponent<
   const router = useRouter();
   const goToUsers = () => router.stateService.go('organization-users');
 
-  const { callback, canInvite } = useCreateInvitation({
+  const { callback, canInvite, loadingProjects } = useCreateInvitation({
     roleTypes: ['customer', 'project'],
     enableBulkUpload: true,
   });
@@ -87,6 +87,7 @@ export const CustomerDashboardChart: FunctionComponent<
               onBadgeClick={goToUsers}
               onAddClick={callback}
               showAdd={canInvite}
+              loadingAdd={loadingProjects}
               className="h-100"
             />
           </Col>

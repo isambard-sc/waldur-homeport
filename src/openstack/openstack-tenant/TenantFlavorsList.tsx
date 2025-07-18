@@ -1,5 +1,5 @@
-import { FunctionComponent, useMemo } from 'react';
-import { OpenStackFlavor, OpenstackFlavorsListData } from 'waldur-js-client';
+import { FunctionComponent } from 'react';
+import { OpenStackFlavor } from 'waldur-js-client';
 
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
@@ -8,16 +8,9 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
-  resourceScope,
+export const TenantFlavorsList: FunctionComponent<{ filter }> = ({
+  filter,
 }) => {
-  const filter = useMemo(
-    (): OpenstackFlavorsListData['query'] => ({
-      tenant_uuid: resourceScope.uuid,
-    }),
-    [resourceScope],
-  );
-
   const props = useTable({
     table: 'openstack-flavors',
     fetchData: createFetcher('openstack-flavors'),
@@ -68,7 +61,7 @@ export const TenantFlavorsList: FunctionComponent<{ resourceScope }> = ({
         },
       ]}
       title={translate('Flavors')}
-      verboseName={translate('flavors')}
+      verboseName={translate('Flavors')}
       hasQuery={true}
       hasOptionalColumns
       showPageSizeSelector

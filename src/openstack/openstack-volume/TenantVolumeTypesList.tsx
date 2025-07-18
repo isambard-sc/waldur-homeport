@@ -1,18 +1,14 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { renderFieldOrDash } from '@waldur/table/utils';
-export const TenantVolumeTypesList: FunctionComponent<{ resourceScope }> = ({
-  resourceScope,
-}) => {
-  const filter = useMemo(
-    () => ({ tenant_uuid: resourceScope.uuid }),
-    [resourceScope],
-  );
 
+export const TenantVolumeTypesList: FunctionComponent<{ filter }> = ({
+  filter,
+}) => {
   const props = useTable({
     table: 'openstack-volume-types',
     fetchData: createFetcher('openstack-volume-types'),
@@ -34,7 +30,7 @@ export const TenantVolumeTypesList: FunctionComponent<{ resourceScope }> = ({
         },
       ]}
       hasQuery={true}
-      title={translate('volume types')}
+      title={translate('Volume types')}
       verboseName={translate('Volume types')}
       showPageSizeSelector
     />

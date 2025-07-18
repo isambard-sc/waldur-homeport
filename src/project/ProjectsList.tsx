@@ -13,7 +13,6 @@ import Table from '@waldur/table/Table';
 import { Column, TableProps } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 import { formatLongText } from '@waldur/table/utils';
-import { ProjectExpandableRow } from '@waldur/user/affiliations/ProjectExpandableRow';
 import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
 
@@ -41,26 +40,11 @@ const TableActions = ({ customer, refetch }) => (
   </>
 );
 
-export const ProjectsList: FC<ProjectsListProps> = ({
+export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
   customer,
   optionalColumns = [],
   ...props
 }) => {
-  const currentCustomer = useSelector(getCustomer);
-  const filter = useMemo(
-    () => ({
-      customer: customer ? customer.uuid : currentCustomer.uuid,
-      o: 'name',
-    }),
-    [currentCustomer, customer],
-  );
-  const tableProps = useTable({
-    table: props.table || PROJECTS_LIST,
-    fetchData: createFetcher('projects'),
-    queryField: 'query',
-    filter,
-    mandatoryFields,
-  });
   const columns: Column[] = [
     {
       title: translate('Name'),
@@ -126,26 +110,50 @@ export const ProjectsList: FC<ProjectsListProps> = ({
 
   return (
     <Table
-      {...tableProps}
       title={translate('Projects')}
       columns={columns}
       verboseName={translate('projects')}
       initialSorting={{ field: 'created', mode: 'desc' }}
       hasQuery={true}
       showPageSizeSelector={true}
-      tableActions={
-        <TableActions
-          customer={customer || currentCustomer}
-          refetch={tableProps.fetch}
-        />
-      }
+      tableActions={<TableActions customer={customer} refetch={props.fetch} />}
       rowActions={({ row }) => (
-        <ProjectsListActions project={row} refetch={tableProps.fetch} />
+        <ProjectsListActions project={row} refetch={props.fetch} />
       )}
-      expandableRow={ProjectExpandableRow}
       enableExport={true}
       hasOptionalColumns
       {...props}
+    />
+  );
+};
+
+export const ProjectsList: FC<ProjectsListProps> = ({
+  customer,
+  optionalColumns = [],
+  ...props
+}) => {
+  const currentCustomer = useSelector(getCustomer);
+  const filter = useMemo(
+    () => ({
+      customer: customer ? customer.uuid : currentCustomer.uuid,
+      o: 'name',
+    }),
+    [currentCustomer, customer],
+  );
+  const tableProps = useTable({
+    table: props.table || PROJECTS_LIST,
+    fetchData: createFetcher('projects'),
+    queryField: 'query',
+    filter,
+    mandatoryFields,
+  });
+
+  return (
+    <ProjectsListTable
+      {...tableProps}
+      {...props}
+      customer={customer || currentCustomer}
+      optionalColumns={optionalColumns}
     />
   );
 };

@@ -15,7 +15,7 @@ import { OrderProviderActions } from '../actions/OrderProviderActions';
 export const OrdersListExpandableRow: FunctionComponent<{
   row: OrderDetails;
 }> = ({ row: order }) => (
-  <ExpandableContainer asTable>
+  <ExpandableContainer asTable hasMultiSelect>
     <Field
       label={translate('Project description')}
       value={order.project_description}

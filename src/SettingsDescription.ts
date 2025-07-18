@@ -235,6 +235,18 @@ export const SettingsDescription = [
         default: '',
         type: 'html_field',
       },
+      {
+        key: 'MAINTENANCE_ANNOUNCEMENT_NOTIFY_BEFORE_MINUTES',
+        description: translate('How many minutes before scheduled maintenance users should be notified.'),
+        default: 60,
+        type: 'integer',
+      },
+      {
+        key: 'MAINTENANCE_ANNOUNCEMENT_NOTIFY_SYSTEM',
+        description: translate('How maintenance notifications are delivered. Choices: AdminAnnouncement or BroadcastMessage.'),
+        default: ['AdminAnnouncement'],
+        type: 'list_field',
+      },
     ],
   },
   {
@@ -770,6 +782,12 @@ export const SettingsDescription = [
         default: '',
         type: 'string',
       },
+      {
+        key: 'DEACTIVATE_USER_IF_NO_ROLES',
+        description: translate('Deactivate user if all roles are revoked (except staff/support)'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
   {
@@ -828,6 +846,47 @@ export const SettingsDescription = [
         description: translate('Optionally disable creation of user groups in FreeIPA matching Waldur structure'),
         default: true,
         type: 'boolean',
+      },
+    ],
+  },
+  {
+    description: translate('OIDC auth settings'),
+    items: [
+      {
+        key: 'OIDC_AUTH_URL',
+        description: translate('OIDC authentication endpoint URL.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'OIDC_INTROSPECTION_URL',
+        description: translate('OIDC introspection endpoint URL for validating access tokens.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'OIDC_CLIENT_ID',
+        description: translate('Client ID for authenticating against the introspection endpoint.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'OIDC_CLIENT_SECRET',
+        description: translate('Client secret for authenticating against the introspection endpoint.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'OIDC_USER_FIELD',
+        description: translate('Field name from the introspection response to identify the user (e.g., \'username\', \'email\', \'client_id\').'),
+        default: 'username',
+        type: 'string',
+      },
+      {
+        key: 'OIDC_CACHE_TIMEOUT',
+        description: translate('Number of seconds to cache token introspection results.'),
+        default: 300,
+        type: 'integer',
       },
     ],
   },

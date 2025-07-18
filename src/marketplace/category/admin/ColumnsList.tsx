@@ -1,7 +1,7 @@
 import { PlusIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Button, Table } from 'react-bootstrap';
-import { FormSection, WrappedFieldArrayProps } from 'redux-form';
+import { FieldArrayRenderProps } from 'react-final-form-arrays';
 
 import { translate } from '@waldur/i18n';
 import { Category } from '@waldur/marketplace/types';
@@ -20,10 +20,9 @@ const CategoryColumnsPlaceholder: FC<{ category: Category }> = ({
   </tr>
 );
 
-interface ColumnsListProps extends WrappedFieldArrayProps {
+interface ColumnsListProps extends FieldArrayRenderProps<any, HTMLElement> {
   CategoryColumns: any[];
-  dispatch: any;
-  category;
+  category: Category;
 }
 
 const ColumnsHeader: FC = () => (
@@ -63,13 +62,13 @@ export const ColumnsList: FC<ColumnsListProps> = ({
           </thead>
           <tbody>
             {fields.map((column, index) => (
-              <FormSection name={column} key={index}>
-                <ColumnRow
-                  column={CategoryColumns[index]}
-                  fields={fields}
-                  index={index}
-                />
-              </FormSection>
+              <ColumnRow
+                key={index}
+                column={CategoryColumns[index]}
+                fields={fields}
+                index={index}
+                name={column}
+              />
             ))}
           </tbody>
         </>

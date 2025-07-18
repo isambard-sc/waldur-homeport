@@ -6,6 +6,7 @@ import { userGroupInvitationsCreate } from 'waldur-js-client';
 import { Project } from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
+import { useCustomerProjects } from '@waldur/customer/workspace/fetchCustomer';
 import { translate } from '@waldur/i18n';
 import { GROUP_INVITATION_CREATE_FORM_ID } from '@waldur/invitations/actions/constants';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -34,6 +35,7 @@ export const GroupInvitationCreateDialog = reduxForm<
 })(({ resolve: { refetch, roles }, submitting, handleSubmit }) => {
   const dispatch = useDispatch();
   const customer = useSelector(getCustomer);
+  const { loading } = useCustomerProjects();
 
   const [invitation, setInvitation] = useState(null);
 
@@ -69,7 +71,11 @@ export const GroupInvitationCreateDialog = reduxForm<
       >
         <div className="pb-5 mb-5 border-bottom">
           <RoleGroup roles={roles} />
-          <ProjectGroup customer={customer} disabled={submitting} />
+          <ProjectGroup
+            customer={customer}
+            loading={loading}
+            disabled={submitting}
+          />
           <SubmitButton
             variant="secondary"
             submitting={submitting}

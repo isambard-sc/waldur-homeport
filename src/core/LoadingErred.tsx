@@ -19,7 +19,7 @@ export const LoadingErred: FunctionComponent<LoadingErredProps> = ({
     <h3>{message || translate('Unable to load data.')}</h3>
     <Button onClick={loadData}>
       <span className="svg-icon svg-icon-2">
-        <ArrowsClockwiseIcon />
+        <ArrowsClockwiseIcon weight="bold" />
       </span>{' '}
       {translate('Reload')}
     </Button>

@@ -8,6 +8,6 @@ export const hasCurrentCustomerPermission = createSelector(
   (user, customer) =>
     user.permissions?.find(
       ({ scope_uuid, scope_type }) =>
-        scope_uuid === customer.uuid && scope_type === 'customer',
+        scope_uuid === customer?.uuid && scope_type === 'customer',
     ),
 );

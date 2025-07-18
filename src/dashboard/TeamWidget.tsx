@@ -24,6 +24,7 @@ interface TeamWidgetProps {
   onBadgeClick?(): void;
   onAddClick?(): void;
   showAdd?: boolean;
+  loadingAdd?: boolean;
   className?: string;
   nameKey?: string;
   emailKey?: string;
@@ -38,6 +39,7 @@ export const TeamWidget: FC<TeamWidgetProps> = ({
   onBadgeClick,
   onAddClick,
   showAdd = true,
+  loadingAdd,
   className,
   nameKey,
   emailKey,
@@ -101,17 +103,20 @@ export const TeamWidget: FC<TeamWidgetProps> = ({
               imageKey={imageKey}
             />
           ) : null}
-          {showAdd && (
-            <div>
-              <Button
-                variant="outline"
-                className="btn-icon btn-outline-dashed border-2 btn-color-muted btn-active-color-primary btn-circle w-40px h-40px"
-                onClick={onAddClick}
-              >
-                <PlusIcon size={18} weight="bold" />
-              </Button>
-            </div>
-          )}
+          {showAdd &&
+            (loadingAdd ? (
+              <LoadingSpinner />
+            ) : (
+              <div>
+                <Button
+                  variant="outline"
+                  className="btn-icon btn-outline-dashed border-2 btn-color-muted btn-active-color-primary btn-circle w-40px h-40px"
+                  onClick={onAddClick}
+                >
+                  <PlusIcon size={18} weight="bold" />
+                </Button>
+              </div>
+            ))}
         </Col>
       }
     >

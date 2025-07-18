@@ -17,6 +17,7 @@ import './wizard.scss';
 export interface WizardFormStepProps
   extends Pick<InjectedFormProps, 'form' | 'initialValues'> {
   title: string;
+  subtitle?: string;
   onSubmit(formData, dispatch, formProps): Promise<any> | void;
   submitLabel: string;
   submitDisabled?: boolean;
@@ -25,6 +26,7 @@ export interface WizardFormStepProps
   step: number;
   onPrev(values: any): void;
   onStep?(step: number): void;
+  hideStepper?: boolean;
   validate?(values: any): any;
   data?: any;
   reinitialize(): void;
@@ -50,6 +52,7 @@ const WizardFormPure: FC<WizardFormProps> = ({ modalProps, ...props }) => {
     <form className="wizard" onSubmit={props.handleSubmit(props.onSubmit)}>
       <ModalDialog
         title={props.title}
+        subtitle={props.subtitle}
         footer={
           <>
             {props.step > 0 && (
@@ -81,21 +84,23 @@ const WizardFormPure: FC<WizardFormProps> = ({ modalProps, ...props }) => {
         {...(modalProps || {})}
       >
         <div className="wizard-big wizard-body clearfix">
-          <StepsList
-            steps={props.steps}
-            value={props.steps[props.step]}
-            onClick={(_, index) => {
-              if (!props.onStep || props.submitDisabled) return;
-              if (index > props.step) {
-                props.submit();
-                if (props.valid) {
+          {!props.hideStepper && (
+            <StepsList
+              steps={props.steps}
+              value={props.steps[props.step]}
+              onClick={(_, index) => {
+                if (!props.onStep || props.submitDisabled) return;
+                if (index > props.step) {
+                  props.submit();
+                  if (props.valid) {
+                    props.onStep(index);
+                  }
+                } else {
                   props.onStep(index);
                 }
-              } else {
-                props.onStep(index);
-              }
-            }}
-          />
+              }}
+            />
+          )}
 
           <div className="content clearfix">
             {typeof props.children === 'function'

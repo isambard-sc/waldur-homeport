@@ -80,11 +80,14 @@ export const MoveProjectDialog: FunctionComponent<{
                 placeholder={translate('Select organization...')}
                 loadOptions={(query, prevOptions, page) =>
                   organizationAutocomplete(query, prevOptions, page, {
-                    field: ['name', 'url'],
+                    field: ['name', 'url', 'abbreviation'],
                     o: 'name',
                   })
                 }
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) =>
+                  option.name +
+                  (option.abbreviation ? ` (${option.abbreviation})` : '')
+                }
                 getOptionValue={(option) => option.url}
                 noOptionsMessage={() => translate('No organizations')}
                 isDisabled={submitting}

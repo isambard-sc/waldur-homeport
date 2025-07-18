@@ -31,5 +31,7 @@ export const CreateFloatingIpAction: FC<TenantActionProps> = ({
     validators={validators}
     apiMethod={(uuid) => openstackTenantsCreateFloatingIp({ path: { uuid } })}
     refetch={refetch}
+    hasConfirmation
+    actionTitle={translate('Create floating IP')}
   />
 );

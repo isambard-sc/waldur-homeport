@@ -8,6 +8,7 @@ import {
   ProviderRequestedOffering,
 } from 'waldur-js-client';
 
+import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -31,6 +32,7 @@ const filtersSelctor = createSelector(
   getFormValues(OFFERING_REQUESTS_FILTER_FORM_ID),
   (customer, filters: any) => {
     const result: ProposalRequestedOfferingsListData['query'] = {};
+    result.o = ['-created'];
     if (customer) {
       result.provider_uuid = customer.uuid;
     }
@@ -96,6 +98,11 @@ export const OfferingRequestsList: FC<OfferingRequestsListProps> = () => {
           filter: 'state',
           inlineFilter: (row) =>
             getCallOfferingStateOptions().filter((s) => s.value === row.state),
+        },
+        {
+          title: translate('Created at'),
+          render: ({ row }) => <>{formatDateTime(row.created)}</>,
+          orderField: 'created',
         },
       ]}
       title={translate('Requests for offerings')}

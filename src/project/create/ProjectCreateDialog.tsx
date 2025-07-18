@@ -1,10 +1,13 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
+import { useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
 import { projectCreditsCreate, projectsCreate } from 'waldur-js-client';
 
 import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { formatISODate } from '@waldur/core/dateUtils';
+import { fetchCustomerProjects } from '@waldur/customer/workspace/fetchCustomer';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
@@ -45,12 +48,36 @@ interface ProjectFormData {
 }
 
 export const ProjectCreateDialog = ({
-  customer,
+  customer: _customer,
   refetch,
 }: ProjectCreateDialogProps) => {
   const { showSuccess, showErrorResponse } = useNotify();
   const { closeDialog } = useModal();
   const router = useRouter();
+
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer>(_customer);
+
+  // Fetch customer projects
+  const {
+    data: projects,
+    isLoading,
+    error,
+    refetch: refetchProjects,
+  } = useQuery({
+    queryKey: ['CustomerProjects', selectedCustomer?.uuid],
+    queryFn: () =>
+      !selectedCustomer
+        ? null
+        : selectedCustomer?.projects
+          ? Promise.resolve(selectedCustomer.projects)
+          : fetchCustomerProjects(selectedCustomer.uuid),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const customer = useMemo(
+    () => (selectedCustomer ? { ...selectedCustomer, projects } : undefined),
+    [selectedCustomer, projects],
+  );
 
   const onSubmit = async (formData: ProjectFormData) => {
     try {
@@ -118,7 +145,7 @@ export const ProjectCreateDialog = ({
               <>
                 <CloseDialogButton className="flex-equal" />
                 <SubmitButton
-                  disabled={invalid || !dirty}
+                  disabled={invalid || !dirty || isLoading || Boolean(error)}
                   submitting={submitting}
                   label={translate('Create')}
                   className="btn btn-primary flex-equal"
@@ -127,8 +154,16 @@ export const ProjectCreateDialog = ({
             }
           >
             <div className="size-lg">
-              <OrganizationGroup isDisabled={!!customer} />
-              <NameGroup customer={values?.customer} />
+              <OrganizationGroup
+                onChange={setSelectedCustomer}
+                isDisabled={!!_customer}
+              />
+              <NameGroup
+                customer={values?.customer}
+                loading={isLoading}
+                error={error}
+                refetch={refetchProjects}
+              />
               <ProjectShortNameGroup isDisabled={!!customer} />
               <DescriptionGroup create />
               <IndustryGroup />

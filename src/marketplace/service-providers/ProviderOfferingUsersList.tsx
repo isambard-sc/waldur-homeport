@@ -10,6 +10,7 @@ import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
 import { OfferingUserRowActions } from '../offerings/actions/OfferingUserRowActions';
+import { UserImportButton } from '../offerings/import-users/UserImportButton';
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 
 import { PROVIDER_OFFERING_USERS_FORM_ID } from './constants';
@@ -102,7 +103,10 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
         />
       }
       tableActions={
-        <CreateProviderOfferingUserButton refetch={tableProps.fetch} />
+        <>
+          <UserImportButton refetch={tableProps.fetch} provider={provider} />
+          <CreateProviderOfferingUserButton refetch={tableProps.fetch} />
+        </>
       }
       rowActions={({ row }) => (
         <OfferingUserRowActions

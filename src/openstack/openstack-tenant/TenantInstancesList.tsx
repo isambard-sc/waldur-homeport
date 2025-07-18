@@ -56,7 +56,7 @@ export const TenantInstancesList: FunctionComponent<{ resourceScope }> = ({
   const props = useTable({
     table: 'openstack-instances',
     fetchData: createFetcher('openstack-instances'),
-    queryField: 'name',
+    queryField: 'query',
     filter,
   });
   return (

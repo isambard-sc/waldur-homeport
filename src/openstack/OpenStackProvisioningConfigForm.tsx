@@ -84,6 +84,11 @@ const openStackFields: OfferingEditField[] = [
     component: CommaSeparatedListField,
   },
   {
+    label: translate('Create highly available Neutron routers'),
+    key: 'service_attributes.create_ha_routers',
+    component: AwesomeCheckboxField,
+  },
+  {
     label: translate('Allow live volume resize'),
     description: translate(
       'Allow live volume resize of system and data volumes',

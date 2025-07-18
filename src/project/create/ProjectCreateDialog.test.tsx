@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -44,13 +45,25 @@ describe('ProjectCreateDialog', () => {
     router.plugin(servicesPlugin);
     router.plugin(pushStateLocationPlugin);
 
+    const queryClient = new QueryClient();
+    // Prepare cache data
+    queryClient.setQueryData(['CustomerProjects', 'mock-customer-uuid'], []);
+
     await render(
       <Provider store={mockStore}>
         <UIRouter router={router}>
-          <ProjectCreateDialog
-            customer={{ url: 'mock-customer-url' } as Customer}
-            refetch={mockedRefetch}
-          />
+          <QueryClientProvider client={queryClient}>
+            <ProjectCreateDialog
+              customer={
+                {
+                  uuid: 'mock-customer-uuid',
+                  url: 'mock-customer-url',
+                  projects: [],
+                } as Customer
+              }
+              refetch={mockedRefetch}
+            />
+          </QueryClientProvider>
         </UIRouter>
       </Provider>,
     );

@@ -17,28 +17,29 @@ import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-const BroadcastCreateDialog = lazyComponent(() =>
-  import('./BroadcastCreateDialog').then((module) => ({
-    default: module.BroadcastCreateDialog,
+const BroadcastFormDialog = lazyComponent(() =>
+  import('./BroadcastFormDialog').then((module) => ({
+    default: module.BroadcastFormDialog,
   })),
 );
 
 export const BroadcastSaveAsTemplateDialog = reduxForm<
   MessageTemplateRequest,
-  { resolve: { refetch; broadcastData } }
+  { resolve: { refetch; broadcastData; broadcastUuid? } }
 >({
   form: 'BroadcastSaveAsTemplateDialog',
 })(({ submitting, handleSubmit, resolve }) => {
   const dispatch = useDispatch();
   const backToBroadcast = (broadcastData) =>
     dispatch(
-      openModalDialog(BroadcastCreateDialog, {
+      openModalDialog(BroadcastFormDialog, {
         dialogClassName: 'modal-dialog-centered',
         resolve: {
           refetch: resolve.refetch,
+          uuid: resolve.broadcastUuid, // We need this if we came from the edit form
         },
         initialValues: broadcastData,
-        size: 'lg',
+        size: 'xl',
       }),
     );
   const callback = useCallback(

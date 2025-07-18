@@ -9,6 +9,7 @@ export { User, Project, Payment } from 'waldur-js-client';
 
 export interface Customer extends SdkCustomer {
   credit?: CustomerCredit;
+  projects?: Project[];
 }
 
 export type PhoneNumber =

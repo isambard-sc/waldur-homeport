@@ -55,6 +55,8 @@ export const TablePagination: FunctionComponent<TablePaginationProps> = (
               <Pagination
                 totalPages={totalPages}
                 currentPage={Math.min(props.currentPage, totalPages)}
+                boundaryPagesRange={props.resultCount > 1000 ? 0 : undefined}
+                siblingPagesRange={props.resultCount > 1000 ? 2 : undefined}
                 onChange={props.gotoPage}
                 hideFirstAndLastPageLinks
                 hidePreviousAndNextPageLinks

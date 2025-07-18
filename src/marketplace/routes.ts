@@ -319,6 +319,19 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'managed-projects',
+    abstract: true,
+    parent: 'marketplace-provider',
+    component: UIView,
+    url: '',
+    data: {
+      //feature: MarketplaceFeatures.show_remote_project_functionality,
+      breadcrumb: () => translate('Managed projects'),
+      priority: 150,
+    },
+  },
+
+  {
     name: 'marketplace-vendor-offerings',
     url: 'offerings/?{state}',
     component: lazyComponent(() =>
@@ -371,6 +384,20 @@ export const states: StateDeclaration[] = [
     component: lazyComponent(() =>
       import('./service-providers/ProviderUsersList').then((module) => ({
         default: module.ProviderUsersList,
+      })),
+    ),
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-projects',
+    parent: 'marketplace-provider-customers',
+    url: 'projects/',
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderProjectsList').then((module) => ({
+        default: module.ProviderProjectsList,
       })),
     ),
     data: {
@@ -534,6 +561,36 @@ export const states: StateDeclaration[] = [
     data: {
       feature: MarketplaceFeatures.show_call_management_functionality,
       breadcrumb: () => translate('Requests for offerings'),
+    },
+  },
+
+  {
+    name: 'marketplace-provider-managed-projects',
+    url: 'managed-projects/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/managed-projects/ManagedProjectsList').then(
+        (module) => ({ default: module.ManagedProjectsList }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      //feature: MarketplaceFeatures.show_managed_project_functionality,
+      breadcrumb: () => translate('Externally managed projects'),
+    },
+  },
+
+  {
+    name: 'marketplace-provider-project-templates',
+    url: 'project-templates/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/project-templates/ProjectTemplateList').then(
+        (module) => ({ default: module.ProjectTemplateList }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      //feature: MarketplaceFeatures.show_managed_project_functionality,
+      breadcrumb: () => translate('Available managed project project-templates'),
     },
   },
 

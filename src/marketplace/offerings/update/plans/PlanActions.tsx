@@ -7,6 +7,7 @@ import { TableDropdownToggle } from '@waldur/table/ActionsDropdown';
 
 import { ArchivePlanButton } from './ArchivePlanButton';
 import { ClonePlanButton } from './ClonePlanButton';
+import { DeletePlanButton } from './DeletePlanButton';
 import { EditPlanDescriptionButton } from './EditPlanDescriptionButton';
 import { EditPlanPricesButton } from './EditPlanPricesButton';
 import { EditPlanQuotasButton } from './EditPlanQuotasButton';
@@ -58,6 +59,7 @@ export const PlanActions = ({ offering, plan, refetch, user }) => {
           permission: PermissionEnum.ARCHIVE_OFFERING_PLAN,
           customerId: offering.customer_uuid,
         }) && <ArchivePlanButton refetch={refetch} plan={plan} />}
+        {user.is_staff && <DeletePlanButton refetch={refetch} plan={plan} />}
       </Dropdown.Menu>
     </Dropdown>
   );
