@@ -33,6 +33,14 @@ const renderProjectTemplateLink = (row: any) => {
         return template;
     }
 
+    if (row.details?.template) {
+        return row.details.template;
+    }
+
+    if (row.details?.class) {
+        return row.details.class;
+    }
+
     return 'No project template assigned';
 };
 
