@@ -37,20 +37,6 @@ export const FormFinalConfigurationStep = (props: FormStepProps) => {
         <TextField />
       </Field>
 
-      <Field
-        name="attributes.allocation"
-        label={translate('Initial Allocation')}
-        component={FormGroup}
-        description={translate(
-          'If set, this will deploy an initial allocation for this resource, overriding any default allocation that is set.',
-        )}
-      >
-        <NumberField
-          min={0}
-          step={1}
-        />
-      </Field>
-
       <div className="mb-7 border-bottom" />
       <TerminationDateField offering={props.offering} />
     </VStepperFormStepCard>
