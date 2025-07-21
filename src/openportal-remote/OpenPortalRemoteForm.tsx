@@ -2,7 +2,7 @@ import { get } from 'lodash-es';
 import { FunctionComponent } from 'react';
 
 import { required } from '@waldur/core/validators';
-import { StringField } from '@waldur/form';
+import { NumberField, StringField } from '@waldur/form';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { FieldEditButton } from '@waldur/marketplace/offerings/update/integration/FieldEditButton';
@@ -23,6 +23,20 @@ const fields = [
     component: StringField,
     fieldProps: { required: true, validate: required },
   },
+  {
+    label: translate('Allocation units'),
+    key: 'service_attributes.allocation_unit',
+    description: translate('The unit of allocation for this instance, e.g. NHR'),
+    component: StringField,
+    fieldProps: { required: false, validate: required },
+  },
+  {
+    label: translate('Default allocation'),
+    key: 'service_attributes.default_allocation',
+    description: translate('Default allocation in the above allocation units for projects using this resource. Leave empty for no default allocation.'),
+    component: NumberField,
+    fieldProps: { required: false, validate: required },
+  }
 ];
 
 export const OpenPortalRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
