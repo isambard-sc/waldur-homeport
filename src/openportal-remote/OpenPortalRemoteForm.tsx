@@ -36,7 +36,14 @@ const fields = [
     description: translate('Default allocation in the above allocation units for projects using this resource. Leave empty for no default allocation.'),
     component: NumberField,
     fieldProps: { required: false, validate: required },
-  }
+  },
+  {
+    label: translate('Maximum allocation'),
+    key: 'service_attributes.max_allocation',
+    description: translate('Maximum allocation in the above allocation units for projects using this resource. Leave empty for no maximum allocation.'),
+    component: NumberField,
+    fieldProps: { required: false, validate: required },
+  },
 ];
 
 export const OpenPortalRemoteForm: FunctionComponent<OfferingEditPanelFormProps> = (
