@@ -16,6 +16,7 @@ import { post } from '../api';
 import { getCustomerURL } from '../utils';
 
 import { RoleMappingField } from './RoleMappingField';
+import { AllocationUnitsMappingField } from './AllocationUnitsMappingField';
 import { OrganizationAutocompleteField } from './OrganizationAutocompleteField';
 import { OfferingAutocompleteField } from './OfferingAutocompleteField';
 
@@ -143,24 +144,36 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                         </FormGroup>
 
                         <FormGroup controlId="offerings" label={translate('Default offerings for new projects')}>
-                            <OfferingAutocompleteField
+                            <Field
                                 name="offerings"
+                                component={OfferingAutocompleteField as any}
                                 placeholder={translate('Select offerings')}
                                 isMulti={true}
                                 reactSelectProps={{
                                     isClearable: true,
-                                    closeMenuOnSelect: false
+                                    closeMenuOnSelect: false,
                                 }}
                             />
                         </FormGroup>
 
-                        <FormGroup controlId="role_mapping" label={translate('Role Mapping')}>
-                            <RoleMappingField
+                        {/*                         <FormGroup controlId="role_mapping" label={translate('Role Mapping')}>
+                            <Field
                                 name="role_mapping"
+                                component={RoleMappingField as any}
                                 placeholder={translate('Map remote portal roles to local roles')}
+                                help={translate('Map remote portal roles to local roles. For example, map "admin" to "Project Manager" and "user" to "Project Member".')}
                             />
                         </FormGroup>
 
+                        <FormGroup controlId="allocation_units_mapping" label={translate('Allocation credit mapping')}>
+                            <Field
+                                name="allocation_units_mapping"
+                                component={AllocationUnitsMappingField as any}
+                                placeholder={translate('Map allocation units to credits')}
+                                help={translate('Map allocation units to credits. For example, 1 credit is 4 GPU hours.')}
+                            />
+                        </FormGroup>
+ */}
                         <FormGroup controlId="approval_limit" label={translate('Credit limit beyond which approval is required')}>
                             <Field
                                 name="approval_limit"
