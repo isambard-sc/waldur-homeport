@@ -53,13 +53,17 @@ const stringify_role = (role: any, project_template: any) => {
         return translate('Will not be added to project');
     }
 
-    console.log('Look up role:', role, 'in project template:', project_template);
-    console.log(project_template);
-
-    const mapped_role = project_template.role_mapping[role];
+    let mapped_role = project_template.role_mapping[role];
 
     if (!mapped_role) {
-        return role + " " + translate(`has no mapping - will not be added to project`);
+        // check if there is a case-insensitive match in the keys of the role_mapping dictionary
+        mapped_role = Object.entries(project_template.role_mapping).find(
+            ([key]) => key.toLowerCase() === role.toLowerCase()
+        )?.[1];
+
+        if (!mapped_role) {
+            return role + " " + translate(`has no mapping - will not be added to project`);
+        }
     }
 
     return mapped_role.description || mapped_role.name || mapped_role.uuid || translate('Not set');
