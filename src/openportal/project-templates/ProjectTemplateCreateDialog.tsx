@@ -131,6 +131,11 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                                 component={OrganizationAutocompleteField as any}
                                 placeholder={translate('Select organisation')}
                                 required
+                                reactSelectProps={{
+                                    isClearable: true,
+                                    closeMenuOnSelect: true,
+                                }}
+                                noOptionsMessage={() => translate('No organisations found')}
                             />
                         </FormGroup>
 
@@ -155,6 +160,7 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                                     isClearable: true,
                                     closeMenuOnSelect: false,
                                 }}
+                                noOptionsMessage={() => translate('No offerings found')}
                             />
                         </FormGroup>
 
@@ -165,7 +171,7 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                                 placeholder={translate('Map remote portal roles to local roles')}
                                 help={translate('Map remote portal roles to local roles. For example, map "admin" to "Project Manager" and "user" to "Project Member".')}
                             />
-                        </FormGroup>
+                        </FormGroup>*/}
 
                         <FormGroup controlId="allocation_units_mapping" label={translate('Allocation credit mapping')}>
                             <Field
@@ -175,7 +181,7 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                                 help={translate('Map allocation units to credits. For example, 1 credit is 4 GPU hours.')}
                             />
                         </FormGroup>
- */}
+
                         <FormGroup controlId="approval_limit" label={translate('Credit limit beyond which approval is required')}>
                             <Field
                                 name="approval_limit"
@@ -198,7 +204,7 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
                     </ModalDialog>
-                </form>
+                </form >
             )}
         />
     );
