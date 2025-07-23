@@ -126,9 +126,11 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                         </FormGroup>
 
                         <FormGroup controlId="customer" label={translate('Organisation into which to deploy projects')} required>
-                            <OrganizationAutocompleteField
+                            <Field
                                 name="customer"
+                                component={OrganizationAutocompleteField as any}
                                 placeholder={translate('Select organisation')}
+                                required
                             />
                         </FormGroup>
 
