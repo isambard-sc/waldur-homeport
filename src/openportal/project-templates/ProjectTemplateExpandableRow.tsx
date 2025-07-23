@@ -64,7 +64,7 @@ const stringify_allocation_mapping = (allocation_mapping: any) => {
     }
     return Object.entries(allocation_mapping).map(([key, value]) => (
         <div key={key}>
-            &nbsp;&nbsp;1 credit = {value != 0 ? (1.0 / value) : 0} {key}
+            &nbsp;&nbsp;1 credit = {value} {key}
         </div>
     ));
 }

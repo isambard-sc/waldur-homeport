@@ -29,6 +29,10 @@ export const AllocationUnitsOptions = [
     }
 ];
 
+interface AllocationMapping {
+    [unit: string]: number;
+}
+
 interface AllocationUnitsMappingProps extends FormField {
     placeholder?: string;
     validator?: any;
@@ -40,104 +44,148 @@ export const AllocationUnitsMappingField: FunctionComponent<AllocationUnitsMappi
     placeholder,
     validator,
     solid,
+    meta,
 }) => {
-
-    const [allocationUnit, setAllocationUnit] = useState(null);
-    const [allocationValue, setAllocationValue] = useState(null);
+    const [allocationUnit, setAllocationUnit] = useState<string | null>(null);
+    const [allocationValue, setAllocationValue] = useState<number | null>(null);
 
     const addMapping = useCallback(() => {
-        if (allocationUnit && allocationValue > 0) {
-            let currentMappings = input.value || {};
+        if (allocationUnit && allocationValue && allocationValue > 0) {
+            const currentMappings: AllocationMapping = input.value || {};
+            const newMappings = {
+                ...currentMappings,
+                [allocationUnit]: allocationValue
+            };
 
-            currentMappings[allocationUnit] = allocationValue;
-
-            // Update the input value with the new mappings
-            input.onChange(currentMappings);
+            input.onChange(newMappings);
             setAllocationUnit(null);
             setAllocationValue(null);
-
-            console.log('Updated mappings:', currentMappings);
         }
     }, [allocationUnit, allocationValue, input]);
 
     const removeMapping = useCallback((unit: string) => {
-        let currentMappings = input.value || {};
+        const currentMappings: AllocationMapping = input.value || {};
         if (currentMappings[unit]) {
-            delete currentMappings[unit];
-            input.onChange(currentMappings);
-            console.log('Removed mapping for unit:', unit);
+            const { [unit]: removed, ...remainingMappings } = currentMappings;
+            input.onChange(remainingMappings);
         }
     }, [input]);
 
-    console.log('Current mappings:', input.value);
+    const handleValueChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setAllocationValue(value === '' ? null : Number(value));
+    }, []);
+
+    const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addMapping();
+        }
+    }, [addMapping]);
+
+    const currentMappings: AllocationMapping = input.value || {};
+    const hasMappings = Object.keys(currentMappings).length > 0;
+    const isAddButtonEnabled = allocationUnit && allocationValue && allocationValue > 0;
+
+    const hasError = meta?.touched && meta?.error;
 
     return (
         <div className="allocation-units-mapping-field">
             <div className="mb-3">
-                {input.value && input.value.length > 0 ? (
+                {hasMappings ? (
                     <>
-                        <div className="text-muted">
+                        <div className="text-muted mb-2">
                             {translate('Current mappings:')}
                         </div>
-                        <ul className="list-group">
-                            {
-                                Object.entries(input.value).map(([unit, value]) => (
-                                    <li key={unit} className="list-group-item d-flex justify-content-between align-items-center">
-                                        <span>1 credit equals {value} {unit}</span>
-                                        <button
-                                            type="button"
-                                            className="btn btn-sm btn-outline-danger"
-                                            onClick={() => removeMapping(unit)}
-                                            title={translate('Remove mapping')}
-                                        >
-                                            {translate('Remove')}
-                                        </button>
-                                    </li>
-                                ))
-                            }
+                        <ul className="list-group mb-3" role="list">
+                            {Object.entries(currentMappings).map(([unit, value]) => (
+                                <li
+                                    key={unit}
+                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                >
+                                    <span>
+                                        {translate('1 credit equals')} {value} {unit}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-danger"
+                                        onClick={() => removeMapping(unit)}
+                                        title={translate('Remove mapping')}
+                                        aria-label={translate('Remove mapping for {{unit}}', { unit })}
+                                    >
+                                        {translate('Remove')}
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
                     </>
                 ) : (
-                    <div className="text-muted">{translate('No mappings added yet.')}</div>
-                )
-                }
-                <div className="text-muted mt-2">
+                    <div className="text-muted mb-3">
+                        {translate('No mappings added yet.')}
+                    </div>
+                )}
+
+                <div className="text-muted mb-2">
                     {translate('Add a new mapping:')}
                 </div>
+
                 <div className="row mb-3 align-items-end">
                     <div className="col-md-5">
+                        <Form.Label className="sr-only">
+                            {translate('Allocation Unit')}
+                        </Form.Label>
                         <Select
-                            value={allocationUnit}
-                            onChange={(value) => setAllocationUnit(value?.value)}
+                            value={AllocationUnitsOptions.find(option => option.value === allocationUnit) || null}
+                            onChange={(option) => setAllocationUnit(option?.value || null)}
                             options={AllocationUnitsOptions}
-                            onBlur={() => input.onBlur(allocationUnit)}
+                            onBlur={() => input.onBlur()}
                             className="metronic-select-container"
                             classNamePrefix="metronic-select"
+                            placeholder={translate('Select unit...')}
+                            aria-label={translate('Select allocation unit')}
+                            isSearchable={false}
                         />
                     </div>
                     <div className="col-md-5">
+                        <Form.Label className="sr-only">
+                            {translate('Allocation Value')}
+                        </Form.Label>
                         <Form.Control
-                            className={classNames(solid && 'form-control-solid', allocationUnit && 'has-unit')}
+                            className={classNames(
+                                solid && 'form-control-solid',
+                                hasError && 'is-invalid'
+                            )}
                             type="number"
-                            value={allocationValue}
-                            onChange={(e) => setAllocationValue(Number(e.target.value))}
-                            placeholder={translate('e.g., 1000.00')}
-                            step="0.01"
+                            value={allocationValue ?? ''}
+                            onChange={handleValueChange}
+                            onKeyPress={handleKeyPress}
+                            placeholder={translate('e.g., 4')}
+                            step="0.5"
                             min="0"
+                            aria-label={translate('Enter allocation value')}
                         />
                     </div>
                     <div className="col-md-2">
                         <button
                             type="button"
-                            className={`btn btn-sm ${allocationUnit && allocationValue > 0 ? 'btn-primary' : 'btn-outline-secondary'}`}
+                            className={`btn btn-sm ${isAddButtonEnabled ? 'btn-primary' : 'btn-outline-secondary'
+                                }`}
                             onClick={addMapping}
-                            disabled={!allocationUnit || allocationValue <= 0}
+                            disabled={!isAddButtonEnabled}
                             title={translate('Add mapping')}
+                            aria-label={translate('Add allocation mapping')}
                         >
                             {translate('Add')}
                         </button>
                     </div>
                 </div>
+
+                {/* Display validation errors */}
+                {hasError && (
+                    <div className="invalid-feedback d-block">
+                        {meta.error}
+                    </div>
+                )}
             </div>
         </div>
     );
