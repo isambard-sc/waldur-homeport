@@ -61,7 +61,7 @@ export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
                     <strong>Description:</strong> {props.row.details.description || 'No description provided.'}
                 </div>
                 <div>
-                    <strong>Credits:</strong> {props.row.details.credits || 'No credits provided.'}
+                    <strong>Allocation:</strong> {props.row.details.allocation || 'No allocation provided.'}
                 </div>
                 <div>
                     <strong>Start date:</strong> {
