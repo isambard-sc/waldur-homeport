@@ -19,6 +19,7 @@ import { RoleMappingField } from './RoleMappingField';
 import { AllocationUnitsMappingField } from './AllocationUnitsMappingField';
 import { OrganizationAutocompleteField } from './OrganizationAutocompleteField';
 import { OfferingAutocompleteField } from './OfferingAutocompleteField';
+import { Project } from '@waldur/workspace/types';
 
 const projectClassCreate = async (params) => {
     const data = {
@@ -168,14 +169,14 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                             />
                         </FormGroup>
 
-                        {/*                         <FormGroup controlId="role_mapping" label={translate('Role Mapping')}>
+                        <FormGroup controlId="role_mapping" label={translate('Role Mapping')}>
                             <Field
                                 name="role_mapping"
                                 component={RoleMappingField as any}
                                 placeholder={translate('Map remote portal roles to local roles')}
                                 help={translate('Map remote portal roles to local roles. For example, map "admin" to "Project Manager" and "user" to "Project Member".')}
                             />
-                        </FormGroup>*/}
+                        </FormGroup>
 
                         <FormGroup controlId="allocation_units_mapping" label={translate('Allocation credit mapping')}>
                             <Field

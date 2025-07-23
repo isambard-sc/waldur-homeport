@@ -1,14 +1,26 @@
-import React, { useState, useEffect, useCallback, useMemo, FunctionComponent, useRef } from 'react';
-import { Field } from 'react-final-form';
+import classNames from 'classnames';
+import React, { useState, FunctionComponent, useCallback, useMemo } from 'react';
 import { debounce } from 'lodash';
+import { FormField } from '@waldur/form/types';
+import { translate } from '@waldur/i18n';
+import { Form } from 'react-bootstrap';
 
 import { rolesList } from 'waldur-js-client';
 import { ENV } from '@waldur/core/config';
 import { parseSelectData } from '@waldur/core/api';
-import { translate } from '@waldur/i18n';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 
+interface RoleMapping {
+    [key: string]: any;
+}
+
+interface RoleMappingFieldProps extends FormField {
+    placeholder?: string;
+    validator?: any;
+    solid?: boolean;
+    debounceMs?: number;
+}
 
 const roleAutocomplete = async (query: string, prevOptions, { page }) => {
     const response = await rolesList({
@@ -26,39 +38,16 @@ const roleAutocomplete = async (query: string, prevOptions, { page }) => {
     );
 };
 
-export const RoleMappingField: FunctionComponent<{
-    name: string;
-    placeholder?: string;
-    validator?: any;
-}> = (props) => (
-    <Field
-        name={props.name}
-        validate={props.validator}
-        component={({ input, meta }) => (
-            <RoleMappingComponent
-                value={input.value}
-                onChange={input.onChange}
-                onBlur={input.onBlur}
-                placeholder={props.placeholder}
-            />
-        )}
-    />
-);
-
-const RoleMappingComponent: FunctionComponent<{
-    value?: Record<string, any>;
-    onChange: (value: Record<string, any>) => void;
-    onBlur: () => void;
-    placeholder?: string;
-    debounceMs?: number;
-}> = ({ value = {}, onChange, onBlur, placeholder, debounceMs }) => {
-    const [mappings, setMappings] = useState<Array<{ key: string; value: any; id: string }>>([]);
-    const [initialized, setInitialized] = useState(false);
-
-    const [inputKey, setInputKey] = useState('');
-    const [inputValue, setInputValue] = useState(null);
-
-    const idCounterRef = useRef(0);
+export const RoleMappingField: FunctionComponent<RoleMappingFieldProps> = ({
+    input,
+    placeholder,
+    validator,
+    solid,
+    meta,
+    debounceMs,
+}) => {
+    const [remoteRoleName, setRemoteRoleName] = useState<string>('');
+    const [localRole, setLocalRole] = useState<any>(null);
 
     const debouncedRoleAutocomplete = useMemo(
         () => debounce(
@@ -79,167 +68,145 @@ const RoleMappingComponent: FunctionComponent<{
         [debouncedRoleAutocomplete]
     );
 
-    useEffect(() => {
-        if (!initialized) {
-            if (value && Object.keys(value).length > 0) {
-                const initialMappings = Object.entries(value).map(([key, val], index) => ({
-                    key,
-                    value: val,
-                    id: `mapping-${index}`
-                }));
-                setMappings(initialMappings);
-                idCounterRef.current = initialMappings.length;
-            }
-            setInitialized(true);
+    const addMapping = useCallback(() => {
+        if (remoteRoleName.trim() && localRole) {
+            const currentMappings: RoleMapping = input.value || {};
+            const newMappings = {
+                ...currentMappings,
+                [remoteRoleName.trim()]: localRole
+            };
+
+            input.onChange(newMappings);
+            setRemoteRoleName('');
+            setLocalRole(null);
         }
-    }, [value, initialized]);
+    }, [remoteRoleName, localRole, input]);
 
-    const updateValue = (newMappings: Array<{ key: string; value: any; id: string }>) => {
-        setMappings(newMappings);
-
-        const dictionary = newMappings.reduce((acc, mapping) => {
-            acc[mapping.key] = mapping.value;
-            return acc;
-        }, {} as Record<string, any>);
-
-        onChange(dictionary);
-    };
-
-    const addMapping = () => {
-        if (!inputKey.trim() || !inputValue) {
-            return;
+    const removeMapping = useCallback((key: string) => {
+        const currentMappings: RoleMapping = input.value || {};
+        if (currentMappings[key]) {
+            const { [key]: removed, ...remainingMappings } = currentMappings;
+            input.onChange(remainingMappings);
         }
+    }, [input]);
 
-        let newMappings = [...mappings];
+    const handleRemoteRoleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        setRemoteRoleName(e.target.value);
+    }, []);
 
-        // Check if key already exists - if it does, remove it
-        if (mappings.some(m => m.key === inputKey.trim())) {
-            newMappings = mappings.filter(m => m.key !== inputKey.trim());
+    const handleKeyPress = useCallback((e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addMapping();
         }
+    }, [addMapping]);
 
-        const newMapping = {
-            key: inputKey.trim(),
-            value: inputValue,
-            id: `mapping-${++idCounterRef.current}`
-        };
+    const currentMappings: RoleMapping = input.value || {};
+    const hasMappings = Object.keys(currentMappings).length > 0;
+    const isAddButtonEnabled = remoteRoleName.trim() && localRole;
 
-        newMappings = [newMapping, ...newMappings];
-
-        updateValue(newMappings);
-
-        // Clear input form
-        setInputKey('');
-        setInputValue(null);
-    };
-
-    const removeMapping = (idToRemove: string) => {
-        const newMappings = mappings.filter(m => m.id !== idToRemove);
-        updateValue(newMappings);
-    };
-
-    const canAddMapping = inputKey.trim() !== '' && inputValue !== null;
+    const hasError = meta?.touched && meta?.error;
 
     return (
-        <div className="role-mapping-container">
-            {mappings.length > 0 && (
-                <div className="mb-4">
-                    {mappings.map((mapping) => (
-                        <div key={mapping.id} className="row mb-2 align-items-center">
-                            <div className="col-md-5">
-                                <div className="form-control-plaintext">
-                                    <strong>{mapping.key}</strong>
-                                </div>
-                            </div>
-
-                            <div className="col-md-1 text-center">
-                                <span className="text-muted">→</span>
-                            </div>
-
-                            <div className="col-md-5">
-                                <div className="form-control-plaintext">
-                                    {mapping.value?.description || mapping.value?.name || 'Selected Role'}
-                                </div>
-                            </div>
-
-                            <div className="col-md-1">
-                                <button
-                                    type="button"
-                                    className="btn btn-outline-danger btn-sm"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        removeMapping(mapping.id);
-                                    }}
-                                    title={translate('Remove mapping')}
-                                >
-                                    {translate('Remove')}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    <hr className="my-4" />
-                </div>
-            )}
-
-            {/* Input form for new mappings */}
+        <div className="role-mapping-field">
             <div className="mb-3">
+                {hasMappings ? (
+                    <>
+                        <div className="text-muted mb-2">
+                            {translate('Current mappings:')}
+                        </div>
+                        <ul className="list-group mb-3" role="list">
+                            {Object.entries(currentMappings).map(([key, value]) => (
+                                <li
+                                    key={key}
+                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                >
+                                    <span>
+                                        <strong>{key}</strong> → {value?.description || value?.name || 'Selected Role'}
+                                    </span>
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-danger"
+                                        onClick={() => removeMapping(key)}
+                                        title={translate('Remove mapping')}
+                                        aria-label={translate('Remove mapping for {{key}}', { key })}
+                                    >
+                                        {translate('Remove')}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                ) : (
+                    <div className="text-muted mb-3">
+                        {translate('No mappings added yet.')}
+                    </div>
+                )}
+
+                <div className="text-muted mb-2">
+                    {translate('Add a new mapping:')}
+                </div>
+
                 <div className="row mb-3 align-items-end">
                     <div className="col-md-5">
-                        <label className="form-label small">
+                        <Form.Label className="sr-only">
                             {translate('Remote Role Name')}
-                        </label>
-                        <input
+                        </Form.Label>
+                        <Form.Control
+                            className={classNames(
+                                solid && 'form-control-solid',
+                                hasError && 'is-invalid'
+                            )}
                             type="text"
-                            className="form-control"
-                            placeholder={translate('e.g., admin, user, viewer')}
-                            value={inputKey}
-                            onChange={(e) => setInputKey(e.target.value)}
-                            onBlur={onBlur}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && canAddMapping) {
-                                    e.preventDefault();
-                                    addMapping();
-                                }
-                            }}
+                            value={remoteRoleName}
+                            onChange={handleRemoteRoleChange}
+                            onKeyPress={handleKeyPress}
+                            onBlur={() => input.onBlur()}
+                            placeholder={placeholder || translate('e.g., admin, user, viewer')}
+                            aria-label={translate('Enter remote role name')}
                         />
                     </div>
-
                     <div className="col-md-5">
-                        <label className="form-label small">
+                        <Form.Label className="sr-only">
                             {translate('Local Role')}
-                        </label>
+                        </Form.Label>
                         <AsyncPaginate
-                            placeholder={translate('Select local role...')}
+                            value={localRole}
+                            onChange={(option) => setLocalRole(option)}
                             loadOptions={loadRoleOptions}
                             defaultOptions
                             getOptionValue={(option) => option}
                             getOptionLabel={(option) => option.description || option.name}
-                            value={inputValue}
-                            onChange={(value) => setInputValue(value)}
-                            onBlur={onBlur}
-                            noOptionsMessage={() => translate('No roles found')}
-                            isClearable={true}
+                            onBlur={() => input.onBlur()}
                             className="metronic-select-container"
                             classNamePrefix="metronic-select"
+                            placeholder={translate('Select local role...')}
+                            aria-label={translate('Select local role')}
+                            noOptionsMessage={() => translate('No roles found')}
+                            isClearable={true}
                         />
                     </div>
-
-                    <div className="col-md-1">
+                    <div className="col-md-2">
                         <button
                             type="button"
-                            className={`btn btn-sm ${canAddMapping ? 'btn-primary' : 'btn-outline-secondary'}`}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                addMapping();
-                            }}
-                            disabled={!canAddMapping}
+                            className={`btn btn-sm ${isAddButtonEnabled ? 'btn-primary' : 'btn-outline-secondary'
+                                }`}
+                            onClick={addMapping}
+                            disabled={!isAddButtonEnabled}
                             title={translate('Add mapping')}
+                            aria-label={translate('Add role mapping')}
                         >
                             {translate('Add')}
                         </button>
                     </div>
                 </div>
+
+                {/* Display validation errors */}
+                {hasError && (
+                    <div className="invalid-feedback d-block">
+                        {meta.error}
+                    </div>
+                )}
             </div>
         </div>
     );
