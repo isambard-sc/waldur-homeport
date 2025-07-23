@@ -31,7 +31,10 @@ const projectClassCreate = async (params) => {
         approval_limit: params.body?.approval_limit,
         max_credit_limit: params.body?.max_credit_limit,
         role_mapping: params.body?.role_mapping || {},
+        allocation_units_mapping: params.body?.allocation_units_mapping || {},
     };
+
+    console.log('Creating project template with data:', data);
 
     await post('/openportal-project-template/', data);
 
@@ -78,6 +81,7 @@ export const ProjectTemplateCreateDialog = ({ resolve }) => {
                     approval_limit: formValues.approval_limit,
                     max_credit_limit: formValues.max_credit_limit,
                     role_mapping: formValues.role_mapping,
+                    allocation_units_mapping: formValues.allocation_units_mapping,
                 },
             });
             showSuccess(translate('Project template has been created'));

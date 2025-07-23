@@ -43,66 +43,63 @@ export const AllocationUnitsMappingField: FunctionComponent<AllocationUnitsMappi
 }) => {
 
     const [allocationUnit, setAllocationUnit] = useState(null);
-    const [allocationValue, setAllocationValue] = useState(0);
+    const [allocationValue, setAllocationValue] = useState(null);
 
     const addMapping = useCallback(() => {
         if (allocationUnit && allocationValue > 0) {
-            let currentMappings = input.value || [];
+            let currentMappings = input.value || {};
 
-            // Check if the unit already exists
-            let existingMapping = currentMappings.find(mapping => mapping.key === allocationUnit);
-
-            if (existingMapping) {
-                // Update the existing mapping
-                existingMapping.value = allocationValue;
-            } else {
-                // Add a new mapping
-                currentMappings.push({ key: allocationUnit, value: allocationValue });
-            }
+            currentMappings[allocationUnit] = allocationValue;
 
             // Update the input value with the new mappings
             input.onChange(currentMappings);
             setAllocationUnit(null);
-            setAllocationValue(0);
+            setAllocationValue(null);
 
             console.log('Updated mappings:', currentMappings);
         }
     }, [allocationUnit, allocationValue, input]);
 
-    const removeMapping = (unit: string) => {
-        let currentMappings = input.value || [];
-        currentMappings = currentMappings.filter(mapping => mapping.key !== unit);
-        input.onChange(currentMappings);
-        console.log('Removed mapping for unit:', unit);
-    };
+    const removeMapping = useCallback((unit: string) => {
+        let currentMappings = input.value || {};
+        if (currentMappings[unit]) {
+            delete currentMappings[unit];
+            input.onChange(currentMappings);
+            console.log('Removed mapping for unit:', unit);
+        }
+    }, [input]);
+
+    console.log('Current mappings:', input.value);
 
     return (
         <div className="allocation-units-mapping-field">
             <div className="mb-3">
-                {
-                    input.value && input.value.length > 0 ? (
-                        <>
-                            <div className="text-muted">
-                                {translate('Current mappings:')}
-                            </div>
-                            <ul className="list-group">
-                                {input.value.map((mapping, index) => (
-                                    <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                                        {`1 credit equals ${mapping.value} ${mapping.key}`}
+                {input.value && input.value.length > 0 ? (
+                    <>
+                        <div className="text-muted">
+                            {translate('Current mappings:')}
+                        </div>
+                        <ul className="list-group">
+                            {
+                                Object.entries(input.value).map(([unit, value]) => (
+                                    <li key={unit} className="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>1 credit equals {value} {unit}</span>
                                         <button
                                             type="button"
-                                            className="btn btn-danger btn-sm"
-                                            onClick={() => removeMapping(mapping.key)}
+                                            className="btn btn-sm btn-outline-danger"
+                                            onClick={() => removeMapping(unit)}
+                                            title={translate('Remove mapping')}
                                         >
                                             {translate('Remove')}
                                         </button>
                                     </li>
-                                ))}
-                            </ul>
-                        </>
-                    ) : (
-                        <div className="text-muted">{translate('No mappings added yet.')}</div>
-                    )
+                                ))
+                            }
+                        </ul>
+                    </>
+                ) : (
+                    <div className="text-muted">{translate('No mappings added yet.')}</div>
+                )
                 }
                 <div className="text-muted mt-2">
                     {translate('Add a new mapping:')}
@@ -111,7 +108,7 @@ export const AllocationUnitsMappingField: FunctionComponent<AllocationUnitsMappi
                     <div className="col-md-5">
                         <Select
                             value={allocationUnit}
-                            onChange={(value) => setAllocationUnit(value)}
+                            onChange={(value) => setAllocationUnit(value?.value)}
                             options={AllocationUnitsOptions}
                             onBlur={() => input.onBlur(allocationUnit)}
                             className="metronic-select-container"
