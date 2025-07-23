@@ -1,10 +1,12 @@
-import { useAsyncFn } from 'react-use';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { PlusCircleIcon } from '@phosphor-icons/react';
 
+import { openModalDialog } from '@waldur/modal/actions';
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+
+import { AttachManagedProjectDialog } from './AttachManagedProjectDialog';
 
 export const AttachManagedProjectButton: FC<{ row; refetch }> = ({
     row,
@@ -31,9 +33,9 @@ export const AttachManagedProjectButton: FC<{ row; refetch }> = ({
     return (
         <ActionItem
             title={translate('Attach Project')}
-            disabled={loading}
             action={callback}
             size="sm"
+            iconNode={<PlusCircleIcon weight="bold" />}
         />
     );
 };

@@ -1,6 +1,7 @@
 import { useAsyncFn } from 'react-use';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
+import { WarningCircleIcon } from '@phosphor-icons/react';
 
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
@@ -52,6 +53,7 @@ export const DetachManagedProjectButton: FC<{ row; refetch }> = ({
             size="sm"
             className="text-danger"
             iconColor="danger"
+            iconNode={<WarningCircleIcon weight="bold" />}
         />
     );
 };

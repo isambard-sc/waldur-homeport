@@ -25,7 +25,7 @@ export const ManagedProjectActions = ({
             actions={[
                 project.state === 'pending' ? ApproveManagedProjectButton : null,
                 project.state === 'pending' ? RejectManagedProjectButton : null,
-                AttachManagedProjectButton,
+                project.project ? null : AttachManagedProjectButton,
                 project.project ? DetachManagedProjectButton : null,
                 DeleteManagedProjectButton,
             ].filter(Boolean)}

@@ -17,6 +17,18 @@ import { post } from '../api';
 
 import { PROJECT_TEMPLATE_FIELD_CONSTRAINTS } from '../constants';
 
+// Validation
+const validateRequired = (value: any) =>
+    value ? undefined : translate('This field is required.');
+
+const validateMaxLength = (maxLength: number) => (value: string) =>
+    value && value.length > maxLength
+        ? translate('Value is too long (max {{maxLength}} characters)', { maxLength })
+        : undefined;
+
+const composeValidators = (...validators: Array<(value: any) => string | undefined>) =>
+    (value: any) => validators.reduce((error, validator) => error || validator(value), undefined);
+
 
 const INITIAL_VALUES = {
     role_mapping: {},
