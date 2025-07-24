@@ -37,11 +37,49 @@ interface AttachManagedProjectDialogProps {
 }
 
 // Main component
-export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProps> = ({ resolve }) => {
+export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProps> = ({ project, resolve, title }) => {
+    if (!project) {
+        return (
+            <ModalDialog title={translate('Attach Project')} size="lg">
+                <div className="alert alert-danger" role="alert">
+                    {translate('Managed Project is not available.')}
+                </div>
+            </ModalDialog>
+        );
+    }
+
     const { showErrorResponse, showSuccess } = useNotify();
     const { closeDialog } = useModal();
     const currentCustomer = useSelector(getCustomer);
     const user = useSelector(getUser);
+
+    const projectTemplate = useMemo(() => {
+        return project?.project_template_data;
+    }, [project?.project_template_data]);
+
+    if (!projectTemplate) {
+        return (
+            <ModalDialog title={translate('Attach Project')} size="lg">
+                <div className="alert alert-danger" role="alert">
+                    {translate('Project template data is not available.')}
+                </div>
+            </ModalDialog>
+        );
+    }
+
+    const targetCustomer = useMemo(() => {
+        return projectTemplate?.customer_data;
+    }, [projectTemplate?.customer_data]);
+
+    if (!targetCustomer) {
+        return (
+            <ModalDialog title={translate('Attach Project')} size="lg">
+                <div className="alert alert-danger" role="alert">
+                    {translate('Customer Organization into which to create the project is not available.')}
+                </div>
+            </ModalDialog>
+        );
+    }
 
     const canEditCustomer = useMemo(() =>
         hasPermission(user, {
@@ -49,6 +87,14 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
             customerId: currentCustomer?.uuid,
         }),
         [user, currentCustomer?.uuid]
+    );
+
+    const canEditTargetCustomer = useMemo(() =>
+        hasPermission(user, {
+            permission: PermissionEnum.UPDATE_CUSTOMER,
+            customerId: targetCustomer?.uuid,
+        }),
+        [user, targetCustomer?.uuid]
     );
 
     const handleSubmit = useCallback(async (formValues: AttachProjectFormValues) => {
@@ -67,17 +113,27 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
         return (
             <ModalDialog title={translate('Attach Project')} size="lg">
                 <div className="alert alert-danger" role="alert">
-                    {translate('You do not have permission to attach projects.')}
+                    {translate('You do not have permission to edit ManagedProjects in {customer}.', { customer: currentCustomer?.name })}
+                </div>
+            </ModalDialog>
+        );
+    }
+
+    if (!canEditTargetCustomer) {
+        return (
+            <ModalDialog title={translate('Attach Project')} size="lg">
+                <div className="alert alert-danger" role="alert">
+                    {translate('You do not have permission to attach projects from {customer}.', { customer: targetCustomer?.name })}
                 </div>
             </ModalDialog>
         );
     }
 
     const query = useMemo(() => ({
-        customer_uuid: currentCustomer?.uuid,
-        field: ['name', 'uuid', 'abbreviation'],
+        customer: targetCustomer?.uuid,
+        field: ['name', 'uuid'],
         o: 'name',
-    }), [currentCustomer?.uuid]);
+    }), [targetCustomer?.uuid]);
 
     return (
         <Form
@@ -100,7 +156,7 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
                     >
                         <FormGroup
                             controlId="project"
-                            label={translate('Name of project template')}
+                            label={translate('Choose a project to attach. Note that only unmanaged projects in {customer} can be attached.', { customer: targetCustomer?.name })}
                             required
                         >
                             <Field

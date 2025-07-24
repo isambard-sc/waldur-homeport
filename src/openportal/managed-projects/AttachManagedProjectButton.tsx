@@ -22,6 +22,8 @@ export const AttachManagedProjectButton: FC<{ row; refetch }> = ({
     const callback = () =>
         dispatch(
             openModalDialog(AttachManagedProjectDialog, {
+                project: project,
+                title: translate('Attach Project'),
                 dialogClassName: 'modal-dialog-centered',
                 resolve: {
                     refetch,
