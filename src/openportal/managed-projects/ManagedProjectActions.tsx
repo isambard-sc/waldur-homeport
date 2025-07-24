@@ -23,8 +23,8 @@ export const ManagedProjectActions = ({
             row={project}
             refetch={refetch}
             actions={[
-                project.state === 'pending' ? ApproveManagedProjectButton : null,
-                project.state === 'pending' ? RejectManagedProjectButton : null,
+                project.state !== 'approved' ? ApproveManagedProjectButton : null,
+                project.state !== 'rejected' ? RejectManagedProjectButton : null,
                 project.project ? null : AttachManagedProjectButton,
                 project.project ? DetachManagedProjectButton : null,
                 DeleteManagedProjectButton,

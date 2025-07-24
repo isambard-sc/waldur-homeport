@@ -3,7 +3,6 @@ import { Form, Field } from 'react-final-form';
 import { useMemo, useCallback } from 'react';
 
 import { SubmitButton } from '@waldur/auth/SubmitButton';
-import { StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { useModal } from '@waldur/modal/hooks';
@@ -15,30 +14,20 @@ import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse } from '@waldur/store/notify';
 import { post } from '../api';
 
-import { PROJECT_TEMPLATE_FIELD_CONSTRAINTS } from '../constants';
-
-// Validation
-const validateRequired = (value: any) =>
-    value ? undefined : translate('This field is required.');
-
-const validateMaxLength = (maxLength: number) => (value: string) =>
-    value && value.length > maxLength
-        ? translate('Value is too long (max {{maxLength}} characters)', { maxLength })
-        : undefined;
-
-const composeValidators = (...validators: Array<(value: any) => string | undefined>) =>
-    (value: any) => validators.reduce((error, validator) => error || validator(value), undefined);
+import { ProjectAutocompleteField } from './ProjectAutocompleteField';
 
 
 const INITIAL_VALUES = {
-    role_mapping: {},
-    allocation_units_mapping: {},
-    offerings: [],
+    project: null,
 } as const;
+
+const validateRequired = (value: any) =>
+    value ? undefined : translate('This field is required.');
+
 
 // Types
 interface AttachProjectFormValues {
-    name: string;
+    project: any;
 }
 
 interface AttachManagedProjectDialogProps {
@@ -46,7 +35,6 @@ interface AttachManagedProjectDialogProps {
         refetch: () => Promise<void>;
     };
 }
-
 
 // Main component
 export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProps> = ({ resolve }) => {
@@ -85,6 +73,12 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
         );
     }
 
+    const query = useMemo(() => ({
+        customer_uuid: currentCustomer?.uuid,
+        field: ['name', 'uuid', 'abbreviation'],
+        o: 'name',
+    }), [currentCustomer?.uuid]);
+
     return (
         <Form
             onSubmit={handleSubmit}
@@ -105,19 +99,22 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
                         }
                     >
                         <FormGroup
-                            controlId="name"
+                            controlId="project"
                             label={translate('Name of project template')}
                             required
                         >
                             <Field
-                                name="name"
-                                component={StringField}
-                                placeholder={translate('e.g., my-project-template')}
-                                maxLength={PROJECT_TEMPLATE_FIELD_CONSTRAINTS.MAX_PROJECTCLASS_LENGTH}
-                                validate={composeValidators(
-                                    validateRequired,
-                                    validateMaxLength(PROJECT_TEMPLATE_FIELD_CONSTRAINTS.MAX_PROJECTCLASS_LENGTH)
-                                )}
+                                name="project"
+                                component={ProjectAutocompleteField}
+                                placeholder={translate('Select project')}
+                                validate={validateRequired}
+                                query={query}
+                                required
+                                reactSelectProps={{
+                                    isClearable: true,
+                                    closeMenuOnSelect: true,
+                                }}
+                                noOptionsMessage={() => translate('No projects found')}
                                 required
                             />
                         </FormGroup>

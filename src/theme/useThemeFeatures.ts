@@ -1,4 +1,6 @@
 
+import { ENV } from '@waldur/core/config'
+
 export const useThemeFeatures = () => {
 
   // We eventually need a way for the theme chosen to set these features.
@@ -15,7 +17,9 @@ export const useThemeFeatures = () => {
   const ShowLoginAuthHeader = false;
 
   // This option controls whether or not to show the local login form
-  const ShowLocalSigninForm = true;
+  // Here, we've set it to only show if we are in development, when
+  // the API URL is localhost. We don't want to show this in production
+  const ShowLocalSigninForm = ENV.apiEndpoint.includes('localhost');
 
   // This option controls whether the Footer items are shown on the login column.
   // These options link to marketplace, calls etc, and may need to be hidden

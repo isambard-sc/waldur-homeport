@@ -26,7 +26,6 @@ export const DetachManagedProjectButton: FC<{ row; refetch }> = ({
                 dispatch,
                 translate('Detach the existing project from this managed project'),
                 translate('Are you sure you would like to detach this project?'),
-                { forDeletion: true },
             );
         } catch {
             return;
