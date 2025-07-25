@@ -1,7 +1,6 @@
 
 import { fixURL } from './api';
 
-
 export const getCustomerURL = (customer) => {
     if (!customer) {
         return null;

@@ -41,8 +41,6 @@ export const unmanagedProjectsList = <ThrowOnError extends boolean = false>(
     query?: UnmanagedProjectsQuery,
     options?: Options<ProjectsListData, ThrowOnError>
 ) => {
-    console.log('unmanagedProjectsList query:', query, 'options:', options);
-
     return (options?.client ?? client).get<ProjectsListResponse, unknown, ThrowOnError>({
         security: [
             {
@@ -68,8 +66,6 @@ export const unmanagedProjectAutocomplete = async (
     additional?: { page: number };
 }> => {
     try {
-        console.log('unmanagedProjectAutocomplete', { searchQuery, currentPage, options });
-
         const queryParams: UnmanagedProjectsQuery = {
             search: searchQuery,
             page: currentPage,
@@ -86,7 +82,6 @@ export const unmanagedProjectAutocomplete = async (
             currentPage,
         );
     } catch (error) {
-        console.error('Error fetching unmanaged projects:', error);
         // Return empty result on error to prevent component from breaking
         return {
             options: prevOptions || [],
@@ -127,7 +122,6 @@ export const ProjectAutocompleteField: FunctionComponent<ProjectAutocompleteProp
                     const result = await unmanagedProjectAutocomplete(searchQuery, prevOptions, page, options);
                     resolve(result);
                 } catch (error) {
-                    console.error('Debounced autocomplete error:', error);
                     resolve({ options: prevOptions || [], hasMore: false });
                 }
             },

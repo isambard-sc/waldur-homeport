@@ -12,7 +12,7 @@ import { getCustomer, getUser } from '@waldur/workspace/selectors';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse } from '@waldur/store/notify';
-import { post } from '../api';
+import { attachProjectToManagedProject } from '../api';
 
 import { ProjectAutocompleteField } from './ProjectAutocompleteField';
 
@@ -99,7 +99,7 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
 
     const handleSubmit = useCallback(async (formValues: AttachProjectFormValues) => {
         try {
-            console.log("AttachManagedProjectDialog submitted with values:", formValues);
+            await attachProjectToManagedProject(project, formValues.project);
             showSuccess(translate('Project has been attached.'));
             closeDialog();
             await resolve.refetch();

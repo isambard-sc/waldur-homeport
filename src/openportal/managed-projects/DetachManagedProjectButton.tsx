@@ -8,6 +8,8 @@ import { waitForConfirmation } from '@waldur/modal/actions';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
+import { detachProjectFromManagedProject } from '../api';
+
 export const DetachManagedProjectButton: FC<{ row; refetch }> = ({
     row,
     refetch,
@@ -31,8 +33,7 @@ export const DetachManagedProjectButton: FC<{ row; refetch }> = ({
             return;
         }
         try {
-            //await detachManagedProject({ identifier: project.identifier });
-            console.log("DetachManagedProjectButton clicked, but functionality not implemented yet.");
+            await detachProjectFromManagedProject(project);
             await refetch();
             dispatch(showSuccess(translate('Project has been detached.')));
         } catch (e) {

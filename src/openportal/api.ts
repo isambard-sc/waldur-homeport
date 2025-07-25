@@ -28,6 +28,8 @@ export async function post(endpoint: string, data?: object) {
             throw new Error(`Failed call: ${response.text()}`);
         }
     }
+
+    return response;
 }
 
 
@@ -49,6 +51,8 @@ export async function put(endpoint: string, data?: object) {
             throw new Error(`Failed call: ${response.text()}`);
         }
     }
+
+    return response;
 }
 
 
@@ -70,6 +74,8 @@ export async function patch(endpoint: string, data?: object) {
             throw new Error(`Failed call: ${response.text()}`);
         }
     }
+
+    return response;
 }
 
 export const deleteManagedProject = async (path: {
@@ -101,3 +107,13 @@ export const deleteProjectTemplate = async (path: {
         ],
     });
 }
+
+export const attachProjectToManagedProject = async (managed_project, project) => {
+    const response = await post(`/openportal-managed-projects/${managed_project.identifier}/attach/`, { project_uuid: project.uuid });
+    return response.json();
+};
+
+export const detachProjectFromManagedProject = async (managed_project) => {
+    const response = await post(`/openportal-managed-projects/${managed_project.identifier}/detach/`, {});
+  return response.json();
+};
