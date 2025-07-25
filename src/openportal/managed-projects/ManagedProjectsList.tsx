@@ -133,10 +133,10 @@ export const ManagedProjectsList = () => {
             id: 'end_date',
         },
         {
-            title: translate('Credits'),
-            render: ({ row }) => renderFieldOrDash(row.details.credits),
-            keys: ['credits'],
-            id: 'credits',
+            title: translate('Allocation'),
+            render: ({ row }) => renderFieldOrDash(row.details.allocation),
+            keys: ['allocation'],
+            id: 'allocation',
         },
         {
             title: translate('State'),

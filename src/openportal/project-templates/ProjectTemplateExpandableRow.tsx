@@ -58,6 +58,17 @@ const stringify_role_mapping = (role_mapping: any) => {
     ));
 }
 
+const stringify_allocation_mapping = (allocation_mapping: any) => {
+    if (!allocation_mapping || Object.keys(allocation_mapping).length === 0) {
+        return translate('No allocation mapping');
+    }
+    return Object.entries(allocation_mapping).map(([key, value]) => (
+        <div key={key}>
+            &nbsp;&nbsp;1 credit = {value} {key}
+        </div>
+    ));
+}
+
 export const ProjectTemplateExpandableRow: FC<OwnProps> = (props) => {
     const project = props.row;
 
@@ -91,6 +102,9 @@ export const ProjectTemplateExpandableRow: FC<OwnProps> = (props) => {
                 </div>
                 <div>
                     <strong>Role mapping:</strong> {stringify_role_mapping(project.role_mapping)}
+                </div>
+                <div>
+                    <strong>Allocation credit mapping:</strong> {stringify_allocation_mapping(project.allocation_units_mapping)}
                 </div>
             </div>
         </ExpandableContainer>

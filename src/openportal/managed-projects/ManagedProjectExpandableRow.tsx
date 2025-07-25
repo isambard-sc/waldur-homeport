@@ -3,6 +3,7 @@ import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 
 import { ManagedProject } from '../types';
+import { translate } from '@waldur/i18n/translate';
 
 interface OwnProps {
     row: ManagedProject;
@@ -44,6 +45,42 @@ const renderProjectTemplateLink = (row: any) => {
     return 'No project template assigned';
 };
 
+const stringify_role = (role: any, project_template: any) => {
+    if (!role) {
+        return translate('No role assigned');
+    }
+    if (!project_template || !project_template.role_mapping) {
+        return translate('Will not be added to project');
+    }
+
+    let mapped_role = project_template.role_mapping[role];
+
+    if (!mapped_role) {
+        // check if there is a case-insensitive match in the keys of the role_mapping dictionary
+        mapped_role = Object.entries(project_template.role_mapping).find(
+            ([key]) => key.toLowerCase() === role.toLowerCase()
+        )?.[1];
+
+        if (!mapped_role) {
+            return role + " " + translate(`has no mapping - will not be added to project`);
+        }
+    }
+
+    return mapped_role.description || mapped_role.name || mapped_role.uuid || translate('Not set');
+};
+
+const stringify_members = (members, project_template) => {
+    if (!members || Object.keys(members).length === 0) {
+        return translate('No members assigned');
+    }
+
+    return Object.entries(members).map(([key, value]) => (
+        <div key={key}>
+            &nbsp;&nbsp;{key} : {stringify_role(value, project_template)}
+        </div>
+    ));
+};
+
 export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
     return (
         <ExpandableContainer>
@@ -61,7 +98,12 @@ export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
                     <strong>Description:</strong> {props.row.details.description || 'No description provided.'}
                 </div>
                 <div>
-                    <strong>Credits:</strong> {props.row.details.credits || 'No credits provided.'}
+                    <strong>Members:</strong> {stringify_members(props.row.details.members,
+                        props.row.project_template_data
+                    )}
+                </div>
+                <div>
+                    <strong>Allocation:</strong> {props.row.details.allocation || 'No allocation provided.'}
                 </div>
                 <div>
                     <strong>Start date:</strong> {

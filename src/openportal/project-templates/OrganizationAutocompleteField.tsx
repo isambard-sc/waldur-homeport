@@ -1,27 +1,36 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { Field } from 'react-final-form';
 import { debounce } from 'lodash';
+import { FormField } from '@waldur/form/types';
 
 import { translate } from '@waldur/i18n';
 import { AsyncPaginate } from '@waldur/form/themed-select';
 import { organizationAutocomplete } from '@waldur/marketplace/common/autocompletes';
 
-export const OrganizationAutocompleteField: FunctionComponent<{
-    name: string;
+interface OrganizationAutocompleteProps extends FormField {
     placeholder?: string;
     validator?: any;
     noOptionsMessage?: string;
     reactSelectProps?: any;
     debounceMs?: number;
-}> = (props) => {
+}
+
+
+export const OrganizationAutocompleteField: FunctionComponent<OrganizationAutocompleteProps> = ({
+    input,
+    placeholder,
+    validator,
+    noOptionsMessage,
+    reactSelectProps,
+    debounceMs,
+}) => {
     const debouncedAutocomplete = useMemo(
         () => debounce(
             (query: string, prevOptions: any, page: number, options: any, resolve: Function) => {
                 organizationAutocomplete(query, prevOptions, page, options).then(resolve);
             },
-            props.debounceMs || 1000
+            debounceMs || 1000
         ),
-        [props.debounceMs]
+        [debounceMs]
     );
 
     const loadOptions = useCallback(
@@ -37,28 +46,22 @@ export const OrganizationAutocompleteField: FunctionComponent<{
     );
 
     return (
-        <Field
-            name={props.name}
-            validate={props.validator}
-            component={({ input, meta }) => (
-                <AsyncPaginate
-                    placeholder={props.placeholder || translate('Select organization...')}
-                    loadOptions={loadOptions}
-                    defaultOptions
-                    getOptionValue={(option) => option.uuid}
-                    getOptionLabel={(option) => option.name}
-                    value={input.value}
-                    onChange={(value) => input.onChange(value)}
-                    onBlur={() => input.onBlur()}
-                    noOptionsMessage={() =>
-                        props.noOptionsMessage || translate('No organizations')
-                    }
-                    isClearable={true}
-                    className="metronic-select-container"
-                    classNamePrefix="metronic-select"
-                    {...props.reactSelectProps}
-                />
-            )}
+        <AsyncPaginate
+            placeholder={placeholder || translate('Select organization...')}
+            loadOptions={loadOptions}
+            defaultOptions
+            getOptionValue={(option) => option.uuid}
+            getOptionLabel={(option) => option.name}
+            value={input.value}
+            onChange={(value) => input.onChange(value)}
+            onBlur={() => input.onBlur()}
+            noOptionsMessage={() =>
+                noOptionsMessage || translate('No organizations')
+            }
+            isClearable={true}
+            className="metronic-select-container"
+            classNamePrefix="metronic-select"
+            {...reactSelectProps}
         />
     );
 };
