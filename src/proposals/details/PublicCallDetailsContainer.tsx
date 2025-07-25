@@ -44,35 +44,33 @@ const getTabs = () => {
 
   const themeFeatures = useThemeFeatures();
 
-  const tabs: PageBarTab[] = [];
+  const tabs: PageBarTab[] = [
+    {
+      key: 'description',
+      title: translate('Description'),
+      component: CallDescriptionCard,
+    },
 
-  tabs.push({
-    key: 'description',
-    title: translate('Description'),
-    component: CallDescriptionCard,
-  });
-
-  if (themeFeatures.ShowPublicCallRounds) {
-    tabs.push({
+    {
       key: 'rounds',
       title: translate('Rounds'),
       component: CallRoundsList,
-    });
-  }
+      visible: themeFeatures.ShowPublicCallRounds,
+    },
 
-  tabs.push({
-    key: 'documents',
-    title: translate('Documents'),
-    component: CallDocumentsCard,
-  });
+    {
+      key: 'documents',
+      title: translate('Documents'),
+      component: CallDocumentsCard,
+    },
 
-  if (themeFeatures.ShowPublicCallOfferings) {
-    tabs.push({
+    {
       key: 'offerings',
       title: translate('Offerings'),
       component: CallOfferingsCard,
-    });
-  }
+      visible: themeFeatures.ShowPublicCallOfferings,
+    },
+  ];
 
   return tabs;
 }
