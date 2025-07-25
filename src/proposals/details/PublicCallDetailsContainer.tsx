@@ -40,40 +40,32 @@ const CallRoundsList = lazyComponent(() =>
   })),
 );
 
-const getTabs = () => {
+const themeFeatures = useThemeFeatures();
 
-  const themeFeatures = useThemeFeatures();
-
-  const tabs: PageBarTab[] = [
-    {
-      key: 'description',
-      title: translate('Description'),
-      component: CallDescriptionCard,
-    },
-
-    {
-      key: 'rounds',
-      title: translate('Rounds'),
-      component: CallRoundsList,
-      visible: themeFeatures.ShowPublicCallRounds,
-    },
-
-    {
-      key: 'documents',
-      title: translate('Documents'),
-      component: CallDocumentsCard,
-    },
-
-    {
-      key: 'offerings',
-      title: translate('Offerings'),
-      component: CallOfferingsCard,
-      visible: themeFeatures.ShowPublicCallOfferings,
-    },
-  ];
-
-  return tabs;
-}
+const tabs: PageBarTab[] = [
+  {
+    key: 'description',
+    title: translate('Description'),
+    component: CallDescriptionCard,
+  },
+  {
+    key: 'rounds',
+    title: translate('Rounds'),
+    component: CallRoundsList,
+    visible: themeFeatures.isCallRoundsEnabled,
+  },
+  {
+    key: 'documents',
+    title: translate('Documents'),
+    component: CallDocumentsCard,
+  },
+  {
+    key: 'offerings',
+    title: translate('Offerings'),
+    component: CallOfferingsCard,
+    visible: themeFeatures.isCallOfferingsEnabled,
+  },
+];
 
 const PageHero = ({ call }) =>
   call ? (
@@ -111,8 +103,6 @@ export const PublicCallDetailsContainer: FC = () => {
 
   const breadcrumbItems = useCallBreadcrumbItems(call);
   useBreadcrumbs(breadcrumbItems);
-
-  const tabs = getTabs();
 
   const filteredTabs = useMemo(
     () =>
