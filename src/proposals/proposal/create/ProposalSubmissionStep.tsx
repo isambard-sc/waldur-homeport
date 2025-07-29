@@ -128,6 +128,21 @@ export const ProposalSubmissionStep: FC<{
           proposal_uuid,
           formValues.supporting_documentation,
         );
+
+        // get the number of attached documents
+        const num_attached_documents = (proposal.supporting_documentation?.length || 0) +
+          (formValues.supporting_documentation
+            ? Object.keys(formValues.supporting_documentation).length
+            : 0);
+
+        if (num_attached_documents < 2) {
+          throw new Error(
+            translate(
+              'You need to attach both the completed Assessment and Project Details forms.',
+            ),
+          );
+        }
+
         await proposalProposalsSubmit({ path: { uuid: proposal_uuid } });
         refetch && refetch();
         dispatch(showSuccess(translate('Proposal submitted successfully')));

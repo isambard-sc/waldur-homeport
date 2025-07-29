@@ -172,8 +172,8 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
           {
             extra_msg: call?.fixed_duration_in_days
               ? translate(
-                  "This field set automatically based on the call's fixed duration.",
-                )
+                "This field set automatically based on the call's fixed duration.",
+              )
               : '',
           },
         )}
@@ -197,6 +197,7 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
           'Upload additional documents, which support the proposal and help to review it.',
         )}
         tooltipEnd
+        required
       >
         <UploadDocumentationFiles proposal={props.params.proposal} />
       </Field>
@@ -204,6 +205,6 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         reviews={reviews}
         fieldName="comment_project_supporting_documentation"
       />
-    </VStepperFormStepCard>
+    </VStepperFormStepCard >
   );
 };

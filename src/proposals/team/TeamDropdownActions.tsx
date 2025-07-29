@@ -29,7 +29,6 @@ export const TeamDropdownActions = ({
         </span>
       </Dropdown.Toggle>
       <Dropdown.Menu flip>
-        <InvitationCreateButton refetch={refetchInvitations} {...rest} />
         <AddUserButton refetch={refetchUsers} {...rest} />
       </Dropdown.Menu>
     </Dropdown>
