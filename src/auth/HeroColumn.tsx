@@ -2,7 +2,8 @@ import { getIconUrl } from '@waldur/core/api';
 import { ENV } from '@waldur/core/config';
 
 // Image is taken from https://www.flickr.com/photos/visitestonia/33974817076
-import DefaultHeroImage from './estonian-bog.jpg';
+// import DefaultHeroImage from './estonian-bog.jpg';
+import DefaultHeroImage from './brics-hero.jpg';
 import { HeroButton } from './HeroButton';
 
 import './HeroColumn.css';
