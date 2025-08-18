@@ -52,7 +52,7 @@ const tabs: PageBarTab[] = [
     key: 'rounds',
     title: translate('Rounds'),
     component: CallRoundsList,
-    visible: themeFeatures.isCallRoundsEnabled,
+    visible: themeFeatures.ShowPublicCallRounds,
   },
   {
     key: 'documents',
@@ -63,7 +63,7 @@ const tabs: PageBarTab[] = [
     key: 'offerings',
     title: translate('Offerings'),
     component: CallOfferingsCard,
-    visible: themeFeatures.isCallOfferingsEnabled,
+    visible: themeFeatures.ShowPublicCallOfferings,
   },
 ];
 
