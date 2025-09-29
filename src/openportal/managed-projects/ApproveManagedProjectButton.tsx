@@ -20,7 +20,7 @@ export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => 
     const { mutate, isPending: isLoading } = useMutation({
         mutationFn: async () => {
             try {
-                await post(`/openportal-managed-projects/${project.identifier}/approve/`);
+                await post(`/openportal-managed-projects/${project.identifier}/${project.destination}/approve/`);
                 if (refetch) {
                     await refetch();
                 }

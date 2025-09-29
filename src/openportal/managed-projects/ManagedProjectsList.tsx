@@ -57,6 +57,14 @@ const renderProjectTemplate = (row: any) => {
     return renderFieldOrDash(row.details.class);
 }
 
+const renderOffering = (destination: string) => {
+    if (destination) {
+        // split by "." and return the last part
+        const parts = destination.split('.');
+        return renderFieldOrDash(parts[parts.length - 1]);
+    }
+    return '-';
+}
 
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
@@ -78,6 +86,13 @@ export const ManagedProjectsList = () => {
             render: ({ row }) => renderFieldOrDash(row.details.name),
             keys: ['name'],
             id: 'managedproject',
+        },
+        {
+            title: translate('Offering'),
+            orderField: 'row.offering',
+            render: ({ row }) => renderOffering(row.destination),
+            keys: ['offering'],
+            id: 'offering',
         },
         {
             title: translate('Project Template'),

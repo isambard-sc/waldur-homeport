@@ -45,6 +45,15 @@ const renderProjectTemplateLink = (row: any) => {
     return 'No project template assigned';
 };
 
+const renderOffering = (destination: string) => {
+    if (destination) {
+        // split by "." and return the last part
+        const parts = destination.split('.');
+        return parts[parts.length - 1];
+    }
+    return '-';
+}
+
 const stringify_role = (role: any, project_template: any) => {
     if (!role) {
         return translate('No role assigned');
@@ -69,6 +78,7 @@ const stringify_role = (role: any, project_template: any) => {
     return mapped_role.description || mapped_role.name || mapped_role.uuid || translate('Not set');
 };
 
+
 const stringify_members = (members, project_template) => {
     if (!members || Object.keys(members).length === 0) {
         return translate('No members assigned');
@@ -90,6 +100,9 @@ export const ManagedProjectExpandableRow: FC<OwnProps> = (props) => {
                 </div>
                 <div>
                     <strong>Project:</strong> {renderProjectLink(props.row)}
+                </div>
+                <div>
+                    <strong>Offering:</strong> {renderOffering(props.row.destination)}
                 </div>
                 <div>
                     <strong>Project Template:</strong> {renderProjectTemplateLink(props.row)}

@@ -34,7 +34,7 @@ export const DeleteManagedProjectButton: FC<{ row; refetch }> = ({
             return;
         }
         try {
-            await deleteManagedProject({ identifier: project.identifier });
+            await deleteManagedProject({ identifier: project.identifier, destination: project.destination });
             await refetch();
             dispatch(showSuccess(translate('Managed project has been deleted.')));
         } catch (e) {
