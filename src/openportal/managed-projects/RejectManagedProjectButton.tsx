@@ -31,7 +31,7 @@ export const RejectManagedProjectButton = ({ row, as, className, refetch }) => {
                 return;
             }
             try {
-                await post(`/openportal-managed-projects/${project.identifier}/reject/`);
+                await post(`/openportal-managed-projects/${project.identifier}/${project.destination}/reject/`);
                 if (refetch) {
                     await refetch();
                 }

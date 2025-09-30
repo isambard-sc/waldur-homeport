@@ -22,12 +22,15 @@ import { RoleMappingField } from './RoleMappingField';
 import { AllocationUnitsMappingField } from './AllocationUnitsMappingField';
 import { OrganizationAutocompleteField } from './OrganizationAutocompleteField';
 import { OfferingAutocompleteField } from './OfferingAutocompleteField';
+import { offering } from '@waldur/marketplace/resources/change-limits/fixtures';
 
 // Constants
 const FIELD_CONSTRAINTS = {
   MAX_PORTALIDENTIFIER_LENGTH: 32,
   MAX_PROJECTCLASS_LENGTH: 128,
   MAX_PROJECT_SHORTNAME_LENGTH: 30,
+  MAX_OFFERING_LENGTH: 128,
+  MAX_KEY_LENGTH: 256,
 } as const;
 
 // Types
@@ -35,7 +38,9 @@ interface ProjectTemplateFormValues {
   uuid: string;
   name: string;
   portal: string;
+  offering: string;
   customer: any;
+  key?: string;
   shortname: string;
   offerings?: any[];
   approval_limit?: number;
@@ -88,7 +93,9 @@ const updateProjectTemplate = async (formData: ProjectTemplateFormValues, curren
     provider: getCustomerURL(currentCustomer),
     name: formData.name,
     portal: formData.portal,
+    offering: formData.offering,
     customer: getCustomerURL(formData.customer),
+    key: formData.key,
     shortname: formData.shortname,
     offerings: formData.offerings?.map((offering) => offering.url) || [],
     approval_limit: formData.approval_limit,
@@ -219,6 +226,24 @@ export const ProjectTemplateEditDialog: React.FC<ProjectTemplateEditDialogProps>
             </FormGroup>
 
             <FormGroup
+              controlId="offering"
+              label={translate('Name of the remote offering, e.g. "isambard-ai"')}
+              required
+            >
+              <Field
+                name="offering"
+                component={StringField}
+                placeholder={translate('e.g., my-remote-offering-name')}
+                maxLength={FIELD_CONSTRAINTS.MAX_OFFERING_LENGTH}
+                validate={composeValidators(
+                  validateRequired,
+                  validateMaxLength(FIELD_CONSTRAINTS.MAX_OFFERING_LENGTH)
+                )}
+                required
+              />
+            </FormGroup>
+
+            <FormGroup
               controlId="portal"
               label={translate('Portal from which requests are allowed')}
               required
@@ -252,6 +277,19 @@ export const ProjectTemplateEditDialog: React.FC<ProjectTemplateEditDialogProps>
                   closeMenuOnSelect: true,
                 }}
                 noOptionsMessage={() => translate('No organisations found')}
+              />
+            </FormGroup>
+
+            <FormGroup
+              controlId="key"
+              label={translate('Key used to verify requests from the remote portal')}
+            >
+              <Field
+                name="key"
+                component={StringField}
+                placeholder={translate('e.g., a1b2c3d4e5f6g7h8i9j0')}
+                maxLength={FIELD_CONSTRAINTS.MAX_KEY_LENGTH}
+                validate={validateMaxLength(FIELD_CONSTRAINTS.MAX_KEY_LENGTH)}
               />
             </FormGroup>
 
@@ -345,7 +383,7 @@ export const ProjectTemplateEditDialog: React.FC<ProjectTemplateEditDialogProps>
               />
             </FormGroup>
           </ModalDialog>
-        </form>
+        </form >
       )}
     />
   );

@@ -79,10 +79,11 @@ export async function patch(endpoint: string, data?: object) {
 }
 
 export const deleteManagedProject = async (path: {
-    identifier: string;
+    identifier: string,
+    destination: string,
 }) => {
     client.delete({
-        url: `/api/openportal-managed-projects/${path.identifier}/`,
+        url: `/api/openportal-managed-projects/${path.identifier}/${path.destination}/`,
         path,
         security: [
             {
@@ -109,11 +110,11 @@ export const deleteProjectTemplate = async (path: {
 }
 
 export const attachProjectToManagedProject = async (managed_project, project) => {
-    const response = await post(`/openportal-managed-projects/${managed_project.identifier}/attach/`, { project_uuid: project.uuid });
+    const response = await post(`/openportal-managed-projects/${managed_project.identifier}/${managed_project.destination}/attach/`, { project_uuid: project.uuid });
     return response.json();
 };
 
 export const detachProjectFromManagedProject = async (managed_project) => {
-    const response = await post(`/openportal-managed-projects/${managed_project.identifier}/detach/`, {});
-  return response.json();
+    const response = await post(`/openportal-managed-projects/${managed_project.identifier}/${managed_project.destination}/detach/`, {});
+    return response.json();
 };

@@ -45,6 +45,10 @@ export const ProjectTemplateList: FunctionComponent<{}> = () => {
           render: ({ row }) => renderFieldOrDash(row.name),
         },
         {
+          title: translate('Offering'),
+          render: ({ row }) => renderFieldOrDash(row.offering),
+        },
+        {
           title: translate('Portal'),
           render: ({ row }) => renderFieldOrDash(row.portal),
         },

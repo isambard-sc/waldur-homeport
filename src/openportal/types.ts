@@ -10,6 +10,7 @@ export const ManagedProject = {
     review_comment: null,
     project: null,
     project_template: null,
+    destination: null,
     details: {
         name: null,
         class: null,
@@ -24,6 +25,7 @@ export const ManagedProject = {
 export const ProjectTemplate = {
     uuid: null,
     name: null,
+    offering: null,
     provider: null,
     portal: null,
     customer: null,

@@ -86,7 +86,13 @@ export const ProjectTemplateExpandableRow: FC<OwnProps> = (props) => {
                     <strong>Portal:</strong> {stringify(project.portal)}
                 </div>
                 <div>
+                    <strong>Offering:</strong> {stringify(project.offering)}
+                </div>
+                <div>
                     <strong>Customer:</strong> {stringify_customer(project.customer_data)}
+                </div>
+                <div>
+                    <strong>Key:</strong> {stringify(project.key)}
                 </div>
                 <div>
                     <strong>Shortname:</strong> {stringify(project.shortname)}
