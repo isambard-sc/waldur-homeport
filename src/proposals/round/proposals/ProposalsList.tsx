@@ -1,5 +1,5 @@
-import { FC } from 'react';
-import { ProtectedRound } from 'waldur-js-client';
+import { FC, useMemo } from 'react';
+import { proposalProposalsList, ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
@@ -20,11 +20,14 @@ interface RoundProposalsListProps {
 }
 
 export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
+  const filter = useMemo(
+    () => ({ round: props.round.uuid }),
+    [props.round.uuid],
+  );
   const tableProps = useTable({
     table: 'RoundProposalsList',
-    fetchData: createFetcher('proposal-proposals', {
-      params: { round: props.round.uuid },
-    }),
+    filter,
+    fetchData: createFetcher(proposalProposalsList),
     queryField: 'name',
   });
 

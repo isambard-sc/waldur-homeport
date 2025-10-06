@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { ProjectCredit } from 'waldur-js-client';
+import { ProjectCredit, projectCreditsList } from 'waldur-js-client';
 
 import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
 import { translate } from '@waldur/i18n';
@@ -17,12 +17,15 @@ import { ProjectCreditActions } from './ProjectCreditActions';
 
 export const ProjectCreditsList: FC = () => {
   const customer = useSelector(getCustomer);
+  const filter = useMemo(
+    () => ({ customer_uuid: customer.uuid }),
+    [customer.uuid],
+  );
   const tableProps = useTable({
     table: 'ProjectCreditsList',
-    fetchData: createFetcher('project-credits', {
-      params: { customer_uuid: customer.uuid },
-    }),
+    fetchData: createFetcher(projectCreditsList),
     queryField: 'query',
+    filter,
   });
 
   return (

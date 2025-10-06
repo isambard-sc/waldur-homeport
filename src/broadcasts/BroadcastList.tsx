@@ -1,7 +1,11 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
-import { BroadcastMessage, BroadcastMessagesListData } from 'waldur-js-client';
+import {
+  BroadcastMessage,
+  broadcastMessagesList,
+  BroadcastMessagesListData,
+} from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
@@ -26,6 +30,11 @@ const mandatoryFields: BroadcastMessagesListData['query']['field'] = [
   'send_at',
 ];
 
+const broadcastState = {
+  DRAFT: { label: translate('Draft'), color: 'default' },
+  SENT: { label: translate('Sent'), color: 'success' },
+};
+
 export const BroadcastList: FunctionComponent<{}> = () => {
   const filterForm: any = useSelector(getFormValues('BroadcastsFilter'));
   const filter = useMemo(
@@ -36,7 +45,7 @@ export const BroadcastList: FunctionComponent<{}> = () => {
   );
   const props = useTable({
     table: 'broadcast',
-    fetchData: createFetcher('broadcast-messages'),
+    fetchData: createFetcher(broadcastMessagesList),
     queryField: 'subject',
     mandatoryFields,
     filter,
@@ -59,14 +68,8 @@ export const BroadcastList: FunctionComponent<{}> = () => {
           title: translate('State'),
           render: ({ row }) => (
             <StateIndicator
-              label={row.state}
-              variant={
-                row.state === 'DRAFT'
-                  ? 'default'
-                  : row.state === 'SENT'
-                    ? 'success'
-                    : 'info'
-              }
+              label={broadcastState[row.state]?.label || row.state}
+              variant={broadcastState[row.state]?.color || 'info'}
               outline
               pill
             />
@@ -85,7 +88,6 @@ export const BroadcastList: FunctionComponent<{}> = () => {
       expandableRow={BroadcastExpandableRow}
       initialPageSize={10}
       showPageSizeSelector={true}
-      expandableRowClassName="bg-gray-200"
       rowActions={BroadcastsRowActions}
       hasQuery={true}
       title={translate('Broadcasts')}

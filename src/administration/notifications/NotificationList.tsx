@@ -2,7 +2,7 @@ import { PencilSimpleIcon, QuestionIcon } from '@phosphor-icons/react';
 import { uniqueId } from 'lodash-es';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
-import { Notification } from 'waldur-js-client';
+import { Notification, notificationMessagesList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
@@ -20,7 +20,7 @@ export const NotificationList = () => {
   const filter = useSelector(getFormValues('notificationFilter'));
   const tableProps = useTable({
     table: 'notification',
-    fetchData: createFetcher('notification-messages'),
+    fetchData: createFetcher(notificationMessagesList),
     filter,
     queryField: 'query',
   });
@@ -37,9 +37,13 @@ export const NotificationList = () => {
             <>
               {row.key}
               {hasOverriddenTemplate(row) && (
-                <span className="svg-icon svg-icon-5 ms-3">
-                  <PencilSimpleIcon />
-                </span>
+                <Tip
+                  id={'tip-notif-overridden-' + row.uuid}
+                  label={translate('Content is overridden')}
+                  className="svg-icon svg-icon-5 ms-3"
+                >
+                  <PencilSimpleIcon weight="bold" />
+                </Tip>
               )}
               {row.description && (
                 <Tip
@@ -47,7 +51,7 @@ export const NotificationList = () => {
                   className="ms-2"
                   id={uniqueId('descriptionTip')}
                 >
-                  <QuestionIcon />
+                  <QuestionIcon weight="bold" />
                 </Tip>
               )}
             </>
@@ -82,7 +86,6 @@ export const NotificationList = () => {
       )}
       initialPageSize={10}
       showPageSizeSelector={true}
-      expandableRowClassName="bg-gray-200"
       hasQuery={true}
       enableExport={true}
       filters={<NotificationFilter />}

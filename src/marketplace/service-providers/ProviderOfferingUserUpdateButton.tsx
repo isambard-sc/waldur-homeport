@@ -1,9 +1,10 @@
-import { PencilSimpleIcon } from '@phosphor-icons/react';
+import { ChatTeardropTextIcon, PencilSimpleIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { useDispatch } from 'react-redux';
 import { PublicOfferingDetails } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -36,10 +37,24 @@ export const ProviderOfferingUserUpdateButton: FC<
         ? props.offering.customer_uuid
         : undefined,
   });
+
+  const icon =
+    props.updateScope === 'comment' ? (
+      <ChatTeardropTextIcon weight="bold" />
+    ) : (
+      <PencilSimpleIcon weight="bold" />
+    );
+
   return (
     canUpdateOfferingUser && (
       <ActionItem
-        title="Edit"
+        title={
+          props.updateScope === 'comment'
+            ? translate('Edit comment')
+            : props.updateScope === 'state'
+              ? translate('Update account state')
+              : translate('Edit external username')
+        }
         action={() =>
           dispatch(
             openModalDialog(ProviderOfferingUserUpdateDialog, {
@@ -48,7 +63,7 @@ export const ProviderOfferingUserUpdateButton: FC<
             }),
           )
         }
-        iconNode={<PencilSimpleIcon weight="bold" />}
+        iconNode={icon}
       />
     )
   );

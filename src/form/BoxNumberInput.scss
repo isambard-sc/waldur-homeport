@@ -1,11 +1,11 @@
 @mixin box-number-input() {
   input[type='number'] {
-    border-radius: 5px;
-    border-color: var(--bs-border-color);
-    padding: 0.6rem 0.5rem;
+    border-radius: 8px;
     text-align: center;
-    min-width: 60px;
-    font-weight: 600;
+    padding: 0.68rem 2.7rem;
+    min-width: 116px;
+    font-weight: 500;
+    color: var(--bs-gray-500);
 
     /* Hide arrows */
 
@@ -27,12 +27,20 @@
 
   .plus-btn,
   .minus-btn {
+    position: absolute;
     display: block;
-    width: 20px !important;
-    padding: 6px;
+    width: 28px !important;
+    height: 28px !important;
 
     i {
       font-size: 0.85rem;
     }
+  }
+
+  .minus-btn {
+    left: 8px;
+  }
+  .plus-btn {
+    right: 8px;
   }
 }

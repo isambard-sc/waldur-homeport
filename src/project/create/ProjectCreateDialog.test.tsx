@@ -13,7 +13,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { projectTypesList, projectsCreate } from 'waldur-js-client';
 
 import { formDataOptions } from '@waldur/core/api';
-import * as config from '@waldur/core/config';
 import { Customer } from '@waldur/workspace/types';
 
 import { ProjectCreateDialog } from './ProjectCreateDialog';
@@ -21,7 +20,26 @@ import { ProjectCreateDialog } from './ProjectCreateDialog';
 // Mock API calls
 vi.mock('../api');
 vi.mock('waldur-js-client');
-vi.mock('@waldur/core/config');
+
+// Create a mocked config that can be modified in tests
+const mockConfig = vi.hoisted(() => ({
+  ENV: {
+    plugins: {
+      WALDUR_CORE: {
+        OECD_FOS_2007_CODE_MANDATORY: false,
+        ENABLE_PROJECT_KIND_COURSE: false,
+      },
+    },
+    FEATURES: {
+      project: {
+        show_description_in_create_dialog: true,
+        show_type_in_create_dialog: true,
+      },
+    },
+  },
+}));
+
+vi.mock('@waldur/core/config', () => mockConfig);
 
 describe('ProjectCreateDialog', () => {
   const mockedRefetch = vi.fn();
@@ -70,10 +88,12 @@ describe('ProjectCreateDialog', () => {
   };
 
   beforeEach(() => {
-    vi.mocked(config).ENV = {
+    // Reset to default config values
+    mockConfig.ENV = {
       plugins: {
         WALDUR_CORE: {
           OECD_FOS_2007_CODE_MANDATORY: false,
+          ENABLE_PROJECT_KIND_COURSE: false,
         },
       },
       FEATURES: {
@@ -82,28 +102,32 @@ describe('ProjectCreateDialog', () => {
           show_type_in_create_dialog: true,
         },
       },
-    } as any;
+    };
   });
 
   afterEach(() => {
     vi.clearAllMocks(); // Clear mocks after each test
   });
 
-  it('should render the form correctly', () => {
+  it('should render the form correctly', async () => {
     vi.mocked(projectTypesList).mockResolvedValue({ data: [] } as any);
     renderComponent();
     // Assert that the form fields are rendered
-    expect(screen.getByText('Project name')).toBeInTheDocument();
-    expect(screen.getByText('Organization')).toBeInTheDocument();
-    expect(screen.getByText('Project description')).toBeInTheDocument();
-    expect(screen.queryByText('Project type')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Project name')).toBeInTheDocument();
+      expect(screen.getByText('Organization')).toBeInTheDocument();
+      expect(screen.getByText('Project description')).toBeInTheDocument();
+      expect(screen.queryByText('Project type')).not.toBeInTheDocument();
+    });
   });
 
-  it('should conceal disabled feature fields', () => {
-    vi.mocked(config).ENV = {
+  it('should conceal disabled feature fields', async () => {
+    // Modify the mock config for this specific test
+    mockConfig.ENV = {
       plugins: {
         WALDUR_CORE: {
           OECD_FOS_2007_CODE_MANDATORY: false,
+          ENABLE_PROJECT_KIND_COURSE: false,
         },
       },
       FEATURES: {
@@ -112,13 +136,16 @@ describe('ProjectCreateDialog', () => {
           show_type_in_create_dialog: true,
         },
       },
-    } as any;
+    };
+
     renderComponent();
     // Assert that the form fields are rendered
-    expect(screen.getByText('Project name')).toBeInTheDocument();
-    expect(screen.getByText('Organization')).toBeInTheDocument();
-    expect(screen.queryByText('Project description')).not.toBeInTheDocument();
-    expect(screen.queryByText('Project type')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Project name')).toBeInTheDocument();
+      expect(screen.getByText('Organization')).toBeInTheDocument();
+      expect(screen.queryByText('Project description')).not.toBeInTheDocument();
+      expect(screen.queryByText('Project type')).not.toBeInTheDocument();
+    });
   });
 
   it('should create a new project using entered values', async () => {

@@ -14,16 +14,11 @@ interface OwnProps {
 const PERMISSION_MAP = {
   customer: 'organization.dashboard',
   project: 'marketplace-projects',
-  callmanagingorganisation: 'call-management.dashboard',
+  call_organizer: 'call-management.dashboard',
   call: 'call-management.dashboard',
 };
 
-const PERMISSION_PRIORITY = [
-  'customer',
-  'project',
-  'callmanagingorganisation',
-  'call',
-];
+const PERMISSION_PRIORITY = ['customer', 'project', 'call_organizer', 'call'];
 
 export const OrganizationLink: FC<PropsWithChildren<OwnProps>> = ({
   uuid,
@@ -43,7 +38,9 @@ export const OrganizationLink: FC<PropsWithChildren<OwnProps>> = ({
     // Find the highest-priority permission the user has for this organization
     for (const scope of PERMISSION_PRIORITY) {
       const hasPermission = user.permissions.some(
-        (p) => p.scope_type === scope && p.customer_uuid === uuid,
+        (p) =>
+          p.scope_type === scope &&
+          (p.customer_uuid === uuid || p.scope_uuid === uuid),
       );
       if (hasPermission) {
         return PERMISSION_MAP[scope];

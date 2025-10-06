@@ -1,6 +1,10 @@
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { MarketplaceCustomerServiceAccountsRetrieveResponse } from 'waldur-js-client';
+import {
+  marketplaceCustomerServiceAccountsList,
+  marketplaceProjectServiceAccountsList,
+  MarketplaceCustomerServiceAccountsRetrieveResponse,
+} from 'waldur-js-client';
 
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
@@ -10,8 +14,8 @@ import { TeamDropdownActions } from '@waldur/customer/team/TeamDropdownActions';
 import { translate } from '@waldur/i18n';
 import { ProjectLink } from '@waldur/project/ProjectLink';
 import { ProjectPermissionsLogButton } from '@waldur/project/team/ProjectPermissionsLogButton';
+import { useTeamTableTabs as useProjectTeamTableTabs } from '@waldur/project/team/tabs';
 import { TeamDropdownActions as ProjectTeamDropdownActions } from '@waldur/project/team/TeamDropdownActions';
-import { PROJECT_TEAM_TABLE_TABS } from '@waldur/project/utils';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { TableProps } from '@waldur/table/types';
@@ -115,13 +119,19 @@ export const ServiceAccountsList: FC<ServiceAccountsProps> = ({
   );
   const tableProps = useTable({
     table: `marketplace-${context}-service-accounts`,
-    fetchData: createFetcher(`marketplace-${context}-service-accounts`),
+    fetchData: createFetcher(
+      context === 'customer'
+        ? marketplaceCustomerServiceAccountsList
+        : marketplaceProjectServiceAccountsList,
+    ),
     filter,
     queryField: 'email',
   });
 
   const tableTabs =
-    context === 'customer' ? useTeamTableTabs() : PROJECT_TEAM_TABLE_TABS;
+    context === 'customer'
+      ? useTeamTableTabs()
+      : useProjectTeamTableTabs(scope);
 
   return (
     <ServiceAccountsTableComponent
@@ -131,20 +141,22 @@ export const ServiceAccountsList: FC<ServiceAccountsProps> = ({
       tabs={tableTabs}
       tableActions={
         context === 'customer' ? (
-          <>
-            <CustomerPermissionsLogButton />
-            <TeamDropdownActions refetch={tableProps.fetch} />
-          </>
+          <TeamDropdownActions refetch={tableProps.fetch} />
         ) : (
-          <>
-            <ProjectPermissionsLogButton />
-            <ProjectTeamDropdownActions
-              refetch={tableProps.fetch}
-              project={scope}
-            />
-          </>
+          <ProjectTeamDropdownActions
+            refetch={tableProps.fetch}
+            project={scope}
+          />
         )
       }
+      dropdownActions={
+        context === 'customer' ? (
+          <CustomerPermissionsLogButton />
+        ) : (
+          <ProjectPermissionsLogButton asDropdownItem />
+        )
+      }
+      showExportInDropdown
     />
   );
 };

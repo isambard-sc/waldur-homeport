@@ -15,13 +15,16 @@ export enum DeploymentFeatures {
 export enum InvitationsFeatures {
   civil_number_required = 'invitations.civil_number_required',
   conceal_civil_number = 'invitations.conceal_civil_number',
+  show_course_accounts = 'invitations.show_course_accounts',
   show_service_accounts = 'invitations.show_service_accounts',
 }
 
 export enum MarketplaceFeatures {
+  allow_display_of_images_in_markdown = 'marketplace.allow_display_of_images_in_markdown',
   call_only = 'marketplace.call_only',
   catalogue_only = 'marketplace.catalogue_only',
   conceal_prices = 'marketplace.conceal_prices',
+  display_user_tos = 'marketplace.display_user_tos',
   import_resources = 'marketplace.import_resources',
   lexis_links = 'marketplace.lexis_links',
   show_call_management_functionality = 'marketplace.show_call_management_functionality',
@@ -45,6 +48,8 @@ export enum ProjectFeatures {
   show_end_date_in_create_dialog = 'project.show_end_date_in_create_dialog',
   show_image_in_create_dialog = 'project.show_image_in_create_dialog',
   show_industry_flag = 'project.show_industry_flag',
+  show_kind_in_create_dialog = 'project.show_kind_in_create_dialog',
+  show_permission_reviews = 'project.show_permission_reviews',
   show_start_date_in_create_dialog = 'project.show_start_date_in_create_dialog',
   show_type_in_create_dialog = 'project.show_type_in_create_dialog',
 }

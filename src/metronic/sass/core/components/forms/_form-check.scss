@@ -123,16 +123,32 @@
       background-image: escape-svg($form-switch-bg-image-solid);
       border-radius: $form-switch-border-radius;
 
+      &:not(:checked) {
+        border: 1px solid $border-color;
+      }
+
       &:hover {
         background-color: $form-check-input-bg-solid;
       }
+      &:active,
+      &:focus {
+        background-color: $gray-100;
+      }
 
+      &:disabled {
+        opacity: unset;
+        background-image: escape-svg($form-switch-bg-image-solid-disabled);
+      }
       &:checked {
         filter: none;
         background-color: $form-switch-checked-bg-color;
+        background-image: escape-svg($form-switch-checked-bg-image-solid);
 
         &:disabled {
           background-color: $brand-200;
+          background-image: escape-svg(
+            $form-switch-checked-bg-image-solid-disabled
+          );
         }
       }
     }

@@ -11,11 +11,9 @@ import { OpenPortalRemoteOffering } from '@waldur/openportal-remote/marketplace'
 import { OpenStackTenantOffering } from '@waldur/openstack/marketplace';
 import { OpenStackInstanceOffering } from '@waldur/openstack/openstack-instance/marketplace';
 import { OpenStackVolumeOffering } from '@waldur/openstack/openstack-volume/marketplace';
-import {
-  ManagedRancherOffering,
-  RancherOffering,
-} from '@waldur/rancher/cluster/create/marketplace';
-import { SlurmOffering, SiteAgentOffering } from '@waldur/slurm/marketplace';
+import { RancherOffering } from '@waldur/rancher/cluster/create/marketplace';
+import { SiteAgentOffering } from '@waldur/site-agent/marketplace';
+import { SlurmOffering } from '@waldur/slurm/marketplace';
 import { BasicOffering, SupportOffering } from '@waldur/support/marketplace';
 import { vmWareOffering } from '@waldur/vmware/marketplace';
 
@@ -106,13 +104,6 @@ export function showBackendId(offeringType: string) {
   );
 }
 
-export function allowToUpdateService(offeringType: string) {
-  return (
-    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
-    REGISTRY[offeringType].allowToUpdateService
-  );
-}
-
 export function hidePlanAddButton(offeringType: string, fields: Array<any>) {
   return (
     Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
@@ -163,17 +154,17 @@ export function getProvisioningConfigForm(offeringType: string) {
   );
 }
 
+export function getCredentialsForm(offeringType: string) {
+  return (
+    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
+    REGISTRY[offeringType].credentialsForm
+  );
+}
+
 export function showComponentsList(offeringType: string) {
   return (
     Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
     REGISTRY[offeringType].showComponents
-  );
-}
-
-export function getProviderType(offeringType: string) {
-  return (
-    Object.prototype.hasOwnProperty.call(REGISTRY, offeringType) &&
-    REGISTRY[offeringType].providerType
   );
 }
 
@@ -214,7 +205,6 @@ registerOfferingType(OpenStackTenantOffering);
 registerOfferingType(OpenStackInstanceOffering);
 registerOfferingType(OpenStackVolumeOffering);
 registerOfferingType(RancherOffering);
-registerOfferingType(ManagedRancherOffering);
 registerOfferingType(SlurmOffering);
 registerOfferingType(SiteAgentOffering);
 registerOfferingType(SupportOffering);

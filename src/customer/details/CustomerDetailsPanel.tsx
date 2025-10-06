@@ -6,9 +6,11 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { CustomerFeatures } from '@waldur/FeaturesEnums';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
+import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { getNativeNameVisible } from '@waldur/store/config';
 import { getUser } from '@waldur/workspace/selectors';
 
+import { CustomerChecklistPanel } from './CustomerChecklistPanel';
 import { CustomerLocationRow } from './CustomerLocationRow';
 import { CustomerMediaPanel } from './CustomerMediaPanel';
 import { CustomerOrganizationGroupsRow } from './CustomerOrganizationGroupsRow';
@@ -18,6 +20,8 @@ import { CustomerEditPanelProps } from './types';
 export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
   const nativeNameVisible = getNativeNameVisible();
   const user = useSelector(getUser);
+
+  const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
 
   const detailsRows = useMemo(
     () =>
@@ -38,6 +42,11 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
           label: translate('Abbreviation'),
           key: 'abbreviation',
           value: props.customer.abbreviation,
+        },
+        {
+          label: translate('Description'),
+          key: 'description',
+          value: props.customer.description,
         },
         isFeatureVisible(CustomerFeatures.show_domain)
           ? {
@@ -134,7 +143,7 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
 
       <FormTable.Card
         title={translate('Identifiers')}
-        className="card-bordered"
+        className="card-bordered mb-5"
       >
         <FormTable>
           <FormTable.Item
@@ -172,6 +181,8 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
           ))}
         </FormTable>
       </FormTable.Card>
+
+      {showExperimentalUiComponents && <CustomerChecklistPanel {...props} />}
     </>
   );
 };

@@ -41,23 +41,33 @@
   }
 
   .slider-number-input-control {
+    position: relative;
     display: flex;
     margin-left: 3rem;
-    padding: 3px;
-    border-radius: 6px;
-    background-color: var(--bs-light);
 
     @include box-number-input();
     input[type='number'] {
       margin-right: 2px;
-      padding: 0 0.5rem;
+      padding-left: 1rem;
       text-align: start;
       width: 70px;
+
+      &.form-control.is-invalid {
+        background-position: right 2rem center;
+      }
     }
     .plus-btn,
     .minus-btn {
-      height: 18px !important;
+      height: 20px !important;
       padding: 0;
+      left: unset;
+      right: 5px;
+    }
+    .minus-btn {
+      bottom: 2px;
+    }
+    .plus-btn {
+      top: 2px;
     }
   }
 

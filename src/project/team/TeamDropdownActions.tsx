@@ -15,6 +15,8 @@ import { InvitationCreateButton } from '@waldur/invitations/actions/create/Invit
 import { getTableState } from '@waldur/table/selectors';
 import { useUser } from '@waldur/workspace/hooks';
 
+import { CourseAccountCreateButton } from '../course-accounts/CourseAccountCreateAction';
+
 import { AddUserButton } from './AddUserButton';
 import { hasCurrentCustomerPermission } from './utils';
 
@@ -37,6 +39,7 @@ export const TeamDropdownActions = ({
   const user = useUser();
 
   const hasCustomerPermission = useSelector(hasCurrentCustomerPermission);
+  const isCourseProject = project.kind === 'course';
 
   const { isLoading, isError, data } = useQuery({
     queryKey: ['TeamDropdownActions', project.uuid],
@@ -75,14 +78,18 @@ export const TeamDropdownActions = ({
           </Dropdown.Item>
         ) : (
           <>
-            <InvitationCreateButton
-              project={project}
-              roleTypes={['project']}
-              refetch={refetch}
-              enableBulkUpload={true}
-            />
+            {!isCourseProject && (
+              <InvitationCreateButton
+                project={project}
+                roleTypes={['project']}
+                refetch={refetch}
+                enableBulkUpload={true}
+              />
+            )}
 
-            {data && <AddUserButton project={project} refetch={refetch} />}
+            {data && !isCourseProject && (
+              <AddUserButton project={project} refetch={refetch} />
+            )}
             {project.max_service_accounts !== 0 && (
               <ServiceAccountCreateButton
                 context="project"
@@ -98,6 +105,7 @@ export const TeamDropdownActions = ({
                 }
               />
             )}
+            <CourseAccountCreateButton project={project} refetch={refetch} />
           </>
         )}
       </Dropdown.Menu>

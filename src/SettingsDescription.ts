@@ -136,6 +136,18 @@ export const SettingsDescription = [
         default: false,
         type: 'boolean',
       },
+      {
+        key: 'ENABLE_MOCK_COURSE_ACCOUNT_BACKEND',
+        description: translate('Enable mock returns for the course account service'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'ENFORCE_USER_CONSENT_FOR_OFFERINGS',
+        description: translate('If True, users must have active consent to access offerings that have active Terms of Service.'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
   {
@@ -785,6 +797,18 @@ export const SettingsDescription = [
       {
         key: 'DEACTIVATE_USER_IF_NO_ROLES',
         description: translate('Deactivate user if all roles are revoked (except staff/support)'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'OIDC_BLOCK_CREATION_OF_UNINVITED_USERS',
+        description: translate('If true, block creation of an account on OIDC login if user email is not provided or provided and is not in the list of one of the active invitations.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'OIDC_ACCESS_TOKEN_ENABLED',
+        description: translate('If true, OIDC complete view returns access token instead of Waldur token'),
         default: false,
         type: 'boolean',
       },

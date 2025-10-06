@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react';
 import { Project } from 'waldur-js-client';
 
+import { ENV } from '@waldur/core/config';
 import FormTable, { FormTableItemProps } from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { useUser } from '@waldur/workspace/hooks';
+
+import { projectKindOptions } from '../utils';
 
 import { FieldEditButton } from './FieldEditButton';
 import { ProjectAvatar } from './ProjectAvatar';
@@ -22,6 +25,11 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
             label: translate('Name'),
             key: 'name',
             value: project.name || 'N/A',
+          },
+          user.is_staff && {
+            label: translate('Slug'),
+            key: 'slug',
+            value: project.slug || 'N/A',
           },
           {
             label: translate('Owner'),
@@ -48,6 +56,15 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
             label: translate('Description'),
             key: 'description',
             value: project.description || 'N/A',
+          },
+          ENV.plugins.WALDUR_CORE.ENABLE_PROJECT_KIND_COURSE && {
+            label: translate('Project kind'),
+            key: 'kind',
+            value:
+              (
+                projectKindOptions()[project.kind] ||
+                projectKindOptions().default
+              )?.label || 'N/A',
           },
           user.is_staff && {
             label: translate('Maximum number of service accounts'),

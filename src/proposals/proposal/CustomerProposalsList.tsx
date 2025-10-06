@@ -2,7 +2,10 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
-import { ProposalProposalsListData } from 'waldur-js-client';
+import {
+  proposalProposalsList,
+  ProposalProposalsListData,
+} from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
@@ -51,7 +54,7 @@ export const CustomerProposalsList: FC<{}> = () => {
   const filter = useSelector(mapStateToFilter);
   const tableProps = useTable({
     table: 'ProposalsList',
-    fetchData: createFetcher('proposal-proposals'),
+    fetchData: createFetcher(proposalProposalsList),
     queryField: 'name',
     filter,
   });
@@ -94,7 +97,13 @@ export const CustomerProposalsList: FC<{}> = () => {
         },
         {
           title: translate('Ending'),
-          render: ({ row }) => <EndingField endDate={row.round?.cutoff_time} />,
+          render: ({ row }) => (
+            <EndingField
+              endDate={row.round?.cutoff_time}
+              hasFixedDuration={Boolean(row.duration_in_days)}
+            />
+          ),
+          className: 'text-nowrap',
         },
         {
           title: translate('State'),

@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { LanguageSelectorBox } from '@waldur/i18n/LanguageSelectorBox';
 import { FooterLinks } from '@waldur/navigation/FooterLinks';
+import { JoinOrganizationFooterLink } from '@waldur/navigation/JoinOrganizationFooterLink';
 
 import { AuthHeader } from './AuthHeader';
 import { IdentityProviderSelector } from './IdentityProviderSelector';
@@ -75,11 +76,15 @@ export const LoginColumn = () => {
         </div>
       </div>
       {themeFeatures.ShowLoginFooter ? (
-        <div className="login-footer">
-          <LanguageSelectorBox />
-          <FooterLinks />
-        </div>
-      ) : null}
+      <div className="login-footer footer-top">
+        <LanguageSelectorBox />
+        <ul className="menu menu-brand justify-content-end icon-align">
+          <JoinOrganizationFooterLink loginPage />
+        </ul>
+      </div>
+      <div className="login-footer">
+        <FooterLinks />
+      </div>) : null}
     </div>
   );
 };

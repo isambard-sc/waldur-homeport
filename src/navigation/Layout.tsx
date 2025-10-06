@@ -10,6 +10,7 @@ import WarningBar from '@waldur/auth/WarningBar';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { DefaultLayoutConfig, useLayout } from '@waldur/metronic/layout/core';
 import { MasterLayout } from '@waldur/metronic/layout/MasterLayout';
+import { OfferingUsersWarningBar } from '@waldur/user/OfferingUsersWarningBar';
 import { getCurrentUser } from '@waldur/user/UsersService';
 import { setCurrentUser } from '@waldur/workspace/actions';
 import { getImpersonatorUser, getUser } from '@waldur/workspace/selectors';
@@ -38,6 +39,8 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const [fullPage, setFullPage] = useState(false);
   const [PageHero, setPageHero] = useState<React.ReactNode>(null);
   const [PageBar, setPageBar] = useState<React.ReactNode>(null);
+  const [ExtraAnnouncementBar, setExtraAnnouncementBar] =
+    useState<React.ReactNode>(null);
   const [ExtraToolbar, setExtraToolbar] = useState<React.ReactNode>(null);
   const context = useMemo<Partial<LayoutContextInterface>>(
     () => ({
@@ -48,6 +51,7 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
       setFullPage,
       setPageHero,
       setPageBar,
+      setExtraAnnouncementBar,
       setBreadcrumbs,
       breadcrumbs,
       setExtraToolbar,
@@ -60,6 +64,7 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
       setFullPage,
       setPageHero,
       setPageBar,
+      setExtraAnnouncementBar,
       setBreadcrumbs,
       breadcrumbs,
       setExtraToolbar,
@@ -106,7 +111,7 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <LayoutContext.Provider value={context}>
       <PermissionDataProvider>
-        <div className="d-flex flex-column flex-root">
+        <div className="d-flex flex-column flex-root print-content-only">
           {PageBar && <OutstandingBar>{PageBar}</OutstandingBar>}
           <div className="page d-flex flex-row flex-column-fluid">
             <UnifiedSidebar />
@@ -117,7 +122,9 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
               )}
               <BreadcrumbMain mobile />
               <Announcements />
+              {ExtraAnnouncementBar}
               <WarningBar />
+              <OfferingUsersWarningBar />
               <div
                 className={classNames(
                   'content d-flex flex-column flex-grow-1',

@@ -1,6 +1,7 @@
 import { FC, ReactNode, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
+import { invoicesItemsRetrieve } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { defaultCurrency } from '@waldur/core/formatCurrency';
@@ -73,14 +74,16 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
   const customer = useSelector(getCustomer);
 
   const fetchItems = useMemo(() => {
-    return createFetcher(`invoices/${invoice.uuid}/items`);
+    return createFetcher(invoicesItemsRetrieve, {
+      path: { uuid: invoice.uuid },
+    });
   }, [invoice.uuid]);
 
   const tableProps = useTable({
     table: 'invoiceItems-' + invoice.uuid,
     fetchData: async (request) => {
       const response = await fetchItems(request);
-      const rows = groupInvoiceItems(response.rows);
+      const rows = groupInvoiceItems(response.rows, request.filter?.o);
 
       if (setTotalFiltered) {
         const totalFiltered = rows.reduce((acc, row) => {
@@ -115,16 +118,19 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
           render: ({ row }) => (
             <ResourceLink uuid={row.resource_uuid} label={row.resource_name} />
           ),
+          orderField: 'resource_name',
         },
         {
           title: translate('Offering'),
           render: ({ row }) => <>{row.offering_name}</>,
           filter: 'offering',
+          orderField: 'offering_name',
         },
         {
           title: translate('Project name'),
           render: ({ row }) => <>{row.project_name}</>,
           filter: 'project',
+          orderField: 'project_name',
           inlineFilter: (row) => ({
             name: row.project_name,
             uuid: row.project_uuid,
@@ -134,6 +140,7 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
           title: translate('Service provider'),
           render: ({ row }) => <>{row.service_provider_name}</>,
           filter: 'provider',
+          orderField: 'service_provider_name',
           inlineFilter: (row) => ({
             customer_name: row.service_provider_name,
             uuid: row.service_provider_uuid,
@@ -142,6 +149,7 @@ export const InvoiceItemsTable: FC<InvoiceItemsTableProps> = ({
         {
           title: translate('Plan name'),
           render: ({ row }) => <>{row.plan_name}</>,
+          orderField: 'plan_name',
         },
         {
           title: (

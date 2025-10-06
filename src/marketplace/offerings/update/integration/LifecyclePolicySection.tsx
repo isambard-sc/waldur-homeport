@@ -60,6 +60,25 @@ const fields: OfferingEditField[] = [
     key: 'plugin_options.required_team_role_for_provisioning',
     component: StringField,
   },
+  {
+    label: translate('Order supports comments and metadata'),
+    key: 'plugin_options.order_supports_comments_and_metadata',
+    component: AwesomeCheckboxField,
+  },
+  {
+    label: translate(
+      'If set to True, pricing and components tab would be concealed',
+    ),
+    key: 'plugin_options.conceal_billing_data',
+    component: AwesomeCheckboxField,
+  },
+  {
+    label: translate(
+      'Maximal number of offering resources allowed per project',
+    ),
+    key: 'plugin_options.maximal_resource_count_per_project',
+    component: NumberField,
+  },
 ];
 
 export const LifecyclePolicySection: FC<OfferingEditPanelProps> = (props) => {

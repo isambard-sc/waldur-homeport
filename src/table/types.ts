@@ -10,6 +10,7 @@ interface RequestConfigExtended extends RequestInit {
 }
 
 export interface TableRequest {
+  tableKey: string;
   pageSize: number;
   currentPage: number;
   filter?: any;
@@ -33,6 +34,12 @@ export type Fetcher = <RowType = any>(
   request: TableRequest,
 ) => Promise<TableResponse<RowType>>;
 
+export type FetcherOptions<QueryPayload = any, PathPayload = any> = {
+  query?: QueryPayload;
+  path?: PathPayload;
+  parser?: (data, query?: any) => any[];
+};
+
 export interface TableOptionsType<RowType = any> {
   table: string;
   fetchData: (request: TableRequest) => any;
@@ -44,9 +51,7 @@ export interface TableOptionsType<RowType = any> {
   exportKeys?: string[];
   exportData?: (rows: RowType[], props: any) => string[][];
   exportRow?: (row: RowType, props: any) => string[];
-  placeholderComponent?: React.ComponentType;
   pullInterval?: number | (() => number);
-  filters?: React.ReactNode;
   filter?;
   mandatoryFields?: string[];
 }
@@ -125,18 +130,6 @@ interface SortingState extends Sorting {
   loading?: boolean;
 }
 
-export interface TableDropdownItem {
-  label: string;
-  iconNode?: ReactNode;
-  action?: () => void;
-  children?: Array<{
-    label: string;
-    iconNode?: ReactNode;
-    action: () => void;
-  }>;
-  isMobileAction?: boolean;
-}
-
 export type DropdownActionItemType<T = any> = React.ComponentType<
   {
     row?: T;
@@ -179,7 +172,7 @@ export interface TableProps<RowType = any> extends TableState {
   gridSize?: ColProps;
   openFiltersDrawer?: (filters: React.ReactNode) => void;
   renderFiltersDrawer?: (filters: React.ReactNode) => void;
-  dropdownActions?: TableDropdownItem[];
+  dropdownActions?: ReactNode;
   tableActions?: React.ReactNode;
   verboseName?: string;
   className?: string;
@@ -192,6 +185,7 @@ export interface TableProps<RowType = any> extends TableState {
   fullWidth?: boolean;
   minHeight?: number | 'auto';
   cardBordered?: boolean;
+  equalColWidth?: boolean;
   showPageSizeSelector?: boolean;
   updatePageSize?: (size: number) => void;
   initialPageSize?: number;
@@ -199,7 +193,7 @@ export interface TableProps<RowType = any> extends TableState {
   hasPagination?: boolean;
   sortList?(sorting: Sorting): void;
   initialSorting?: Sorting;
-  expandableRow?: React.ComponentType<{ row: RowType }>;
+  expandableRow?: React.ComponentType<{ row: RowType; fetch }>;
   expandableRowClassName?: string;
   rowActions?: React.ComponentType<{ row: RowType; fetch }>;
   toggleRow?(row: any): void;
@@ -235,6 +229,7 @@ export interface TableProps<RowType = any> extends TableState {
   swapColumns?(column1: string, column2: string): void;
   initialMode?: 'grid' | 'table';
   standalone?: boolean;
+  standaloneActionsInTable?: boolean;
   hideClearFilters?: boolean;
   hideRefresh?: boolean;
   portal?: TablePortal;

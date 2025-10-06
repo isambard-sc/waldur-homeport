@@ -1,5 +1,6 @@
-import { Template } from 'waldur-js-client';
+import { supportTemplatesList, Template } from 'waldur-js-client';
 
+import { IssueTemplateTypeOptions } from '@waldur/administration/utils';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
@@ -20,7 +21,10 @@ const renderType = ({ row }) => (
           ? 'warning'
           : 'danger'
     }
-    label={row.issue_type}
+    label={
+      IssueTemplateTypeOptions.find((opt) => opt.value === row.issue_type)
+        ?.label || row.issue_type
+    }
     outline
     pill
   />
@@ -29,7 +33,7 @@ const renderType = ({ row }) => (
 export const AdministrationIssueTemplatesList = () => {
   const tableProps = useTable({
     table: 'issueTemplates',
-    fetchData: createFetcher('support-templates'),
+    fetchData: createFetcher(supportTemplatesList),
   });
   const columns: Column<Template>[] = [
     {

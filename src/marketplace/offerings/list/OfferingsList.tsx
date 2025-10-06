@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 import {
+  marketplaceProviderOfferingsList,
   MarketplaceProviderOfferingsListData,
   ProviderOfferingDetails,
 } from 'waldur-js-client';
@@ -34,12 +35,20 @@ export const BaseOfferingsList: FunctionComponent<{
   filter: MarketplaceProviderOfferingsListData['query'];
   hasOrganizationColumn?: boolean;
   showActions?: boolean;
+  showProvider?: boolean;
   filters?;
-}> = ({ table, filter, hasOrganizationColumn, showActions, filters }) => {
+}> = ({
+  table,
+  filter,
+  hasOrganizationColumn,
+  showActions,
+  showProvider,
+  filters,
+}) => {
   const props = useTable({
     table,
     filter,
-    fetchData: createFetcher('marketplace-provider-offerings'),
+    fetchData: createFetcher(marketplaceProviderOfferingsList),
     queryField: 'keyword',
     mandatoryFields,
   });
@@ -131,6 +140,14 @@ export const BaseOfferingsList: FunctionComponent<{
       {...props}
       placeholderActions={
         showActions && <CreateOfferingButton className="w-175px mw-350px" />
+      }
+      tableActions={
+        showActions && (
+          <CreateOfferingButton
+            showProvider={showProvider}
+            fetch={props.fetch}
+          />
+        )
       }
       columns={columns}
       verboseName={translate('Offerings')}

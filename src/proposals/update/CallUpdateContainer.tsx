@@ -21,6 +21,7 @@ import { Call } from '../types';
 import { useCallBreadcrumbItems } from '../utils';
 
 import { CallUpdateHero } from './CallUpdateHero';
+import { CallConfiguration } from './configuration/CallConfiguration';
 import { CallDocumentsSection } from './documents/CallDocumentsSection';
 import { CallGeneralSection } from './general/CallGeneralSection';
 import { CallOfferingsSection } from './offerings/CallOfferingsSection';
@@ -61,6 +62,11 @@ const Body = ({ call, refetch, loading }) => {
           component: CallGeneralSection,
         },
         {
+          key: 'configuration',
+          title: translate('Configuration'),
+          component: CallConfiguration,
+        },
+        {
           key: 'documents',
           title: translate('Documents'),
           component: CallDocumentsSection,
@@ -79,7 +85,7 @@ const Body = ({ call, refetch, loading }) => {
                 <TeamSection
                   scope={call}
                   roles={[RoleEnum.CALL_REVIEWER]}
-                  roleTypes={['call']}
+                  roleTypes={['call', 'call_organizer']}
                   title={translate('Reviewers')}
                   hasTeamTabs
                 />
@@ -94,7 +100,7 @@ const Body = ({ call, refetch, loading }) => {
                 <TeamSection
                   scope={call}
                   roles={[RoleEnum.CALL_MANAGER]}
-                  roleTypes={['call']}
+                  roleTypes={['call', 'call_organizer']}
                   title={translate('Managers')}
                   hasTeamTabs
                 />
