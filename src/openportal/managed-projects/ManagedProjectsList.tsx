@@ -2,6 +2,8 @@ import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
+import { openportalManagedProjectsList } from 'waldur-js-client';
+
 import { translate } from '@waldur/i18n';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
@@ -74,7 +76,7 @@ export const ManagedProjectsList = () => {
 
     const tableProps = useTable({
         table: `ManagedProjectsList`,
-        fetchData: createFetcher('openportal-managed-projects'),
+        fetchData: createFetcher(openportalManagedProjectsList),
         queryField: 'query',
         filter,
     });

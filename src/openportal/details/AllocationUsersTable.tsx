@@ -1,4 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
+import { openportalAssociationsList } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { createFetcher } from '@waldur/table/api';
@@ -16,7 +17,7 @@ export const AllocationUsersTable: FunctionComponent<{ resourceScope }> = ({
   );
   const tableProps = useTable({
     table: 'AllocationUsersTable',
-    fetchData: createFetcher('openportal-associations'),
+    fetchData: createFetcher(openportalAssociationsList),
     filter,
   });
   return (

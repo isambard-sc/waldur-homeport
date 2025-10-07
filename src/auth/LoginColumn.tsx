@@ -76,15 +76,16 @@ export const LoginColumn = () => {
         </div>
       </div>
       {themeFeatures.ShowLoginFooter ? (
-      <div className="login-footer footer-top">
-        <LanguageSelectorBox />
-        <ul className="menu menu-brand justify-content-end icon-align">
-          <JoinOrganizationFooterLink loginPage />
-        </ul>
-      </div>
-      <div className="login-footer">
-        <FooterLinks />
-      </div>) : null}
+        <div className="login-footer footer-top">
+          <LanguageSelectorBox />
+          <ul className="menu menu-brand justify-content-end icon-align">
+            <JoinOrganizationFooterLink loginPage />
+          </ul>
+        </div>) : null}
+      {themeFeatures.ShowLoginFooter ? (
+        <div className="login-footer">
+          <FooterLinks />
+        </div>) : null}
     </div>
   );
 };
