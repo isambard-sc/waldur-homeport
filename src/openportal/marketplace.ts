@@ -3,20 +3,14 @@ import { translate } from '@waldur/i18n';
 import { OfferingConfiguration } from '@waldur/marketplace/common/types';
 import { OPENPORTAL_PLUGIN } from '@waldur/openportal/constants';
 
-const UserPluginOptionsForm = lazyComponent(() =>
-  import('@waldur/marketplace/UserPluginOptionsForm').then((module) => ({
-    default: module.UserPluginOptionsForm,
-  })),
-);
-
-const UserSecretOptionsForm = lazyComponent(() =>
-  import('@waldur/marketplace/UserSecretOptionsForm').then((module) => ({
-    default: module.UserSecretOptionsForm,
+const OpenPortalCredentialsForm = lazyComponent(() =>
+  import('./OpenPortalCredentialsForm').then((module) => ({
+    default: module.OpenPortalCredentialsForm,
   })),
 );
 
 const OpenPortalOrderForm = lazyComponent(() =>
-  import('./deploy/OpenPortalOrderForm').then((module) => ({
+  import('./OpenPortalOrderForm').then((module) => ({
     default: module.OpenPortalOrderForm,
   })),
 );
@@ -27,6 +21,5 @@ export const OpenPortalOffering: OfferingConfiguration = {
     return translate('OpenPortal allocation');
   },
   orderFormComponent: OpenPortalOrderForm,
-  providerType: 'OpenPortal',
-  allowToUpdateService: true,
+  credentialsForm: OpenPortalCredentialsForm,
 };

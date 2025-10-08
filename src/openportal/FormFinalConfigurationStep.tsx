@@ -1,14 +1,19 @@
+import { useSelector } from 'react-redux';
 import { Field } from 'redux-form';
 
-import { FormGroup, TextField, StringField, NumberField } from '@waldur/form';
+import { FormGroup, TextField } from '@waldur/form';
 import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
 import { translate } from '@waldur/i18n';
 
+import { orderProjectSelector } from '@waldur/marketplace/deploy/selectors';
 import { FormStepProps } from '@waldur/marketplace/deploy/types';
 
+import { ResourceNameGroup } from '@waldur/openportal/ResourceNameGroup';
 import { TerminationDateField } from '@waldur/marketplace/deploy/steps/TerminationDateField';
 
 export const FormFinalConfigurationStep = (props: FormStepProps) => {
+  const project = useSelector(orderProjectSelector);
+
   return (
     <VStepperFormStepCard
       title={translate('Final configuration')}
@@ -16,17 +21,12 @@ export const FormFinalConfigurationStep = (props: FormStepProps) => {
       disabled={props.disabled}
       disabledTooltip={props.disabledTooltip}
     >
-      <Field
-        name="attributes.name"
-        label={translate('Name')}
-        component={FormGroup}
-        description={translate('This name will be visible in accounting data.')}
-      >
-        <StringField
-          defaultValue={props.offering.name}
-          placeholder={props.offering.name}
-        />
-      </Field>
+      <ResourceNameGroup
+        nameValidate={props.params?.nameValidate}
+        nameLabel={props.params?.nameLabel}
+        offering={props.offering}
+        project={project}
+      />
 
       <Field
         name="attributes.description"
@@ -36,21 +36,6 @@ export const FormFinalConfigurationStep = (props: FormStepProps) => {
       >
         <TextField />
       </Field>
-
-      <Field
-        name="attributes.allocation"
-        label={translate('Initial Allocation')}
-        component={FormGroup}
-        description={translate(
-          'If set, this will deploy an initial allocation for this resource, overriding any default allocation that is set.',
-        )}
-      >
-        <NumberField
-          min={0}
-          step={1}
-        />
-      </Field>
-
       <div className="mb-7 border-bottom" />
       <TerminationDateField offering={props.offering} />
     </VStepperFormStepCard>
