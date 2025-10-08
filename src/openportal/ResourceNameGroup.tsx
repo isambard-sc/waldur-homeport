@@ -34,7 +34,6 @@ const ResourceNameField = (props) => {
       <div className="flex-grow-1 me-3 ">
         <StringField
           input={props.input}
-          defaultValue={props.offering.name}
           placeholder={props.offering.name}
         />
       </div>
@@ -79,6 +78,7 @@ export const ResourceNameGroup = ({
     required={true}
     description={translate('This name will be visible in accounting data.')}
     validate={nameValidate}
+    initialValue={offering.name}
   >
     <ResourceNameField offering={offering} project={project} />
   </Field>
