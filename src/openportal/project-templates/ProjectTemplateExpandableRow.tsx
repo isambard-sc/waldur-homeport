@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { translate } from '@waldur/i18n';
 
-import { ProjectTemplate } from '../types';
+import { ProjectTemplate } from 'waldur-js-client';
 
 interface OwnProps {
     row: ProjectTemplate;
