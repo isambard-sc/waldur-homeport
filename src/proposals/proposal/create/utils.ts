@@ -12,6 +12,7 @@ import {
   RequestedResource,
 } from 'waldur-js-client';
 
+import { post } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
@@ -21,6 +22,17 @@ import { Call } from '@waldur/proposals/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { fetchListStart } from '@waldur/table/actions';
 import { useUser } from '@waldur/workspace/hooks';
+
+// Custom API function for return_to_applicant until waldur-js-client is regenerated
+const proposalProposalsReturnToApplicant = async ({
+  path,
+  body,
+}: {
+  path: { uuid: string };
+  body?: { allocation_comment?: string };
+}) => {
+  await post(`/proposal-proposals/${path.uuid}/return_to_applicant/`, body);
+};
 
 export const useProposalDecisionActions = (
   proposal: Proposal,
@@ -93,10 +105,50 @@ export const useProposalDecisionActions = (
     }
   }, [dispatch, proposal.uuid, proposal.name, refetch]);
 
+  const handleReturnToApplicant = useCallback(async () => {
+    try {
+      const reason = await waitForConfirmation(
+        dispatch,
+        translate('Confirmation'),
+        translate(
+          'Are you sure you want to return the proposal to the applicant: {name}?',
+          {
+            name: proposal.name,
+          },
+        ),
+        {
+          showInput: true,
+          inputLabel: translate('Reason for return'),
+          inputPlaceholder: translate('Enter reason for returning to applicant'),
+          inputRequired: false,
+        },
+      );
+
+      await proposalProposalsReturnToApplicant({
+        path: { uuid: proposal.uuid },
+        body: { allocation_comment: reason || '' },
+      });
+
+      dispatch(
+        showSuccess(translate('Proposal has been returned to applicant.')),
+      );
+      refetch();
+    } catch (error) {
+      if (!error) return;
+      dispatch(
+        showErrorResponse(
+          error,
+          translate('Unable to return the proposal to applicant.'),
+        ),
+      );
+    }
+  }, [dispatch, proposal.uuid, proposal.name, refetch]);
+
   return {
     canPerformDecisionActions,
     handleApproveProposal,
     handleRejectProposal,
+    handleReturnToApplicant,
   };
 };
 

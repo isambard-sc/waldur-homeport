@@ -1,4 +1,8 @@
-import { CheckCircleIcon, XCircleIcon } from '@phosphor-icons/react';
+import {
+  ArrowUUpLeftIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { Button } from 'react-bootstrap';
 
@@ -41,6 +45,7 @@ export const ProposalDetails = ({
     canPerformDecisionActions,
     handleApproveProposal,
     handleRejectProposal,
+    handleReturnToApplicant,
   } = useProposalDecisionActions(proposal, refetch);
 
   const isCallManagerView = state.name?.startsWith('call-management');
@@ -85,6 +90,14 @@ export const ProposalDetails = ({
             >
               <XCircleIcon className="me-1" />
               {translate('Reject')}
+            </Button>
+            <Button
+              variant="btn btn-icon btn-light-warning"
+              onClick={handleReturnToApplicant}
+              className="w-100 mt-2"
+            >
+              <ArrowUUpLeftIcon className="me-1" />
+              {translate('Return to Applicant')}
             </Button>
           </>
         )}

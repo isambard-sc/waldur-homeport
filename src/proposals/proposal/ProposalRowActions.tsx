@@ -1,4 +1,5 @@
 import {
+  ArrowUUpLeftIcon,
   ChatTextIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -52,6 +53,7 @@ export const ProposalRowActions = ({ row, refetch }) => {
     canPerformDecisionActions,
     handleApproveProposal,
     handleRejectProposal,
+    handleReturnToApplicant,
   } = useProposalDecisionActions(row, refetch);
 
   if (!canPerformDecisionActions && !canCreateReview) {
@@ -83,6 +85,15 @@ export const ProposalRowActions = ({ row, refetch }) => {
             disabled={!canPerformDecisionActions}
             className="text-danger"
             iconColor="danger"
+          />
+
+          <ActionItem
+            title={translate('Return to Applicant')}
+            action={handleReturnToApplicant}
+            iconNode={<ArrowUUpLeftIcon weight="bold" />}
+            disabled={!canPerformDecisionActions}
+            className="text-warning"
+            iconColor="warning"
           />
         </>
       )}
