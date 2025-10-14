@@ -171,7 +171,6 @@ export const AttachManagedProjectDialog: React.FC<AttachManagedProjectDialogProp
                                     closeMenuOnSelect: true,
                                 }}
                                 noOptionsMessage={() => translate('No projects found')}
-                                required
                             />
                         </FormGroup>
 
