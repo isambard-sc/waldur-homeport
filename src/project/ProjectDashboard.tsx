@@ -103,7 +103,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   return (
     <>
       <Row>
-        {!shouldConcealPrices && showBillingInfo && (
+        {!shouldConcealPrices && showBillingInfo && show_resource_limits && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardCostLimits project={project} />
           </Col>
