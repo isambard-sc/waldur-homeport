@@ -1,9 +1,9 @@
 import { useSelector } from 'react-redux';
+import { OfferingUser } from 'waldur-js-client';
 
 import { ProviderOfferingUserDeleteButton } from '@waldur/marketplace/service-providers/ProviderOfferingUserDeleteButton';
 import { ProviderOfferingUserUpdateButton } from '@waldur/marketplace/service-providers/ProviderOfferingUserUpdateButton';
 import { RestrictOfferingUserButton } from '@waldur/marketplace/service-providers/RestrictOfferingUser';
-import { OfferingUser } from '@waldur/marketplace/service-providers/types';
 import { ServiceProvider } from '@waldur/marketplace/types';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
@@ -44,7 +44,24 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
               {...props}
               provider={provider}
               offering={offering}
+              updateScope="username"
             />
+            {Boolean(provider) && (
+              <>
+                <ProviderOfferingUserUpdateButton
+                  {...props}
+                  provider={provider}
+                  offering={offering}
+                  updateScope="comment"
+                />
+                <ProviderOfferingUserUpdateButton
+                  {...props}
+                  provider={provider}
+                  offering={offering}
+                  updateScope="state"
+                />
+              </>
+            )}
 
             <ProviderOfferingUserDeleteButton
               {...props}
@@ -56,7 +73,7 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
 
         canUpdateRestrictedStatus ? RestrictOfferingUserButton : null,
       ].filter(Boolean)}
-      data-cy="public-resources-list-actions-dropdown-btn"
+      data-cy="offering-users-list-actions-dropdown-btn"
     />
   );
 };

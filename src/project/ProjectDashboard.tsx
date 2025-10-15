@@ -90,11 +90,12 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   );
 
   const shouldShowAggregateLimitWidget =
-    aggregateLimitData?.components?.length > 0;
+    aggregateLimitData?.components?.length > 0 && show_resource_limits;
 
   const shouldShowCurrentMonthWidget =
-    currentMonthFilteredData?.components?.length > 0;
+    currentMonthFilteredData?.components?.length > 0 && show_resource_limits;
 
+  const showBillingInfo = project.customer_display_billing_info_in_projects;
 
   if (!project || !user) {
     return null;
@@ -102,7 +103,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   return (
     <>
       <Row>
-        {!shouldConcealPrices && show_resource_limits && (
+        {!shouldConcealPrices && showBillingInfo && show_resource_limits && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardCostLimits project={project} />
           </Col>
@@ -141,38 +142,32 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             imageKey="user_image"
           />
         </Col>
-      </Row>
-      {show_resource_limits && (
-        <Row>
-          {shouldShowCurrentMonthWidget && (
-            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-              <AggregateLimitWidget
-                project={project}
-                data={currentMonthFilteredData}
-                isLoading={isAggregateLimitLoadingForCurrentMonth}
-                error={aggregateLimitErrorForCurrentMonth}
-                refetch={aggregateLimitRefetchForCurrentMonth}
-                type="monthly"
-              />
-            </Col>
-          )}
-          {shouldShowAggregateLimitWidget && (
-            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-              <AggregateLimitWidget
-                project={project}
-                data={aggregateLimitData}
-                isLoading={isAggregateLimitLoading}
-                error={aggregateLimitError}
-                refetch={aggregateLimitRefetch}
-              />
-            </Col>
-          )}
-        </Row>
-      )}
-      <Row>
-        <Col md={12} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+        {shouldShowCurrentMonthWidget && (
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+            <AggregateLimitWidget
+              project={project}
+              data={currentMonthFilteredData}
+              isLoading={isAggregateLimitLoadingForCurrentMonth}
+              error={aggregateLimitErrorForCurrentMonth}
+              refetch={aggregateLimitRefetchForCurrentMonth}
+              type="monthly"
+            />
+          </Col>
+        )}
+        {shouldShowAggregateLimitWidget && (
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+            <AggregateLimitWidget
+              project={project}
+              data={aggregateLimitData}
+              isLoading={isAggregateLimitLoading}
+              error={aggregateLimitError}
+              refetch={aggregateLimitRefetch}
+            />
+          </Col>
+        )}
+        {showBillingInfo && (
           <ProjectDashboardCredit project={project} className="mb-5" />
-        </Col>
+        )}
       </Row>
 
       {project.description ? (

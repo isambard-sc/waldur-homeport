@@ -1,5 +1,5 @@
 import { ComponentType, ReactNode } from 'react';
-import { PublicOfferingDetails } from 'waldur-js-client';
+import { Customer, PublicOfferingDetails } from 'waldur-js-client';
 
 import { OfferingComponent } from '@waldur/marketplace/types';
 
@@ -23,6 +23,8 @@ export interface PlanDetailsTableProps extends PricesData {
   viewMode?: boolean;
   formGroupClassName?: string;
   columnClassName?: string;
+  customer?: Customer;
+  concealBillingInfo?: boolean;
   extraTabs?: Array<{
     title: ReactNode;
     eventKey: string | number;

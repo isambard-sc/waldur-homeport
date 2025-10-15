@@ -1,4 +1,9 @@
-import { CheckCircleIcon, XCircleIcon } from '@phosphor-icons/react';
+import {
+  ArrowUUpLeftIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from '@phosphor-icons/react';
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { Button } from 'react-bootstrap';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
@@ -23,7 +28,7 @@ interface ProposalDetails {
   reviews?: ProposalReview[];
   isLoading?;
   error?;
-  refetch?;
+  refetch;
 }
 
 export const ProposalDetails = ({
@@ -33,13 +38,17 @@ export const ProposalDetails = ({
   error,
   refetch,
 }: ProposalDetails) => {
+  const { state } = useCurrentStateAndParams();
   const formSteps = createProposalSteps;
 
   const {
     canPerformDecisionActions,
     handleApproveProposal,
     handleRejectProposal,
+    handleReturnToApplicant,
   } = useProposalDecisionActions(proposal, refetch);
+
+  const isCallManagerView = state.name?.startsWith('call-management');
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -64,7 +73,7 @@ export const ProposalDetails = ({
         <Panel title={translate('Progress')} cardBordered className="mb-5">
           <FormSteps steps={formSteps} />
         </Panel>
-        {canPerformDecisionActions && (
+        {canPerformDecisionActions && isCallManagerView && (
           <>
             <Button
               variant="btn btn-icon btn-primary"
@@ -81,6 +90,14 @@ export const ProposalDetails = ({
             >
               <XCircleIcon className="me-1" />
               {translate('Reject')}
+            </Button>
+            <Button
+              variant="btn btn-icon btn-light-warning"
+              onClick={handleReturnToApplicant}
+              className="w-100 mt-2"
+            >
+              <ArrowUUpLeftIcon className="me-1" />
+              {translate('Return to Applicant')}
             </Button>
           </>
         )}

@@ -1,3 +1,5 @@
+import { broadcastMessageTemplatesList } from 'waldur-js-client';
+
 import { BroadcastTemplateActions } from '@waldur/broadcasts/BroadcastTemplateActions';
 import { BroadcastTemplateCreateButton } from '@waldur/broadcasts/BroadcastTemplateCreateButton';
 import { BroadcastTemplateExpandableRow } from '@waldur/broadcasts/BroadcastTemplateExpandableRow';
@@ -9,7 +11,7 @@ import { useTable } from '@waldur/table/useTable';
 export const BroadcastTemplateList = () => {
   const tableProps = useTable({
     table: 'broadcast-templates',
-    fetchData: createFetcher('broadcast-message-templates'),
+    fetchData: createFetcher(broadcastMessageTemplatesList),
   });
   return (
     <Table
@@ -32,7 +34,6 @@ export const BroadcastTemplateList = () => {
       expandableRow={BroadcastTemplateExpandableRow}
       initialPageSize={10}
       showPageSizeSelector={true}
-      expandableRowClassName="bg-gray-200"
       rowActions={({ row }) => (
         <BroadcastTemplateActions row={row} refetch={tableProps.fetch} />
       )}

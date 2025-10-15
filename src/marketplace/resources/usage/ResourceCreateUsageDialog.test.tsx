@@ -43,7 +43,14 @@ const mockData = {
   periods: [
     {
       label: 'January 2024',
-      value: { uuid: 'period-1', components: [] },
+      value: {
+        uuid: 'period-1',
+        plan_name: 'Test Plan',
+        plan_uuid: 'plan-1',
+        start: '2024-01-01',
+        end: '2024-01-31',
+        components: [],
+      },
     },
   ],
 };
@@ -75,8 +82,8 @@ describe('ResourceCreateUsageDialog', () => {
 
   it('renders error message when API call fails', async () => {
     vi.mocked(getProviderUsageComponents).mockRejectedValue('error');
-    await act(() => {
-      renderDialog(props);
+    await act(async () => {
+      await renderDialog(props);
     });
     expect(
       screen.getByText('Unable to load offering details.'),
@@ -88,8 +95,8 @@ describe('ResourceCreateUsageDialog', () => {
       components: [],
       periods: [],
     });
-    await act(() => {
-      renderDialog(props);
+    await act(async () => {
+      await renderDialog(props);
     });
     expect(
       screen.getByText('Offering does not have any usage-based components.'),
@@ -101,8 +108,8 @@ describe('ResourceCreateUsageDialog', () => {
       components: [],
       periods: [],
     });
-    await act(() => {
-      renderDialog(props);
+    await act(async () => {
+      await renderDialog(props);
     });
     expect(
       screen.getByText(`${translate('Resource usage')} "Test resource"`),
@@ -111,8 +118,8 @@ describe('ResourceCreateUsageDialog', () => {
 
   it('displays client organization name', async () => {
     vi.mocked(getProviderUsageComponents).mockResolvedValue(mockData);
-    await act(() => {
-      renderDialog(props);
+    await act(async () => {
+      await renderDialog(props);
     });
     expect(screen.getByText('Client organization')).toBeInTheDocument();
     expect(
@@ -125,8 +132,8 @@ describe('ResourceCreateUsageDialog', () => {
     const submitSpy = vi.mocked(marketplaceComponentUsagesSetUsage);
     submitSpy.mockResolvedValue({} as any);
 
-    await act(() => {
-      renderDialog(props);
+    await act(async () => {
+      await renderDialog(props);
     });
 
     const amountInput = screen.getByPlaceholderText('Amount *');
@@ -136,8 +143,8 @@ describe('ResourceCreateUsageDialog', () => {
     fireEvent.change(amountInput, { target: { value: '10' } });
     fireEvent.change(descInput, { target: { value: 'Test usage' } });
 
-    await act(() => {
-      fireEvent.click(submitBtn);
+    await act(async () => {
+      await fireEvent.click(submitBtn);
     });
 
     await waitFor(() => {

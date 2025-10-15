@@ -2,8 +2,9 @@ import { FC } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
-import { ProposalReviewsListData } from 'waldur-js-client';
+import { proposalReviewsList, ProposalReviewsListData } from 'waldur-js-client';
 
+import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { ProposalReview } from '@waldur/proposals/types';
 import { getReviewStateOptions } from '@waldur/proposals/utils';
@@ -44,7 +45,7 @@ export const UserReviewsList: FC = () => {
 
   const tableProps = useTable({
     table: 'MyReviewsList',
-    fetchData: createFetcher('proposal-reviews'),
+    fetchData: createFetcher(proposalReviewsList),
     queryField: 'proposal_name',
     filter,
     mandatoryFields,
@@ -62,7 +63,24 @@ export const UserReviewsList: FC = () => {
           optional: true,
         },
         {
-          title: translate('Proposal'),
+          title: translate('Proposal slug'),
+          render: ({ row }) => (
+            <Link
+              state="proposal-review"
+              params={{
+                uuid: row.call_uuid,
+                review_uuid: row.uuid,
+              }}
+              label={(row as any).proposal_slug}
+            />
+          ),
+
+          keys: ['proposal_slug'] as any,
+          id: 'proposal_slug',
+        },
+
+        {
+          title: translate('Proposal name'),
           render: ({ row }) => (
             <span className="text-gray-700 fw-bold">{row.proposal_name}</span>
           ),
@@ -106,6 +124,7 @@ export const UserReviewsList: FC = () => {
       hasQuery={true}
       rowActions={ReviewsRowActions}
       filters={<ReviewsTableFilter />}
+      showPageSizeSelector={true}
       expandableRow={ReviewsExpandableRow}
       hasOptionalColumns
     />

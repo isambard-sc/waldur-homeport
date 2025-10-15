@@ -18,7 +18,7 @@ export const FeaturesDescription: FeatureSection[] = [
       },
       {
         key: 'show_permission_reviews',
-        description: translate('Allows to show permission reviews tab and popups.'),
+        description: translate('Allows to show permission reviews tab and popups for organisations.'),
       },
     ],
   },
@@ -49,6 +49,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Conceal civil number in invitation creation dialog.'),
       },
       {
+        key: 'show_course_accounts',
+        description: translate('Show course accounts of the scopes.'),
+      },
+      {
         key: 'show_service_accounts',
         description: translate('Show service accounts of the scopes.'),
       },
@@ -58,6 +62,10 @@ export const FeaturesDescription: FeatureSection[] = [
     key: 'marketplace',
     description: translate('Marketplace offerings and resources'),
     items: [
+      {
+        key: 'allow_display_of_images_in_markdown',
+        description: translate('Allow display of images in markdown format.'),
+      },
       {
         key: 'call_only',
         description: translate('Allow marketplace to serve only as aggregator of call info.'),
@@ -69,6 +77,10 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'conceal_prices',
         description: translate('Do not render prices in order details.'),
+      },
+      {
+        key: 'display_user_tos',
+        description: translate('Enable display of user terms of service in UI.'),
       },
       {
         key: 'import_resources',
@@ -149,6 +161,14 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'show_industry_flag',
         description: translate('Show industry flag.'),
+      },
+      {
+        key: 'show_kind_in_create_dialog',
+        description: translate('Show kind field in project create dialog.'),
+      },
+      {
+        key: 'show_permission_reviews',
+        description: translate('Allows to show permission reviews tab and popups for projects.'),
       },
       {
         key: 'show_start_date_in_create_dialog',

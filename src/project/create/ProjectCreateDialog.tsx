@@ -3,7 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { useMemo, useState } from 'react';
 import { Form } from 'react-final-form';
-import { projectCreditsCreate, projectsCreate } from 'waldur-js-client';
+import {
+  KindEnum,
+  projectCreditsCreate,
+  projectsCreate,
+} from 'waldur-js-client';
 
 import { formDataOptions, fileSerializer } from '@waldur/core/api';
 import { formatISODate } from '@waldur/core/dateUtils';
@@ -22,9 +26,11 @@ import { DescriptionGroup } from './DescriptionGroup';
 import { EndDateGroup } from './EndDateGroup';
 import { ImageGroup } from './ImageGroup';
 import { IndustryGroup } from './IndustryGroup';
+import { KindGroup } from './KindGroup';
 import { NameGroup } from './NameGroup';
 import { OecdCodeGroup } from './OecdCodeGroup';
 import { OrganizationGroup } from './OrganizationGroup';
+import { SlugGroup } from './SlugGroup';
 import { StartDateGroup } from './StartDateGroup';
 import { TypeGroup } from './TypeGroup';
 
@@ -35,6 +41,7 @@ interface ProjectCreateDialogProps {
 
 interface ProjectFormData {
   name: string;
+  slug?: string;
   description: string;
   short_name?: string;
   end_date?: Date;
@@ -45,6 +52,7 @@ interface ProjectFormData {
   is_industry: boolean;
   image?: File | Blob;
   project_credit?: string;
+  kind?: KindEnum;
 }
 
 export const ProjectCreateDialog = ({
@@ -84,6 +92,7 @@ export const ProjectCreateDialog = ({
       const response = await projectsCreate({
         body: {
           name: formData.name,
+          slug: formData.slug,
           description: formData.description,
           short_name: formData.short_name,
           end_date: formData.end_date
@@ -96,6 +105,7 @@ export const ProjectCreateDialog = ({
           type: formData.type?.url,
           oecd_fos_2007_code: formData.oecd_fos_2007_code?.value,
           is_industry: formData.is_industry,
+          kind: formData.kind,
           image: fileSerializer(formData.image),
         },
         ...formDataOptions,
@@ -165,9 +175,12 @@ export const ProjectCreateDialog = ({
                 refetch={refetchProjects}
               />
               <ProjectShortNameGroup isDisabled={!!customer} />
+              <SlugGroup />
               <DescriptionGroup create />
               <IndustryGroup />
               <OecdCodeGroup />
+              <KindGroup create />
+
               <TypeGroup create />
               <StartDateGroup create />
               <EndDateGroup create />

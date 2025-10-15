@@ -53,7 +53,7 @@ const RoleAndProjectSelectPopup: React.FC<RoleAndProjectSelectPopupProps> = ({
         select(role, null);
         MenuComponent.hideDropdowns(null);
       } else {
-        refSearch?.current && refSearch.current.focus();
+        if (refSearch?.current) refSearch.current.focus();
       }
     },
     [select, selectedRole, selectedProject, refSearch?.current],
@@ -73,7 +73,7 @@ const RoleAndProjectSelectPopup: React.FC<RoleAndProjectSelectPopupProps> = ({
   const projects = useMemo(() => {
     if (!customer?.projects_count) return [];
     const q = query.toLowerCase();
-    return customer.projects.filter((project) =>
+    return (customer.projects || []).filter((project) =>
       project.name.toLowerCase().includes(q),
     );
   }, [customer, query]);

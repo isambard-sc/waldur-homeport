@@ -1,11 +1,14 @@
 import { FunctionComponent, useMemo } from 'react';
-import { ImportableResource } from 'waldur-js-client';
+import {
+  ImportableResource,
+  marketplaceProviderOfferingsImportableResourcesList,
+} from 'waldur-js-client';
 
 import { requiredArray } from '@waldur/core/validators';
 import { Select } from '@waldur/form/themed-select';
 import { translate } from '@waldur/i18n';
 import { Offering } from '@waldur/marketplace/types';
-import { ResourceIcon } from '@waldur/resource/ResourceName';
+import { ResourceIcon } from '@waldur/resource/ResourceIcon';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -37,7 +40,8 @@ export const ResourcesList: FunctionComponent<{
   const tableProps = useTable({
     table: 'offeringImportableResources',
     fetchData: createFetcher(
-      `marketplace-provider-offerings/${offering.uuid}/importable_resources`,
+      marketplaceProviderOfferingsImportableResourcesList,
+      { path: { uuid: offering.uuid } },
     ),
     filter,
     queryField: 'name',

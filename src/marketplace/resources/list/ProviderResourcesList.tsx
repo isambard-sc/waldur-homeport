@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 import {
+  marketplaceProviderResourcesList,
   MarketplaceProviderResourcesListData,
   Resource,
 } from 'waldur-js-client';
@@ -299,7 +300,7 @@ const TableComponent: FunctionComponent<any> = (props) => {
 
 const TableOptions = {
   table: TABLE_PUBLIC_RESOURCE,
-  fetchData: createFetcher('marketplace-provider-resources'),
+  fetchData: createFetcher(marketplaceProviderResourcesList),
   queryField: 'query',
 };
 
@@ -310,14 +311,13 @@ const mapStateToFilter = createSelector(
     const filter: MarketplaceProviderResourcesListData['query'] = {};
 
     // Public resources should only contain resources from billable offerings.
-    // @ts-ignore
-    filter.billable = true;
+    filter.offering_billable = true;
 
     if (customer) {
       filter.provider_uuid = customer.uuid;
     }
-    if (filters?.offering) {
-      filter.offering_uuid = filters.offering.uuid;
+    if (filters?.offering?.uuid) {
+      filter.offering_uuid = [filters.offering.uuid];
     }
     if (filters?.parent_offering) {
       filter.parent_offering_uuid = filters.parent_offering.uuid;
@@ -355,7 +355,7 @@ const mandatoryFields: MarketplaceProviderResourcesListData['query']['field'] =
     'project_uuid', // CreateRobotAccountAction
     'project_name', // ShowUsageAction, ReportUsageAction
     'offering_uuid', // ShowUsageAction, ReportUsageAction
-    'offering_customer_uuid', // CreateRobotAccountAction
+    'provider_uuid', // CreateRobotAccountAction
     'offering_plugin_options', // CreateRobotAccountAction
     'backend_id', // ShowUsageAction, ReportUsageAction, SetBackendIdAction
     'is_usage_based', // Expandable view, ShowUsageAction, ReportUsageAction

@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 
-import { ManagedProject } from '../types';
+import { ManagedProject } from 'waldur-js-client';
 import { translate } from '@waldur/i18n/translate';
 
 interface OwnProps {

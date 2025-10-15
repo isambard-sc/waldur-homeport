@@ -1,5 +1,6 @@
-import { FC } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { marketplacePlansList } from 'waldur-js-client';
 
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
@@ -56,7 +57,7 @@ export const PlansSection: FC<OfferingSectionProps> = (props) => {
     {
       title: translate('Organization groups'),
       render: ({ row }) =>
-        row.organization_groups.map((group) => group.name).join(', ') ||
+        row.organization_groups?.map((group) => group.name).join(', ') ||
         DASH_ESCAPE_CODE,
     },
     {
@@ -65,11 +66,15 @@ export const PlansSection: FC<OfferingSectionProps> = (props) => {
     },
   ];
 
+  const filter = useMemo(
+    () => ({ offering_uuid: props.offering.uuid }),
+    [props.offering],
+  );
+
   const tableProps = useTable({
     table: 'OfferingPlans',
-    fetchData: createFetcher('marketplace-plans', {
-      params: { offering_uuid: props.offering.uuid },
-    }),
+    filter,
+    fetchData: createFetcher(marketplacePlansList),
   });
 
   const canCreatePlan =
@@ -80,6 +85,13 @@ export const PlansSection: FC<OfferingSectionProps> = (props) => {
     });
 
   const tableTabs = useOfferingAccountingTableTabs(props.offering);
+
+  const ExpandableRow = useCallback(
+    ({ row }) => (
+      <PlanExpandableRow row={row} components={props.offering.components} />
+    ),
+    [props.offering.components],
+  );
 
   return (
     <Table<Plan>
@@ -118,9 +130,7 @@ export const PlansSection: FC<OfferingSectionProps> = (props) => {
           user={user}
         />
       )}
-      expandableRow={({ row }) => (
-        <PlanExpandableRow row={row} components={props.offering.components} />
-      )}
+      expandableRow={ExpandableRow}
     />
   );
 };

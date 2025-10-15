@@ -8,6 +8,7 @@ import { setPrevParams, setPrevState } from './error/utils';
 import { isFeatureVisible } from './features/connect';
 import { MarketplaceFeatures } from './FeaturesEnums';
 import { tryAcceptInvitation } from './invitations/tryAcceptInvitation';
+import { tryJoinOrganization } from './invitations/tryJoinOrganization';
 import { closeModalDialog } from './modal/actions';
 import { router } from './router';
 import { UsersService } from './user/UsersService';
@@ -40,9 +41,8 @@ export function attachTransitions() {
           return;
         }
         return transition.router.stateService.target('profile-manage');
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(e);
+      } catch {
+        return transition.router.stateService.target('errorPage.serverError');
       }
     },
   );
@@ -180,6 +180,11 @@ export function attachTransitions() {
     if (AuthService.isAuthenticated() && !transition.to().data?.skipAuth) {
       if (router.urlService.path().split('/')[1] !== 'user-group-invitations') {
         tryAcceptInvitation();
+      }
+
+      // If it comes from the login page, check selected group invitation
+      if (!transition.from().name) {
+        tryJoinOrganization();
       }
     }
   });

@@ -1,22 +1,15 @@
-import { client } from 'waldur-js-client/client.gen';
+import { RequestResult } from 'waldur-js-client';
 
 import { queryClient } from '@waldur/Application';
 import { fetchResultCount, parseNextPage } from '@waldur/core/api';
 
-import { Fetcher, TableRequest } from './types';
+import { Fetcher, FetcherOptions, TableRequest } from './types';
 
-export const parseResponse = async (url: string, query?, options?) => {
-  const result = await client.get({
-    url,
-    query,
-    security: [
-      {
-        name: 'Authorization',
-        type: 'apiKey',
-      },
-    ],
-    ...options,
-  });
+export const processApiResponse = <TData = any>(
+  result: Awaited<RequestResult<TData>>,
+  parser?: FetcherOptions['parser'],
+  query?: any,
+) => {
   const contentType = result.response.headers
     .get('content-type')
     .toLowerCase()
@@ -25,32 +18,71 @@ export const parseResponse = async (url: string, query?, options?) => {
   if (contentType !== 'application/json') {
     throw new Error('Unexpected response content type');
   }
-  const rows = result.data as any[];
+  const rows = parser ? parser(result.data, query) : (result.data as any[]);
   const resultCount = fetchResultCount(result);
+  const nextPage = parseNextPage(result);
   return {
     rows,
     resultCount,
-    nextPage: parseNextPage(result),
+    nextPage,
   };
 };
 
-export function createFetcher(endpoint: string, options?): Fetcher {
+export type DataPage<TData = any> = ReturnType<
+  typeof processApiResponse<TData>
+>;
+
+export type SdkFunction<
+  QueryPayload = any,
+  PathPayload = any,
+  DataType = any,
+> = (options?: {
+  query?: QueryPayload;
+  path?: PathPayload;
+  signal?: AbortSignal;
+}) => RequestResult<DataType>;
+
+/**
+ * Creates a fetcher function for a table, using a type-safe SDK function.
+ * @param sdkFunction - The SDK function to call for fetching data.
+ * @param options - Default options for the fetcher.
+ */
+
+export function createFetcher<QueryPayload = any, PathPayload = any>(
+  sdkFunction: SdkFunction<QueryPayload, PathPayload>,
+  options?: FetcherOptions<QueryPayload, PathPayload>,
+): Fetcher {
   return (request: TableRequest) => {
-    const { params: optionsParams, ...restOptions } = options || {};
+    const {
+      query: optionsParams,
+      path: pathParams,
+      parser,
+      ...restOptions
+    } = options || {};
+
     const { params: requestOptionsParams, ...restRequestOptions } =
       request.options || {};
-    const mergedParams = {
+
+    const mergedQueryParams = {
       page: request.currentPage,
       page_size: request.pageSize,
       ...request.filter,
       ...optionsParams,
       ...requestOptionsParams,
     };
+
     const mergedOptions = { ...restOptions, ...restRequestOptions };
+
     return queryClient.fetchQuery({
-      queryKey: ['table', endpoint, mergedParams],
-      queryFn: () =>
-        parseResponse(`/api/${endpoint}/`, mergedParams, mergedOptions),
+      queryKey: ['table', request.tableKey, pathParams, mergedQueryParams],
+      queryFn: async () => {
+        const result = await sdkFunction({
+          path: pathParams,
+          query: mergedQueryParams,
+          ...mergedOptions,
+        });
+        return processApiResponse(result, parser, mergedQueryParams);
+      },
       staleTime: request.options?.staleTime,
     });
   };
@@ -71,12 +103,3 @@ export async function fetchAll(fetch: Fetcher, request: TableRequest) {
   }
   return result;
 }
-
-export const ANONYMOUS_CONFIG = {
-  transformRequest: [
-    (data, headers) => {
-      delete headers.Authorization;
-      return data;
-    },
-  ],
-};

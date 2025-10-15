@@ -21,12 +21,14 @@ import { getCustomer } from '@waldur/workspace/selectors';
 import { DescriptionGroup } from '../create/DescriptionGroup';
 import { EndDateGroup } from '../create/EndDateGroup';
 import { IndustryGroup } from '../create/IndustryGroup';
+import { KindGroup } from '../create/KindGroup';
 import { NameGroup } from '../create/NameGroup';
 import { OecdCodeGroup } from '../create/OecdCodeGroup';
 import { StartDateGroup } from '../create/StartDateGroup';
 import { EditProjectProps } from '../types';
 
 const formatValue = (key, value) => {
+  if (['', undefined, null].includes(value)) return null;
   switch (key) {
     case 'end_date':
     case 'start_date':
@@ -121,6 +123,8 @@ export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
               <FormGroup label={translate('Slug')}>
                 <Field component={StringField as any} name="slug" />
               </FormGroup>
+            ) : resolve.name === 'kind' ? (
+              <KindGroup />
             ) : resolve.name === 'max_service_accounts' ? (
               <FormGroup
                 label={translate('Maximum number of service accounts')}

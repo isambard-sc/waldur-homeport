@@ -1,15 +1,12 @@
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { createSelector } from 'reselect';
+import { customerPermissionsReviewsList } from 'waldur-js-client';
 
-import { formatDateTime } from '@waldur/core/dateUtils';
-import { translate } from '@waldur/i18n';
+import { PermissionsReviewsList } from '@waldur/core/PermissionsReviewsList';
 import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 import { getCustomer } from '@waldur/workspace/selectors';
-
-import { ReviewCloseButton } from './ReviewCloseButton';
 
 const mapStateToProps = createSelector(getCustomer, (customer) => ({
   customer_uuid: customer.uuid,
@@ -18,53 +15,11 @@ const mapStateToProps = createSelector(getCustomer, (customer) => ({
 
 export const CustomerPermissionsReviewList: FunctionComponent<{}> = () => {
   const filter = useSelector(mapStateToProps);
-  const props = useTable({
+  const tableProps = useTable({
     table: 'customer-permissions-reviews',
-    fetchData: createFetcher('customer-permissions-reviews'),
+    fetchData: createFetcher(customerPermissionsReviewsList),
     filter,
   });
-  return (
-    <Table
-      {...props}
-      columns={[
-        {
-          title: translate('Created'),
-          render: ({ row }) => <>{formatDateTime(row.created)}</>,
-          orderField: 'created',
-          export: (row) => formatDateTime(row.created),
-        },
-        {
-          title: translate('Performed'),
-          render: ({ row }) => (
-            <>{row.closed ? formatDateTime(row.closed) : 'N/A'}</>
-          ),
 
-          export: (row) => (row.closed ? formatDateTime(row.closed) : 'N/A'),
-        },
-        {
-          title: translate('Performed by'),
-          render: ({ row }) => <>{row.reviewer_full_name || 'N/A'}</>,
-          export: (row) => row.reviewer_full_name || 'N/A',
-        },
-        {
-          title: translate('State'),
-          render: ({ row }) => (
-            <>
-              {row.is_pending ? translate('Pending') : translate('Performed')}
-            </>
-          ),
-
-          export: (row) =>
-            row.is_pending ? translate('Pending') : translate('Performed'),
-        },
-      ]}
-      verboseName={translate('permission reviews')}
-      rowActions={({ row }) => (
-        <>
-          {row.is_pending ? <ReviewCloseButton reviewId={row.uuid} /> : 'N/A'}
-        </>
-      )}
-      enableExport
-    />
-  );
+  return <PermissionsReviewsList tableProps={tableProps} scope="customer" />;
 };

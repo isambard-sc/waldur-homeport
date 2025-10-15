@@ -136,6 +136,18 @@ export const SettingsDescription = [
         default: false,
         type: 'boolean',
       },
+      {
+        key: 'ENABLE_MOCK_COURSE_ACCOUNT_BACKEND',
+        description: translate('Enable mock returns for the course account service'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'ENFORCE_USER_CONSENT_FOR_OFFERINGS',
+        description: translate('If True, users must have active consent to access offerings that have active Terms of Service.'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
   {
@@ -788,6 +800,18 @@ export const SettingsDescription = [
         default: false,
         type: 'boolean',
       },
+      {
+        key: 'OIDC_BLOCK_CREATION_OF_UNINVITED_USERS',
+        description: translate('If true, block creation of an account on OIDC login if user email is not provided or provided and is not in the list of one of the active invitations.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'OIDC_ACCESS_TOKEN_ENABLED',
+        description: translate('If true, OIDC complete view returns access token instead of Waldur token'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
   {
@@ -886,6 +910,41 @@ export const SettingsDescription = [
         key: 'OIDC_CACHE_TIMEOUT',
         description: translate('Number of seconds to cache token introspection results.'),
         default: 300,
+        type: 'integer',
+      },
+    ],
+  },
+  {
+    description: translate('Onboarding settings'),
+    items: [
+      {
+        key: 'ONBOARDING_VERIFICATION_EXPIRY_HOURS',
+        description: translate('Number of hours after which onboarding verifications expire.'),
+        default: 48,
+        type: 'integer',
+      },
+      {
+        key: 'ONBOARDING_ARIREGISTER_BASE_URL',
+        description: translate('Base URL for Estonian Äriregister API endpoint.'),
+        default: 'https://demo-ariregxmlv6.rik.ee/',
+        type: 'url_field',
+      },
+      {
+        key: 'ONBOARDING_ARIREGISTER_USERNAME',
+        description: translate('Username for Estonian Äriregister API authentication.'),
+        default: '',
+        type: 'text_field',
+      },
+      {
+        key: 'ONBOARDING_ARIREGISTER_PASSWORD',
+        description: translate('Password for Estonian Äriregister API authentication.'),
+        default: '',
+        type: 'secret_field',
+      },
+      {
+        key: 'ONBOARDING_ARIREGISTER_TIMEOUT',
+        description: translate('Timeout in seconds for Estonian Äriregister API requests.'),
+        default: 30,
         type: 'integer',
       },
     ],

@@ -7,7 +7,7 @@ import * as AuthService from '@waldur/auth/AuthService';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { createDeferred } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { openModalDialog, waitForConfirmation } from '@waldur/modal/actions';
 import { router } from '@waldur/router';
 import {
   showError,
@@ -85,9 +85,28 @@ export function submitPermissionRequest(token) {
   return confirmUserGroupInvitation(token)
     .then((accept) => {
       if (accept) {
-        submitGroupRequest(token).then(() => {
-          router.stateService.go('profile.details');
-        });
+        submitGroupRequest(token)
+          .then(() => {
+            router.stateService.go('profile.details');
+          })
+          .catch(async (error) => {
+            await waitForConfirmation(
+              store.dispatch,
+              translate('Access restricted'),
+              error ||
+                translate(
+                  "You don't have the required permissions to join this organization.",
+                ),
+              {
+                type: 'danger',
+                size: 'sm',
+                positiveButton: translate('Go to dashboard'),
+                positiveButtonVariant: 'primary w-175px',
+                onlyPositiveButton: true,
+              },
+            );
+            router.stateService.go('profile.details');
+          });
       }
     })
     .catch(() => {
@@ -120,12 +139,20 @@ export async function acceptInvitation(token) {
   }
 }
 
-function submitGroupRequest(token) {
+export function submitGroupRequest(token) {
   return userGroupInvitationsSubmitRequest({ path: { uuid: token } })
-    .then(() => {
+    .then((res) => {
       store.dispatch(
-        showSuccess(translate('Your permission request has been submitted.')),
+        showSuccess(
+          translate(
+            'Request has been sent. You’ll be notified once it’s approved.',
+          ),
+          translate('You are requested to join {organization}', {
+            organization: res.data.scope_name,
+          }),
+        ),
       );
+      return res.data;
     })
     .catch((error) => {
       if (error.response?.status === 404 || error.response?.status === 400) {
@@ -139,6 +166,7 @@ function submitGroupRequest(token) {
           ),
         );
       }
+      throw error;
     });
 }
 

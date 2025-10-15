@@ -2,6 +2,7 @@ import { FunctionComponent, useMemo } from 'react';
 import { ButtonGroup } from 'react-bootstrap';
 import {
   OpenStackFloatingIp,
+  openstackFloatingIpsList,
   OpenstackFloatingIpsListData,
 } from 'waldur-js-client';
 
@@ -41,13 +42,14 @@ export const FloatingIpsList: FunctionComponent<{ resourceScope }> = ({
         'instance_uuid',
         'instance_name',
         'project_uuid',
+        'port_fixed_ips',
       ],
     }),
     [resourceScope],
   );
   const tableProps = useTable({
     table: 'openstack-floating-ips',
-    fetchData: createFetcher('openstack-floating-ips'),
+    fetchData: createFetcher(openstackFloatingIpsList),
     filter,
   });
   return (
@@ -61,6 +63,16 @@ export const FloatingIpsList: FunctionComponent<{ resourceScope }> = ({
         {
           title: translate('State'),
           render: ({ row }) => <ResourceState resource={row} />,
+        },
+        {
+          title: translate('Internal address'),
+          render: ({ row }) => (
+            <>
+              {row.port_fixed_ips && row.port_fixed_ips.length > 0
+                ? row.port_fixed_ips.map((fip) => fip.ip_address).join(', ')
+                : 'N/A'}
+            </>
+          ),
         },
         {
           title: translate('Instance'),

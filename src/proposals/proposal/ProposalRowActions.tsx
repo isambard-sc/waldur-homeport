@@ -1,4 +1,5 @@
 import {
+  ArrowUUpLeftIcon,
   ChatTextIcon,
   CheckCircleIcon,
   XCircleIcon,
@@ -12,7 +13,10 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
+import {
+  ActionsDropdown,
+  ActionsDropdownComponent,
+} from '@waldur/table/ActionsDropdown';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { useProposalDecisionActions } from './create/utils';
@@ -25,10 +29,12 @@ const CreateReviewDialog = lazyComponent(() =>
 
 export const ProposalRowActions = ({ row, refetch }) => {
   const user = useSelector(getUser);
-  const canCreateReview = hasPermission(user, {
-    permission: PermissionEnum.MANAGE_PROPOSAL_REVIEW,
-    scopeId: row.call_uuid,
-  });
+  const canCreateReview =
+    hasPermission(user, {
+      permission: PermissionEnum.MANAGE_PROPOSAL_REVIEW,
+      scopeId: row.call_uuid,
+      callOrganizerId: row.call_managing_organisation_uuid,
+    }) && !['accepted', 'rejected', 'canceled'].includes(row.state);
 
   const dispatch = useDispatch();
 
@@ -47,7 +53,12 @@ export const ProposalRowActions = ({ row, refetch }) => {
     canPerformDecisionActions,
     handleApproveProposal,
     handleRejectProposal,
+    handleReturnToApplicant,
   } = useProposalDecisionActions(row, refetch);
+
+  if (!canPerformDecisionActions && !canCreateReview) {
+    return <ActionsDropdown disabled tooltip />;
+  }
 
   return (
     <ActionsDropdownComponent>
@@ -74,6 +85,15 @@ export const ProposalRowActions = ({ row, refetch }) => {
             disabled={!canPerformDecisionActions}
             className="text-danger"
             iconColor="danger"
+          />
+
+          <ActionItem
+            title={translate('Return to Applicant')}
+            action={handleReturnToApplicant}
+            iconNode={<ArrowUUpLeftIcon weight="bold" />}
+            disabled={!canPerformDecisionActions}
+            className="text-warning"
+            iconColor="warning"
           />
         </>
       )}

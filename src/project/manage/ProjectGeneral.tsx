@@ -1,9 +1,13 @@
 import React, { useMemo } from 'react';
 import { Project } from 'waldur-js-client';
 
+import { ENV } from '@waldur/core/config';
+import { parseDate } from '@waldur/core/dateUtils';
 import FormTable, { FormTableItemProps } from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
 import { useUser } from '@waldur/workspace/hooks';
+
+import { projectKindOptions } from '../utils';
 
 import { FieldEditButton } from './FieldEditButton';
 import { ProjectAvatar } from './ProjectAvatar';
@@ -23,6 +27,11 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
             key: 'name',
             value: project.name || 'N/A',
           },
+          user.is_staff && {
+            label: translate('Slug'),
+            key: 'slug',
+            value: project.slug || 'N/A',
+          },
           {
             label: translate('Owner'),
             key: 'customer_name',
@@ -35,6 +44,10 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
             ),
             key: 'start_date',
             value: project.start_date || 'N/A',
+            // If date is past, disable it
+            disabled: project.start_date
+              ? parseDate(project.start_date) < parseDate(null)
+              : false,
           },
           {
             label: translate('End date'),
@@ -48,6 +61,15 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
             label: translate('Description'),
             key: 'description',
             value: project.description || 'N/A',
+          },
+          ENV.plugins.WALDUR_CORE.ENABLE_PROJECT_KIND_COURSE && {
+            label: translate('Project kind'),
+            key: 'kind',
+            value:
+              (
+                projectKindOptions()[project.kind] ||
+                projectKindOptions().default
+              )?.label || 'N/A',
           },
           user.is_staff && {
             label: translate('Maximum number of service accounts'),
@@ -76,7 +98,13 @@ export const ProjectGeneral: React.FC<ProjectGeneralProps> = ({ project }) => {
               label={row.label}
               description={row.description}
               value={row.value}
-              actions={<FieldEditButton project={project} name={row.key} />}
+              actions={
+                <FieldEditButton
+                  project={project}
+                  name={row.key}
+                  disabled={row.disabled}
+                />
+              }
             />
           ))}
         </FormTable>

@@ -1,7 +1,14 @@
 import { uniq } from 'lodash-es';
-import { useState, createElement, FC, useCallback } from 'react';
+import {
+  useState,
+  createElement,
+  FC,
+  useCallback,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { change, getFormValues } from 'redux-form';
+import { change, destroy, getFormValues } from 'redux-form';
 
 import { ProgressStep } from '@waldur/core/ProgressSteps';
 import { WizardFormStepProps } from '@waldur/form/WizardForm';
@@ -18,9 +25,12 @@ interface WizardFormContainerProps {
   hideStepper?: boolean;
   wizardForms: FC<WizardFormStepProps>[];
   initialValues?: any;
+  actions?: WizardFormStepProps['actions'];
   data?: any;
   validate?(values: any): any;
   modalProps?: {
+    iconNode?: ReactNode;
+    iconColor?: string;
     headerClassName?: string;
     bodyClassName?: string;
   };
@@ -68,6 +78,11 @@ export const WizardFormContainer: FC<WizardFormContainerProps> = ({
     setInitialized(true);
   }, [initialized, setInitialized, dispatch, formValues]);
 
+  // Destroy the form on close wizard
+  useEffect(() => {
+    return () => dispatch(destroy(form));
+  }, []);
+
   return createElement(props.wizardForms[step], {
     form,
     title: props.title,
@@ -80,6 +95,7 @@ export const WizardFormContainer: FC<WizardFormContainerProps> = ({
     steps: props.steps,
     hideStepper: props.hideStepper,
     initialValues: props.initialValues,
+    actions: props.actions,
     data: props.data,
     reinitialize,
     validate: props.validate,

@@ -1,4 +1,5 @@
 import { ComponentType, LazyExoticComponent } from 'react';
+import { InjectedFormProps } from 'redux-form';
 import {
   Project,
   Customer,
@@ -23,7 +24,9 @@ export interface OfferingConfiguration<
   RequestPayloadType = any,
 > {
   type: string;
-  orderFormComponent?: LazyExoticComponent<ComponentType<any>>;
+  orderFormComponent?: LazyExoticComponent<
+    ComponentType<OrderFormComponentProps>
+  >;
   pluginOptionsForm?: LazyExoticComponent<
     ComponentType<OfferingEditPanelFormProps>
   >;
@@ -31,6 +34,9 @@ export interface OfferingConfiguration<
     ComponentType<OfferingEditPanelFormProps>
   >;
   provisioningConfigForm?: LazyExoticComponent<
+    ComponentType<OfferingEditPanelFormProps>
+  >;
+  credentialsForm?: LazyExoticComponent<
     ComponentType<OfferingEditPanelFormProps>
   >;
   detailsComponent?: LazyExoticComponent<ComponentType<OrderDetailsProps>>;
@@ -48,11 +54,9 @@ export interface OfferingConfiguration<
   label: string;
   showComponents?: boolean;
   onlyOnePlan?: boolean;
-  providerType?: string;
   disableOfferingCreation?: boolean;
   schedulable?: boolean;
   showBackendId?: boolean;
-  allowToUpdateService?: boolean;
   offeringComponentsFilter?: (
     formData: any,
     components: OfferingComponent[],
@@ -60,9 +64,24 @@ export interface OfferingConfiguration<
 }
 export interface DeployFormData {
   project?: Pick<Project, 'uuid' | 'name' | 'end_date' | 'url'>;
-  customer?: Pick<Customer, 'uuid' | 'name' | 'url' | 'payment_profiles'>;
+  customer?: Pick<
+    Customer,
+    | 'uuid'
+    | 'name'
+    | 'url'
+    | 'payment_profiles'
+    | 'display_billing_info_in_projects'
+  >;
   offering?;
   attributes?: AttributesType;
   limits?: Limits;
   plan?: Plan;
+  request_comment?: string;
+  attachment?: File;
+}
+
+export interface OrderFormComponentProps extends InjectedFormProps {
+  offering: Offering;
+  formData: DeployFormData;
+  selectedOffering: Offering;
 }

@@ -29,6 +29,22 @@ export default defineConfig({
     markdownPlugin.default({ mode: 'react' }),
     reactDisplayNamePlugin(),
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern-compiler',
+        silenceDeprecations: [
+          'mixed-decls',
+          'import',
+          'abs-percent',
+          'function-units',
+          'color-functions',
+          'slash-div',
+          'global-builtin',
+        ],
+      },
+    },
+  },
   build: {
     sourcemap: false,
     minify: false,
@@ -42,5 +58,25 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./test/setupTests.js'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov', 'clover', 'cobertura'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx,js,jsx}'],
+      exclude: [
+        'node_modules/',
+        'test/',
+        '**/*.test.{ts,tsx}',
+        '**/*.d.ts',
+        'vite.config.ts',
+        'cypress/',
+        'src/vendor.ts',
+        'src/echarts/',
+        'src/metronic/',
+        'build.dev/',
+        '**/*.config.{ts,js}',
+        '**/*.setup.{ts,js}',
+      ],
+    },
   },
 });

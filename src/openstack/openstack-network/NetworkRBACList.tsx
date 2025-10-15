@@ -1,5 +1,9 @@
 import { FC, useMemo } from 'react';
-import { OpenStackNetwork } from 'waldur-js-client';
+import {
+  OpenStackNetwork,
+  openstackNetworkRbacPoliciesDestroy,
+  openstackNetworkRbacPoliciesList,
+} from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -10,23 +14,19 @@ import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
-import { deleteNetworkRBAC } from '../api';
-
 const POLICY_TYPE = {
   access_as_shared: { color: 'blue', label: translate('Shared') },
   access_as_external: { color: 'warning', label: translate('External') },
 };
 
-const RowActions: FC<{ row; networkUuid; fetch }> = ({
-  row,
-  networkUuid,
-  fetch,
-}) => {
+const RowActions: FC<{ row; fetch }> = ({ row, fetch }) => {
   return (
     <ActionsDropdownComponent>
       <ResourceDeleteButton
         apiFunction={() =>
-          deleteNetworkRBAC({ network_uuid: networkUuid, uuid: row.uuid })
+          openstackNetworkRbacPoliciesDestroy({
+            path: { uuid: row.uuid },
+          })
         }
         resourceType={translate('Network sharing')}
         refetch={fetch}
@@ -41,7 +41,7 @@ export const NetworkRBACList: FC<{ network: OpenStackNetwork }> = ({
   const filter = useMemo(() => ({ network_uuid: network.uuid }), [network]);
   const props = useTable({
     table: 'openstack-network-rbac-' + network.uuid,
-    fetchData: createFetcher('openstack-network-rbac-policies'),
+    fetchData: createFetcher(openstackNetworkRbacPoliciesList),
     filter,
   });
   return (
@@ -71,9 +71,7 @@ export const NetworkRBACList: FC<{ network: OpenStackNetwork }> = ({
       ]}
       verboseName={translate('Network sharing')}
       hasActionBar={false}
-      rowActions={({ row, fetch }) => (
-        <RowActions row={row} fetch={fetch} networkUuid={network.uuid} />
-      )}
+      rowActions={RowActions}
       initialPageSize={5}
       minHeight={265}
     />

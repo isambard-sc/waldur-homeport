@@ -1,5 +1,9 @@
 import { FunctionComponent, useMemo } from 'react';
-import { OpenStackSubNet, OpenstackSubnetsListData } from 'waldur-js-client';
+import {
+  OpenStackSubNet,
+  openstackSubnetsList,
+  OpenstackSubnetsListData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
@@ -8,6 +12,8 @@ import { ResourceSummary } from '@waldur/resource/summary/ResourceSummary';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
+
+import { CreateSubnetButton } from './actions/CreateSubnetButton';
 
 export const TenantSubnetsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
@@ -44,7 +50,7 @@ export const TenantSubnetsList: FunctionComponent<{ resourceScope }> = ({
   );
   const props = useTable({
     table: 'openstack-subnets',
-    fetchData: createFetcher('openstack-subnets'),
+    fetchData: createFetcher(openstackSubnetsList),
     filter,
   });
 
@@ -73,6 +79,9 @@ export const TenantSubnetsList: FunctionComponent<{ resourceScope }> = ({
       title={translate('Subnets')}
       verboseName={translate('subnets')}
       showPageSizeSelector
+      tableActions={
+        <CreateSubnetButton resource={resourceScope} refetch={props.fetch} />
+      }
       rowActions={({ row }) => (
         <ActionButtonResource url={row.url} refetch={props.fetch} />
       )}

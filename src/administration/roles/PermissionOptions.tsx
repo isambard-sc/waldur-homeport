@@ -68,14 +68,6 @@ export const PermissionOptions = [
     label: translate('Customer'),
     options: [
       {
-        label: translate('Create customer'),
-        value: 'CUSTOMER.CREATE',
-      },
-      {
-        label: translate('Delete customer'),
-        value: 'CUSTOMER.DELETE',
-      },
-      {
         label: translate('List users'),
         value: 'CUSTOMER.LIST_USERS',
       },
@@ -325,6 +317,10 @@ export const PermissionOptions = [
     label: translate('Project'),
     options: [
       {
+        label: translate('Course account manage'),
+        value: 'PROJECT.COURSE_ACCOUNT_MANAGE',
+      },
+      {
         label: translate('Create project'),
         value: 'PROJECT.CREATE',
       },
@@ -335,6 +331,14 @@ export const PermissionOptions = [
       {
         label: translate('List project'),
         value: 'PROJECT.LIST',
+      },
+      {
+        label: translate('Review membership'),
+        value: 'PROJECT.REVIEW_MEMBERSHIP',
+      },
+      {
+        label: translate('Update metadata'),
+        value: 'PROJECT.UPDATE_METADATA',
       },
       {
         label: translate('Update project'),
@@ -358,6 +362,10 @@ export const PermissionOptions = [
         value: 'SERVICE_PROVIDER.GENERATE_API_SECRET_CODE',
       },
       {
+        label: translate('List course accounts'),
+        value: 'SERVICE_PROVIDER.LIST_COURSE_ACCOUNTS',
+      },
+      {
         label: translate('List customer projects'),
         value: 'SERVICE_PROVIDER.LIST_CUSTOMER_PROJECTS',
       },
@@ -376,6 +384,10 @@ export const PermissionOptions = [
       {
         label: translate('List projects'),
         value: 'SERVICE_PROVIDER.LIST_PROJECTS',
+      },
+      {
+        label: translate('List service accounts'),
+        value: 'SERVICE_PROVIDER.LIST_SERVICE_ACCOUNTS',
       },
       {
         label: translate('List user customers'),

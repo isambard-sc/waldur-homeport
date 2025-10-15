@@ -9,9 +9,11 @@ export interface TipProps {
   placement?: OverlayTriggerProps['placement'];
   trigger?: OverlayTriggerProps['trigger'];
   rootClose?: OverlayTriggerProps['rootClose'];
+  delay?: OverlayTriggerProps['delay'];
   autoWidth?: boolean;
   className?: string;
   tipClassName?: string;
+  theme?: 'light' | 'dark';
   onClick?(): void;
 }
 
@@ -25,6 +27,7 @@ export const Tip: React.FC<PropsWithChildren<TipProps>> = ({
   className,
   tipClassName,
   onClick,
+  theme = 'dark',
   ...rest
 }) =>
   label ? (
@@ -35,7 +38,7 @@ export const Tip: React.FC<PropsWithChildren<TipProps>> = ({
         <Tooltip
           id={id}
           className={classNames(
-            'tooltip-dark',
+            `tooltip-${theme}`,
             autoWidth && 'tooltip-auto-width',
             tipClassName,
           )}

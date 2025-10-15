@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { userPermissionRequestsList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
@@ -19,7 +20,7 @@ export const UserPermissionRequestsList: FC<OwnProps> = ({
   const tableOptions = useMemo(
     () => ({
       table: [USER_PERMISSION_REQUESTS_TABLE_ID, groupInvitationUuid].join('-'),
-      fetchData: createFetcher('user-permission-requests'),
+      fetchData: createFetcher(userPermissionRequestsList),
       filter: {
         invitation: groupInvitationUuid,
       },
@@ -50,14 +51,6 @@ export const UserPermissionRequestsList: FC<OwnProps> = ({
       render: PermissionRequestStateField,
       className: 'w-175px',
     },
-    {
-      title: translate('Actions'),
-      render: ({ row }) => (
-        <UserPermissionRequestRowActions row={row} refetch={props.fetch} />
-      ),
-
-      className: 'w-90px',
-    },
   ];
 
   return (
@@ -74,6 +67,7 @@ export const UserPermissionRequestsList: FC<OwnProps> = ({
       hideRefresh
       headerClassName="py-0 min-h-45px"
       titleClassName="fs-6 fw-bolder text-gray-700"
+      rowActions={UserPermissionRequestRowActions}
     />
   );
 };

@@ -1,5 +1,9 @@
 import { FunctionComponent, memo, useMemo } from 'react';
-import { OpenStackNetwork, OpenstackNetworksListData } from 'waldur-js-client';
+import {
+  OpenStackNetwork,
+  openstackNetworksList,
+  OpenstackNetworksListData,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionButtonResource } from '@waldur/resource/actions/ActionButtonResource';
@@ -43,7 +47,6 @@ export const TenantNetworksList: FunctionComponent<{ resourceScope }> = ({
         'created',
         'is_external',
         'type',
-        // @ts-ignore
         'segmentation_id',
         'mtu',
         'subnets',
@@ -61,7 +64,7 @@ export const TenantNetworksList: FunctionComponent<{ resourceScope }> = ({
   );
   const props = useTable({
     table: 'openstack-networks',
-    fetchData: createFetcher('openstack-networks'),
+    fetchData: createFetcher(openstackNetworksList),
     filter,
   });
   return (

@@ -124,6 +124,20 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-quick-shortcuts',
+    url: 'quick-shortcuts/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./quick-shortcuts/QuickShortcutsList').then((module) => ({
+        default: module.QuickShortcutsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Quick shortcuts'),
+    },
+  },
+
+  {
     name: 'admin-branding',
     url: 'branding/',
     parent: 'admin-settings',
@@ -399,6 +413,21 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-course-accounts',
+    url: 'course-accounts/?tab',
+    parent: 'admin-accounts',
+    component: lazyComponent(() =>
+      import('./CourseAccountsTable').then((module) => ({
+        default: module.CourseAccountsTable,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Course accounts'),
+      feature: InvitationsFeatures.show_course_accounts,
+    },
+  },
+
+  {
     name: 'admin-marketplace-category-groups',
     url: 'category-groups',
     parent: 'admin-marketplace',
@@ -491,6 +520,22 @@ export const states: StateDeclaration[] = [
       permissions: [isStaff],
     },
   },
+  {
+    name: 'admin-organization-requests',
+    url: 'organization-requests/',
+    parent: 'admin-organizations',
+    component: lazyComponent(() =>
+      import('./organizations/requests/OrganizationRequestsList').then(
+        (module) => ({
+          default: module.OrganizationRequestsList,
+        }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Requests'),
+      permissions: [isStaff],
+    },
+  },
 
   {
     name: 'admin-identity',
@@ -517,6 +562,20 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('User roles'),
+    },
+  },
+
+  {
+    name: 'admin-auto-provisioning-rules',
+    url: 'auto-provisioning-rules/',
+    parent: 'admin-settings',
+    component: lazyComponent(() =>
+      import('./auto-provisioning-rules/RulesList').then((module) => ({
+        default: module.RulesList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Auto-provisioning rules'),
     },
   },
 

@@ -2,7 +2,11 @@ import arrayMutators from 'final-form-arrays';
 import { useCallback } from 'react';
 import { Form } from 'react-final-form';
 import { useDispatch } from 'react-redux';
-import { notificationMessagesTemplatesOverride } from 'waldur-js-client';
+import {
+  Notification,
+  notificationMessagesTemplatesOverride,
+  NotificationTemplateDetailSerializers,
+} from 'waldur-js-client';
 
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
@@ -12,7 +16,10 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { NotificationForm } from './NotificationForm';
 
-function findDifferentTemplates(formTemplate, initTemplate) {
+function findDifferentTemplates(
+  formTemplate: { templates: NotificationTemplateDetailSerializers[] },
+  initTemplate: { templates: NotificationTemplateDetailSerializers[] },
+) {
   const formTemplates = formTemplate.templates;
   const initTemplates = initTemplate.templates;
 
@@ -24,7 +31,11 @@ function findDifferentTemplates(formTemplate, initTemplate) {
   });
 }
 
-export const NotificationUpdateDialog = ({ resolve }) => {
+export const NotificationUpdateDialog = ({
+  resolve,
+}: {
+  resolve: { notification: Notification; refetch };
+}) => {
   const dispatch = useDispatch();
 
   const onSubmit = useCallback(
@@ -32,6 +43,11 @@ export const NotificationUpdateDialog = ({ resolve }) => {
       const templatesToUpdate = findDifferentTemplates(formData, {
         templates: resolve.notification.templates,
       });
+
+      if (templatesToUpdate.length === 0) {
+        dispatch(closeModalDialog());
+        return;
+      }
 
       for (const template of templatesToUpdate) {
         try {
@@ -41,19 +57,22 @@ export const NotificationUpdateDialog = ({ resolve }) => {
               content: template.content,
             },
           });
-          await resolve.refetch();
-          dispatch(showSuccess(translate('Notification has been updated.')));
-          dispatch(closeModalDialog());
         } catch (e) {
           dispatch(
             showErrorResponse(e, translate('Unable to update a notification.')),
           );
+          return;
         }
       }
+      await resolve.refetch();
+      dispatch(showSuccess(translate('Notification has been updated.')));
+      dispatch(closeModalDialog());
     },
     [dispatch, resolve],
   );
 
+  // @ts-ignore
+  const contextSchema = resolve.notification.context_schema;
   return (
     <Form
       onSubmit={onSubmit}
@@ -64,7 +83,8 @@ export const NotificationUpdateDialog = ({ resolve }) => {
       render={({ handleSubmit, submitting, pristine }) => (
         <form onSubmit={handleSubmit}>
           <ModalDialog
-            title={translate('Update a notification')}
+            title={translate('Update notification template')}
+            subtitle={resolve.notification.description}
             footer={
               <SubmitButton
                 submitting={submitting}
@@ -73,7 +93,7 @@ export const NotificationUpdateDialog = ({ resolve }) => {
               />
             }
           >
-            <NotificationForm submitting={submitting} />
+            <NotificationForm schema={contextSchema} />
           </ModalDialog>
         </form>
       )}

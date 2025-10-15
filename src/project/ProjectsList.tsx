@@ -1,5 +1,6 @@
 import { FC, useMemo } from 'react';
 import { useSelector } from 'react-redux';
+import { projectsList } from 'waldur-js-client';
 
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { isFeatureVisible } from '@waldur/features/connect';
@@ -16,10 +17,10 @@ import { formatLongText } from '@waldur/table/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 import { Customer } from '@waldur/workspace/types';
 
-import { ProjectCreateButton } from './create/ProjectCreateButton';
-import { ProjectImportButton } from './import/ProjectImportButton';
 import { ProjectCostField } from './ProjectCostField';
+import { ProjectKindField } from './ProjectKindField';
 import { ProjectLink } from './ProjectLink';
+import { ProjectsTableActions } from './ProjectsTableActions';
 
 const mandatoryFields = [
   'uuid',
@@ -33,13 +34,6 @@ interface ProjectsListProps extends Partial<TableProps> {
   optionalColumns?: ('description' | 'created')[];
 }
 
-const TableActions = ({ customer, refetch }) => (
-  <>
-    <ProjectImportButton customer={customer} refetch={refetch} />
-    <ProjectCreateButton customer={customer} refetch={refetch} />
-  </>
-);
-
 export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
   customer,
   optionalColumns = [],
@@ -48,12 +42,12 @@ export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
   const columns: Column[] = [
     {
       title: translate('Name'),
-      render: ProjectLink,
+      render: ({ row }) => <ProjectLink row={row} showKind />,
       copyField: (row) => row.name,
       orderField: 'name',
       export: 'name',
       id: 'name',
-      keys: ['uuid', 'name', 'is_industry'],
+      keys: ['uuid', 'name', 'is_industry', 'kind'],
     },
     {
       title: translate('Description'),
@@ -108,6 +102,14 @@ export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
     });
   }
 
+  columns.push({
+    title: translate('Type'),
+    render: ProjectKindField,
+    export: 'kind',
+    id: 'kind',
+    keys: ['kind'],
+  });
+
   return (
     <Table
       title={translate('Projects')}
@@ -116,7 +118,9 @@ export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
       initialSorting={{ field: 'created', mode: 'desc' }}
       hasQuery={true}
       showPageSizeSelector={true}
-      tableActions={<TableActions customer={customer} refetch={props.fetch} />}
+      tableActions={
+        <ProjectsTableActions customer={customer} refetch={props.fetch} />
+      }
       rowActions={({ row }) => (
         <ProjectsListActions project={row} refetch={props.fetch} />
       )}
@@ -142,7 +146,7 @@ export const ProjectsList: FC<ProjectsListProps> = ({
   );
   const tableProps = useTable({
     table: props.table || PROJECTS_LIST,
-    fetchData: createFetcher('projects'),
+    fetchData: createFetcher(projectsList),
     queryField: 'query',
     filter,
     mandatoryFields,

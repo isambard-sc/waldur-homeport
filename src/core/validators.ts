@@ -28,7 +28,9 @@ export const isMatchPattern =
   };
 
 export const required = (value) =>
-  value || value === 0 ? undefined : translate('This field is required.');
+  value || [0, false].includes(value)
+    ? undefined
+    : translate('This field is required.');
 
 export const requiredArray = (value) =>
   Array.isArray(value) && value.length
@@ -41,15 +43,81 @@ export const number = (value) =>
 export const lessThanOrEqual = (n) => (value: number) =>
   value && value > n ? translate('Must be {n} or less.', { n }) : undefined;
 
+export const greaterThan = (n) => (value: number) =>
+  value && value <= n
+    ? translate('Must be greater than {n}.', { n })
+    : undefined;
+
 export const max = (length) => (value) =>
   value && value.length > length
     ? translate('Must be {length} characters or less.', { length })
     : undefined;
 
 export const email = (value) =>
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value)
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
     ? translate('Invalid email address')
     : undefined;
+
+export const url = (value) => {
+  if (!value) return undefined;
+
+  // Early length check to avoid processing extremely long URLs
+  if (value.length > 10000) {
+    return translate('URL is too long');
+  }
+
+  try {
+    // Fast string checks before regex
+    if (value.indexOf('://') !== -1) {
+      const protocol = value.substring(0, value.indexOf('://'));
+      if (
+        [
+          'ftp',
+          'file',
+          'javascript',
+          'data',
+          'vbscript',
+          'about',
+          'blob',
+        ].includes(protocol.toLowerCase())
+      ) {
+        throw new Error('Invalid protocol');
+      }
+    }
+
+    // Reject protocol-relative URLs
+    if (value.startsWith('//')) {
+      throw new Error('Protocol-relative URLs not allowed');
+    }
+
+    // Use startsWith for performance instead of regex
+    const urlToTest =
+      value.startsWith('http://') || value.startsWith('https://')
+        ? value
+        : `https://${value}`;
+
+    const urlObj = new URL(urlToTest);
+
+    // Only allow http and https protocols
+    if (!['http:', 'https:'].includes(urlObj.protocol)) {
+      throw new Error('Invalid protocol');
+    }
+
+    // Check for valid hostname
+    if (
+      !urlObj.hostname ||
+      urlObj.hostname.includes(' ') ||
+      urlObj.hostname === '.' ||
+      urlObj.hostname === '..'
+    ) {
+      throw new Error('Invalid hostname');
+    }
+
+    return undefined;
+  } catch {
+    return translate('Please enter a valid URL (e.g., https://example.com)');
+  }
+};
 
 const latinName = (value: string) => {
   if (!value.match(LATIN_NAME_PATTERN)) {

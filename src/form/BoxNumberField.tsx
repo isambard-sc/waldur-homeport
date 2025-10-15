@@ -35,15 +35,15 @@ export const BoxNumberField: FunctionComponent<BoxNumberFieldProps> = (
       <div className="box-number-input-control">
         <Button
           size="sm"
-          variant="light"
-          className="minus-btn btn-icon"
+          variant="active-icon-primary"
+          className="minus-btn btn-icon btn-no-focus"
           onClick={() =>
             change(Number(input.value) - 1 * Number(props.step || 1))
           }
           disabled={props.disabled}
         >
           <span className="svg-icon svg-icon-2">
-            <MinusIcon />
+            <MinusIcon weight="bold" />
           </span>
         </Button>
         <Form.Control
@@ -57,8 +57,8 @@ export const BoxNumberField: FunctionComponent<BoxNumberFieldProps> = (
 
         <Button
           size="sm"
-          variant="light"
-          className="plus-btn btn-icon"
+          variant="active-icon-primary"
+          className="plus-btn btn-icon btn-no-focus"
           onClick={() =>
             change(Number(input.value) + 1 * Number(props.step || 1))
           }

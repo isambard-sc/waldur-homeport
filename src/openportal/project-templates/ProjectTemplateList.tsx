@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { openportalProjectTemplateList } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
@@ -34,7 +35,7 @@ const stringify_customer = (customer: any) => {
 export const ProjectTemplateList: FunctionComponent<{}> = () => {
   const props = useTable({
     table: 'project-template',
-    fetchData: createFetcher('openportal-project-template'),
+    fetchData: createFetcher(openportalProjectTemplateList),
   });
   return (
     <Table

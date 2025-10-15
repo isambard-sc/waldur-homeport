@@ -1,9 +1,14 @@
-import { CheckIcon, XIcon } from '@phosphor-icons/react';
+import {
+  CheckIcon,
+  GlobeSimpleIcon,
+  LockIcon,
+  XIcon,
+} from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
-import { GroupInvitation } from 'waldur-js-client';
+import { GroupInvitation, userGroupInvitationsList } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -36,7 +41,7 @@ export const GroupInvitationsList: FunctionComponent<{}> = () => {
   const filter = useSelector(mapStateToFilter);
   const props = useTable({
     table: 'group-invitations',
-    fetchData: createFetcher('user-group-invitations'),
+    fetchData: createFetcher(userGroupInvitationsList),
     filter,
   });
 
@@ -69,14 +74,49 @@ export const GroupInvitationsList: FunctionComponent<{}> = () => {
           export: (row) => formatDateTime(row.expires),
         },
         {
+          title: translate('Type'),
+          render: ({ row }) =>
+            row.is_public ? (
+              <Badge
+                variant="blue"
+                leftIcon={<GlobeSimpleIcon weight="bold" />}
+                outline
+                pill
+              >
+                {translate('Public')}
+              </Badge>
+            ) : (
+              <Badge
+                variant="default"
+                leftIcon={<LockIcon weight="bold" />}
+                outline
+                pill
+              >
+                {translate('Private')}
+              </Badge>
+            ),
+          export: (row) =>
+            row.is_public ? translate('Public') : translate('Private'),
+        },
+        {
           title: translate('Status'),
           render: ({ row }) =>
             row.is_active ? (
-              <Badge variant="success" leftIcon={<CheckIcon />} outline pill>
+              <Badge
+                variant="success"
+                leftIcon={<CheckIcon weight="bold" />}
+                outline
+                pill
+              >
                 {translate('Active')}
               </Badge>
             ) : (
-              <Badge variant="default" leftIcon={<XIcon />} outline pill>
+              <Badge
+                variant="default"
+                leftIcon={<XIcon weight="bold" />}
+                outline
+                pill
+              >
                 {translate('Inactive')}
               </Badge>
             ),
@@ -88,18 +128,15 @@ export const GroupInvitationsList: FunctionComponent<{}> = () => {
       tabs={tableTabs}
       title={translate('Team')}
       verboseName={translate('group invitations')}
-      tableActions={
-        <>
-          <CustomerPermissionsLogButton />
-          <TeamDropdownActions refetch={props.fetch} />
-        </>
-      }
+      tableActions={<TeamDropdownActions refetch={props.fetch} />}
+      dropdownActions={<CustomerPermissionsLogButton />}
+      enableExport
+      showExportInDropdown
       rowActions={({ row }) => (
         <GroupInvitationRowActions row={row} refetch={props.fetch} />
       )}
       expandableRow={GroupInvitationsListExpandableRow}
       expandableRowClassName="pb-2 pe-2"
-      enableExport
     />
   );
 };

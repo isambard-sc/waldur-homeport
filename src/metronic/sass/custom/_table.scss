@@ -67,7 +67,7 @@
 
       th.pinned,
       td.pinned {
-        background-color: unset;
+        background-color: $gray-50;
       }
     }
     &.expanded + tr {
@@ -139,7 +139,7 @@
         top: 50%;
         transform: translateY(-50%);
         transition: opacity 0.15s linear;
-        background: rgba($gray-50, 0.75);
+        background: $gray-50;
         width: 32px;
         height: 32px;
         border: none;
@@ -147,12 +147,8 @@
         svg {
           color: $gray-600;
         }
-        &:hover {
-          background: $gray-50;
-
-          svg {
-            color: $gray-700;
-          }
+        &:hover svg {
+          color: $gray-700;
         }
       }
     }
@@ -160,15 +156,31 @@
     > td.ellipsis {
       max-width: 300px;
 
-      > * {
-        white-space: nowrap;
-        text-overflow: ellipsis;
+      &,
+      > *,
+      div.td-data,
+      div.td-data > * {
         overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
 
-    &:hover > td.has-filter button.inline-filter {
-      opacity: 1;
+    &:hover > td.has-filter {
+      div.td-data:not(.with-copy div.td-data) {
+        width: calc(100% - 40px); /* 32px of filter button + 8px of gap */
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      > .with-copy {
+        width: calc(100% - 40px);
+      }
+
+      button.inline-filter {
+        opacity: 1;
+      }
     }
   }
 
@@ -235,7 +247,7 @@
 
 /* TABLE IN CARD */
 .card.card-table {
-  .card-header {
+  .card-header:not(.card-solid .card-header) {
     min-height: 77px;
 
     .card-toolbar {
@@ -247,7 +259,8 @@
     }
   }
 
-  &:not(.grid-table) .card-body {
+  &:not(.grid-table)
+    .card-body:not(.tab-content .card-body):not(.card-solid .card-body) {
     padding-top: 0;
   }
 
@@ -267,8 +280,7 @@
   }
 
   &.grid-table .table-container {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    overflow-x: hidden;
   }
 
   .table-filter {
@@ -347,7 +359,7 @@
       padding-right: $card-px;
     }
 
-    &:not(.grid-table) .card-body {
+    &:not(.grid-table) .card-body:not(.card-solid .card-body) {
       padding-top: 0;
       padding-left: 0;
       padding-right: 0;
@@ -526,6 +538,11 @@ $mobile-spacing: get($content-spacing, tablet-and-mobile);
       padding-right: $mobile-spacing !important;
     }
   }
+
+  // Standalone table header
+  .table-standalone-header {
+    margin-bottom: $mobile-spacing;
+  }
 }
 
 // Dark mode
@@ -553,6 +570,8 @@ $mobile-spacing: get($content-spacing, tablet-and-mobile);
 
 // Standalone table header
 .table-standalone-header {
+  margin-bottom: get($content-spacing, desktop);
+
   .btn {
     height: 44px;
     font-size: $input-btn-font-size-lg;

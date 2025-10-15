@@ -1,15 +1,10 @@
 @import './BoxNumberInput';
 
 .box-number-input {
-  display: flex;
-  align-items: center;
-
   .box-number-input-control {
+    position: relative;
     display: flex;
     align-items: center;
-    padding: 3px;
-    border-radius: 6px;
-    background-color: var(--bs-light);
 
     @include box-number-input();
   }

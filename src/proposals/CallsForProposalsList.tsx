@@ -1,4 +1,5 @@
 import { FC, useMemo } from 'react';
+import { proposalPublicCallsList } from 'waldur-js-client';
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
@@ -13,7 +14,7 @@ export const CallsForProposalsList: FC = () => {
   const tableProps = useTable({
     table: 'CallsForProposals',
     filter,
-    fetchData: createFetcher('proposal-public-calls'),
+    fetchData: createFetcher(proposalPublicCallsList),
     staleTime: 3 * 60 * 1000,
   });
 
@@ -21,7 +22,7 @@ export const CallsForProposalsList: FC = () => {
     <Table
       {...tableProps}
       gridItem={({ row }) => <CallCard call={row} />}
-      gridSize={{ lg: 6, xl: 4 }}
+      gridSize={{ lg: 6, xxl: 4 }}
       hoverShadow={{ grid: false }}
       mode="grid"
       title={translate('Open calls')}

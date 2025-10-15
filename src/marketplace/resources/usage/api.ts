@@ -50,13 +50,13 @@ export const getProviderUsageComponents = async (
   const options =
     periods.length > 0
       ? periods.map((period) => ({
-          // @ts-ignore
           label: getPeriodLabel(period),
           value: period,
         }))
       : [
           {
             label: 'Default plan',
+            value: null,
           },
         ];
   return {

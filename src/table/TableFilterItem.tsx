@@ -11,12 +11,15 @@ import React, {
 } from 'react';
 import { Accordion, Badge, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { useDebounce } from 'react-use';
 import { Field, change, formValueSelector } from 'redux-form';
 
 import { translate } from '@waldur/i18n';
 import { MenuComponent } from '@waldur/metronic/components';
 
 import { TableFilterContext } from './FilterContextProvider';
+
+const DELAY_WAITING_FOR_FILTER = 50; // ms
 
 interface TableFilterItem {
   title: string;
@@ -222,7 +225,7 @@ const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   );
   useEffect(() => {
     _setFilter(itemValue);
-    props.onApply &&
+    if (props.onApply)
       props.onApply({ title: props.title, name: props.name, value: itemValue });
   }, [itemValue, _setFilter]);
 
@@ -330,13 +333,17 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   );
 
   // The filter field must have an initial value (at least null) so that the filter menu popup does not close when setting this filter for the first time.
-  useEffect(() => {
-    if (itemValue) {
+  // Wait a moment for the filters to set to the form. Then use them in the table state.
+  useDebounce(
+    () => {
       _setFilter(itemValue);
-    } else {
-      dispatch(change(form, props.name, null));
-    }
-  }, []);
+      if (itemValue === null) {
+        dispatch(change(form, props.name, null));
+      }
+    },
+    DELAY_WAITING_FOR_FILTER,
+    [],
+  );
 
   // Update filter when selecting a saved filter
   useEffect(() => {
@@ -351,7 +358,7 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
 
   const onApply = () => {
     _setFilter(itemValue);
-    props.onApply &&
+    if (props.onApply)
       props.onApply({ title: props.title, name: props.name, value: itemValue });
     apply();
   };

@@ -1,7 +1,11 @@
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
-import { Project, UserRoleDetails } from 'waldur-js-client';
+import {
+  Project,
+  projectsListUsersList,
+  UserRoleDetails,
+} from 'waldur-js-client';
 
 import { TeamTableComponent } from '@waldur/customer/team/TeamTableComponent';
 import { createFetcher } from '@waldur/table/api';
@@ -9,14 +13,15 @@ import { useTable } from '@waldur/table/useTable';
 import { getProject } from '@waldur/workspace/selectors';
 
 import { PROJECT_USERS_LIST_FILTER_FORM_ID } from '../constants';
-import { PROJECT_TEAM_TABLE_TABS } from '../utils';
 
 import { ProjectPermisionActions } from './ProjectPermisionActions';
 import { ProjectPermissionsLogButton } from './ProjectPermissionsLogButton';
 import { ProjectUsersBulkRemoveButton } from './ProjectUsersBulkRemoveButton';
 import { ProjectUsersListFilter } from './ProjectUsersListFilter';
 import { SyncMembersButton } from './SyncMembersButton';
+import { useTeamTableTabs } from './tabs';
 import { TeamDropdownActions } from './TeamDropdownActions';
+import { useRedirectCourseProjects } from './utils';
 
 const mandatoryFields = [
   // Required for actions
@@ -40,6 +45,15 @@ const mapStateToFilter = createSelector(
   },
 );
 
+const TeamSecondaryDropdownActions = ({ project, refetch }) => {
+  return (
+    <>
+      <SyncMembersButton project={project} refetch={refetch} />
+      <ProjectPermissionsLogButton projectId={project?.uuid} asDropdownItem />
+    </>
+  );
+};
+
 export const ProjectUsersList = ({
   hideTabs = false,
   project,
@@ -54,25 +68,34 @@ export const ProjectUsersList = ({
 
   const tableProps = useTable({
     table: 'project-users',
-    fetchData: createFetcher(`projects/${_project?.uuid}/list_users`),
+    fetchData: createFetcher(projectsListUsersList, {
+      path: { uuid: _project?.uuid },
+    }),
     queryField: 'search_string',
     filter,
     mandatoryFields,
   });
+
+  const tabs = useTeamTableTabs(_project);
+
+  useRedirectCourseProjects(_project);
 
   return (
     <TeamTableComponent<UserRoleDetails>
       {...tableProps}
       context="project"
       userFieldPrefix="user_"
-      tabs={!hideTabs && PROJECT_TEAM_TABLE_TABS}
+      tabs={!hideTabs && tabs}
       tableActions={
-        <>
-          <SyncMembersButton project={_project} refetch={tableProps.fetch} />
-          <ProjectPermissionsLogButton projectId={_project?.uuid} />
-          <TeamDropdownActions project={_project} refetch={tableProps.fetch} />
-        </>
+        <TeamDropdownActions project={_project} refetch={tableProps.fetch} />
       }
+      dropdownActions={
+        <TeamSecondaryDropdownActions
+          project={_project}
+          refetch={tableProps.fetch}
+        />
+      }
+      showExportInDropdown
       rowActions={({ row, fetch }) => (
         <ProjectPermisionActions
           row={row}

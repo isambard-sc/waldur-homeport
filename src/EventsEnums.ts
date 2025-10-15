@@ -22,6 +22,7 @@ export const CallEnum = {
 
 export const CreditsEnum = {
   allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
+  automatic_credit_adjustment: 'automatic_credit_adjustment',
   create_of_credit_by_staff: 'create_of_credit_by_staff',
   reduction_of_customer_credit: 'reduction_of_customer_credit',
   reduction_of_customer_credit_due_to_minimal_consumption: 'reduction_of_customer_credit_due_to_minimal_consumption',
@@ -37,9 +38,12 @@ export const CreditsEnum = {
 
 export const CustomersEnum = {
   allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
+  automatic_credit_adjustment: 'automatic_credit_adjustment',
   create_of_credit_by_staff: 'create_of_credit_by_staff',
   customer_creation_succeeded: 'customer_creation_succeeded',
   customer_deletion_succeeded: 'customer_deletion_succeeded',
+  customer_permission_review_closed: 'customer_permission_review_closed',
+  customer_permission_review_created: 'customer_permission_review_created',
   customer_update_succeeded: 'customer_update_succeeded',
   payment_added: 'payment_added',
   payment_removed: 'payment_removed',
@@ -57,6 +61,7 @@ export const CustomersEnum = {
 
 export const InvoicesEnum = {
   allowed_offerings_have_been_updated: 'allowed_offerings_have_been_updated',
+  automatic_credit_adjustment: 'automatic_credit_adjustment',
   create_of_credit_by_staff: 'create_of_credit_by_staff',
   invoice_canceled: 'invoice_canceled',
   invoice_created: 'invoice_created',
@@ -101,6 +106,8 @@ export const ProjectsEnum = {
   project_creation_succeeded: 'project_creation_succeeded',
   project_deletion_succeeded: 'project_deletion_succeeded',
   project_deletion_triggered: 'project_deletion_triggered',
+  project_permission_review_closed: 'project_permission_review_closed',
+  project_permission_review_created: 'project_permission_review_created',
   project_update_request_approved: 'project_update_request_approved',
   project_update_request_created: 'project_update_request_created',
   project_update_request_rejected: 'project_update_request_rejected',
@@ -277,6 +284,11 @@ export const SupportEnum = {
   issue_creation_succeeded: 'issue_creation_succeeded',
   issue_deletion_succeeded: 'issue_deletion_succeeded',
   issue_update_succeeded: 'issue_update_succeeded',
+};
+
+export const Terms_of_serviceEnum = {
+  terms_of_service_consent_granted: 'terms_of_service_consent_granted',
+  terms_of_service_consent_revoked: 'terms_of_service_consent_revoked',
 };
 
 export const UsersEnum = {

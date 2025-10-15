@@ -139,11 +139,14 @@ const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (props) => {
   const { periodic, oneTime } = useComponentsDetailPrices(props);
   const [selectedPeriod, setSelectedPeriod] = useState<PlanPeriod>('monthly');
 
-  const customer = useSelector(getCustomer);
+  const currentCustomer = useSelector(getCustomer);
+  const customer = props.customer || currentCustomer;
   const activeFixedPriceProfile =
     customer && getActiveFixedPricePaymentProfile(customer.payment_profiles);
 
-  const shouldConcealPrices = useSelector(concealPricesSelector);
+  const shouldConcealPrices =
+    useSelector(concealPricesSelector) ||
+    customer?.display_billing_info_in_projects === false;
 
   const activePriceIndex = useMemo(
     () => props.periodKeys.indexOf(selectedPeriod) ?? 0,
@@ -261,7 +264,7 @@ const PureDetailsTable: FunctionComponent<PlanDetailsTableProps> = (props) => {
                     <FixedRows
                       components={periodic.fixedRows}
                       hidePrices={Boolean(
-                        activeFixedPriceProfile && !shouldConcealPrices,
+                        activeFixedPriceProfile || shouldConcealPrices,
                       )}
                       period={selectedPeriod}
                       activePriceIndex={activePriceIndex}

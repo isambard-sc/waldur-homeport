@@ -1,8 +1,9 @@
 import { WarningCircleIcon } from '@phosphor-icons/react';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
+import { StringField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 
@@ -12,7 +13,7 @@ import { ConfirmationDialogType } from './types';
 interface ConfirmationDialogProps {
   resolve: {
     deferred: {
-      resolve: () => void;
+      resolve: (value?: any) => void;
       reject: () => void;
     };
     title: ReactNode;
@@ -22,7 +23,12 @@ interface ConfirmationDialogProps {
     positiveButton?: string;
     negativeButton?: string;
     positiveButtonVariant?: string;
+    onlyPositiveButton?: boolean;
     iconNode?: ReactNode;
+    showInput?: boolean;
+    inputRequired?: boolean;
+    inputLabel?: string;
+    inputPlaceholder?: string;
   };
 }
 
@@ -35,14 +41,23 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     positiveButton = translate('Yes'),
     negativeButton = translate('No'),
     positiveButtonVariant,
+    onlyPositiveButton,
     iconNode,
+    showInput = false,
+    inputRequired = false,
+    inputLabel,
+    inputPlaceholder,
   },
 }) => {
   const dispatch = useDispatch();
   const closeDialog = () => dispatch(closeModalDialog('HIDE_CONFIRM'));
+  const [inputValue, setInputValue] = useState('');
 
   const handleSubmit = () => {
-    deferred.resolve();
+    if (showInput && inputRequired && !inputValue.trim()) {
+      return;
+    }
+    deferred.resolve(showInput ? inputValue : undefined);
     closeDialog();
   };
 
@@ -59,24 +74,40 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       bodyClassName="text-gray-500 pt-2"
       footer={
         <>
-          <Button
-            variant="outline btn-outline-default"
-            className="flex-equal px-3"
-            onClick={handleCancel}
-          >
-            {negativeButton}
-          </Button>
+          {!onlyPositiveButton && (
+            <Button
+              variant="outline btn-outline-default"
+              className="flex-equal px-3"
+              onClick={handleCancel}
+            >
+              {negativeButton}
+            </Button>
+          )}
           <Button
             variant={positiveButtonVariant}
-            className="flex-equal px-3"
+            className={onlyPositiveButton ? undefined : 'flex-equal px-3'}
             onClick={handleSubmit}
+            disabled={showInput && inputRequired && !inputValue.trim()}
           >
             {positiveButton}
           </Button>
         </>
       }
     >
-      {body}
+      <div>
+        {body}
+        {showInput && (
+          <div className="mt-3">
+            <StringField
+              label={inputLabel}
+              placeholder={inputPlaceholder}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              required={inputRequired}
+            />
+          </div>
+        )}
+      </div>
     </ModalDialog>
   );
 };

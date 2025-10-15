@@ -9,6 +9,8 @@ import {
 
 import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { Offering, ServiceProvider } from '@waldur/marketplace/types';
 import { OFFERING_TYPE_CUSTOM_SCRIPTS } from '@waldur/marketplace-script/constants';
@@ -18,7 +20,7 @@ import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitte
 import { TENANT_TYPE } from '@waldur/openstack/constants';
 
 import {
-  allowToUpdateService,
+  getCredentialsForm,
   getPluginOptionsForm,
   getProvisioningConfigForm,
   getSecretOptionsForm,
@@ -29,7 +31,6 @@ import { ValidationIcon } from '../common/ValidationIcon';
 import { PROVIDER_OFFERING_DATA_QUERY_KEY } from './constants';
 import { getOfferingBreadcrumbItems } from './hooks';
 import { OfferingViewHero } from './OfferingViewHero';
-import { getServiceSettingsForm } from './update/integration/registry';
 import { SCRIPT_ROWS } from './update/integration/utils';
 
 const OverviewSection = lazyComponent(() =>
@@ -50,6 +51,11 @@ const LifecyclePolicySection = lazyComponent(() =>
 const UserManagementSection = lazyComponent(() =>
   import('./update/integration/UserManagementSection').then((module) => ({
     default: module.UserManagementSection,
+  })),
+);
+const TosManagementSection = lazyComponent(() =>
+  import('./update/tos/TosManagementSection').then((module) => ({
+    default: module.TosManagementSection,
   })),
 );
 const ProvisioningConfigSection = lazyComponent(() =>
@@ -133,13 +139,13 @@ const getTabs = (offering: Offering): PageBarTab[] => {
   ];
 
   // Integration
-  const ServiceSettingsForm = getServiceSettingsForm(offering.type);
+  const CredentialsForm = getCredentialsForm(offering.type);
   const SecretOptionsForm = getSecretOptionsForm(offering.type);
   const PluginOptionsForm = getPluginOptionsForm(offering.type);
   const provisioningConfigForm = getProvisioningConfigForm(offering.type);
 
   if (
-    ServiceSettingsForm ||
+    CredentialsForm ||
     SecretOptionsForm ||
     PluginOptionsForm ||
     provisioningConfigForm
@@ -162,7 +168,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
       ),
 
       children: [
-        ServiceSettingsForm && allowToUpdateService(offering.type)
+        CredentialsForm
           ? {
               key: 'credentials',
               component: CredentialsSection,
@@ -252,6 +258,11 @@ const getTabs = (offering: Offering): PageBarTab[] => {
       title: translate('Resource options'),
     },
     { key: 'roles', component: RolesSection, title: translate('Roles') },
+    isFeatureVisible(MarketplaceFeatures.display_user_tos) && {
+      key: 'tos_management',
+      component: TosManagementSection,
+      title: translate('ToS management'),
+    },
   );
 
   tabs.push({

@@ -1,6 +1,7 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
+import { marketplaceOfferingUsersList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
@@ -11,10 +12,12 @@ import { useTable } from '@waldur/table/useTable';
 
 import { OfferingUserRowActions } from '../offerings/actions/OfferingUserRowActions';
 import { UserImportButton } from '../offerings/import-users/UserImportButton';
+import { OfferingUserStateField } from '../OfferingUserStateField';
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 
 import { PROVIDER_OFFERING_USERS_FORM_ID } from './constants';
 import { CreateProviderOfferingUserButton } from './CreateProviderOfferingUserButton';
+import { OfferingUsersExpandableRow } from './OfferingUsersExpandableRow';
 import { ProviderOfferingUsersFilter } from './ProviderOfferingUsersFilter';
 
 export const ProviderOfferingUsersListComponent: FunctionComponent<{
@@ -23,19 +26,20 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
 }> = ({ provider, hasOrganizationColumn }) => {
   const filterValues = useSelector(
     getFormValues(PROVIDER_OFFERING_USERS_FORM_ID),
-  ) as { offering?; provider? };
+  ) as { offering?; provider?; state?: Array<{ value: any }> };
   const filter = useMemo(
     () => ({
       provider_uuid: hasOrganizationColumn
         ? filterValues?.provider?.customer_uuid
         : provider?.customer_uuid,
       offering_uuid: filterValues?.offering?.uuid,
+      state: filterValues?.state?.map((option) => option.value),
     }),
     [provider, filterValues],
   );
   const tableProps = useTable({
     table: 'marketplace-offering-users',
-    fetchData: createFetcher(`marketplace-offering-users`),
+    fetchData: createFetcher(marketplaceOfferingUsersList),
     filter,
     queryField: 'query',
   });
@@ -49,6 +53,14 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
             customer_name: row.customer_name,
             customer_uuid: row.customer_uuid,
           }),
+        },
+      ]
+    : [];
+  const stateColumn = provider
+    ? [
+        {
+          title: translate('Account state'),
+          render: OfferingUserStateField,
         },
       ]
     : [];
@@ -74,6 +86,7 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
       title: translate('User'),
       render: ({ row }) => row.user_full_name,
     },
+    ...stateColumn,
     {
       title: translate('External username'),
       render: ({ row }) => row.username || 'N/A',
@@ -105,7 +118,10 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
       tableActions={
         <>
           <UserImportButton refetch={tableProps.fetch} provider={provider} />
-          <CreateProviderOfferingUserButton refetch={tableProps.fetch} />
+          <CreateProviderOfferingUserButton
+            refetch={tableProps.fetch}
+            provider={provider}
+          />
         </>
       }
       rowActions={({ row }) => (
@@ -116,6 +132,7 @@ export const ProviderOfferingUsersListComponent: FunctionComponent<{
         />
       )}
       hasQuery={true}
+      expandableRow={provider ? OfferingUsersExpandableRow : undefined}
     />
   );
 };

@@ -282,6 +282,21 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-provider-maintenance',
+    parent: 'marketplace-provider',
+    url: 'maintenance/',
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderMaintenanceList').then((module) => ({
+        default: module.ProviderMaintenanceList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Maintenance'),
+      feature: MarketplaceFeatures.show_experimental_ui_components,
+    },
+  },
+
+  {
     name: 'provider-marketplace',
     abstract: true,
     parent: 'marketplace-provider',
@@ -449,8 +464,8 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-projects',
     url: 'marketplace-projects/',
     component: lazyComponent(() =>
-      import('@waldur/project/ProjectsList').then((module) => ({
-        default: module.ProjectsList,
+      import('@waldur/project/ProjectsListWithTabs').then((module) => ({
+        default: module.ProjectsListWithTabs,
       })),
     ),
     parent: 'organization',

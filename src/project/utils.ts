@@ -1,7 +1,9 @@
+import { GlobeSimpleIcon, GraduationCapIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import {
   invoiceItemsCostsList,
+  KindEnum,
   marketplaceProjectEstimatedCostPoliciesList,
   projectCreditsList,
 } from 'waldur-js-client';
@@ -15,9 +17,8 @@ import {
   getCreditChartAndOptions,
   getCostChartAndOptions,
 } from '@waldur/dashboard/utils';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { InvitationsFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
+import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { Project, User } from '@waldur/workspace/types';
@@ -155,20 +156,45 @@ export const canEditProject = (user: User, context: { customer?; project? }) =>
     projectId: context?.project?.uuid,
   });
 
-export const PROJECT_TEAM_TABLE_TABS = [
-  {
-    key: 'users',
-    title: translate('Active'),
-    state: 'project-users',
-  },
-  {
-    key: 'project-invitations',
-    title: translate('Invitations'),
-    state: 'project-invitations',
-  },
-  isFeatureVisible(InvitationsFeatures.show_service_accounts) && {
-    key: 'project-service-accounts',
-    title: translate('Service accounts'),
-    state: 'project-service-accounts',
-  },
-];
+export const userHasProjectPermission = (permission) => (state) => {
+  const user = state?.workspace?.user;
+  const projectId = state?.workspace?.project?.uuid;
+
+  return hasPermission(user, {
+    projectId,
+    permission,
+  });
+};
+
+export const projectKindOptions = (): Partial<
+  Record<KindEnum, { value: KindEnum; label; color; component }>
+> => {
+  const baseOptions = {
+    default: {
+      value: 'default' as KindEnum,
+      label: translate('Regular'),
+      color: 'default',
+      component: null,
+    },
+    course: {
+      value: 'course' as KindEnum,
+      label: translate('Course'),
+      color: 'warning',
+      component: GraduationCapIcon,
+    },
+  };
+
+  if (isExperimentalUiComponentsVisible()) {
+    return {
+      ...baseOptions,
+      public: {
+        value: 'public' as KindEnum,
+        label: translate('Public'),
+        color: 'blue',
+        component: GlobeSimpleIcon,
+      },
+    };
+  }
+
+  return baseOptions;
+};
