@@ -41,16 +41,25 @@ export function attachTransitions() {
           return;
         }
         return transition.router.stateService.target('profile-manage');
-      } catch (error) {
+      } catch (error: any) {
         // Debug logging for 401 error handling
         console.log('[Auth Debug] Route guard caught error:', {
           error,
           detailStatus: error?.detail?.status,
           responseStatus: error?.response?.status,
           detail: error?.detail,
+          handled401: error?._handled401,
           errorType: typeof error,
           errorKeys: error ? Object.keys(error) : null,
         });
+
+        // If the error has already been handled by the error interceptor, don't redirect to error page
+        if (error?._handled401) {
+          console.log('[Auth Debug] Error already handled by interceptor, allowing redirect to proceed');
+          // Return false to abort the transition - the interceptor has already called localLogout
+          // which will redirect to login
+          return false;
+        }
 
         // Check if it's a 401/authentication error in multiple possible formats:
         // 1. error.detail.status === 401 (from router errors)

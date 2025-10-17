@@ -106,6 +106,8 @@ client.interceptors.error.use((error, response) => {
       });
     }
     localLogout();
+    // Mark the error as a 401 that has been handled
+    (error as any)._handled401 = true;
   }
   return error;
 });
