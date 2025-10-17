@@ -44,10 +44,15 @@ export function initApiClient() {
 }
 
 client.interceptors.response.use((response) => {
+  console.log('[Auth Debug] Response interceptor called:', {
+    status: response?.status,
+    url: response?.url,
+  });
   if (
     response?.status === 401 &&
     response.url !== ENV.apiEndpoint + 'api-auth/password/'
   ) {
+    console.log('[Auth Debug] Response interceptor detected 401, calling localLogout');
     if (router.globals.transition) {
       const target = router.globals.transition.targetState();
       setRedirect({
@@ -71,10 +76,19 @@ client.interceptors.response.use((response) => {
 
 // Handle 401 errors (expired/invalid tokens) that are thrown as errors
 client.interceptors.error.use((error, response) => {
+  console.log('[Auth Debug] Error interceptor called:', {
+    error,
+    response,
+    responseStatus: response?.status,
+    responseUrl: response?.url,
+    errorType: typeof error,
+    errorKeys: error ? Object.keys(error) : null,
+  });
   if (
     response?.status === 401 &&
     response.url !== ENV.apiEndpoint + 'api-auth/password/'
   ) {
+    console.log('[Auth Debug] Error interceptor detected 401, calling localLogout');
     if (router.globals.transition) {
       const target = router.globals.transition.targetState();
       setRedirect({

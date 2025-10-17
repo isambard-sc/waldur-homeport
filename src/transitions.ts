@@ -41,7 +41,30 @@ export function attachTransitions() {
           return;
         }
         return transition.router.stateService.target('profile-manage');
-      } catch {
+      } catch (error) {
+        // Debug logging for 401 error handling
+        console.log('[Auth Debug] Route guard caught error:', {
+          error,
+          detailStatus: error?.detail?.status,
+          responseStatus: error?.response?.status,
+          errorType: typeof error,
+          errorKeys: error ? Object.keys(error) : null,
+        });
+
+        // If it's a 401 error (expired/invalid token), redirect to login instead of error page
+        if (error?.detail?.status === 401 || error?.response?.status === 401) {
+          console.log('[Auth Debug] Detected 401 error, redirecting to login', {
+            toState: transition.to().name,
+            toParams: transition.to().params,
+          });
+          setRedirect({
+            toState: transition.to().name,
+            toParams: transition.to().params,
+          });
+          AuthService.clearAuthCache();
+          return transition.router.stateService.target('login');
+        }
+        console.log('[Auth Debug] Non-401 error, redirecting to error page');
         return transition.router.stateService.target('errorPage.serverError');
       }
     },
