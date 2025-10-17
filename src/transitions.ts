@@ -42,20 +42,8 @@ export function attachTransitions() {
         }
         return transition.router.stateService.target('profile-manage');
       } catch (error: any) {
-        // Debug logging for 401 error handling
-        console.log('[Auth Debug] Route guard caught error:', {
-          error,
-          detailStatus: error?.detail?.status,
-          responseStatus: error?.response?.status,
-          detail: error?.detail,
-          handled401: error?._handled401,
-          errorType: typeof error,
-          errorKeys: error ? Object.keys(error) : null,
-        });
-
         // If the error has already been handled by the error interceptor, don't redirect to error page
         if (error?._handled401) {
-          console.log('[Auth Debug] Error already handled by interceptor, allowing redirect to proceed');
           // Return false to abort the transition - the interceptor has already called localLogout
           // which will redirect to login
           return false;
@@ -74,10 +62,6 @@ export function attachTransitions() {
             error.detail.includes('Not authenticated')));
 
         if (is401Error) {
-          console.log('[Auth Debug] Detected 401/auth error, redirecting to login', {
-            toState: transition.to().name,
-            toParams: transition.to().params,
-          });
           setRedirect({
             toState: transition.to().name,
             toParams: transition.to().params,
@@ -85,7 +69,6 @@ export function attachTransitions() {
           AuthService.clearAuthCache();
           return transition.router.stateService.target('login');
         }
-        console.log('[Auth Debug] Non-401 error, redirecting to error page');
         return transition.router.stateService.target('errorPage.serverError');
       }
     },
