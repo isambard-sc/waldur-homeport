@@ -47,13 +47,25 @@ export function attachTransitions() {
           error,
           detailStatus: error?.detail?.status,
           responseStatus: error?.response?.status,
+          detail: error?.detail,
           errorType: typeof error,
           errorKeys: error ? Object.keys(error) : null,
         });
 
-        // If it's a 401 error (expired/invalid token), redirect to login instead of error page
-        if (error?.detail?.status === 401 || error?.response?.status === 401) {
-          console.log('[Auth Debug] Detected 401 error, redirecting to login', {
+        // Check if it's a 401/authentication error in multiple possible formats:
+        // 1. error.detail.status === 401 (from router errors)
+        // 2. error.response.status === 401 (from HTTP errors)
+        // 3. error.detail === "Invalid token." (from API client errors)
+        const is401Error =
+          error?.detail?.status === 401 ||
+          error?.response?.status === 401 ||
+          (typeof error?.detail === 'string' &&
+           (error.detail.includes('Invalid token') ||
+            error.detail.includes('Authentication credentials') ||
+            error.detail.includes('Not authenticated')));
+
+        if (is401Error) {
+          console.log('[Auth Debug] Detected 401/auth error, redirecting to login', {
             toState: transition.to().name,
             toParams: transition.to().params,
           });
