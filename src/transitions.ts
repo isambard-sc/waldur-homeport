@@ -41,7 +41,34 @@ export function attachTransitions() {
           return;
         }
         return transition.router.stateService.target('profile-manage');
-      } catch {
+      } catch (error: any) {
+        // If the error has already been handled by the error interceptor, don't redirect to error page
+        if (error?._handled401) {
+          // Return false to abort the transition - the interceptor has already called localLogout
+          // which will redirect to login
+          return false;
+        }
+
+        // Check if it's a 401/authentication error in multiple possible formats:
+        // 1. error.detail.status === 401 (from router errors)
+        // 2. error.response.status === 401 (from HTTP errors)
+        // 3. error.detail === "Invalid token." (from API client errors)
+        const is401Error =
+          error?.detail?.status === 401 ||
+          error?.response?.status === 401 ||
+          (typeof error?.detail === 'string' &&
+           (error.detail.includes('Invalid token') ||
+            error.detail.includes('Authentication credentials') ||
+            error.detail.includes('Not authenticated')));
+
+        if (is401Error) {
+          setRedirect({
+            toState: transition.to().name,
+            toParams: transition.to().params,
+          });
+          AuthService.clearAuthCache();
+          return transition.router.stateService.target('login');
+        }
         return transition.router.stateService.target('errorPage.serverError');
       }
     },

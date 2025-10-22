@@ -6,8 +6,8 @@ import {
   KindEnum,
   marketplaceProjectEstimatedCostPoliciesList,
   projectCreditsList,
+  projectsRetrieve,
 } from 'waldur-js-client';
-
 import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { getCostPolicyActionOptions } from '@waldur/customer/cost-policies/utils';
 import { getLineChartOptions } from '@waldur/dashboard/chart';
@@ -197,4 +197,64 @@ export const projectKindOptions = (): Partial<
   }
 
   return baseOptions;
+};
+
+// Temporary API function to fetch project grace period data
+// This will be replaced once waldur-js-client is regenerated with grace period fields
+export interface ProjectGraceData {
+  end_date: string | null;
+  grace_period_days: number | null;
+  end_date_with_grace: string | null;
+  is_expired: boolean;
+  is_in_grace_period: boolean;
+}
+
+export async function getProjectGraceData(
+  projectUuid: string,
+): Promise<ProjectGraceData> {
+  const response = await projectsRetrieve({
+    path: {
+      uuid: projectUuid,
+    },
+  });
+
+  // The API returns the full project, but we only need the grace period fields
+  // Cast to any to access fields that aren't yet in the generated types
+  const data = response.data as any;
+
+  return {
+    end_date: data.end_date || null,
+    grace_period_days: data.grace_period_days || null,
+    end_date_with_grace: data.end_date_with_grace || null,
+    is_expired: data.is_expired || false,
+    is_in_grace_period: data.is_in_grace_period || false,
+  };
+}
+
+// Helper function to check if a project is currently in its grace period
+export function isProjectInGracePeriod(graceData: ProjectGraceData): boolean {
+  // Use the computed field from the backend API
+  return graceData.is_in_grace_period;
+}
+
+// Hook to fetch and check project grace period status
+export function useProjectGraceStatus(project: Project) {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['ProjectGraceData', project?.uuid],
+    queryFn: () => (project ? getProjectGraceData(project.uuid) : null),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const isInGracePeriod = useMemo(() => {
+    if (!data) return false;
+    return isProjectInGracePeriod(data);
+  }, [data]);
+
+  return {
+    graceData: data,
+    isInGracePeriod,
+    isLoading,
+    error,
+    refetch,
+  };
 };

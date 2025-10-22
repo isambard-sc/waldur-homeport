@@ -69,6 +69,35 @@ client.interceptors.response.use((response) => {
   return response;
 });
 
+// Handle 401 errors (expired/invalid tokens) that are thrown as errors
+client.interceptors.error.use((error, response) => {
+  if (
+    response?.status === 401 &&
+    response.url !== ENV.apiEndpoint + 'api-auth/password/'
+  ) {
+    if (router.globals.transition) {
+      const target = router.globals.transition.targetState();
+      setRedirect({
+        toState: target.name(),
+        toParams: target.params(),
+      });
+    } else if (router.globals.$current.name === 'login') {
+      setRedirect(router.globals.params as any);
+    } else if (router.globals.$current.name) {
+      setRedirect({
+        toState: router.globals.$current.name,
+        toParams: router.globals.params
+          ? cleanObject(router.globals.params)
+          : undefined,
+      });
+    }
+    localLogout();
+    // Mark the error as a 401 that has been handled
+    (error as any)._handled401 = true;
+  }
+  return error;
+});
+
 export const getIconUrl = (name: string) =>
   `${ENV.apiEndpoint}api/icons/${name}/`;
 
