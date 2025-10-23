@@ -140,7 +140,7 @@ const PermissionLayout: FC<PropsWithChildren> = ({ children }) => {
           ) &&
           !user.permissions.find(
             (permission) =>
-              permission.scope_uuid === project.customer_uuid &&
+              permission.scope_uuid === project?.customer_uuid &&
               permission.scope_type === 'customer',
           )
         ) {
