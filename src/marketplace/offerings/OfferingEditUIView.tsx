@@ -226,43 +226,45 @@ const getTabs = (offering: Offering): PageBarTab[] => {
   }
 
   tabs.push(
-    {
-      key: 'public_information',
-      title: translate('Public information'),
-      children: [
-        {
-          key: 'endpoints',
-          component: OfferingEndpointsSection,
-          title: translate('Endpoints'),
-        },
-        {
-          key: 'category',
-          component: AttributesSection,
-          title: translate('Category'),
-        },
-        {
-          key: 'images',
-          component: OfferingImagesList,
-          title: translate('Images'),
-        },
-      ],
-    },
-    {
-      key: 'options',
-      component: OfferingOptionsSection,
-      title: translate('User input'),
-    },
-    {
-      key: 'resource_options',
-      component: OfferingResourceOptionsSection,
-      title: translate('Resource options'),
-    },
-    { key: 'roles', component: RolesSection, title: translate('Roles') },
-    isFeatureVisible(MarketplaceFeatures.display_user_tos) && {
-      key: 'tos_management',
-      component: TosManagementSection,
-      title: translate('ToS management'),
-    },
+    ...[
+      {
+        key: 'public_information',
+        title: translate('Public information'),
+        children: [
+          {
+            key: 'endpoints',
+            component: OfferingEndpointsSection,
+            title: translate('Endpoints'),
+          },
+          {
+            key: 'category',
+            component: AttributesSection,
+            title: translate('Category'),
+          },
+          {
+            key: 'images',
+            component: OfferingImagesList,
+            title: translate('Images'),
+          },
+        ],
+      },
+      {
+        key: 'options',
+        component: OfferingOptionsSection,
+        title: translate('User input'),
+      },
+      {
+        key: 'resource_options',
+        component: OfferingResourceOptionsSection,
+        title: translate('Resource options'),
+      },
+      { key: 'roles', component: RolesSection, title: translate('Roles') },
+      isFeatureVisible(MarketplaceFeatures.display_user_tos) && {
+        key: 'tos_management',
+        component: TosManagementSection,
+        title: translate('ToS management'),
+      },
+    ].filter(Boolean),
   );
 
   tabs.push({
@@ -328,7 +330,7 @@ export const OfferingEditUIView = ({
       data?.offering && plugins
         ? plugins.data.find(
             (plugin) => plugin.offering_type === data.offering.type,
-          ).components
+          )?.components || []
         : [],
     [plugins, data?.offering],
   );
