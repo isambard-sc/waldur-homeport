@@ -97,6 +97,7 @@ export const ProposalSubmissionStep: FC<{
           path: { uuid: proposal_uuid },
           body: formData,
         });
+        // Files are now uploaded automatically when selected, so we only upload if there are pending files
         await attachDocuments(proposal_uuid, formData.supporting_documentation);
         dispatch(showSuccess(translate('Proposal updated successfully')));
         // clear formData.supporting_documentation from redux-form store to prevent file upload on next submit/switchToTeam

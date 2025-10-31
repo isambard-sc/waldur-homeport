@@ -202,7 +202,10 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         tooltipEnd
         required
       >
-        <UploadDocumentationFiles proposal={props.params.proposal} />
+        <UploadDocumentationFiles
+          proposal={props.params.proposal}
+          refetch={props.params.refetch}
+        />
       </Field>
       <FieldReviewComments
         reviews={reviews}
