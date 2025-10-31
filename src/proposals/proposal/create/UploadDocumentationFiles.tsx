@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   proposalProposalsAttachDocument,
+  proposalProposalsDetachDocument,
   ProposalDocumentation,
 } from 'waldur-js-client';
 
@@ -10,7 +11,7 @@ import { ACCEPTED_FILE_TYPES } from '@waldur/core/constants';
 import { UploadContainer } from '@waldur/form/upload/UploadContainer';
 import { translate } from '@waldur/i18n';
 import { waitForConfirmation } from '@waldur/modal/actions';
-import { showError, showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { DocumentationFiles } from './DocumentationFiles';
 
@@ -74,26 +75,18 @@ export const UploadDocumentationFiles = (props) => {
 
       setDeletingFileUrl(file.file);
 
-      // TODO: Backend endpoint needs to be implemented
-      // The backend should provide an endpoint like:
-      // DELETE /api/proposal-proposals/{uuid}/detach_document/
-      // Request body: { file_url: string } or { file_name: string }
-      //
-      // Once the backend endpoint is available, replace this with:
-      // await proposalProposalsDetachDocument({
-      //   path: { uuid: props.proposal.uuid },
-      //   body: { file: file.file },
-      // });
-
       try {
-        // Temporary: Show error message that backend is not implemented yet
-        dispatch(
-          showError(
-            translate(
-              'File deletion is not yet available. Please contact support to remove this file.',
-            ),
-          ),
-        );
+        await proposalProposalsDetachDocument({
+          path: { uuid: props.proposal.uuid },
+          body: { file: file.file },
+        });
+
+        // Refresh the proposal data to show the updated file list
+        if (props.refetch) {
+          await props.refetch();
+        }
+
+        dispatch(showSuccess(translate('File deleted successfully')));
       } catch (error) {
         dispatch(
           showErrorResponse(error, translate('Failed to delete file')),
