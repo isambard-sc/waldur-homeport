@@ -1,5 +1,7 @@
+import { FC } from 'react';
 import { ProposalDocumentation } from 'waldur-js-client';
 
+import { AttachmentItem } from '@waldur/form/upload/AttachmentItem';
 import { AttachmentItemPending } from '@waldur/form/upload/AttachmentItemPending';
 import { AttachmentsList } from '@waldur/form/upload/AttachmentsList';
 
@@ -7,9 +9,12 @@ interface DocumentationFilesProps {
   files: Array<ProposalDocumentation>;
   pending?: FileList;
   onChange?(value): void;
+  onDelete?(file: ProposalDocumentation): void;
+  isDraft?: boolean;
+  deletingFileUrl?: string;
 }
 
-export const DocumentationFiles = (props: DocumentationFilesProps) =>
+export const DocumentationFiles: FC<DocumentationFilesProps> = (props) =>
   props.files?.length > 0 || props.pending?.length > 0 ? (
     <AttachmentsList
       attachments={
@@ -30,6 +35,19 @@ export const DocumentationFiles = (props: DocumentationFilesProps) =>
           key: file.size,
           file,
         }))
+      }
+      ItemComponent={
+        props.isDraft && props.onDelete
+          ? (itemProps) => (
+              <AttachmentItem
+                {...itemProps}
+                onDelete={() => props.onDelete(itemProps.attachment)}
+                isDeleting={
+                  props.deletingFileUrl === itemProps.attachment.file
+                }
+              />
+            )
+          : undefined
       }
       ItemPendingComponent={(itemProps) => (
         <AttachmentItemPending

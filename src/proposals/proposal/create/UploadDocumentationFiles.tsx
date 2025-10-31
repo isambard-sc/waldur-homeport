@@ -1,17 +1,22 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { proposalProposalsAttachDocument } from 'waldur-js-client';
+import {
+  proposalProposalsAttachDocument,
+  ProposalDocumentation,
+} from 'waldur-js-client';
 
 import { formDataOptions } from '@waldur/core/api';
 import { ACCEPTED_FILE_TYPES } from '@waldur/core/constants';
 import { UploadContainer } from '@waldur/form/upload/UploadContainer';
 import { translate } from '@waldur/i18n';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { waitForConfirmation } from '@waldur/modal/actions';
+import { showError, showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 import { DocumentationFiles } from './DocumentationFiles';
 
 export const UploadDocumentationFiles = (props) => {
   const dispatch = useDispatch();
+  const [deletingFileUrl, setDeletingFileUrl] = useState<string | null>(null);
 
   const handleFileDrop = useCallback(
     async (files: File[]) => {
@@ -39,9 +44,7 @@ export const UploadDocumentationFiles = (props) => {
         }
 
         dispatch(
-          showSuccess(
-            translate('File(s) uploaded successfully'),
-          ),
+          showSuccess(translate('File(s) uploaded successfully')),
         );
       } catch (error) {
         // Clear pending files on error
@@ -52,6 +55,54 @@ export const UploadDocumentationFiles = (props) => {
       }
     },
     [props.proposal.uuid, props.input, props.refetch, dispatch],
+  );
+
+  const handleDeleteFile = useCallback(
+    async (file: ProposalDocumentation) => {
+      // Show confirmation dialog
+      try {
+        await waitForConfirmation(
+          dispatch,
+          translate('Delete file'),
+          translate('Are you sure you want to delete {fileName}?', {
+            fileName: file.file_name,
+          }),
+        );
+      } catch {
+        return; // User cancelled
+      }
+
+      setDeletingFileUrl(file.file);
+
+      // TODO: Backend endpoint needs to be implemented
+      // The backend should provide an endpoint like:
+      // DELETE /api/proposal-proposals/{uuid}/detach_document/
+      // Request body: { file_url: string } or { file_name: string }
+      //
+      // Once the backend endpoint is available, replace this with:
+      // await proposalProposalsDetachDocument({
+      //   path: { uuid: props.proposal.uuid },
+      //   body: { file: file.file },
+      // });
+
+      try {
+        // Temporary: Show error message that backend is not implemented yet
+        dispatch(
+          showError(
+            translate(
+              'File deletion is not yet available. Please contact support to remove this file.',
+            ),
+          ),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(error, translate('Failed to delete file')),
+        );
+      } finally {
+        setDeletingFileUrl(null);
+      }
+    },
+    [props.proposal.uuid, props.refetch, dispatch],
   );
 
   return (
@@ -72,6 +123,9 @@ export const UploadDocumentationFiles = (props) => {
         files={props.proposal.supporting_documentation}
         pending={props.input.value}
         onChange={props.input.onChange}
+        onDelete={handleDeleteFile}
+        isDraft={props.proposal.state === 'draft'}
+        deletingFileUrl={deletingFileUrl}
       />
     </>
   );
