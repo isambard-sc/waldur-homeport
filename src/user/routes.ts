@@ -33,6 +33,7 @@ export const states: StateDeclaration[] = [
     component: UIView,
     url: '',
     data: {
+      feature: UserFeatures.credentials,
       breadcrumb: () => translate('Credentials'),
       priority: 110,
     },
@@ -180,6 +181,7 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
+      feature: UserFeatures.permission_requests,
       breadcrumb: () => translate('Permission requests'),
       priority: 130,
     },

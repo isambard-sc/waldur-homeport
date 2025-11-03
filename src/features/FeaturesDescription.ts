@@ -227,12 +227,20 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('User workspace'),
     items: [
       {
+        key: 'credentials',
+        description: translate('Enable credentials management (SSH keys, API tokens, etc.) in user workspace.'),
+      },
+      {
         key: 'disable_user_termination',
         description: translate('Disable user termination in user workspace.'),
       },
       {
         key: 'notifications',
         description: translate('Enable email and webhook notifications management in user workspace.'),
+      },
+      {
+        key: 'permission_requests',
+        description: translate('Enable permission requests management in user workspace.'),
       },
       {
         key: 'preferred_language',

@@ -70,8 +70,10 @@ export enum SupportFeatures {
 }
 
 export enum UserFeatures {
+  credentials = 'user.credentials',
   disable_user_termination = 'user.disable_user_termination',
   notifications = 'user.notifications',
+  permission_requests = 'user.permission_requests',
   preferred_language = 'user.preferred_language',
   show_slug = 'user.show_slug',
   show_username = 'user.show_username',
