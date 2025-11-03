@@ -22,6 +22,22 @@ export const UnifiedSidebar = () => {
   const { state, params } = useCurrentStateAndParams();
   const themeFeatures = useThemeFeatures();
 
+  const hasOrganizations =
+    user?.is_staff ||
+    user?.is_support ||
+    user?.permissions?.some((permission) => permission.scope_type === 'customer');
+  const hasProjects =
+    user?.is_staff ||
+    user?.is_support ||
+    user?.permissions?.some((permission) => permission.scope_type === 'project');
+  const hasResources =
+    user?.is_staff ||
+    user?.is_support ||
+    user?.permissions?.some(
+      (permission) =>
+        permission.scope_type === 'customer' || permission.scope_type === 'project',
+    );
+
   useEffect(() => {
     MenuComponent.reinitialization();
     const menuElement = document.querySelector('#kt_aside_menu');
@@ -66,9 +82,9 @@ export const UnifiedSidebar = () => {
       {themeFeatures.ShowMarketplaceTrigger && (user.is_staff || user.permissions?.length !== 0) ? (
         <MarketplaceTrigger />
       ) : null}
-      <OrganizationsListMenu />
-      <ProjectsListMenu />
-      <ResourcesMenu user={user} />
+      {hasOrganizations ? <OrganizationsListMenu /> : null}
+      {hasProjects ? <ProjectsListMenu /> : null}
+      {hasResources ? <ResourcesMenu user={user} /> : null}
       <ReportingMenu />
       <CallPublicMenu />
       {themeFeatures.ShowSidebarMarketPlace ? (

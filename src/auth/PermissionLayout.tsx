@@ -207,20 +207,6 @@ const PermissionLayout: FC<PropsWithChildren> = ({ children }) => {
         } else {
           setHasPermissionView(false);
         }
-      } else if (
-        user.permissions.filter((permission) =>
-          ['customer', 'project'].includes(permission.scope_type),
-        ).length === 0 &&
-        state.name === 'profile.details'
-      ) {
-        setPermission('limited');
-        setBanner({
-          title: translate('No association'),
-          message: translate(
-            'Your account is not part of any organization. Your view will be restricted.',
-          ),
-        });
-        setHasPermissionView(true);
       } else {
         setHasPermissionView(false);
       }
