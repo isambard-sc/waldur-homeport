@@ -8,6 +8,8 @@ import { RoleDetails } from 'waldur-js-client';
 import { post } from '@waldur/core/api';
 import { required } from '@waldur/core/validators';
 import { usersAutocomplete } from '@waldur/customer/team/utils';
+import { UserFeatures } from '@waldur/FeaturesEnums';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { FormContainer, SubmitButton } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { translate } from '@waldur/i18n';
@@ -162,12 +164,14 @@ export const AddUserDialog = reduxForm<
             getOptionLabel={getOptionLabel}
             components={{
               Option: UserListOptionInline,
-              Menu: (props) => (
-                <MenuWithCreateButton
-                  {...props}
-                  openCreateDialog={openCreateUserDialog}
-                />
-              ),
+              ...(isFeatureVisible(UserFeatures.allow_user_creation) && {
+                Menu: (props) => (
+                  <MenuWithCreateButton
+                    {...props}
+                    openCreateDialog={openCreateUserDialog}
+                  />
+                ),
+              }),
             }}
             required={true}
             validate={[required]}

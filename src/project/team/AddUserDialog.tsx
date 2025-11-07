@@ -21,6 +21,8 @@ import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { required } from '@waldur/core/validators';
 import { OrganizationProjectSelectField } from '@waldur/customer/team/OrganizationProjectSelectField';
 import { usersAutocomplete } from '@waldur/customer/team/utils';
+import { UserFeatures } from '@waldur/FeaturesEnums';
+import { isFeatureVisible } from '@waldur/features/connect';
 import { FormContainer } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
@@ -333,12 +335,14 @@ export const AddUserDialog = reduxForm<
             getOptionLabel={getOptionLabel}
             components={{
               Option: UserListOptionInline,
-              Menu: (props) => (
-                <MenuWithCreateButton
-                  {...props}
-                  openCreateDialog={openCreateUserDialog}
-                />
-              ),
+              ...(isFeatureVisible(UserFeatures.allow_user_creation) && {
+                Menu: (props) => (
+                  <MenuWithCreateButton
+                    {...props}
+                    openCreateDialog={openCreateUserDialog}
+                  />
+                ),
+              }),
             }}
             required={true}
             validate={[required]}
