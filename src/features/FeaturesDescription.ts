@@ -27,6 +27,10 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('Waldur deployment settings'),
     items: [
       {
+        key: 'application_portal_only',
+        description: translate('Configure Waldur to function as an application and awards portal only.'),
+      },
+      {
         key: 'enable_cookie_notice',
         description: translate('Enable cookie notice in marketplace.'),
       },
@@ -95,12 +99,12 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Enabled display of call management functionality.'),
       },
       {
-        key: 'show_remote_project_functionality',
-        description: translate('Enabled display of remote project functionality.'),
-      },
-      {
         key: 'show_experimental_ui_components',
         description: translate('Enabled display of experimental or mocked components in marketplace.'),
+      },
+      {
+        key: 'show_managed_projects',
+        description: translate('Allows to show managed (openportal) remote projects in organization.'),
       },
       {
         key: 'show_resource_end_date',
@@ -227,12 +231,20 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('User workspace'),
     items: [
       {
+        key: 'allow_user_creation',
+        description: translate('Allow users to create new user accounts when adding team members to projects and proposals.'),
+      },
+      {
         key: 'credentials',
         description: translate('Enable credentials management (SSH keys, API tokens, etc.) in user workspace.'),
       },
       {
         key: 'disable_user_termination',
         description: translate('Disable user termination in user workspace.'),
+      },
+      {
+        key: 'minimal_user_profile',
+        description: translate('Show and allow editing of minimal set of user profile fields (e.g. just name and email).'),
       },
       {
         key: 'notifications',
@@ -261,4 +273,3 @@ export const FeaturesDescription: FeatureSection[] = [
     ],
   },
 ];
-

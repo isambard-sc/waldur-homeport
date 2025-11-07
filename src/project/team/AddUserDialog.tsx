@@ -1,4 +1,6 @@
-import { UserPlusIcon } from '@phosphor-icons/react';
+import { PlusIcon, UserPlusIcon } from '@phosphor-icons/react';
+import { useState } from 'react';
+import { components } from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
 import { formValueSelector, reduxForm } from 'redux-form';
 import {
@@ -23,12 +25,13 @@ import { FormContainer } from '@waldur/form';
 import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
 import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
+import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { Role, RoleType } from '@waldur/permissions/types';
+import { CreateUserDialog } from '@waldur/proposals/team/CreateUserDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { type RootState } from '@waldur/store/reducers';
 import { getCurrentUser } from '@waldur/user/UsersService';
@@ -107,13 +110,47 @@ const showAllUsersSelector = (state: RootState) =>
 const roleSelector = (state: RootState) =>
   formValueSelector(FORM_ID)(state, 'role');
 
+// Custom Menu component with "Create user" button
+const MenuWithCreateButton = ({ openCreateDialog, ...props }) => {
+  return (
+    <>
+      <components.Menu {...props}>
+        <div>
+          {props.children}
+          <div
+            style={{
+              borderTop: '1px solid #e0e0e0',
+              padding: '8px 12px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: '#009ef7',
+              fontWeight: 500,
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              openCreateDialog();
+            }}
+          >
+            <PlusIcon size={16} weight="bold" />
+            <span>{translate('Create user')}</span>
+          </div>
+        </div>
+      </components.Menu>
+    </>
+  );
+};
+
 export const AddUserDialog = reduxForm<
   AddUserDialogFormData,
   AddUserDialogProps
 >({
   form: FORM_ID,
-})(({ submitting, handleSubmit, refetch, invalid, level, title }) => {
+})(({ submitting, handleSubmit, refetch, invalid, level, title, change }) => {
   const dispatch = useDispatch();
+  const [selectKey, setSelectKey] = useState(0);
 
   const currentUser = useUser() as User;
   const currentProject = useSelector(getProject);
@@ -155,6 +192,29 @@ export const AddUserDialog = reduxForm<
     option.email
       ? (option.full_name || option.username) + ` (${option.email})`
       : option.full_name || option.username;
+
+  const handleUserCreated = (user: any) => {
+    // Set the newly created user in the form
+    change('user', user);
+    // Force re-render of the select component
+    setSelectKey((prev) => prev + 1);
+    // Close only the CreateUserDialog (HIDE_CONFIRM), not the AddUserDialog
+    dispatch(closeModalDialog('HIDE_CONFIRM'));
+  };
+
+  const openCreateUserDialog = () => {
+    // Use SHOW_CONFIRM type to overlay on top of current modal
+    // This prevents closing the AddUserDialog when CreateUserDialog opens
+    dispatch(
+      openModalDialog(
+        CreateUserDialog,
+        {
+          onUserCreated: handleUserCreated,
+        },
+        'SHOW_CONFIRM',
+      ),
+    );
+  };
 
   const saveUser = async (formData: AddUserDialogFormData) => {
     if (formData.role.content_type === 'project') {
@@ -261,13 +321,25 @@ export const AddUserDialog = reduxForm<
         <FormContainer submitting={submitting}>
           <AsyncSelectField
             name="user"
-            key={showAllUsers ? 'showAllUsers' : 'notShowAllUsers'}
+            key={
+              showAllUsers
+                ? `showAllUsers-${selectKey}`
+                : `notShowAllUsers-${selectKey}`
+            }
             label={translate('User')}
             placeholder={translate('Select user...')}
             loadOptions={loadUsers}
             getOptionValue={(option) => option.uuid}
             getOptionLabel={getOptionLabel}
-            components={{ Option: UserListOptionInline }}
+            components={{
+              Option: UserListOptionInline,
+              Menu: (props) => (
+                <MenuWithCreateButton
+                  {...props}
+                  openCreateDialog={openCreateUserDialog}
+                />
+              ),
+            }}
             required={true}
             validate={[required]}
           />

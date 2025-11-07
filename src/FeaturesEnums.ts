@@ -8,6 +8,7 @@ export enum CustomerFeatures {
 }
 
 export enum DeploymentFeatures {
+  application_portal_only = 'deployment.application_portal_only',
   enable_cookie_notice = 'deployment.enable_cookie_notice',
   send_metrics = 'deployment.send_metrics',
 }
@@ -28,8 +29,8 @@ export enum MarketplaceFeatures {
   import_resources = 'marketplace.import_resources',
   lexis_links = 'marketplace.lexis_links',
   show_call_management_functionality = 'marketplace.show_call_management_functionality',
-  show_remote_project_functionality = 'marketplace.show_remote_project_functionality',
   show_experimental_ui_components = 'marketplace.show_experimental_ui_components',
+  show_managed_projects = 'marketplace.show_managed_projects',
   show_resource_end_date = 'marketplace.show_resource_end_date',
 }
 
@@ -70,8 +71,10 @@ export enum SupportFeatures {
 }
 
 export enum UserFeatures {
+  allow_user_creation = 'user.allow_user_creation',
   credentials = 'user.credentials',
   disable_user_termination = 'user.disable_user_termination',
+  minimal_user_profile = 'user.minimal_user_profile',
   notifications = 'user.notifications',
   permission_requests = 'user.permission_requests',
   preferred_language = 'user.preferred_language',
