@@ -341,7 +341,7 @@ export const states: StateDeclaration[] = [
     component: UIView,
     url: '',
     data: {
-      //feature: MarketplaceFeatures.show_remote_project_functionality,
+      feature: MarketplaceFeatures.show_managed_projects,
       breadcrumb: () => translate('Managed projects'),
       priority: 150,
     },

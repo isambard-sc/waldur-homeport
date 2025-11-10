@@ -1,10 +1,12 @@
 import { EnvelopeIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
+import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
 import { email, required } from '@waldur/core/validators';
 import { FormContainer, StringField, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
@@ -29,6 +31,7 @@ export const CreateUserDialog: FunctionComponent<any> = reduxForm<
 >({
   form: FORM_ID,
 })(({ submitting, handleSubmit, invalid, onUserCreated }) => {
+  const dispatch = useDispatch();
   const { showSuccess, showErrorResponse } = useNotify();
 
   const createUser = async (formData: CreateUserDialogFormData) => {
@@ -43,6 +46,8 @@ export const CreateUserDialog: FunctionComponent<any> = reduxForm<
       // Call the callback with the created user
       onUserCreated(user);
       showSuccess(translate('User has been created.'));
+      // Close the CreateUserDialog (HIDE_CONFIRM)
+      dispatch(closeModalDialog('HIDE_CONFIRM'));
     } catch (error) {
       showErrorResponse(error, translate('Unable to create user.'));
     }

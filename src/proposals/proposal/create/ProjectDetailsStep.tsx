@@ -62,8 +62,8 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
       <Field
         name="name"
         component={FormGroup}
-        label={translate('Name')}
-        placeholder={translate('Enter a name...')}
+        label={translate('Project title')}
+        placeholder={translate('Enter a project title...')}
         tooltip={translate(
           'Short title for the project, which explains the project goal as much as possible.',
         )}
@@ -82,9 +82,9 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         name="project_summary"
         component={FormGroup}
         maxLength={1000}
-        label={translate('Summary')}
-        placeholder={translate('Enter a summary...')}
-        tooltip={translate('Brief description of the project.')}
+        label={translate('Summary (public)')}
+        placeholder={translate('Enter a summary that will be shown to anyone interested in your project...')}
+        tooltip={translate('Brief summary of the project.')}
         tooltipEnd
         validate={required}
         required
@@ -100,10 +100,10 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
         name="description"
         component={FormGroup}
         maxLength={1000}
-        label={translate('Description')}
-        placeholder={translate('Enter a description...')}
+        label={translate('Description (private)')}
+        placeholder={translate('Enter a description that will help the reviewers understand the project better...')}
         tooltip={translate(
-          'Explanation of the scientific case of the project for which the resources are intended to be used.',
+          'Explanation of what the resources will be used to research.',
         )}
         tooltipEnd
       >
