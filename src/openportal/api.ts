@@ -1,6 +1,6 @@
 
 import { ENV } from '@waldur/core/config';
-import { getToken } from '@waldur/auth/TokenStorage';
+import { AuthTokenStorage } from '@waldur/core/StorageManager';
 import { client } from 'waldur-js-client/client.gen';
 
 
@@ -16,7 +16,7 @@ export async function post(endpoint: string, data?: object) {
         body: data ? JSON.stringify(data) : undefined,
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Token ${getToken()}`,
+            Authorization: `Token ${AuthTokenStorage.get()}`,
         },
     });
 
@@ -39,7 +39,7 @@ export async function put(endpoint: string, data?: object) {
         body: data ? JSON.stringify(data) : undefined,
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Token ${getToken()}`,
+            Authorization: `Token ${AuthTokenStorage.get()}`,
         },
     });
 
@@ -62,7 +62,7 @@ export async function patch(endpoint: string, data?: object) {
         body: data ? JSON.stringify(data) : undefined,
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Token ${getToken()}`,
+            Authorization: `Token ${AuthTokenStorage.get()}`,
         },
     });
 
