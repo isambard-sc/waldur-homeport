@@ -1,5 +1,6 @@
 import { EnvelopeIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
+import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { reduxForm } from 'redux-form';
 
@@ -7,7 +8,6 @@ import { email, required } from '@waldur/core/validators';
 import { FormContainer, StringField, SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
 
@@ -64,7 +64,13 @@ export const CreateUserDialog: FunctionComponent<any> = reduxForm<
         iconColor="primary"
         footer={
           <>
-            <CloseDialogButton className="min-w-125px" />
+            <Button
+              className="min-w-125px"
+              onClick={() => dispatch(closeModalDialog('HIDE_CONFIRM'))}
+              variant="tertiary"
+            >
+              {translate('Cancel')}
+            </Button>
             <SubmitButton
               label={translate('Create')}
               submitting={submitting}
