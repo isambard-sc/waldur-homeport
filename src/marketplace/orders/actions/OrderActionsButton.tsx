@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { OrderDetails } from 'waldur-js-client';
+import { OrderDetails, PublicOfferingDetails } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { PermissionEnum } from '@waldur/permissions/enums';
@@ -15,13 +15,16 @@ import { getUser } from '@waldur/workspace/selectors';
 import { CancelOrderButton } from '../details/CancelOrderButton';
 
 import { ApproveByProviderButton } from './ApproveByProviderButton';
+import { MarkAsDoneButton } from './MarkAsDoneButton';
 import { OrderConsumerActions } from './OrderConsumerActions';
 
 export const OrderActionsButton = ({
   order,
+  offering,
   loadData,
 }: {
   order: OrderDetails;
+  offering: PublicOfferingDetails;
   loadData;
 }) => {
   const user = useSelector(getUser);
@@ -52,17 +55,31 @@ export const OrderActionsButton = ({
     );
   }, [order, user]);
 
+  const showMarkAsDoneButton = useMemo(() => {
+    return (
+      order.state === 'executing' &&
+      hasPermission(user, {
+        permission: PermissionEnum.APPROVE_ORDER,
+        customerId: order.provider_uuid,
+      })
+    );
+  }, [order, user]);
+
   return showCancelButton ||
     showApproveByProviderButton ||
+    showMarkAsDoneButton ||
     order.state === 'pending-consumer' ? (
     <ActionsDropdownComponent label={translate('Actions')} labeled={true}>
       {showApproveByProviderButton && (
         <ApproveByProviderButton row={order} refetch={loadData} />
       )}
+      {showMarkAsDoneButton && (
+        <MarkAsDoneButton row={order} refetch={loadData} />
+      )}
       {showCancelButton && (
         <CancelOrderButton uuid={order.uuid} loadData={loadData} />
       )}
-      <OrderConsumerActions order={order} />
+      <OrderConsumerActions order={order} offering={offering} />
     </ActionsDropdownComponent>
   ) : null;
 };

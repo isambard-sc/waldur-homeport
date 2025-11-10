@@ -166,10 +166,36 @@ Build artifact:
       - dist/
     expire_in: 1 week
 
-Publish latest multiarch docker image:
-  extends: .Publish multiarch latest docker image template
+Publish latest docker image:
+  stage: release
+  interruptible: true
+  image:
+    name: quay.io/containers/buildah:latest
+    entrypoint: [""]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   variables:
-    EXTRA_BUILD_ARGS: "--build-arg COMMIT_INFO=${CI_COMMIT_SHA} --build-arg VERSION=latest"
+    BUILDAH_FORMAT: docker
+    BUILDAH_ISOLATION: chroot
+    DOCKER_HUB_REGISTRY: "docker.io"
+    IMAGE_TAG: "opennode/waldur-homeport:latest"
+  before_script:
+    - echo "[+] Build and publish latest docker image for ${CI_DEFAULT_BRANCH} branch"
+    # Log in to Docker Hub
+    - echo "${WALDUR_DOCKER_HUB_PASSWORD}" | buildah login -u "${WALDUR_DOCKER_HUB_USER}" --password-stdin "${DOCKER_HUB_REGISTRY}"
+  script:
+    - echo "[+] Building image ${IMAGE_TAG}"
+    - |
+      buildah bud \
+        --build-arg DOCKER_REGISTRY="${DOCKER_REGISTRY}" \
+        --build-arg COMMIT_INFO="${CI_COMMIT_SHA}" \
+        --build-arg VERSION="latest" \
+        -t "${IMAGE_TAG}" \
+        -f "${CI_PROJECT_DIR}/Dockerfile" \
+        "${CI_PROJECT_DIR}"
+    - buildah push "${IMAGE_TAG}" "docker://${IMAGE_TAG}"
 
 Publish multiarch docker image with specific version:
   extends: .Publish multiarch docker image with specific version template
@@ -252,28 +278,6 @@ Generate Codebase SBOM:
   artifacts:
     paths:
       - waldur-homeport-${CI_COMMIT_TAG}-source.cyclonedx.tar.gz
-
-
-Update UI developer docs:
-  stage: build
-  interruptible: true
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "develop"'
-  image:
-    name: registry.hpc.ut.ee/mirror/alpine/git:latest
-    entrypoint: [""]
-  script:
-    - cd /tmp/
-    - git clone "https://homeport-token:$DOCS_TOKEN@$CI_SERVER_HOST/waldur/waldur-docs.git"
-    - git config --global user.name "$GITLAB_USER_NAME"
-    - git config --global user.email "$GITLAB_USER_EMAIL"
-    - cd waldur-docs
-    - cp -rv $CI_PROJECT_DIR/docs/* docs/developer-guide/ui
-    - git add docs/developer-guide/ui
-    - git commit -m "Update UI developer docs" || exit 0
-    - git branch new-ui-guide
-    - git push --set-upstream origin new-ui-guide:master
-  before_script: []
 
 Build test docker image:
   stage: test

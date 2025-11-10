@@ -1,22 +1,24 @@
 import { PaperclipIcon, XIcon } from '@phosphor-icons/react';
-import { Field } from 'redux-form';
+import { Field } from 'react-final-form';
 
 import { formatFilesize } from '@waldur/core/utils';
+import { required as requiredValidator } from '@waldur/core/validators';
 import { FileUploadField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { ActionButton } from '@waldur/table/ActionButton';
 
-export const OrderAttachmentField = () => (
+export const OrderAttachmentField = ({ required }) => (
   <Field
     name="attachment"
+    validate={required ? requiredValidator : undefined}
     component={({ input }) => (
       <div className="d-flex justify-content-between">
         <FileUploadField
           iconNode={<PaperclipIcon />}
-          input={input}
+          input={input as any}
           accept="application/pdf"
           buttonLabel={translate('Attach file')}
-          className="btn-outline-default btn btn-outline"
+          className="btn btn-tertiary"
         />
         <div className="flex-grow-1 ms-3 align-items-center d-flex">
           <span className="text-muted fs-5">

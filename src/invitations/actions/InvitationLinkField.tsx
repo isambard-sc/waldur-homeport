@@ -13,7 +13,7 @@ export const InvitationLinkField = ({ invitation }) => {
       <div className="d-flex gap-2">
         <Form.Control
           value={link}
-          placeholder={translate('e.g.') + ' https://'}
+          placeholder={translate('e.g. https://')}
           readOnly
           className="form-control-solid"
         />
@@ -21,7 +21,7 @@ export const InvitationLinkField = ({ invitation }) => {
         <CopyToClipboardButton
           value={link}
           size={20}
-          buttonClassName="btn btn-active-secondary btn-icon"
+          buttonClassName="btn btn-text-secondary btn-icon"
           onlyButton
         />
       </div>

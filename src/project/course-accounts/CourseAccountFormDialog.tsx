@@ -220,7 +220,7 @@ export const CourseAccountFormDialog: FC<OwnProps> = ({
                 <>
                   {activeTab === 'batch' && step > 0 && (
                     <Button
-                      variant="outline btn-outline-default"
+                      variant="tertiary"
                       className="w-125px me-auto"
                       onClick={prevStep}
                     >
@@ -269,9 +269,7 @@ export const CourseAccountFormDialog: FC<OwnProps> = ({
                     <Field
                       component={EmailField as any}
                       name="email"
-                      placeholder={
-                        translate('e.g.') + ' Courseaccount@example.com'
-                      }
+                      placeholder={translate('e.g. Courseaccount@example.com')}
                       validate={activeTab === 'single' ? required : undefined}
                     />
                   </FormGroup>

@@ -107,7 +107,7 @@ export const FormNodeStorageRow: FC<FormNodeStorageRowProps> = (props) => {
             name={props.typeName}
             component={SelectField}
             validate={props.typeValidate}
-            placeholder={translate('Select volume type') + '...'}
+            placeholder={translate('Select volume type...')}
             options={props.volumeTypeChoices}
             getOptionValue={(option) => option.value}
             simpleValue
@@ -117,8 +117,8 @@ export const FormNodeStorageRow: FC<FormNodeStorageRowProps> = (props) => {
       {props.onDeleteRow && (
         <td className="w-60px">
           <Button
-            variant="light"
-            className="btn-icon btn-active-light-danger"
+            variant="text-danger"
+            className="btn-icon"
             onClick={props.onDeleteRow}
           >
             <span className="svg-icon svg-icon-2">

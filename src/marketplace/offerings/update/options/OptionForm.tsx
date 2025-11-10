@@ -11,6 +11,8 @@ import { DisplayNameField } from '../../DisplayNameField';
 import { FormGroup } from '../../FormGroup';
 import { InternalNameField } from '../../InternalNameField';
 
+import { ComponentMultiplierConfiguration } from './ComponentMultiplierConfiguration';
+import { ConditionalCascadeConfiguration } from './ConditionalCascadeConfiguration';
 import { FIELD_TYPES, OPTION_FORM_ID } from './constants';
 
 const selector = getFormValues(OPTION_FORM_ID);
@@ -32,7 +34,7 @@ const TypeGroup = () => (
   </FormGroup>
 );
 
-export const OptionForm = ({ resourceType }) => {
+export const OptionForm = ({ resourceType, offering }) => {
   const optionValue = useSelector(selector) as any;
   const type = optionValue.type.value;
 
@@ -71,6 +73,15 @@ export const OptionForm = ({ resourceType }) => {
         <FormGroup label={translate('Default value')}>
           <Field name="default" type="text" component={InputField} />
         </FormGroup>
+      )}
+      {type === 'conditional_cascade' && (
+        <ConditionalCascadeConfiguration name="cascade_config" />
+      )}
+      {type === 'component_multiplier' && (
+        <ComponentMultiplierConfiguration
+          name="component_multiplier_config"
+          offering={offering}
+        />
       )}
       {resourceType === 'options' ? (
         <FormGroup>

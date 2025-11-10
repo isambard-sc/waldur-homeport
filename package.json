@@ -103,7 +103,7 @@
     "reselect": "^3.0.1",
     "source-map": "^0.7.4",
     "text-security": "^3.2.1",
-    "waldur-js-client": "7.8.3-dev.10",
+    "waldur-js-client": "^7.8.6-dev.11",
     "yjs": "^13.5.22"
   },
   "devDependencies": {
@@ -172,7 +172,7 @@
     "ts-import-plugin": "^3.0.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.0",
-    "vite": "^7.0.0",
+    "vite": "7.1.11",
     "vite-plugin-markdown": "^2.2.0",
     "vite-plugin-svgr": "^4.3.0",
     "vitest": "^3.2.4",

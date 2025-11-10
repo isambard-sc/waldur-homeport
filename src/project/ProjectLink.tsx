@@ -1,6 +1,7 @@
 import { FactoryIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, PropsWithChildren } from 'react';
+import { Variant } from 'react-bootstrap/esm/types';
 import { Project } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
@@ -15,6 +16,7 @@ import { projectKindOptions } from './utils';
 
 interface OwnProps {
   row: AtLeast<Project, 'uuid' | 'name'>;
+  buttonVariant?: Variant;
   className?: string;
   showIndustry?: boolean;
   showKind?: boolean;
@@ -23,6 +25,7 @@ interface OwnProps {
 
 export const ProjectLink: FC<PropsWithChildren<OwnProps>> = ({
   row,
+  buttonVariant,
   className,
   children,
   showIndustry = true,
@@ -35,9 +38,13 @@ export const ProjectLink: FC<PropsWithChildren<OwnProps>> = ({
     <div className="d-flex align-items-center gap-1">
       <Link
         state="project.dashboard"
-        params={{ uuid: row.uuid }}
+        params={{
+          uuid: row.uuid,
+          ...(row.is_removed && { include_terminated: 'true' }),
+        }}
         label={children ? undefined : row.name}
         onClick={onClick}
+        buttonVariant={buttonVariant}
         className={classNames(className, !children && 'ellipsis')}
       >
         {children}
@@ -52,7 +59,7 @@ export const ProjectLink: FC<PropsWithChildren<OwnProps>> = ({
         >
           <Tip
             id={'tip-kind-' + row.uuid}
-            label={kind.label + ' ' + translate('Project')}
+            label={translate('{name} project', { name: kind.label })}
           >
             <kind.component weight="bold" size={12} />
           </Tip>
@@ -65,6 +72,11 @@ export const ProjectLink: FC<PropsWithChildren<OwnProps>> = ({
             <FactoryIcon />
           </span>
         )}
+      {row.is_removed && (
+        <Badge variant="light-danger" pill className="align-middle fs-8">
+          {translate('Removed')}
+        </Badge>
+      )}
     </div>
   );
 };

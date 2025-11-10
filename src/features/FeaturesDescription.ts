@@ -13,6 +13,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Make payments menu visible for staff users only.'),
       },
       {
+        key: 'show_banking_data',
+        description: translate('Display banking related data under customer profile.'),
+      },
+      {
         key: 'show_domain',
         description: translate('Allows to hide domain field in organization detail.'),
       },
@@ -81,6 +85,14 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'conceal_prices',
         description: translate('Do not render prices in order details.'),
+      },
+      {
+        key: 'display_offering_partitions',
+        description: translate('Enable display of offering partitions in UI.'),
+      },
+      {
+        key: 'display_software_catalog',
+        description: translate('Enable display of software catalog in UI.'),
       },
       {
         key: 'display_user_tos',

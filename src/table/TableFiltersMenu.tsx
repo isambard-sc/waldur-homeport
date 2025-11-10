@@ -157,7 +157,7 @@ const SaveFilterItems = ({ table, formId, apply }) => {
       >
         <span className="menu-link" aria-hidden="true">
           <span className="menu-title">
-            {translate('Saved filters') + ` (${list.length})`}
+            {translate('Saved filters ({count})', { count: list.length })}
           </span>
           <CaretRightIcon size={20} className="ms-auto" weight="bold" />
         </span>
@@ -312,8 +312,8 @@ export const TableFiltersMenu: FC<TableFiltersMenuProps> = (props) => {
       ) : (
         <Tip id="table-add-filter-tip" label={translate('Add filter')}>
           <Button
-            variant="outline"
-            className="btn-outline-default btn-icon btn-add-filter w-40px h-40px"
+            variant="tertiary"
+            className="btn-icon btn-add-filter w-40px h-40px"
             data-kt-menu-trigger="click"
             data-kt-menu-attach="parent"
             data-kt-menu-placement="bottom-start"

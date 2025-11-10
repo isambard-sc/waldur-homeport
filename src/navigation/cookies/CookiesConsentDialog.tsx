@@ -44,7 +44,6 @@ export const CookiesConsentDialog: FC<OwnProps> = ({ resolve }) => {
             {translate(
               'For complete details, please see our <pp>Privacy policy</pp>.',
               {
-                b: (s) => <b>{s}</b>,
                 pp: (s: string) => <Link state="about.privacy" label={s} />,
               },
               formatJsx,
@@ -61,7 +60,7 @@ export const CookiesConsentDialog: FC<OwnProps> = ({ resolve }) => {
           <>
             <Button
               onClick={resolve.acceptEssential}
-              variant="outline btn-outline-default"
+              variant="tertiary"
               className="flex-equal"
             >
               {translate('Deny analytical cookies')}

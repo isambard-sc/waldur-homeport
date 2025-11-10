@@ -2,38 +2,59 @@ import Qs from 'qs';
 import { formDataBodySerializer, RequestResult } from 'waldur-js-client';
 import { client } from 'waldur-js-client/client.gen';
 
-import { setRedirect } from '@waldur/auth/AuthRedirectStorage';
 import { localLogout } from '@waldur/auth/AuthService';
-import { getToken } from '@waldur/auth/TokenStorage';
 import { ENV } from '@waldur/core/config';
+import {
+  ImpersonationStorage,
+  RedirectStorage,
+  AuthTokenStorage,
+  LanguageStorage,
+  AuthMethodStorage,
+} from '@waldur/core/StorageManager';
 import { cleanObject } from '@waldur/core/utils';
-import { getLanguageKey } from '@waldur/i18n/LanguageStorage';
 import { router } from '@waldur/router';
-import { getImpersonatedUserUuid } from '@waldur/workspace/WorkspaceStorage';
 
 const querySerializer = (params) =>
   Qs.stringify(params, { arrayFormat: 'repeat' });
 
+const getAuthPrefix = (): 'Token' | 'Bearer' => {
+  const method = AuthMethodStorage.get();
+  if (method === 'local') {
+    return 'Token';
+  }
+  if (!ENV.plugins.WALDUR_CORE.OIDC_ACCESS_TOKEN_ENABLED) {
+    return 'Token';
+  }
+  return 'Bearer';
+};
+
 const getAuthHeader = () => {
-  const prefix = ENV.plugins.WALDUR_CORE.OIDC_ACCESS_TOKEN_ENABLED
-    ? 'Bearer'
-    : 'Token';
-  const token = getToken();
+  const token = AuthTokenStorage.get();
+  const prefix = getAuthPrefix();
   if (token) {
     return [prefix, token].join(' ');
   }
 };
 
-export function initApiClient() {
+export function getHeaders(impersonate = true) {
   const headers = {
     Accept: 'application/json',
   };
 
-  headers['X-IMPERSONATED-USER-UUID'] = getImpersonatedUserUuid();
-
-  if (getLanguageKey()) {
-    headers['Accept-Language'] = getLanguageKey();
+  if (impersonate && ImpersonationStorage.get()) {
+    headers['X-IMPERSONATED-USER-UUID'] = ImpersonationStorage.get();
+  } else {
+    headers['X-IMPERSONATED-USER-UUID'] = null;
   }
+
+  if (LanguageStorage.get()) {
+    headers['Accept-Language'] = LanguageStorage.get();
+  }
+  return headers;
+}
+
+export function initApiClient() {
+  const headers = getHeaders();
   client.setConfig({
     auth: getAuthHeader,
     baseUrl: ENV.apiEndpoint,
@@ -43,6 +64,13 @@ export function initApiClient() {
   });
 }
 
+client.interceptors.error.use((error: Error, response) => {
+  return {
+    ...error,
+    response,
+  };
+});
+
 client.interceptors.response.use((response) => {
   if (
     response?.status === 401 &&
@@ -50,14 +78,14 @@ client.interceptors.response.use((response) => {
   ) {
     if (router.globals.transition) {
       const target = router.globals.transition.targetState();
-      setRedirect({
+      RedirectStorage.set({
         toState: target.name(),
         toParams: target.params(),
       });
     } else if (router.globals.$current.name === 'login') {
-      setRedirect(router.globals.params as any);
+      RedirectStorage.set(router.globals.params as any);
     } else if (router.globals.$current.name) {
-      setRedirect({
+      RedirectStorage.set({
         toState: router.globals.$current.name,
         toParams: router.globals.params
           ? cleanObject(router.globals.params)
@@ -112,7 +140,7 @@ export const fetchResultCount = (result: Awaited<RequestResult>): number =>
 export async function get<T = any>(endpoint: string): Promise<T> {
   const response = await fetch(
     fixURL(endpoint),
-    getToken()
+    AuthTokenStorage.get()
       ? {
           headers: { Authorization: getAuthHeader() },
         }
@@ -224,11 +252,6 @@ export const count = (url: string, query?) =>
       url,
       query,
       parseAs: 'text',
-      security: [
-        {
-          name: 'Authorization',
-          type: 'apiKey',
-        },
-      ],
+      security: [{ in: 'header', type: 'http' }],
     })
     .then(fetchResultCount);
