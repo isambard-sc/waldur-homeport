@@ -120,7 +120,7 @@ export const useProposalDecisionActions = (
           showInput: true,
           inputLabel: translate('Reason for return'),
           inputPlaceholder: translate('Enter reason for returning to applicant'),
-          inputRequired: false,
+          inputRequired: true,
         },
       );
 
