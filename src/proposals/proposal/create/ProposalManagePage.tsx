@@ -16,6 +16,8 @@ import { SidebarLayout } from '@waldur/form/SidebarLayout';
 import { translate } from '@waldur/i18n';
 import { PageBarProvider } from '@waldur/marketplace/context';
 import { useTitle } from '@waldur/navigation/title';
+import { PermissionEnum } from '@waldur/permissions/enums';
+import { hasPermission } from '@waldur/permissions/hasPermission';
 import { Proposal } from '@waldur/proposals/types';
 import { getUser } from '@waldur/workspace/selectors';
 
@@ -57,8 +59,19 @@ export const ProposalManagePage = () => {
   const user = useSelector(getUser);
 
   const isEditPage = state.name === 'proposals.manage-proposal';
+
+  // Check if user can edit the proposal:
+  // 1. Staff users can always edit
+  // 2. The proposal creator can edit
+  // 3. Users with PROPOSAL.MANAGE permission (Proposal Manager role) can edit
   const hasPermissionToSubmit =
-    user.is_staff || (proposal && user.uuid === proposal.created_by_uuid);
+    user.is_staff ||
+    (proposal && user.uuid === proposal.created_by_uuid) ||
+    (proposal &&
+      hasPermission(user, {
+        permission: PermissionEnum.MANAGE_PROPOSAL,
+        scopeId: proposal.uuid,
+      }));
 
   const { data: call } = useQuery({
     queryKey: ['ProposalCall', proposal?.call_uuid],
