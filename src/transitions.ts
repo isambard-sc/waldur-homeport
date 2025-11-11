@@ -62,7 +62,7 @@ export function attachTransitions() {
             error.detail.includes('Not authenticated')));
 
         if (is401Error) {
-          setRedirect({
+          RedirectStorage.set({
             toState: transition.to().name,
             toParams: transition.to().params,
           });

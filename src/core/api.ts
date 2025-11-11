@@ -105,14 +105,14 @@ client.interceptors.error.use((error, response) => {
   ) {
     if (router.globals.transition) {
       const target = router.globals.transition.targetState();
-      setRedirect({
+      RedirectStorage.set({
         toState: target.name(),
         toParams: target.params(),
       });
     } else if (router.globals.$current.name === 'login') {
-      setRedirect(router.globals.params as any);
+      RedirectStorage.set(router.globals.params as any);
     } else if (router.globals.$current.name) {
-      setRedirect({
+      RedirectStorage.set({
         toState: router.globals.$current.name,
         toParams: router.globals.params
           ? cleanObject(router.globals.params)
