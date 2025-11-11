@@ -251,6 +251,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Enable credentials management (SSH keys, API tokens, etc.) in user workspace.'),
       },
       {
+        key: 'disable_long_tokens',
+        description: translate('Disallow non-staff/support users from creating API tokens with unlimited or long expiration times (more than an hour).'),
+      },
+      {
         key: 'disable_user_termination',
         description: translate('Disable user termination in user workspace.'),
       },

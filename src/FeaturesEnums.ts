@@ -76,6 +76,7 @@ export enum SupportFeatures {
 export enum UserFeatures {
   allow_user_creation = 'user.allow_user_creation',
   credentials = 'user.credentials',
+  disable_long_tokens = 'user.disable_long_tokens',
   disable_user_termination = 'user.disable_user_termination',
   minimal_user_profile = 'user.minimal_user_profile',
   notifications = 'user.notifications',
