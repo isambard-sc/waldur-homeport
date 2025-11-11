@@ -213,6 +213,7 @@ export const ProposalSubmissionStep: FC<{
               editable={proposal.state === 'draft'}
               submitting={formProps.submitting}
               completedSteps={completedSteps}
+              proposal={{ uuid: proposal.uuid, name: proposal.name }}
             />
           </SidebarLayout.Sidebar>
         </SidebarLayout.Container>
