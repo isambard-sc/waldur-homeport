@@ -168,7 +168,7 @@ export function parseSelectData<TData = {}>(
 }
 
 export async function post(endpoint: string, data?: object) {
-  await fetch(fixURL(endpoint), {
+  const response = await fetch(fixURL(endpoint), {
     method: 'POST',
     body: data ? JSON.stringify(data) : undefined,
     headers: {
@@ -176,6 +176,29 @@ export async function post(endpoint: string, data?: object) {
       Authorization: getAuthHeader(),
     },
   });
+
+  if (!response.ok) {
+    const error: any = new Error(`HTTP error! status: ${response.status}`);
+    error.response = response;
+    error.status = response.status;
+    error.statusText = response.statusText;
+
+    // Try to parse error response body if available
+    try {
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        error.data = await response.json();
+      } else {
+        error.data = await response.text();
+      }
+    } catch {
+      // Ignore parsing errors
+    }
+
+    throw error;
+  }
+
+  return response;
 }
 
 export const getNextPageUrl = (response) => {
