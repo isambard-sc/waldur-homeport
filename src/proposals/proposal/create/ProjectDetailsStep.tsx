@@ -1,10 +1,12 @@
 import { DownloadSimpleIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { Field } from 'redux-form';
+import { Field, formValueSelector } from 'redux-form';
 import { proposalPublicCallsRetrieve } from 'waldur-js-client';
+import { useSelector } from 'react-redux';
+import { useMemo } from 'react';
 
 import { ENV } from '@waldur/core/config';
-import { number, required } from '@waldur/core/validators';
+import { number, required, composeValidators, createProposalNameValidator } from '@waldur/core/validators';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { FormGroup, SelectField, StringField, TextField } from '@waldur/form';
@@ -25,8 +27,11 @@ import { UploadDocumentationFiles } from './UploadDocumentationFiles';
 
 const isCodeRequired = ENV.plugins.WALDUR_CORE.OECD_FOS_2007_CODE_MANDATORY;
 
+const selector = formValueSelector('ProposalSubmissionStep');
+
 export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
   const reviews: ProposalReview[] = props.params?.reviews;
+  const proposalName = useSelector((state) => selector(state, 'name')) || '';
 
   const { data: call } = useQuery({
     queryKey: ['Call', props.params.proposal.call_uuid],
@@ -34,13 +39,29 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
     queryFn: () =>
       proposalPublicCallsRetrieve({
         path: { uuid: props.params.proposal.call_uuid },
-        query: { field: ['fixed_duration_in_days'] },
+        query: { field: ['fixed_duration_in_days', 'backend_id', 'slug'] },
       }).then(
-        (response) => response.data as Pick<Call, 'fixed_duration_in_days'>,
+        (response) => response.data as Pick<Call, 'fixed_duration_in_days' | 'backend_id' | 'slug'>,
       ),
 
     refetchOnWindowFocus: false,
   });
+
+  // Get call prefix (backend_id or slug)
+  const callPrefix = call?.backend_id || call?.slug || '';
+
+  // Calculate maximum allowed length for proposal name
+  const maxProposalNameLength = useMemo(() => {
+    if (!callPrefix) return 150 - 10 - 6; // Fallback if call data not loaded yet
+    // Formula: 150 - callPrefix.length - 10 - 6
+    return 150 - callPrefix.length - 10 - 6;
+  }, [callPrefix]);
+
+  // Create validator with the calculated max length
+  const nameValidator = useMemo(
+    () => composeValidators(required, createProposalNameValidator(callPrefix)),
+    [callPrefix]
+  );
 
   return (
     <VStepperFormStepCard
@@ -68,7 +89,14 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
           'Short title for the project, which explains the project goal as much as possible.',
         )}
         tooltipEnd
-        validate={required}
+        description={translate(
+          'Maximum {maxLength} characters. Current: {current}/{maxLength}',
+          {
+            maxLength: maxProposalNameLength,
+            current: proposalName.length,
+          }
+        )}
+        validate={nameValidator}
         required
       >
         <StringField />
