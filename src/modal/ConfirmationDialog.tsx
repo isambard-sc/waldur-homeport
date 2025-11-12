@@ -29,6 +29,7 @@ interface ConfirmationDialogProps {
     inputRequired?: boolean;
     inputLabel?: string;
     inputPlaceholder?: string;
+    inputMaxLength?: number;
   };
 }
 
@@ -47,6 +48,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     inputRequired = false,
     inputLabel,
     inputPlaceholder,
+    inputMaxLength,
   },
 }) => {
   const dispatch = useDispatch();
@@ -104,7 +106,13 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               required={inputRequired}
+              maxLength={inputMaxLength}
             />
+            {inputMaxLength && (
+              <div className="text-muted small mt-1">
+                {inputValue.length}/{inputMaxLength} {translate('characters')}
+              </div>
+            )}
           </div>
         )}
       </div>

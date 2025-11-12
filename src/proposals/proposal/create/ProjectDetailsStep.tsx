@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { useMemo } from 'react';
 
 import { ENV } from '@waldur/core/config';
-import { number, required, composeValidators, createProposalNameValidator } from '@waldur/core/validators';
+import { number, required, composeValidators, createProposalNameValidator, max } from '@waldur/core/validators';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { FormGroup, SelectField, StringField, TextField } from '@waldur/form';
@@ -32,6 +32,8 @@ const selector = formValueSelector('ProposalSubmissionStep');
 export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
   const reviews: ProposalReview[] = props.params?.reviews;
   const proposalName = useSelector((state) => selector(state, 'name')) || '';
+  const projectSummary = useSelector((state) => selector(state, 'project_summary')) || '';
+  const description = useSelector((state) => selector(state, 'description')) || '';
 
   const { data: call } = useQuery({
     queryKey: ['Call', props.params.proposal.call_uuid],
@@ -61,6 +63,17 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
   const nameValidator = useMemo(
     () => composeValidators(required, createProposalNameValidator(callPrefix)),
     [callPrefix]
+  );
+
+  // Validators for project_summary and description (4096 character limit)
+  const projectSummaryValidator = useMemo(
+    () => composeValidators(required, max(4096)),
+    []
+  );
+
+  const descriptionValidator = useMemo(
+    () => max(4096),
+    []
   );
 
   return (
@@ -109,12 +122,19 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
       <Field
         name="project_summary"
         component={FormGroup}
-        maxLength={1000}
+        maxLength={4096}
         label={translate('Summary (public)')}
         placeholder={translate('Enter a summary that will be shown to anyone interested in your project...')}
         tooltip={translate('Brief summary of the project.')}
         tooltipEnd
-        validate={required}
+        description={translate(
+          '{current}/{maxLength} characters',
+          {
+            maxLength: 4096,
+            current: projectSummary.length,
+          }
+        )}
+        validate={projectSummaryValidator}
         required
       >
         <TextField />
@@ -127,13 +147,21 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
       <Field
         name="description"
         component={FormGroup}
-        maxLength={1000}
+        maxLength={4096}
         label={translate('Description (private)')}
         placeholder={translate('Enter a description that will help the reviewers understand the project better...')}
         tooltip={translate(
           'Explanation of what the resources will be used to research.',
         )}
         tooltipEnd
+        description={translate(
+          '{current}/{maxLength} characters',
+          {
+            maxLength: 4096,
+            current: description.length,
+          }
+        )}
+        validate={descriptionValidator}
       >
         <TextField />
       </Field>

@@ -87,6 +87,7 @@ export const useProposalDecisionActions = (
           inputLabel: translate('Rejection reason'),
           inputPlaceholder: translate('Enter reason for rejection'),
           inputRequired: true,
+          inputMaxLength: 150,
         },
       );
 
@@ -121,6 +122,7 @@ export const useProposalDecisionActions = (
           inputLabel: translate('Reason for return'),
           inputPlaceholder: translate('Enter reason for returning to applicant'),
           inputRequired: true,
+          inputMaxLength: 150,
         },
       );
 

@@ -43,6 +43,7 @@ export const waitForConfirmation = (
     inputLabel?: string;
     inputPlaceholder?: string;
     inputRequired?: boolean;
+    inputMaxLength?: number;
   } = {},
 ) => {
   const deferred = createDeferred();
