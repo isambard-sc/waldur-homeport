@@ -171,6 +171,7 @@ export const useSubmitProposalResourcesFromTemplates = (
   const newSelections = useMemo(() => {
     if (!formData?.resources?.length) return [];
     return formData.resources.filter((resource) => {
+      if (!resource?.url) return false;
       return !formData.resources_init.some(
         (req) => req.call_resource_template === resource.url,
       );
@@ -180,7 +181,7 @@ export const useSubmitProposalResourcesFromTemplates = (
     if (!formData?.resources_init?.length) return [];
     return formData.resources_init.filter((req) => {
       return !formData.resources.some(
-        (resource) => resource.url === req.call_resource_template,
+        (resource) => resource?.url === req.call_resource_template,
       );
     });
   }, [formData]);
