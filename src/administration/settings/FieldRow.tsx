@@ -5,7 +5,7 @@ import { translate } from '@waldur/i18n';
 
 import { ConfigurationEditButton } from './ConfigurationEditButton';
 import { CountryListField } from './CountryListField';
-import { getKeyTitle } from './utils';
+import { getKeyTitle, SIDEBAR_STYLES } from './utils';
 
 const ColorField = ({ value }) => (
   <div className="symbol symbol-50px symbol-circle">
@@ -64,8 +64,17 @@ export const FieldRow = ({ item, value, onEdit, isLoading }: FieldRowProps) => {
           ) : (
             <CountryListField value={value} />
           )
+        ) : item.type === 'dict_field' ? (
+          <pre style={{ fontSize: '12px', margin: 0, whiteSpace: 'pre-wrap' }}>
+            {typeof value === 'object' && value !== null
+              ? JSON.stringify(value, null, 2)
+              : value || ''}
+          </pre>
         ) : typeof value === 'object' ? (
           <pre>{JSON.stringify(value, null, 2)}</pre>
+        ) : item.key === 'SIDEBAR_STYLE' ? (
+          SIDEBAR_STYLES.find((option) => option.value === value)?.label ||
+          value
         ) : (
           value
         )

@@ -7,7 +7,6 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { CustomerFeatures } from '@waldur/FeaturesEnums';
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { isExperimentalUiComponentsVisible } from '@waldur/marketplace/utils';
 import { getNativeNameVisible } from '@waldur/store/config';
 import { getUser } from '@waldur/workspace/selectors';
 
@@ -16,13 +15,12 @@ import { CustomerLocationRow } from './CustomerLocationRow';
 import { CustomerMediaPanel } from './CustomerMediaPanel';
 import { CustomerOrganizationGroupsRow } from './CustomerOrganizationGroupsRow';
 import { FieldEditButton } from './FieldEditButton';
+import { StaffOnlyIndicator } from './StaffOnlyIndicator';
 import { CustomerEditPanelProps } from './types';
 
 export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
   const nativeNameVisible = getNativeNameVisible();
   const user = useSelector(getUser);
-
-  const showExperimentalUiComponents = isExperimentalUiComponentsVisible();
 
   const detailsRows = useMemo(
     () =>
@@ -133,18 +131,33 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
               label={row.label}
               value={row.value || 'N/A'}
               actions={
-                <FieldEditButton
-                  customer={props.customer}
-                  name={row.key}
-                  callback={props.callback}
-                />
+                props.canUpdate ? (
+                  <>
+                    {[
+                      'max_service_accounts',
+                      'display_billing_info_in_projects',
+                      'agreement_number',
+                      'domain',
+                      'sponsor_number',
+                    ].includes(row.key) && <StaffOnlyIndicator />}
+                    <FieldEditButton
+                      customer={props.customer}
+                      name={row.key}
+                      callback={props.callback}
+                    />
+                  </>
+                ) : null
               }
             />
           ))}
-          <CustomerOrganizationGroupsRow customer={props.customer} />
+          <CustomerOrganizationGroupsRow
+            customer={props.customer}
+            canUpdate={props.canUpdate}
+          />
           <CustomerLocationRow
             customer={props.customer}
             callback={props.callback}
+            canUpdate={props.canUpdate}
           />
         </FormTable>
       </FormTable.Card>
@@ -164,11 +177,14 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
             value={props.customer.slug}
             actions={
               user?.is_staff ? (
-                <FieldEditButton
-                  customer={props.customer}
-                  name="slug"
-                  callback={props.callback}
-                />
+                <>
+                  <StaffOnlyIndicator />
+                  <FieldEditButton
+                    customer={props.customer}
+                    name="slug"
+                    callback={props.callback}
+                  />
+                </>
               ) : null
             }
           />
@@ -179,18 +195,20 @@ export const CustomerDetailsPanel: FC<CustomerEditPanelProps> = (props) => {
               label={row.label}
               value={row.value || 'N/A'}
               actions={
-                <FieldEditButton
-                  customer={props.customer}
-                  name={row.key}
-                  callback={props.callback}
-                />
+                props.canUpdate ? (
+                  <FieldEditButton
+                    customer={props.customer}
+                    name={row.key}
+                    callback={props.callback}
+                  />
+                ) : null
               }
             />
           ))}
         </FormTable>
       </FormTable.Card>
 
-      {showExperimentalUiComponents && <CustomerChecklistPanel {...props} />}
+      <CustomerChecklistPanel {...props} />
     </>
   );
 };

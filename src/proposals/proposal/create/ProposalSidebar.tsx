@@ -11,10 +11,16 @@ import { TosNotification } from '@waldur/form/TosNotification';
 import { translate } from '@waldur/i18n';
 import { PROPOSAL_UPDATE_SUBMISSION_FORM_ID } from '@waldur/proposals/constants';
 
+import { ProposalDeleteButton } from './ProposalDeleteButton';
+
 interface CompletionPageSidebarProps extends SidebarProps {
   saveAsDraft(): void;
   isSaving?: boolean;
   editable?: boolean;
+  proposal?: {
+    uuid: string;
+    name: string;
+  };
 }
 
 const formErrorsSelector = (state) =>
@@ -67,6 +73,9 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
             {props.isSaving && <LoadingSpinnerIcon className="me-1" />}
             {translate('Save as draft')}
           </Button>
+
+          {props.proposal && <ProposalDeleteButton proposal={props.proposal} />}
+
           <TosNotification />
         </>
       )}

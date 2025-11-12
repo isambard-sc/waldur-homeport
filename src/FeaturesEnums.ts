@@ -3,11 +3,13 @@
 
 export enum CustomerFeatures {
   payments_for_staff_only = 'customer.payments_for_staff_only',
+  show_banking_data = 'customer.show_banking_data',
   show_domain = 'customer.show_domain',
   show_permission_reviews = 'customer.show_permission_reviews',
 }
 
 export enum DeploymentFeatures {
+  application_portal_only = 'deployment.application_portal_only',
   enable_cookie_notice = 'deployment.enable_cookie_notice',
   send_metrics = 'deployment.send_metrics',
 }
@@ -24,12 +26,14 @@ export enum MarketplaceFeatures {
   call_only = 'marketplace.call_only',
   catalogue_only = 'marketplace.catalogue_only',
   conceal_prices = 'marketplace.conceal_prices',
+  display_offering_partitions = 'marketplace.display_offering_partitions',
+  display_software_catalog = 'marketplace.display_software_catalog',
   display_user_tos = 'marketplace.display_user_tos',
   import_resources = 'marketplace.import_resources',
   lexis_links = 'marketplace.lexis_links',
   show_call_management_functionality = 'marketplace.show_call_management_functionality',
-  show_remote_project_functionality = 'marketplace.show_remote_project_functionality',
   show_experimental_ui_components = 'marketplace.show_experimental_ui_components',
+  show_managed_projects = 'marketplace.show_managed_projects',
   show_resource_end_date = 'marketplace.show_resource_end_date',
 }
 
@@ -70,8 +74,13 @@ export enum SupportFeatures {
 }
 
 export enum UserFeatures {
+  allow_user_creation = 'user.allow_user_creation',
+  credentials = 'user.credentials',
+  disable_long_tokens = 'user.disable_long_tokens',
   disable_user_termination = 'user.disable_user_termination',
+  minimal_user_profile = 'user.minimal_user_profile',
   notifications = 'user.notifications',
+  permission_requests = 'user.permission_requests',
   preferred_language = 'user.preferred_language',
   show_slug = 'user.show_slug',
   show_username = 'user.show_username',

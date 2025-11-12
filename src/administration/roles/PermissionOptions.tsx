@@ -116,6 +116,10 @@ export const PermissionOptions = [
         label: translate('Update options for resource'),
         value: 'RESOURCE.UPDATE_OPTIONS',
       },
+      {
+        label: translate('Update resource'),
+        value: 'RESOURCE.UPDATE',
+      },
     ],
   },
   {
@@ -256,6 +260,23 @@ export const PermissionOptions = [
       {
         label: translate('Update user'),
         value: 'OFFERING.UPDATE_USER',
+      },
+    ],
+  },
+  {
+    label: translate('Openstack_instance'),
+    options: [
+      {
+        label: translate('Console access'),
+        value: 'OPENSTACK_INSTANCE.CONSOLE_ACCESS',
+      },
+      {
+        label: translate('Manage openstack instance'),
+        value: 'OPENSTACK_INSTANCE.MANAGE',
+      },
+      {
+        label: translate('Manage power for openstack instance'),
+        value: 'OPENSTACK_INSTANCE.MANAGE_POWER',
       },
     ],
   },

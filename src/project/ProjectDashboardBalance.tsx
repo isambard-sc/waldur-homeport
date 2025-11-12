@@ -5,9 +5,9 @@ import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { WidgetCard } from '@waldur/dashboard/WidgetCard';
 import { translate } from '@waldur/i18n';
-
-import { useProjectCreditChart, useProjectGraceStatus } from './utils';
 import { formatDate } from '@waldur/core/dateUtils';
+
+import { useProjectCreditChart } from './utils';
 
 export const ProjectDashboardBalance = ({
   project,
@@ -19,16 +19,9 @@ export const ProjectDashboardBalance = ({
   const { credit, chart, options, error, isLoading, refetch } =
     useProjectCreditChart(project);
 
-  const {
-    graceData,
-    isInGracePeriod,
-    isLoading: graceLoading,
-    error: graceError,
-  } = useProjectGraceStatus(project);
-
-  if (isLoading || graceLoading) {
+  if (isLoading) {
     return <LoadingSpinner />;
-  } else if (error || graceError) {
+  } else if (error) {
     return (
       <LoadingErred
         message={translate('Unable to load data.')}
@@ -38,11 +31,7 @@ export const ProjectDashboardBalance = ({
   }
 
   // If project is in grace period, show grace warning instead of normal accounting info
-  if (isInGracePeriod && graceData) {
-    const graceEndDate = graceData.end_date_with_grace
-      ? new Date(graceData.end_date_with_grace)
-      : null;
-
+  if (project.is_in_grace_period && project.end_date_with_grace) {
     return (
       <WidgetCard
         cardTitle={
@@ -64,10 +53,7 @@ export const ProjectDashboardBalance = ({
             {translate(
               'You will lose access to this project and all of its resources on:',
             )}{' '}
-            <strong>{
-              graceEndDate ? formatDate(graceEndDate)
-                : 'No end date provided.'
-            }</strong>
+            <strong>{formatDate(new Date(project.end_date_with_grace))}</strong>
           </p>
           <hr />
           <p className="mb-0">

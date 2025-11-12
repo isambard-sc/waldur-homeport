@@ -48,6 +48,13 @@ const LifecyclePolicySection = lazyComponent(() =>
     default: module.LifecyclePolicySection,
   })),
 );
+const ResourceDisplayOptionsSection = lazyComponent(() =>
+  import('./update/integration/ResourceDisplayOptionsSection').then(
+    (module) => ({
+      default: module.ResourceDisplayOptionsSection,
+    }),
+  ),
+);
 const UserManagementSection = lazyComponent(() =>
   import('./update/integration/UserManagementSection').then((module) => ({
     default: module.UserManagementSection,
@@ -66,6 +73,18 @@ const ProvisioningConfigSection = lazyComponent(() =>
 const OfferingEndpointsSection = lazyComponent(() =>
   import('./update/endpoints/OfferingEndpointsSection').then((module) => ({
     default: module.OfferingEndpointsSection,
+  })),
+);
+const OfferingSoftwareCatalogsSection = lazyComponent(() =>
+  import('./update/software-catalogs/OfferingSoftwareCatalogsSection').then(
+    (module) => ({
+      default: module.OfferingSoftwareCatalogsSection,
+    }),
+  ),
+);
+const OfferingPartitionsSection = lazyComponent(() =>
+  import('./update/partitions/OfferingPartitionsSection').then((module) => ({
+    default: module.OfferingPartitionsSection,
   })),
 );
 const OfferingOptionsSection = lazyComponent(() =>
@@ -170,32 +189,37 @@ const getTabs = (offering: Offering): PageBarTab[] => {
       children: [
         CredentialsForm
           ? {
-              key: 'credentials',
-              component: CredentialsSection,
-              title: translate('Credentials'),
-            }
+            key: 'credentials',
+            component: CredentialsSection,
+            title: translate('Credentials'),
+          }
           : null,
         {
           key: 'lifecycle-policy',
           component: LifecyclePolicySection,
           title: translate('Lifecycle policy'),
         },
+        {
+          key: 'resource-display-options',
+          component: ResourceDisplayOptionsSection,
+          title: translate('Resource display options'),
+        },
         SecretOptionsForm || PluginOptionsForm
           ? {
-              key: 'user-management',
-              component: UserManagementSection,
-              title: translate('User management'),
-            }
+            key: 'user-management',
+            component: UserManagementSection,
+            title: translate('User management'),
+          }
           : null,
         provisioningConfigForm ||
-        [OFFERING_TYPE_CUSTOM_SCRIPTS, OFFERING_TYPE_BOOKING].includes(
-          offering.type,
-        )
+          [OFFERING_TYPE_CUSTOM_SCRIPTS, OFFERING_TYPE_BOOKING].includes(
+            offering.type,
+          )
           ? {
-              key: 'provisioning-configuration',
-              component: ProvisioningConfigSection,
-              title: translate('Provisioning configuration'),
-            }
+            key: 'provisioning-configuration',
+            component: ProvisioningConfigSection,
+            title: translate('Provisioning configuration'),
+          }
           : null,
       ].filter(Boolean),
     });
@@ -235,6 +259,16 @@ const getTabs = (offering: Offering): PageBarTab[] => {
           component: OfferingEndpointsSection,
           title: translate('Endpoints'),
         },
+        isFeatureVisible(MarketplaceFeatures.display_software_catalog) && {
+          key: 'software_catalogs',
+          component: OfferingSoftwareCatalogsSection,
+          title: translate('Software catalogs'),
+        },
+        isFeatureVisible(MarketplaceFeatures.display_offering_partitions) && {
+          key: 'slurm_partitions',
+          component: OfferingPartitionsSection,
+          title: translate('Slurm partitions'),
+        },
         {
           key: 'category',
           component: AttributesSection,
@@ -245,7 +279,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
           component: OfferingImagesList,
           title: translate('Images'),
         },
-      ],
+      ].filter(Boolean),
     },
     {
       key: 'options',
@@ -297,7 +331,7 @@ const getTabs = (offering: Offering): PageBarTab[] => {
     ].filter(Boolean),
   });
 
-  return tabs;
+  return tabs.filter(Boolean);
 };
 
 export const OfferingEditUIView = ({
@@ -327,8 +361,8 @@ export const OfferingEditUIView = ({
     () =>
       data?.offering && plugins
         ? plugins.data.find(
-            (plugin) => plugin.offering_type === data.offering.type,
-          ).components
+          (plugin) => plugin.offering_type === data.offering.type,
+        )?.components || []
         : [],
     [plugins, data?.offering],
   );

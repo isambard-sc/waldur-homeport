@@ -25,7 +25,7 @@ async function loadData(offering_uuid: string) {
   const plugins = await marketplacePluginsList();
   const limits = plugins.data.find(
     (plugin) => plugin.offering_type === offering.type,
-  ).available_limits;
+  )?.available_limits || [];
   return { offering, limits };
 }
 

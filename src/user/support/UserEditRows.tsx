@@ -4,7 +4,7 @@ import { User } from 'waldur-js-client';
 import { ENV } from '@waldur/core/config';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { isFeatureVisible } from '@waldur/features/connect';
-import { UserFeatures } from '@waldur/FeaturesEnums';
+import { DeploymentFeatures, UserFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getNativeNameVisible } from '@waldur/store/config';
 import { getShortNameVisible } from '@waldur/store/config';
@@ -330,12 +330,29 @@ export const UserEditRows = ({
 }) => {
   const currentUser = useSelector(getUser);
   const isSelf = currentUser.uuid === user.uuid;
+  const minimalProfile = isFeatureVisible(UserFeatures.minimal_user_profile);
+  const applicationPortalOnly = isFeatureVisible(
+    DeploymentFeatures.application_portal_only,
+  );
+
+  if (minimalProfile) {
+    return (
+      <>
+        <FirstNameRow user={user} isSelf={isSelf} disabled={disabled} />
+        <LastNameRow user={user} isSelf={isSelf} disabled={disabled} />
+        {!applicationPortalOnly && (
+          <ShortNameRow user={user} isSelf={isSelf} />
+        )}
+        <EmailRow user={user} isSelf={isSelf} disabled={disabled} />
+      </>
+    );
+  }
 
   return (
     <>
       <FirstNameRow user={user} isSelf={isSelf} disabled={disabled} />
       <LastNameRow user={user} isSelf={isSelf} disabled={disabled} />
-      <ShortNameRow user={user} isSelf={isSelf} />
+      {!applicationPortalOnly && <ShortNameRow user={user} isSelf={isSelf} />}
       <NativeNameRow user={user} isSelf={isSelf} disabled={disabled} />
       <PhoneNumberRow user={user} isSelf={isSelf} disabled={disabled} />
       <EmailRow user={user} isSelf={isSelf} disabled={disabled} />

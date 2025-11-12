@@ -40,15 +40,25 @@ const formatAttributes = (props): OrderCreateRequest['attributes'] => {
   }
   const serializer = getFormSerializer(props.offering.type);
   const attributes = serializer(props.formData.attributes, props.offering);
-  let newAttributes = {} as OrderCreateRequest['attributes'];
+  const newAttributes = {} as OrderCreateRequest['attributes'];
+
   for (const [key, value] of Object.entries(attributes)) {
-    newAttributes = {
-      ...newAttributes,
-      [key]:
-        typeof value === 'object' && !Array.isArray(value)
-          ? value['value']
-          : value,
-    };
+    const optionConfig = props.offering.options?.options?.[key];
+
+    if (optionConfig?.type === 'conditional_cascade') {
+      // For conditional cascade fields, keep the whole object
+      newAttributes[key] = value;
+    } else if (optionConfig?.type === 'component_multiplier') {
+      // For component multiplier fields, store the original user input
+      // The multiplication will be handled by backend during order processing
+      newAttributes[key] = value;
+    } else if (typeof value === 'object' && !Array.isArray(value)) {
+      // For regular select fields, extract the value property
+      newAttributes[key] = value['value'];
+    } else {
+      // For primitive values, use as-is
+      newAttributes[key] = value;
+    }
   }
   return newAttributes;
 };
@@ -60,5 +70,5 @@ export const formatOrderForCreate = (props: OrderSummaryProps) => ({
   attributes: formatAttributes(props),
   limits: formatLimits(props),
   accepting_terms_of_service: true,
-  request_comment: props.formData?.request_comment,
+  start_date: props.formData.start_date,
 });
