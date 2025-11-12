@@ -91,11 +91,13 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
   // If the call has resource templates, change 'resources' field so that the values correspond to the templates.
   useEffect(() => {
     if (call?.resource_templates?.length && resourceRequests.length) {
-      const selectedTemplates = resourceRequests.map((req) =>
-        call.resource_templates.find(
-          (template) => template.url === req.call_resource_template,
-        ),
-      );
+      const selectedTemplates = resourceRequests
+        .map((req) =>
+          call.resource_templates.find(
+            (template) => template.url === req.call_resource_template,
+          ),
+        )
+        .filter(Boolean); // Filter out undefined values
       change('resources', [...selectedTemplates]);
     }
   }, [resourceRequests, call]);
