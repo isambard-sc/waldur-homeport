@@ -1,10 +1,11 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { useRouter } from '@uirouter/react';
-import { useCallback } from 'react';
-import { reduxForm } from 'redux-form';
+import { useCallback, useMemo } from 'react';
+import { reduxForm, formValueSelector } from 'redux-form';
 import { NestedRound, proposalProposalsCreate } from 'waldur-js-client';
+import { useSelector } from 'react-redux';
 
-import { required } from '@waldur/core/validators';
+import { required, composeValidators, createProposalNameValidator } from '@waldur/core/validators';
 import { SubmitButton } from '@waldur/form';
 import { FormContainer } from '@waldur/form/FormContainer';
 import { StringField } from '@waldur/form/StringField';
@@ -21,6 +22,8 @@ interface FormData {
   name: string;
 }
 
+const selector = formValueSelector('AddProposalForm');
+
 export const AddProposalDialog = reduxForm<
   FormData,
   { resolve: { round: NestedRound; call: Call } }
@@ -29,6 +32,23 @@ export const AddProposalDialog = reduxForm<
 })((props) => {
   const router = useRouter();
   const { showSuccess, showErrorResponse } = useNotify();
+  const proposalName = useSelector((state) => selector(state, 'name')) || '';
+
+  // Get call prefix (backend_id or slug)
+  const callPrefix = props.resolve.call.backend_id || props.resolve.call.slug || '';
+
+  // Calculate maximum allowed length for proposal name
+  const maxProposalNameLength = useMemo(() => {
+    // Formula: 150 - callPrefix.length - 10 - 6
+    return 150 - callPrefix.length - 10 - 6;
+  }, [callPrefix]);
+
+  // Create validator with the calculated max length
+  const nameValidator = useMemo(
+    () => composeValidators(required, createProposalNameValidator(callPrefix)),
+    [callPrefix]
+  );
+
   const processRequest = useCallback(
     async (values: FormData) => {
       try {
@@ -103,7 +123,14 @@ export const AddProposalDialog = reduxForm<
             label={translate('Name')}
             name="name"
             required
-            validate={required}
+            validate={nameValidator}
+            description={translate(
+              'Maximum {maxLength} characters. Current: {current}/{maxLength}',
+              {
+                maxLength: maxProposalNameLength,
+                current: proposalName.length,
+              }
+            )}
             spaceless
           />
         </FormContainer>
