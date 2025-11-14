@@ -56,6 +56,9 @@ const mandatoryFields: CustomersUsersListData['query']['field'] = [
   'projects',
 ];
 
+// Add slug conditionally - it may not be in the type definition yet
+const mandatoryFieldsWithSlug = [...mandatoryFields, 'slug'] as any;
+
 export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
   filters,
 }) => {
@@ -70,7 +73,7 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
     }),
     queryField: 'user_keyword',
     filter,
-    mandatoryFields,
+    mandatoryFields: mandatoryFieldsWithSlug,
   });
 
   // The "Team" page contains several other pages. We have to check the access permissions to this page here.

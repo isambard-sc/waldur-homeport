@@ -49,8 +49,24 @@ export const ProposalDetailsDialog: FC<ProposalDetailsDialogProps> = ({
           unmountOnExit={true}
           className="nav-line-tabs"
         >
+          <Tab eventKey={1} title={translate('Proposal')}>
+            <FormTable hideActions alignTop className="gy-5">
+              <FormTable.Item
+                label={translate('ID')}
+                value={
+                  <span className="fw-semibold">
+                    <FieldWithCopy value={proposal.slug} />
+                  </span>
+                }
+              />
+              <FormTable.Item
+                label={translate('Name')}
+                value={<FieldWithCopy value={proposal.name} />}
+              />
+            </FormTable>
+          </Tab>
           {call ? (
-            <Tab eventKey={1} title={translate('Call')}>
+            <Tab eventKey={2} title={translate('Call')}>
               <FormTable hideActions alignTop className="gy-5">
                 <FormTable.Item
                   label={translate('Name')}
@@ -64,7 +80,7 @@ export const ProposalDetailsDialog: FC<ProposalDetailsDialogProps> = ({
               </FormTable>
             </Tab>
           ) : null}
-          <Tab eventKey={2} title={translate('Round')}>
+          <Tab eventKey={3} title={translate('Round')}>
             <FormTable hideActions alignTop className="gy-5">
               <FormTable.Item
                 label={translate('Cutoff date')}

@@ -22,15 +22,15 @@ export const EntityHeader = ({
       <h1 className="mb-0 fs-1x">{title}</h1>
       <div className="ms-4">{badge}</div>
     </div>
-    <p className="fs-6 text-muted mb-1">
-      Slug: {slug}{' '}
+    <div className="d-flex align-items-center gap-2 mb-1">
+      <span className="fs-5 fw-semibold text-dark">ID: {slug}</span>
       <CopyToClipboardButton
         value={slug}
         onlyButton
         size={20}
-        buttonClassName="ms-2"
+        buttonClassName="ms-1"
       />
-    </p>
+    </div>
     {helpText && <p className="fs-6 text-muted mb-0">{helpText}</p>}
   </div>
 );

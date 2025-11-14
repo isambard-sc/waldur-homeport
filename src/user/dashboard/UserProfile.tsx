@@ -9,8 +9,11 @@ import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { User } from 'waldur-js-client';
 
+import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { StateIndicator } from '@waldur/core/StateIndicator';
 import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { UserFeatures } from '@waldur/FeaturesEnums';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { isStaffOrSupport } from '@waldur/workspace/selectors';
 
@@ -58,6 +61,19 @@ export const UserProfile = ({
         className="flex-wrap text-gray-500 lh-1"
         gap={5}
       >
+        {isFeatureVisible(UserFeatures.show_slug) &&
+          isFeatureVisible(UserFeatures.show_slug_as_id) &&
+          user.slug && (
+            <span className="fw-semibold text-dark text-nowrap">
+              ID: {user.slug}
+              <CopyToClipboardButton
+                value={user.slug}
+                onlyButton
+                size={16}
+                buttonClassName="ms-2"
+              />
+            </span>
+          )}
         {user.job_title && (
           <span className="text-nowrap">
             <UserSquareIcon size={18} weight="duotone" className="me-1" />

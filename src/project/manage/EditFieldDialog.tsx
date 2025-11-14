@@ -7,6 +7,8 @@ import { Project } from 'waldur-js-client';
 import { formatISODate } from '@waldur/core/dateUtils';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { useCustomerProjects } from '@waldur/customer/workspace/fetchCustomer';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { DeploymentFeatures } from '@waldur/FeaturesEnums';
 import { SubmitButton } from '@waldur/form';
 import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { StringField } from '@waldur/form/StringField';
@@ -129,7 +131,20 @@ export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
               </FormGroup>
             ) : resolve.name === 'slug' ? (
               <FormGroup label={translate('Slug')}>
-                <Field component={StringField as any} name="slug" />
+                <Field
+                  component={StringField as any}
+                  name="slug"
+                  disabled={
+                    isFeatureVisible(DeploymentFeatures.make_slugs_immutable) &&
+                    !!resolve.project.slug
+                  }
+                />
+                {isFeatureVisible(DeploymentFeatures.make_slugs_immutable) &&
+                  resolve.project.slug && (
+                    <p className="text-muted mt-2">
+                      {translate('Slug cannot be changed once set.')}
+                    </p>
+                  )}
               </FormGroup>
             ) : resolve.name === 'staff_notes' ? (
               <FormGroup label={translate('Staff notes')}>
