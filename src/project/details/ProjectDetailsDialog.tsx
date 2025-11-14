@@ -25,6 +25,15 @@ export const ProjectDetailsDialog: FC<{
     >
       <FormTable hideActions alignTop detailsMode className="gy-5">
         <FormTable.Item
+          label={translate('ID')}
+          value={
+            <span className="fw-semibold">
+              <FieldWithCopy value={project.slug} />
+            </span>
+          }
+        />
+
+        <FormTable.Item
           label={translate('Name')}
           value={<FieldWithCopy value={project.name} />}
         />

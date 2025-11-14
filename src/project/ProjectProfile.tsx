@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { Project } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
+import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
@@ -115,6 +116,15 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
       }
     >
       <Stack direction="horizontal" className="gap-6 mb-1">
+        <span className="fw-semibold text-dark">
+          ID: {project.slug}
+          <CopyToClipboardButton
+            value={project.slug}
+            onlyButton
+            size={16}
+            buttonClassName="ms-2"
+          />
+        </span>
         {project.oecd_fos_2007_code && (
           <span>{`${project.oecd_fos_2007_code}. ${project.oecd_fos_2007_label}`}</span>
         )}

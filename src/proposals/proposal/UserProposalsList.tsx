@@ -84,6 +84,13 @@ export const UserProposalsList: FC = () => {
       id: 'proposal',
     },
     {
+      title: translate('ID'),
+      render: ({ row }) => <span className="fw-semibold">{row.slug}</span>,
+      keys: ['slug'],
+      id: 'id',
+      className: 'text-nowrap',
+    },
+    {
       title: translate('Call'),
       render: ({ row }) => <>{renderFieldOrDash(row.call_name)}</>,
       keys: ['call_name'],

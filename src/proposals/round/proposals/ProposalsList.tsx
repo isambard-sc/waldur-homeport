@@ -52,6 +52,11 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
           copyField: (row) => row.name,
         },
         {
+          title: translate('ID'),
+          render: ({ row }) => <span className="fw-semibold">{row.slug}</span>,
+          className: 'text-nowrap',
+        },
+        {
           title: translate('By'),
           render: ({ row }) => <>{row.created_by_name || '-'} </>,
         },

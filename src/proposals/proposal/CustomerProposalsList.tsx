@@ -74,6 +74,11 @@ export const CustomerProposalsList: FC<{}> = () => {
           ),
         },
         {
+          title: translate('ID'),
+          render: ({ row }) => <span className="fw-semibold">{row.slug}</span>,
+          className: 'text-nowrap',
+        },
+        {
           title: translate('Applicant'),
           render: ({ row }) => <>{row.created_by_name || '-'} </>,
         },
