@@ -2,7 +2,10 @@ import { EyeIcon } from '@phosphor-icons/react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
+import { formatDateTime } from '@waldur/core/dateUtils';
 import { lazyComponent } from '@waldur/core/lazyComponent';
+import { Link } from '@waldur/core/Link';
+import { getUUID } from '@waldur/core/utils';
 import {
   VStepperFormStepCard,
   VStepperFormStepProps,
@@ -42,7 +45,11 @@ const DetailsOverviewButton = ({ proposal }) => {
 };
 
 export const ProposalDetailsOverviewStep = (props: VStepperFormStepProps) => {
-  const proposal: Proposal = props.params.proposal;
+  const proposal: Proposal & {
+    modified?: string;
+    submitted?: string;
+    reviewed?: string;
+  } = props.params.proposal;
   return (
     <VStepperFormStepCard
       id={props.id}
@@ -84,6 +91,63 @@ export const ProposalDetailsOverviewStep = (props: VStepperFormStepProps) => {
             valueCol={7}
           />
         </Col>
+        <Col sm={6}>
+          <Field
+            label={translate('Created')}
+            value={formatDateTime(proposal.created)}
+            labelCol={5}
+            valueCol={7}
+          />
+        </Col>
+        {proposal.modified && (
+          <Col sm={6}>
+            <Field
+              label={translate('Last edited')}
+              value={formatDateTime(proposal.modified)}
+              labelCol={5}
+              valueCol={7}
+            />
+          </Col>
+        )}
+        {proposal.state !== 'draft' && proposal.submitted && (
+          <Col sm={6}>
+            <Field
+              label={translate('Submitted')}
+              value={formatDateTime(proposal.submitted)}
+              labelCol={5}
+              valueCol={7}
+            />
+          </Col>
+        )}
+        {(proposal.state === 'accepted' || proposal.state === 'rejected') &&
+          (proposal.reviewed || proposal.modified) && (
+            <Col sm={6}>
+              <Field
+                label={translate(
+                  proposal.state === 'accepted' ? 'Accepted' : 'Rejected',
+                )}
+                value={formatDateTime(proposal.reviewed || proposal.modified)}
+                labelCol={5}
+                valueCol={7}
+              />
+            </Col>
+          )}
+        {proposal.state === 'accepted' && proposal.project && (
+          <Col sm={6}>
+            <Field
+              label={translate('Project')}
+              value={
+                <Link
+                  state="project.dashboard"
+                  params={{ uuid: getUUID(proposal.project) }}
+                  label={proposal.project_name}
+                />
+              }
+              labelCol={5}
+              valueCol={7}
+            />
+          </Col>
+        )}
       </Row>
     </VStepperFormStepCard>
   );
