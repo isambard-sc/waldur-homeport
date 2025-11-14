@@ -11,6 +11,7 @@ export enum CustomerFeatures {
 export enum DeploymentFeatures {
   application_portal_only = 'deployment.application_portal_only',
   enable_cookie_notice = 'deployment.enable_cookie_notice',
+  make_slugs_immutable = 'deployment.make_slugs_immutable',
   send_metrics = 'deployment.send_metrics',
 }
 
@@ -83,6 +84,7 @@ export enum UserFeatures {
   permission_requests = 'user.permission_requests',
   preferred_language = 'user.preferred_language',
   show_slug = 'user.show_slug',
+  show_slug_as_id = 'user.show_slug_as_id',
   show_username = 'user.show_username',
   ssh_keys = 'user.ssh_keys',
 }

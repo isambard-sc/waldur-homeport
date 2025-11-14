@@ -39,6 +39,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Enable cookie notice in marketplace.'),
       },
       {
+        key: 'make_slugs_immutable',
+        description: translate('Make slugs immutable, i.e. disallow direct changes to slugs after they have been set. Note that slugs may still be changed indirectly.'),
+      },
+      {
         key: 'send_metrics',
         description: translate('Send telemetry metrics.'),
       },
@@ -277,6 +281,10 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'show_slug',
         description: translate('Enable display of slug field in user summary.'),
+      },
+      {
+        key: 'show_slug_as_id',
+        description: translate('Show the user slug as an identifier on the dashboard and all user lists.'),
       },
       {
         key: 'show_username',
