@@ -8,6 +8,8 @@ import { organizationGroupsList } from 'waldur-js-client';
 import { getAllPages } from '@waldur/core/api';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { DeploymentFeatures } from '@waldur/FeaturesEnums';
 import {
   NumberField,
   SelectField,
@@ -179,13 +181,24 @@ export const EditFieldDialog = connect<{}, {}, { resolve: EditCustomerProps }>(
                 label={translate('Sponsor number')}
               />
             ) : props.resolve.name === 'slug' ? (
-              <StringField
-                name="slug"
-                label={translate('Slug')}
-                description={translate(
-                  'Warning: Changing the slug may break external integrations that rely on this value. Ensure that all dependent systems are updated before proceeding.',
-                )}
-              />
+              <>
+                <StringField
+                  name="slug"
+                  label={translate('Slug')}
+                  description={
+                    isFeatureVisible(DeploymentFeatures.make_slugs_immutable) &&
+                    props.resolve.customer.slug
+                      ? translate('Slug cannot be changed once set.')
+                      : translate(
+                          'Warning: Changing the slug may break external integrations that rely on this value. Ensure that all dependent systems are updated before proceeding.',
+                        )
+                  }
+                  disabled={
+                    isFeatureVisible(DeploymentFeatures.make_slugs_immutable) &&
+                    !!props.resolve.customer.slug
+                  }
+                />
+              </>
             ) : props.resolve.name === 'max_service_accounts' ? (
               <NumberField
                 name="max_service_accounts"
