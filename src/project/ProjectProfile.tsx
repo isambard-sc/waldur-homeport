@@ -110,7 +110,7 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
         query: {
           project_uuid: project.uuid,
           page_size: 100,
-        } as any, // Type will be updated when SDK is regenerated
+        },
       });
       return response.data;
     },
