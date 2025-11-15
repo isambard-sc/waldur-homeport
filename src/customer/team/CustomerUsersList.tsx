@@ -56,8 +56,8 @@ const mandatoryFields: CustomersUsersListData['query']['field'] = [
   'projects',
 ];
 
-// Add slug conditionally - it may not be in the type definition yet
-const mandatoryFieldsWithSlug = [...mandatoryFields, 'slug'] as any;
+// Add slug and unix_username conditionally - they may not be in the type definition yet
+const mandatoryFieldsWithSlug = [...mandatoryFields, 'slug', 'unix_username'] as any;
 
 export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
   filters,

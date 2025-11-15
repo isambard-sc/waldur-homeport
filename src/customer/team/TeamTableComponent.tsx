@@ -88,13 +88,23 @@ export const TeamTableComponent = <
         isFeatureVisible(UserFeatures.show_slug) &&
           isFeatureVisible(UserFeatures.show_slug_as_id) && {
             title: translate('ID'),
-            render: ({ row }) => (
-              <span className="fw-semibold">{getField(row, 'slug')}</span>
-            ),
+            render: ({ row }) => {
+              const slug = getField(row, 'slug');
+              const unixUsername = getField(row, 'unix_username');
+              return slug && unixUsername ? (
+                <span className="fw-semibold">{slug}</span>
+              ) : (
+                DASH_ESCAPE_CODE
+              );
+            },
             export: getKey('slug'),
             id: 'id',
-            keys: [getKey('slug')],
-            copyField: (row) => getField(row, 'slug'),
+            keys: [getKey('slug'), getKey('unix_username')],
+            copyField: (row) => {
+              const slug = getField(row, 'slug');
+              const unixUsername = getField(row, 'unix_username');
+              return slug && unixUsername ? slug : '';
+            },
             className: 'text-nowrap',
           },
         !hideRole && {

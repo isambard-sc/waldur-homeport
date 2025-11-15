@@ -62,7 +62,22 @@ export const UserAffiliationsList: FunctionComponent<
   ]);
   const props = useTable({
     table: 'UserAffiliationsList',
-    fetchData: createFetcher(userPermissionsList),
+    fetchData: createFetcher(userPermissionsList, {
+      parser: (data) => {
+        // Filter out broken/stale permissions where the scope resource has been deleted
+        // A permission is considered broken if:
+        // 1. scope_uuid is null/undefined (deleted resource)
+        // 2. scope_name is null/undefined (deleted resource)
+        return Array.isArray(data)
+          ? data.filter(
+              (permission) =>
+                permission.scope_uuid &&
+                permission.scope_name &&
+                permission.scope_type,
+            )
+          : [];
+      },
+    }),
     queryField: 'name',
     filter,
   });
@@ -75,16 +90,35 @@ export const UserAffiliationsList: FunctionComponent<
     },
     {
       title: translate('Scope name'),
-      render: ({ row }) =>
-        row.scope_type === 'project' ? (
-          <Link
-            state="project.dashboard"
-            params={{ uuid: row.scope_uuid }}
-            label={row.scope_name}
-          />
-        ) : (
-          <>{row.scope_name}</>
-        ),
+      render: ({ row }) => {
+        if (row.scope_type === 'project') {
+          return (
+            <Link
+              state="project.dashboard"
+              params={{ uuid: row.scope_uuid }}
+              label={row.scope_name}
+            />
+          );
+        } else if (row.scope_type === 'proposal') {
+          return (
+            <Link
+              state="proposals.manage-proposal"
+              params={{ proposal_uuid: row.scope_uuid }}
+              label={row.scope_name}
+            />
+          );
+        } else if (row.scope_type === 'call') {
+          return (
+            <Link
+              state="public-call.details"
+              params={{ call_uuid: row.scope_uuid }}
+              label={row.scope_name}
+            />
+          );
+        } else {
+          return <>{row.scope_name}</>;
+        }
+      },
 
       filter: 'scope_name',
     },
