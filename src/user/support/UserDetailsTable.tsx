@@ -58,24 +58,26 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
         value={<FieldWithCopy value={props.user.email} />}
       />
 
-      {isFeatureVisible(UserFeatures.show_slug) && (
-        <FormTable.Item
-          label={
-            isFeatureVisible(UserFeatures.show_slug_as_id)
-              ? translate('ID')
-              : translate('Shortname')
-          }
-          value={
-            isFeatureVisible(UserFeatures.show_slug_as_id) ? (
-              <span className="fw-semibold">
+      {isFeatureVisible(UserFeatures.show_slug) &&
+        props.user.slug &&
+        props.user.unix_username && (
+          <FormTable.Item
+            label={
+              isFeatureVisible(UserFeatures.show_slug_as_id)
+                ? translate('ID')
+                : translate('Shortname')
+            }
+            value={
+              isFeatureVisible(UserFeatures.show_slug_as_id) ? (
+                <span className="fw-semibold">
+                  <FieldWithCopy value={props.user.slug} />
+                </span>
+              ) : (
                 <FieldWithCopy value={props.user.slug} />
-              </span>
-            ) : (
-              <FieldWithCopy value={props.user.slug} />
-            )
-          }
-        />
-      )}
+              )
+            }
+          />
+        )}
       {isFeatureVisible(UserFeatures.preferred_language) && (
         <FormTable.Item
           label={translate('Preferred language')}

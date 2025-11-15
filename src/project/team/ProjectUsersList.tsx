@@ -32,6 +32,7 @@ const mandatoryFields = [
   'role_name',
   'user_username',
   'user_slug',
+  'user_unix_username',
 ];
 const mapStateToFilter = createSelector(
   getFormValues(PROJECT_USERS_LIST_FILTER_FORM_ID),
