@@ -1,4 +1,5 @@
 import { PlusIcon, UserCirclePlusIcon } from '@phosphor-icons/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { FC, useCallback, useState } from 'react';
 import { Form } from 'react-final-form';
 import { components } from 'react-select';
@@ -83,6 +84,7 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
   roles,
 }) => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { showSuccess, showErrorResponse } = useNotify();
   const { closeDialog } = useModal();
   const [selectKey, setSelectKey] = useState(0);
@@ -136,6 +138,10 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
           dispatch(setCurrentUser(newUser));
         }
 
+        // Invalidate all Proposal queries to force a refetch
+        // This ensures the proposal page re-renders with updated permissions
+        await queryClient.invalidateQueries({ queryKey: ['Proposal'] });
+
         showSuccess(
           translate('Ownership transferred from {previous} to {new}.', {
             previous: responseData.previous_manager,
@@ -148,7 +154,7 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
 
       closeDialog();
     },
-    [scope, roles, refetch, showSuccess, closeDialog, currentUser, dispatch],
+    [scope, roles, refetch, showSuccess, closeDialog, currentUser, dispatch, queryClient],
   );
 
   const saveUser = useCallback(
