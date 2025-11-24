@@ -19,12 +19,17 @@ import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { useModal } from '@waldur/modal/hooks';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { openModalDialog } from '@waldur/modal/actions';
+import { RoleEnum } from '@waldur/permissions/enums';
 import { ExpirationTimeGroup } from '@waldur/project/team/ExpirationTimeGroup';
 import { RoleGroup } from '@waldur/project/team/RoleGroup';
 import { UserListOptionInline } from '@waldur/project/team/UserListOptionInline';
 import { useNotify } from '@waldur/store/hooks';
+import { getCurrentUser } from '@waldur/user/UsersService';
+import { setCurrentUser } from '@waldur/workspace/actions';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { CreateUserDialog } from './CreateUserDialog';
+import { OwnershipTransferDialog } from './OwnershipTransferDialog';
 import { AddUserDialogProps } from './types';
 
 interface AddUserDialogFormData {
@@ -81,6 +86,7 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
   const { showSuccess, showErrorResponse } = useNotify();
   const { closeDialog } = useModal();
   const [selectKey, setSelectKey] = useState(0);
+  const currentUser = useUser();
 
   const handleUserCreated = (user: any, form) => {
     // Set the newly created user in the form
@@ -103,23 +109,100 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
     );
   };
 
+  const performAddUser = useCallback(
+    async (formData: AddUserDialogFormData) => {
+      const selectedRole =
+        roles && roles.length === 1 ? roles[0] : formData.role.name;
+
+      const response = await post(`${scope.url}add_user/`, {
+        user: formData.user.uuid,
+        expiration_time: formData.expiration_time,
+        role: selectedRole,
+      });
+
+      const responseData = await response.json();
+
+      await refetch();
+
+      // Check if ownership was transferred
+      if (responseData?.ownership_transferred) {
+        // Refresh the current user's permissions if they were involved in the transfer
+        // This ensures the UI updates correctly (e.g., old manager sees member view)
+        if (
+          currentUser.uuid === formData.user.uuid ||
+          selectedRole === RoleEnum.PROPOSAL_MANAGER
+        ) {
+          const newUser = await getCurrentUser();
+          dispatch(setCurrentUser(newUser));
+        }
+
+        showSuccess(
+          translate('Ownership transferred from {previous} to {new}.', {
+            previous: responseData.previous_manager,
+            new: responseData.new_manager,
+          }),
+        );
+      } else {
+        showSuccess(translate('User has been added.'));
+      }
+
+      closeDialog();
+    },
+    [scope, roles, refetch, showSuccess, closeDialog, currentUser, dispatch],
+  );
+
   const saveUser = useCallback(
     async (formData: AddUserDialogFormData) => {
       try {
-        await post(`${scope.url}add_user/`, {
-          user: formData.user.uuid,
-          expiration_time: formData.expiration_time,
-          role: roles && roles.length === 1 ? roles[0] : formData.role.name,
-        });
+        const selectedRole =
+          roles && roles.length === 1 ? roles[0] : formData.role.name;
 
-        await refetch();
-        showSuccess('User has been added.');
-        closeDialog();
+        // Check if the role being assigned is MANAGER
+        if (selectedRole === RoleEnum.PROPOSAL_MANAGER) {
+          // Show ownership transfer confirmation dialog
+          dispatch(
+            openModalDialog(
+              OwnershipTransferDialog,
+              {
+                currentManager: {
+                  full_name: currentUser.full_name,
+                  email: currentUser.email,
+                  username: currentUser.username,
+                },
+                newManager: {
+                  full_name: formData.user.full_name,
+                  email: formData.user.email,
+                  username: formData.user.username,
+                },
+                onConfirm: async () => {
+                  try {
+                    await performAddUser(formData);
+                  } catch (error) {
+                    showErrorResponse(
+                      error,
+                      translate('Unable to transfer ownership.'),
+                    );
+                  }
+                },
+              },
+              'SHOW_CONFIRM',
+            ),
+          );
+        } else {
+          await performAddUser(formData);
+        }
       } catch (error) {
         showErrorResponse(error, translate('Unable to add user.'));
       }
     },
-    [scope, roles, refetch, showSuccess, closeDialog, showErrorResponse],
+    [
+      scope,
+      roles,
+      currentUser,
+      dispatch,
+      performAddUser,
+      showErrorResponse,
+    ],
   );
 
   const initialValues =
