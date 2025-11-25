@@ -69,6 +69,13 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
           className="col-12 col-md-6"
         />
         {translate('Duration')}: {duration || '-'}
+        <ReadOnlyFormControl
+          label={translate('Minimum required uploads')}
+          value={
+            round.minimum_required_uploads ?? 0
+          }
+          className="col-12 col-md-6"
+        />
       </Card.Body>
     </Card>
   );
