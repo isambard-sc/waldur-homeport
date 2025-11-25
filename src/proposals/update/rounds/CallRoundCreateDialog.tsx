@@ -85,7 +85,10 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
       steps={steps}
       title={translate('New round')}
       wizardForms={WizardForms}
-      initialValues={{ timezone: DateTime.local().zoneName }}
+      initialValues={{
+        timezone: DateTime.local().zoneName,
+        minimum_required_uploads: 0,
+      }}
       submitLabel={translate('Create')}
       validate={validate}
     />
