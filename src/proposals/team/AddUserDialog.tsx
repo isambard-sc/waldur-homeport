@@ -116,45 +116,59 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
       const selectedRole =
         roles && roles.length === 1 ? roles[0] : formData.role.name;
 
-      const response = await post(`${scope.url}add_user/`, {
-        user: formData.user.uuid,
-        expiration_time: formData.expiration_time,
-        role: selectedRole,
-      });
+      try {
+        const response = await post(`${scope.url}add_user/`, {
+          user: formData.user.uuid,
+          expiration_time: formData.expiration_time,
+          role: selectedRole,
+        });
 
-      const responseData = await response.json();
+        const responseData = await response.json();
 
-      await refetch();
+        await refetch();
 
-      // Check if ownership was transferred
-      if (responseData?.ownership_transferred) {
-        // Refresh the current user's permissions if they were involved in the transfer
-        // This ensures the UI updates correctly (e.g., old manager sees member view)
-        if (
-          currentUser.uuid === formData.user.uuid ||
-          selectedRole === RoleEnum.PROPOSAL_MANAGER
-        ) {
-          const newUser = await getCurrentUser();
-          dispatch(setCurrentUser(newUser));
+        // Check if ownership was transferred
+        if (responseData?.ownership_transferred) {
+          // Refresh the current user's permissions if they were involved in the transfer
+          // This ensures the UI updates correctly (e.g., old manager sees member view)
+          if (
+            currentUser.uuid === formData.user.uuid ||
+            selectedRole === RoleEnum.PROPOSAL_MANAGER
+          ) {
+            const newUser = await getCurrentUser();
+            dispatch(setCurrentUser(newUser));
+          }
+
+          // Invalidate all Proposal queries to force a refetch
+          // This ensures the proposal page re-renders with updated permissions
+          await queryClient.invalidateQueries({ queryKey: ['Proposal'] });
+
+          showSuccess(
+            translate('Ownership transferred from {previous} to {new}.', {
+              previous: responseData.previous_manager,
+              new: responseData.new_manager,
+            }),
+          );
+        } else {
+          showSuccess(translate('User has been added.'));
         }
 
-        // Invalidate all Proposal queries to force a refetch
-        // This ensures the proposal page re-renders with updated permissions
-        await queryClient.invalidateQueries({ queryKey: ['Proposal'] });
-
-        showSuccess(
-          translate('Ownership transferred from {previous} to {new}.', {
-            previous: responseData.previous_manager,
-            new: responseData.new_manager,
-          }),
-        );
-      } else {
-        showSuccess(translate('User has been added.'));
+        closeDialog();
+      } catch (error) {
+        // Re-throw with proper error formatting for the outer catch
+        throw error;
       }
-
-      closeDialog();
     },
-    [scope, roles, refetch, showSuccess, closeDialog, currentUser, dispatch, queryClient],
+    [
+      scope,
+      roles,
+      refetch,
+      showSuccess,
+      closeDialog,
+      currentUser,
+      dispatch,
+      queryClient,
+    ],
   );
 
   const saveUser = useCallback(
@@ -184,10 +198,9 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
                   try {
                     await performAddUser(formData);
                   } catch (error) {
-                    showErrorResponse(
-                      error,
-                      translate('Unable to transfer ownership.'),
-                    );
+                    // Remove the generic error message to let backend error details show
+                    delete error.message;
+                    showErrorResponse(error, '');
                   }
                 },
               },
@@ -198,7 +211,9 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
           await performAddUser(formData);
         }
       } catch (error) {
-        showErrorResponse(error, translate('Unable to add user.'));
+        // Remove the generic error message to let backend error details show
+        delete error.message;
+        showErrorResponse(error, '');
       }
     },
     [
