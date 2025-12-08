@@ -9,6 +9,7 @@ import {
   proposalProposalsResourcesList,
 } from 'waldur-js-client';
 
+import { ENV } from '@waldur/core/config';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -42,6 +43,12 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
   const [isExporting, setIsExporting] = useState(false);
 
   const stateOptions = getProposalStateOptions();
+
+  // Get role description from ENV.roles
+  const getRoleDescription = (roleName: string): string => {
+    const role = ENV.roles.find((role) => role.name === roleName);
+    return role?.description || role?.name || roleName;
+  };
 
   const toggleState = (state: ProposalState) => {
     const newStates = new Set(selectedStates);
@@ -189,7 +196,7 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             proposal.users
               ?.map(
                 (u) =>
-                  `${u.user_email || 'Unknown'} [${u.role_description || u.role_name || 'Member'}]`,
+                  `${u.user_email || 'Unknown'} [${getRoleDescription(u.role_name) || 'Member'}]`,
               )
               .join(':') || '',
           ];
