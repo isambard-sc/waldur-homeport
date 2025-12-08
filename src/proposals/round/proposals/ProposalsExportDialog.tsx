@@ -121,6 +121,14 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
         return;
       }
 
+      // Calculate maximum number of attachments across all proposals
+      const maxAttachments = Math.max(
+        ...allProposals.map(
+          (p) => p.supporting_documentation?.length || 0,
+        ),
+        0,
+      );
+
       // Prepare export data fields
       const fields = [
         translate('Proposal ID'),
@@ -134,10 +142,7 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
 
       // Add project fields if checkbox is selected
       if (includeProjectDetails) {
-        fields.push(
-          translate('Project name'),
-          translate('Project URL'),
-        );
+        fields.push(translate('Project name'), translate('Project URL'));
       }
 
       fields.push(
@@ -149,38 +154,79 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
         translate('Team members'),
       );
 
+      // Add attachment columns
+      for (let i = 1; i <= maxAttachments; i++) {
+        fields.push(translate('Attachment {index}', { index: i }));
+      }
+
       // Prepare export data
       const exportData: ExportData = {
         fields,
         data: allProposals.map((proposal) => {
+          // Extract project UUID from project URL if it exists
+          // URL format: https://localhost/api/projects/{uuid}/
+          let projectUuid = '';
+          if (proposal.project) {
+            const match = proposal.project.match(/\/projects\/([^/]+)\//);
+            if (match) {
+              projectUuid = match[1];
+            }
+          }
+
+          const proposalUrl = `${window.location.origin}/call-management/${callUuid}/proposals/${proposal.uuid}/`;
+          const projectUrl = projectUuid
+            ? `${window.location.origin}/projects/${projectUuid}/`
+            : '';
+
           const row: any[] = [
             proposal.slug,
-            `${window.location.origin}/call-management/${callUuid}/proposals/${proposal.uuid}/`,
+            // Excel HYPERLINK formula for proposal URL
+            `=HYPERLINK("${proposalUrl}", "View")`,
             proposal.name,
             proposal.description || '',
             proposal.state,
-            proposal.project_summary || '',
-            proposal.duration_in_days?.toString() || '',
-            proposal.project_is_confidential ? 'Yes' : 'No',
-            proposal.project_has_civilian_purpose ? 'Yes' : 'No',
-            proposal.resources
-              ?.map((r) => r.requested_offering.offering_name)
-              .join(':') || '',
             proposal.created_by_name,
             formatDateTime(proposal.created),
-            proposal.users
-              ?.map((u) => `${u.email} [${u.role || 'Member'}]`)
-              .join(':') || '',
           ];
 
           // Add project details if checkbox is selected
           if (includeProjectDetails) {
             row.push(
               proposal.project_name || '',
-              proposal.project
-                ? `${window.location.origin}/projects/${proposal.project}/`
-                : '',
+              projectUrl ? `=HYPERLINK("${projectUrl}", "View")` : '',
             );
+          }
+
+          row.push(
+            proposal.project_summary || '',
+            // Duration as a number, not string
+            proposal.duration_in_days ?? '',
+            proposal.project_is_confidential ? 'Yes' : 'No',
+            proposal.project_has_civilian_purpose ? 'Yes' : 'No',
+            // Resources as colon-separated list of template names
+            proposal.resources
+              ?.map((r) => r.requested_offering.offering_name)
+              .join(':') || '',
+            // Team members with roles - use user_email and role_name from UserRoleDetails
+            proposal.users
+              ?.map(
+                (u) =>
+                  `${u.user_email || 'Unknown'} [${u.role_name || 'Member'}]`,
+              )
+              .join(':') || '',
+          );
+
+          // Add attachment URLs
+          for (let i = 0; i < maxAttachments; i++) {
+            const attachment = proposal.supporting_documentation?.[i];
+            if (attachment && attachment.file) {
+              // Create clickable hyperlink for attachment
+              row.push(
+                `=HYPERLINK("${attachment.file}", "${attachment.file_name || 'Download'}")`,
+              );
+            } else {
+              row.push('');
+            }
           }
 
           return row;
