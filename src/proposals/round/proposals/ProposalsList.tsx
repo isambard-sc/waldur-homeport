@@ -13,6 +13,7 @@ import { useTable } from '@waldur/table/useTable';
 import { ProposalRowActions } from '../../proposal/ProposalRowActions';
 
 import { ProposalExpandableRow } from './ProposalExpandableRow';
+import { ProposalsExportButton } from './ProposalsExportButton';
 
 interface RoundProposalsListProps {
   round: ProtectedRound;
@@ -35,6 +36,7 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
     <Table
       {...tableProps}
       id="proposals"
+      tableActions={<ProposalsExportButton roundUuid={props.round.uuid} />}
       columns={[
         {
           title: translate('Name'),
