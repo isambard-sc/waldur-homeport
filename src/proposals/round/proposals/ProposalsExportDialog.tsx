@@ -132,31 +132,27 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
       // Prepare export data fields
       const fields = [
         translate('Proposal ID'),
-        translate('URL'),
         translate('Name'),
         translate('Description'),
         translate('State'),
         translate('Created by'),
         translate('Created'),
-      ];
-
-      // Add project fields if checkbox is selected
-      if (includeProjectDetails) {
-        fields.push(translate('Project name'), translate('Project URL'));
-      }
-
-      fields.push(
         translate('Project summary'),
         translate('Duration (days)'),
         translate('Confidential'),
         translate('Research only'),
         translate('Requested resources'),
         translate('Team members'),
-      );
+      ];
 
       // Add attachment columns
       for (let i = 1; i <= maxAttachments; i++) {
         fields.push(translate('Attachment {index}', { index: i }));
+      }
+
+      // Add project field at the end if checkbox is selected
+      if (includeProjectDetails) {
+        fields.push(translate('Project name'));
       }
 
       // Prepare export data
@@ -173,31 +169,20 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             }
           }
 
-          const proposalUrl = `${window.location.origin}/call-management/${callUuid}/proposals/${proposal.uuid}/`;
+          // Use proposal.call_uuid directly from the proposal object
+          const proposalUrl = `${window.location.origin}/call-management/${proposal.call_uuid}/proposals/${proposal.uuid}/`;
           const projectUrl = projectUuid
             ? `${window.location.origin}/projects/${projectUuid}/`
             : '';
 
           const row: any[] = [
-            proposal.slug,
-            // Excel HYPERLINK formula for proposal URL
-            `=HYPERLINK("${proposalUrl}", "View")`,
+            // Proposal ID with hyperlink
+            { formula: `HYPERLINK("${proposalUrl}","${proposal.slug}")` },
             proposal.name,
             proposal.description || '',
             proposal.state,
             proposal.created_by_name,
             formatDateTime(proposal.created),
-          ];
-
-          // Add project details if checkbox is selected
-          if (includeProjectDetails) {
-            row.push(
-              proposal.project_name || '',
-              projectUrl ? `=HYPERLINK("${projectUrl}", "View")` : '',
-            );
-          }
-
-          row.push(
             proposal.project_summary || '',
             // Duration as a number, not string
             proposal.duration_in_days ?? '',
@@ -214,18 +199,34 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
                   `${u.user_email || 'Unknown'} [${u.role_name || 'Member'}]`,
               )
               .join(':') || '',
-          );
+          ];
 
           // Add attachment URLs
           for (let i = 0; i < maxAttachments; i++) {
             const attachment = proposal.supporting_documentation?.[i];
             if (attachment && attachment.file) {
+              // Extract filename from file path
+              const filename =
+                attachment.file_name ||
+                attachment.file.split('/').pop() ||
+                'Download';
               // Create clickable hyperlink for attachment
-              row.push(
-                `=HYPERLINK("${attachment.file}", "${attachment.file_name || 'Download'}")`,
-              );
+              row.push({
+                formula: `HYPERLINK("${attachment.file}","${filename}")`,
+              });
             } else {
               row.push('');
+            }
+          }
+
+          // Add project details at the end if checkbox is selected
+          if (includeProjectDetails) {
+            if (projectUrl && proposal.project_name) {
+              row.push({
+                formula: `HYPERLINK("${projectUrl}","${proposal.project_name}")`,
+              });
+            } else {
+              row.push(proposal.project_name || '');
             }
           }
 

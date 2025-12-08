@@ -100,6 +100,17 @@ function formatCell(ref, type, value) {
   return `<c r="${ref}" t="${type}"><v>${value}</v></c>`;
 }
 
+function formatFormulaCell(ref, formula) {
+  // Escape XML characters in formula
+  const escapedFormula = formula
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+  return `<c r="${ref}" t="str"><f>${escapedFormula}</f></c>`;
+}
+
 export function getSheetData(sharedStrings: SharedStrings, rows: any[][]) {
   return rows
     .map((row, rowIndex) => {
@@ -107,6 +118,12 @@ export function getSheetData(sharedStrings: SharedStrings, rows: any[][]) {
       const cells = row
         .map((value, cellIndex) => {
           const colRef = getColumnLetter(cellIndex + 1) + rowRef;
+
+          // Check if value is a formula object
+          if (value && typeof value === 'object' && value.formula) {
+            return formatFormulaCell(colRef, value.formula);
+          }
+
           switch (typeof value) {
             case 'boolean':
               return formatCell(colRef, 'b', value ? 1 : 0);
