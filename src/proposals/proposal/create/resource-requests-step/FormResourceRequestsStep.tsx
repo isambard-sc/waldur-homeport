@@ -82,7 +82,11 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
     onFetch(rows) {
       if (change) {
         setResourceRequests([...rows]);
-        change('resources', rows);
+        // Only set resources directly if NOT using templates
+        // If using templates, the useEffect below will handle the conversion
+        if (!call?.resource_templates?.length) {
+          change('resources', rows);
+        }
         change('resources_init', [...rows]);
       }
     },
@@ -90,7 +94,9 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
 
   // If the call has resource templates, change 'resources' field so that the values correspond to the templates.
   useEffect(() => {
-    if (call?.resource_templates?.length && resourceRequests.length) {
+    if (!call?.resource_templates?.length) return;
+
+    if (resourceRequests.length) {
       const selectedTemplates = resourceRequests
         .map((req) =>
           call.resource_templates.find(
@@ -98,8 +104,13 @@ export const FormResourceRequestsStep = (props: VStepperFormStepProps) => {
           ),
         )
         .filter(Boolean); // Filter out undefined values
+
       change('resources', [...selectedTemplates]);
     }
+    // Note: We don't set resources to [] when resourceRequests is empty
+    // because this can happen during component unmounting or race conditions,
+    // and we don't want to clear the field if it already has valid data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resourceRequests, call]);
 
   return (
