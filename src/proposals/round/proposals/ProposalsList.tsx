@@ -36,7 +36,12 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
     <Table
       {...tableProps}
       id="proposals"
-      tableActions={<ProposalsExportButton roundUuid={props.round.uuid} />}
+      tableActions={
+        <ProposalsExportButton
+          roundUuid={props.round.uuid}
+          callUuid={props.call.uuid}
+        />
+      }
       columns={[
         {
           title: translate('Name'),

@@ -15,17 +15,19 @@ const ProposalsExportDialog = lazyComponent(() =>
 
 interface ProposalsExportButtonProps {
   roundUuid: string;
+  callUuid: string;
 }
 
 export const ProposalsExportButton: FC<ProposalsExportButtonProps> = ({
   roundUuid,
+  callUuid,
 }) => {
   const dispatch = useDispatch();
 
   const handleClick = () => {
     dispatch(
       openModalDialog(ProposalsExportDialog, {
-        resolve: { roundUuid },
+        resolve: { roundUuid, callUuid },
         size: 'md',
       }),
     );
