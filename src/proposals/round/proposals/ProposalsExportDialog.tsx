@@ -1,6 +1,6 @@
 import { FileXlsIcon } from '@phosphor-icons/react';
 import { ChangeEvent, FC, useCallback, useState } from 'react';
-import { Button, Form, Spinner } from 'react-bootstrap';
+import { Button, Form, ProgressBar, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import {
   Proposal,
@@ -41,6 +41,10 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
   );
   const [includeProjectDetails, setIncludeProjectDetails] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
 
   const stateOptions = getProposalStateOptions();
 
@@ -67,58 +71,69 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
     }
 
     setIsExporting(true);
+    setExportProgress(null);
     try {
       // Fetch all proposals for the round with selected states
       const allProposals: ProposalWithDetails[] = [];
 
+      // First pass: collect all proposals to determine total count
+      const proposalsByState: Proposal[][] = [];
       for (const state of selectedStates) {
         try {
           const response = await proposalProposalsList({
             query: {
               round: roundUuid,
               state: state,
-              page_size: 1000, // Get all proposals
+              page_size: 1000,
             },
           });
-
-          // The response.data is an array of proposals
           if (response.data && Array.isArray(response.data)) {
-            // Fetch users and resources for each proposal
-            for (const proposal of response.data) {
-              try {
-                // Fetch team members
-                const usersResponse = await proposalProposalsListUsersList({
-                  path: { uuid: proposal.uuid },
-                  query: { page_size: 1000 },
-                });
-
-                // Fetch resources
-                const resourcesResponse =
-                  await proposalProposalsResourcesList({
-                    path: { uuid: proposal.uuid },
-                    query: { page_size: 1000 },
-                  });
-
-                allProposals.push({
-                  ...proposal,
-                  users: usersResponse.data || [],
-                  resources: resourcesResponse.data || [],
-                });
-              } catch (error) {
-                console.error(
-                  `Error fetching details for proposal ${proposal.slug}:`,
-                  error,
-                );
-                // Add proposal without details if fetching fails
-                allProposals.push(proposal);
-              }
-            }
+            proposalsByState.push(response.data);
           }
         } catch (error) {
           console.error(`Error fetching proposals for state ${state}:`, error);
           showError(
             translate('Error fetching proposals for state {state}', { state }),
           );
+        }
+      }
+
+      const totalProposals = proposalsByState.reduce((sum, proposals) => sum + proposals.length, 0);
+      let processedCount = 0;
+
+      // Second pass: fetch details for each proposal with progress tracking
+      for (const proposals of proposalsByState) {
+        for (const proposal of proposals) {
+          processedCount++;
+          setExportProgress({ current: processedCount, total: totalProposals });
+
+          try {
+            // Fetch team members
+            const usersResponse = await proposalProposalsListUsersList({
+              path: { uuid: proposal.uuid },
+              query: { page_size: 1000 },
+            });
+
+            // Fetch resources
+            const resourcesResponse =
+              await proposalProposalsResourcesList({
+                path: { uuid: proposal.uuid },
+                query: { page_size: 1000 },
+              });
+
+            allProposals.push({
+              ...proposal,
+              users: usersResponse.data || [],
+              resources: resourcesResponse.data || [],
+            });
+          } catch (error) {
+            console.error(
+              `Error fetching details for proposal ${proposal.slug}:`,
+              error,
+            );
+            // Add proposal without details if fetching fails
+            allProposals.push(proposal);
+          }
         }
       }
 
@@ -243,6 +258,7 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
       showError(translate('Failed to export proposals'));
     } finally {
       setIsExporting(false);
+      setExportProgress(null);
     }
   }, [
     roundUuid,
@@ -329,6 +345,26 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
           )}
         </Form.Text>
       </div>
+      {exportProgress && (
+        <div className="mt-4">
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <span className="text-muted">
+              {translate('Downloading proposal {current} of {total}', {
+                current: exportProgress.current,
+                total: exportProgress.total,
+              })}
+            </span>
+            <span className="text-muted">
+              {Math.round((exportProgress.current / exportProgress.total) * 100)}%
+            </span>
+          </div>
+          <ProgressBar
+            now={(exportProgress.current / exportProgress.total) * 100}
+            variant="primary"
+            animated
+          />
+        </div>
+      )}
     </ModalDialog>
   );
 };
