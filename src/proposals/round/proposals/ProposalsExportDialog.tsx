@@ -131,17 +131,17 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
 
       // Prepare export data fields
       const fields = [
-        translate('Proposal ID'),
+        translate('Proposal'),
         translate('Name'),
+        translate('Summary'),
         translate('Description'),
         translate('State'),
-        translate('Created by'),
-        translate('Created'),
-        translate('Project summary'),
+        translate('Requested resources'),
         translate('Duration (days)'),
         translate('Confidential'),
         translate('Research only'),
-        translate('Requested resources'),
+        translate('Created by'),
+        translate('Created'),
         translate('Team members'),
       ];
 
@@ -152,15 +152,13 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
 
       // Add project field at the end if checkbox is selected
       if (includeProjectDetails) {
-        fields.push(translate('Project name'));
+        fields.push(translate('Project'));
       }
 
       // Prepare export data
       const exportData: ExportData = {
         fields,
         data: allProposals.map((proposal) => {
-          // Extract project UUID from project URL if it exists
-          // URL format: https://localhost/api/projects/{uuid}/
           let projectUuid = '';
           if (proposal.project) {
             const match = proposal.project.match(/\/projects\/([^/]+)\//);
@@ -169,34 +167,29 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             }
           }
 
-          // Use proposal.call_uuid directly from the proposal object
-          const proposalUrl = `${window.location.origin}/call-management/${proposal.call_uuid}/proposals/${proposal.uuid}/`;
+          const proposalUrl = `${window.location.origin}/proposals/${proposal.uuid}/`;
           const projectUrl = projectUuid
             ? `${window.location.origin}/projects/${projectUuid}/`
             : '';
 
           const row: any[] = [
-            // Proposal ID with hyperlink
             { formula: `HYPERLINK("${proposalUrl}","${proposal.slug}")` },
             proposal.name,
+            proposal.project_summary || '',
             proposal.description || '',
             proposal.state,
-            proposal.created_by_name,
-            formatDateTime(proposal.created),
-            proposal.project_summary || '',
-            // Duration as a number, not string
-            proposal.duration_in_days ?? '',
-            proposal.project_is_confidential ? 'Yes' : 'No',
-            proposal.project_has_civilian_purpose ? 'Yes' : 'No',
-            // Resources as colon-separated list of template names
             proposal.resources
               ?.map((r) => r.requested_offering.offering_name)
               .join(':') || '',
-            // Team members with roles - use user_email and role_name from UserRoleDetails
+            proposal.duration_in_days ?? '',
+            proposal.project_is_confidential ? 'Yes' : 'No',
+            proposal.project_has_civilian_purpose ? 'Yes' : 'No',
+            proposal.created_by_name,
+            formatDateTime(proposal.created),
             proposal.users
               ?.map(
                 (u) =>
-                  `${u.user_email || 'Unknown'} [${u.role_name || 'Member'}]`,
+                  `${u.user_email || 'Unknown'} [${u.role_description || u.role_name || 'Member'}]`,
               )
               .join(':') || '',
           ];
@@ -207,7 +200,7 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             if (attachment && attachment.file) {
               // Extract filename from file path
               const filename =
-                attachment.file_name ||
+                attachment.file_name.split('/').pop() ||
                 attachment.file.split('/').pop() ||
                 'Download';
               // Create clickable hyperlink for attachment
