@@ -10,6 +10,7 @@ import { EndingField } from '@waldur/proposals/EndingField';
 import { ReviewsTableFilter } from '@waldur/proposals/review/ReviewsTableFilter';
 import { ProposalReview } from '@waldur/proposals/types';
 import { getReviewStateOptions } from '@waldur/proposals/utils';
+import { router } from '@waldur/router';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
@@ -60,7 +61,17 @@ export const CustomerReviewsList: FC<{}> = () => {
         },
         {
           title: translate('Proposal'),
-          render: ({ row }) => <>{row.proposal_name}</>,
+          render: ({ row }) => (
+            <a
+              onClick={() =>
+                router.stateService.go('proposal-review-view', {
+                  review_uuid: row.uuid,
+                })
+              }
+            >
+              {row.proposal_name}
+            </a>
+          ),
           keys: ['proposal_name'],
           id: 'proposal',
         },

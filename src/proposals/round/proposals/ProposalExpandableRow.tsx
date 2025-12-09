@@ -5,11 +5,11 @@ import {
   proposalReviewsList,
 } from 'waldur-js-client';
 
-import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { RateStars } from '@waldur/proposals/proposal/create-review/RateStars';
 import { ReviewStateRenderer } from '@waldur/proposals/review/ReviewStateRenderer';
 import { Field } from '@waldur/resource/summary';
+import { router } from '@waldur/router';
 import { createFetcher } from '@waldur/table/api';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import Table from '@waldur/table/Table';
@@ -51,11 +51,16 @@ export const ProposalExpandableRow: React.FC<ProposalExpandableRowProps> = ({
     {
       title: translate('Review'),
       render: ({ row }) => (
-        <Link
-          state="proposal-review"
-          params={{ review_uuid: row.uuid }}
-          label={row.name} // Generated in frontend
-        />
+        <a
+          onClick={() =>
+            router.stateService.go('proposal-review', {
+              uuid: row.call_managing_organisation_uuid,
+              review_uuid: row.uuid,
+            })
+          }
+        >
+          {row.name}
+        </a>
       ),
     },
     {
