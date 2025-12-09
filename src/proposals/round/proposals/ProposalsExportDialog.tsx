@@ -21,8 +21,10 @@ import exportAs from '@waldur/table/exporters';
 import { ExportData } from '@waldur/table/exporters/types';
 
 interface ProposalsExportDialogProps {
-  roundUuid: string;
-  callUuid: string;
+  resolve: {
+    roundUuid: string;
+    callUuid: string;
+  };
 }
 
 interface ProposalWithDetails extends Proposal {
@@ -31,8 +33,7 @@ interface ProposalWithDetails extends Proposal {
 }
 
 export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
-  roundUuid,
-  callUuid,
+  resolve: { roundUuid, callUuid },
 }) => {
   const dispatch = useDispatch();
   const { showError, showSuccess } = useNotify();
