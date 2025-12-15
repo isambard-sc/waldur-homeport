@@ -16,7 +16,7 @@ import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 import {
   getCustomer,
-  isOwnerOrStaff as isOwnerOrStaffSelector,
+  isOwnerOrStaffOrReader as isOwnerOrStafforReaderSelector,
 } from '@waldur/workspace/selectors';
 
 import { CustomerPermissionsLogButton } from './CustomerPermissionsLogButton';
@@ -59,7 +59,7 @@ const mandatoryFields: CustomersUsersListData['query']['field'] = [
 // Add slug and unix_username conditionally - they may not be in the type definition yet
 const mandatoryFieldsWithSlug = [...mandatoryFields, 'slug', 'unix_username'] as any;
 
-export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
+export const CustomerUsersList: FunctionComponent<{ filters?}> = ({
   filters,
 }) => {
   const filter = useSelector(mapStateToFilter);
@@ -78,9 +78,9 @@ export const CustomerUsersList: FunctionComponent<{ filters? }> = ({
 
   // The "Team" page contains several other pages. We have to check the access permissions to this page here.
   const router = useRouter();
-  const isOwnerOrStaff = useSelector(isOwnerOrStaffSelector);
+  const isOwnerOrStafforReader = useSelector(isOwnerOrStafforReaderSelector);
   useEffect(() => {
-    if (!isOwnerOrStaff) {
+    if (!isOwnerOrStafforReader) {
       router.stateService.go('organization-invitations');
     }
   }, []);
