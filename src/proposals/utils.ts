@@ -127,7 +127,7 @@ export const getReviewStateOptions = () =>
     { value: 'created', label: translate('Created') },
     { value: 'in_review', label: translate('In review') },
     { value: 'submitted', label: translate('Submitted') },
-    { value: 'rejected', label: translate('Rejected') },
+    { value: 'rejected', label: translate('Declined') },
   ] as { value: ProposalReviewStateEnum; label: string }[];
 
 export const formatReviewState = (value: ProposalReviewStateEnum) =>

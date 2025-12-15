@@ -34,6 +34,10 @@ const dataParser = (data: ProposalReview[], query) => {
 };
 
 const renderReviewScoreField = ({ row }) => {
+  // Only show stars for in_review and submitted reviews
+  if (row.state === 'rejected' || row.state === 'created') {
+    return null;
+  }
   return <RateStars value={row.summary_score} />;
 };
 
@@ -74,6 +78,17 @@ export const ProposalExpandableRow: React.FC<ProposalExpandableRowProps> = ({
     {
       title: translate('Score'),
       render: renderReviewScoreField,
+    },
+    {
+      title: translate('Comment'),
+      render: ({ row }) => {
+        const comment = row.summary_private_comment || row.summary_public_comment;
+        return comment ? (
+          <span className="text-muted">{comment}</span>
+        ) : (
+          <span className="text-muted">-</span>
+        );
+      },
     },
   ];
 
