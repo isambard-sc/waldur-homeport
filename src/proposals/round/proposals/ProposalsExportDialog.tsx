@@ -165,6 +165,7 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
         translate('Research only'),
         translate('Created by'),
         translate('Created'),
+        translate('Submitted'),
         translate('Team members'),
       ];
 
@@ -209,6 +210,9 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             proposal.project_has_civilian_purpose ? 'Yes' : 'No',
             proposal.created_by_name,
             formatDateTime(proposal.created),
+            !['draft', 'canceled'].includes(proposal.state)
+              ? formatDateTime(proposal.modified)
+              : '',
             proposal.users
               ?.map(
                 (u) =>
