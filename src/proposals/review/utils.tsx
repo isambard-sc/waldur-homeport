@@ -54,8 +54,9 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
   });
   const { mutate: reject, isPending: isRejecting } = useMutation({
     mutationFn: async () => {
+      let rejectionReason: string;
       try {
-        await waitForConfirmation(
+        rejectionReason = await waitForConfirmation(
           dispatch,
           translate('Reject review'),
           translate(
@@ -65,12 +66,25 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
             },
             formatJsxTemplate,
           ),
+          {
+            showInput: true,
+            inputLabel: translate('Reason for rejection'),
+            inputPlaceholder: translate(
+              'Please provide a reason for rejecting this review',
+            ),
+            inputRequired: true,
+            inputRows: 4,
+            inputMaxLength: 500,
+          },
         );
       } catch {
         return;
       }
       try {
-        await proposalReviewsReject({ path: { uuid: review.uuid } });
+        await proposalReviewsReject({
+          path: { uuid: review.uuid },
+          body: { summary_private_comment: rejectionReason },
+        });
         if (refetch) refetch();
         dispatch(showSuccess(translate('Review has been rejected.')));
       } catch (response) {

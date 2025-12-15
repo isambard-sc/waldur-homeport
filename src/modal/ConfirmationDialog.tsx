@@ -3,7 +3,7 @@ import React, { ReactNode, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
-import { StringField } from '@waldur/form';
+import { StringField, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 
@@ -30,6 +30,7 @@ interface ConfirmationDialogProps {
     inputLabel?: string;
     inputPlaceholder?: string;
     inputMaxLength?: number;
+    inputRows?: number;
   };
 }
 
@@ -49,6 +50,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     inputLabel,
     inputPlaceholder,
     inputMaxLength,
+    inputRows,
   },
 }) => {
   const dispatch = useDispatch();
@@ -100,14 +102,28 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         {body}
         {showInput && (
           <div className="mt-3">
-            <StringField
-              label={inputLabel}
-              placeholder={inputPlaceholder}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              required={inputRequired}
-              maxLength={inputMaxLength}
-            />
+            {inputRows ? (
+              <TextField
+                label={inputLabel}
+                placeholder={inputPlaceholder}
+                input={{
+                  value: inputValue,
+                  onChange: (e) => setInputValue(e.target.value),
+                }}
+                required={inputRequired}
+                maxLength={inputMaxLength}
+                rows={inputRows}
+              />
+            ) : (
+              <StringField
+                label={inputLabel}
+                placeholder={inputPlaceholder}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                required={inputRequired}
+                maxLength={inputMaxLength}
+              />
+            )}
             {inputMaxLength && (
               <div className="text-muted small mt-1">
                 {inputValue.length}/{inputMaxLength} {translate('characters')}
