@@ -68,13 +68,27 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
           ),
           {
             showInput: true,
-            inputLabel: translate('Reason for rejection'),
+            inputLabel: translate('Additional details (optional)'),
             inputPlaceholder: translate(
-              'Please provide a reason for rejecting this review',
+              'Provide any additional details about your rejection',
             ),
             inputRequired: true,
             inputRows: 4,
-            inputMaxLength: 500,
+            inputMaxLength: 400,
+            inputCheckboxes: [
+              {
+                label: translate('Too busy'),
+                value: translate('Too busy'),
+              },
+              {
+                label: translate('Conflict of interest'),
+                value: translate('Conflict of interest'),
+              },
+              {
+                label: translate('Outside area of expertise'),
+                value: translate('Outside area of expertise'),
+              },
+            ],
           },
         );
       } catch {

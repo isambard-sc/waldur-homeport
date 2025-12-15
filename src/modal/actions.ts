@@ -45,6 +45,7 @@ export const waitForConfirmation = (
     inputRequired?: boolean;
     inputMaxLength?: number;
     inputRows?: number;
+    inputCheckboxes?: Array<{ label: string; value: string }>;
   } = {},
 ) => {
   const deferred = createDeferred();

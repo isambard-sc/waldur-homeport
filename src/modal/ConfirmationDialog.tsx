@@ -1,6 +1,6 @@
 import { WarningCircleIcon } from '@phosphor-icons/react';
 import React, { ReactNode, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 
 import { StringField, TextField } from '@waldur/form';
@@ -31,6 +31,7 @@ interface ConfirmationDialogProps {
     inputPlaceholder?: string;
     inputMaxLength?: number;
     inputRows?: number;
+    inputCheckboxes?: Array<{ label: string; value: string }>;
   };
 }
 
@@ -51,17 +52,46 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     inputPlaceholder,
     inputMaxLength,
     inputRows,
+    inputCheckboxes,
   },
 }) => {
   const dispatch = useDispatch();
   const closeDialog = () => dispatch(closeModalDialog('HIDE_CONFIRM'));
   const [inputValue, setInputValue] = useState('');
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const handleCheckboxChange = (value: string) => {
+    setSelectedCheckboxes((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(value)) {
+        newSet.delete(value);
+      } else {
+        newSet.add(value);
+      }
+      return newSet;
+    });
+  };
 
   const handleSubmit = () => {
-    if (showInput && inputRequired && !inputValue.trim()) {
+    if (showInput && inputRequired && !inputValue.trim() && selectedCheckboxes.size === 0) {
       return;
     }
-    deferred.resolve(showInput ? inputValue : undefined);
+
+    let result: string;
+    if (showInput) {
+      const checkboxValues = Array.from(selectedCheckboxes).join(' | ');
+      if (checkboxValues && inputValue.trim()) {
+        result = `${checkboxValues} | ${inputValue.trim()}`;
+      } else if (checkboxValues) {
+        result = checkboxValues;
+      } else {
+        result = inputValue.trim();
+      }
+    }
+
+    deferred.resolve(showInput ? result : undefined);
     closeDialog();
   };
 
@@ -102,6 +132,21 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
         {body}
         {showInput && (
           <div className="mt-3">
+            {inputCheckboxes && inputCheckboxes.length > 0 && (
+              <div className="mb-3">
+                {inputCheckboxes.map((checkbox) => (
+                  <Form.Check
+                    key={checkbox.value}
+                    type="checkbox"
+                    id={`checkbox-${checkbox.value}`}
+                    label={checkbox.label}
+                    checked={selectedCheckboxes.has(checkbox.value)}
+                    onChange={() => handleCheckboxChange(checkbox.value)}
+                    className="mb-2"
+                  />
+                ))}
+              </div>
+            )}
             {inputRows ? (
               <TextField
                 label={inputLabel}
