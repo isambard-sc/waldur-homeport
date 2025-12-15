@@ -58,9 +58,9 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
       try {
         rejectionReason = await waitForConfirmation(
           dispatch,
-          translate('Reject review'),
+          translate('Decline to review'),
           translate(
-            'Are you sure you want to reject the {name} proposal review?',
+            'Are you sure you want to decline to review the {name} proposal?',
             {
               name: <b>{review.proposal_name}</b>,
             },
@@ -70,7 +70,7 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
             showInput: true,
             inputLabel: translate('Additional details (optional)'),
             inputPlaceholder: translate(
-              'Provide any additional details about your rejection',
+              'Provide any additional details',
             ),
             inputRequired: true,
             inputRows: 4,
@@ -100,10 +100,10 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
           body: { summary_private_comment: rejectionReason },
         });
         if (refetch) refetch();
-        dispatch(showSuccess(translate('Review has been rejected.')));
+        dispatch(showSuccess(translate('Review has been declined.')));
       } catch (response) {
         dispatch(
-          showErrorResponse(response, translate('Unable to reject review.')),
+          showErrorResponse(response, translate('Unable to decline review.')),
         );
       }
     },
