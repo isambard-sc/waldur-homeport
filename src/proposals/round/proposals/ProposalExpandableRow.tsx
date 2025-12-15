@@ -5,6 +5,7 @@ import {
   proposalReviewsList,
 } from 'waldur-js-client';
 
+import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { RateStars } from '@waldur/proposals/proposal/create-review/RateStars';
 import { ReviewStateRenderer } from '@waldur/proposals/review/ReviewStateRenderer';
@@ -83,11 +84,20 @@ export const ProposalExpandableRow: React.FC<ProposalExpandableRowProps> = ({
       title: translate('Comment'),
       render: ({ row }) => {
         const comment = row.summary_private_comment || row.summary_public_comment;
-        return comment ? (
-          <span className="text-muted">{comment}</span>
-        ) : (
-          <span className="text-muted">-</span>
-        );
+        if (!comment) {
+          return <span className="text-muted">-</span>;
+        }
+        // Show tooltip for long comments (> 80 characters)
+        if (comment.length > 80) {
+          return (
+            <Tip label={comment} id={`comment-${row.uuid}`}>
+              <span className="ellipsis d-inline-block text-muted" style={{ maxWidth: 300 }}>
+                {comment}
+              </span>
+            </Tip>
+          );
+        }
+        return <span className="text-muted">{comment}</span>;
       },
     },
   ];
