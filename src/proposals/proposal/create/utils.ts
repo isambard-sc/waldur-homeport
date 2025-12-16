@@ -49,49 +49,6 @@ export const useProposalDecisionActions = (
     callOrganizerId: proposal.call_managing_organisation_uuid,
   });
 
-  // DIAGNOSTIC LOGGING - Remove after debugging
-  console.group('🔍 Proposal Decision Actions Diagnostic');
-  console.log('User:', {
-    uuid: user?.uuid,
-    username: user?.username,
-    is_staff: user?.is_staff,
-    permissions: user?.permissions,
-  });
-  console.log('Proposal:', {
-    uuid: proposal.uuid,
-    name: proposal.name,
-    state: proposal.state,
-    call_uuid: proposal.call_uuid,
-    call_name: proposal.call_name,
-    call_managing_organisation_uuid: proposal.call_managing_organisation_uuid,
-  });
-  console.log('Permission Check:', {
-    checkingPermission: PermissionEnum.APPROVE_AND_REJECT_PROPOSALS,
-    scopeId: proposal.call_uuid,
-    callOrganizerId: proposal.call_managing_organisation_uuid,
-  });
-  console.log('Results:', {
-    stateIsValid,
-    hasPermissionForDecision,
-    canPerformDecisionActions: stateIsValid && hasPermissionForDecision,
-  });
-
-  // Check each user permission against the call
-  if (user?.permissions) {
-    console.log('Detailed Permission Analysis:');
-    user.permissions.forEach((perm, index) => {
-      console.log(`  Permission ${index + 1}:`, {
-        role_name: perm.role_name,
-        scope_type: perm.scope_type,
-        scope_uuid: perm.scope_uuid,
-        scope_name: perm.scope_name,
-        matches_call_uuid: perm.scope_uuid === proposal.call_uuid,
-        matches_org_uuid: perm.scope_uuid === proposal.call_managing_organisation_uuid,
-      });
-    });
-  }
-  console.groupEnd();
-
   const canPerformDecisionActions = stateIsValid && hasPermissionForDecision;
 
   const handleApproveProposal = useCallback(async () => {

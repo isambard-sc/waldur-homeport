@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent, useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { proposalProtectedCallsRetrieve } from 'waldur-js-client';
 
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
@@ -14,11 +15,13 @@ import { useTitle } from '@waldur/navigation/title';
 import { PageBarTab } from '@waldur/navigation/types';
 import { usePageTabsTransmitter } from '@waldur/navigation/usePageTabsTransmitter';
 import { RoleEnum } from '@waldur/permissions/enums';
+import { type RootState } from '@waldur/store/reducers';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { CallTabs } from '../details/CallTabs';
 import { TeamSection } from '../team/TeamSection';
 import { Call } from '../types';
-import { useCallBreadcrumbItems } from '../utils';
+import { checkIsCallManager, useCallBreadcrumbItems } from '../utils';
 
 import { CallUpdateHero } from './CallUpdateHero';
 import { CallConfiguration } from './configuration/CallConfiguration';
@@ -36,10 +39,22 @@ const PageHero = ({ call, refetch }) => (
 );
 
 const Body = ({ call, refetch, loading }) => {
+  // Check if user can manage the call (staff or call manager only)
+  const canManageCall = useSelector((state: RootState) => {
+    const user = getUser(state);
+    if (!user) return false;
+    // Staff users have full access
+    if (user.is_staff) return true;
+    // Call managers have full access
+    if (checkIsCallManager(call, user)) return true;
+    return false;
+  });
+
   const tabs = useMemo<PageBarTab[]>(
     () =>
       [
-        {
+        // Only show management tabs to Call Managers and staff
+        canManageCall && {
           key: 'rounds',
           title: (
             <>
@@ -50,7 +65,7 @@ const Body = ({ call, refetch, loading }) => {
 
           component: CallRoundsList,
         },
-        {
+        canManageCall && {
           key: 'general',
           title: (
             <>
@@ -61,17 +76,17 @@ const Body = ({ call, refetch, loading }) => {
 
           component: CallGeneralSection,
         },
-        {
+        canManageCall && {
           key: 'configuration',
           title: translate('Configuration'),
           component: CallConfiguration,
         },
-        {
+        canManageCall && {
           key: 'documents',
           title: translate('Documents'),
           component: CallDocumentsSection,
         },
-        {
+        canManageCall && {
           key: 'team',
           title: translate('Team'),
           defaultKey: !isFeatureVisible(MarketplaceFeatures.call_only)
@@ -110,24 +125,37 @@ const Body = ({ call, refetch, loading }) => {
             },
           ].filter(Boolean),
         },
-        {
+        canManageCall && {
           key: 'offerings',
           title: translate('Offerings'),
           component: CallOfferingsSection,
         },
-        {
+        canManageCall && {
           key: 'role_mapping',
           title: translate('Role mapping'),
           component: CallRoleMappingsList,
         },
       ].filter(Boolean) as PageBarTab[],
-    [call],
+    [call, canManageCall],
   );
 
   usePageHero(<PageHero call={call} refetch={refetch} />);
 
   const breadcrumbItems = useCallBreadcrumbItems(call);
   useBreadcrumbs(breadcrumbItems);
+
+  // If no tabs are available (e.g., user is only a reviewer), show access denied message
+  if (tabs.length === 0) {
+    return (
+      <div className="container-fluid">
+        <div className="alert alert-warning">
+          {translate(
+            'You do not have permission to manage this call. Only call managers can access call management features.',
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const {
     tabSpec: { component: Component },
