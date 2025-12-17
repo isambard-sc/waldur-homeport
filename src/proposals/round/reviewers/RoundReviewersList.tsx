@@ -1,29 +1,195 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import {
   callRoundsReviewersList,
+  proposalReviewsList,
   ProtectedRound,
   RoundReviewer,
 } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
-import { createFetcher } from '@waldur/table/api';
+import { Call } from '@waldur/proposals/types';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
 
+import { ReviewerExpandableRow } from './ReviewerExpandableRow';
+
 interface RoundReviewersListProps {
   round: ProtectedRound;
+  call: Call;
 }
 
+// Enhanced RoundReviewer with computed statistics
+interface EnhancedRoundReviewer extends RoundReviewer {
+  reviewer_uuid?: string;
+  outstanding_reviews?: number;
+  declined_reviews?: number;
+  in_progress_reviews?: number;
+  submitted_reviews?: number;
+  average_score?: number;
+  acceptance_rate?: number;
+  reviews?: any[]; // Pre-fetched reviews for this reviewer
+}
+
+// Custom fetcher that enhances reviewer data with review statistics
+const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) => {
+  return async (request) => {
+    const { queryClient } = await import('@waldur/Application');
+    const { fetchResultCount, parseNextPage } = await import('@waldur/core/api');
+
+    return queryClient.fetchQuery({
+      queryKey: ['table', request.tableKey, roundUuid, request.filter],
+      queryFn: async () => {
+        // First fetch the reviewers list
+        const reviewersResponse = await callRoundsReviewersList({
+          path: { uuid: roundUuid },
+          query: {
+            page: request.currentPage,
+            page_size: request.pageSize,
+            ...request.filter,
+          },
+        });
+
+        const reviewers = reviewersResponse.data || [];
+
+        // Fetch all reviews for this call
+        const query: any = { page_size: 1000 };
+        if (callUuid) {
+          query.call_uuid = callUuid;
+        }
+
+        const allReviews = await proposalReviewsList({ query });
+
+        const reviewsData = (allReviews.data || []).filter(
+          (review) => review.round_uuid === roundUuid,
+        );
+
+        // Process each reviewer and add statistics
+        const enhanced: EnhancedRoundReviewer[] = reviewers.map((reviewer) => {
+          // Find all reviews for this reviewer
+          const reviewerReviews = reviewsData.filter(
+            (review) => review.reviewer_full_name === reviewer.full_name,
+          );
+
+          // Extract reviewer_uuid if available
+          const reviewer_uuid = reviewerReviews[0]?.reviewer_uuid;
+
+          // Count reviews by state
+          const outstanding = reviewerReviews.filter(
+            (r) => r.state === 'created',
+          ).length;
+          const declined = reviewerReviews.filter(
+            (r) => r.state === 'rejected',
+          ).length;
+          const inProgress = reviewerReviews.filter(
+            (r) => r.state === 'in_review',
+          ).length;
+          const submitted = reviewerReviews.filter(
+            (r) => r.state === 'submitted',
+          ).length;
+
+          // Calculate average score for submitted reviews
+          const submittedWithScores = reviewerReviews.filter(
+            (r) => r.state === 'submitted' && r.summary_score != null,
+          );
+          const averageScore =
+            submittedWithScores.length > 0
+              ? submittedWithScores.reduce((sum, r) => sum + r.summary_score, 0) /
+                submittedWithScores.length
+              : undefined;
+
+          // Calculate acceptance rate
+          const totalDecisions =
+            reviewer.accepted_proposals + reviewer.rejected_proposals;
+          const acceptanceRate =
+            totalDecisions > 0
+              ? (reviewer.accepted_proposals / totalDecisions) * 100
+              : undefined;
+
+          return {
+            ...reviewer,
+            reviewer_uuid,
+            outstanding_reviews: outstanding,
+            declined_reviews: declined,
+            in_progress_reviews: inProgress,
+            submitted_reviews: submitted,
+            average_score: averageScore,
+            acceptance_rate: acceptanceRate,
+            reviews: reviewerReviews, // Include pre-fetched reviews
+          };
+        });
+
+        // Return in the expected format with rows, resultCount, nextPage
+        const resultCount = fetchResultCount(reviewersResponse);
+        const nextPage = parseNextPage(reviewersResponse);
+
+        return {
+          rows: enhanced,
+          resultCount,
+          nextPage,
+        };
+      },
+      staleTime: request.options?.staleTime,
+    });
+  };
+};
+
+const AcceptanceRateRenderer: FC<{ row: EnhancedRoundReviewer }> = ({ row }) => {
+  const total = row.accepted_proposals + row.rejected_proposals;
+
+  if (total === 0) {
+    return <span className="text-muted">-</span>;
+  }
+
+  const rate = row.acceptance_rate || 0;
+  const accepted = row.accepted_proposals;
+  const rejected = row.rejected_proposals;
+
+  return (
+    <div className="d-flex align-items-center gap-2">
+      <div className="flex-grow-1">
+        <div className="progress" style={{ height: '20px', minWidth: '100px' }}>
+          <div
+            className="progress-bar bg-success"
+            role="progressbar"
+            style={{ width: `${rate}%` }}
+            aria-valuenow={rate}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            {rate > 15 && <small>{accepted}</small>}
+          </div>
+          <div
+            className="progress-bar bg-danger"
+            role="progressbar"
+            style={{ width: `${100 - rate}%` }}
+            aria-valuenow={100 - rate}
+            aria-valuemin={0}
+            aria-valuemax={100}
+          >
+            {100 - rate > 15 && <small>{rejected}</small>}
+          </div>
+        </div>
+      </div>
+      <small className="text-muted text-nowrap">
+        {accepted}/{total}
+      </small>
+    </div>
+  );
+};
+
 export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
+  const fetchData = useMemo(
+    () => createEnhancedReviewersFetcher(props.round.uuid, props.call.uuid),
+    [props.round.uuid, props.call.uuid],
+  );
+
   const tableProps = useTable({
     table: 'RoundReviewersList',
-    fetchData: createFetcher(callRoundsReviewersList, {
-      path: { uuid: props.round.uuid },
-    }),
+    fetchData,
   });
 
   return (
-    <Table<RoundReviewer>
+    <Table<EnhancedRoundReviewer>
       {...tableProps}
       id="reviewers"
       columns={[
@@ -38,20 +204,44 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
           copyField: (row) => row.email,
         },
         {
-          title: translate('Proposals in progress'),
-          render: ({ row }) => <>{row.in_review_proposals}</>,
+          title: translate('Outstanding'),
+          render: ({ row }) => <>{row.outstanding_reviews ?? '-'}</>,
+          orderField: 'outstanding_reviews',
         },
         {
-          title: translate('Accepted proposals'),
-          render: ({ row }) => <>{row.accepted_proposals}</>,
+          title: translate('Declined'),
+          render: ({ row }) => <>{row.declined_reviews ?? '-'}</>,
+          orderField: 'declined_reviews',
         },
         {
-          title: translate('Rejected proposals'),
-          render: ({ row }) => <>{row.rejected_proposals}</>,
+          title: translate('In progress'),
+          render: ({ row }) => <>{row.in_progress_reviews ?? '-'}</>,
+          orderField: 'in_progress_reviews',
+        },
+        {
+          title: translate('Submitted'),
+          render: ({ row }) => <>{row.submitted_reviews ?? '-'}</>,
+          orderField: 'submitted_reviews',
+        },
+        {
+          title: translate('Accepted/Rejected'),
+          render: AcceptanceRateRenderer,
+        },
+        {
+          title: translate('Avg. score'),
+          render: ({ row }) => (
+            <>
+              {row.average_score != null
+                ? row.average_score.toFixed(1)
+                : '-'}
+            </>
+          ),
+          orderField: 'average_score',
         },
       ]}
       title={translate('Reviewers')}
       verboseName={translate('Reviewers')}
+      expandableRow={ReviewerExpandableRow}
     />
   );
 };
