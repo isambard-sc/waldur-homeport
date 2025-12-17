@@ -35,8 +35,8 @@ const dataParser = (data: ProposalReview[], query) => {
 };
 
 const renderReviewScoreField = ({ row }) => {
-  // Only show stars for in_review and submitted reviews
-  if (row.state === 'rejected' || row.state === 'created') {
+  // Only show stars for submitted reviews
+  if (row.state !== 'submitted') {
     return null;
   }
   return <RateStars value={row.summary_score} />;
