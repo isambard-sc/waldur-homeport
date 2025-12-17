@@ -32,7 +32,7 @@ const getReviewerOptionLabel = (option) =>
 
 export const CreateReviewDialog = reduxForm<
   FormData,
-  { resolve: { proposal: Proposal } }
+  { resolve: { proposal: Proposal; refetch?: () => void } }
 >({
   form: 'CreateReviewForm',
 })((props) => {
@@ -70,6 +70,10 @@ export const CreateReviewDialog = reduxForm<
           showSuccess(translate('Proposal review created successfully')),
         );
         dispatch(closeModalDialog());
+        // Refresh the table if refetch callback is provided
+        if (props.resolve.refetch) {
+          props.resolve.refetch();
+        }
         router.stateService.go('call-management.review-list');
       } catch (error) {
         dispatch(showErrorResponse(error, translate('Something went wrong')));
