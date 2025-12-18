@@ -33,9 +33,20 @@ const PureProposalsListFilter: FunctionComponent = () => (
   </TableFilterItem>
 );
 
+// Default filter to show only Submitted and In review proposals
+const getInitialValues = () => {
+  const stateOptions = getProposalStateOptions();
+  return {
+    state: stateOptions.filter(
+      (option) => option.value === 'submitted' || option.value === 'in_review',
+    ),
+  };
+};
+
 const enhance = reduxForm({
   form: PROPOSALS_FILTER_FORM_ID,
   destroyOnUnmount: false,
+  initialValues: getInitialValues(),
 });
 
 export const ProposalsListFilter = enhance(PureProposalsListFilter);

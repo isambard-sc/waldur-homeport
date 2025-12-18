@@ -35,6 +35,9 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
     if (filterValues?.state && filterValues.state.length > 0) {
       // Extract the values from the multi-select options
       baseFilter.state = filterValues.state.map((option) => option.value);
+    } else if (!filterValues) {
+      // Apply default filter on initial load: show only submitted and in_review
+      baseFilter.state = ['submitted', 'in_review'];
     }
     return baseFilter;
   }, [props.round.uuid, filterValues?.state]);
