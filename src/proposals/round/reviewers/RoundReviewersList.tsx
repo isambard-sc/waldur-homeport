@@ -9,6 +9,7 @@ import {
 import { translate } from '@waldur/i18n';
 import { Call } from '@waldur/proposals/types';
 import Table from '@waldur/table/Table';
+import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
 import { ReviewerExpandableRow } from './ReviewerExpandableRow';
@@ -35,9 +36,16 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
   return async (request) => {
     const { queryClient } = await import('@waldur/Application');
     const { fetchResultCount, parseNextPage } = await import('@waldur/core/api');
+    const { getTableState } = await import('@waldur/table/selectors');
+    const storeModule = await import('@waldur/store/store');
+    const store = storeModule.default;
+
+    // Get the current sorting state from Redux
+    const tableState = getTableState(request.tableKey)(store.getState());
+    const sorting = tableState.sorting;
 
     return queryClient.fetchQuery({
-      queryKey: ['table', request.tableKey, roundUuid, request.filter],
+      queryKey: ['table', request.tableKey, roundUuid, request.filter, sorting],
       queryFn: async () => {
         // First fetch the reviewers list
         const reviewersResponse = await callRoundsReviewersList({
@@ -64,7 +72,7 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
         );
 
         // Process each reviewer and add statistics
-        const enhanced: EnhancedRoundReviewer[] = reviewers.map((reviewer) => {
+        let enhanced: EnhancedRoundReviewer[] = reviewers.map((reviewer) => {
           // Find all reviews for this reviewer
           const reviewerReviews = reviewsData.filter(
             (review) => review.reviewer_full_name === reviewer.full_name,
@@ -94,7 +102,7 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
           const averageScore =
             submittedWithScores.length > 0
               ? submittedWithScores.reduce((sum, r) => sum + r.summary_score, 0) /
-                submittedWithScores.length
+              submittedWithScores.length
               : undefined;
 
           // Calculate acceptance rate
@@ -117,6 +125,32 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
             reviews: reviewerReviews, // Include pre-fetched reviews
           };
         });
+
+        // Apply client-side sorting if requested
+        if (sorting?.field) {
+          const field = sorting.field;
+          const mode = sorting.mode || 'asc';
+
+          enhanced = [...enhanced].sort((a, b) => {
+            let aVal = a[field];
+            let bVal = b[field];
+
+            // Handle undefined/null values - sort them to the end
+            if (aVal == null && bVal == null) return 0;
+            if (aVal == null) return 1;
+            if (bVal == null) return -1;
+
+            // String comparison
+            if (typeof aVal === 'string' && typeof bVal === 'string') {
+              const comparison = aVal.toLowerCase().localeCompare(bVal.toLowerCase());
+              return mode === 'asc' ? comparison : -comparison;
+            }
+
+            // Numeric comparison
+            const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+            return mode === 'asc' ? comparison : -comparison;
+          });
+        }
 
         // Return in the expected format with rows, resultCount, nextPage
         const resultCount = fetchResultCount(reviewersResponse);
@@ -188,60 +222,95 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
     fetchData,
   });
 
+  const columns: Column<EnhancedRoundReviewer>[] = [
+    {
+      title: translate('Full name'),
+      render: ({ row }) => <>{row.full_name || '-'}</>,
+      copyField: (row) => row.full_name,
+      keys: ['full_name'],
+      id: 'full_name',
+      export: 'full_name',
+      orderField: 'full_name',
+    },
+    {
+      title: translate('Email'),
+      render: ({ row }) => <>{row.email || '-'}</>,
+      copyField: (row) => row.email,
+      keys: ['email'],
+      id: 'email',
+      export: 'email',
+      orderField: 'email',
+      optional: true,
+    },
+    {
+      title: translate('Outstanding'),
+      render: ({ row }) => <>{row.outstanding_reviews ?? '-'}</>,
+      keys: ['outstanding_reviews'],
+      id: 'outstanding',
+      export: (row) => row.outstanding_reviews ?? '-',
+      orderField: 'outstanding_reviews',
+    },
+    {
+      title: translate('In progress'),
+      render: ({ row }) => <>{row.in_progress_reviews ?? '-'}</>,
+      keys: ['in_progress_reviews'],
+      id: 'in_progress',
+      export: (row) => row.in_progress_reviews ?? '-',
+      orderField: 'in_progress_reviews',
+    },
+    {
+      title: translate('Submitted'),
+      render: ({ row }) => <>{row.submitted_reviews ?? '-'}</>,
+      keys: ['submitted_reviews'],
+      id: 'submitted',
+      export: (row) => row.submitted_reviews ?? '-',
+      orderField: 'submitted_reviews',
+    },
+    {
+      title: translate('Declined'),
+      render: ({ row }) => <>{row.declined_reviews ?? '-'}</>,
+      keys: ['declined_reviews'],
+      id: 'declined',
+      export: (row) => row.declined_reviews ?? '-',
+      orderField: 'declined_reviews',
+    },
+    {
+      title: translate('Accepted/Rejected'),
+      render: AcceptanceRateRenderer,
+      keys: ['accepted_proposals', 'rejected_proposals', 'acceptance_rate'],
+      id: 'acceptance_rate',
+      export: (row) => {
+        const total = row.accepted_proposals + row.rejected_proposals;
+        return total > 0 ? `${row.accepted_proposals}/${total}` : '-';
+      },
+      orderField: 'acceptance_rate',
+      optional: true,
+    },
+    {
+      title: translate('Avg. score'),
+      render: ({ row }) => (
+        <>
+          {row.average_score != null ? row.average_score.toFixed(1) : '-'}
+        </>
+      ),
+      keys: ['average_score'],
+      id: 'average_score',
+      export: (row) =>
+        row.average_score != null ? row.average_score.toFixed(1) : '-',
+      orderField: 'average_score',
+    },
+  ];
+
   return (
     <Table<EnhancedRoundReviewer>
       {...tableProps}
       id="reviewers"
-      columns={[
-        {
-          title: translate('Full name'),
-          render: ({ row }) => <>{row.full_name || '-'} </>,
-          copyField: (row) => row.full_name,
-        },
-        {
-          title: translate('Email'),
-          render: ({ row }) => <>{row.email || '-'} </>,
-          copyField: (row) => row.email,
-        },
-        {
-          title: translate('Outstanding'),
-          render: ({ row }) => <>{row.outstanding_reviews ?? '-'}</>,
-          orderField: 'outstanding_reviews',
-        },
-        {
-          title: translate('Declined'),
-          render: ({ row }) => <>{row.declined_reviews ?? '-'}</>,
-          orderField: 'declined_reviews',
-        },
-        {
-          title: translate('In progress'),
-          render: ({ row }) => <>{row.in_progress_reviews ?? '-'}</>,
-          orderField: 'in_progress_reviews',
-        },
-        {
-          title: translate('Submitted'),
-          render: ({ row }) => <>{row.submitted_reviews ?? '-'}</>,
-          orderField: 'submitted_reviews',
-        },
-        {
-          title: translate('Accepted/Rejected'),
-          render: AcceptanceRateRenderer,
-        },
-        {
-          title: translate('Avg. score'),
-          render: ({ row }) => (
-            <>
-              {row.average_score != null
-                ? row.average_score.toFixed(1)
-                : '-'}
-            </>
-          ),
-          orderField: 'average_score',
-        },
-      ]}
+      columns={columns}
       title={translate('Reviewers')}
       verboseName={translate('Reviewers')}
       expandableRow={ReviewerExpandableRow}
+      hasOptionalColumns
+      enableExport
     />
   );
 };
