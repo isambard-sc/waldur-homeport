@@ -95,18 +95,19 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
     },
     {
       title: translate('Submitted'),
+      orderField: 'submitted_at',
       render: ({ row }) => (
         <>
-          {row.state !== 'draft' && row.modified
-            ? formatDateTime(row.modified)
+          {row.submitted_at
+            ? formatDateTime(row.submitted_at)
             : DASH_ESCAPE_CODE}
         </>
       ),
-      keys: ['modified', 'state'],
+      keys: ['submitted_at'],
       id: 'submitted',
       export: (row) =>
-        row.state !== 'draft' && row.modified
-          ? formatDateTime(row.modified)
+        row.submitted_at
+          ? formatDateTime(row.submitted_at)
           : DASH_ESCAPE_CODE,
     },
     {

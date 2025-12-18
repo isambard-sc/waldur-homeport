@@ -210,9 +210,7 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             proposal.project_has_civilian_purpose ? 'Yes' : 'No',
             proposal.created_by_name,
             formatDateTime(proposal.created),
-            !['draft', 'canceled'].includes(proposal.state)
-              ? formatDateTime(proposal.modified)
-              : '',
+            proposal.submitted_at ? formatDateTime(proposal.submitted_at) : '',
             proposal.users
               ?.map(
                 (u) =>

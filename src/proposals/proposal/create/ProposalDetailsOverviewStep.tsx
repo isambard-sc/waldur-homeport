@@ -47,7 +47,6 @@ const DetailsOverviewButton = ({ proposal }) => {
 export const ProposalDetailsOverviewStep = (props: VStepperFormStepProps) => {
   const proposal: Proposal & {
     modified?: string;
-    submitted?: string;
     reviewed?: string;
   } = props.params.proposal;
   return (
@@ -109,11 +108,11 @@ export const ProposalDetailsOverviewStep = (props: VStepperFormStepProps) => {
             />
           </Col>
         )}
-        {proposal.state !== 'draft' && proposal.submitted && (
+        {proposal.state !== 'draft' && proposal.submitted_at && (
           <Col sm={6}>
             <Field
               label={translate('Submitted')}
-              value={formatDateTime(proposal.submitted)}
+              value={formatDateTime(proposal.submitted_at)}
               labelCol={5}
               valueCol={7}
             />
