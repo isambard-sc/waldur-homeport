@@ -28,8 +28,11 @@ const filtersSelctor = createSelector(
   (user, filters: any) => {
     const result: ProposalReviewsListData['query'] = {};
     result.reviewer_uuid = user.uuid;
-    if (filters?.state) {
+    if (filters?.state && filters.state.length > 0) {
       result.state = filters.state.map((option) => option.value);
+    } else if (!filters) {
+      // Apply default filter on initial load: show only created and in_review
+      result.state = ['created', 'in_review'];
     }
     if (filters?.call) {
       result.call_uuid = filters.call.uuid;
