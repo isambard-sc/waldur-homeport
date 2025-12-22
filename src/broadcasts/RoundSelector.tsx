@@ -152,6 +152,13 @@ export const RoundSelector = () => {
               />
             </div>
           ))}
+          <hr className="my-4" />
+          <Field
+            name="include_reviewers"
+            component={AwesomeCheckboxField as any}
+            label={translate('Include reviewers')}
+            hideLabel={true}
+          />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleStateDialogClose}>

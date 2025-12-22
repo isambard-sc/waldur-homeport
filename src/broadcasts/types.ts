@@ -22,6 +22,7 @@ export interface BroadcastFormData extends Broadcast {
   all_users: boolean;
   round?: IdNamePair & { call_name?: string };
   proposal_states?: string[];
+  include_reviewers?: boolean;
   send_to_me?: boolean;
   additional_recipients?: any[];
   excluded_recipients?: string[];
@@ -33,6 +34,7 @@ interface QueryRequest {
   all_users: boolean;
   round?: string;
   proposal_states?: string[];
+  include_reviewers?: boolean;
   send_to_me?: boolean;
   additional_recipients?: string[];
   excluded_recipients?: string[];

@@ -48,6 +48,7 @@ export const RecipientsList: FunctionComponent<{
         offerings: query?.offerings?.map((c) => c.uuid),
         round: query?.round?.uuid,
         proposal_states: query?.proposal_states,
+        include_reviewers: query?.include_reviewers,
         send_to_me: query?.send_to_me,
         additional_recipients: query?.additional_recipients?.map((u) => u.email),
         excluded_recipients: query?.excluded_recipients,
