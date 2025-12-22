@@ -38,7 +38,8 @@ export const RecipientsList: FunctionComponent<{
   query;
   onRemoveRecipient?: (email: string) => void;
   onAddRecipient?: () => void;
-}> = ({ query, onRemoveRecipient, onAddRecipient }) => {
+  onRestoreRecipient?: (email: string) => void;
+}> = ({ query, onRemoveRecipient, onAddRecipient, onRestoreRecipient }) => {
   const filter = useMemo(
     () => {
       const filterObj = {
@@ -74,13 +75,15 @@ export const RecipientsList: FunctionComponent<{
 
   if (onRemoveRecipient) {
     columns.push({
-      title: translate('Actions'),
+      title: translate('Action'),
       render: ({ row }) => (
         <div
           onClick={() => {
             onRemoveRecipient(row.email);
-          }}>
-          {translate('Remove')}
+          }}
+          style={{ cursor: 'pointer', color: '#007bff' }}
+        >
+          {translate('Exclude')}
         </div>
       ),
     });
@@ -100,8 +103,40 @@ export const RecipientsList: FunctionComponent<{
         {...props}
         hasActionBar={false}
         columns={columns}
-        verboseName={translate('recepients')}
+        verboseName={translate('recipients')}
       />
+      {onRestoreRecipient && query?.excluded_recipients?.length > 0 && (
+        <div className="mt-4">
+          <h5 className="mb-3">{translate('Excluded recipients')}</h5>
+          <div className="table-responsive">
+            <table className="table table-sm">
+              <thead>
+                <tr>
+                  <th>{translate('Email')}</th>
+                  <th>{translate('Action')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {query.excluded_recipients.map((email) => (
+                  <tr key={email}>
+                    <td>{email}</td>
+                    <td>
+                      <div
+                        onClick={() => {
+                          onRestoreRecipient(email);
+                        }}
+                        style={{ cursor: 'pointer', color: '#007bff' }}
+                      >
+                        {translate('Include')}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </>
   );
 };

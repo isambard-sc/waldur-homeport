@@ -43,12 +43,21 @@ const RecipientsListQuery = () => {
     }
   };
 
+  const handleRestoreRecipient = (email: string) => {
+    const currentExcluded = values?.excluded_recipients || [];
+    form.change(
+      'excluded_recipients',
+      currentExcluded.filter((e) => e !== email),
+    );
+  };
+
   return (
     <>
       <RecipientsList
         query={values}
         onRemoveRecipient={handleRemoveRecipient}
         onAddRecipient={() => setShowAddDialog(true)}
+        onRestoreRecipient={handleRestoreRecipient}
       />
       <AddRecipientDialog
         show={showAddDialog}
