@@ -27,10 +27,15 @@ export const BroadcastFormDialog = ({
 
   const onSubmit = useBroadcastFormSubmit(resolve.refetch, resolve.uuid);
 
+  // Set default value for send_to_me if not editing
+  const defaultInitialValues = isEdit
+    ? initialValues
+    : { ...initialValues, send_to_me: true };
+
   return (
     <Form
       onSubmit={onSubmit}
-      initialValues={initialValues}
+      initialValues={defaultInitialValues}
       render={({ handleSubmit, submitting, errors, values, form }) => (
         <form onSubmit={handleSubmit}>
           <Modal.Header closeButton className="without-border">

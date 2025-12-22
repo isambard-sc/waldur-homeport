@@ -20,12 +20,22 @@ export interface BroadcastFormData extends Broadcast {
   customers: IdNamePair[];
   offerings: IdNamePair[];
   all_users: boolean;
+  round?: IdNamePair & { call_name?: string };
+  proposal_states?: string[];
+  send_to_me?: boolean;
+  additional_recipients?: any[];
+  excluded_recipients?: string[];
 }
 
 interface QueryRequest {
   customers: string[];
   offerings: string[];
   all_users: boolean;
+  round?: string;
+  proposal_states?: string[];
+  send_to_me?: boolean;
+  additional_recipients?: string[];
+  excluded_recipients?: string[];
 }
 
 export interface BroadcastRequestData extends Broadcast {

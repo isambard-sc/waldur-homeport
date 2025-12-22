@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import { useState } from 'react';
 import { Col, Modal, Row } from 'react-bootstrap';
 import { Field, useForm, useFormState } from 'react-final-form';
 
@@ -16,13 +17,46 @@ import {
 } from '@waldur/marketplace/common/autocompletes';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 
+import { AddRecipientDialog } from './AddRecipientDialog';
 import { templateAutocomplete } from './autocomplete';
 import { RecipientsList } from './RecipientsList';
+import { RoundSelector } from './RoundSelector';
 import { MessageTemplate } from './types';
 
 const RecipientsListQuery = () => {
   const { values } = useFormState();
-  return <RecipientsList query={values} />;
+  const form = useForm();
+  const [showAddDialog, setShowAddDialog] = useState(false);
+
+  const handleRemoveRecipient = (email: string) => {
+    const currentExcluded = values?.excluded_recipients || [];
+    if (!currentExcluded.includes(email)) {
+      form.change('excluded_recipients', [...currentExcluded, email]);
+    }
+  };
+
+  const handleAddRecipient = (user: any) => {
+    const currentAdditional = values?.additional_recipients || [];
+    const alreadyAdded = currentAdditional.some((u) => u.email === user.email);
+    if (!alreadyAdded) {
+      form.change('additional_recipients', [...currentAdditional, user]);
+    }
+  };
+
+  return (
+    <>
+      <RecipientsList
+        query={values}
+        onRemoveRecipient={handleRemoveRecipient}
+        onAddRecipient={() => setShowAddDialog(true)}
+      />
+      <AddRecipientDialog
+        show={showAddDialog}
+        onHide={() => setShowAddDialog(false)}
+        onAdd={handleAddRecipient}
+      />
+    </>
+  );
 };
 
 export const BroadcastForm = ({
@@ -169,6 +203,17 @@ export const BroadcastForm = ({
                   getOptionValue={(option) => option.uuid}
                   noOptionsMessage={() => translate('No organizations found')}
                   isMulti={true}
+                />
+              </FormGroup>
+
+              <RoundSelector />
+
+              <FormGroup>
+                <Field
+                  name="send_to_me"
+                  component={AwesomeCheckboxField as any}
+                  label={translate('Send message to me as well')}
+                  hideLabel={true}
                 />
               </FormGroup>
             </Col>
