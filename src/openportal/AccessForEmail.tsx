@@ -3,51 +3,217 @@ import { FunctionComponent } from 'react';
 import { Card } from 'react-bootstrap';
 import { FilterBox } from '@waldur/form/FilterBox';
 import { Field } from '@waldur/resource/summary/Field';
-
 import { useTitle } from '@waldur/navigation/title';
 import { get } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 
+// Type definitions
+interface Resource {
+    name: string;
+    username: string;
+}
+
+interface Project {
+    name: string;
+    resources: Resource[];
+}
+
+interface UserData {
+    email: string;
+    status: string;
+    short_name?: string;
+    invited_by?: string;
+    reason?: string;
+    projects: Record<string, Project>;
+}
+
+interface UserInfoCardProps {
+    userData: UserData;
+    index?: number | null;
+}
+
+interface ProjectsCardProps {
+    projects: Record<string, Project>;
+}
+
+// Reusable component to display user information
+const UserInfoCard: FunctionComponent<UserInfoCardProps> = ({ userData, index = null }) => {
+    return (
+        <Card className="mb-3">
+            <Card.Header className="custom-card-header custom-padding-zero">
+                <Card.Title>
+                    {translate('User Information')}
+                    {index !== null && ` - User ${index + 1}`}
+                </Card.Title>
+            </Card.Header>
+            <Card.Body className="custom-padding-zero">
+                <Field
+                    label={translate('Email')}
+                    value={userData.email}
+                />
+                <Field
+                    label={translate('Status')}
+                    value={userData.status}
+                />
+                {userData.short_name && (
+                    <Field
+                        label={translate('Short Name')}
+                        value={userData.short_name}
+                    />
+                )}
+                {userData.invited_by && (
+                    <Field
+                        label={translate('Invited By')}
+                        value={userData.invited_by}
+                    />
+                )}
+                {userData.reason && (
+                    <Field
+                        label={translate('Reason')}
+                        value={userData.reason}
+                    />
+                )}
+            </Card.Body>
+        </Card>
+    );
+};
+
+// Reusable component to display projects
+const ProjectsCard: FunctionComponent<ProjectsCardProps> = ({ projects }) => {
+    if (!projects || typeof projects !== 'object' || Object.keys(projects).length === 0) {
+        return (
+            <div className="p-4 text-center text-gray-500">
+                {translate('No projects found for this user')}
+            </div>
+        );
+    }
+
+    return (
+        <Card>
+            <Card.Header className="custom-card-header custom-padding-zero">
+                <Card.Title>
+                    {translate('Projects')} ({Object.keys(projects).length})
+                </Card.Title>
+            </Card.Header>
+            <Card.Body className="custom-padding-zero">
+                {Object.entries(projects).map(([projectId, project]) => (
+                    <div key={projectId} className="mb-4 pb-4 border-bottom">
+                        <div className="mb-3">
+                            <h3 className="text-lg font-medium text-gray-800 mb-1">
+                                {project.name}
+                            </h3>
+                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                                {projectId}
+                            </span>
+                        </div>
+
+                        {project.resources && Array.isArray(project.resources) && project.resources.length > 0 && (
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                                    {translate('Resources')} ({project.resources.length}):
+                                </h4>
+                                <div className="space-y-2">
+                                    {project.resources.map((resource, index) => (
+                                        <div key={index} className="p-3 bg-gray-50 rounded">
+                                            <div className="flex items-center justify-between flex-wrap">
+                                                <span className="text-sm font-medium text-gray-800">
+                                                    {resource.name}
+                                                </span>
+                                                <div className="text-sm text-gray-600">
+                                                    {translate('Username')}:{' '}
+                                                    <span className="font-mono bg-gray-200 px-2 py-1 rounded">
+                                                        {resource.username}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </Card.Body>
+        </Card>
+    );
+};
+
 export const AccessForEmail: FunctionComponent<{}> = () => {
     useTitle(translate('Check user access'), '', 'browser');
 
-    const [email, setEmail] = useState('');
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [searchType, setSearchType] = useState<string>('email');
+    const [searchValue, setSearchValue] = useState<string>('');
+    const [data, setData] = useState<UserData[] | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const isValidEmail = (email) => {
+    const isValidEmail = (email: string): boolean => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     };
 
-    const handleSearch = async (e) => {
+    const isValidSearch = (value: string, type: string): boolean => {
+        if (!value.trim()) return false;
+        if (type === 'email') return isValidEmail(value);
+        return true;
+    };
+
+    const handleSearch = async (e: React.FormEvent | null) => {
         if (e) e.preventDefault();
-        if (!email.trim() || !isValidEmail(email)) return;
+        if (!isValidSearch(searchValue, searchType)) return;
 
         setLoading(true);
         setError(null);
 
         try {
-            const url = `/openportal/access_for_email/?email=${encodeURIComponent(email)}`;
+            const params = new URLSearchParams();
+            params.append(searchType, searchValue);
+            const url = `/openportal/access_for_email/?${params.toString()}`;
             const response = await get(url);
-            setData(response);
-        } catch (err) {
+            
+            // Normalize response to always be an array of users
+            if (Array.isArray(response)) {
+                setData(response);
+            } else {
+                // Single user response - wrap in array
+                setData([response]);
+            }
+        } catch (err: any) {
             setError(err.message || 'Failed to fetch data');
+            setData(null);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (email && isValidEmail(email)) {
+        if (isValidSearch(searchValue, searchType)) {
             const timeoutId = setTimeout(() => {
                 handleSearch(null);
-            }, 500); // 500ms delay to avoid too many requests while typing
+            }, 500);
 
             return () => clearTimeout(timeoutId);
+        } else {
+            setData(null);
         }
-    }, [email]);
+    }, [searchValue, searchType]);
+
+    const getPlaceholder = (): string => {
+        switch (searchType) {
+            case 'email':
+                return translate('Enter email address');
+            case 'short_name':
+                return translate('Enter short name');
+            case 'project_name':
+                return translate('Enter project name');
+            case 'project_id':
+                return translate('Enter project ID');
+            default:
+                return translate('Enter search value');
+        }
+    };
+
+    const isMultiUserSearch = searchType === 'project_name' || searchType === 'project_id';
 
     return (
         <Card className="card-bordered">
@@ -57,105 +223,81 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
                 </Card.Title>
             </Card.Header>
             <Card.Body className="custom-padding-zero">
+                <div className="mb-3 px-4 pt-4">
+                    <label className="form-label">
+                        {translate('Search by')}:
+                    </label>
+                    <select
+                        className="form-select"
+                        value={searchType}
+                        onChange={(e) => {
+                            setSearchType(e.target.value);
+                            setSearchValue('');
+                            setData(null);
+                            setError(null);
+                        }}
+                    >
+                        <option value="email">{translate('Email')}</option>
+                        <option value="short_name">{translate('Short Name')}</option>
+                        <option value="project_name">{translate('Project Name')}</option>
+                        <option value="project_id">{translate('Project ID')}</option>
+                    </select>
+                </div>
+
                 <FilterBox
                     type="search"
-                    placeholder={translate('Enter email address')}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={getPlaceholder()}
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
                 />
 
-                {
-                    error && (
-                        <div className="p-4 bg-red-50 border-l-4 border-red-400">
-                            <div className="flex">
-                                <div className="ml-3">
-                                    <p className="text-sm text-red-700">{error}</p>
-                                </div>
+                {loading && (
+                    <div className="p-4 text-center">
+                        <div className="spinner-border" role="status">
+                            <span className="visually-hidden">{translate('Loading...')}</span>
+                        </div>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="p-4 bg-red-50 border-l-4 border-red-400">
+                        <div className="flex">
+                            <div className="ml-3">
+                                <p className="text-sm text-red-700">{error}</p>
                             </div>
                         </div>
-                    )
-                }
+                    </div>
+                )}
 
-                {
-                    data && (
-                        <Card>
-                            <Card.Header className="custom-card-header custom-padding-zero">
-                                <Card.Title>
-                                    {translate('User Information')}
-                                </Card.Title>
-                            </Card.Header>
-                            <Card.Body className="custom-padding-zero">
-                                <Field
-                                    label={translate('Email')}
-                                    value={data.email}
+                {data && Array.isArray(data) && data.length > 0 && (
+                    <>
+                        {isMultiUserSearch && data.length > 1 && (
+                            <div className="px-4 pt-4">
+                                <div className="alert alert-info">
+                                    {translate('Found')} {data.length} {translate('users in this project')}
+                                </div>
+                            </div>
+                        )}
+
+                        {data.map((userData, index) => (
+                            <div key={index} className="mb-3">
+                                <UserInfoCard 
+                                    userData={userData} 
+                                    index={data.length > 1 ? index : null}
                                 />
-                                <Field
-                                    label={translate('Status')}
-                                    value={data.status}
-                                />
-                                {data.short_name && (<Field
-                                    label={translate('Short Name')}
-                                    value={data.short_name}
-                                />)}
-                                {data.invited_by && (<Field
-                                    label={translate('Invited By')}
-                                    value={data.invited_by}
-                                />)}
-                                {data.reason && (<Field
-                                    label={translate('Reason')}
-                                    value={data.reason}
-                                />)}
-                            </Card.Body>
-                        </Card>
-                    )
-                }
+                                <ProjectsCard projects={userData.projects} />
+                            </div>
+                        ))}
+                    </>
+                )}
 
-                {
-                    data && data.projects && typeof data.projects === 'object' && Object.keys(data.projects).length > 0 && (
-                        <Card>
-                            <Card.Header className="custom-card-header custom-padding-zero">
-                                <Card.Title>
-                                    {translate('Projects')}
-                                </Card.Title>
-                            </Card.Header>
-                            <Card.Body className="custom-padding-zero">
-                                {Object.entries(data.projects).map(([projectId, project]) => (
-                                    <div key={projectId}>
-                                        <div>
-                                            <h3 className="text-lg font-medium text-gray-800">{project.name}</h3>
-                                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                                {projectId}
-                                            </span>
-                                        </div>
-
-                                        {project.resources && Array.isArray(project.resources) && project.resources.length > 0 && (
-                                            <div>
-                                                <h4 className="text-sm font-medium text-gray-700 mb-2">Resources:</h4>
-                                                <div className="space-y-2">
-                                                    {project.resources.map((resource, index) => (
-                                                        <div key={index}>
-                                                            <div className="flex items-center justify-between">
-                                                                <span className="text-sm font-medium text-gray-800">
-                                                                    {resource.name}
-                                                                </span>
-                                                                <div className="text-sm text-gray-600">
-                                                                    {translate('Username')}: <span className="font-mono bg-gray-200 px-2 py-1 rounded">
-                                                                        {resource.username}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </Card.Body>
-                        </Card>
-                    )
-                }
+                {data && Array.isArray(data) && data.length === 0 && (
+                    <div className="p-4 text-center text-gray-500">
+                        {translate('No results found')}
+                    </div>
+                )}
             </Card.Body>
-        </Card >
+        </Card>
     );
 };
