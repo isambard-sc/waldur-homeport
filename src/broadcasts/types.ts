@@ -12,6 +12,15 @@ export interface IdNamePair {
   uuid: string;
 }
 
+export interface BroadcastAttachment {
+  uuid: string;
+  filename: string;
+  size: number;
+  created: string;
+  uploaded_by_full_name: string;
+  file_url: string;
+}
+
 interface Broadcast extends Message {
   send_at: string;
 }

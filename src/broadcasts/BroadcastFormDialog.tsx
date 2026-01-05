@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Form } from 'react-final-form';
+import { BroadcastMessage, broadcastMessagesRetrieve } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 
 import { BroadcastFooter } from './BroadcastFooter';
 import { BroadcastForm } from './BroadcastForm';
-import { BroadcastFormData } from './types';
+import { BroadcastAttachment, BroadcastFormData } from './types';
 import { useBroadcastFormSubmit } from './utils';
 
 interface BroadcastUpdateDialogOwnProps {
@@ -22,10 +23,28 @@ export const BroadcastFormDialog = ({
   resolve,
 }: BroadcastUpdateDialogOwnProps) => {
   const [step, setStep] = useState(0);
+  const [attachments, setAttachments] = useState<BroadcastAttachment[]>([]);
+  const [broadcastData, setBroadcastData] = useState<BroadcastMessage | null>(
+    null,
+  );
 
   const isEdit = Boolean(resolve.uuid);
 
   const onSubmit = useBroadcastFormSubmit(resolve.refetch, resolve.uuid);
+
+  // Fetch broadcast data including attachments when editing
+  useEffect(() => {
+    if (resolve.uuid) {
+      broadcastMessagesRetrieve({ path: { uuid: resolve.uuid } })
+        .then((response) => {
+          setBroadcastData(response.data);
+          setAttachments(response.data.attachments || []);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch broadcast data:', error);
+        });
+    }
+  }, [resolve.uuid]);
 
   // Set default value for send_to_me if not editing
   const defaultInitialValues = isEdit
@@ -45,7 +64,14 @@ export const BroadcastFormDialog = ({
                 : translate('Create a broadcast')}
             </h2>
           </Modal.Header>
-          <BroadcastForm step={step} setStep={setStep} />
+          <BroadcastForm
+            step={step}
+            setStep={setStep}
+            broadcastUuid={resolve.uuid}
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+            broadcastState={broadcastData?.state}
+          />
           <BroadcastFooter
             step={step}
             setStep={setStep}

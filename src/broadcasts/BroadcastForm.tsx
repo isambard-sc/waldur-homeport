@@ -18,10 +18,11 @@ import {
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 
 import { AddRecipientDialog } from './AddRecipientDialog';
+import { AttachmentsSection } from './AttachmentsSection';
 import { templateAutocomplete } from './autocomplete';
 import { RecipientsList } from './RecipientsList';
 import { RoundSelector } from './RoundSelector';
-import { MessageTemplate } from './types';
+import { BroadcastAttachment, MessageTemplate } from './types';
 
 const RecipientsListQuery = () => {
   const { values } = useFormState();
@@ -71,9 +72,17 @@ const RecipientsListQuery = () => {
 export const BroadcastForm = ({
   step,
   setStep,
+  broadcastUuid,
+  attachments,
+  onAttachmentsChange,
+  broadcastState,
 }: {
   step: number;
   setStep(step: number): void;
+  broadcastUuid?: string;
+  attachments?: BroadcastAttachment[];
+  onAttachmentsChange?: (attachments: BroadcastAttachment[]) => void;
+  broadcastState?: 'DRAFT' | 'SCHEDULED' | 'SENT';
 }) => {
   const { values: formValues } = useFormState();
   const form = useForm();
@@ -152,6 +161,15 @@ export const BroadcastForm = ({
                 minDate={DateTime.now().plus({ days: 1 }).toISO()}
               />
             </FormGroup>
+
+            {broadcastUuid && (
+              <AttachmentsSection
+                broadcastUuid={broadcastUuid}
+                attachments={attachments || []}
+                onAttachmentsChange={onAttachmentsChange}
+                state={broadcastState}
+              />
+            )}
           </div>
         ) : (
           <Row>
