@@ -6,15 +6,18 @@ import { InvitationCreateButton } from '@waldur/invitations/actions/create/Invit
 import { GenericInvitationContext } from '@waldur/invitations/types';
 
 import { AddUserButton } from './AddUserButton';
+import { ImportReviewersButton } from './ImportReviewersButton';
 
 interface TeamDropdownActionsProps extends GenericInvitationContext {
   refetchUsers?(): void;
   refetchInvitations?(): void;
+  showImportReviewers?: boolean;
 }
 
 export const TeamDropdownActions = ({
   refetchUsers,
   refetchInvitations,
+  showImportReviewers = false,
   ...rest
 }: TeamDropdownActionsProps) => {
   return (
@@ -35,6 +38,9 @@ export const TeamDropdownActions = ({
           {...rest}
         />
         <AddUserButton refetch={refetchUsers} {...rest} />
+        {showImportReviewers && (
+          <ImportReviewersButton refetch={refetchUsers} {...rest} />
+        )}
       </Dropdown.Menu>
     </Dropdown>
   );
