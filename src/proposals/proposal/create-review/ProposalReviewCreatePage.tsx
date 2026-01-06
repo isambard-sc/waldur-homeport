@@ -7,6 +7,7 @@ import {
   Proposal,
   proposalProposalsRetrieve,
   proposalPublicCallsRetrieve,
+  proposalReviewsAccept,
   proposalReviewsPartialUpdate,
   proposalReviewsRetrieve,
   proposalReviewsSubmit,
@@ -110,6 +111,14 @@ export const ProposalReviewCreatePage = (props) => {
 
     setIsSaving(true);
     try {
+      // If the review is still in "created" state, automatically accept it
+      // since the user is saving a draft (implicitly starting the review)
+      if (data.review.state === 'created') {
+        await proposalReviewsAccept({
+          path: { uuid: data.review.uuid },
+        });
+      }
+
       const response = await proposalReviewsPartialUpdate({
         body: values,
         path: { uuid: data.review.uuid },
