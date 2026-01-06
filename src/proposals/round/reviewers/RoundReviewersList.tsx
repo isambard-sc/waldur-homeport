@@ -12,6 +12,7 @@ import Table from '@waldur/table/Table';
 import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
 
+import { ImportAssignmentsButton } from './ImportAssignmentsButton';
 import { ReviewerExpandableRow } from './ReviewerExpandableRow';
 
 interface RoundReviewersListProps {
@@ -311,6 +312,13 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
       expandableRow={ReviewerExpandableRow}
       hasOptionalColumns
       enableExport
+      tableActions={
+        <ImportAssignmentsButton
+          round={props.round}
+          call={props.call}
+          refetch={tableProps.fetch}
+        />
+      }
     />
   );
 };
