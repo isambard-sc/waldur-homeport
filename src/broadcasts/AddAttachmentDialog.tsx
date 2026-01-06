@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import { broadcastMessagesAttachFile } from 'waldur-js-client';
 
 import { formDataOptions } from '@waldur/core/api';
@@ -7,8 +8,8 @@ import { format } from '@waldur/core/ErrorMessageFormatter';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { SubmitButton } from '@waldur/form';
 import { translate } from '@waldur/i18n';
+import { closeModalDialog } from '@waldur/modal/actions';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { useModal } from '@waldur/modal/hooks';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useNotify } from '@waldur/store/hooks';
 
@@ -24,8 +25,8 @@ interface AddAttachmentDialogProps {
 export const AddAttachmentDialog = ({
   resolve: { broadcastUuid, onAttachmentAdded },
 }: AddAttachmentDialogProps) => {
+  const dispatch = useDispatch();
   const { showSuccess, showErrorResponse } = useNotify();
-  const { closeDialog } = useModal();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -67,7 +68,7 @@ export const AddAttachmentDialog = ({
 
       showSuccess(translate('Attachment added successfully.'));
       onAttachmentAdded(result.data);
-      closeDialog();
+      dispatch(closeModalDialog('HIDE_CONFIRM'));
     } catch (e) {
       const errorMessage = format(e);
       setError(errorMessage);
@@ -75,7 +76,7 @@ export const AddAttachmentDialog = ({
     } finally {
       setUploading(false);
     }
-  }, [selectedFile, broadcastUuid, onAttachmentAdded, closeDialog, showSuccess, showErrorResponse]);
+  }, [selectedFile, broadcastUuid, onAttachmentAdded, dispatch, showSuccess, showErrorResponse]);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes >= 1024 * 1024) {

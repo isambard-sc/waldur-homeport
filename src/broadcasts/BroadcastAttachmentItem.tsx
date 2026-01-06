@@ -2,12 +2,23 @@ import { FileIcon, TrashIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { Button } from 'react-bootstrap';
 
+import { ENV } from '@waldur/core/config';
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { formatFilesize } from '@waldur/core/utils';
 import { translate } from '@waldur/i18n';
 
 import { BroadcastAttachment } from './types';
+
+const getAbsoluteUrl = (url: string): string => {
+  if (!url) return url;
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // Remove leading slash if present to avoid double slashes
+  const path = url.startsWith('/') ? url.slice(1) : url;
+  return `${ENV.apiEndpoint}${path}`;
+};
 
 interface BroadcastAttachmentItemProps {
   attachment: BroadcastAttachment;
@@ -35,7 +46,7 @@ export const BroadcastAttachmentItem: FC<BroadcastAttachmentItemProps> = ({
       <div className="attachment-item__body">
         <h6 className="fw-bold text-gray-700 mb-0">
           <a
-            href={attachment.file_url}
+            href={getAbsoluteUrl(attachment.file_url)}
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-700 text-hover-primary"

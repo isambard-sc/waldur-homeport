@@ -18,11 +18,12 @@ const AddAttachmentDialog = lazyComponent(() =>
 );
 
 interface AttachmentsSectionProps {
-  broadcastUuid: string;
+  broadcastUuid?: string;
   attachments: BroadcastAttachment[];
   onAttachmentsChange: (attachments: BroadcastAttachment[]) => void;
   readOnly?: boolean;
   state?: 'DRAFT' | 'SCHEDULED' | 'SENT';
+  onSaveDraft?: () => Promise<string>;
 }
 
 export const AttachmentsSection: FC<AttachmentsSectionProps> = ({
@@ -31,28 +32,71 @@ export const AttachmentsSection: FC<AttachmentsSectionProps> = ({
   onAttachmentsChange,
   readOnly,
   state,
+  onSaveDraft,
 }) => {
   const dispatch = useDispatch();
   const { showSuccess, showErrorResponse } = useNotify();
   const [deletingAttachments, setDeletingAttachments] = useState<Set<string>>(
     new Set(),
   );
+  const [saving, setSaving] = useState(false);
 
   const isSent = state === 'SENT';
   const canModify = !readOnly && !isSent;
 
-  const handleAddAttachment = useCallback(() => {
+  const handleAddAttachment = useCallback(async () => {
+    let uuid = broadcastUuid;
+
+    // If no UUID exists, save the broadcast as draft first
+    if (!uuid && onSaveDraft) {
+      setSaving(true);
+      try {
+        uuid = await onSaveDraft();
+        if (!uuid) {
+          showErrorResponse(
+            null,
+            translate('Failed to save broadcast. Please try again.'),
+          );
+          return;
+        }
+      } catch (e) {
+        showErrorResponse(e, translate('Failed to save broadcast.'));
+        return;
+      } finally {
+        setSaving(false);
+      }
+    }
+
+    if (!uuid) {
+      showErrorResponse(
+        null,
+        translate('Cannot add attachments without saving the broadcast first.'),
+      );
+      return;
+    }
+
     dispatch(
-      openModalDialog(AddAttachmentDialog, {
-        resolve: {
-          broadcastUuid,
-          onAttachmentAdded: (attachment: BroadcastAttachment) => {
-            onAttachmentsChange([...attachments, attachment]);
+      openModalDialog(
+        AddAttachmentDialog,
+        {
+          resolve: {
+            broadcastUuid: uuid,
+            onAttachmentAdded: (attachment: BroadcastAttachment) => {
+              onAttachmentsChange([...attachments, attachment]);
+            },
           },
         },
-      }),
+        'SHOW_CONFIRM',
+      ),
     );
-  }, [dispatch, broadcastUuid, attachments, onAttachmentsChange]);
+  }, [
+    dispatch,
+    broadcastUuid,
+    attachments,
+    onAttachmentsChange,
+    onSaveDraft,
+    showErrorResponse,
+  ]);
 
   const handleDeleteAttachment = useCallback(
     async (attachment: BroadcastAttachment) => {
@@ -107,9 +151,23 @@ export const AttachmentsSection: FC<AttachmentsSectionProps> = ({
 
       {canModify && (
         <div className="mb-4">
-          <Button variant="primary" size="sm" onClick={handleAddAttachment}>
-            <i className="fa fa-plus me-2"></i>
-            {translate('Add Attachment')}
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleAddAttachment}
+            disabled={saving}
+          >
+            {saving ? (
+              <>
+                <i className="fa fa-spinner fa-spin me-2"></i>
+                {translate('Saving broadcast...')}
+              </>
+            ) : (
+              <>
+                <i className="fa fa-plus me-2"></i>
+                {translate('Add Attachment')}
+              </>
+            )}
           </Button>
         </div>
       )}

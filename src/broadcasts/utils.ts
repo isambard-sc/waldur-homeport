@@ -17,7 +17,7 @@ import { BroadcastFormData, BroadcastRequestData } from './types';
 
 type SubmitAction = 'submit' | 'template' | 'draft';
 
-const serializeBroadcast = (
+export const serializeBroadcast = (
   formData: BroadcastFormData,
 ): BroadcastRequestData => ({
   subject: formData.subject,

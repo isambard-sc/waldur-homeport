@@ -76,6 +76,7 @@ export const BroadcastForm = ({
   attachments,
   onAttachmentsChange,
   broadcastState,
+  onSaveDraft,
 }: {
   step: number;
   setStep(step: number): void;
@@ -83,6 +84,7 @@ export const BroadcastForm = ({
   attachments?: BroadcastAttachment[];
   onAttachmentsChange?: (attachments: BroadcastAttachment[]) => void;
   broadcastState?: 'DRAFT' | 'SCHEDULED' | 'SENT';
+  onSaveDraft?: () => Promise<string>;
 }) => {
   const { values: formValues } = useFormState();
   const form = useForm();
@@ -162,14 +164,13 @@ export const BroadcastForm = ({
               />
             </FormGroup>
 
-            {broadcastUuid && (
-              <AttachmentsSection
-                broadcastUuid={broadcastUuid}
-                attachments={attachments || []}
-                onAttachmentsChange={onAttachmentsChange}
-                state={broadcastState}
-              />
-            )}
+            <AttachmentsSection
+              broadcastUuid={broadcastUuid}
+              attachments={attachments || []}
+              onAttachmentsChange={onAttachmentsChange}
+              state={broadcastState}
+              onSaveDraft={onSaveDraft}
+            />
           </div>
         ) : (
           <Row>

@@ -1,14 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Form } from 'react-final-form';
-import { BroadcastMessage, broadcastMessagesRetrieve } from 'waldur-js-client';
+import {
+  BroadcastMessage,
+  broadcastMessagesCreate,
+  broadcastMessagesRetrieve,
+  broadcastMessagesUpdate,
+} from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 
 import { BroadcastFooter } from './BroadcastFooter';
 import { BroadcastForm } from './BroadcastForm';
 import { BroadcastAttachment, BroadcastFormData } from './types';
-import { useBroadcastFormSubmit } from './utils';
+import { serializeBroadcast, useBroadcastFormSubmit } from './utils';
 
 interface BroadcastUpdateDialogOwnProps {
   initialValues?: BroadcastFormData;
@@ -27,10 +32,13 @@ export const BroadcastFormDialog = ({
   const [broadcastData, setBroadcastData] = useState<BroadcastMessage | null>(
     null,
   );
+  const [currentUuid, setCurrentUuid] = useState<string | undefined>(
+    resolve.uuid,
+  );
 
   const isEdit = Boolean(resolve.uuid);
 
-  const onSubmit = useBroadcastFormSubmit(resolve.refetch, resolve.uuid);
+  const onSubmit = useBroadcastFormSubmit(resolve.refetch, currentUuid);
 
   // Fetch broadcast data including attachments when editing
   useEffect(() => {
@@ -55,34 +63,61 @@ export const BroadcastFormDialog = ({
     <Form
       onSubmit={onSubmit}
       initialValues={defaultInitialValues}
-      render={({ handleSubmit, submitting, errors, values, form }) => (
-        <form onSubmit={handleSubmit}>
-          <Modal.Header closeButton className="without-border">
-            <h2 className="fw-bolder">
-              {isEdit
-                ? translate('Update a broadcast')
-                : translate('Create a broadcast')}
-            </h2>
-          </Modal.Header>
-          <BroadcastForm
-            step={step}
-            setStep={setStep}
-            broadcastUuid={resolve.uuid}
-            attachments={attachments}
-            onAttachmentsChange={setAttachments}
-            broadcastState={broadcastData?.state}
-          />
-          <BroadcastFooter
-            step={step}
-            setStep={setStep}
-            refetch={resolve.refetch}
-            form={form}
-            disabled={(errors && Object.keys(errors).length > 0) || submitting}
-            formValues={values}
-            uuid={resolve.uuid}
-          />
-        </form>
-      )}
+      render={({ handleSubmit, submitting, errors, values, form }) => {
+        const handleSaveDraft = useCallback(async (): Promise<string> => {
+          const formData = values as BroadcastFormData;
+
+          try {
+            let response;
+            if (currentUuid) {
+              response = await broadcastMessagesUpdate({
+                path: { uuid: currentUuid },
+                body: serializeBroadcast(formData),
+              });
+            } else {
+              response = await broadcastMessagesCreate({
+                body: serializeBroadcast(formData),
+              });
+              const newUuid = response.data.uuid;
+              setCurrentUuid(newUuid);
+              return newUuid;
+            }
+            return currentUuid;
+          } catch (error) {
+            throw error;
+          }
+        }, [values, currentUuid]);
+
+        return (
+          <form onSubmit={handleSubmit}>
+            <Modal.Header closeButton className="without-border">
+              <h2 className="fw-bolder">
+                {isEdit
+                  ? translate('Update a broadcast')
+                  : translate('Create a broadcast')}
+              </h2>
+            </Modal.Header>
+            <BroadcastForm
+              step={step}
+              setStep={setStep}
+              broadcastUuid={currentUuid}
+              attachments={attachments}
+              onAttachmentsChange={setAttachments}
+              broadcastState={broadcastData?.state}
+              onSaveDraft={handleSaveDraft}
+            />
+            <BroadcastFooter
+              step={step}
+              setStep={setStep}
+              refetch={resolve.refetch}
+              form={form}
+              disabled={(errors && Object.keys(errors).length > 0) || submitting}
+              formValues={values}
+              uuid={currentUuid}
+            />
+          </form>
+        );
+      }}
     />
   );
 };
