@@ -7,6 +7,7 @@ import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { ReviewDeleteAction } from '../../review/ReviewDeleteAction';
+import { ReviewReturnAction } from '../../review/ReviewReturnAction';
 import { ShowReviewCommentsAction } from './ShowReviewCommentsAction';
 
 type ProposalReviewsRowActionsProps = {
@@ -19,19 +20,23 @@ export const ProposalReviewsRowActions = ({
   fetch,
 }: ProposalReviewsRowActionsProps) => {
   const user = useSelector(getUser);
-  const canDelete = hasPermission(user, {
+  const canManage = hasPermission(user, {
     permission: PermissionEnum.MANAGE_PROPOSAL_REVIEW,
     scopeId: row.call_uuid,
     callOrganizerId: row.call_managing_organisation_uuid,
   });
 
+  const canReturn = canManage && row.state === 'submitted';
+
   return (
     <ActionsDropdown
       row={row}
       refetch={fetch}
-      actions={[ShowReviewCommentsAction, canDelete && ReviewDeleteAction].filter(
-        Boolean,
-      )}
+      actions={[
+        ShowReviewCommentsAction,
+        canReturn && ReviewReturnAction,
+        canManage && ReviewDeleteAction,
+      ].filter(Boolean)}
     />
   );
 };
