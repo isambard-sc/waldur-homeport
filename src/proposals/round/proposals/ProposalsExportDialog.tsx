@@ -10,7 +10,6 @@ import {
 } from 'waldur-js-client';
 
 import { ENV } from '@waldur/core/config';
-import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -209,8 +208,8 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
             proposal.project_is_confidential ? 'Yes' : 'No',
             proposal.project_has_civilian_purpose ? 'Yes' : 'No',
             proposal.created_by_name,
-            formatDateTime(proposal.created),
-            proposal.submitted_at ? formatDateTime(proposal.submitted_at) : '',
+            proposal.created ? new Date(proposal.created) : '',
+            proposal.submitted_at ? new Date(proposal.submitted_at) : '',
             proposal.users
               ?.map(
                 (u) =>
