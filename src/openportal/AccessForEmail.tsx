@@ -141,34 +141,21 @@ const ProjectsCard: FunctionComponent<ProjectsCardProps> = ({ projects }) => {
 export const AccessForEmail: FunctionComponent<{}> = () => {
     useTitle(translate('Check user access'), '', 'browser');
 
-    const [searchType, setSearchType] = useState<string>('email');
     const [searchValue, setSearchValue] = useState<string>('');
     const [data, setData] = useState<UserData[] | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const isValidEmail = (email: string): boolean => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    const isValidSearch = (value: string, type: string): boolean => {
-        if (!value.trim()) return false;
-        if (type === 'email') return isValidEmail(value);
-        return true;
-    };
-
     const handleSearch = async (e: React.FormEvent | null) => {
         if (e) e.preventDefault();
-        if (!isValidSearch(searchValue, searchType)) return;
+        if (!searchValue.trim()) return;
 
         setLoading(true);
         setError(null);
 
         try {
-            const params = new URLSearchParams();
-            params.append(searchType, searchValue);
-            const url = `/openportal/access_for_email/?${params.toString()}`;
+            // Use 'q' parameter for free text search
+            const url = `/openportal/access_for_email/?q=${encodeURIComponent(searchValue)}`;
             const response = await get(url);
             
             // Normalize response to always be an array of users
@@ -187,7 +174,7 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
     };
 
     useEffect(() => {
-        if (isValidSearch(searchValue, searchType)) {
+        if (searchValue.trim()) {
             const timeoutId = setTimeout(() => {
                 handleSearch(null);
             }, 500);
@@ -196,24 +183,13 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
         } else {
             setData(null);
         }
-    }, [searchValue, searchType]);
+    }, [searchValue]);
 
-    const getPlaceholder = (): string => {
-        switch (searchType) {
-            case 'email':
-                return translate('Enter email address');
-            case 'short_name':
-                return translate('Enter short name');
-            case 'project_name':
-                return translate('Enter project name');
-            case 'project_id':
-                return translate('Enter project ID');
-            default:
-                return translate('Enter search value');
-        }
+    const handleClear = () => {
+        setSearchValue('');
+        setData(null);
+        setError(null);
     };
-
-    const isMultiUserSearch = searchType === 'project_name' || searchType === 'project_id';
 
     return (
         <Card className="card-bordered">
@@ -224,33 +200,32 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
             </Card.Header>
             <Card.Body className="custom-padding-zero">
                 <div className="mb-3 px-4 pt-4">
-                    <label className="form-label">
-                        {translate('Search by')}:
-                    </label>
-                    <select
-                        className="form-select"
-                        value={searchType}
-                        onChange={(e) => {
-                            setSearchType(e.target.value);
-                            setSearchValue('');
-                            setData(null);
-                            setError(null);
-                        }}
-                    >
-                        <option value="email">{translate('Email')}</option>
-                        <option value="short_name">{translate('Short Name')}</option>
-                        <option value="project_name">{translate('Project Name')}</option>
-                        <option value="project_id">{translate('Project ID')}</option>
-                    </select>
+                    <p className="text-muted mb-3">
+                        {translate('Search by email, short name, project name, or project ID')}
+                    </p>
                 </div>
 
-                <FilterBox
-                    type="search"
-                    placeholder={getPlaceholder()}
-                    value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                />
+                <div className="px-4 pb-3">
+                    <div className="d-flex gap-2">
+                        <FilterBox
+                            type="search"
+                            placeholder={translate('Enter email, short name, project name, or project ID...')}
+                            value={searchValue}
+                            onChange={(e) => setSearchValue(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
+                            style={{ flex: 1 }}
+                        />
+                        {searchValue && (
+                            <button 
+                                type="button"
+                                className="btn btn-outline-secondary"
+                                onClick={handleClear}
+                            >
+                                {translate('Clear')}
+                            </button>
+                        )}
+                    </div>
+                </div>
 
                 {loading && (
                     <div className="p-4 text-center">
@@ -272,10 +247,10 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
 
                 {data && Array.isArray(data) && data.length > 0 && (
                     <>
-                        {isMultiUserSearch && data.length > 1 && (
+                        {data.length > 1 && (
                             <div className="px-4 pt-4">
                                 <div className="alert alert-info">
-                                    {translate('Found')} {data.length} {translate('users in this project')}
+                                    {translate('Found')} {data.length} {translate('users')}
                                 </div>
                             </div>
                         )}
