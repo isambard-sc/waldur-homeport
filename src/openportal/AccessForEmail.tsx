@@ -40,39 +40,72 @@ interface ProjectsCardProps {
 const UserInfoCard: FunctionComponent<UserInfoCardProps> = ({ userData, index = null }) => {
     return (
         <Card className="mb-3">
-            <Card.Header className="custom-card-header custom-padding-zero">
-                <Card.Title>
+            <Card.Header>
+                <Card.Title className="mb-0">
                     {translate('User Information')}
-                    {index !== null && ` - User ${index + 1}`}
+                    {index !== null && ` - ${translate('User')} ${index + 1}`}
                 </Card.Title>
             </Card.Header>
-            <Card.Body className="custom-padding-zero">
-                <Field
-                    label={translate('Email')}
-                    value={userData.email}
-                />
-                <Field
-                    label={translate('Status')}
-                    value={userData.status}
-                />
-                {userData.short_name && (
+            <Card.Body>
+                <div className="fs-6">
                     <Field
-                        label={translate('Short Name')}
-                        value={userData.short_name}
+                        label={translate('Email')}
+                        value={userData.email}
+                        space={2}
+                        labelCol={4}
+                        valueCol={8}
+                        valueClass="text-break"
                     />
-                )}
-                {userData.invited_by && (
                     <Field
-                        label={translate('Invited By')}
-                        value={userData.invited_by}
+                        label={translate('Status')}
+                        value={
+                            <span className={`badge ${
+                                userData.status === 'active' 
+                                    ? 'badge-success' 
+                                    : userData.status === 'invited'
+                                    ? 'badge-warning'
+                                    : 'badge-secondary'
+                            }`}>
+                                {userData.status}
+                            </span>
+                        }
+                        space={2}
+                        labelCol={4}
+                        valueCol={8}
                     />
-                )}
-                {userData.reason && (
-                    <Field
-                        label={translate('Reason')}
-                        value={userData.reason}
-                    />
-                )}
+                    {userData.short_name && (
+                        <Field
+                            label={translate('Short Name')}
+                            value={<code className="text-primary">{userData.short_name}</code>}
+                            space={2}
+                            labelCol={4}
+                            valueCol={8}
+                        />
+                    )}
+                    {userData.invited_by && (
+                        <Field
+                            label={translate('Invited By')}
+                            value={userData.invited_by}
+                            space={2}
+                            labelCol={4}
+                            valueCol={8}
+                            valueClass="text-break"
+                        />
+                    )}
+                    {userData.reason && (
+                        <Field
+                            label={translate('Reason')}
+                            value={
+                                <span className="text-danger">
+                                    {userData.reason}
+                                </span>
+                            }
+                            space={2}
+                            labelCol={4}
+                            valueCol={8}
+                        />
+                    )}
+                </div>
             </Card.Body>
         </Card>
     );
@@ -82,57 +115,75 @@ const UserInfoCard: FunctionComponent<UserInfoCardProps> = ({ userData, index = 
 const ProjectsCard: FunctionComponent<ProjectsCardProps> = ({ projects }) => {
     if (!projects || typeof projects !== 'object' || Object.keys(projects).length === 0) {
         return (
-            <div className="p-4 text-center text-gray-500">
-                {translate('No projects found for this user')}
-            </div>
+            <Card>
+                <Card.Body>
+                    <div className="text-center text-muted py-4">
+                        {translate('No projects found for this user')}
+                    </div>
+                </Card.Body>
+            </Card>
         );
     }
 
     return (
         <Card>
-            <Card.Header className="custom-card-header custom-padding-zero">
-                <Card.Title>
+            <Card.Header>
+                <Card.Title className="mb-0">
                     {translate('Projects')} ({Object.keys(projects).length})
                 </Card.Title>
             </Card.Header>
-            <Card.Body className="custom-padding-zero">
-                {Object.entries(projects).map(([projectId, project]) => (
-                    <div key={projectId} className="mb-4 pb-4 border-bottom">
-                        <div className="mb-3">
-                            <h3 className="text-lg font-medium text-gray-800 mb-1">
-                                {project.name}
-                            </h3>
-                            <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                                {projectId}
-                            </span>
-                        </div>
-
-                        {project.resources && Array.isArray(project.resources) && project.resources.length > 0 && (
-                            <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-2">
-                                    {translate('Resources')} ({project.resources.length}):
-                                </h4>
-                                <div className="space-y-2">
-                                    {project.resources.map((resource, index) => (
-                                        <div key={index} className="p-3 bg-gray-50 rounded">
-                                            <div className="flex items-center justify-between flex-wrap">
-                                                <span className="text-sm font-medium text-gray-800">
-                                                    {resource.name}
-                                                </span>
-                                                <div className="text-sm text-gray-600">
-                                                    {translate('Username')}:{' '}
-                                                    <span className="font-mono bg-gray-200 px-2 py-1 rounded">
-                                                        {resource.username}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+            <Card.Body>
+                <div className="d-flex flex-column gap-4">
+                    {Object.entries(projects).map(([projectId, project]) => (
+                        <div key={projectId} className="border rounded p-3">
+                            <div className="mb-3">
+                                <h5 className="mb-1 fw-bold">
+                                    {project.name}
+                                </h5>
+                                <div>
+                                    <span className="badge badge-light-primary">
+                                        {projectId}
+                                    </span>
                                 </div>
                             </div>
-                        )}
-                    </div>
-                ))}
+
+                            {project.resources && Array.isArray(project.resources) && project.resources.length > 0 && (
+                                <div>
+                                    <h6 className="mb-2 text-muted fw-semibold">
+                                        {translate('Resources')} ({project.resources.length})
+                                    </h6>
+                                    <div className="d-flex flex-column gap-2">
+                                        {project.resources.map((resource, index) => (
+                                            <div key={index} className="bg-light rounded p-3">
+                                                <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                                                    <div className="flex-grow-1">
+                                                        <div className="fw-semibold text-dark">
+                                                            {resource.name}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-end">
+                                                        <small className="text-muted d-block">
+                                                            {translate('Username')}
+                                                        </small>
+                                                        <code className="bg-secondary bg-opacity-25 px-2 py-1 rounded">
+                                                            {resource.username}
+                                                        </code>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {(!project.resources || project.resources.length === 0) && (
+                                <div className="text-muted fst-italic">
+                                    {translate('No resources in this project')}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </Card.Body>
         </Card>
     );
@@ -193,19 +244,19 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
 
     return (
         <Card className="card-bordered">
-            <Card.Header className="custom-card-header custom-padding-zero">
-                <Card.Title>
+            <Card.Header>
+                <Card.Title className="mb-0">
                     {translate('Check user access')}
                 </Card.Title>
             </Card.Header>
-            <Card.Body className="custom-padding-zero">
-                <div className="mb-3 px-4 pt-4">
+            <Card.Body>
+                <div className="mb-3">
                     <p className="text-muted mb-3">
                         {translate('Search by email, short name, project name, or project ID')}
                     </p>
                 </div>
 
-                <div className="px-4 pb-3">
+                <div className="mb-3">
                     <div className="d-flex gap-2">
                         <FilterBox
                             type="search"
@@ -228,47 +279,50 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
                 </div>
 
                 {loading && (
-                    <div className="p-4 text-center">
-                        <div className="spinner-border" role="status">
+                    <div className="text-center py-4">
+                        <div className="spinner-border text-primary" role="status">
                             <span className="visually-hidden">{translate('Loading...')}</span>
                         </div>
                     </div>
                 )}
 
                 {error && (
-                    <div className="p-4 bg-red-50 border-l-4 border-red-400">
-                        <div className="flex">
-                            <div className="ml-3">
-                                <p className="text-sm text-red-700">{error}</p>
-                            </div>
-                        </div>
+                    <div className="alert alert-danger d-flex align-items-center" role="alert">
+                        <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>{error}</div>
                     </div>
                 )}
 
                 {data && Array.isArray(data) && data.length > 0 && (
                     <>
                         {data.length > 1 && (
-                            <div className="px-4 pt-4">
-                                <div className="alert alert-info">
-                                    {translate('Found')} {data.length} {translate('users')}
+                            <div className="mb-3">
+                                <div className="alert alert-info d-flex align-items-center">
+                                    <i className="bi bi-info-circle-fill me-2"></i>
+                                    <div>
+                                        {translate('Found')} <strong>{data.length}</strong> {translate('users')}
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        {data.map((userData, index) => (
-                            <div key={index} className="mb-3">
-                                <UserInfoCard 
-                                    userData={userData} 
-                                    index={data.length > 1 ? index : null}
-                                />
-                                <ProjectsCard projects={userData.projects} />
-                            </div>
-                        ))}
+                        <div className="d-flex flex-column gap-3">
+                            {data.map((userData, index) => (
+                                <div key={index}>
+                                    <UserInfoCard 
+                                        userData={userData} 
+                                        index={data.length > 1 ? index : null}
+                                    />
+                                    <ProjectsCard projects={userData.projects} />
+                                </div>
+                            ))}
+                        </div>
                     </>
                 )}
 
                 {data && Array.isArray(data) && data.length === 0 && (
-                    <div className="p-4 text-center text-gray-500">
+                    <div className="alert alert-warning text-center">
+                        <i className="bi bi-search me-2"></i>
                         {translate('No results found')}
                     </div>
                 )}
