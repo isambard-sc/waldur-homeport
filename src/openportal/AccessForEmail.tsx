@@ -269,7 +269,7 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
                         {searchValue && (
                             <button 
                                 type="button"
-                                className="btn btn-outline-secondary"
+                                className="btn btn-secondary"
                                 onClick={handleClear}
                             >
                                 {translate('Clear')}
