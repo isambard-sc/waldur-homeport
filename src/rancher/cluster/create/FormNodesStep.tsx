@@ -76,7 +76,7 @@ const CheckboxGroup = ({ groupName, options, input, groupClassName }) => (
 const renderNodeRows = ({ fields, flavors }: any) => {
   const addRow = useCallback(() => {
     fields.push({
-      name: translate('Rancher node ') + (fields.length + 1),
+      name: translate('Rancher node {index}', { index: fields.length + 1 }),
       roles: ['worker'],
       units: 1,
     });
@@ -129,7 +129,7 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                           <Field
                             name={`${node}.flavor`}
                             component={SelectField}
-                            placeholder={translate('Select flavor') + '...'}
+                            placeholder={translate('Select flavor...')}
                             options={flavors}
                             validate={required}
                             isClearable={true}
@@ -147,8 +147,8 @@ const renderNodeRows = ({ fields, flavors }: any) => {
                         </td>
                         <td>
                           <Button
-                            variant="light"
-                            className="btn-icon btn-active-light-danger"
+                            variant="text-danger"
+                            className="btn-icon"
                             onClick={() => fields.remove(index)}
                           >
                             <span className="svg-icon svg-icon-2">
@@ -165,7 +165,7 @@ const renderNodeRows = ({ fields, flavors }: any) => {
           </div>
         </Form.Group>
       )}
-      <Button variant="light" className="text-nowrap" onClick={addRow}>
+      <Button variant="tertiary" className="text-nowrap" onClick={addRow}>
         <span className="svg-icon svg-icon-2">
           <PlusIcon weight="bold" />
         </span>
@@ -226,7 +226,7 @@ export const FormNodesStep = (props: FormStepProps) => {
             : undefined;
           dispatch(
             arrayPush(ORDER_FORM_ID, NODES_FIELD_ARRAY, {
-              name: translate('Rancher node ') + (i + 1),
+              name: translate('Rancher node {index}', { index: i + 1 }),
               units: 1,
               roles: node.roles,
               system_volume_size: node.system_volume_size,

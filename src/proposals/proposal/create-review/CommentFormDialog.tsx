@@ -41,10 +41,7 @@ export const CommentFormDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
           }
           footer={
             <>
-              <CloseDialogButton
-                variant="outline btn-outline-default"
-                className="flex-equal"
-              />
+              <CloseDialogButton variant="tertiary" className="flex-equal" />
 
               <SubmitButton
                 disabled={props.invalid || props.pristine}
@@ -58,7 +55,7 @@ export const CommentFormDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
           <FormContainer submitting={props.submitting}>
             <TextField
               label={translate('Comment')}
-              placeholder={translate('Enter a comment') + '...'}
+              placeholder={translate('Enter a comment...')}
               name="comment"
               required
               validate={required}

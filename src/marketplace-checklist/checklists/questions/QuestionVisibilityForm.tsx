@@ -11,7 +11,7 @@ import {
   QuestionTypeEnum,
 } from 'waldur-js-client';
 
-import { CustomRadioButton } from '@waldur/core/CustomRadioButton';
+import { AwesomeRadioButton } from '@waldur/core/AwesomeRadioButton';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { required } from '@waldur/core/validators';
@@ -92,22 +92,22 @@ const FieldsListGroup = ({
           name="dependency_logic_operator"
           defaultValue="and"
           render={({ input }) => (
-            <CustomRadioButton
+            <AwesomeRadioButton
               label={translate(
                 'When multiple conditions exist, show this question if:',
               )}
               choices={[
                 {
-                  label: translate('All conditions match') + ' (AND)',
+                  label: translate('All conditions match (AND)'),
                   value: 'and',
                 },
                 {
-                  label: translate('Any condition matches') + ' (OR)',
+                  label: translate('Any condition matches (OR)'),
                   value: 'or',
                 },
               ]}
               direction="horizontal"
-              align="left"
+              justify="start"
               input={input as any}
               disabled={fields.length < 2}
               tooltip={
@@ -134,12 +134,12 @@ const FieldsListGroup = ({
           <Card key={name} className="card-bordered bg-gray-50 mb-3">
             <Card.Header className="mx-4 min-h-auto">
               <h6 className="mb-0 text-gray">
-                {translate('Condition') + ' ' + (i + 1)}
+                {translate('Condition {index}', { index: i + 1 })}
               </h6>
               <div className="card-toolbar m-0">
                 <Button
-                  variant="active-light-danger"
-                  className="btn-icon btn-icon-danger"
+                  variant="text-danger"
+                  className="btn-icon"
                   onClick={() => removeRow(i)}
                 >
                   <span className="svg-icon svg-icon-1">
@@ -251,12 +251,7 @@ const FieldsListGroup = ({
         );
       })}
       <div>
-        <Button
-          variant="active-secondary"
-          className="btn-text-primary btn-icon-primary"
-          onClick={addRow}
-          disabled={addDisabled}
-        >
+        <Button variant="text-primary" onClick={addRow} disabled={addDisabled}>
           <span className="svg-icon svg-icon-2">
             <PlusIcon weight="bold" />
           </span>

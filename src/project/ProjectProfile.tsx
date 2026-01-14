@@ -4,12 +4,14 @@ import {
   GlobeSimpleIcon,
   GraduationCapIcon,
 } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { Project } from 'waldur-js-client';
+import { Project, proposalProposalsList } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
+import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
 import { formatDate } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { PublicDashboardHero } from '@waldur/dashboard/hero/PublicDashboardHero';
@@ -100,6 +102,21 @@ const ProjectKindCard = ({ project }: ProjectProfileProps) => {
 export const ProjectProfile = ({ project }: ProjectProfileProps) => {
   const abbreviation = useMemo(() => getItemAbbreviation(project), [project]);
 
+  // Fetch proposals linked to this project
+  const { data: proposals, isLoading: isLoadingProposals } = useQuery({
+    queryKey: ['project-proposals', project.uuid],
+    queryFn: async () => {
+      const response = await proposalProposalsList({
+        query: {
+          project_uuid: project.uuid,
+          page_size: 100,
+        },
+      });
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
   return (
     <PublicDashboardHero
       hideQuickSection={project.kind === 'default'}
@@ -115,6 +132,15 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
       }
     >
       <Stack direction="horizontal" className="gap-6 mb-1">
+        <span className="fw-semibold text-dark">
+          ID: {project.slug}
+          <CopyToClipboardButton
+            value={project.slug}
+            onlyButton
+            size={16}
+            buttonClassName="ms-2"
+          />
+        </span>
         {project.oecd_fos_2007_code && (
           <span>{`${project.oecd_fos_2007_code}. ${project.oecd_fos_2007_label}`}</span>
         )}
@@ -130,6 +156,29 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
           </span>
         )}
       </Stack>
+      {!isLoadingProposals && proposals && proposals.length > 0 && (
+        <Stack direction="horizontal" className="gap-3 mt-2">
+          <span className="fw-semibold text-dark">
+            {proposals.length === 1
+              ? translate('Proposal')
+              : translate('Proposals')}
+            :
+          </span>
+          {proposals.map((proposal, index) => (
+            <span key={proposal.uuid}>
+              <Link
+                state="call-management.proposal-details"
+                params={{
+                  proposal_uuid: proposal.uuid,
+                  uuid: project.customer_uuid,
+                }}
+                label={proposal.slug}
+              />
+              {index < proposals.length - 1 && ', '}
+            </span>
+          ))}
+        </Stack>
+      )}
     </PublicDashboardHero>
   );
 };

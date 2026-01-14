@@ -79,7 +79,7 @@ export const CustomIpField = ({
         <div>
           <FormLabel>{translate('Custom IP')}</FormLabel>
           <Select
-            placeholder={translate('e.g.') + ' 192.168.42.16'}
+            placeholder={translate('e.g. 192.168.42.16')}
             options={options}
             value={options.find((opt) => opt.value === selected?.value)}
             onChange={(opt) => {
@@ -276,8 +276,8 @@ const renderNetworkRows = ({
               </Col>
               <Col xs="auto" className="align-self-end">
                 <Button
-                  variant="active-light-danger"
-                  className="btn-icon btn-icon-danger"
+                  variant="text-danger"
+                  className="btn-icon"
                   onClick={() => fields.remove(index)}
                 >
                   <span className="svg-icon svg-icon-1x">
@@ -301,8 +301,7 @@ const renderNetworkRows = ({
         ))}
       </div>
       <Button
-        variant="active-secondary"
-        className="btn-text-primary btn-icon-primary"
+        variant="text-primary"
         disabled={freeSubnets.length === 0}
         onClick={addRow}
       >

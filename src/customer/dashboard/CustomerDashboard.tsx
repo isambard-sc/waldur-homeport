@@ -11,7 +11,7 @@ import {
   checkIsServiceManager,
   getCustomer,
   getUser,
-  isOwnerOrStaff,
+  isOwnerOrStaffOrReader,
 } from '@waldur/workspace/selectors';
 
 import { CustomerDashboardChart } from './CustomerDashboardChart';
@@ -26,7 +26,7 @@ export const CustomerDashboard: FunctionComponent = () => {
     () => checkIsServiceManager(customer, user),
     [customer, user],
   );
-  const canSeeCharts = useSelector(isOwnerOrStaff);
+  const canSeeCharts = useSelector(isOwnerOrStaffOrReader);
 
   const {
     data: aggregateLimitData,

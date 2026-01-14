@@ -16,16 +16,25 @@ export function checkScope(
   if (user?.is_staff) {
     return true;
   }
-  const userRole = user.permissions?.find(
+
+  // FIX: Check ALL matching roles, not just the first one
+  // A user can have multiple roles for the same scope (e.g., CALL.REVIEWER and CALL.MANAGER)
+  const userRoles = user.permissions?.filter(
     ({ scope_uuid, scope_type }) =>
       scope_uuid === targetScopeId && scope_type === targetScopeType,
   );
-  if (userRole) {
-    const role = ENV.roles.find(({ name }) => name === userRole.role_name);
-    if (role && role.permissions.includes(targetPerm)) {
-      return true;
+
+  // Check each role to see if any of them have the required permission
+  if (userRoles && userRoles.length > 0) {
+    for (const userRole of userRoles) {
+      const role = ENV.roles.find(({ name }) => name === userRole.role_name);
+      if (role && role.permissions.includes(targetPerm)) {
+        return true;
+      }
     }
   }
+
+  return false;
 }
 
 export const hasPermission = (user: User, request: PermissionRequest) => {

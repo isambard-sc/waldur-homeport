@@ -34,7 +34,7 @@ export const ProposalRowActions = ({ row, refetch }) => {
       permission: PermissionEnum.MANAGE_PROPOSAL_REVIEW,
       scopeId: row.call_uuid,
       callOrganizerId: row.call_managing_organisation_uuid,
-    }) && !['accepted', 'rejected', 'canceled'].includes(row.state);
+    }) && !['draft', 'accepted', 'rejected', 'canceled'].includes(row.state);
 
   const dispatch = useDispatch();
 
@@ -42,11 +42,11 @@ export const ProposalRowActions = ({ row, refetch }) => {
     (proposal) =>
       dispatch(
         openModalDialog(CreateReviewDialog, {
-          resolve: { proposal },
+          resolve: { proposal, refetch },
           size: 'lg',
         }),
       ),
-    [dispatch],
+    [dispatch, refetch],
   );
 
   const {

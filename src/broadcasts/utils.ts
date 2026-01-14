@@ -17,7 +17,7 @@ import { BroadcastFormData, BroadcastRequestData } from './types';
 
 type SubmitAction = 'submit' | 'template' | 'draft';
 
-const serializeBroadcast = (
+export const serializeBroadcast = (
   formData: BroadcastFormData,
 ): BroadcastRequestData => ({
   subject: formData.subject,
@@ -26,6 +26,12 @@ const serializeBroadcast = (
     customers: formData.customers?.map((c) => c.uuid),
     offerings: formData.offerings?.map((c) => c.uuid),
     all_users: formData.all_users,
+    round: formData.round?.uuid,
+    proposal_states: formData.proposal_states,
+    include_reviewers: formData.include_reviewers,
+    send_to_me: formData.send_to_me,
+    additional_recipients: formData.additional_recipients?.map((u) => u.email),
+    excluded_recipients: formData.excluded_recipients,
   },
   send_at: formData.send_at,
 });
@@ -38,6 +44,12 @@ export const parseBroadcast = (
   offerings: broadcast.query['offerings'],
   customers: broadcast.query['customers'],
   all_users: broadcast.query['all_users'],
+  round: broadcast.query['round'],
+  proposal_states: broadcast.query['proposal_states'],
+  include_reviewers: broadcast.query['include_reviewers'],
+  send_to_me: broadcast.query['send_to_me'] ?? true,
+  additional_recipients: broadcast.query['additional_recipients'],
+  excluded_recipients: broadcast.query['excluded_recipients'],
   send_at: broadcast.send_at,
 });
 

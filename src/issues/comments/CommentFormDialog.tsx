@@ -72,11 +72,7 @@ const PureCommentFormDialog: FC<CommentFormDialogProps> = (props) => {
         }
         footer={
           <>
-            <CloseDialogButton
-              variant="outline btn-outline-default"
-              className="flex-equal"
-            />
-
+            <CloseDialogButton variant="tertiary" className="flex-equal" />
             <SubmitButton
               submitting={props.submitting}
               disabled={props.invalid || props.submitting}
@@ -91,7 +87,7 @@ const PureCommentFormDialog: FC<CommentFormDialogProps> = (props) => {
             name={constants.FORM_FIELDS.comment}
             spaceless
             hideLabel
-            placeholder={translate('Enter a comment') + '...'}
+            placeholder={translate('Enter a comment...')}
             validate={required}
             autoFocus
           />

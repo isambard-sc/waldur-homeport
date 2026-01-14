@@ -5,11 +5,12 @@ import {
   proposalReviewsList,
 } from 'waldur-js-client';
 
-import { Link } from '@waldur/core/Link';
+import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { RateStars } from '@waldur/proposals/proposal/create-review/RateStars';
 import { ReviewStateRenderer } from '@waldur/proposals/review/ReviewStateRenderer';
 import { Field } from '@waldur/resource/summary';
+import { router } from '@waldur/router';
 import { createFetcher } from '@waldur/table/api';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
 import Table from '@waldur/table/Table';
@@ -26,12 +27,18 @@ const dataParser = (data: ProposalReview[], query) => {
   const { page = 1, page_size = 5 } = query;
   return data.map((review, index) => {
     const num = (page - 1) * page_size + index + 1;
-    Object.assign(review, { name: translate('Review') + ' ' + num });
+    Object.assign(review, {
+      name: translate('Review, {index}', { index: num }),
+    });
     return review;
   });
 };
 
 const renderReviewScoreField = ({ row }) => {
+  // Only show stars for submitted reviews
+  if (row.state !== 'submitted') {
+    return null;
+  }
   return <RateStars value={row.summary_score} />;
 };
 
@@ -49,11 +56,16 @@ export const ProposalExpandableRow: React.FC<ProposalExpandableRowProps> = ({
     {
       title: translate('Review'),
       render: ({ row }) => (
-        <Link
-          state="proposal-review"
-          params={{ review_uuid: row.uuid }}
-          label={row.name} // Generated in frontend
-        />
+        <a
+          onClick={() =>
+            router.stateService.go('proposal-review', {
+              uuid: row.call_managing_organisation_uuid,
+              review_uuid: row.uuid,
+            })
+          }
+        >
+          {row.name}
+        </a>
       ),
     },
     {
@@ -67,6 +79,26 @@ export const ProposalExpandableRow: React.FC<ProposalExpandableRowProps> = ({
     {
       title: translate('Score'),
       render: renderReviewScoreField,
+    },
+    {
+      title: translate('Comment'),
+      render: ({ row }) => {
+        const comment = row.summary_private_comment || row.summary_public_comment;
+        if (!comment) {
+          return <span className="text-muted">-</span>;
+        }
+        // Show tooltip for long comments (> 80 characters)
+        if (comment.length > 80) {
+          return (
+            <Tip label={comment} id={`comment-${row.uuid}`}>
+              <span className="ellipsis d-inline-block text-muted" style={{ maxWidth: 300 }}>
+                {comment}
+              </span>
+            </Tip>
+          );
+        }
+        return <span className="text-muted">{comment}</span>;
+      },
     },
   ];
 

@@ -69,6 +69,7 @@ export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
         timezone: DateTime.local().zoneName,
         start_time: props.resolve.round.start_time,
         cutoff_time: props.resolve.round.cutoff_time,
+        minimum_required_uploads: props.resolve.round.minimum_required_uploads ?? 0,
       }}
       validate={validate}
     />

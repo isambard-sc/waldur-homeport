@@ -49,7 +49,7 @@
   "Project is confidential": "Project involves confidential, sensitive or GDPR-protected information.",
   "{sender} has invited you to join {name} {type} in {role} role.": "{sender} has invited you to join the {type} called '{name}' in the role of '{role}'.",
   "Select if the project proposal contains confidential information.": "Select if the project involves confidential, sensitive or GDPR-protected information.",
-  "Upload additional documents, which support the proposal and help to review it.": "You must complete the two application forms downloaded from the call details page (the Assessment and Project Details forms). Please upload both completed forms here.",
-  "Upload supporting documentation": "Upload both the completed Assessment and Project Details forms (available from the Documents tab of the call details page).",
+  "Upload additional documents, which support the proposal and help to review it.": "You must complete any application forms described in the call details (available from the Documents tab of the Call Details page). Please upload the completed forms here.",
+  "Upload supporting documentation": "Upload any forms described in the call details (available from the Documents tab of the Call Details page).",
   "Sign in with {label}": "Click here to login"
 }

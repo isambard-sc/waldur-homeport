@@ -145,3 +145,22 @@ export const getLatinNameValidators = () => {
   }
   return validators;
 };
+
+export const createProposalNameValidator = (callPrefix: string) => {
+  // Formula: maxProposalNameLength = 150 - callPrefix.length - 10 - 6
+  // Where: 150 = max project name length, 10 = date length (YYYY-MM-DD), 6 = separators (" - " × 2)
+  const maxLength = 150 - (callPrefix?.length || 0) - 10 - 6;
+
+  return (value: string) => {
+    if (!value) {
+      return undefined;
+    }
+    if (value.length > maxLength) {
+      return translate(
+        'Proposal name is too long. Maximum {maxLength} characters allowed.',
+        { maxLength }
+      );
+    }
+    return undefined;
+  };
+};

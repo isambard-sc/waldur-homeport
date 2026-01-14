@@ -1,7 +1,8 @@
-import { OrderDetails } from 'waldur-js-client';
+import { OrderDetails, PublicOfferingDetails } from 'waldur-js-client';
 
 export interface OrderActionProps {
   order: OrderDetails;
-  refetch?(): void;
+  offering?: PublicOfferingDetails;
+  refetch?(): void | Promise<void>;
   as?: React.ElementType;
 }

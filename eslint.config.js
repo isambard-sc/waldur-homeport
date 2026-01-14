@@ -9,6 +9,8 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import enforceButtonVariants from './eslint-rules/enforce-button-variants.js';
+import noTemplateInTranslate from './eslint-rules/no-template-in-translate.js';
 
 const browserGlobals = {
   ...globals.browser,
@@ -31,6 +33,12 @@ export default tseslint
         prettier: prettier,
         import: importPlugin,
         'react-refresh': reactRefresh,
+        'waldur-custom': {
+          rules: {
+            ...noTemplateInTranslate.rules,
+            'enforce-button-variants': enforceButtonVariants,
+          },
+        },
       },
       languageOptions: {
         parserOptions: {
@@ -54,6 +62,10 @@ export default tseslint
       },
       rules: {
         ...reactHooks.configs.recommended.rules,
+
+        // Custom local rules
+        'waldur-custom/no-template-in-translate': 'error',
+        'waldur-custom/enforce-button-variants': 'error',
 
         // React Hooks rules
         'react-hooks/rules-of-hooks': 'off',

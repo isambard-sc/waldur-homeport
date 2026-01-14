@@ -40,6 +40,8 @@ export const TeamSection: FC<
 > = (props) => {
   const queryClient = useQueryClient();
   const hideRole = props.roles && props.roles.length === 1;
+  const isReviewersSection =
+    props.roles && props.roles.includes(RoleEnum.CALL_REVIEWER);
 
   const usersFilter = useMemo(
     () => ({
@@ -105,6 +107,7 @@ export const TeamSection: FC<
             <TeamDropdownActions
               refetchUsers={usersTable.fetch}
               refetchInvitations={invitationsTable.fetch}
+              showImportReviewers={isReviewersSection}
               {...props}
             />
           ) : props.onAddCommentClick ? (

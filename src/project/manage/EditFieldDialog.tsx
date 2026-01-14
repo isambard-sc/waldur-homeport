@@ -7,7 +7,10 @@ import { Project } from 'waldur-js-client';
 import { formatISODate } from '@waldur/core/dateUtils';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { useCustomerProjects } from '@waldur/customer/workspace/fetchCustomer';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { DeploymentFeatures } from '@waldur/FeaturesEnums';
 import { SubmitButton } from '@waldur/form';
+import MarkdownEditor from '@waldur/form/MarkdownEditor';
 import { StringField } from '@waldur/form/StringField';
 import { translate } from '@waldur/i18n';
 import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
@@ -18,7 +21,6 @@ import { useNotify } from '@waldur/store/hooks';
 import { setCurrentProject } from '@waldur/workspace/actions';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { DescriptionGroup } from '../create/DescriptionGroup';
 import { EndDateGroup } from '../create/EndDateGroup';
 import { IndustryGroup } from '../create/IndustryGroup';
 import { KindGroup } from '../create/KindGroup';
@@ -28,7 +30,13 @@ import { StartDateGroup } from '../create/StartDateGroup';
 import { EditProjectProps } from '../types';
 
 const formatValue = (key, value) => {
-  if (['', undefined, null].includes(value)) return null;
+  if (['', undefined, null].includes(value)) {
+    // For markdown fields, return empty string instead of null
+    if (key === 'description' || key === 'staff_notes') {
+      return '';
+    }
+    return null;
+  }
   switch (key) {
     case 'end_date':
     case 'start_date':
@@ -106,7 +114,9 @@ export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
                 <NameGroup customer={customer} />
               )
             ) : resolve.name === 'description' ? (
-              <DescriptionGroup />
+              <FormGroup label={translate('Description')}>
+                <Field component={MarkdownEditor as any} name="description" />
+              </FormGroup>
             ) : resolve.name === 'is_industry' ? (
               <IndustryGroup />
             ) : resolve.name === 'start_date' ? (
@@ -121,7 +131,24 @@ export const EditFieldDialog = ({ resolve }: { resolve: EditProjectProps }) => {
               </FormGroup>
             ) : resolve.name === 'slug' ? (
               <FormGroup label={translate('Slug')}>
-                <Field component={StringField as any} name="slug" />
+                <Field
+                  component={StringField as any}
+                  name="slug"
+                  disabled={
+                    isFeatureVisible(DeploymentFeatures.make_slugs_immutable) &&
+                    !!resolve.project.slug
+                  }
+                />
+                {isFeatureVisible(DeploymentFeatures.make_slugs_immutable) &&
+                  resolve.project.slug && (
+                    <p className="text-muted mt-2">
+                      {translate('Slug cannot be changed once set.')}
+                    </p>
+                  )}
+              </FormGroup>
+            ) : resolve.name === 'staff_notes' ? (
+              <FormGroup label={translate('Staff notes')}>
+                <Field component={MarkdownEditor as any} name="staff_notes" />
               </FormGroup>
             ) : resolve.name === 'kind' ? (
               <KindGroup />

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Accordion, Form } from 'react-bootstrap';
 import { useSelector, connect } from 'react-redux';
-import { formValueSelector, reduxForm } from 'redux-form';
+import { Field, formValueSelector, reduxForm } from 'redux-form';
 import { customerCreditsList } from 'waldur-js-client';
 
 import { EChart } from '@waldur/core/EChart';
@@ -10,14 +10,21 @@ import {
   LoadingSpinner,
   LoadingSpinnerIcon,
 } from '@waldur/core/LoadingSpinner';
-import { FieldError, FormContainer, SubmitButton } from '@waldur/form';
+import { required } from '@waldur/core/validators';
+import {
+  FieldError,
+  FormContainer,
+  SelectField,
+  SubmitButton,
+} from '@waldur/form';
+import { FormGroup } from '@waldur/form/FormGroup';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { useProjectCostChart } from '@waldur/project/utils';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { OrganizationProjectSelectField } from '../team/OrganizationProjectSelectField';
+import { useCustomerProjects } from '../workspace/fetchCustomer';
 
 import {
   useMinimalConsumptionFields,
@@ -30,6 +37,31 @@ interface ProjectCreditFormDialogProps {
   submitFn(formData: ProjectCreditFormData): void;
   initialValues?: any;
 }
+
+// Redux-form compatible project select field
+const ProjectSelectFieldComponent = ({ disabled = false }) => {
+  const currentCustomer = useSelector(getCustomer);
+  const { loading } = useCustomerProjects();
+
+  return (
+    <Field
+      name="project"
+      component={FormGroup as any}
+      label={translate('Project')}
+      required={true}
+      validate={required}
+    >
+      <SelectField
+        options={currentCustomer?.projects}
+        getOptionLabel={(option) => option.name}
+        getOptionValue={(option) => option.url}
+        isClearable={false}
+        isDisabled={disabled}
+        isLoading={loading}
+      />
+    </Field>
+  );
+};
 
 export const ProjectCreditFormDialog = connect<
   {},
@@ -105,7 +137,7 @@ export const ProjectCreditFormDialog = connect<
           }
         >
           <FormContainer submitting={props.submitting} className="size-lg">
-            <OrganizationProjectSelectField disabled={isEdit} />
+            <ProjectSelectFieldComponent disabled={isEdit} />
             {isLoading ? (
               <LoadingSpinner />
             ) : error ? (

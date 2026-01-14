@@ -54,28 +54,56 @@ export const useReviewActions = (review: ProposalReview, refetch = null) => {
   });
   const { mutate: reject, isPending: isRejecting } = useMutation({
     mutationFn: async () => {
+      let rejectionReason: string;
       try {
-        await waitForConfirmation(
+        rejectionReason = await waitForConfirmation(
           dispatch,
-          translate('Reject review'),
+          translate('Decline to review'),
           translate(
-            'Are you sure you want to reject the {name} proposal review?',
+            'Are you sure you want to decline to review the {name} proposal?',
             {
               name: <b>{review.proposal_name}</b>,
             },
             formatJsxTemplate,
           ),
+          {
+            showInput: true,
+            inputLabel: translate('Additional details (optional)'),
+            inputPlaceholder: translate(
+              'Provide any additional details',
+            ),
+            inputRequired: true,
+            inputRows: 4,
+            inputMaxLength: 400,
+            inputCheckboxes: [
+              {
+                label: translate('Too busy'),
+                value: translate('Too busy'),
+              },
+              {
+                label: translate('Conflict of interest'),
+                value: translate('Conflict of interest'),
+              },
+              {
+                label: translate('Outside area of expertise'),
+                value: translate('Outside area of expertise'),
+              },
+            ],
+          },
         );
       } catch {
         return;
       }
       try {
-        await proposalReviewsReject({ path: { uuid: review.uuid } });
+        await proposalReviewsReject({
+          path: { uuid: review.uuid },
+          body: { summary_private_comment: rejectionReason },
+        });
         if (refetch) refetch();
-        dispatch(showSuccess(translate('Review has been rejected.')));
+        dispatch(showSuccess(translate('Review has been declined.')));
       } catch (response) {
         dispatch(
-          showErrorResponse(response, translate('Unable to reject review.')),
+          showErrorResponse(response, translate('Unable to decline review.')),
         );
       }
     },

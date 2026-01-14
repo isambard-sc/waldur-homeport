@@ -68,7 +68,7 @@ const FieldsListGroup = ({ fields, components }: ComponentLimitsFieldProps) => {
                             name={`${component}.type`}
                             component={SelectField as any}
                             validate={required}
-                            placeholder={translate('Select component') + '...'}
+                            placeholder={translate('Select component...')}
                             options={getAvailableOptions(details)}
                             getOptionValue={(option) => option.type}
                             getOptionLabel={(option) => option.name}
@@ -86,7 +86,7 @@ const FieldsListGroup = ({ fields, components }: ComponentLimitsFieldProps) => {
                         </td>
                         <td>
                           <Button
-                            variant="light-danger"
+                            variant="danger"
                             className="btn-icon"
                             onClick={() => removeRow(i)}
                             disabled={fields.length === 1}
@@ -109,7 +109,7 @@ const FieldsListGroup = ({ fields, components }: ComponentLimitsFieldProps) => {
       {fields.length < components.length && (
         <div>
           <Button
-            variant="light"
+            variant="tertiary"
             className="btn-icon"
             onClick={addRow}
             aria-label="Add"

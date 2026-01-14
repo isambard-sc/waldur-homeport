@@ -1,12 +1,12 @@
-import { IdentificationBadgeIcon, QuestionIcon } from '@phosphor-icons/react';
+import { QuestionIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { uniqueId } from 'lodash-es';
+import { uniqueId } from 'lodash';
 import { FC, ReactNode, useContext } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';
 
 import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
+import { StaffOnlyIndicator } from '@waldur/customer/details/StaffOnlyIndicator';
 import { ResourceActionMenuContext } from '@waldur/marketplace/resources/actions/ResourceActionMenuContext';
 
 export interface ActionItemProps {
@@ -58,7 +58,11 @@ export const ActionItem: FC<ActionItemProps> = (props) => {
         <div className={props.disabled ? 'opacity-50' : undefined}>
           {props.iconNode && (
             <span
-              className={`svg-icon svg-icon-2 svg-icon-${props.iconColor || 'gray-400'}`}
+              className={classNames(
+                'svg-icon svg-icon-2',
+                Component !== Button &&
+                  `svg-icon-${props.iconColor || 'gray-400'}`,
+              )}
             >
               {props.iconNode}
             </span>
@@ -79,15 +83,7 @@ export const ActionItem: FC<ActionItemProps> = (props) => {
           />
         </Tip>
       )}
-      {props.staff && (
-        <Tip
-          label={translate('Staff action')}
-          id={`staff-action-${uniqueId()}`}
-          className="text-dark ms-1 me-3"
-        >
-          <IdentificationBadgeIcon size={22} />
-        </Tip>
-      )}
+      {props.staff && <StaffOnlyIndicator className="text-dark ms-1 me-3" />}
     </div>
   ) : (
     <Component {...props} />

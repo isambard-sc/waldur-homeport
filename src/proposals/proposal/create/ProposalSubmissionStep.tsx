@@ -143,10 +143,13 @@ export const ProposalSubmissionStep: FC<{
             ? Object.keys(formValues.supporting_documentation).length
             : 0);
 
-        if (num_attached_documents < 2) {
+        // Check minimum required uploads from round configuration
+        const minimum_required_uploads = proposal.round?.minimum_required_uploads ?? 0;
+        if (minimum_required_uploads > 0 && num_attached_documents < minimum_required_uploads) {
           throw new Error(
             translate(
-              'You need to attach both the completed Assessment and Project Details forms.',
+              'Please upload at least {count} supporting document(s) before submitting.',
+              { count: minimum_required_uploads },
             ),
           );
         }
@@ -213,6 +216,7 @@ export const ProposalSubmissionStep: FC<{
               editable={proposal.state === 'draft'}
               submitting={formProps.submitting}
               completedSteps={completedSteps}
+              proposal={{ uuid: proposal.uuid, name: proposal.name }}
             />
           </SidebarLayout.Sidebar>
         </SidebarLayout.Container>

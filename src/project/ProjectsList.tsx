@@ -50,6 +50,14 @@ export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
       keys: ['uuid', 'name', 'is_industry', 'kind'],
     },
     {
+      title: translate('ID'),
+      render: ({ row }) => <span className="fw-semibold">{row.slug}</span>,
+      export: 'slug',
+      id: 'id',
+      keys: ['slug'],
+      className: 'text-nowrap',
+    },
+    {
       title: translate('Description'),
       render: ({ row }) => <>{formatLongText(row.description)}</>,
       export: 'description',
@@ -101,14 +109,15 @@ export const ProjectsListTable: FC<TableProps & ProjectsListProps> = ({
       keys: ['billing_price_estimate'],
     });
   }
-
-  columns.push({
-    title: translate('Type'),
-    render: ProjectKindField,
-    export: 'kind',
-    id: 'kind',
-    keys: ['kind'],
-  });
+  if (isFeatureVisible(ProjectFeatures.show_kind_in_create_dialog)) {
+    columns.push({
+      title: translate('Type'),
+      render: ProjectKindField,
+      export: 'kind',
+      id: 'kind',
+      keys: ['kind'],
+    });
+  }
 
   return (
     <Table
@@ -139,7 +148,7 @@ export const ProjectsList: FC<ProjectsListProps> = ({
   const currentCustomer = useSelector(getCustomer);
   const filter = useMemo(
     () => ({
-      customer: customer ? customer.uuid : currentCustomer.uuid,
+      customer: customer ? customer.uuid : currentCustomer?.uuid,
       o: 'name',
     }),
     [currentCustomer, customer],

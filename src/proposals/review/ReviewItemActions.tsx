@@ -30,7 +30,7 @@ export const ReviewItemAction = ({ row, refetch }: ReviewItemActionProps) => {
       />
 
       <ActionItem
-        title={translate('Send back')}
+        title={translate('Decline to review')}
         action={reject}
         iconNode={<ArrowBendDoubleUpLeftIcon weight="bold" />}
         disabled={isAccepting || isRejecting}

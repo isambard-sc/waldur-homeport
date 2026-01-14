@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { Field as FinalField } from 'react-final-form';
 import { Field } from 'redux-form';
 
 import { AsyncPaginate } from '@waldur/form/themed-select';
@@ -26,7 +27,24 @@ export const AsyncSelectField: FunctionComponent<any> = (props) => {
       name={name}
       component={Select}
       defaultOptions
-      placeholder={placeholder || translate('Select') + '...'}
+      placeholder={placeholder || translate('Select...')}
+      loadOptions={props.loadOptions}
+      noOptionsMessage={() => translate('No results found')}
+      getOptionLabel={(option) => option.name}
+      getOptionValue={(option) => option.value || option.uuid}
+      {...rest}
+    />
+  );
+};
+
+export const AsyncSelectFieldFinal: FunctionComponent<any> = (props) => {
+  const { name, placeholder, ...rest } = props;
+  return (
+    <FinalField
+      name={name}
+      component={Select}
+      defaultOptions
+      placeholder={placeholder || translate('Select...')}
       loadOptions={props.loadOptions}
       noOptionsMessage={() => translate('No results found')}
       getOptionLabel={(option) => option.name}

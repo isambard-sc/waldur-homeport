@@ -148,6 +148,23 @@ export const SettingsDescription = [
         default: false,
         type: 'boolean',
       },
+      {
+        key: 'ENABLE_ORDER_START_DATE',
+        description: translate('Allow setting start date to control when resource creation order is processed.'),
+        default: false,
+        type: 'boolean',
+      },
+    ],
+  },
+  {
+    description: translate('Project'),
+    items: [
+      {
+        key: 'PROJECT_END_DATE_MANDATORY',
+        description: translate('If true, project end date field becomes mandatory when creating or updating projects.'),
+        default: false,
+        type: 'boolean',
+      },
     ],
   },
   {
@@ -447,6 +464,30 @@ export const SettingsDescription = [
         type: 'secret_field',
       },
       {
+        key: 'ATLASSIAN_PERSONAL_ACCESS_TOKEN',
+        description: translate('Personal Access Token for user'),
+        default: '',
+        type: 'secret_field',
+      },
+      {
+        key: 'ATLASSIAN_OAUTH2_CLIENT_ID',
+        description: translate('OAuth 2.0 Client ID'),
+        default: '',
+        type: 'secret_field',
+      },
+      {
+        key: 'ATLASSIAN_OAUTH2_ACCESS_TOKEN',
+        description: translate('OAuth 2.0 Access Token'),
+        default: '',
+        type: 'secret_field',
+      },
+      {
+        key: 'ATLASSIAN_OAUTH2_TOKEN_TYPE',
+        description: translate('OAuth 2.0 Token Type'),
+        default: 'Bearer',
+        type: 'string',
+      },
+      {
         key: 'ATLASSIAN_PROJECT_ID',
         description: translate('Service desk ID or key'),
         default: '',
@@ -469,6 +510,12 @@ export const SettingsDescription = [
         description: translate('Comma-separated list of enabled issue types. First type is the default one.'),
         default: 'Informational, Service Request, Change Request, Incident',
         type: 'string',
+      },
+      {
+        key: 'ATLASSIAN_SUPPORT_TYPE_MAPPING',
+        description: translate('Mapping from frontend issue types to backend request types'),
+        default: {'Informational': 'Get IT help', 'Service Request': 'Request new software', 'Change Request': 'Change Request', 'Incident': 'Report a system problem'},
+        type: 'dict_field',
       },
       {
         key: 'ATLASSIAN_AFFECTED_RESOURCE_FIELD',
@@ -555,6 +602,12 @@ export const SettingsDescription = [
         type: 'string',
       },
       {
+        key: 'ATLASSIAN_WALDUR_BACKEND_ID_FIELD',
+        description: translate('Waldur backend ID custom field ID (fallback when field lookup by name fails)'),
+        default: 'customfield_10200',
+        type: 'string',
+      },
+      {
         key: 'ATLASSIAN_CUSTOM_ISSUE_FIELD_MAPPING_ENABLED',
         description: translate('Should extra issue field mappings be applied'),
         default: true,
@@ -579,33 +632,9 @@ export const SettingsDescription = [
         type: 'boolean',
       },
       {
-        key: 'ATLASSIAN_USE_TEENAGE_API',
-        description: translate('Toggler for teenage API usage.'),
-        default: false,
-        type: 'boolean',
-      },
-      {
-        key: 'ATLASSIAN_USE_AUTOMATIC_REQUEST_MAPPING',
-        description: translate('Toggler for automatic request mapping.'),
-        default: true,
-        type: 'boolean',
-      },
-      {
         key: 'ATLASSIAN_MAP_WALDUR_USERS_TO_SERVICEDESK_AGENTS',
         description: translate('Toggler for mapping between waldur user and service desk agents.'),
         default: false,
-        type: 'boolean',
-      },
-      {
-        key: 'ATLASSIAN_STRANGE_SETTING',
-        description: translate('A constant in the API path, sometimes differs'),
-        default: 1,
-        type: 'integer',
-      },
-      {
-        key: 'ATLASSIAN_PULL_PRIORITIES',
-        description: translate('Toggler for pulling priorities from backend'),
-        default: true,
         type: 'boolean',
       },
     ],

@@ -13,6 +13,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Make payments menu visible for staff users only.'),
       },
       {
+        key: 'show_banking_data',
+        description: translate('Display banking related data under customer profile.'),
+      },
+      {
         key: 'show_domain',
         description: translate('Allows to hide domain field in organization detail.'),
       },
@@ -27,8 +31,16 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('Waldur deployment settings'),
     items: [
       {
+        key: 'application_portal_only',
+        description: translate('Configure Waldur to function as an application and awards portal only.'),
+      },
+      {
         key: 'enable_cookie_notice',
         description: translate('Enable cookie notice in marketplace.'),
+      },
+      {
+        key: 'make_slugs_immutable',
+        description: translate('Make slugs immutable, i.e. disallow direct changes to slugs after they have been set. Note that slugs may still be changed indirectly.'),
       },
       {
         key: 'send_metrics',
@@ -79,6 +91,14 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Do not render prices in order details.'),
       },
       {
+        key: 'display_offering_partitions',
+        description: translate('Enable display of offering partitions in UI.'),
+      },
+      {
+        key: 'display_software_catalog',
+        description: translate('Enable display of software catalog in UI.'),
+      },
+      {
         key: 'display_user_tos',
         description: translate('Enable display of user terms of service in UI.'),
       },
@@ -95,12 +115,12 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Enabled display of call management functionality.'),
       },
       {
-        key: 'show_remote_project_functionality',
-        description: translate('Enabled display of remote project functionality.'),
-      },
-      {
         key: 'show_experimental_ui_components',
         description: translate('Enabled display of experimental or mocked components in marketplace.'),
+      },
+      {
+        key: 'show_managed_projects',
+        description: translate('Allows to show managed (openportal) remote projects in organization.'),
       },
       {
         key: 'show_resource_end_date',
@@ -227,12 +247,24 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('User workspace'),
     items: [
       {
+        key: 'allow_user_creation',
+        description: translate('Allow users to create new user accounts when adding team members to projects and proposals.'),
+      },
+      {
         key: 'credentials',
         description: translate('Enable credentials management (SSH keys, API tokens, etc.) in user workspace.'),
       },
       {
+        key: 'disable_long_tokens',
+        description: translate('Disallow non-staff/support users from creating API tokens with unlimited or long expiration times (more than an hour).'),
+      },
+      {
         key: 'disable_user_termination',
         description: translate('Disable user termination in user workspace.'),
+      },
+      {
+        key: 'minimal_user_profile',
+        description: translate('Show and allow editing of minimal set of user profile fields (e.g. just name and email).'),
       },
       {
         key: 'notifications',
@@ -251,6 +283,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Enable display of slug field in user summary.'),
       },
       {
+        key: 'show_slug_as_id',
+        description: translate('Show the user slug as an identifier on the dashboard and all user lists.'),
+      },
+      {
         key: 'show_username',
         description: translate('Enable display of username field in user tables.'),
       },
@@ -261,4 +297,3 @@ export const FeaturesDescription: FeatureSection[] = [
     ],
   },
 ];
-

@@ -7,6 +7,8 @@ import { translate } from '@waldur/i18n';
 import { getUser } from '@waldur/workspace/selectors';
 
 import { AcceptTosWarning } from './AcceptTosWarning';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { UserFeatures } from '@waldur/FeaturesEnums';
 import { IdentityProviderCard } from './IdentityProviderCard';
 import { TermsOfServiceCheckbox } from './TermsOfServiceCheckbox';
 import { UserEditAvatarFormItem } from './UserEditAvatarFormItem';
@@ -21,10 +23,13 @@ export const UserEditTab: React.FC<UserEditTabProps> = ({ user }) => {
 
   const isSelf = currentUser.uuid === user.uuid;
   const isDisabled = !currentUser.agreement_date;
+  const minimalProfile = isFeatureVisible(UserFeatures.minimal_user_profile);
 
   return (
     <>
-      <IdentityProviderCard user={user} />
+      {!minimalProfile && (
+        <IdentityProviderCard user={user} />
+      )}
       <FormTable.Card
         title={
           isSelf

@@ -353,8 +353,8 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                 <Nav.Item>
                   <Dropdown>
                     <Dropdown.Toggle
-                      variant="active-light-primary"
-                      className="btn-icon btn-text-gray-500 no-arrow w-35px h-35px"
+                      variant="text-secondary"
+                      className="btn-icon no-arrow w-35px h-35px"
                     >
                       <DotsThreeIcon size={22} weight="bold" />
                       {wrappedComponents.some((comp) =>
@@ -436,7 +436,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                           : undefined
                       }
                       validate={required}
-                      placeholder={translate('Amount') + ' *'}
+                      placeholder={translate('Amount *')}
                       aria-label={translate('{amount} for {name}', {
                         amount: translate('Amount'),
                         name: component.name,
@@ -449,7 +449,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                     <Field
                       component={TextField as any}
                       name={`components.${component.type}.description`}
-                      placeholder={translate('Enter a description') + '...'}
+                      placeholder={translate('Enter a description...')}
                       rows={3}
                       aria-label={translate('{description} for {name}', {
                         description: translate('Description'),

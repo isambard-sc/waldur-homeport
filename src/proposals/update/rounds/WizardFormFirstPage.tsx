@@ -2,7 +2,7 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { formatISOWithoutZone, parseDate } from '@waldur/core/dateUtils';
 import { required } from '@waldur/core/validators';
-import { FormContainer } from '@waldur/form';
+import { FormContainer, NumberField } from '@waldur/form';
 import { DateTimeField } from '@waldur/form/DateTimeField';
 import { TimezoneField } from '@waldur/form/TimezoneField';
 import { WizardForm, WizardFormStepProps } from '@waldur/form/WizardForm';
@@ -58,6 +58,15 @@ export const WizardFormFirstPage: FunctionComponent<WizardFormStepProps> = (
               format={(value) => (value ? new Date(value) : value)}
             />
             {translate('Duration')}: {duration || '-'}
+            <NumberField
+              label={translate('Minimum Required Uploads')}
+              name="minimum_required_uploads"
+              description={translate(
+                'Minimum number of documents required to submit a proposal. Set to 0 for no requirement.',
+              )}
+              min={0}
+              step={1}
+            />
           </FormContainer>
         );
       }}

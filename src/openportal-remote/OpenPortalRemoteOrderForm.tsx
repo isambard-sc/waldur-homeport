@@ -8,7 +8,6 @@ import { BaseDeployPage } from '@waldur/marketplace/deploy/DeployPage';
 import {
   AdditionalConfigurationStep,
   DetailsOverviewStep,
-  NotesStep,
   PlanStep,
 } from '@waldur/marketplace/deploy/steps/constants';
 import { ORDER_FORM_ID } from '@waldur/marketplace/details/constants';
@@ -19,7 +18,6 @@ const deployOfferingSteps: OfferingConfigurationFormStep[] = [
   DetailsOverviewStep,
   PlanStep,
   AdditionalConfigurationStep,
-  NotesStep,
   {
     ...FinalConfigurationStep,
     params: {

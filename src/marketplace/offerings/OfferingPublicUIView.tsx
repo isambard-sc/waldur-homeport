@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   marketplaceCategoriesRetrieve,
+  marketplaceOfferingTermsOfServiceList,
   marketplacePublicOfferingsRetrieve,
 } from 'waldur-js-client';
 
@@ -52,8 +53,23 @@ const PublicOfferingLocation = lazyComponent(() =>
     default: module.PublicOfferingLocation,
   })),
 );
+const PublicOfferingSoftwareCatalog = lazyComponent(() =>
+  import('./details/PublicOfferingSoftwareCatalog').then((module) => ({
+    default: module.PublicOfferingSoftwareCatalog,
+  })),
+);
+const PublicOfferingPartitions = lazyComponent(() =>
+  import('./details/PublicOfferingPartitions').then((module) => ({
+    default: module.PublicOfferingPartitions,
+  })),
+);
+const PublicOfferingTermsOfService = lazyComponent(() =>
+  import('./details/PublicOfferingTermsOfService').then((module) => ({
+    default: module.PublicOfferingTermsOfService,
+  })),
+);
 
-const getTabs = (offering?): PageBarTab[] => {
+const getTabs = (offering?, hasActiveTos = false): PageBarTab[] => {
   if (!offering) {
     // Return an empty array or placeholders until the offering is loaded
     return [];
@@ -93,6 +109,21 @@ const getTabs = (offering?): PageBarTab[] => {
           key: 'components',
           component: PublicOfferingComponents,
         },
+    offering?.software_catalogs?.length
+      ? {
+          title: translate('Software'),
+          key: 'software',
+          component: PublicOfferingSoftwareCatalog,
+        }
+      : null,
+    isFeatureVisible(MarketplaceFeatures.display_offering_partitions) &&
+    offering?.partitions?.length
+      ? {
+          title: translate('Slurm partitions'),
+          key: 'partitions',
+          component: PublicOfferingPartitions,
+        }
+      : null,
     offering?.screenshots.length
       ? {
           title: translate('Images'),
@@ -105,6 +136,13 @@ const getTabs = (offering?): PageBarTab[] => {
           title: translate('Location'),
           key: 'location',
           component: PublicOfferingLocation,
+        }
+      : null,
+    hasActiveTos
+      ? {
+          title: translate('Terms of Service'),
+          key: 'terms-of-service',
+          component: PublicOfferingTermsOfService,
         }
       : null,
   ].filter(Boolean);
@@ -132,14 +170,31 @@ export const OfferingPublicUIView = () => {
         path: { uuid: offering.category_uuid },
         ...options,
       }).then((response) => response.data);
-      return { offering, category };
+
+      // Check if offering has active ToS
+      let hasActiveTos = false;
+      if (user) {
+        try {
+          const tosData = await marketplaceOfferingTermsOfServiceList({
+            query: { offering_uuid: offering.uuid, is_active: true },
+          }).then((response) => response.data || []);
+          hasActiveTos = tosData.length > 0;
+        } catch {
+          hasActiveTos = false;
+        }
+      }
+
+      return { offering, category, hasActiveTos };
     },
 
     refetchOnWindowFocus: false,
     staleTime: 3 * 60 * 1000,
   });
 
-  const tabs = useMemo(() => getTabs(data?.offering), [data]);
+  const tabs = useMemo(
+    () => getTabs(data?.offering, data?.hasActiveTos),
+    [data],
+  );
   const { tabSpec } = usePageTabsTransmitter(tabs);
 
   usePageHero(
@@ -164,17 +219,23 @@ export const OfferingPublicUIView = () => {
 
   return (
     <UIView
-      render={(Component, { key, ...props }) => (
-        <Component
-          key={key}
-          {...props}
-          refetch={refetch}
-          data={data}
-          isLoading={isLoading}
-          error={error}
-          tabSpec={tabSpec}
-        />
-      )}
+      render={(Component, { key, ...props }) => {
+        // Use tabSpec.component if available (for tab navigation)
+        const ComponentToRender = tabSpec?.component || Component;
+        return (
+          <ComponentToRender
+            key={key}
+            {...props}
+            refetch={refetch}
+            data={data}
+            isLoading={isLoading}
+            error={error}
+            tabSpec={tabSpec}
+            offering={data?.offering}
+            category={data?.category}
+          />
+        );
+      }}
     />
   );
 };

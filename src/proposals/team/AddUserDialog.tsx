@@ -1,35 +1,48 @@
 import { PlusIcon, UserCirclePlusIcon } from '@phosphor-icons/react';
-import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { FC, useCallback, useState } from 'react';
+import { Form } from 'react-final-form';
 import { components } from 'react-select';
 import { useDispatch } from 'react-redux';
-import { reduxForm } from 'redux-form';
 import { RoleDetails } from 'waldur-js-client';
 
 import { post } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { required } from '@waldur/core/validators';
 import { usersAutocomplete } from '@waldur/customer/team/utils';
-import { FormContainer, SubmitButton } from '@waldur/form';
-import { AsyncSelectField } from '@waldur/form/AsyncSelectField';
+import { UserFeatures } from '@waldur/FeaturesEnums';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { SubmitButton } from '@waldur/form';
+import { AsyncSelectFieldFinal } from '@waldur/form/AsyncSelectField';
 import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { useModal } from '@waldur/modal/hooks';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { openModalDialog } from '@waldur/modal/actions';
+import { RoleEnum } from '@waldur/permissions/enums';
 import { ExpirationTimeGroup } from '@waldur/project/team/ExpirationTimeGroup';
 import { RoleGroup } from '@waldur/project/team/RoleGroup';
 import { UserListOptionInline } from '@waldur/project/team/UserListOptionInline';
 import { useNotify } from '@waldur/store/hooks';
+import { getCurrentUser } from '@waldur/user/UsersService';
+import { setCurrentUser } from '@waldur/workspace/actions';
+import { useUser } from '@waldur/workspace/hooks';
 
 import { CreateUserDialog } from './CreateUserDialog';
+import { OwnershipTransferDialog } from './OwnershipTransferDialog';
 import { AddUserDialogProps } from './types';
-
-const FORM_ID = 'AddUserDialog';
 
 interface AddUserDialogFormData {
   role: RoleDetails;
   expiration_time: string;
   user: any;
 }
+
+const getOptionLabel = (option) =>
+  option.email
+    ? (option.full_name || option.username) + ` (${option.email})`
+    : option.full_name || option.username;
 
 // Custom Menu component with "Create user" button
 const MenuWithCreateButton = ({ openCreateDialog, ...props }) => {
@@ -64,119 +77,215 @@ const MenuWithCreateButton = ({ openCreateDialog, ...props }) => {
   );
 };
 
-export const AddUserDialog = reduxForm<
-  AddUserDialogFormData,
-  AddUserDialogProps
->({
-  form: FORM_ID,
-})(({
-  submitting,
-  handleSubmit,
+export const AddUserDialog: FC<AddUserDialogProps> = ({
   refetch,
-  invalid,
   scope,
   roleTypes,
   roles,
-  change,
 }) => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { showSuccess, showErrorResponse } = useNotify();
   const { closeDialog } = useModal();
   const [selectKey, setSelectKey] = useState(0);
+  const currentUser = useUser();
 
-  const getOptionLabel = (option) =>
-    option.email
-      ? (option.full_name || option.username) + ` (${option.email})`
-      : option.full_name || option.username;
-
-  const handleUserCreated = (user: any) => {
+  const handleUserCreated = (user: any, form) => {
     // Set the newly created user in the form
-    change('user', user);
+    form.change('user', user);
     // Force re-render of the select component
     setSelectKey((prev) => prev + 1);
-    // Close only the CreateUserDialog (HIDE_CONFIRM), not the AddUserDialog
-    closeDialog('HIDE_CONFIRM');
   };
 
-  const openCreateUserDialog = () => {
+  const openCreateUserDialog = (form) => {
     // Use SHOW_CONFIRM type to overlay on top of current modal
     // This prevents closing the AddUserDialog when CreateUserDialog opens
     dispatch(
       openModalDialog(
         CreateUserDialog,
         {
-          onUserCreated: handleUserCreated,
+          onUserCreated: (user) => handleUserCreated(user, form),
         },
         'SHOW_CONFIRM',
       ),
     );
   };
 
-  const saveUser = async (formData: AddUserDialogFormData) => {
-    try {
-      await post(`${scope.url}add_user/`, {
-        user: formData.user.uuid,
-        expiration_time: formData.expiration_time,
-        role: roles && roles.length === 1 ? roles[0] : formData.role.name,
-      });
+  const performAddUser = useCallback(
+    async (formData: AddUserDialogFormData) => {
+      const selectedRole =
+        roles && roles.length === 1 ? roles[0] : formData.role.name;
 
-      await refetch();
-      showSuccess('User has been added.');
-      closeDialog();
-    } catch (error) {
-      showErrorResponse(error, translate('Unable to add user.'));
-    }
-  };
+      try {
+        const response = await post(`${scope.url}add_user/`, {
+          user: formData.user.uuid,
+          expiration_time: formData.expiration_time,
+          role: selectedRole,
+        });
+
+        const responseData = await response.json();
+
+        await refetch();
+
+        // Check if ownership was transferred
+        if (responseData?.ownership_transferred) {
+          // Refresh the current user's permissions if they were involved in the transfer
+          // This ensures the UI updates correctly (e.g., old manager sees member view)
+          if (
+            currentUser.uuid === formData.user.uuid ||
+            selectedRole === RoleEnum.PROPOSAL_MANAGER
+          ) {
+            const newUser = await getCurrentUser();
+            dispatch(setCurrentUser(newUser));
+          }
+
+          // Invalidate all Proposal queries to force a refetch
+          // This ensures the proposal page re-renders with updated permissions
+          await queryClient.invalidateQueries({ queryKey: ['Proposal'] });
+
+          showSuccess(
+            translate('Ownership transferred from {previous} to {new}.', {
+              previous: responseData.previous_manager,
+              new: responseData.new_manager,
+            }),
+          );
+        } else {
+          showSuccess(translate('User has been added.'));
+        }
+
+        closeDialog();
+      } catch (error) {
+        // Re-throw with proper error formatting for the outer catch
+        throw error;
+      }
+    },
+    [
+      scope,
+      roles,
+      refetch,
+      showSuccess,
+      closeDialog,
+      currentUser,
+      dispatch,
+      queryClient,
+    ],
+  );
+
+  const saveUser = useCallback(
+    async (formData: AddUserDialogFormData) => {
+      try {
+        const selectedRole =
+          roles && roles.length === 1 ? roles[0] : formData.role.name;
+
+        // Check if the role being assigned is MANAGER
+        if (selectedRole === RoleEnum.PROPOSAL_MANAGER) {
+          // Show ownership transfer confirmation dialog
+          dispatch(
+            openModalDialog(
+              OwnershipTransferDialog,
+              {
+                currentManager: {
+                  full_name: currentUser.full_name,
+                  email: currentUser.email,
+                  username: currentUser.username,
+                },
+                newManager: {
+                  full_name: formData.user.full_name,
+                  email: formData.user.email,
+                  username: formData.user.username,
+                },
+                onConfirm: async () => {
+                  try {
+                    await performAddUser(formData);
+                  } catch (error) {
+                    // Remove the generic error message to let backend error details show
+                    delete error.message;
+                    showErrorResponse(error, '');
+                  }
+                },
+              },
+              'SHOW_CONFIRM',
+            ),
+          );
+        } else {
+          await performAddUser(formData);
+        }
+      } catch (error) {
+        // Remove the generic error message to let backend error details show
+        delete error.message;
+        showErrorResponse(error, '');
+      }
+    },
+    [
+      scope,
+      roles,
+      currentUser,
+      dispatch,
+      performAddUser,
+      showErrorResponse,
+    ],
+  );
+
+  const initialValues =
+    roles && roles.length === 1
+      ? { role: ENV.roles.find((role) => role.name === roles[0]) }
+      : {};
 
   return (
-    <form onSubmit={handleSubmit(saveUser)}>
-      <ModalDialog
-        title={translate('Add member')}
-        subtitle={translate(
-          'Select a user to assign a role within the project.',
-        )}
-        iconNode={<UserCirclePlusIcon weight="bold" />}
-        iconColor="success"
-        footer={
-          <>
-            <CloseDialogButton className="min-w-125px" />
-            <SubmitButton
-              label={translate('Add role')}
-              submitting={submitting}
-              disabled={invalid}
-              className="btn btn-primary min-w-125px"
-            />
-          </>
-        }
-      >
-        <FormContainer submitting={submitting}>
-          <AsyncSelectField
-            key={selectKey}
-            name="user"
-            label={translate('User')}
-            placeholder={translate('Search and select user...')}
-            loadOptions={(query, prevOptions, page) =>
-              usersAutocomplete({ query }, prevOptions, page)
-            }
-            getOptionValue={(option) => option.uuid}
-            getOptionLabel={getOptionLabel}
-            components={{
-              Option: UserListOptionInline,
-              Menu: (props) => (
-                <MenuWithCreateButton
-                  {...props}
-                  openCreateDialog={openCreateUserDialog}
+    <Form onSubmit={saveUser} initialValues={initialValues}>
+      {({ handleSubmit, submitting, invalid, form }) => (
+        <form onSubmit={handleSubmit}>
+          <ModalDialog
+            title={translate('Add member')}
+            subtitle={translate(
+              'Select a user to assign a role within the project.',
+            )}
+            iconNode={<UserCirclePlusIcon weight="bold" />}
+            iconColor="success"
+            footer={
+              <>
+                <CloseDialogButton className="min-w-125px" />
+                <SubmitButton
+                  label={translate('Add role')}
+                  submitting={submitting}
+                  disabled={invalid}
+                  className="btn btn-primary min-w-125px"
                 />
-              ),
-            }}
-            required={true}
-            validate={[required]}
-          />
+              </>
+            }
+          >
+            <FormGroup label={translate('User')} required>
+              <AsyncSelectFieldFinal
+                key={selectKey}
+                name="user"
+                placeholder={translate('Search and select user...')}
+                loadOptions={(query, prevOptions, page) =>
+                  usersAutocomplete({ query }, prevOptions, page)
+                }
+                getOptionValue={(option) => option.uuid}
+                getOptionLabel={getOptionLabel}
+                components={{
+                  Option: UserListOptionInline,
+                  ...(isFeatureVisible(UserFeatures.allow_user_creation) && {
+                    Menu: (props) => (
+                      <MenuWithCreateButton
+                        {...props}
+                        openCreateDialog={() => openCreateUserDialog(form)}
+                      />
+                    ),
+                  }),
+                }}
+                validate={required}
+              />
+            </FormGroup>
 
-          {roles && roles.length === 1 ? null : <RoleGroup types={roleTypes} />}
-          <ExpirationTimeGroup />
-        </FormContainer>
-      </ModalDialog>
-    </form>
+            {roles && roles.length === 1 ? null : (
+              <RoleGroup types={roleTypes} />
+            )}
+            <ExpirationTimeGroup />
+          </ModalDialog>
+        </form>
+      )}
+    </Form>
   );
-});
+};

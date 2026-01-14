@@ -50,6 +50,17 @@ export const checkIsServiceManager = (
       permission.role_name === RoleEnum.CUSTOMER_MANAGER,
   );
 
+export const checkIsReader = (
+  customer: AtLeast<Customer, 'uuid'>,
+  user: User,
+): boolean =>
+  !!user?.permissions?.find(
+    (permission) =>
+      permission.scope_type === 'customer' &&
+      permission.scope_uuid === customer?.uuid &&
+      permission.role_name === RoleEnum.CUSTOMER_READER,
+  );
+
 export const checkCustomerUser = (
   customer: AtLeast<Customer, 'uuid'>,
   user: User,
@@ -79,5 +90,22 @@ export const isOwnerOrStaff = createSelector(
       return true;
     }
     return userIsOwner;
+  },
+);
+
+export const isReader = createSelector(getCustomer, getUser, checkIsReader);
+
+export const isOwnerOrStaffOrReader = createSelector(
+  getUser,
+  isOwner,
+  isReader,
+  (user: User, userIsOwner: boolean, userIsReader: boolean): boolean => {
+    if (!user) {
+      return false;
+    }
+    if (user.is_staff) {
+      return true;
+    }
+    return userIsOwner || userIsReader;
   },
 );

@@ -240,8 +240,9 @@ export const EditScriptDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
       <form onSubmit={handleSaveAndExit} className="script-editor">
         <ModalDialog
           title={
-            translate('Manage custom scripts') +
-            (language ? ` (${language})` : '')
+            language
+              ? translate('Manage custom scripts ({language})', { language })
+              : translate('Manage custom scripts')
           }
           closeButton
           onHide={closeDialog}
@@ -292,7 +293,7 @@ export const EditScriptDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
               </AccordionCard>
               <div className="d-flex justify-content-end gap-2">
                 <Button
-                  variant="outline btn-outline-default"
+                  variant="tertiary"
                   onClick={closeDialog}
                   disabled={props.submitting}
                 >

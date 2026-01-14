@@ -49,10 +49,21 @@ const PureReviewsTableFilter = ({ form }) => {
   );
 };
 
+// Default filter to show only Created and In review reviews
+const getInitialValues = () => {
+  const stateOptions = getReviewStateOptions();
+  return {
+    state: stateOptions.filter(
+      (option) => option.value === 'created' || option.value === 'in_review',
+    ),
+  };
+};
+
 const enhance = reduxForm({
   form: USER_REVIEWS_FILTER_FORM_ID,
   destroyOnUnmount: false,
   onChange: syncFiltersToURL,
+  initialValues: getInitialValues(),
 });
 
 export const ReviewsTableFilter = enhance(PureReviewsTableFilter);
