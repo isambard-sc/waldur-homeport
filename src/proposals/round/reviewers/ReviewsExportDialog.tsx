@@ -83,12 +83,55 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
 
       setExportProgress({ current: 1, total: 1 });
 
+      // Sort reviews by proposal so reviews for the same proposal are contiguous
+      const sortedReviews = [...allReviews].sort((a, b) => {
+        const slugA = a.proposal_slug || '';
+        const slugB = b.proposal_slug || '';
+        return slugA.localeCompare(slugB);
+      });
+
+      // Calculate mean and variance of scores per proposal
+      // (only considering reviews with a score)
+      const proposalStats: Record<
+        string,
+        { mean: number | null; variance: number | null }
+      > = {};
+
+      // Group reviews by proposal and calculate stats
+      const reviewsByProposal: Record<string, ProposalReview[]> = {};
+      for (const review of sortedReviews) {
+        const key = review.proposal_uuid;
+        if (!reviewsByProposal[key]) {
+          reviewsByProposal[key] = [];
+        }
+        reviewsByProposal[key].push(review);
+      }
+
+      for (const [proposalUuid, reviews] of Object.entries(reviewsByProposal)) {
+        const scores = reviews
+          .filter((r) => r.summary_score != null)
+          .map((r) => r.summary_score as number);
+
+        if (scores.length === 0) {
+          proposalStats[proposalUuid] = { mean: null, variance: null };
+        } else {
+          const mean = scores.reduce((sum, s) => sum + s, 0) / scores.length;
+          const variance =
+            scores.length > 1
+              ? scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) /
+                (scores.length - 1)
+              : null;
+          proposalStats[proposalUuid] = { mean, variance };
+        }
+      }
+
       // Prepare export data fields
       const fields = [
         translate('Proposal'),
         translate('Proposal name'),
+        translate('Mean score'),
+        translate('Score variance'),
         translate('Reviewer'),
-        translate('Reviewer email'),
         translate('State'),
         translate('Score'),
         translate('Public comment'),
@@ -99,20 +142,27 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
       // Prepare export data
       const exportData: ExportData = {
         fields,
-        data: allReviews.map((review) => {
+        data: sortedReviews.map((review) => {
           const proposalUrl = `${window.location.origin}/proposals/${review.proposal_uuid}/`;
+          const stats = proposalStats[review.proposal_uuid] || {
+            mean: null,
+            variance: null,
+          };
 
-          return [
+          const row: any[] = [
             { formula: `HYPERLINK("${proposalUrl}","${review.proposal_slug}")` },
             review.proposal_name || '',
+            stats.mean != null ? Number(stats.mean.toFixed(2)) : '',
+            stats.variance != null ? Number(stats.variance.toFixed(2)) : '',
             review.reviewer_full_name || '',
-            review.reviewer_email || '',
             review.state || '',
             review.summary_score ?? '',
             review.summary_public_comment || '',
             review.summary_private_comment || '',
             review.review_end_date ? new Date(review.review_end_date) : '',
           ];
+
+          return row;
         }),
       };
 

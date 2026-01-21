@@ -40,7 +40,7 @@ export const ReviewsExportButton: FC<ReviewsExportButtonProps> = ({
       <span className="svg-icon svg-icon-2">
         <FileXlsIcon weight="bold" />
       </span>
-      {translate('Export reviews')}
+      {translate('Export to Excel')}
     </Button>
   );
 };

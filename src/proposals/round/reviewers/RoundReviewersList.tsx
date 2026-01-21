@@ -312,7 +312,6 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
       verboseName={translate('Reviewers')}
       expandableRow={ReviewerExpandableRow}
       hasOptionalColumns
-      enableExport
       tableActions={
         <>
           <ReviewsExportButton
