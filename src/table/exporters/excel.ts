@@ -51,12 +51,17 @@ const templates = {
     '<borders count="1">' +
     '<border><left/><right/><top/><bottom/><diagonal/></border>' +
     '</borders>' +
-    '<cellXfs count="2">' +
+    '<cellXfs count="4">' +
     '<xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>' +
     '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" applyNumberFormat="1"/>' +
+    '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyAlignment="1"><alignment wrapText="1"/></xf>' +
+    '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" applyNumberFormat="1" applyAlignment="1"><alignment wrapText="1"/></xf>' +
     '</cellXfs>' +
     '</styleSheet>',
 };
+
+// Default column width in Excel units (approximately characters)
+const DEFAULT_COLUMN_WIDTH = 20;
 
 export class SharedStrings {
   private strings: string[] = [];
@@ -119,8 +124,15 @@ function addToZip(zip, path, content) {
   folder.file(file, content);
 }
 
+// Style indices:
+// 0 = default (no wrap)
+// 1 = date format (no wrap)
+// 2 = text with wrap
+// 3 = date with wrap
+
 function formatCell(ref, type, value) {
-  return `<c r="${ref}" t="${type}"><v>${value}</v></c>`;
+  // Use style 2 for text wrapping
+  return `<c r="${ref}" t="${type}" s="2"><v>${value}</v></c>`;
 }
 
 function formatFormulaCell(ref, formula) {
@@ -131,7 +143,8 @@ function formatFormulaCell(ref, formula) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&apos;');
-  return `<c r="${ref}" t="str"><f>${escapedFormula}</f></c>`;
+  // Use style 2 for text wrapping
+  return `<c r="${ref}" t="str" s="2"><f>${escapedFormula}</f></c>`;
 }
 
 function formatDateCell(ref: string, date: Date) {
@@ -151,7 +164,8 @@ function formatDateCell(ref: string, date: Date) {
   // Add the difference in days to get the Excel serial number
   // The fractional part represents the time of day.
   const excel_serial = days_since_epoch + EXCEL_EPOCH_DIFF;
-  return `<c r="${ref}" t="n" s="1"><v>${excel_serial}</v></c>`;
+  // Use style 3 for date format with text wrapping
+  return `<c r="${ref}" t="n" s="3"><v>${excel_serial}</v></c>`;
 }
 
 export function getSheetData(sharedStrings: SharedStrings, rows: any[][]) {
@@ -191,13 +205,33 @@ export function getSheetData(sharedStrings: SharedStrings, rows: any[][]) {
     .join('');
 }
 
-function getSheet(sharedStrings: SharedStrings, rows: any[][]) {
+function getColumnDefinitions(columnCount: number, columnWidths?: number[]) {
+  // Generate column width definitions for all columns
+  // Uses custom widths if provided, otherwise falls back to DEFAULT_COLUMN_WIDTH
+  let cols = '<cols>';
+  for (let i = 1; i <= columnCount; i++) {
+    const width = columnWidths?.[i - 1] ?? DEFAULT_COLUMN_WIDTH;
+    cols += `<col min="${i}" max="${i}" width="${width}" customWidth="1"/>`;
+  }
+  cols += '</cols>';
+  return cols;
+}
+
+function getSheet(
+  sharedStrings: SharedStrings,
+  rows: any[][],
+  columnWidths?: number[],
+) {
+  // Determine number of columns from first row (headers)
+  const columnCount = rows.length > 0 ? rows[0].length : 0;
+
   return (
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' +
     'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ' +
     'xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" ' +
     'xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac">' +
+    getColumnDefinitions(columnCount, columnWidths) +
     '<sheetData>' +
     getSheetData(sharedStrings, rows) +
     '</sheetData>' +
@@ -214,7 +248,7 @@ export default function exportExcel(table, data) {
   }
   const sharedStrings = new SharedStrings();
   const rows = [data.fields].concat(data.data);
-  const sheet = getSheet(sharedStrings, rows);
+  const sheet = getSheet(sharedStrings, rows, data.columnWidths);
   addToZip(zip, 'xl/worksheets/sheet1.xml', sheet);
   addToZip(zip, 'xl/sharedStrings.xml', sharedStrings.serialize());
   zip
