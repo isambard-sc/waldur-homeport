@@ -205,18 +205,23 @@ export function getSheetData(sharedStrings: SharedStrings, rows: any[][]) {
     .join('');
 }
 
-function getColumnDefinitions(columnCount: number) {
+function getColumnDefinitions(columnCount: number, columnWidths?: number[]) {
   // Generate column width definitions for all columns
-  // Using DEFAULT_COLUMN_WIDTH for consistent column sizing
+  // Uses custom widths if provided, otherwise falls back to DEFAULT_COLUMN_WIDTH
   let cols = '<cols>';
   for (let i = 1; i <= columnCount; i++) {
-    cols += `<col min="${i}" max="${i}" width="${DEFAULT_COLUMN_WIDTH}" customWidth="1"/>`;
+    const width = columnWidths?.[i - 1] ?? DEFAULT_COLUMN_WIDTH;
+    cols += `<col min="${i}" max="${i}" width="${width}" customWidth="1"/>`;
   }
   cols += '</cols>';
   return cols;
 }
 
-function getSheet(sharedStrings: SharedStrings, rows: any[][]) {
+function getSheet(
+  sharedStrings: SharedStrings,
+  rows: any[][],
+  columnWidths?: number[],
+) {
   // Determine number of columns from first row (headers)
   const columnCount = rows.length > 0 ? rows[0].length : 0;
 
@@ -226,7 +231,7 @@ function getSheet(sharedStrings: SharedStrings, rows: any[][]) {
     'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ' +
     'xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x14ac" ' +
     'xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac">' +
-    getColumnDefinitions(columnCount) +
+    getColumnDefinitions(columnCount, columnWidths) +
     '<sheetData>' +
     getSheetData(sharedStrings, rows) +
     '</sheetData>' +
@@ -243,7 +248,7 @@ export default function exportExcel(table, data) {
   }
   const sharedStrings = new SharedStrings();
   const rows = [data.fields].concat(data.data);
-  const sheet = getSheet(sharedStrings, rows);
+  const sheet = getSheet(sharedStrings, rows, data.columnWidths);
   addToZip(zip, 'xl/worksheets/sheet1.xml', sheet);
   addToZip(zip, 'xl/sharedStrings.xml', sharedStrings.serialize());
   zip

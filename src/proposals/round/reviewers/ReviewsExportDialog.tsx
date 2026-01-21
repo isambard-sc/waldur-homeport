@@ -167,9 +167,34 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
         translate('State'),
       ];
 
+      // Column widths in Excel character units
+      // Wider columns for text-heavy fields like comments and names
+      const columnWidths = [
+        18, // Proposal
+        15, // Randomisation
+        40, // Proposal name
+        12, // Mean score
+        14, // Score variance
+        25, // Reviewer
+        10, // Score
+        50, // Public comment
+        50, // Private comment
+        30, // Comment: Title
+        50, // Comment: Summary
+        50, // Comment: Description
+        20, // Comment: Duration
+        20, // Comment: Research only
+        20, // Comment: Confidential
+        30, // Comment: Documentation
+        40, // Comment: Resources
+        40, // Comment: Team
+        12, // State
+      ];
+
       // Prepare export data
       const exportData: ExportData = {
         fields,
+        columnWidths,
         data: sortedReviews.map((review) => {
           const proposalUrl = `${window.location.origin}/proposals/${review.proposal_uuid}/`;
           const stats = proposalStats[review.proposal_uuid] || {
