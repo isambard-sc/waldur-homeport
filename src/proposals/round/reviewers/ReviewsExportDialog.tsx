@@ -107,6 +107,24 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
         reviewsByProposal[key].push(review);
       }
 
+      // Generate unique random numbers for each proposal (for partial randomisation)
+      // Uses crypto.getRandomValues for high-quality randomness
+      const proposalRandomNumbers: Record<string, number> = {};
+      const proposalUuids = Object.keys(reviewsByProposal);
+      const usedNumbers = new Set<number>();
+
+      for (const proposalUuid of proposalUuids) {
+        let randomNum: number;
+        do {
+          // Generate a random number between 10000 and 99999 (5 digits)
+          const array = new Uint32Array(1);
+          crypto.getRandomValues(array);
+          randomNum = 10000 + (array[0] % 90000);
+        } while (usedNumbers.has(randomNum));
+        usedNumbers.add(randomNum);
+        proposalRandomNumbers[proposalUuid] = randomNum;
+      }
+
       for (const [proposalUuid, reviews] of Object.entries(reviewsByProposal)) {
         const scores = reviews
           .filter((r) => r.summary_score != null)
@@ -119,7 +137,7 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
           const variance =
             scores.length > 1
               ? scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) /
-                (scores.length - 1)
+              (scores.length - 1)
               : null;
           proposalStats[proposalUuid] = { mean, variance };
         }
@@ -128,15 +146,15 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
       // Prepare export data fields
       const fields = [
         translate('Proposal'),
+        translate('Randomisation'),
         translate('Proposal name'),
         translate('Mean score'),
         translate('Score variance'),
         translate('Reviewer'),
-        translate('State'),
         translate('Score'),
         translate('Public comment'),
         translate('Private comment'),
-        translate('Review end date'),
+        translate('State'),
       ];
 
       // Prepare export data
@@ -151,15 +169,15 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
 
           const row: any[] = [
             { formula: `HYPERLINK("${proposalUrl}","${review.proposal_slug}")` },
+            proposalRandomNumbers[review.proposal_uuid] ?? '',
             review.proposal_name || '',
             stats.mean != null ? Number(stats.mean.toFixed(2)) : '',
             stats.variance != null ? Number(stats.variance.toFixed(2)) : '',
             review.reviewer_full_name || '',
-            review.state || '',
             review.summary_score ?? '',
             review.summary_public_comment || '',
             review.summary_private_comment || '',
-            review.review_end_date ? new Date(review.review_end_date) : '',
+            review.state || '',
           ];
 
           return row;
