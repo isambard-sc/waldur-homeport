@@ -154,6 +154,16 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
         translate('Score'),
         translate('Public comment'),
         translate('Private comment'),
+        // Section-specific comment fields
+        translate('Comment: Title'),
+        translate('Comment: Summary'),
+        translate('Comment: Description'),
+        translate('Comment: Duration'),
+        translate('Comment: Research only'),
+        translate('Comment: Confidential'),
+        translate('Comment: Documentation'),
+        translate('Comment: Resources'),
+        translate('Comment: Team'),
         translate('State'),
       ];
 
@@ -177,6 +187,16 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
             review.summary_score ?? '',
             review.summary_public_comment || '',
             review.summary_private_comment || '',
+            // Section-specific comment fields
+            review.comment_project_title || '',
+            review.comment_project_summary || '',
+            review.comment_project_description || '',
+            review.comment_project_duration || '',
+            review.comment_project_has_civilian_purpose || '',
+            review.comment_project_is_confidential || '',
+            review.comment_project_supporting_documentation || '',
+            review.comment_resource_requests || '',
+            review.comment_team || '',
             review.state || '',
           ];
 
