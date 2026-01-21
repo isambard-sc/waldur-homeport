@@ -14,6 +14,7 @@ import { useTable } from '@waldur/table/useTable';
 
 import { ImportAssignmentsButton } from './ImportAssignmentsButton';
 import { ReviewerExpandableRow } from './ReviewerExpandableRow';
+import { ReviewsExportButton } from './ReviewsExportButton';
 
 interface RoundReviewersListProps {
   round: ProtectedRound;
@@ -313,11 +314,18 @@ export const RoundReviewersList: FC<RoundReviewersListProps> = (props) => {
       hasOptionalColumns
       enableExport
       tableActions={
-        <ImportAssignmentsButton
-          round={props.round}
-          call={props.call}
-          refetch={tableProps.fetch}
-        />
+        <>
+          <ReviewsExportButton
+            roundUuid={props.round.uuid}
+            callUuid={props.call.uuid}
+            roundName={props.round.name}
+          />
+          <ImportAssignmentsButton
+            round={props.round}
+            call={props.call}
+            refetch={tableProps.fetch}
+          />
+        </>
       }
     />
   );
