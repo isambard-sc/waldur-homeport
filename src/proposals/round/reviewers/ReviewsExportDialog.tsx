@@ -126,8 +126,9 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
       }
 
       for (const [proposalUuid, reviews] of Object.entries(reviewsByProposal)) {
+        // Only submitted reviews contribute to mean and variance
         const scores = reviews
-          .filter((r) => r.summary_score != null)
+          .filter((r) => r.state === 'submitted' && r.summary_score != null)
           .map((r) => r.summary_score as number);
 
         if (scores.length === 0) {
@@ -137,7 +138,7 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
           const variance =
             scores.length > 1
               ? scores.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) /
-              (scores.length - 1)
+                (scores.length - 1)
               : null;
           proposalStats[proposalUuid] = { mean, variance };
         }
