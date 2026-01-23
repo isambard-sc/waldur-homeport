@@ -2,6 +2,7 @@ import {
   ArrowUUpLeftIcon,
   ChatTextIcon,
   CheckCircleIcon,
+  PencilSimpleIcon,
   XCircleIcon,
 } from '@phosphor-icons/react';
 import { useCallback } from 'react';
@@ -27,6 +28,12 @@ const CreateReviewDialog = lazyComponent(() =>
   })),
 );
 
+const ModifyAllocationDialog = lazyComponent(() =>
+  import('./ModifyAllocationDialog').then((module) => ({
+    default: module.ModifyAllocationDialog,
+  })),
+);
+
 export const ProposalRowActions = ({ row, refetch }) => {
   const user = useSelector(getUser);
   const canCreateReview =
@@ -47,6 +54,17 @@ export const ProposalRowActions = ({ row, refetch }) => {
         }),
       ),
     [dispatch, refetch],
+  );
+
+  const openModifyAllocationDialog = useCallback(
+    () =>
+      dispatch(
+        openModalDialog(ModifyAllocationDialog, {
+          resolve: { proposal: row, refetch },
+          size: 'lg',
+        }),
+      ),
+    [dispatch, row, refetch],
   );
 
   const {
@@ -75,6 +93,13 @@ export const ProposalRowActions = ({ row, refetch }) => {
             title={translate('Approve')}
             action={handleApproveProposal}
             iconNode={<CheckCircleIcon weight="bold" />}
+            disabled={!canPerformDecisionActions}
+          />
+
+          <ActionItem
+            title={translate('Modify allocation')}
+            action={openModifyAllocationDialog}
+            iconNode={<PencilSimpleIcon weight="bold" />}
             disabled={!canPerformDecisionActions}
           />
 
