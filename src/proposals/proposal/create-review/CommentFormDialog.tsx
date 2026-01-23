@@ -1,12 +1,12 @@
 import { connect } from 'react-redux';
-import { reduxForm } from 'redux-form';
+import { Field, formValueSelector, reduxForm } from 'redux-form';
 
 import { required } from '@waldur/core/validators';
-import { SubmitButton, TextField } from '@waldur/form';
-import { FormContainer } from '@waldur/form/FormContainer';
+import { FormGroup, SubmitButton, TextField } from '@waldur/form';
 import { translate } from '@waldur/i18n';
 import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { RootState } from '@waldur/store/reducers';
 
 interface OwnProps {
   resolve: { title?; onSubmit; value? };
@@ -16,11 +16,35 @@ interface FormData {
   comment: string;
 }
 
-export const CommentFormDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
-  initialValues: { comment: ownProps.resolve.value },
-}))(
-  reduxForm<FormData, OwnProps>({
-    form: 'ReviewCommentForm',
+interface StateProps {
+  commentValue: string;
+}
+
+const FORM_ID = 'ReviewCommentForm';
+const MAX_LENGTH = 255;
+const selector = formValueSelector(FORM_ID);
+
+const TextFieldWithCount = ({ maxLength, ...props }) => {
+  const currentLength = props.input?.value?.length || 0;
+  const remaining = maxLength - currentLength;
+  return (
+    <>
+      <TextField {...props} maxLength={maxLength} />
+      <div className="text-end text-muted mt-1">
+        {translate('{remaining} characters remaining', { remaining })}
+      </div>
+    </>
+  );
+};
+
+export const CommentFormDialog = connect<StateProps, {}, OwnProps>(
+  (state: RootState, ownProps) => ({
+    initialValues: { comment: ownProps.resolve.value },
+    commentValue: selector(state, 'comment') || '',
+  }),
+)(
+  reduxForm<FormData, OwnProps & StateProps>({
+    form: FORM_ID,
   })((props) => {
     return (
       <form onSubmit={props.handleSubmit(props.resolve.onSubmit)}>
@@ -52,17 +76,22 @@ export const CommentFormDialog = connect<{}, {}, OwnProps>((_, ownProps) => ({
             </>
           }
         >
-          <FormContainer submitting={props.submitting}>
-            <TextField
+          <div className="size-sm">
+            <Field
+              name="comment"
+              component={FormGroup}
               label={translate('Comment')}
               placeholder={translate('Enter a comment...')}
-              name="comment"
               required
               validate={required}
               hideLabel
               spaceless
-            />
-          </FormContainer>
+              disabled={props.submitting}
+              maxLength={MAX_LENGTH}
+            >
+              <TextFieldWithCount maxLength={MAX_LENGTH} />
+            </Field>
+          </div>
         </ModalDialog>
       </form>
     );

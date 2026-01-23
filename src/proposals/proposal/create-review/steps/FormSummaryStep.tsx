@@ -15,6 +15,19 @@ import { translate } from '@waldur/i18n';
 import { REVIEW_SUMMARY_FORM_ID } from '@waldur/proposals/constants';
 import { isReviewInFinalState } from '@waldur/proposals/utils';
 
+const TextFieldWithCount = ({ maxLength, ...props }) => {
+  const currentLength = props.input?.value?.length || 0;
+  const remaining = maxLength - currentLength;
+  return (
+    <>
+      <TextField {...props} maxLength={maxLength} />
+      <div className="text-end text-muted mt-1">
+        {translate('{remaining} characters remaining', { remaining })}
+      </div>
+    </>
+  );
+};
+
 type FormSummaryStepProps = VStepperFormStepProps &
   InjectedFormProps<ReviewSubmitRequest, VStepperFormStepProps>;
 
@@ -77,22 +90,22 @@ const FormSummaryStep: React.FC<FormSummaryStepProps> = (props) => {
       <Field
         name="summary_public_comment"
         component={FormGroup}
-        maxLength={1000}
+        maxLength={2000}
         label={translate('Comments')}
         placeholder={translate('Add your comment here')}
         disabled={disabled}
       >
-        <TextField />
+        <TextFieldWithCount maxLength={2000} />
       </Field>
       <Field
         name="summary_private_comment"
         component={FormGroup}
-        maxLength={1000}
+        maxLength={2000}
         label={translate('Notes (not visible to user)')}
         placeholder={translate('Add your notes here')}
         disabled={disabled}
       >
-        <TextField />
+        <TextFieldWithCount maxLength={2000} />
       </Field>
     </Panel>
   );
