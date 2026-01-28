@@ -5,7 +5,6 @@ import { getFormValues } from 'redux-form';
 import {
   CallResourceTemplate,
   Proposal,
-  proposalProposalsApprove,
   proposalProposalsReject,
   proposalProposalsResourcesDestroy,
   proposalProposalsResourcesSet,
@@ -13,8 +12,9 @@ import {
 } from 'waldur-js-client';
 
 import { post } from '@waldur/core/api';
+import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
-import { waitForConfirmation } from '@waldur/modal/actions';
+import { openModalDialog, waitForConfirmation } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { PROPOSAL_UPDATE_SUBMISSION_FORM_ID } from '@waldur/proposals/constants';
@@ -22,6 +22,12 @@ import { Call } from '@waldur/proposals/types';
 import { showSuccess, showErrorResponse } from '@waldur/store/notify';
 import { fetchListStart } from '@waldur/table/actions';
 import { useUser } from '@waldur/workspace/hooks';
+
+const ApprovalConfirmationDialog = lazyComponent(() =>
+  import('../ApprovalConfirmationDialog').then((module) => ({
+    default: module.ApprovalConfirmationDialog,
+  })),
+);
 
 // Custom API function for return_to_applicant until waldur-js-client is regenerated
 const proposalProposalsReturnToApplicant = async ({
@@ -51,28 +57,14 @@ export const useProposalDecisionActions = (
 
   const canPerformDecisionActions = stateIsValid && hasPermissionForDecision;
 
-  const handleApproveProposal = useCallback(async () => {
-    await waitForConfirmation(
-      dispatch,
-      translate('Confirmation'),
-      translate(
-        'Are you sure you want to approve the proposal {name} in state {state}?',
-        {
-          name: proposal.name,
-          state: proposal.state,
-        },
-      ),
+  const handleApproveProposal = useCallback(() => {
+    dispatch(
+      openModalDialog(ApprovalConfirmationDialog, {
+        resolve: { proposal, refetch },
+        size: 'lg',
+      }),
     );
-    try {
-      await proposalProposalsApprove({ path: { uuid: proposal.uuid } });
-      dispatch(showSuccess(translate('Proposal has been approved.')));
-      refetch();
-    } catch (error) {
-      dispatch(
-        showErrorResponse(error, translate('Unable to approve the proposal.')),
-      );
-    }
-  }, [dispatch, proposal.uuid, proposal.name, proposal.state, refetch]);
+  }, [dispatch, proposal, refetch]);
 
   const handleRejectProposal = useCallback(async () => {
     try {

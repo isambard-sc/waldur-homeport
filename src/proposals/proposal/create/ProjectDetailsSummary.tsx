@@ -48,7 +48,9 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
         onAddCommentClick={onAddCommentClick}
         reviews={reviews}
         proposal={proposal}
-      />
+      >
+        <TextField solid />
+      </CommentSection>
 
       <CommentSection
         label={translate('Description')}
