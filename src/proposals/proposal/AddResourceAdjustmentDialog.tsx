@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import {
   Proposal,
   RequestedOffering,
+  marketplacePublicOfferingsRetrieve,
   proposalProposalsResourceAdjustmentsCreate,
   proposalProtectedCallsOfferingsList,
 } from 'waldur-js-client';
@@ -15,6 +16,34 @@ import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+
+interface ResourceOption {
+  key: string;
+  label: string;
+  help_text?: string;
+  type: string;
+  min?: number;
+  max?: number;
+  required?: boolean;
+}
+
+const getResourceOptions = (offering: any): ResourceOption[] => {
+  if (!offering?.resource_options?.options) return [];
+  const order: string[] = offering.resource_options.order || [];
+  const options = offering.resource_options.options;
+  const keys = order.length > 0 ? order : Object.keys(options);
+  return keys
+    .filter((key) => key in options)
+    .map((key) => ({
+      key,
+      label: options[key].label || key,
+      help_text: options[key].help_text,
+      type: options[key].type || 'integer',
+      min: options[key].min,
+      max: options[key].max,
+      required: options[key].required,
+    }));
+};
 
 interface AddResourceAdjustmentDialogProps {
   resolve: {
@@ -28,10 +57,9 @@ export const AddResourceAdjustmentDialog: FC<
 > = ({ resolve: { proposal, refetch } }) => {
   const dispatch = useDispatch();
 
-  const [selectedOffering, setSelectedOffering] = useState<RequestedOffering | null>(
-    null,
-  );
-  const [limits, setLimits] = useState<Record<string, number>>({});
+  const [selectedOffering, setSelectedOffering] =
+    useState<RequestedOffering | null>(null);
+  const [attributes, setAttributes] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -45,38 +73,53 @@ export const AddResourceAdjustmentDialog: FC<
       proposalProtectedCallsOfferingsList({
         path: { uuid: proposal.call_uuid },
         query: { state: ['accepted'] },
-      }).then((r) => (Array.isArray(r.data) ? r.data : []) as RequestedOffering[]),
+      }).then(
+        (r) => (Array.isArray(r.data) ? r.data : []) as RequestedOffering[],
+      ),
     refetchOnWindowFocus: false,
   });
 
-  const componentKeys = useMemo(() => {
-    if (!selectedOffering?.components) return [];
-    return selectedOffering.components
-      .filter((c) => c.billing_type === 'limit')
-      .map((c) => ({
-        type: c.type,
-        name: c.name,
-      }));
-  }, [selectedOffering]);
+  // Fetch full offering details to get resource_options
+  const { data: offeringDetails, isLoading: isLoadingDetails } = useQuery({
+    queryKey: ['offering', selectedOffering?.offering_uuid],
+    queryFn: () =>
+      marketplacePublicOfferingsRetrieve({
+        path: { uuid: selectedOffering.offering_uuid },
+      }).then((r) => r.data),
+    enabled: !!selectedOffering?.offering_uuid,
+    refetchOnWindowFocus: false,
+  });
+
+  const resourceOptions = useMemo(
+    () => getResourceOptions(offeringDetails),
+    [offeringDetails],
+  );
 
   const handleOfferingSelect = useCallback(
     (uuid: string) => {
       const offering = offerings?.find((o) => o.uuid === uuid);
       setSelectedOffering(offering || null);
-      setLimits({});
+      setAttributes({});
     },
     [offerings],
   );
 
-  const handleLimitChange = useCallback((key: string, value: string) => {
+  const handleChange = useCallback((key: string, value: string) => {
     const numValue = parseInt(value, 10);
-    if (!isNaN(numValue) && numValue >= 0) {
-      setLimits((prev) => ({ ...prev, [key]: numValue }));
+    if (!isNaN(numValue)) {
+      setAttributes((prev) => ({ ...prev, [key]: numValue }));
     }
   }, []);
 
   const handleSubmit = useCallback(async () => {
     if (!selectedOffering) return;
+
+    const adjustedAttributes: Record<string, number> = {};
+    for (const option of resourceOptions) {
+      if (option.key in attributes) {
+        adjustedAttributes[option.key] = attributes[option.key];
+      }
+    }
 
     setIsSubmitting(true);
     try {
@@ -85,7 +128,7 @@ export const AddResourceAdjustmentDialog: FC<
         body: {
           call_offering_uuid: selectedOffering.uuid,
           action: 'add',
-          adjusted_limits: limits,
+          adjusted_attributes: adjustedAttributes,
         },
       });
 
@@ -99,7 +142,14 @@ export const AddResourceAdjustmentDialog: FC<
     } finally {
       setIsSubmitting(false);
     }
-  }, [proposal.uuid, selectedOffering, limits, dispatch, refetch]);
+  }, [
+    proposal.uuid,
+    selectedOffering,
+    attributes,
+    resourceOptions,
+    dispatch,
+    refetch,
+  ]);
 
   const handleCancel = () => {
     dispatch(closeModalDialog('HIDE_CONFIRM'));
@@ -144,29 +194,44 @@ export const AddResourceAdjustmentDialog: FC<
             </Form.Select>
           </Form.Group>
 
-          {selectedOffering && componentKeys.length > 0 && (
-            <>
-              <hr />
-              <p className="text-muted mb-3">{translate('Set limits:')}</p>
-              {componentKeys.map(({ type, name }) => (
-                <Form.Group key={type} className="mb-3">
-                  <Form.Label>{name}</Form.Label>
-                  <Form.Control
-                    type="number"
-                    min={0}
-                    value={limits[type] ?? 0}
-                    onChange={(e) => handleLimitChange(type, e.target.value)}
-                  />
-                </Form.Group>
-              ))}
-            </>
-          )}
+          {selectedOffering && isLoadingDetails && <LoadingSpinner />}
 
-          {selectedOffering && componentKeys.length === 0 && (
-            <p className="text-muted">
-              {translate('No configurable limits for this offering.')}
-            </p>
-          )}
+          {selectedOffering &&
+            !isLoadingDetails &&
+            resourceOptions.length > 0 && (
+              <>
+                <hr />
+                <p className="text-muted mb-3">
+                  {translate('Set allocation:')}
+                </p>
+                {resourceOptions.map((option) => (
+                  <Form.Group key={option.key} className="mb-3">
+                    <Form.Label>{option.label}</Form.Label>
+                    {option.help_text && (
+                      <Form.Text className="d-block mb-1 text-muted">
+                        {option.help_text}
+                      </Form.Text>
+                    )}
+                    <Form.Control
+                      type="number"
+                      min={option.min ?? 0}
+                      max={option.max ?? undefined}
+                      value={attributes[option.key] ?? ''}
+                      placeholder={translate('default')}
+                      onChange={(e) => handleChange(option.key, e.target.value)}
+                    />
+                  </Form.Group>
+                ))}
+              </>
+            )}
+
+          {selectedOffering &&
+            !isLoadingDetails &&
+            resourceOptions.length === 0 && (
+              <p className="text-muted">
+                {translate('No configurable options for this offering.')}
+              </p>
+            )}
         </Form>
       )}
     </ModalDialog>

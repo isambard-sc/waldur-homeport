@@ -168,10 +168,12 @@ const AllocationActions: FC<AllocationActionsProps> = ({
   );
 };
 
-const formatLimits = (limits: unknown): string => {
-  if (!limits || typeof limits !== 'object') return '-';
-  const entries = Object.entries(limits as Record<string, number>);
-  if (entries.length === 0) return '-';
+const formatAttributes = (attrs: unknown): string => {
+  if (!attrs || typeof attrs !== 'object') return translate('default');
+  const entries = Object.entries(attrs as Record<string, unknown>).filter(
+    ([, value]) => value != null,
+  );
+  if (entries.length === 0) return translate('default');
   return entries.map(([key, value]) => `${key}: ${value}`).join(', ');
 };
 
@@ -256,16 +258,16 @@ export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
             ),
           },
           {
-            title: translate('Original limits'),
-            render: ({ row }) => <>{formatLimits(row.original_limits)}</>,
+            title: translate('Original allocation'),
+            render: ({ row }) => <>{formatAttributes(row.original_attributes)}</>,
           },
           {
-            title: translate('Effective limits'),
+            title: translate('Effective allocation'),
             render: ({ row }) => (
               <span
                 className={row.has_modifications ? 'fw-bold text-primary' : ''}
               >
-                {formatLimits(row.effective_limits)}
+                {formatAttributes(row.effective_attributes)}
               </span>
             ),
           },
