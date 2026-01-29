@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import {
   Proposal,
   RequestedOffering,
+  marketplaceProviderOfferingsRetrieve,
   marketplacePublicOfferingsRetrieve,
   proposalProposalsResourceAdjustmentsCreate,
   proposalProtectedCallsOfferingsList,
@@ -79,13 +80,23 @@ export const AddResourceAdjustmentDialog: FC<
     refetchOnWindowFocus: false,
   });
 
-  // Fetch full offering details to get resource_options
+  // Fetch offering details — try provider endpoint first (includes service_attributes),
+  // fall back to public endpoint if the user lacks provider access
   const { data: offeringDetails, isLoading: isLoadingDetails } = useQuery({
-    queryKey: ['offering', selectedOffering?.offering_uuid],
-    queryFn: () =>
-      marketplacePublicOfferingsRetrieve({
-        path: { uuid: selectedOffering.offering_uuid },
-      }).then((r) => r.data),
+    queryKey: ['providerOffering', selectedOffering?.offering_uuid],
+    queryFn: async () => {
+      try {
+        const res = await marketplaceProviderOfferingsRetrieve({
+          path: { uuid: selectedOffering.offering_uuid },
+        });
+        return res.data;
+      } catch {
+        const res = await marketplacePublicOfferingsRetrieve({
+          path: { uuid: selectedOffering.offering_uuid },
+        });
+        return res.data;
+      }
+    },
     enabled: !!selectedOffering?.offering_uuid,
     refetchOnWindowFocus: false,
   });
@@ -94,6 +105,16 @@ export const AddResourceAdjustmentDialog: FC<
     () => getResourceOptions(offeringDetails),
     [offeringDetails],
   );
+
+  const allocationUnit = useMemo(() => {
+    const sa = (offeringDetails as any)?.service_attributes;
+    return sa?.allocation_unit as string | undefined;
+  }, [offeringDetails]);
+
+  const defaultAllocation = useMemo(() => {
+    const sa = (offeringDetails as any)?.service_attributes;
+    return sa?.default_allocation as number | undefined;
+  }, [offeringDetails]);
 
   const handleOfferingSelect = useCallback(
     (uuid: string) => {
@@ -211,31 +232,43 @@ export const AddResourceAdjustmentDialog: FC<
                 <p className="text-muted mb-3">
                   {translate('Set allocation:')}
                 </p>
-                {resourceOptions.map((option) => (
-                  <Form.Group key={option.key} className="mb-3">
-                    <Form.Label>{option.label}</Form.Label>
-                    {option.help_text && (
-                      <Form.Text className="d-block mb-1 text-muted">
-                        {option.help_text}
-                      </Form.Text>
-                    )}
-                    <Form.Control
-                      type="number"
-                      min={option.min ?? 0}
-                      max={option.max ?? undefined}
-                      value={attributes[option.key] ?? ''}
-                      placeholder={translate('default')}
-                      onChange={(e) =>
-                        handleChange(
-                          option.key,
-                          e.target.value,
-                          option.min,
-                          option.max,
-                        )
-                      }
-                    />
-                  </Form.Group>
-                ))}
+                {resourceOptions.map((option) => {
+                  const unitSuffix = allocationUnit
+                    ? ` (${allocationUnit})`
+                    : '';
+                  const placeholderLabel =
+                    defaultAllocation != null
+                      ? `${translate('default')}: ${defaultAllocation}${unitSuffix}`
+                      : translate('default');
+                  return (
+                    <Form.Group key={option.key} className="mb-3">
+                      <Form.Label>
+                        {option.label}
+                        {unitSuffix}
+                      </Form.Label>
+                      {option.help_text && (
+                        <Form.Text className="d-block mb-1 text-muted">
+                          {option.help_text}
+                        </Form.Text>
+                      )}
+                      <Form.Control
+                        type="number"
+                        min={option.min ?? 0}
+                        max={option.max ?? undefined}
+                        value={attributes[option.key] ?? ''}
+                        placeholder={placeholderLabel}
+                        onChange={(e) =>
+                          handleChange(
+                            option.key,
+                            e.target.value,
+                            option.min,
+                            option.max,
+                          )
+                        }
+                      />
+                    </Form.Group>
+                  );
+                })}
               </>
             )}
 

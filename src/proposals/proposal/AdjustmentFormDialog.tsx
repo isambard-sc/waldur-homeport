@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import {
   EffectiveAllocationItem,
   Proposal,
+  marketplaceProviderOfferingsRetrieve,
   marketplacePublicOfferingsRetrieve,
   proposalProposalsResourceAdjustmentsCreate,
   proposalProposalsResourceAdjustmentsPartialUpdate,
@@ -58,13 +59,23 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
 }) => {
   const dispatch = useDispatch();
 
-  // Fetch offering details to get resource_options
+  // Fetch offering details — try provider endpoint first (includes service_attributes),
+  // fall back to public endpoint if the user lacks provider access
   const { data: offering, isLoading: isLoadingOffering } = useQuery({
-    queryKey: ['offering', allocationItem.offering_uuid],
-    queryFn: () =>
-      marketplacePublicOfferingsRetrieve({
-        path: { uuid: allocationItem.offering_uuid },
-      }).then((r) => r.data),
+    queryKey: ['providerOffering', allocationItem.offering_uuid],
+    queryFn: async () => {
+      try {
+        const res = await marketplaceProviderOfferingsRetrieve({
+          path: { uuid: allocationItem.offering_uuid },
+        });
+        return res.data;
+      } catch {
+        const res = await marketplacePublicOfferingsRetrieve({
+          path: { uuid: allocationItem.offering_uuid },
+        });
+        return res.data;
+      }
+    },
     refetchOnWindowFocus: false,
   });
 
@@ -72,6 +83,16 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
     () => getResourceOptions(offering),
     [offering],
   );
+
+  const allocationUnit = useMemo(() => {
+    const sa = (offering as any)?.service_attributes;
+    return sa?.allocation_unit as string | undefined;
+  }, [offering]);
+
+  const defaultAllocation = useMemo(() => {
+    const sa = (offering as any)?.service_attributes;
+    return sa?.default_allocation as number | undefined;
+  }, [offering]);
 
   // Get current effective attribute values
   const currentAttributes = useMemo(() => {
@@ -207,14 +228,22 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
             const originalValue = originalAttributes[option.key] as
               | number
               | undefined;
+            const unitSuffix = allocationUnit
+              ? ` (${allocationUnit})`
+              : '';
             const originalLabel =
               originalValue != null
-                ? String(originalValue)
+                ? `${originalValue}${unitSuffix}`
+                : translate('default');
+            const placeholderLabel =
+              defaultAllocation != null
+                ? `${translate('default')}: ${defaultAllocation}${unitSuffix}`
                 : translate('default');
             return (
               <Form.Group key={option.key} className="mb-3">
                 <Form.Label>
-                  {option.label}{' '}
+                  {option.label}
+                  {unitSuffix}{' '}
                   <span className="text-muted">
                     ({translate('Original')}: {originalLabel})
                   </span>
@@ -229,7 +258,7 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
                   min={option.min ?? 0}
                   max={option.max ?? undefined}
                   value={currentValue ?? ''}
-                  placeholder={translate('default')}
+                  placeholder={placeholderLabel}
                   onChange={(e) =>
                     handleChange(
                       option.key,
