@@ -4,6 +4,7 @@ import { Button, Form } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import {
   Proposal,
+  RequestedOffering,
   proposalProposalsResourceAdjustmentsCreate,
   proposalProtectedCallsOfferingsList,
 } from 'waldur-js-client';
@@ -13,7 +14,6 @@ import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { CallOffering } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
 interface AddResourceAdjustmentDialogProps {
@@ -28,7 +28,7 @@ export const AddResourceAdjustmentDialog: FC<
 > = ({ resolve: { proposal, refetch } }) => {
   const dispatch = useDispatch();
 
-  const [selectedOffering, setSelectedOffering] = useState<CallOffering | null>(
+  const [selectedOffering, setSelectedOffering] = useState<RequestedOffering | null>(
     null,
   );
   const [limits, setLimits] = useState<Record<string, number>>({});
@@ -45,7 +45,7 @@ export const AddResourceAdjustmentDialog: FC<
       proposalProtectedCallsOfferingsList({
         path: { uuid: proposal.call_uuid },
         query: { state: ['accepted'] },
-      }).then((r) => r.data.results as CallOffering[]),
+      }).then((r) => (Array.isArray(r.data) ? r.data : []) as RequestedOffering[]),
     refetchOnWindowFocus: false,
   });
 
@@ -92,7 +92,7 @@ export const AddResourceAdjustmentDialog: FC<
       dispatch(
         showSuccess(translate('Resource has been added to allocation.')),
       );
-      dispatch(closeModalDialog());
+      dispatch(closeModalDialog('HIDE_CONFIRM'));
       refetch();
     } catch (error) {
       dispatch(showErrorResponse(error, translate('Unable to add resource.')));
@@ -102,7 +102,7 @@ export const AddResourceAdjustmentDialog: FC<
   }, [proposal.uuid, selectedOffering, limits, dispatch, refetch]);
 
   const handleCancel = () => {
-    dispatch(closeModalDialog());
+    dispatch(closeModalDialog('HIDE_CONFIRM'));
   };
 
   return (

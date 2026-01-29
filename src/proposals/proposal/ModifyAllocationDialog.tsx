@@ -65,14 +65,18 @@ const AllocationActions: FC<AllocationActionsProps> = ({
   const openEditDialog = useCallback(
     () =>
       dispatch(
-        openModalDialog(AdjustmentFormDialog, {
-          resolve: {
-            proposal,
-            allocationItem: row,
-            refetch,
+        openModalDialog(
+          AdjustmentFormDialog,
+          {
+            resolve: {
+              proposal,
+              allocationItem: row,
+              refetch,
+            },
+            size: 'lg',
           },
-          size: 'lg',
-        }),
+          'SHOW_CONFIRM',
+        ),
       ),
     [dispatch, proposal, row, refetch],
   );
@@ -186,10 +190,14 @@ export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
   const openAddResourceDialog = useCallback(
     () =>
       dispatch(
-        openModalDialog(AddResourceAdjustmentDialog, {
-          resolve: { proposal, refetch: tableProps.fetch },
-          size: 'lg',
-        }),
+        openModalDialog(
+          AddResourceAdjustmentDialog,
+          {
+            resolve: { proposal, refetch: tableProps.fetch },
+            size: 'lg',
+          },
+          'SHOW_CONFIRM',
+        ),
       ),
     [dispatch, proposal, tableProps.fetch],
   );

@@ -80,7 +80,7 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
       }
 
       dispatch(showSuccess(translate('Allocation has been updated.')));
-      dispatch(closeModalDialog());
+      dispatch(closeModalDialog('HIDE_CONFIRM'));
       refetch();
     } catch (error) {
       dispatch(
@@ -92,7 +92,7 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
   }, [proposal.uuid, allocationItem, limits, dispatch, refetch]);
 
   const handleCancel = () => {
-    dispatch(closeModalDialog());
+    dispatch(closeModalDialog('HIDE_CONFIRM'));
   };
 
   return (
