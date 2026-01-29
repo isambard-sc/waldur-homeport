@@ -89,12 +89,19 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
   const [attributes, setAttributes] = useState<Record<string, number>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = useCallback((key: string, value: string) => {
-    const numValue = parseInt(value, 10);
-    if (!isNaN(numValue)) {
-      setAttributes((prev) => ({ ...prev, [key]: numValue }));
-    }
-  }, []);
+  const handleChange = useCallback(
+    (key: string, value: string, min?: number, max?: number) => {
+      const numValue = parseInt(value, 10);
+      if (!isNaN(numValue)) {
+        const clamped = Math.max(
+          min ?? 0,
+          max != null ? Math.min(numValue, max) : numValue,
+        );
+        setAttributes((prev) => ({ ...prev, [key]: clamped }));
+      }
+    },
+    [],
+  );
 
   const getEffectiveValue = useCallback(
     (key: string): number | null => {
@@ -223,7 +230,14 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
                   max={option.max ?? undefined}
                   value={currentValue ?? ''}
                   placeholder={translate('default')}
-                  onChange={(e) => handleChange(option.key, e.target.value)}
+                  onChange={(e) =>
+                    handleChange(
+                      option.key,
+                      e.target.value,
+                      option.min,
+                      option.max,
+                    )
+                  }
                 />
               </Form.Group>
             );
