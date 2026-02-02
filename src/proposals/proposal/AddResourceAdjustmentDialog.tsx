@@ -206,7 +206,12 @@ export const AddResourceAdjustmentDialog: FC<
       ) : error ? (
         <LoadingErred loadData={refetchOfferings} />
       ) : (
-        <Form>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <Form.Group className="mb-3">
             <Form.Label>{translate('Select offering')}</Form.Label>
             <Form.Select

@@ -222,7 +222,12 @@ export const AdjustmentFormDialog: FC<AdjustmentFormDialogProps> = ({
           {translate('No configurable options for this resource.')}
         </p>
       ) : (
-        <Form>
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           {resourceOptions.map((option) => {
             const currentValue = getEffectiveValue(option.key);
             const originalValue = originalAttributes[option.key] as

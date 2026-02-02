@@ -1,6 +1,7 @@
 import {
   ArrowUUpLeftIcon,
   CheckCircleIcon,
+  PencilSimpleIcon,
   XCircleIcon,
 } from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
@@ -46,6 +47,7 @@ export const ProposalDetails = ({
     handleApproveProposal,
     handleRejectProposal,
     handleReturnToApplicant,
+    handleModifyAllocation,
   } = useProposalDecisionActions(proposal, refetch);
 
   const isCallManagerView = state.name?.startsWith('call-management');
@@ -90,6 +92,14 @@ export const ProposalDetails = ({
             >
               <XCircleIcon className="me-1" />
               {translate('Reject')}
+            </Button>
+            <Button
+              variant="btn btn-icon btn-light-primary"
+              onClick={handleModifyAllocation}
+              className="w-100 mt-2"
+            >
+              <PencilSimpleIcon className="me-1" />
+              {translate('Modify allocation')}
             </Button>
             <Button
               variant="btn btn-icon btn-light-warning"
