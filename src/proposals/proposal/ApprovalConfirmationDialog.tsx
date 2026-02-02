@@ -2,22 +2,19 @@ import { FC } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import {
+  EffectiveAllocationItem,
   Proposal,
   proposalProposalsApprove,
-  proposalProposalsResourcesList,
+  proposalProposalsEffectiveAllocationList,
 } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { ProposalResource } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { renderFieldOrDash } from '@waldur/table/utils';
-
-import { ResourceRequestExpandableRow } from './create/resource-requests-step/ResourceRequestExpandableRow';
 
 interface ApprovalConfirmationDialogProps {
   resolve: {
@@ -26,17 +23,31 @@ interface ApprovalConfirmationDialogProps {
   };
 }
 
+const formatAttributes = (attrs: unknown): string => {
+  if (!attrs || typeof attrs !== 'object') return translate('default');
+  const entries = Object.entries(attrs as Record<string, unknown>).filter(
+    ([, value]) => value != null,
+  );
+  if (entries.length === 0) return translate('default');
+  return entries.map(([key, value]) => `${key}: ${value}`).join(', ');
+};
+
 export const ApprovalConfirmationDialog: FC<ApprovalConfirmationDialogProps> = ({
   resolve: { proposal, refetch },
 }) => {
   const dispatch = useDispatch();
 
   const tableProps = useTable({
-    table: 'ApprovalResourcesList',
-    fetchData: createFetcher(proposalProposalsResourcesList, {
+    table: 'ApprovalEffectiveAllocationList',
+    fetchData: createFetcher(proposalProposalsEffectiveAllocationList, {
       path: { uuid: proposal.uuid },
     }),
   });
+
+  // Filter out removed resources for the approval view
+  const activeResources = (tableProps.rows || []).filter(
+    (row: EffectiveAllocationItem) => !row.is_removed,
+  );
 
   const handleApprove = async () => {
     try {
@@ -80,29 +91,50 @@ export const ApprovalConfirmationDialog: FC<ApprovalConfirmationDialogProps> = (
         )}
       </p>
 
-      <Table<ProposalResource>
+      <Table<EffectiveAllocationItem>
         {...tableProps}
+        rows={activeResources}
+        resultCount={activeResources.length}
         columns={[
           {
             title: translate('Offering'),
-            render: ({ row }) => <>{row.requested_offering.offering_name}</>,
-          },
-          {
-            title: translate('Provider'),
-            render: ({ row }) => <>{row.requested_offering.provider_name}</>,
-          },
-          {
-            title: translate('Category'),
             render: ({ row }) => (
-              <>{renderFieldOrDash(row.requested_offering.category_name)}</>
+              <span>
+                {row.offering_name}
+                {row.is_added && (
+                  <span className="badge bg-success ms-2">
+                    {translate('Added')}
+                  </span>
+                )}
+                {row.has_modifications && !row.is_added && (
+                  <span className="badge bg-warning ms-2">
+                    {translate('Modified')}
+                  </span>
+                )}
+              </span>
+            ),
+          },
+          {
+            title: translate('Allocation'),
+            render: ({ row }) => (
+              <span
+                className={row.has_modifications ? 'fw-bold text-primary' : ''}
+              >
+                {formatAttributes(row.effective_attributes)}
+              </span>
             ),
           },
         ]}
         verboseName={translate('Resources')}
-        expandableRow={ResourceRequestExpandableRow}
         minHeight="auto"
         hideRefresh
       />
+
+      {activeResources.length === 0 && !tableProps.loading && (
+        <p className="text-muted mt-3">
+          {translate('No resources will be allocated.')}
+        </p>
+      )}
     </ModalDialog>
   );
 };

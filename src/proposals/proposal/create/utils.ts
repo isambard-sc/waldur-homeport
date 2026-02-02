@@ -29,6 +29,12 @@ const ApprovalConfirmationDialog = lazyComponent(() =>
   })),
 );
 
+const ModifyAllocationDialog = lazyComponent(() =>
+  import('../ModifyAllocationDialog').then((module) => ({
+    default: module.ModifyAllocationDialog,
+  })),
+);
+
 // Custom API function for return_to_applicant until waldur-js-client is regenerated
 const proposalProposalsReturnToApplicant = async ({
   path,
@@ -138,11 +144,21 @@ export const useProposalDecisionActions = (
     }
   }, [dispatch, proposal.uuid, proposal.name, refetch]);
 
+  const handleModifyAllocation = useCallback(() => {
+    dispatch(
+      openModalDialog(ModifyAllocationDialog, {
+        resolve: { proposal, refetch },
+        size: 'lg',
+      }),
+    );
+  }, [dispatch, proposal, refetch]);
+
   return {
     canPerformDecisionActions,
     handleApproveProposal,
     handleRejectProposal,
     handleReturnToApplicant,
+    handleModifyAllocation,
   };
 };
 

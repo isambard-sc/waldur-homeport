@@ -10,6 +10,9 @@ export {
   type Proposal,
   ProposalReview,
   ProtectedCall as Call,
+  type ProposalResourceAdjustment,
+  type EffectiveAllocationItem,
+  type ActionEnum as AdjustmentAction,
 } from 'waldur-js-client';
 
 export type RoundReviewStrategy = 'after_round' | 'after_proposal';

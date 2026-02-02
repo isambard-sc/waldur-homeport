@@ -1,38 +1,44 @@
-import { PlusCircleIcon } from '@phosphor-icons/react';
+import {
+  ArrowCounterClockwiseIcon,
+  PlusCircleIcon,
+  TrashIcon,
+} from '@phosphor-icons/react';
 import { useMutation } from '@tanstack/react-query';
 import { FC, useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import {
+  EffectiveAllocationItem,
   Proposal,
-  proposalProposalsResourcesDestroy,
-  proposalProposalsResourcesList,
+  proposalProposalsEffectiveAllocationList,
+  proposalProposalsResourceAdjustmentsCreate,
+  proposalProposalsResourceAdjustmentsDestroy,
 } from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditButton } from '@waldur/form/EditButton';
-import { formatJsxTemplate, translate } from '@waldur/i18n';
+import { translate } from '@waldur/i18n';
 import {
   closeModalDialog,
   openModalDialog,
   waitForConfirmation,
 } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { ProposalResource } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ActionButton, RowActionButton } from '@waldur/table/ActionButton';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
 import { useTable } from '@waldur/table/useTable';
-import { renderFieldOrDash } from '@waldur/table/utils';
 
-import { ResourceRequestExpandableRow } from './create/resource-requests-step/ResourceRequestExpandableRow';
+const AdjustmentFormDialog = lazyComponent(() =>
+  import('./AdjustmentFormDialog').then((module) => ({
+    default: module.AdjustmentFormDialog,
+  })),
+);
 
-const ResourceRequestFormDialog = lazyComponent(() =>
-  import(
-    './create/resource-requests-step/ResourceRequestFormDialog'
-  ).then((module) => ({
-    default: module.ResourceRequestFormDialog,
+const AddResourceAdjustmentDialog = lazyComponent(() =>
+  import('./AddResourceAdjustmentDialog').then((module) => ({
+    default: module.AddResourceAdjustmentDialog,
   })),
 );
 
@@ -43,75 +49,132 @@ interface ModifyAllocationDialogProps {
   };
 }
 
-interface ResourceActionsProps {
-  row: ProposalResource;
+interface AllocationActionsProps {
+  row: EffectiveAllocationItem;
   proposal: Proposal;
   refetch: () => void;
 }
 
-const ResourceActions: FC<ResourceActionsProps> = ({
+const AllocationActions: FC<AllocationActionsProps> = ({
   row,
   proposal,
   refetch,
 }) => {
   const dispatch = useDispatch();
 
-  const openEditResourceDialog = useCallback(
+  const openEditDialog = useCallback(
     () =>
       dispatch(
-        openModalDialog(ResourceRequestFormDialog, {
-          resolve: { resourceRequest: row, proposal, refetch },
-          size: 'lg',
-        }),
+        openModalDialog(
+          AdjustmentFormDialog,
+          {
+            resolve: {
+              proposal,
+              allocationItem: row,
+              refetch,
+            },
+            size: 'lg',
+          },
+          'SHOW_CONFIRM',
+        ),
       ),
-    [dispatch, row, proposal, refetch],
+    [dispatch, proposal, row, refetch],
   );
 
-  const { mutate: remove, isPending: isRemoving } = useMutation({
+  const { mutate: removeResource, isPending: isRemoving } = useMutation({
     mutationFn: async () => {
       try {
         await waitForConfirmation(
           dispatch,
-          translate('Removing resource request'),
+          translate('Remove resource'),
           translate(
-            'Are you sure you want to remove the {name} resource request?',
-            {
-              name: <b>{row.requested_offering.offering_name}</b>,
-            },
-            formatJsxTemplate,
+            'Are you sure you want to remove "{name}" from the allocation?',
+            { name: row.offering_name },
           ),
         );
       } catch {
         return;
       }
       try {
-        await proposalProposalsResourcesDestroy({
-          path: { uuid: proposal.uuid, obj_uuid: row.uuid },
+        await proposalProposalsResourceAdjustmentsCreate({
+          path: { uuid: proposal.uuid },
+          body: {
+            requested_resource_uuid: row.requested_resource_uuid,
+            action: 'remove',
+          },
         });
         refetch();
-        dispatch(showSuccess(translate('Resource request has been deleted.')));
-      } catch (response) {
         dispatch(
-          showErrorResponse(
-            response,
-            translate('Unable to delete resource request.'),
-          ),
+          showSuccess(translate('Resource has been removed from allocation.')),
+        );
+      } catch (error) {
+        dispatch(
+          showErrorResponse(error, translate('Unable to remove resource.')),
         );
       }
     },
   });
 
+  const { mutate: undoAdjustment, isPending: isUndoing } = useMutation({
+    mutationFn: async () => {
+      if (!row.adjustment) return;
+      try {
+        await proposalProposalsResourceAdjustmentsDestroy({
+          path: {
+            uuid: proposal.uuid,
+            obj_uuid: (row.adjustment as any).uuid,
+          },
+        });
+        refetch();
+        dispatch(showSuccess(translate('Adjustment has been removed.')));
+      } catch (error) {
+        dispatch(
+          showErrorResponse(error, translate('Unable to undo adjustment.')),
+        );
+      }
+    },
+  });
+
+  // If this is an added resource or has been modified/removed, show undo button
+  if (row.is_added || row.is_removed || row.has_modifications) {
+    return (
+      <>
+        {!row.is_removed && !row.is_added && (
+          <EditButton onClick={openEditDialog} size="sm" />
+        )}
+        <RowActionButton
+          action={undoAdjustment}
+          title={translate('Undo')}
+          pending={isUndoing}
+          size="sm"
+          iconNode={<ArrowCounterClockwiseIcon />}
+        />
+      </>
+    );
+  }
+
+  // For original resources without adjustments
   return (
     <>
-      <EditButton onClick={openEditResourceDialog} size="sm" />
+      <EditButton onClick={openEditDialog} size="sm" />
       <RowActionButton
-        action={remove}
+        action={removeResource}
         title={translate('Remove')}
         pending={isRemoving}
         size="sm"
+        iconNode={<TrashIcon />}
       />
     </>
   );
+};
+
+const formatAttributes = (attrs: unknown): string => {
+  if (!attrs || typeof attrs !== 'object') return translate('default');
+  const entries = Object.entries(attrs as Record<string, unknown>).filter(
+    ([, value]) => value != null,
+  );
+  if (entries.length === 0) return translate('default');
+  return entries.map(([key, value]) => `${key}: ${value}`).join(', ');
 };
 
 export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
@@ -120,8 +183,8 @@ export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
   const dispatch = useDispatch();
 
   const tableProps = useTable({
-    table: 'ModifyAllocationResourcesList',
-    fetchData: createFetcher(proposalProposalsResourcesList, {
+    table: 'EffectiveAllocationList',
+    fetchData: createFetcher(proposalProposalsEffectiveAllocationList, {
       path: { uuid: proposal.uuid },
     }),
   });
@@ -129,10 +192,14 @@ export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
   const openAddResourceDialog = useCallback(
     () =>
       dispatch(
-        openModalDialog(ResourceRequestFormDialog, {
-          resolve: { proposal, refetch: tableProps.fetch },
-          size: 'lg',
-        }),
+        openModalDialog(
+          AddResourceAdjustmentDialog,
+          {
+            resolve: { proposal, refetch: tableProps.fetch },
+            size: 'lg',
+          },
+          'SHOW_CONFIRM',
+        ),
       ),
     [dispatch, proposal, tableProps.fetch],
   );
@@ -153,31 +220,59 @@ export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
     >
       <p className="mb-4">
         {translate(
-          'Modify the resources to be allocated for proposal "{name}". You can add, edit, or remove resources.',
+          'Modify the resources to be allocated for proposal "{name}". You can adjust limits, remove resources, or add new ones.',
           { name: proposal.name },
         )}
       </p>
 
-      <Table<ProposalResource>
+      <Table<EffectiveAllocationItem>
         {...tableProps}
         columns={[
           {
             title: translate('Offering'),
-            render: ({ row }) => <>{row.requested_offering.offering_name}</>,
-          },
-          {
-            title: translate('Provider'),
-            render: ({ row }) => <>{row.requested_offering.provider_name}</>,
-          },
-          {
-            title: translate('Category'),
             render: ({ row }) => (
-              <>{renderFieldOrDash(row.requested_offering.category_name)}</>
+              <span
+                className={
+                  row.is_removed
+                    ? 'text-decoration-line-through text-muted'
+                    : ''
+                }
+              >
+                {row.offering_name}
+                {row.is_added && (
+                  <span className="badge bg-success ms-2">
+                    {translate('Added')}
+                  </span>
+                )}
+                {row.is_removed && (
+                  <span className="badge bg-danger ms-2">
+                    {translate('Removed')}
+                  </span>
+                )}
+                {row.has_modifications && !row.is_removed && !row.is_added && (
+                  <span className="badge bg-warning ms-2">
+                    {translate('Modified')}
+                  </span>
+                )}
+              </span>
+            ),
+          },
+          {
+            title: translate('Original allocation'),
+            render: ({ row }) => <>{formatAttributes(row.original_attributes)}</>,
+          },
+          {
+            title: translate('Effective allocation'),
+            render: ({ row }) => (
+              <span
+                className={row.has_modifications ? 'fw-bold text-primary' : ''}
+              >
+                {formatAttributes(row.effective_attributes)}
+              </span>
             ),
           },
         ]}
         verboseName={translate('Resources')}
-        expandableRow={ResourceRequestExpandableRow}
         minHeight="auto"
         tableActions={
           <ActionButton
@@ -187,7 +282,7 @@ export const ModifyAllocationDialog: FC<ModifyAllocationDialogProps> = ({
           />
         }
         rowActions={({ row, fetch }) => (
-          <ResourceActions row={row} proposal={proposal} refetch={fetch} />
+          <AllocationActions row={row} proposal={proposal} refetch={fetch} />
         )}
       />
     </ModalDialog>
