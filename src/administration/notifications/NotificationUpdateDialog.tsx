@@ -17,17 +17,12 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { NotificationForm } from './NotificationForm';
 
 function findDifferentTemplates(
-  formTemplate: { templates: NotificationTemplateDetailSerializers[] },
-  initTemplate: { templates: NotificationTemplateDetailSerializers[] },
+  formTemplates: NotificationTemplateDetailSerializers[],
+  baseTemplates: NotificationTemplateDetailSerializers[],
 ) {
-  const formTemplates = formTemplate.templates;
-  const initTemplates = initTemplate.templates;
-
-  return formTemplates.filter((template1) => {
-    const matchingTemplate2 = initTemplates.find(
-      (template2) => template2.content === template1.content,
-    );
-    return !matchingTemplate2;
+  return formTemplates.filter((formTemplate) => {
+    const base = baseTemplates.find((t) => t.uuid === formTemplate.uuid);
+    return base && formTemplate.content !== base.content;
   });
 }
 
@@ -38,11 +33,17 @@ export const NotificationUpdateDialog = ({
 }) => {
   const dispatch = useDispatch();
 
+  const initialTemplates = resolve.notification.templates.map((t) => ({
+    ...t,
+    content: t.content ?? t.original_content,
+  }));
+
   const onSubmit = useCallback(
     async (formData) => {
-      const templatesToUpdate = findDifferentTemplates(formData, {
-        templates: resolve.notification.templates,
-      });
+      const templatesToUpdate = findDifferentTemplates(
+        formData.templates,
+        initialTemplates,
+      );
 
       if (templatesToUpdate.length === 0) {
         dispatch(closeModalDialog());
@@ -76,7 +77,7 @@ export const NotificationUpdateDialog = ({
   return (
     <Form
       onSubmit={onSubmit}
-      initialValues={{ templates: resolve.notification.templates }}
+      initialValues={{ templates: initialTemplates }}
       mutators={{
         ...arrayMutators,
       }}
