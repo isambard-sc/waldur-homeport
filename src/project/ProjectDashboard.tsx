@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
+import { FunctionComponent, useMemo } from 'react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
@@ -165,6 +166,29 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
 
   const showBillingInfo = project.customer_display_billing_info_in_projects;
 
+  // Check if current date is on or after project end date
+  const shouldShowSurvey = useMemo(() => {
+    if (!project?.end_date) return false;
+    const today = new Date();
+    const endDate = new Date(project.end_date);
+    return today >= endDate;
+  }, [project?.end_date]);
+
+  const shouldShowSurveyTest = useMemo(() => {
+    if (!project?.end_date) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+    
+    const endDate = new Date(project.end_date);
+    endDate.setHours(0, 0, 0, 0); // Reset time to start of day
+    
+    // Calculate the day before end date
+    const dayBeforeEndDate = new Date(endDate);
+    dayBeforeEndDate.setDate(endDate.getDate() - 1);
+    
+    return today >= dayBeforeEndDate;
+  }, [project?.end_date]);
+
   if (!project || !user) {
     return null;
   }
@@ -304,6 +328,27 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
               </Panel>
             </Col>
           )}
+        </Row>
+      )}
+
+      {/* Formbricks Survey - Only shown on/after project end date */}
+      {shouldShowSurveyTest && (
+        <Row className="mb-6">
+          <Col>
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title mb-4">{translate('Project Feedback')}</h5>
+                <div style={{ position: 'relative', height: '80dvh', overflow: 'auto' }}> 
+                  <iframe 
+                    src="https://formbricks.localhost/s/cmmh0nsu8000imt016lsfhwo7" 
+                    frameBorder="0" 
+                    style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', border: 0 }}
+                    title="Project Feedback Survey"
+                  />
+                </div>
+              </div>
+            </div>
+          </Col>
         </Row>
       )}
     </>
