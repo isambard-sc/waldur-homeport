@@ -34,65 +34,130 @@ const withAlpha = (hex: string, alpha: number): string => {
 };
 
 /**
- * Horizontal grouped-bar chart.
+ * Horizontal bar chart showing storage usage vs quota limit.
  *
- * Layout:
- *   Y-axis: local_usernames (or UserIdentifiers when no local name is available)
- *   X-axis: bytes (auto-scaled to the best unit)
- *   For each volume there are two series:
- *     - "volume (used)"  — solid bar showing actual usage
- *     - "volume (limit)" — transparent/ghost bar showing the quota limit
+ * Y-axis layout — project-level quotas first, then per-user quotas:
+ *   "Project · projects"   ← from report.projectQuotas (shared across all users)
+ *   "chris.aiproject"      ← from report.userQuotas (per-user volumes like home/scratch)
+ *   "david.aiproject"
+ *   …
  *
- * The limit bar sits behind the used bar via z-index and barGap, giving a
- * "progress bar within a quota" appearance for each user × volume pair.
+ * Each volume is a solid "used" bar with a transparent "limit" ghost bar behind it.
+ * Project volumes and user volumes are separate series so they never conflict.
  */
 export function buildStorageBarOptions(
   report: ProjectStorageReport,
   volumeFilter: string | 'all' = 'all',
 ): EChartsOption {
-  const allVolumes = report.volumes();
-  const volumes = volumeFilter === 'all' ? allVolumes : [volumeFilter];
+  const projectQuotas = report.projectQuotas;
+  const projectVolNames = Object.keys(projectQuotas).sort();
+
   const uids = report.userIdentifiers();
   const localNames = uids.map((uid) => report.users[uid] ?? uid);
 
-  // Determine a sensible Y-axis scale by looking at the max limit across users
-  let maxBytes = 0;
+  // Derive user-level volume names from actual quota data
+  const userVolSet = new Set<string>();
   for (const uid of uids) {
-    for (const vol of volumes) {
-      const q: Quota | undefined = report.quotaForUser(uid)[vol];
-      if (q && isFinite(q.limitBytes)) maxBytes = Math.max(maxBytes, q.limitBytes);
+    for (const v of Object.keys(report.quotaForUser(uid))) userVolSet.add(v);
+  }
+  const userVolNames = [...userVolSet].sort();
+
+  const visibleProjectVols =
+    volumeFilter === 'all'
+      ? projectVolNames
+      : projectVolNames.filter((v) => v === volumeFilter);
+  const visibleUserVols =
+    volumeFilter === 'all'
+      ? userVolNames
+      : userVolNames.filter((v) => v === volumeFilter);
+
+  // Y-axis: project rows first, then user rows
+  const projectRowLabels = visibleProjectVols.map((v) => `Project · ${v}`);
+  const yAxisData = [...projectRowLabels, ...localNames];
+  const totalRows = yAxisData.length;
+  const projectRowCount = projectRowLabels.length;
+
+  // Determine a readable unit from the largest limit seen anywhere
+  let maxBytes = 0;
+  for (const [, q] of Object.entries(projectQuotas)) {
+    if (isFinite(q.limitBytes)) maxBytes = Math.max(maxBytes, q.limitBytes);
+  }
+  for (const uid of uids) {
+    for (const [, q] of Object.entries(report.quotaForUser(uid))) {
+      if (isFinite(q.limitBytes)) maxBytes = Math.max(maxBytes, q.limitBytes);
     }
   }
-
-  // Pick a display unit so axis labels are readable
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'] as const;
   const unitIndex = maxBytes > 0
     ? Math.min(Math.floor(Math.log(maxBytes) / Math.log(1024)), units.length - 1)
-    : 3; // default GB
+    : 3;
   const unitDivisor = 1024 ** unitIndex;
   const unitLabel = units[unitIndex];
 
-  const series: EChartsOption['series'] = volumes.flatMap((vol, vi) => {
+  const toUnit = (bytes: number) => +(bytes / unitDivisor).toFixed(3);
+  // Sparse data array: value at specific index, 0 elsewhere
+  const sparse = (index: number, value: number) =>
+    Array.from({ length: totalRows }, (_, i) => (i === index ? value : 0));
+
+  const series: EChartsOption['series'] = [];
+  const legendItems: string[] = [];
+
+  // ── Project-level volume series ──────────────────────────────────────────
+  visibleProjectVols.forEach((vol, vi) => {
+    const q: Quota | undefined = projectQuotas[vol];
     const color = PALETTE[vi % PALETTE.length];
+    const rowIndex = vi; // project rows are at the top
 
-    const usedData = uids.map((uid) => {
-      const q = report.quotaForUser(uid)[vol];
-      return q ? +(q.usageBytes / unitDivisor).toFixed(3) : 0;
-    });
-
-    const limitData = uids.map((uid) => {
-      const q = report.quotaForUser(uid)[vol];
-      if (!q || !isFinite(q.limitBytes)) return 0;
-      return +(q.limitBytes / unitDivisor).toFixed(3);
-    });
-
-    return [
+    legendItems.push(vol);
+    series.push(
       {
-        name: `${vol}`,
+        name: vol,
+        type: 'bar' as const,
+        data: sparse(rowIndex, q ? toUnit(q.usageBytes) : 0),
+        itemStyle: { color },
+        emphasis: { focus: 'series' as const },
+        z: 10,
+      },
+      {
+        name: `${vol} (limit)`,
+        type: 'bar' as const,
+        data: sparse(rowIndex, q && isFinite(q.limitBytes) ? toUnit(q.limitBytes) : 0),
+        barGap: '-100%',
+        itemStyle: { color: withAlpha(color, 0.15) },
+        silent: true,
+        z: 1,
+      },
+    );
+  });
+
+  // ── Per-user volume series ────────────────────────────────────────────────
+  visibleUserVols.forEach((vol, vi) => {
+    const color = PALETTE[(visibleProjectVols.length + vi) % PALETTE.length];
+
+    // Data array: zeros for project rows, then one value per user row
+    const usedData = [
+      ...Array(projectRowCount).fill(0),
+      ...uids.map((uid) => {
+        const q = report.quotaForUser(uid)[vol];
+        return q ? toUnit(q.usageBytes) : 0;
+      }),
+    ];
+    const limitData = [
+      ...Array(projectRowCount).fill(0),
+      ...uids.map((uid) => {
+        const q = report.quotaForUser(uid)[vol];
+        return q && isFinite(q.limitBytes) ? toUnit(q.limitBytes) : 0;
+      }),
+    ];
+
+    legendItems.push(vol);
+    series.push(
+      {
+        name: vol,
         type: 'bar' as const,
         data: usedData,
         itemStyle: { color },
-        emphasis: { focus: 'series' },
+        emphasis: { focus: 'series' as const },
         z: 10,
       },
       {
@@ -100,11 +165,11 @@ export function buildStorageBarOptions(
         type: 'bar' as const,
         data: limitData,
         barGap: '-100%',
-        itemStyle: { color: withAlpha(color.startsWith('#') ? color : '#006699', 0.15) },
-        silent: true, // no tooltip/hover on the ghost bar
+        itemStyle: { color: withAlpha(color, 0.15) },
+        silent: true,
         z: 1,
       },
-    ];
+    );
   });
 
   return {
@@ -114,10 +179,20 @@ export function buildStorageBarOptions(
       axisPointer: { type: 'shadow' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
-        const user = params[0].axisValueLabel ?? params[0].name;
-        const uid = uids[localNames.indexOf(user)] ?? user;
-        const lines: string[] = [`<b>${user}</b> <small>(${uid})</small>`];
-        for (const vol of volumes) {
+        const rowLabel: string = params[0].axisValueLabel ?? params[0].name;
+        const isProjectRow = rowLabel.startsWith('Project · ');
+
+        if (isProjectRow) {
+          const vol = rowLabel.replace('Project · ', '');
+          const q = projectQuotas[vol];
+          if (!q) return rowLabel;
+          const pct = (q.usedFraction * 100).toFixed(1);
+          return `<b>${rowLabel}</b><br/>${q.usageFormatted} / ${q.limitFormatted} (${pct}%)`;
+        }
+
+        const uid = uids[localNames.indexOf(rowLabel)] ?? rowLabel;
+        const lines: string[] = [`<b>${rowLabel}</b> <small>(${uid})</small>`];
+        for (const vol of visibleUserVols) {
           const q = report.quotaForUser(uid)?.[vol];
           if (q) {
             const pct = (q.usedFraction * 100).toFixed(1);
@@ -127,15 +202,9 @@ export function buildStorageBarOptions(
         return lines.join('<br/>');
       },
     },
-    legend: {
-      data: volumes, // only show real series in legend, not ghost limit bars
-      bottom: 0,
-    },
-    toolbox: {
-      right: 10,
-      feature: { saveAsImage: { title: 'Save image' } },
-    },
-    grid: { left: '15%', right: '5%', bottom: 40 },
+    legend: { data: legendItems, bottom: 0 },
+    toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
+    grid: { left: '18%', right: '5%', bottom: 40 },
     xAxis: {
       type: 'value',
       name: unitLabel,
@@ -143,7 +212,14 @@ export function buildStorageBarOptions(
     },
     yAxis: {
       type: 'category',
-      data: localNames,
+      data: yAxisData,
+      axisLabel: {
+        // Visually distinguish project rows with a different style
+        formatter: (v: string) => v,
+        rich: {
+          project: { fontWeight: 'bold', color: '#555' },
+        },
+      },
     },
     series,
   };
