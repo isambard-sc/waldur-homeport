@@ -14,11 +14,14 @@
  * All filter state is local — zero re-fetches on interaction.
  */
 
+import { FileArrowDownIcon, FileXlsIcon } from '@phosphor-icons/react';
 import React, { FC, useMemo, useState } from 'react';
 
 import { EChart } from '@waldur/core/EChart';
+import { Tip } from '@waldur/core/Tooltip';
 
 import { ProjectUsageReport } from './ProjectUsageReport';
+import { downloadUsageExcel, downloadJson } from './reportExcel';
 import {
   UsageComponent,
   UsageMetric,
@@ -151,6 +154,38 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             ))}
           </select>
         )}
+
+        {/* Download buttons */}
+        <div className="d-flex gap-2 ms-auto">
+          <Tip id="tip-usage-excel" label="Download Excel">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() =>
+                downloadUsageExcel(
+                  report,
+                  `${report.project} usage ${report.year}-${String(report.month).padStart(2, '0')}`,
+                )
+              }
+            >
+              <FileXlsIcon size={20} />
+            </button>
+          </Tip>
+          <Tip id="tip-usage-json" label="Download JSON">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() =>
+                downloadJson(
+                  reports.map((r) => r.apiItem),
+                  `${report.project} usage ${report.year}-${String(report.month).padStart(2, '0')}.json`,
+                )
+              }
+            >
+              <FileArrowDownIcon size={20} />
+            </button>
+          </Tip>
+        </div>
       </div>
 
       {/* ── Chart ────────────────────────────────────────────────────── */}
@@ -158,7 +193,6 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
         options={options}
         height={height}
         exportTitle={`${report.project} ${METRIC_LABELS[metric]} ${report.year}-${String(report.month).padStart(2, '0')}`}
-        exportCsv
       />
     </div>
   );

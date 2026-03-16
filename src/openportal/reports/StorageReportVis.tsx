@@ -12,11 +12,14 @@
  * All filter state is local — zero re-fetches on interaction.
  */
 
+import { FileArrowDownIcon, FileXlsIcon } from '@phosphor-icons/react';
 import React, { FC, useMemo, useState } from 'react';
 
 import { EChart } from '@waldur/core/EChart';
+import { Tip } from '@waldur/core/Tooltip';
 
 import { ProjectStorageReport } from './ProjectStorageReport';
+import { downloadStorageExcel, downloadJson } from './reportExcel';
 import {
   buildStorageBarOptions,
   buildStorageTimeseriesOptions,
@@ -80,7 +83,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
         </span>
 
         {/* Chart type */}
-        <div className="btn-group btn-group-sm ms-auto" role="group">
+        <div className="btn-group btn-group-sm" role="group">
           <button
             type="button"
             className={`btn btn-${view === 'bar' ? 'primary' : 'secondary'}`}
@@ -115,6 +118,38 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             ))}
           </select>
         )}
+
+        {/* Download buttons */}
+        <div className="d-flex gap-2 ms-auto">
+          <Tip id="tip-storage-excel" label="Download Excel">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() =>
+                downloadStorageExcel(
+                  report,
+                  `${report.project} storage ${report.year}-${String(report.month).padStart(2, '0')}`,
+                )
+              }
+            >
+              <FileXlsIcon size={20} />
+            </button>
+          </Tip>
+          <Tip id="tip-storage-json" label="Download JSON">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() =>
+                downloadJson(
+                  reports.map((r) => r.apiItem),
+                  `${report.project} storage ${report.year}-${String(report.month).padStart(2, '0')}.json`,
+                )
+              }
+            >
+              <FileArrowDownIcon size={20} />
+            </button>
+          </Tip>
+        </div>
       </div>
 
       {/* ── Chart ────────────────────────────────────────────────────── */}
