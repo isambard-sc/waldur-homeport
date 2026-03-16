@@ -104,23 +104,45 @@ export const OpenPortalReportsTab: FC = () => {
     enabled: !!project,
   });
 
-  const usageByMonth = usageReports ? groupByMonth(usageReports) : {};
-  const storageByMonth = storageReports ? groupByMonth(storageReports) : {};
+  // Collect distinct resources across both report types
+  const allResources = [
+    ...new Set([
+      ...(usageReports ?? []).map((r) => r.resource),
+      ...(storageReports ?? []).map((r) => r.resource),
+    ]),
+  ].sort();
+
+  const [selectedResource, setSelectedResource] = useState<string>('');
+  // Resolve the active resource: use state if valid, otherwise fall back to first
+  const activeResource =
+    allResources.includes(selectedResource)
+      ? selectedResource
+      : (allResources[0] ?? '');
+
+  // Filter by resource first, then group by month
+  const usageForResource = (usageReports ?? []).filter(
+    (r) => r.resource === activeResource,
+  );
+  const storageForResource = (storageReports ?? []).filter(
+    (r) => r.resource === activeResource,
+  );
+
+  const usageByMonth = groupByMonth(usageForResource);
+  const storageByMonth = groupByMonth(storageForResource);
   const allMonths = [
     ...new Set([...Object.keys(usageByMonth), ...Object.keys(storageByMonth)]),
   ].sort().reverse();
 
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
-  // 'all' = full history; otherwise a 'YYYY-MM' key
   const activeMonth = selectedMonth;
 
   const apiUsage: ProjectUsageReport[] =
     activeMonth === 'all'
-      ? (usageReports ?? [])
+      ? usageForResource
       : (usageByMonth[activeMonth] ?? []);
   const apiStorage: ProjectStorageReport[] =
     activeMonth === 'all'
-      ? (storageReports ?? [])
+      ? storageForResource
       : (storageByMonth[activeMonth] ?? []);
 
   // Editable JSON state — seeded from API data, editable by the user
@@ -134,7 +156,7 @@ export const OpenPortalReportsTab: FC = () => {
         ? JSON.stringify(apiUsage.map((r) => r.apiItem), null, 2)
         : '[]',
     );
-  }, [activeMonth, usageReports]);
+  }, [activeMonth, activeResource, usageReports]);
 
   useEffect(() => {
     setStorageText(
@@ -142,7 +164,7 @@ export const OpenPortalReportsTab: FC = () => {
         ? JSON.stringify(apiStorage.map((r) => r.apiItem), null, 2)
         : '[]',
     );
-  }, [activeMonth, storageReports]);
+  }, [activeMonth, activeResource, storageReports]);
 
   // Parse the textarea text live
   const parsedUsage = parseUsageJson(usageText);
@@ -159,6 +181,25 @@ export const OpenPortalReportsTab: FC = () => {
     <div className="container-fluid py-4">
       <div className="d-flex align-items-center gap-3 mb-4">
         <h4 className="mb-0">OpenPortal Reports</h4>
+        {/* Resource / destination picker */}
+        {allResources.length > 1 && (
+          <select
+            className="form-select form-select-sm"
+            style={{ width: 'auto' }}
+            value={activeResource}
+            onChange={(e) => {
+              setSelectedResource(e.target.value);
+              setSelectedMonth('all');
+            }}
+          >
+            {allResources.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        )}
+
         {/* Month picker */}
         {allMonths.length > 0 && (
           <select

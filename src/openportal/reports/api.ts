@@ -36,7 +36,7 @@ export const fetchUsageReports = async (
   filters: UsageReportFilters = {},
 ): Promise<ProjectUsageReport[]> => {
   const items = await get<UsageReportApiItem[]>(
-    `/openportal-project-usage-reports/${buildQuery(filters)}`,
+    `/openportal-project-usage-reports/${buildQuery({ page_size: 1000, ...filters })}`,
   );
   return items.map(ProjectUsageReport.fromApiResponse);
 };
@@ -50,7 +50,7 @@ export const fetchStorageReports = async (
   filters: StorageReportFilters = {},
 ): Promise<ProjectStorageReport[]> => {
   const items = await get<StorageReportApiItem[]>(
-    `/openportal-project-storage-reports/${buildQuery(filters)}`,
+    `/openportal-project-storage-reports/${buildQuery({ page_size: 1000, ...filters })}`,
   );
   return items.map(ProjectStorageReport.fromApiResponse);
 };

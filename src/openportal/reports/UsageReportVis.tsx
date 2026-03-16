@@ -164,7 +164,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
               onClick={() =>
                 downloadUsageExcel(
                   report,
-                  `${report.project} usage ${report.year}-${String(report.month).padStart(2, '0')}`,
+                  `usage_report`,
                 )
               }
             >
@@ -178,7 +178,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
               onClick={() =>
                 downloadJson(
                   reports.map((r) => r.apiItem),
-                  `${report.project} usage ${report.year}-${String(report.month).padStart(2, '0')}.json`,
+                  `usage_report.json`,
                 )
               }
             >

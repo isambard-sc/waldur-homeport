@@ -128,7 +128,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
               onClick={() =>
                 downloadStorageExcel(
                   report,
-                  `${report.project} storage ${report.year}-${String(report.month).padStart(2, '0')}`,
+                  `storage_report`,
                 )
               }
             >
@@ -142,7 +142,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
               onClick={() =>
                 downloadJson(
                   reports.map((r) => r.apiItem),
-                  `${report.project} storage ${report.year}-${String(report.month).padStart(2, '0')}.json`,
+                  `storage_report.json`,
                 )
               }
             >
