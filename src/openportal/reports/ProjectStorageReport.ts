@@ -207,6 +207,11 @@ export class ProjectStorageReport {
 
   // ─── Daily snapshots ────────────────────────────────────────────────────────
 
+  /** All dates with daily snapshots, sorted ascending. */
+  get dates(): string[] {
+    return Object.keys(this.json.daily_reports ?? {}).sort();
+  }
+
   /** Daily storage snapshots sorted by date ascending. Empty array if none present. */
   dailyReports(): DailyStorageReport[] {
     if (!this.json.daily_reports) return [];
@@ -271,6 +276,15 @@ export class ProjectStorageReport {
       }
     }
 
+    // Merge daily_reports across all monthly reports (later entries for the
+    // same date from later reports win, which is fine for cross-month merges).
+    const daily_reports: Record<string, DailyStorageReportJson> = {};
+    for (const r of reports) {
+      if (r.json.daily_reports) {
+        Object.assign(daily_reports, r.json.daily_reports);
+      }
+    }
+
     const first = reports[0];
     return new ProjectStorageReport(
       {
@@ -278,7 +292,7 @@ export class ProjectStorageReport {
         users,
         project_quotas,
         user_quotas,
-        daily_reports: undefined,
+        daily_reports: Object.keys(daily_reports).length > 0 ? daily_reports : undefined,
       },
       {
         ...first.apiItem,

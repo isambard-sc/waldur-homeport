@@ -19,10 +19,10 @@ import { EChart } from '@waldur/core/EChart';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import {
   buildStorageBarOptions,
-  buildStorageTreemapOptions,
+  buildStorageTimeseriesOptions,
 } from './storageChartOptions';
 
-type ChartView = 'bar' | 'treemap';
+type ChartView = 'bar' | 'timeseries';
 
 interface Props {
   /** One or more already-fetched reports. Multiple are combined client-side. */
@@ -46,14 +46,15 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
     [report],
   );
 
+  const hasDailyData = useMemo(() => (report?.dates.length ?? 0) > 0, [report]);
+
   const [view, setView] = useState<ChartView>('bar');
   const [volumeFilter, setVolumeFilter] = useState<string>('all');
 
   const options = useMemo(() => {
     if (!report) return {};
-    return view === 'bar'
-      ? buildStorageBarOptions(report, volumeFilter)
-      : buildStorageTreemapOptions(report);
+    if (view === 'timeseries') return buildStorageTimeseriesOptions(report);
+    return buildStorageBarOptions(report, volumeFilter);
   }, [report, view, volumeFilter]);
 
   if (!report) {
@@ -87,13 +88,15 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
           >
             Bar
           </button>
-          <button
-            type="button"
-            className={`btn btn-${view === 'treemap' ? 'primary' : 'outline-primary'}`}
-            onClick={() => setView('treemap')}
-          >
-            Treemap
-          </button>
+          {hasDailyData && (
+            <button
+              type="button"
+              className={`btn btn-${view === 'timeseries' ? 'primary' : 'outline-primary'}`}
+              onClick={() => setView('timeseries')}
+            >
+              Timeline
+            </button>
+          )}
         </div>
 
         {/* Volume filter — only relevant for bar view */}

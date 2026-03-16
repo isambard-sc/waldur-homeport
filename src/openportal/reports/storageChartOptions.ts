@@ -226,6 +226,129 @@ export function buildStorageBarOptions(
 }
 
 /**
+ * Timeseries stacked-bar chart: daily storage usage over time.
+ *
+ * Shows project-level volumes first ("Project · vol"), then per-user totals
+ * (sum across all of that user's volumes). Uses daily_reports snapshots.
+ */
+export function buildStorageTimeseriesOptions(
+  report: ProjectStorageReport,
+): EChartsOption {
+  const dates = report.dates;
+  const uids = report.userIdentifiers();
+  const localNames = uids.map((uid) => report.users[uid] ?? uid);
+
+  // Project volumes present across any daily snapshot
+  const projectVolSet = new Set<string>();
+  for (const date of dates) {
+    const daily = report.getReport(date);
+    if (!daily) continue;
+    for (const v of Object.keys(daily.projectQuotas)) projectVolSet.add(v);
+  }
+  const projectVols = [...projectVolSet].sort();
+
+  // Determine unit from largest value seen (project or user)
+  let maxBytes = 0;
+  for (const date of dates) {
+    const daily = report.getReport(date);
+    if (!daily) continue;
+    for (const q of Object.values(daily.projectQuotas)) {
+      maxBytes = Math.max(maxBytes, q.usageBytes);
+    }
+    for (const uid of uids) {
+      const total = Object.values(daily.userQuotas[uid] ?? {}).reduce(
+        (s, q) => s + q.usageBytes,
+        0,
+      );
+      maxBytes = Math.max(maxBytes, total);
+    }
+  }
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'] as const;
+  const unitIndex =
+    maxBytes > 0
+      ? Math.min(Math.floor(Math.log(maxBytes) / Math.log(1024)), units.length - 1)
+      : 3;
+  const unitDivisor = 1024 ** unitIndex;
+  const unitLabel = units[unitIndex];
+  const toUnit = (bytes: number) => +(bytes / unitDivisor).toFixed(3);
+
+  // Project-volume series (one per volume, not stacked with users)
+  const projectSeries = projectVols.map((vol, vi) => ({
+    name: `Project · ${vol}`,
+    type: 'line' as const,
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[vi % PALETTE.length] },
+    data: dates.map((date) => {
+      const daily = report.getReport(date);
+      return daily ? toUnit(daily.projectQuotas[vol]?.usageBytes ?? 0) : 0;
+    }),
+  }));
+
+  // Per-user series (stacked together)
+  const userSeries = uids.map((uid, i) => ({
+    name: localNames[i],
+    type: 'bar' as const,
+    stack: 'users',
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[(projectVols.length + i) % PALETTE.length] },
+    data: dates.map((date) => {
+      const daily = report.getReport(date);
+      if (!daily) return 0;
+      const total = Object.values(daily.userQuotas[uid] ?? {}).reduce(
+        (s, q) => s + q.usageBytes,
+        0,
+      );
+      return toUnit(total);
+    }),
+  }));
+
+  const allNames = [...projectVols.map((v) => `Project · ${v}`), ...localNames];
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const date = params[0].axisValueLabel ?? params[0].name;
+        const rows = (params as any[])
+          .filter((p: any) => (p.value as number) > 0)
+          .map(
+            (p: any) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} ${unitLabel}</b>`,
+          )
+          .join('<br/>');
+        return `<b>${date}</b><br/>${rows}`;
+      },
+    },
+    legend: { data: allNames, type: 'scroll', bottom: 40 },
+    toolbox: {
+      right: 10,
+      feature: {
+        saveAsImage: { title: 'Save image' },
+      },
+    },
+    dataZoom: [
+      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 20, start: 0, end: 100 },
+      { type: 'inside', xAxisIndex: 0 },
+    ],
+    grid: { bottom: 80 },
+    xAxis: {
+      type: 'category',
+      data: dates,
+      axisLabel: { rotate: 30, formatter: (v: string) => v.slice(5) },
+    },
+    yAxis: {
+      type: 'value',
+      name: unitLabel,
+      axisLabel: { formatter: `{value} ${unitLabel}` },
+    },
+    series: [...projectSeries, ...userSeries],
+  };
+}
+
+/**
  * Treemap showing hierarchical storage usage breakdown.
  * Hierarchy: user → volume → usage bytes.
  *

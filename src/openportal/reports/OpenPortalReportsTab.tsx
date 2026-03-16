@@ -110,11 +110,18 @@ export const OpenPortalReportsTab: FC = () => {
     ...new Set([...Object.keys(usageByMonth), ...Object.keys(storageByMonth)]),
   ].sort().reverse();
 
-  const [selectedMonth, setSelectedMonth] = useState<string>('');
-  const activeMonth = selectedMonth || allMonths[0] || '';
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  // 'all' = full history; otherwise a 'YYYY-MM' key
+  const activeMonth = selectedMonth;
 
-  const apiUsage: ProjectUsageReport[] = usageByMonth[activeMonth] ?? [];
-  const apiStorage: ProjectStorageReport[] = storageByMonth[activeMonth] ?? [];
+  const apiUsage: ProjectUsageReport[] =
+    activeMonth === 'all'
+      ? (usageReports ?? [])
+      : (usageByMonth[activeMonth] ?? []);
+  const apiStorage: ProjectStorageReport[] =
+    activeMonth === 'all'
+      ? (storageReports ?? [])
+      : (storageByMonth[activeMonth] ?? []);
 
   // Editable JSON state — seeded from API data, editable by the user
   const [usageText, setUsageText] = useState('[]');
@@ -153,13 +160,14 @@ export const OpenPortalReportsTab: FC = () => {
       <div className="d-flex align-items-center gap-3 mb-4">
         <h4 className="mb-0">OpenPortal Reports</h4>
         {/* Month picker */}
-        {allMonths.length > 1 && (
+        {allMonths.length > 0 && (
           <select
             className="form-select form-select-sm"
             style={{ width: 'auto' }}
             value={activeMonth}
             onChange={(e) => setSelectedMonth(e.target.value)}
           >
+            <option value="all">All time</option>
             {allMonths.map((m) => (
               <option key={m} value={m}>
                 {m}
@@ -192,7 +200,7 @@ export const OpenPortalReportsTab: FC = () => {
         />
       )}
 
-      {!isLoading && !usageError && !storageError && allMonths.length === 0 && activeUsage.length === 0 && activeStorage.length === 0 && (
+      {!isLoading && !usageError && !storageError && allMonths.length === 0 && (
         <p className="text-muted">
           No OpenPortal reports found for this project.
         </p>
