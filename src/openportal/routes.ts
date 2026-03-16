@@ -18,4 +18,19 @@ export const states: StateDeclaration[] = [
       permissions: [isStaffOrSupport],
     },
   },
+  {
+    name: 'organization-openportal-reports',
+    url: 'openportal-reports/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./reports/OrganisationReportsTab').then((m) => ({
+        default: m.OrganisationReportsTab,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('OpenPortal Reports'),
+      priority: 200,
+      permissions: [isStaffOrSupport],
+    },
+  },
 ];
