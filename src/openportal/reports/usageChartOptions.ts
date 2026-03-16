@@ -32,6 +32,9 @@ const PALETTE = [
 export type UsageMetric = 'usage' | 'jobs' | 'avg_wait';
 export type UsageComponent = 'total' | string; // "total" | "cpu" | "memory" | "billing" | …
 
+/** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
+const shortName = (s: string) => s.split('.')[0];
+
 /**
  * Build a stacked-bar (or line) + dataZoom chart showing daily usage per user.
  *
@@ -46,6 +49,7 @@ export function buildTimeseriesOptions(
 ): EChartsOption {
   const dates = report.dates;
   const users = report.localUsers();
+  const displayNames = users.map(shortName);
 
   const getHours = (user: string, date: string): number => {
     const daily = report.getReport(date);
@@ -84,9 +88,8 @@ export function buildTimeseriesOptions(
       },
     },
     legend: {
-      data: users,
-      type: 'scroll',
-      bottom: 40,
+      data: displayNames,
+      bottom: 50,
     },
     toolbox: {
       right: 10,
@@ -104,13 +107,12 @@ export function buildTimeseriesOptions(
         xAxisIndex: 0,
         bottom: 10,
         height: 20,
-        // Show the full range by default — user can scrub
         start: 0,
         end: 100,
       },
       { type: 'inside', xAxisIndex: 0 },
     ],
-    grid: { bottom: 80 },
+    grid: { bottom: 120 },
     xAxis: {
       type: 'category',
       data: dates,
@@ -122,7 +124,7 @@ export function buildTimeseriesOptions(
       axisLabel: { formatter: '{value} h' },
     },
     series: users.map((user, i) => ({
-      name: user,
+      name: displayNames[i],
       type: 'bar',
       stack: 'usage',
       emphasis: { focus: 'series' },
@@ -148,7 +150,7 @@ function baseTimeseriesConfig(dates: string[], yName: string, yFormatter: string
       { type: 'slider', xAxisIndex: 0, bottom: 10, height: 20, start: 0, end: 100 },
       { type: 'inside', xAxisIndex: 0 },
     ],
-    grid: { bottom: 80 },
+    grid: { bottom: 120 },
     xAxis: {
       type: 'category' as const,
       data: dates,
@@ -173,10 +175,11 @@ export function buildJobsTimeseriesOptions(
 ): EChartsOption {
   const dates = report.dates;
   const users = report.localUsers();
+  const displayNames = users.map(shortName);
   const base = baseTimeseriesConfig(dates, 'Jobs', '{value}');
 
   const userSeries = users.map((user, i) => ({
-    name: user,
+    name: displayNames[i],
     type: 'bar' as const,
     stack: 'jobs',
     emphasis: { focus: 'series' as const },
@@ -202,7 +205,7 @@ export function buildJobsTimeseriesOptions(
         return `<b>${date}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
       },
     },
-    legend: { data: users, type: 'scroll', bottom: 40 },
+    legend: { data: displayNames, bottom: 50 },
     ...base,
     series: userSeries,
   };
@@ -221,7 +224,7 @@ export function buildJobsPieOptions(report: ProjectUsageReport): EChartsOption {
         (s, d) => s + (d.userJobCounts[user] ?? 0),
         0,
       );
-      return { name: user, value: total, itemStyle: { color: PALETTE[i % PALETTE.length] } };
+      return { name: shortName(user), value: total, itemStyle: { color: PALETTE[i % PALETTE.length] } };
     })
     .filter((d) => d.value > 0);
 
@@ -256,10 +259,11 @@ export function buildAvgWaitTimeseriesOptions(
 ): EChartsOption {
   const dates = report.dates;
   const users = report.localUsers();
+  const displayNames = users.map(shortName);
   const base = baseTimeseriesConfig(dates, 'Avg wait (min)', '{value} min');
 
   const userSeries = users.map((user, i) => ({
-    name: user,
+    name: displayNames[i],
     type: 'line' as const,
     connectNulls: false,
     emphasis: { focus: 'series' as const },
@@ -304,7 +308,7 @@ export function buildAvgWaitTimeseriesOptions(
         return `<b>${date}</b><br/>${rows}`;
       },
     },
-    legend: { data: [...users, 'Total avg'], type: 'scroll', bottom: 40 },
+    legend: { data: [...displayNames, 'Total avg'], bottom: 50 },
     ...base,
     // Override toolbox — avg wait shouldn't offer stacked bar
     toolbox: {
@@ -334,7 +338,7 @@ export function buildAvgWaitPieOptions(report: ProjectUsageReport): EChartsOptio
       );
       if (totalJobs === 0) return null;
       const avgMin = Math.round(totalWait / totalJobs / 60);
-      return { name: user, value: avgMin, itemStyle: { color: PALETTE[i % PALETTE.length] } };
+      return { name: shortName(user), value: avgMin, itemStyle: { color: PALETTE[i % PALETTE.length] } };
     })
     .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
 
@@ -375,7 +379,7 @@ export function buildPieOptions(
               report.componentUsageForUser(component, user).seconds,
             );
       return {
-        name: user,
+        name: shortName(user),
         value: hours,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };

@@ -83,7 +83,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
         <div className="btn-group btn-group-sm ms-auto" role="group">
           <button
             type="button"
-            className={`btn btn-${view === 'bar' ? 'primary' : 'outline-primary'}`}
+            className={`btn btn-${view === 'bar' ? 'primary' : 'secondary'}`}
             onClick={() => setView('bar')}
           >
             Bar
@@ -91,7 +91,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
           {hasDailyData && (
             <button
               type="button"
-              className={`btn btn-${view === 'timeseries' ? 'primary' : 'outline-primary'}`}
+              className={`btn btn-${view === 'timeseries' ? 'primary' : 'secondary'}`}
               onClick={() => setView('timeseries')}
             >
               Timeline

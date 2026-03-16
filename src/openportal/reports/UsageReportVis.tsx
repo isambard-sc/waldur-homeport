@@ -110,7 +110,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             <button
               key={m}
               type="button"
-              className={`btn btn-${metric === m ? 'primary' : 'outline-primary'}`}
+              className={`btn btn-${metric === m ? 'primary' : 'secondary'}`}
               onClick={() => setMetric(m)}
             >
               {METRIC_LABELS[m]}
@@ -122,14 +122,14 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
         <div className="btn-group btn-group-sm" role="group">
           <button
             type="button"
-            className={`btn btn-${view === 'timeseries' ? 'secondary' : 'outline-secondary'}`}
+            className={`btn btn-${view === 'timeseries' ? 'primary' : 'secondary'}`}
             onClick={() => setView('timeseries')}
           >
             Timeline
           </button>
           <button
             type="button"
-            className={`btn btn-${view === 'pie' ? 'secondary' : 'outline-secondary'}`}
+            className={`btn btn-${view === 'pie' ? 'primary' : 'secondary'}`}
             onClick={() => setView('pie')}
           >
             Pie

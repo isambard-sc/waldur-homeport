@@ -25,6 +25,9 @@ const PALETTE = [
   '#1abc9c',
 ];
 
+/** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
+const shortName = (s: string) => s.split('.')[0];
+
 /** Slightly transparent version of a palette colour for the limit bar */
 const withAlpha = (hex: string, alpha: number): string => {
   const r = parseInt(hex.slice(1, 3), 16);
@@ -53,7 +56,7 @@ export function buildStorageBarOptions(
   const projectVolNames = Object.keys(projectQuotas).sort();
 
   const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) => report.users[uid] ?? uid);
+  const localNames = uids.map((uid) => shortName(report.users[uid] ?? uid));
 
   // Derive user-level volume names from actual quota data
   const userVolSet = new Set<string>();
@@ -236,7 +239,7 @@ export function buildStorageTimeseriesOptions(
 ): EChartsOption {
   const dates = report.dates;
   const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) => report.users[uid] ?? uid);
+  const localNames = uids.map((uid) => shortName(report.users[uid] ?? uid));
 
   // Project volumes present across any daily snapshot
   const projectVolSet = new Set<string>();
