@@ -17,6 +17,7 @@ import { states as userRoutes } from '@waldur/user/routes';
 
 import { states as aboutRoutes } from './about';
 import { StateDeclaration } from './core/types';
+import { states as openportalRoutes } from './openportal/routes';
 // Errors module should be the last, because it contains special route.
 // Route with url='*path' allows to display error page without redirect.
 
@@ -36,6 +37,7 @@ export const states: StateDeclaration[] = [
   ...administrationRoutes,
   ...rancherRoutes,
   ...reportingRoutes,
+  ...openportalRoutes,
   ...aboutRoutes,
   ...errorRoutes,
 ];
