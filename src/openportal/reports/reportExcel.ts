@@ -46,7 +46,7 @@ const STYLES_XML =
   '<numFmt numFmtId="164" formatCode="yyyy-mm-dd hh:mm:ss"/>' +
   '</numFmts>' +
   '<fonts count="1"><font><sz val="11"/><name val="Calibri"/></font></fonts>' +
-  '<fills count="1"><fill><patternFill patternType="none"/></fill></fills>' +
+  '<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>' +
   '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>' +
   '<cellXfs count="4">' +
   '<xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>' +
