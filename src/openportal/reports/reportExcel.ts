@@ -9,12 +9,12 @@
  *   "Usage by user" — Date | <user>... | Total (h)
  *   "Jobs by user"  — Date | <user>... | Total
  *   "Wait by user"  — Date | <user>... | Total avg (min)
- *   "Comp: <name>"  — one per component, Date | <user>... | Total (h)
+ *   "Comp <name>"   — one per component, Date | <user>... | Total (h)
  *
  * Storage report sheets:
  *   "Snapshot"      — Type | User | Volume | Usage | Limit | % Used
  *   "Daily totals"  — Date | <user>... | Total (GB)
- *   "Vol: <name>"   — one per volume, Date | Project (GB) | <user>... (GB)
+ *   "Vol <name>"    — one per volume, Date | Project (GB) | <user>... (GB)
  */
 
 import JSZip from 'jszip';
@@ -277,7 +277,7 @@ function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
       }),
     ];
     // Sheet names max 31 chars in Excel
-    sheets.push({ name: `Comp: ${comp}`.slice(0, 31), rows: compRows });
+    sheets.push({ name: `Comp ${comp}`.slice(0, 31), rows: compRows });
   }
 
   return sheets;
@@ -367,7 +367,7 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
         return [date, projectGB, ...userVals];
       }),
     ];
-    sheets.push({ name: `Vol: ${vol}`.slice(0, 31), rows: volRows });
+    sheets.push({ name: `Vol ${vol}`.slice(0, 31), rows: volRows });
   }
 
   return sheets;
