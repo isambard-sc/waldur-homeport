@@ -1,6 +1,7 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
+import { isStaffOrSupport } from '@waldur/workspace/selectors';
 
 export const states: StateDeclaration[] = [
   {
@@ -14,6 +15,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('OpenPortal Reports'),
       priority: 200,
+      permissions: [isStaffOrSupport],
     },
   },
 ];
