@@ -34,6 +34,21 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'support.openportal-usage',
+    url: 'openportal-usage/',
+    parent: 'support',
+    component: lazyComponent(() =>
+      import('./reports/SystemUsageTab').then((m) => ({
+        default: m.SystemUsageTab,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('OpenPortal Usage'),
+      priority: 110,
+      permissions: [isStaffOrSupport],
+    },
+  },
+  {
     name: 'organization-openportal-allocation',
     url: 'openportal-allocation/',
     parent: 'organization',
