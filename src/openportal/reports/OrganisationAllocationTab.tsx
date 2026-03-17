@@ -188,7 +188,7 @@ const buildChartOptions = (
       type: 'value',
       name: `${currencyName} remaining`,
     },
-    dataZoom: [{ type: 'inside' }, { type: 'slider', bottom: 35 }],
+    dataZoom: [{ type: 'slider', bottom: 35 }],
     series,
   };
 };
@@ -317,7 +317,7 @@ const buildConsumptionChartOptions = (
           ? `${currencyName} / day`
           : `${currencyName} / month`,
     },
-    dataZoom: [{ type: 'inside' }, { type: 'slider', bottom: 35 }],
+    dataZoom: [{ type: 'slider', bottom: 35 }],
     series,
   };
 };
@@ -674,30 +674,34 @@ export const OrganisationAllocationTab: FC = () => {
       return daysBetween(today, end);
     };
 
+    // total_credits = remaining balance; totalAlloc = remaining + spent
     const slowStart = summaries.filter((s: ProjectAccountingSummary) => {
-      const total = parseCredits(s.total_credits);
-      if (!s.start_date || total === 0) return false;
+      if (!s.start_date) return false;
       if (monthsElapsed(s.start_date) < thresholds.slowStartMonths) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
-      return (spent / total) * 100 < thresholds.slowStartPercent;
+      const totalAlloc = parseCredits(s.total_credits) + spent;
+      if (totalAlloc === 0) return false;
+      return (spent / totalAlloc) * 100 < thresholds.slowStartPercent;
     });
 
     const inactive = summaries.filter((s: ProjectAccountingSummary) => {
-      const total = parseCredits(s.total_credits);
-      if (!s.start_date || total === 0) return false;
+      if (!s.start_date) return false;
       if (monthsElapsed(s.start_date) < thresholds.inactiveMonths) return false;
       if (parseCredits(s.current_month_spend) >= 0.01) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
-      const remaining = total - spent;
-      return (remaining / total) * 100 > thresholds.inactiveRemainingPercent;
+      const remaining = parseCredits(s.total_credits);
+      const totalAlloc = remaining + spent;
+      if (totalAlloc === 0) return false;
+      return (remaining / totalAlloc) * 100 > thresholds.inactiveRemainingPercent;
     });
 
     const depleted = summaries.filter((s: ProjectAccountingSummary) => {
-      const total = parseCredits(s.total_credits);
-      if (!s.end_date || total === 0) return false;
+      if (!s.end_date) return false;
       if (daysUntil(s.end_date) < thresholds.depletedDaysRemaining) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
-      return (spent / total) * 100 >= thresholds.depletedSpentPercent;
+      const totalAlloc = parseCredits(s.total_credits) + spent;
+      if (totalAlloc === 0) return false;
+      return (spent / totalAlloc) * 100 >= thresholds.depletedSpentPercent;
     });
 
     return { slowStart, inactive, depleted };
@@ -1209,11 +1213,15 @@ export const OrganisationAllocationTab: FC = () => {
                     ) : (
                       <ul className="mb-0">
                         {slowStart.map((s: ProjectAccountingSummary) => {
-                          const total = parseCredits(s.total_credits);
                           const spent =
                             parseCredits(s.total_spend) +
                             parseCredits(s.current_month_spend);
-                          const pct = ((spent / total) * 100).toFixed(1);
+                          const totalAlloc =
+                            parseCredits(s.total_credits) + spent;
+                          const pct = (
+                            (spent / (totalAlloc || 1)) *
+                            100
+                          ).toFixed(1);
                           return (
                             <li key={s.project_uuid} className="mb-1">
                               <a
@@ -1227,7 +1235,7 @@ export const OrganisationAllocationTab: FC = () => {
                               {s.start_date}
                               {', '}
                               {pct}% spent ({fmtCredits(spent)} /{' '}
-                              {fmtCredits(total)} {currencyName})
+                              {fmtCredits(totalAlloc)} {currencyName})
                             </li>
                           );
                         })}
@@ -1251,12 +1259,15 @@ export const OrganisationAllocationTab: FC = () => {
                     ) : (
                       <ul className="mb-0">
                         {inactive.map((s: ProjectAccountingSummary) => {
-                          const total = parseCredits(s.total_credits);
                           const spent =
                             parseCredits(s.total_spend) +
                             parseCredits(s.current_month_spend);
-                          const remaining = total - spent;
-                          const pct = ((remaining / total) * 100).toFixed(1);
+                          const remaining = parseCredits(s.total_credits);
+                          const totalAlloc = remaining + spent;
+                          const pct = (
+                            (remaining / (totalAlloc || 1)) *
+                            100
+                          ).toFixed(1);
                           return (
                             <li key={s.project_uuid} className="mb-1">
                               <a
@@ -1269,8 +1280,8 @@ export const OrganisationAllocationTab: FC = () => {
                               {' — started '}
                               {s.start_date}
                               {', no spend this month, '}
-                              {pct}% remaining ({fmtCredits(remaining)}{' '}
-                              {currencyName})
+                              {pct}% remaining ({fmtCredits(remaining)} /{' '}
+                              {fmtCredits(totalAlloc)} {currencyName})
                             </li>
                           );
                         })}
@@ -1291,11 +1302,15 @@ export const OrganisationAllocationTab: FC = () => {
                     ) : (
                       <ul className="mb-0">
                         {depleted.map((s: ProjectAccountingSummary) => {
-                          const total = parseCredits(s.total_credits);
                           const spent =
                             parseCredits(s.total_spend) +
                             parseCredits(s.current_month_spend);
-                          const spentPct = ((spent / total) * 100).toFixed(1);
+                          const totalAlloc =
+                            parseCredits(s.total_credits) + spent;
+                          const spentPct = (
+                            (spent / (totalAlloc || 1)) *
+                            100
+                          ).toFixed(1);
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
                           const end = new Date(s.end_date!);
@@ -1312,7 +1327,7 @@ export const OrganisationAllocationTab: FC = () => {
                               </a>
                               {' — '}
                               {spentPct}% spent ({fmtCredits(spent)} /{' '}
-                              {fmtCredits(total)} {currencyName}), ends{' '}
+                              {fmtCredits(totalAlloc)} {currencyName}), ends{' '}
                               {s.end_date} ({days} days remaining)
                             </li>
                           );
