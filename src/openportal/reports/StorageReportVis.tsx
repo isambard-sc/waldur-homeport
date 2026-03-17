@@ -24,6 +24,7 @@ import {
   buildStorageBarOptions,
   buildStorageTimeseriesOptions,
 } from './storageChartOptions';
+import { GroupBy } from './usageChartOptions';
 
 type ChartView = 'bar' | 'timeseries';
 
@@ -53,12 +54,13 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
 
   const [view, setView] = useState<ChartView>('bar');
   const [volumeFilter, setVolumeFilter] = useState<string>('all');
+  const [groupBy, setGroupBy] = useState<GroupBy>('day');
 
   const options = useMemo(() => {
     if (!report) return {};
-    if (view === 'timeseries') return buildStorageTimeseriesOptions(report);
+    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy);
     return buildStorageBarOptions(report, volumeFilter);
-  }, [report, view, volumeFilter]);
+  }, [report, view, volumeFilter, groupBy]);
 
   if (!report) {
     return <div className="text-muted p-4">No storage data available.</div>;
@@ -101,6 +103,26 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             </button>
           )}
         </div>
+
+        {/* Day / Month toggle — timeseries only */}
+        {view === 'timeseries' && (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-${groupBy === 'day' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupBy('day')}
+            >
+              Day
+            </button>
+            <button
+              type="button"
+              className={`btn btn-${groupBy === 'month' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupBy('month')}
+            >
+              Month
+            </button>
+          </div>
+        )}
 
         {/* Volume filter — only relevant for bar view */}
         {view === 'bar' && volumes.length > 1 && (

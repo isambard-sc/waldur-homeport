@@ -2,10 +2,20 @@
  * Pure functions that build EChartsOption objects from ProjectUsageReport data.
  * No React, no API calls — accepts wrapper class instances and returns options.
  *
+ * Grouping dimensions:
+ *   groupBy  — 'day' (default) | 'month'  aggregates daily bars into monthly bars
+ *   groupMode — the Vis component decides whether to call buildProject* functions
+ *               (one series per project) or the regular per-user functions.
+ *
  * Three metrics, two views each:
  *   buildTimeseriesOptions / buildPieOptions  — CPU-hours (or component hours)
  *   buildJobsTimeseriesOptions / buildJobsPieOptions  — job counts per user
  *   buildAvgWaitTimeseriesOptions / buildAvgWaitPieOptions  — avg scheduler wait
+ *
+ * Project-level equivalents (one series per project, not per user):
+ *   buildProjectTimeseriesOptions / buildProjectPieOptions
+ *   buildProjectJobsTimeseriesOptions / buildProjectJobsPieOptions
+ *   buildProjectAvgWaitTimeseriesOptions / buildProjectAvgWaitPieOptions
  */
 
 import type { EChartsOption } from 'echarts';
@@ -30,67 +40,64 @@ const PALETTE = [
 ];
 
 export type UsageMetric = 'usage' | 'jobs' | 'avg_wait';
-export type UsageComponent = 'total' | string; // "total" | "cpu" | "memory" | "billing" | …
+export type UsageComponent = 'total' | string;
+export type GroupBy = 'day' | 'month';
 
 /** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
 const shortName = (s: string) => s.split('.')[0];
 
+// ── Aggregation helpers ───────────────────────────────────────────────────────
+
+/** Derive x-axis labels from raw dates according to the groupBy mode. */
+function computeLabels(dates: string[], groupBy: GroupBy): string[] {
+  if (groupBy === 'month') {
+    return [...new Set(dates.map((d) => d.slice(0, 7)))].sort();
+  }
+  return dates;
+}
+
+/** Sum a per-date value over all dates within a label (day or month bucket). */
+function sumOverLabel(
+  dates: string[],
+  label: string,
+  groupBy: GroupBy,
+  getValue: (d: string) => number,
+): number {
+  if (groupBy === 'month') {
+    return dates
+      .filter((d) => d.startsWith(label))
+      .reduce((s, d) => s + getValue(d), 0);
+  }
+  return getValue(label);
+}
+
 /**
- * Build a stacked-bar (or line) + dataZoom chart showing daily usage per user.
- *
- * ECharts handles internally:
- *   - legend click → show/hide individual user series
- *   - dataZoom slider → interactive date-range pan/zoom
- *   - toolbox magicType → switch between bar and line without a React state change
+ * Weighted-average wait time (minutes) over a label bucket.
+ * Returns null when there are zero jobs (gap in line chart).
  */
-export function buildTimeseriesOptions(
-  report: ProjectUsageReport,
-  component: UsageComponent = 'total',
-): EChartsOption {
-  const dates = report.dates;
-  const users = report.localUsers();
-  const displayNames = users.map(shortName);
+function avgWaitOverLabel(
+  dates: string[],
+  label: string,
+  groupBy: GroupBy,
+  getTotalWaitSec: (d: string) => number,
+  getJobs: (d: string) => number,
+): number | null {
+  const relevantDates =
+    groupBy === 'month' ? dates.filter((d) => d.startsWith(label)) : [label];
+  const totalJobs = relevantDates.reduce((s, d) => s + getJobs(d), 0);
+  const totalWait = relevantDates.reduce((s, d) => s + getTotalWaitSec(d), 0);
+  return totalJobs > 0 ? Math.round(totalWait / totalJobs / 60) : null;
+}
 
-  const getHours = (user: string, date: string): number => {
-    const daily = report.getReport(date);
-    if (!daily) return 0;
-    if (component === 'total') {
-      return secondsToHours(daily.usageForUser(user).seconds);
-    }
-    return secondsToHours(daily.componentUsageForUser(component, user).seconds);
-  };
+// ── Shared base config ────────────────────────────────────────────────────────
 
-  const yLabel =
-    component === 'total'
-      ? 'Usage (hours)'
-      : `${component.charAt(0).toUpperCase()}${component.slice(1)} (hours)`;
-
+function baseTimeseriesConfig(
+  labels: string[],
+  groupBy: GroupBy,
+  yName: string,
+  yFormatter: string,
+) {
   return {
-    color: PALETTE,
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' },
-      formatter: (params: any) => {
-        if (!Array.isArray(params) || params.length === 0) return '';
-        const date = params[0].axisValueLabel ?? params[0].name;
-        const total = (params as any[]).reduce(
-          (s: number, p: any) => s + (p.value as number),
-          0,
-        );
-        const rows = (params as any[])
-          .filter((p: any) => (p.value as number) > 0)
-          .map(
-            (p: any) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} h</b>`,
-          )
-          .join('<br/>');
-        return `<b>${date}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
-      },
-    },
-    legend: {
-      data: displayNames,
-      bottom: 50,
-    },
     toolbox: {
       right: 10,
       feature: {
@@ -114,47 +121,13 @@ export function buildTimeseriesOptions(
     ],
     grid: { bottom: 120 },
     xAxis: {
-      type: 'category',
-      data: dates,
-      axisLabel: { rotate: 30, formatter: (v: string) => v.slice(5) }, // show MM-DD
-    },
-    yAxis: {
-      type: 'value',
-      name: yLabel,
-      axisLabel: { formatter: '{value} h' },
-    },
-    series: users.map((user, i) => ({
-      name: displayNames[i],
-      type: 'bar',
-      stack: 'usage',
-      emphasis: { focus: 'series' },
-      itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: dates.map((date) => getHours(user, date)),
-    })),
-  };
-}
-
-// ─── Shared helpers ──────────────────────────────────────────────────────────
-
-/** Common dataZoom + toolbox + xAxis config reused across all timeseries charts */
-function baseTimeseriesConfig(dates: string[], yName: string, yFormatter: string) {
-  return {
-    toolbox: {
-      right: 10,
-      feature: {
-        magicType: { type: ['bar', 'line'], title: { bar: 'Bar chart', line: 'Line chart' } },
-        saveAsImage: { title: 'Save image' },
-      },
-    },
-    dataZoom: [
-      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 20, start: 0, end: 100 },
-      { type: 'inside', xAxisIndex: 0 },
-    ],
-    grid: { bottom: 120 },
-    xAxis: {
       type: 'category' as const,
-      data: dates,
-      axisLabel: { rotate: 30, formatter: (v: string) => v.slice(5) },
+      data: labels,
+      axisLabel: {
+        rotate: 30,
+        formatter:
+          groupBy === 'month' ? undefined : (v: string) => v.slice(5),
+      },
     },
     yAxis: {
       type: 'value' as const,
@@ -164,28 +137,53 @@ function baseTimeseriesConfig(dates: string[], yName: string, yFormatter: string
   };
 }
 
-// ─── Jobs ─────────────────────────────────────────────────────────────────────
+// ── Group reports by project ──────────────────────────────────────────────────
 
 /**
- * Stacked bar chart: number of jobs per user per day.
- * Total-jobs line overlaid on a second y-axis for readability.
+ * Combine multiple monthly reports for the same project into one per project.
+ * Preserves project separation so "by project" charts can show one series each.
  */
-export function buildJobsTimeseriesOptions(
+function groupByProject(reports: ProjectUsageReport[]): ProjectUsageReport[] {
+  const map = new Map<string, ProjectUsageReport[]>();
+  for (const r of reports) {
+    const existing = map.get(r.project) ?? [];
+    map.set(r.project, [...existing, r]);
+  }
+  return [...map.values()].map((group) =>
+    group.length === 1 ? group[0] : ProjectUsageReport.combine(group),
+  );
+}
+
+// ─── Usage (hours) ────────────────────────────────────────────────────────────
+
+/**
+ * Stacked bar chart: daily or monthly usage per user.
+ */
+export function buildTimeseriesOptions(
   report: ProjectUsageReport,
+  component: UsageComponent = 'total',
+  groupBy: GroupBy = 'day',
 ): EChartsOption {
   const dates = report.dates;
+  const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
   const displayNames = users.map(shortName);
-  const base = baseTimeseriesConfig(dates, 'Jobs', '{value}');
 
-  const userSeries = users.map((user, i) => ({
-    name: displayNames[i],
-    type: 'bar' as const,
-    stack: 'jobs',
-    emphasis: { focus: 'series' as const },
-    itemStyle: { color: PALETTE[i % PALETTE.length] },
-    data: dates.map((date) => report.getReport(date)?.userJobCounts[user] ?? 0),
-  }));
+  const getHoursForDate = (user: string, date: string): number => {
+    const daily = report.getReport(date);
+    if (!daily) return 0;
+    if (component === 'total') {
+      return secondsToHours(daily.usageForUser(user).seconds);
+    }
+    return secondsToHours(daily.componentUsageForUser(component, user).seconds);
+  };
+
+  const yLabel =
+    component === 'total'
+      ? 'Usage (hours)'
+      : `${component.charAt(0).toUpperCase()}${component.slice(1)} (hours)`;
+
+  const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h');
 
   return {
     color: PALETTE,
@@ -194,175 +192,38 @@ export function buildJobsTimeseriesOptions(
       axisPointer: { type: 'cross' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
-        const date = params[0].axisValueLabel ?? params[0].name;
-        const total = (params as any[]).reduce((s, p) => s + (p.value as number), 0);
+        const label = params[0].axisValueLabel ?? params[0].name;
+        const total = (params as any[]).reduce(
+          (s: number, p: any) => s + (p.value as number),
+          0,
+        );
         const rows = (params as any[])
-          .filter((p) => (p.value as number) > 0)
-          .map((p) =>
-            `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value}</b>`,
+          .filter((p: any) => (p.value as number) > 0)
+          .map(
+            (p: any) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} h</b>`,
           )
           .join('<br/>');
-        return `<b>${date}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
+        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
     legend: { data: displayNames, bottom: 50 },
     ...base,
-    series: userSeries,
+    series: users.map((user, i) => ({
+      name: displayNames[i],
+      type: 'bar',
+      stack: 'usage',
+      emphasis: { focus: 'series' },
+      itemStyle: { color: PALETTE[i % PALETTE.length] },
+      data: labels.map((label) =>
+        sumOverLabel(dates, label, groupBy, (d) => getHoursForDate(user, d)),
+      ),
+    })),
   };
 }
 
 /**
- * Donut pie chart: total jobs per user across all days.
- */
-export function buildJobsPieOptions(report: ProjectUsageReport): EChartsOption {
-  const users = report.localUsers();
-
-  // Sum user_job_counts across all daily reports
-  const data = users
-    .map((user, i) => {
-      const total = report.dailyReports().reduce(
-        (s, d) => s + (d.userJobCounts[user] ?? 0),
-        0,
-      );
-      return { name: shortName(user), value: total, itemStyle: { color: PALETTE[i % PALETTE.length] } };
-    })
-    .filter((d) => d.value > 0);
-
-  return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
-    series: [{
-      name: 'Jobs',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: true,
-      itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
-      label: { show: true, formatter: '{b}\n{d}%' },
-      emphasis: {
-        label: { show: true, fontWeight: 'bold' },
-        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
-      },
-      data,
-    }],
-  };
-}
-
-// ─── Average wait ─────────────────────────────────────────────────────────────
-
-/**
- * Line chart: average scheduler wait time per user per day (minutes).
- * Not stacked — averages don't add up meaningfully.
- * Days with zero jobs for a user are shown as null (gap in line).
- */
-export function buildAvgWaitTimeseriesOptions(
-  report: ProjectUsageReport,
-): EChartsOption {
-  const dates = report.dates;
-  const users = report.localUsers();
-  const displayNames = users.map(shortName);
-  const base = baseTimeseriesConfig(dates, 'Avg wait (min)', '{value} min');
-
-  const userSeries = users.map((user, i) => ({
-    name: displayNames[i],
-    type: 'line' as const,
-    connectNulls: false,
-    emphasis: { focus: 'series' as const },
-    itemStyle: { color: PALETTE[i % PALETTE.length] },
-    data: dates.map((date) => {
-      const daily = report.getReport(date);
-      if (!daily) return null;
-      const jobs = daily.userJobCounts[user] ?? 0;
-      if (jobs === 0) return null;
-      return Math.round((daily.userWaitSeconds[user] ?? 0) / jobs / 60);
-    }),
-  }));
-
-  // Total average wait line
-  const totalSeries = {
-    name: 'Total avg',
-    type: 'line' as const,
-    lineStyle: { type: 'dashed' as const, width: 2 },
-    itemStyle: { color: '#999' },
-    connectNulls: false,
-    data: dates.map((date) => {
-      const daily = report.getReport(date);
-      if (!daily || daily.numJobs === 0) return null;
-      return Math.round(daily.totalWaitSeconds / daily.numJobs / 60);
-    }),
-  };
-
-  return {
-    color: PALETTE,
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' },
-      formatter: (params: any) => {
-        if (!Array.isArray(params) || params.length === 0) return '';
-        const date = params[0].axisValueLabel ?? params[0].name;
-        const rows = (params as any[])
-          .filter((p) => p.value !== null && p.value !== undefined)
-          .map((p) =>
-            `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value} min</b>`,
-          )
-          .join('<br/>');
-        return `<b>${date}</b><br/>${rows}`;
-      },
-    },
-    legend: { data: [...displayNames, 'Total avg'], bottom: 50 },
-    ...base,
-    // Override toolbox — avg wait shouldn't offer stacked bar
-    toolbox: {
-      right: 10,
-      feature: { saveAsImage: { title: 'Save image' } },
-    },
-    series: [...userSeries, totalSeries],
-  };
-}
-
-/**
- * Donut pie chart: average wait time per user across all days (minutes).
- * Value = total wait seconds for user / total jobs for user.
- */
-export function buildAvgWaitPieOptions(report: ProjectUsageReport): EChartsOption {
-  const users = report.localUsers();
-
-  const data = users
-    .map((user, i) => {
-      const totalJobs = report.dailyReports().reduce(
-        (s, d) => s + (d.userJobCounts[user] ?? 0),
-        0,
-      );
-      const totalWait = report.dailyReports().reduce(
-        (s, d) => s + (d.userWaitSeconds[user] ?? 0),
-        0,
-      );
-      if (totalJobs === 0) return null;
-      const avgMin = Math.round(totalWait / totalJobs / 60);
-      return { name: shortName(user), value: avgMin, itemStyle: { color: PALETTE[i % PALETTE.length] } };
-    })
-    .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
-
-  return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
-    series: [{
-      name: 'Avg wait',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: true,
-      itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
-      label: { show: true, formatter: '{b}\n{c} min' },
-      emphasis: {
-        label: { show: true, fontWeight: 'bold' },
-        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
-      },
-      data,
-    }],
-  };
-}
-
-/**
- * Build a donut pie chart showing total usage per user.
+ * Donut pie chart: total usage per user across the selected period.
  */
 export function buildPieOptions(
   report: ProjectUsageReport,
@@ -390,15 +251,8 @@ export function buildPieOptions(
     component === 'total' ? 'Total usage' : `${component} usage`;
 
   return {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: {c} h ({d}%)',
-    },
-    legend: {
-      orient: 'vertical',
-      right: 10,
-      type: 'scroll',
-    },
+    tooltip: { trigger: 'item', formatter: '{b}: {c} h ({d}%)' },
+    legend: { orient: 'vertical', right: 10, type: 'scroll' },
     series: [
       {
         name: label,
@@ -406,13 +260,572 @@ export function buildPieOptions(
         radius: ['40%', '70%'],
         avoidLabelOverlap: true,
         itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
-        label: {
-          show: true,
-          formatter: '{b}\n{d}%',
-        },
+        label: { show: true, formatter: '{b}\n{d}%' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0,0,0,0.3)',
+          },
+        },
+        data,
+      },
+    ],
+  };
+}
+
+// ─── Usage by project ─────────────────────────────────────────────────────────
+
+/**
+ * Stacked bar chart: daily or monthly usage, one series per project.
+ * Used when multiple projects are present and the user selects "By project".
+ */
+export function buildProjectTimeseriesOptions(
+  reports: ProjectUsageReport[],
+  component: UsageComponent = 'total',
+  groupBy: GroupBy = 'day',
+): EChartsOption {
+  const projectReports = groupByProject(reports);
+  const allDates = [
+    ...new Set(projectReports.flatMap((r) => r.dates)),
+  ].sort();
+  const labels = computeLabels(allDates, groupBy);
+
+  const getTotalHoursForDate = (
+    r: ProjectUsageReport,
+    date: string,
+  ): number => {
+    const daily = r.getReport(date);
+    if (!daily) return 0;
+    if (component === 'total') {
+      return secondsToHours(daily.totalUsage().seconds);
+    }
+    return r
+      .localUsers()
+      .reduce(
+        (s, user) =>
+          s +
+          secondsToHours(
+            daily.componentUsageForUser(component, user).seconds,
+          ),
+        0,
+      );
+  };
+
+  const yLabel =
+    component === 'total'
+      ? 'Usage (hours)'
+      : `${component.charAt(0).toUpperCase()}${component.slice(1)} (hours)`;
+
+  const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h');
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const label = params[0].axisValueLabel ?? params[0].name;
+        const total = (params as any[]).reduce(
+          (s: number, p: any) => s + (p.value as number),
+          0,
+        );
+        const rows = (params as any[])
+          .filter((p: any) => (p.value as number) > 0)
+          .map(
+            (p: any) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} h</b>`,
+          )
+          .join('<br/>');
+        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
+      },
+    },
+    legend: { data: projectReports.map((r) => r.project), bottom: 50 },
+    ...base,
+    series: projectReports.map((r, i) => ({
+      name: r.project,
+      type: 'bar',
+      stack: 'usage',
+      emphasis: { focus: 'series' },
+      itemStyle: { color: PALETTE[i % PALETTE.length] },
+      data: labels.map((label) =>
+        sumOverLabel(allDates, label, groupBy, (d) =>
+          getTotalHoursForDate(r, d),
+        ),
+      ),
+    })),
+  };
+}
+
+/**
+ * Donut pie: total usage per project.
+ */
+export function buildProjectPieOptions(
+  reports: ProjectUsageReport[],
+): EChartsOption {
+  const projectReports = groupByProject(reports);
+
+  const data = projectReports
+    .map((r, i) => ({
+      name: r.project,
+      value: r.totalUsageHours(),
+      itemStyle: { color: PALETTE[i % PALETTE.length] },
+    }))
+    .filter((d) => d.value > 0);
+
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}: {c} h ({d}%)' },
+    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    series: [
+      {
+        name: 'Usage by project',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
+        label: { show: true, formatter: '{b}\n{d}%' },
+        emphasis: {
+          label: { show: true, fontWeight: 'bold' },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0,0,0,0.3)',
+          },
+        },
+        data,
+      },
+    ],
+  };
+}
+
+// ─── Jobs ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Stacked bar chart: number of jobs per user per day/month.
+ */
+export function buildJobsTimeseriesOptions(
+  report: ProjectUsageReport,
+  groupBy: GroupBy = 'day',
+): EChartsOption {
+  const dates = report.dates;
+  const labels = computeLabels(dates, groupBy);
+  const users = report.localUsers();
+  const displayNames = users.map(shortName);
+  const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}');
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const label = params[0].axisValueLabel ?? params[0].name;
+        const total = (params as any[]).reduce(
+          (s, p) => s + (p.value as number),
+          0,
+        );
+        const rows = (params as any[])
+          .filter((p) => (p.value as number) > 0)
+          .map(
+            (p) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value}</b>`,
+          )
+          .join('<br/>');
+        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
+      },
+    },
+    legend: { data: displayNames, bottom: 50 },
+    ...base,
+    series: users.map((user, i) => ({
+      name: displayNames[i],
+      type: 'bar',
+      stack: 'jobs',
+      emphasis: { focus: 'series' },
+      itemStyle: { color: PALETTE[i % PALETTE.length] },
+      data: labels.map((label) =>
+        sumOverLabel(
+          dates,
+          label,
+          groupBy,
+          (d) => report.getReport(d)?.userJobCounts[user] ?? 0,
+        ),
+      ),
+    })),
+  };
+}
+
+/**
+ * Donut pie chart: total jobs per user.
+ */
+export function buildJobsPieOptions(
+  report: ProjectUsageReport,
+): EChartsOption {
+  const users = report.localUsers();
+
+  const data = users
+    .map((user, i) => {
+      const total = report
+        .dailyReports()
+        .reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
+      return {
+        name: shortName(user),
+        value: total,
+        itemStyle: { color: PALETTE[i % PALETTE.length] },
+      };
+    })
+    .filter((d) => d.value > 0);
+
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
+    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    series: [
+      {
+        name: 'Jobs',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
+        label: { show: true, formatter: '{b}\n{d}%' },
+        emphasis: {
+          label: { show: true, fontWeight: 'bold' },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0,0,0,0.3)',
+          },
+        },
+        data,
+      },
+    ],
+  };
+}
+
+// ─── Jobs by project ──────────────────────────────────────────────────────────
+
+export function buildProjectJobsTimeseriesOptions(
+  reports: ProjectUsageReport[],
+  groupBy: GroupBy = 'day',
+): EChartsOption {
+  const projectReports = groupByProject(reports);
+  const allDates = [
+    ...new Set(projectReports.flatMap((r) => r.dates)),
+  ].sort();
+  const labels = computeLabels(allDates, groupBy);
+  const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}');
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const label = params[0].axisValueLabel ?? params[0].name;
+        const total = (params as any[]).reduce(
+          (s, p) => s + (p.value as number),
+          0,
+        );
+        const rows = (params as any[])
+          .filter((p) => (p.value as number) > 0)
+          .map(
+            (p) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value}</b>`,
+          )
+          .join('<br/>');
+        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
+      },
+    },
+    legend: { data: projectReports.map((r) => r.project), bottom: 50 },
+    ...base,
+    series: projectReports.map((r, i) => ({
+      name: r.project,
+      type: 'bar',
+      stack: 'jobs',
+      emphasis: { focus: 'series' },
+      itemStyle: { color: PALETTE[i % PALETTE.length] },
+      data: labels.map((label) =>
+        sumOverLabel(
+          allDates,
+          label,
+          groupBy,
+          (d) => r.getReport(d)?.numJobs ?? 0,
+        ),
+      ),
+    })),
+  };
+}
+
+export function buildProjectJobsPieOptions(
+  reports: ProjectUsageReport[],
+): EChartsOption {
+  const projectReports = groupByProject(reports);
+
+  const data = projectReports
+    .map((r, i) => ({
+      name: r.project,
+      value: r.dailyReports().reduce((s, d) => s + d.numJobs, 0),
+      itemStyle: { color: PALETTE[i % PALETTE.length] },
+    }))
+    .filter((d) => d.value > 0);
+
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
+    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    series: [
+      {
+        name: 'Jobs by project',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
+        label: { show: true, formatter: '{b}\n{d}%' },
+        emphasis: {
+          label: { show: true, fontWeight: 'bold' },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0,0,0,0.3)',
+          },
+        },
+        data,
+      },
+    ],
+  };
+}
+
+// ─── Average wait ─────────────────────────────────────────────────────────────
+
+/**
+ * Line chart: average scheduler wait per user per day/month (minutes).
+ */
+export function buildAvgWaitTimeseriesOptions(
+  report: ProjectUsageReport,
+  groupBy: GroupBy = 'day',
+): EChartsOption {
+  const dates = report.dates;
+  const labels = computeLabels(dates, groupBy);
+  const users = report.localUsers();
+  const displayNames = users.map(shortName);
+  const base = baseTimeseriesConfig(
+    labels,
+    groupBy,
+    'Avg wait (min)',
+    '{value} min',
+  );
+
+  const userSeries = users.map((user, i) => ({
+    name: displayNames[i],
+    type: 'line' as const,
+    connectNulls: false,
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[i % PALETTE.length] },
+    data: labels.map((label) =>
+      avgWaitOverLabel(
+        dates,
+        label,
+        groupBy,
+        (d) => report.getReport(d)?.userWaitSeconds[user] ?? 0,
+        (d) => report.getReport(d)?.userJobCounts[user] ?? 0,
+      ),
+    ),
+  }));
+
+  const totalSeries = {
+    name: 'Total avg',
+    type: 'line' as const,
+    lineStyle: { type: 'dashed' as const, width: 2 },
+    itemStyle: { color: '#999' },
+    connectNulls: false,
+    data: labels.map((label) =>
+      avgWaitOverLabel(
+        dates,
+        label,
+        groupBy,
+        (d) => report.getReport(d)?.totalWaitSeconds ?? 0,
+        (d) => report.getReport(d)?.numJobs ?? 0,
+      ),
+    ),
+  };
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const label = params[0].axisValueLabel ?? params[0].name;
+        const rows = (params as any[])
+          .filter((p) => p.value !== null && p.value !== undefined)
+          .map(
+            (p) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value} min</b>`,
+          )
+          .join('<br/>');
+        return `<b>${label}</b><br/>${rows}`;
+      },
+    },
+    legend: { data: [...displayNames, 'Total avg'], bottom: 50 },
+    ...base,
+    toolbox: {
+      right: 10,
+      feature: { saveAsImage: { title: 'Save image' } },
+    },
+    series: [...userSeries, totalSeries],
+  };
+}
+
+/**
+ * Donut pie: average wait per user across all days.
+ */
+export function buildAvgWaitPieOptions(
+  report: ProjectUsageReport,
+): EChartsOption {
+  const users = report.localUsers();
+
+  const data = users
+    .map((user, i) => {
+      const totalJobs = report
+        .dailyReports()
+        .reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
+      const totalWait = report
+        .dailyReports()
+        .reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
+      if (totalJobs === 0) return null;
+      return {
+        name: shortName(user),
+        value: Math.round(totalWait / totalJobs / 60),
+        itemStyle: { color: PALETTE[i % PALETTE.length] },
+      };
+    })
+    .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
+
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
+    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    series: [
+      {
+        name: 'Avg wait',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
+        label: { show: true, formatter: '{b}\n{c} min' },
+        emphasis: {
+          label: { show: true, fontWeight: 'bold' },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0,0,0,0.3)',
+          },
+        },
+        data,
+      },
+    ],
+  };
+}
+
+// ─── Avg wait by project ──────────────────────────────────────────────────────
+
+export function buildProjectAvgWaitTimeseriesOptions(
+  reports: ProjectUsageReport[],
+  groupBy: GroupBy = 'day',
+): EChartsOption {
+  const projectReports = groupByProject(reports);
+  const allDates = [
+    ...new Set(projectReports.flatMap((r) => r.dates)),
+  ].sort();
+  const labels = computeLabels(allDates, groupBy);
+  const base = baseTimeseriesConfig(
+    labels,
+    groupBy,
+    'Avg wait (min)',
+    '{value} min',
+  );
+
+  const series = projectReports.map((r, i) => ({
+    name: r.project,
+    type: 'line' as const,
+    connectNulls: false,
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[i % PALETTE.length] },
+    data: labels.map((label) =>
+      avgWaitOverLabel(
+        allDates,
+        label,
+        groupBy,
+        (d) => r.getReport(d)?.totalWaitSeconds ?? 0,
+        (d) => r.getReport(d)?.numJobs ?? 0,
+      ),
+    ),
+  }));
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const label = params[0].axisValueLabel ?? params[0].name;
+        const rows = (params as any[])
+          .filter((p) => p.value !== null && p.value !== undefined)
+          .map(
+            (p) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value} min</b>`,
+          )
+          .join('<br/>');
+        return `<b>${label}</b><br/>${rows}`;
+      },
+    },
+    legend: { data: projectReports.map((r) => r.project), bottom: 50 },
+    ...base,
+    toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
+    series,
+  };
+}
+
+export function buildProjectAvgWaitPieOptions(
+  reports: ProjectUsageReport[],
+): EChartsOption {
+  const projectReports = groupByProject(reports);
+
+  const data = projectReports
+    .map((r, i) => {
+      const totalJobs = r.dailyReports().reduce((s, d) => s + d.numJobs, 0);
+      const totalWait = r
+        .dailyReports()
+        .reduce((s, d) => s + d.totalWaitSeconds, 0);
+      if (totalJobs === 0) return null;
+      return {
+        name: r.project,
+        value: Math.round(totalWait / totalJobs / 60),
+        itemStyle: { color: PALETTE[i % PALETTE.length] },
+      };
+    })
+    .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
+
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
+    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    series: [
+      {
+        name: 'Avg wait by project',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: true,
+        itemStyle: { borderRadius: 4, borderWidth: 2, borderColor: '#fff' },
+        label: { show: true, formatter: '{b}\n{c} min' },
+        emphasis: {
+          label: { show: true, fontWeight: 'bold' },
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0,0,0,0.3)',
+          },
         },
         data,
       },

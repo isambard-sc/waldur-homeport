@@ -49,6 +49,7 @@ const groupByMonth = <T extends { year: number; month: number }>(
 interface ProjectFilterDialogProps {
   projects: Project[];
   selected: Set<string>;
+  initialNameFilter?: string;
   onConfirm: (next: Set<string>) => void;
   onClose: () => void;
 }
@@ -56,11 +57,12 @@ interface ProjectFilterDialogProps {
 const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   projects,
   selected,
+  initialNameFilter = '',
   onConfirm,
   onClose,
 }) => {
   const [draft, setDraft] = useState(() => new Set(selected));
-  const [nameFilter, setNameFilter] = useState('');
+  const [nameFilter, setNameFilter] = useState(initialNameFilter);
   const [startAfter, setStartAfter] = useState('');
   const [endBefore, setEndBefore] = useState('');
 
@@ -261,6 +263,7 @@ export const OrganisationReportsTab: FC = () => {
     new Set(),
   );
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [projectSearch, setProjectSearch] = useState('');
 
   // When projects first load, select them all
   const effectiveSelected =
@@ -360,15 +363,28 @@ export const OrganisationReportsTab: FC = () => {
       <div className="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <h4 className="mb-0">OpenPortal Reports</h4>
 
-        {/* Project selector */}
+        {/* Project search + selector */}
         {projects && projects.length > 0 && (
-          <button
-            type="button"
-            className="btn btn-outline-secondary btn-sm"
-            onClick={() => setDialogOpen(true)}
-          >
-            Projects ({effectiveSelected.size} / {projects.length})
-          </button>
+          <div className="d-flex align-items-center gap-2">
+            <input
+              type="text"
+              className="form-control form-control-sm"
+              style={{ width: 180 }}
+              placeholder="Search projects…"
+              value={projectSearch}
+              onChange={(e) => {
+                setProjectSearch(e.target.value);
+                setDialogOpen(true);
+              }}
+            />
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm text-nowrap"
+              onClick={() => setDialogOpen(true)}
+            >
+              {effectiveSelected.size} / {projects.length} projects
+            </button>
+          </div>
         )}
 
         {/* Resource picker */}
@@ -493,12 +509,17 @@ export const OrganisationReportsTab: FC = () => {
         <ProjectFilterDialog
           projects={projects}
           selected={effectiveSelected}
+          initialNameFilter={projectSearch}
           onConfirm={(next) => {
             setSelectedProjects(next);
             setSelectedMonth('all');
+            setProjectSearch('');
             setDialogOpen(false);
           }}
-          onClose={() => setDialogOpen(false)}
+          onClose={() => {
+            setProjectSearch('');
+            setDialogOpen(false);
+          }}
         />
       )}
     </div>

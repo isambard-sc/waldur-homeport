@@ -10,6 +10,7 @@
 import type { EChartsOption } from 'echarts';
 
 import { ProjectStorageReport, Quota } from './ProjectStorageReport';
+import { GroupBy } from './usageChartOptions';
 import { formatStorageBytes } from './storage';
 
 const PALETTE = [
@@ -236,8 +237,26 @@ export function buildStorageBarOptions(
  */
 export function buildStorageTimeseriesOptions(
   report: ProjectStorageReport,
+  groupBy: GroupBy = 'day',
 ): EChartsOption {
-  const dates = report.dates;
+  const allDates = report.dates;
+
+  // For 'month' mode: use the last snapshot date within each month as the representative value
+  const dates: string[] =
+    groupBy === 'month'
+      ? [
+          ...new Set(allDates.map((d) => d.slice(0, 7))),
+        ]
+          .sort()
+          .map((month) => {
+            const monthDates = allDates.filter((d) => d.startsWith(month));
+            return monthDates[monthDates.length - 1]; // last reading of each month
+          })
+      : allDates;
+
+  // Labels shown on x-axis
+  const labels =
+    groupBy === 'month' ? dates.map((d) => d.slice(0, 7)) : dates;
   const uids = report.userIdentifiers();
   const localNames = uids.map((uid) => shortName(report.users[uid] ?? uid));
 
@@ -339,8 +358,11 @@ export function buildStorageTimeseriesOptions(
     grid: { bottom: 80 },
     xAxis: {
       type: 'category',
-      data: dates,
-      axisLabel: { rotate: 30, formatter: (v: string) => v.slice(5) },
+      data: labels,
+      axisLabel: {
+        rotate: 30,
+        formatter: groupBy === 'month' ? undefined : (v: string) => v.slice(5),
+      },
     },
     yAxis: {
       type: 'value',
