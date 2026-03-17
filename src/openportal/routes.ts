@@ -33,4 +33,19 @@ export const states: StateDeclaration[] = [
       permissions: [isStaffOrSupport],
     },
   },
+  {
+    name: 'organization-openportal-allocation',
+    url: 'openportal-allocation/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./reports/OrganisationAllocationTab').then((m) => ({
+        default: m.OrganisationAllocationTab,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Allocation Summary'),
+      priority: 106,
+      permissions: [isStaffOrSupport],
+    },
+  },
 ];
