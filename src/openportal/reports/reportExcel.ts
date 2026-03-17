@@ -664,6 +664,55 @@ function buildAllocationSheets(
       cursor.setMonth(cursor.getMonth() + 1);
     }
     sheets.push({ name: 'Burn-down (monthly)', rows: monthRows });
+
+    // ── Consumption (daily) sheet ─────────────────────────────────────────
+    const consumptionDailyRows: any[][] = [
+      ['Date', ...projectNames, `Total ${currencyName} / day`],
+      ...dates.map((dateStr) => {
+        const d = new Date(dateStr);
+        const vals = projectData.map((pd) => {
+          if (d >= pd.end) return 0;
+          return round2(Math.max(0, pd.remaining) / pd.totalDays);
+        });
+        return [dateStr, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
+      }),
+    ];
+    sheets.push({ name: 'Consumption (daily)', rows: consumptionDailyRows });
+
+    // ── Consumption (monthly) sheet ───────────────────────────────────────
+    const consumptionMonthRows: any[][] = [
+      ['Month', ...projectNames, `Total ${currencyName} / month`],
+    ];
+    const consumptionCursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    consumptionCursor.setHours(0, 0, 0, 0);
+    while (consumptionCursor < maxEnd) {
+      const monthLabel = toDateStrLocal(consumptionCursor).slice(0, 7);
+      const monthEnd = new Date(
+        consumptionCursor.getFullYear(),
+        consumptionCursor.getMonth() + 1,
+        0,
+      );
+      monthEnd.setHours(0, 0, 0, 0);
+      const vals = projectData.map((pd) => {
+        const activeStart =
+          consumptionCursor >= today ? consumptionCursor : today;
+        const projectLastDay = addDaysLocal(pd.end, -1);
+        const activeEnd =
+          projectLastDay <= monthEnd ? projectLastDay : monthEnd;
+        const activeDays =
+          activeEnd >= activeStart
+            ? daysBetweenLocal(activeStart, activeEnd) + 1
+            : 0;
+        return round2((Math.max(0, pd.remaining) / pd.totalDays) * activeDays);
+      });
+      consumptionMonthRows.push([
+        monthLabel,
+        ...vals,
+        round2(vals.reduce((s, v) => s + v, 0)),
+      ]);
+      consumptionCursor.setMonth(consumptionCursor.getMonth() + 1);
+    }
+    sheets.push({ name: 'Consumption (monthly)', rows: consumptionMonthRows });
   }
 
   return sheets;

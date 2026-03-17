@@ -262,6 +262,7 @@ export const OrganisationReportsTab: FC = () => {
     new Set(),
   );
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // When projects first load, select them all
   const effectiveSelected =
@@ -299,7 +300,7 @@ export const OrganisationReportsTab: FC = () => {
         storage: results.flatMap(([, s]) => s),
       };
     },
-    enabled: selectedUuids.length > 0,
+    enabled: selectedUuids.length > 0 && loadTriggered,
   });
 
   const allUsage = reportData?.usage ?? [];
@@ -419,12 +420,35 @@ export const OrganisationReportsTab: FC = () => {
           className="btn btn-outline-secondary btn-sm ms-auto"
           onClick={() => {
             refetchProjects();
-            refetchReports();
+            if (loadTriggered) refetchReports();
           }}
         >
           Refresh
         </button>
       </div>
+
+      {/* ── Load prompt ──────────────────────────────────────────────── */}
+      {!loadTriggered && !projectsLoading && !projectsError && (
+        <div className="card mb-4">
+          <div className="card-body d-flex align-items-center gap-3 flex-wrap">
+            <div>
+              <p className="mb-1 fw-semibold">Usage reports not yet loaded</p>
+              <p className="mb-0 text-muted small">
+                Loading fetches individual reports for each selected project in
+                parallel and may take 10–15 seconds. You can optionally filter
+                to a subset of projects first to speed things up.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm ms-auto"
+              onClick={() => setLoadTriggered(true)}
+            >
+              Load reports
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Progress bar (shown while fetching per-project reports) ─── */}
       {reportsLoading && fetchProgress.total > 0 && (
@@ -463,7 +487,8 @@ export const OrganisationReportsTab: FC = () => {
         />
       )}
 
-      {!projectsLoading &&
+      {loadTriggered &&
+        !projectsLoading &&
         !reportsLoading &&
         !projectsError &&
         !reportsError &&
