@@ -25,11 +25,17 @@ import {
 import React, { FC, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import { FileXlsIcon } from '@phosphor-icons/react';
+
 import { getAllPages } from '@waldur/core/api';
+import { ENV } from '@waldur/core/config';
 import { EChart } from '@waldur/core/EChart';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { Tip } from '@waldur/core/Tooltip';
 import { getCustomer } from '@waldur/workspace/selectors';
+
+import { downloadAllocationExcel } from './reportExcel';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -61,6 +67,7 @@ type ChartType = 'bar' | 'line';
 const buildChartOptions = (
   summaries: ProjectAccountingSummary[],
   chartType: ChartType,
+  currencyName: string,
 ): object | null => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -137,7 +144,7 @@ const buildChartOptions = (
     },
     yAxis: {
       type: 'value',
-      name: 'Credits remaining',
+      name: `${currencyName} remaining`,
     },
     dataZoom: [{ type: 'inside' }, { type: 'slider', bottom: 35 }],
     series,
@@ -429,10 +436,12 @@ export const OrganisationAllocationTab: FC = () => {
   // ── Chart type toggle ───────────────────────────────────────────────────
   const [chartType, setChartType] = useState<ChartType>('bar');
 
+  const currencyName = ENV.plugins.WALDUR_CORE.CURRENCY_NAME;
+
   // ── Chart options ───────────────────────────────────────────────────────
   const chartOptions = useMemo(
-    () => buildChartOptions(summaries, chartType),
-    [summaries, chartType],
+    () => buildChartOptions(summaries, chartType, currencyName),
+    [summaries, chartType, currencyName],
   );
 
   // ── Projects without end dates ──────────────────────────────────────────
@@ -481,30 +490,6 @@ export const OrganisationAllocationTab: FC = () => {
           </div>
         )}
 
-        {/* Bar / Line toggle */}
-        {chartOptions && (
-          <div
-            className="btn-group btn-group-sm ms-2"
-            role="group"
-            aria-label="Chart type"
-          >
-            <button
-              type="button"
-              className={`btn btn-outline-secondary${chartType === 'bar' ? ' active' : ''}`}
-              onClick={() => setChartType('bar')}
-            >
-              Bar
-            </button>
-            <button
-              type="button"
-              className={`btn btn-outline-secondary${chartType === 'line' ? ' active' : ''}`}
-              onClick={() => setChartType('line')}
-            >
-              Line
-            </button>
-          </div>
-        )}
-
         <button
           type="button"
           className="btn btn-outline-secondary btn-sm ms-auto"
@@ -544,16 +529,16 @@ export const OrganisationAllocationTab: FC = () => {
       {summaries.length > 0 && (
         <div className="d-flex flex-wrap gap-3 mb-4">
           <StatCard
-            label="Total credits awarded"
+            label={`Total ${currencyName} awarded`}
             value={fmtCredits(stats.totalCredits)}
           />
           <StatCard
-            label="Total spend"
+            label={`Total ${currencyName} spent`}
             value={fmtCredits(stats.totalSpent)}
             variant="warning"
           />
           <StatCard
-            label="Remaining allocation"
+            label={`Remaining ${currencyName}`}
             value={fmtCredits(stats.remaining)}
             variant={stats.remaining > 0 ? 'success' : 'danger'}
           />
@@ -563,8 +548,43 @@ export const OrganisationAllocationTab: FC = () => {
       {/* ── Burn-down chart ─────────────────────────────────────────────── */}
       {summaries.length > 0 && (
         <div className="card mb-4">
-          <div className="card-header fw-semibold">
-            Predicted allocation burn-down
+          <div className="card-header fw-semibold d-flex align-items-center gap-3">
+            <span>Predicted allocation burn-down</span>
+
+            {chartOptions && (
+              <div className="btn-group btn-group-sm ms-auto" role="group">
+                <button
+                  type="button"
+                  className={`btn btn-${chartType === 'bar' ? 'primary' : 'secondary'}`}
+                  onClick={() => setChartType('bar')}
+                >
+                  Bar
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-${chartType === 'line' ? 'primary' : 'secondary'}`}
+                  onClick={() => setChartType('line')}
+                >
+                  Line
+                </button>
+              </div>
+            )}
+
+            <Tip id="tip-alloc-excel" label="Download Excel">
+              <button
+                type="button"
+                className="text-btn text-hover-primary"
+                onClick={() =>
+                  downloadAllocationExcel(
+                    summaries,
+                    currencyName,
+                    `allocation-summary-${customer?.name ?? 'org'}`,
+                  )
+                }
+              >
+                <FileXlsIcon size={20} />
+              </button>
+            </Tip>
           </div>
           <div className="card-body">
             {chartOptions ? (
@@ -580,20 +600,50 @@ export const OrganisationAllocationTab: FC = () => {
 
       {/* ── Warning: projects without end dates ─────────────────────────── */}
       {noEndDateSummaries.length > 0 && (
-        <div className="alert alert-warning d-flex align-items-start gap-2">
-          <span>⚠</span>
-          <span>
-            <strong>
-              {noEndDateSummaries.length} project
-              {noEndDateSummaries.length !== 1 ? 's have' : ' has'} no end date
-            </strong>{' '}
-            and{' '}
-            {noEndDateSummaries.length !== 1 ? 'are' : 'is'} not shown in the
-            burn-down chart. Together{' '}
-            {noEndDateSummaries.length !== 1 ? 'they represent' : 'it represents'}{' '}
-            <strong>{fmtCredits(noEndDateUnspent)}</strong> credits of unspent
-            allocation.
-          </span>
+        <div className="alert alert-warning">
+          <div className="d-flex align-items-start gap-2 mb-2">
+            <span>⚠</span>
+            <span>
+              <strong>
+                {noEndDateSummaries.length} project
+                {noEndDateSummaries.length !== 1 ? 's have' : ' has'} no end
+                date
+              </strong>{' '}
+              and{' '}
+              {noEndDateSummaries.length !== 1 ? 'are' : 'is'} not shown in the
+              burn-down chart. Together{' '}
+              {noEndDateSummaries.length !== 1
+                ? 'they represent'
+                : 'it represents'}{' '}
+              <strong>
+                {fmtCredits(noEndDateUnspent)} {currencyName}
+              </strong>{' '}
+              of unspent allocation.
+            </span>
+          </div>
+          <ul className="mb-0 ps-4">
+            {noEndDateSummaries.map((s) => {
+              const unspent = Math.max(
+                0,
+                parseCredits(s.total_credits) -
+                  parseCredits(s.total_spend) -
+                  parseCredits(s.current_month_spend),
+              );
+              return (
+                <li key={s.project_uuid}>
+                  <a
+                    href={`/projects/${s.project_uuid}/`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {s.project_name}
+                  </a>
+                  {' — '}
+                  {fmtCredits(unspent)} {currencyName} unspent
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
 

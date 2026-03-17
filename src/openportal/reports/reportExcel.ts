@@ -27,6 +27,8 @@ import JSZip from 'jszip';
 import { SharedStrings, getSheetData } from '@waldur/table/exporters/excel';
 import { saveFile } from '@waldur/table/exporters/saveFile';
 
+import { ProjectAccountingSummary } from 'waldur-js-client';
+
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { secondsToHours } from './storage';
@@ -534,6 +536,116 @@ export function downloadStorageExcel(
   title: string,
 ): void {
   const sheets = buildStorageSheets(report);
+  downloadMultiSheetExcel(`${title}.xlsx`, sheets);
+}
+
+// ── Allocation summary ────────────────────────────────────────────────────────
+
+const parseNum = (v: string) => parseFloat(v) || 0;
+
+const addDaysLocal = (d: Date, days: number): Date => {
+  const out = new Date(d);
+  out.setDate(out.getDate() + days);
+  return out;
+};
+
+const toDateStrLocal = (d: Date): string => d.toISOString().slice(0, 10);
+
+const daysBetweenLocal = (a: Date, b: Date): number =>
+  Math.round((b.getTime() - a.getTime()) / 86_400_000);
+
+function buildAllocationSheets(
+  summaries: ProjectAccountingSummary[],
+  currencyName: string,
+): SheetSpec[] {
+  const round2 = (n: number) => +n.toFixed(2);
+
+  // ── Sheet 1: Summary ──────────────────────────────────────────────────────
+  const summaryRows: any[][] = [
+    [
+      'Project',
+      'Start date',
+      'End date',
+      `Total ${currencyName} awarded`,
+      `Total ${currencyName} spent`,
+      `Remaining ${currencyName}`,
+    ],
+    ...summaries.map((s) => {
+      const spent = parseNum(s.total_spend) + parseNum(s.current_month_spend);
+      const remaining = round2(parseNum(s.total_credits) - spent);
+      return [
+        s.project_name,
+        s.start_date ?? '',
+        s.end_date ?? '',
+        round2(parseNum(s.total_credits)),
+        round2(spent),
+        remaining,
+      ];
+    }),
+  ];
+
+  const sheets: SheetSpec[] = [{ name: 'Summary', rows: summaryRows }];
+
+  // ── Sheet 2: Burn-down ────────────────────────────────────────────────────
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const eligible = summaries.filter((s) => {
+    if (!s.end_date) return false;
+    const end = new Date(s.end_date);
+    end.setHours(0, 0, 0, 0);
+    return end > today;
+  });
+
+  if (eligible.length > 0) {
+    const endDates = eligible.map((s) => {
+      const d = new Date(s.end_date!);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    });
+    const maxEnd = new Date(Math.max(...endDates.map((d) => d.getTime())));
+
+    const dates: string[] = [];
+    for (let i = 0; ; i++) {
+      const d = addDaysLocal(today, i);
+      if (d >= maxEnd) break;
+      dates.push(toDateStrLocal(d));
+    }
+
+    const projectNames = eligible.map((s) => s.project_name);
+    const burnRows: any[][] = [
+      ['Date', ...projectNames, `Total ${currencyName} remaining`],
+      ...dates.map((dateStr) => {
+        const d = new Date(dateStr);
+        const vals = eligible.map((s) => {
+          const remaining =
+            parseNum(s.total_credits) -
+            parseNum(s.total_spend) -
+            parseNum(s.current_month_spend);
+          const end = new Date(s.end_date!);
+          end.setHours(0, 0, 0, 0);
+          if (d >= end) return 0;
+          const totalDays = Math.max(1, daysBetweenLocal(today, end));
+          const daysFromToday = daysBetweenLocal(today, d);
+          const daysLeft = totalDays - daysFromToday;
+          return round2(Math.max(0, (remaining * daysLeft) / totalDays));
+        });
+        return [dateStr, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
+      }),
+    ];
+
+    sheets.push({ name: 'Burn-down', rows: burnRows });
+  }
+
+  return sheets;
+}
+
+export function downloadAllocationExcel(
+  summaries: ProjectAccountingSummary[],
+  currencyName: string,
+  title: string,
+): void {
+  const sheets = buildAllocationSheets(summaries, currencyName);
   downloadMultiSheetExcel(`${title}.xlsx`, sheets);
 }
 
