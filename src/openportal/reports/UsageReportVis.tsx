@@ -7,6 +7,8 @@
  * Interactive controls:
  *   - Metric selector:     Usage (h) / Jobs / Avg Wait
  *   - Chart type toggle:   Timeseries ↔ Pie
+ *   - Group-by toggle:     By user ↔ By project  (shown when multiple projects)
+ *   - Day/Month toggle:    Day ↔ Month  (timeseries only)
  *   - Component selector:  Total / CPU / Memory / Billing / … (usage metric only)
  *   - ECharts built-ins:   legend click (show/hide users), dataZoom scrubber,
  *                          toolbox bar↔line toggle, save-as-image
@@ -23,6 +25,7 @@ import { Tip } from '@waldur/core/Tooltip';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { downloadUsageExcel, downloadJson } from './reportExcel';
 import {
+  GroupBy,
   UsageComponent,
   UsageMetric,
   buildAvgWaitPieOptions,
@@ -30,10 +33,17 @@ import {
   buildJobsPieOptions,
   buildJobsTimeseriesOptions,
   buildPieOptions,
+  buildProjectAvgWaitPieOptions,
+  buildProjectAvgWaitTimeseriesOptions,
+  buildProjectJobsPieOptions,
+  buildProjectJobsTimeseriesOptions,
+  buildProjectPieOptions,
+  buildProjectTimeseriesOptions,
   buildTimeseriesOptions,
 } from './usageChartOptions';
 
 type ChartView = 'timeseries' | 'pie';
+type GroupMode = 'user' | 'project';
 
 const METRIC_LABELS: Record<UsageMetric, string> = {
   usage: 'Usage (h)',
@@ -48,6 +58,11 @@ interface Props {
 }
 
 export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
+  const multipleProjects = useMemo(
+    () => new Set(reports.map((r) => r.project)).size > 1,
+    [reports],
+  );
+
   const report = useMemo(
     () =>
       reports.length === 0
@@ -66,24 +81,46 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
   const [metric, setMetric] = useState<UsageMetric>('usage');
   const [view, setView] = useState<ChartView>('timeseries');
   const [component, setComponent] = useState<UsageComponent>('total');
+  const [groupBy, setGroupBy] = useState<GroupBy>('day');
+  const [groupMode, setGroupMode] = useState<GroupMode>(
+    multipleProjects ? 'project' : 'user',
+  );
+
+  // Use full usernames when viewing by user across multiple projects
+  const fullNames = multipleProjects && groupMode === 'user';
 
   const options = useMemo(() => {
+    if (groupMode === 'project') {
+      if (metric === 'jobs') {
+        return view === 'timeseries'
+          ? buildProjectJobsTimeseriesOptions(reports, groupBy)
+          : buildProjectJobsPieOptions(reports);
+      }
+      if (metric === 'avg_wait') {
+        return view === 'timeseries'
+          ? buildProjectAvgWaitTimeseriesOptions(reports, groupBy)
+          : buildProjectAvgWaitPieOptions(reports);
+      }
+      return view === 'timeseries'
+        ? buildProjectTimeseriesOptions(reports, component, groupBy)
+        : buildProjectPieOptions(reports);
+    }
+
     if (!report) return {};
     if (metric === 'jobs') {
       return view === 'timeseries'
-        ? buildJobsTimeseriesOptions(report)
-        : buildJobsPieOptions(report);
+        ? buildJobsTimeseriesOptions(report, groupBy, fullNames)
+        : buildJobsPieOptions(report, fullNames);
     }
     if (metric === 'avg_wait') {
       return view === 'timeseries'
-        ? buildAvgWaitTimeseriesOptions(report)
-        : buildAvgWaitPieOptions(report);
+        ? buildAvgWaitTimeseriesOptions(report, groupBy, fullNames)
+        : buildAvgWaitPieOptions(report, fullNames);
     }
-    // usage
     return view === 'timeseries'
-      ? buildTimeseriesOptions(report, component)
-      : buildPieOptions(report, component);
-  }, [report, metric, view, component]);
+      ? buildTimeseriesOptions(report, component, groupBy, fullNames)
+      : buildPieOptions(report, component, fullNames);
+  }, [report, reports, metric, view, component, groupBy, groupMode, fullNames]);
 
   if (!report) {
     return <div className="text-muted p-4">No usage data available.</div>;
@@ -91,6 +128,8 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
 
   const totalHours = report.totalUsageHours();
   const numUsers = report.localUsers().length;
+  const numProjects = new Set(reports.map((r) => r.project)).size;
+  const destination = reports[0]?.resource ?? '';
 
   return (
     <div>
@@ -98,10 +137,10 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
         {/* Summary badge */}
         <span className="text-muted small">
-          {report.project} &middot; {report.year}-
-          {String(report.month).padStart(2, '0')} &middot;{' '}
-          <strong>{totalHours.toFixed(1)} h</strong> across{' '}
-          <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''}
+          {destination} &middot; <strong>{totalHours.toFixed(1)} h</strong>{' '}
+          across <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''}{' '}
+          and <strong>{numProjects}</strong> project
+          {numProjects !== 1 ? 's' : ''}
           {!report.isComplete && (
             <span className="badge bg-warning ms-2">In progress</span>
           )}
@@ -139,8 +178,48 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
           </button>
         </div>
 
-        {/* Component filter — only relevant for usage metric */}
-        {metric === 'usage' && components.length > 1 && (
+        {/* Day / Month toggle — timeseries only */}
+        {view === 'timeseries' && (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-${groupBy === 'day' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupBy('day')}
+            >
+              Day
+            </button>
+            <button
+              type="button"
+              className={`btn btn-${groupBy === 'month' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupBy('month')}
+            >
+              Month
+            </button>
+          </div>
+        )}
+
+        {/* By user / By project toggle — only when multiple projects */}
+        {multipleProjects && (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-${groupMode === 'user' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupMode('user')}
+            >
+              By user
+            </button>
+            <button
+              type="button"
+              className={`btn btn-${groupMode === 'project' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupMode('project')}
+            >
+              By project
+            </button>
+          </div>
+        )}
+
+        {/* Component filter — only relevant for usage metric, user mode */}
+        {metric === 'usage' && groupMode === 'user' && components.length > 1 && (
           <select
             className="form-select form-select-sm"
             style={{ width: 'auto' }}
@@ -149,7 +228,9 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
           >
             {components.map((c) => (
               <option key={c} value={c}>
-                {c === 'total' ? 'All usage' : c.charAt(0).toUpperCase() + c.slice(1)}
+                {c === 'total'
+                  ? 'All usage'
+                  : c.charAt(0).toUpperCase() + c.slice(1)}
               </option>
             ))}
           </select>
@@ -161,12 +242,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() =>
-                downloadUsageExcel(
-                  report,
-                  `usage_report`,
-                )
-              }
+              onClick={() => downloadUsageExcel(reports, 'usage_report')}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -178,7 +254,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
               onClick={() =>
                 downloadJson(
                   reports.map((r) => r.apiItem),
-                  `usage_report.json`,
+                  'usage_report.json',
                 )
               }
             >
@@ -192,7 +268,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <EChart
         options={options}
         height={height}
-        exportTitle={`${report.project} ${METRIC_LABELS[metric]} ${report.year}-${String(report.month).padStart(2, '0')}`}
+        exportTitle={`${destination} ${METRIC_LABELS[metric]}`}
       />
     </div>
   );

@@ -13,8 +13,38 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('OpenPortal Reports'),
-      priority: 200,
+      breadcrumb: () => translate('Usage Report'),
+      priority: 105,
+      permissions: [isStaffOrSupport],
+    },
+  },
+  {
+    name: 'organization-openportal-reports',
+    url: 'openportal-reports/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./reports/OrganisationReportsTab').then((m) => ({
+        default: m.OrganisationReportsTab,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Usage Report'),
+      priority: 105,
+      permissions: [isStaffOrSupport],
+    },
+  },
+  {
+    name: 'organization-openportal-allocation',
+    url: 'openportal-allocation/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./reports/OrganisationAllocationTab').then((m) => ({
+        default: m.OrganisationAllocationTab,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Allocation Summary'),
+      priority: 106,
       permissions: [isStaffOrSupport],
     },
   },

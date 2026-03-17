@@ -10,6 +10,7 @@
 import type { EChartsOption } from 'echarts';
 
 import { ProjectStorageReport, Quota } from './ProjectStorageReport';
+import { GroupBy } from './usageChartOptions';
 import { formatStorageBytes } from './storage';
 
 const PALETTE = [
@@ -51,12 +52,17 @@ const withAlpha = (hex: string, alpha: number): string => {
 export function buildStorageBarOptions(
   report: ProjectStorageReport,
   volumeFilter: string | 'all' = 'all',
+  fullNames = false,
 ): EChartsOption {
   const projectQuotas = report.projectQuotas;
   const projectVolNames = Object.keys(projectQuotas).sort();
 
   const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) => shortName(report.users[uid] ?? uid));
+  const localNames = uids.map((uid) =>
+    fullNames
+      ? (report.users[uid] ?? uid)
+      : shortName(report.users[uid] ?? uid),
+  );
 
   // Derive user-level volume names from actual quota data
   const userVolSet = new Set<string>();
@@ -236,10 +242,33 @@ export function buildStorageBarOptions(
  */
 export function buildStorageTimeseriesOptions(
   report: ProjectStorageReport,
+  groupBy: GroupBy = 'day',
+  fullNames = false,
 ): EChartsOption {
-  const dates = report.dates;
+  const allDates = report.dates;
+
+  // For 'month' mode: use the last snapshot date within each month as the representative value
+  const dates: string[] =
+    groupBy === 'month'
+      ? [
+          ...new Set(allDates.map((d) => d.slice(0, 7))),
+        ]
+          .sort()
+          .map((month) => {
+            const monthDates = allDates.filter((d) => d.startsWith(month));
+            return monthDates[monthDates.length - 1]; // last reading of each month
+          })
+      : allDates;
+
+  // Labels shown on x-axis
+  const labels =
+    groupBy === 'month' ? dates.map((d) => d.slice(0, 7)) : dates;
   const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) => shortName(report.users[uid] ?? uid));
+  const localNames = uids.map((uid) =>
+    fullNames
+      ? (report.users[uid] ?? uid)
+      : shortName(report.users[uid] ?? uid),
+  );
 
   // Project volumes present across any daily snapshot
   const projectVolSet = new Set<string>();
@@ -325,7 +354,7 @@ export function buildStorageTimeseriesOptions(
         return `<b>${date}</b><br/>${rows}`;
       },
     },
-    legend: { data: allNames, type: 'scroll', bottom: 40 },
+    legend: { data: allNames, type: 'scroll', bottom: 60 },
     toolbox: {
       right: 10,
       feature: {
@@ -333,14 +362,16 @@ export function buildStorageTimeseriesOptions(
       },
     },
     dataZoom: [
-      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 20, start: 0, end: 100 },
-      { type: 'inside', xAxisIndex: 0 },
+      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: 0, end: 100 },
     ],
-    grid: { bottom: 80 },
+    grid: { bottom: 130 },
     xAxis: {
       type: 'category',
-      data: dates,
-      axisLabel: { rotate: 30, formatter: (v: string) => v.slice(5) },
+      data: labels,
+      axisLabel: {
+        rotate: 30,
+        formatter: groupBy === 'month' ? undefined : (v: string) => v.slice(5),
+      },
     },
     yAxis: {
       type: 'value',
@@ -348,6 +379,210 @@ export function buildStorageTimeseriesOptions(
       axisLabel: { formatter: `{value} ${unitLabel}` },
     },
     series: [...projectSeries, ...userSeries],
+  };
+}
+
+// ── Per-project builders ──────────────────────────────────────────────────────
+
+/** Group storage reports by project, combining months within each project. */
+function groupStorageByProject(
+  reports: ProjectStorageReport[],
+): ProjectStorageReport[] {
+  const map = new Map<string, ProjectStorageReport[]>();
+  for (const r of reports) {
+    const existing = map.get(r.project) ?? [];
+    map.set(r.project, [...existing, r]);
+  }
+  return [...map.values()].map((group) =>
+    group.length === 1 ? group[0] : ProjectStorageReport.combine(group),
+  );
+}
+
+/**
+ * Horizontal bar chart: total user storage per project.
+ */
+export function buildStorageProjectBarOptions(
+  reports: ProjectStorageReport[],
+): EChartsOption {
+  const projectReports = groupStorageByProject(reports);
+  const projectNames = projectReports.map((r) => r.project);
+
+  let maxBytes = 0;
+  const totals = projectReports.map((r) => {
+    const uids = r.userIdentifiers();
+    const bytes = uids.reduce((s, uid) => {
+      return (
+        s +
+        Object.values(r.quotaForUser(uid)).reduce(
+          (ss, q) => ss + q.usageBytes,
+          0,
+        )
+      );
+    }, 0);
+    if (bytes > maxBytes) maxBytes = bytes;
+    return bytes;
+  });
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'] as const;
+  const unitIndex =
+    maxBytes > 0
+      ? Math.min(Math.floor(Math.log(maxBytes) / Math.log(1024)), units.length - 1)
+      : 3;
+  const unitDivisor = 1024 ** unitIndex;
+  const unitLabel = units[unitIndex];
+  const toUnit = (bytes: number) => +(bytes / unitDivisor).toFixed(3);
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const label = params[0].axisValueLabel ?? params[0].name;
+        return `<b>${label}</b><br/>${(params[0].value as number).toFixed(2)} ${unitLabel}`;
+      },
+    },
+    toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
+    grid: { left: '20%', right: '5%', bottom: 40 },
+    xAxis: {
+      type: 'value',
+      name: unitLabel,
+      axisLabel: { formatter: `{value} ${unitLabel}` },
+    },
+    yAxis: { type: 'category', data: projectNames },
+    series: [
+      {
+        name: 'Storage',
+        type: 'bar',
+        data: totals.map((b, i) => ({
+          value: toUnit(b),
+          itemStyle: { color: PALETTE[i % PALETTE.length] },
+        })),
+        emphasis: { focus: 'series' as const },
+      },
+    ],
+  };
+}
+
+/**
+ * Timeseries chart: total storage per project over time.
+ */
+export function buildStorageProjectTimeseriesOptions(
+  reports: ProjectStorageReport[],
+  groupBy: GroupBy = 'day',
+): EChartsOption {
+  const projectReports = groupStorageByProject(reports);
+  const allDates = [
+    ...new Set(projectReports.flatMap((r) => r.dates)),
+  ].sort();
+
+  const dates: string[] =
+    groupBy === 'month'
+      ? [...new Set(allDates.map((d) => d.slice(0, 7)))]
+          .sort()
+          .map((month) => {
+            const monthDates = allDates.filter((d) => d.startsWith(month));
+            return monthDates[monthDates.length - 1];
+          })
+      : allDates;
+
+  const labels =
+    groupBy === 'month' ? dates.map((d) => d.slice(0, 7)) : dates;
+
+  // Determine unit
+  let maxBytes = 0;
+  for (const r of projectReports) {
+    for (const date of dates) {
+      const daily = r.getReport(date);
+      if (!daily) continue;
+      const total =
+        Object.values(daily.userQuotas).reduce(
+          (s, vols) =>
+            s + Object.values(vols).reduce((ss, q) => ss + q.usageBytes, 0),
+          0,
+        ) +
+        Object.values(daily.projectQuotas).reduce(
+          (s, q) => s + q.usageBytes,
+          0,
+        );
+      if (total > maxBytes) maxBytes = total;
+    }
+  }
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'] as const;
+  const unitIndex =
+    maxBytes > 0
+      ? Math.min(Math.floor(Math.log(maxBytes) / Math.log(1024)), units.length - 1)
+      : 3;
+  const unitDivisor = 1024 ** unitIndex;
+  const unitLabel = units[unitIndex];
+  const toUnit = (bytes: number) => +(bytes / unitDivisor).toFixed(3);
+
+  const series = projectReports.map((r, i) => ({
+    name: r.project,
+    type: 'bar' as const,
+    stack: 'projects',
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[i % PALETTE.length] },
+    data: dates.map((date) => {
+      const daily = r.getReport(date);
+      if (!daily) return 0;
+      const userBytes = Object.values(daily.userQuotas).reduce(
+        (s, vols) =>
+          s + Object.values(vols).reduce((ss, q) => ss + q.usageBytes, 0),
+        0,
+      );
+      const projectBytes = Object.values(daily.projectQuotas).reduce(
+        (s, q) => s + q.usageBytes,
+        0,
+      );
+      return toUnit(userBytes + projectBytes);
+    }),
+  }));
+
+  return {
+    color: PALETTE,
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'cross' },
+      formatter: (params: any) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const date = params[0].axisValueLabel ?? params[0].name;
+        const rows = (params as any[])
+          .filter((p: any) => (p.value as number) > 0)
+          .map(
+            (p: any) =>
+              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} ${unitLabel}</b>`,
+          )
+          .join('<br/>');
+        return `<b>${date}</b><br/>${rows}`;
+      },
+    },
+    legend: {
+      data: projectReports.map((r) => r.project),
+      type: 'scroll',
+      bottom: 60,
+    },
+    toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
+    dataZoom: [
+      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: 0, end: 100 },
+    ],
+    grid: { bottom: 120 },
+    xAxis: {
+      type: 'category',
+      data: labels,
+      axisLabel: {
+        rotate: 30,
+        formatter: groupBy === 'month' ? undefined : (v: string) => v.slice(5),
+      },
+    },
+    yAxis: {
+      type: 'value',
+      name: unitLabel,
+      axisLabel: { formatter: `{value} ${unitLabel}` },
+    },
+    series,
   };
 }
 

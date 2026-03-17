@@ -238,6 +238,36 @@ export async function getAllPages<T>(
   return results;
 }
 
+/**
+ * Fetch all pages of a custom (non-SDK) paginated endpoint sequentially,
+ * following the Link header returned by the server.
+ *
+ * Uses page_size=25 by default so each response is small and the server
+ * is not burdened by one giant query.
+ */
+export async function getAll<T = any>(
+  endpoint: string,
+  pageSize = 25,
+): Promise<T[]> {
+  const results: T[] = [];
+  const sep = endpoint.includes('?') ? '&' : '?';
+  let url: string | null = fixURL(`${endpoint}${sep}page_size=${pageSize}`);
+
+  while (url) {
+    const response = await fetch(
+      url,
+      AuthTokenStorage.get()
+        ? { headers: { Authorization: getAuthHeader() } }
+        : {},
+    );
+    const data = (await response.json()) as T[];
+    results.push(...data);
+    url = getNextPageUrl(response);
+  }
+
+  return results;
+}
+
 export const formDataOptions = {
   ...formDataBodySerializer,
   headers: {
