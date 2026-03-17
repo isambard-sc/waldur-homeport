@@ -635,6 +635,74 @@ export const OrganisationAllocationTab: FC = () => {
     [summaries, consumptionChartType, consumptionGroupBy, currencyName],
   );
 
+  // ── Concerning projects ─────────────────────────────────────────────────
+  const [thresholds, setThresholds] = useState({
+    slowStartMonths: 1,
+    slowStartPercent: 5,
+    inactiveMonths: 2,
+    inactiveRemainingPercent: 10,
+    depletedSpentPercent: 90,
+    depletedDaysRemaining: 60,
+  });
+  const setThreshold = (
+    key: keyof typeof thresholds,
+    raw: string,
+  ) => {
+    const v = parseFloat(raw);
+    if (!isNaN(v) && v >= 0)
+      setThresholds((prev: typeof thresholds) => ({ ...prev, [key]: v }));
+  };
+  const [showThresholds, setShowThresholds] = useState(false);
+  const [concerningTab, setConcerningTab] = useState<
+    'slowStart' | 'inactive' | 'depleted'
+  >('slowStart');
+
+  const { slowStart, inactive, depleted } = useMemo(() => {
+    const now = new Date();
+    const monthsElapsed = (dateStr: string) => {
+      const s = new Date(dateStr);
+      return (
+        (now.getFullYear() - s.getFullYear()) * 12 +
+        (now.getMonth() - s.getMonth())
+      );
+    };
+    const daysUntil = (dateStr: string) => {
+      const end = new Date(dateStr);
+      end.setHours(0, 0, 0, 0);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return daysBetween(today, end);
+    };
+
+    const slowStart = summaries.filter((s: ProjectAccountingSummary) => {
+      const total = parseCredits(s.total_credits);
+      if (!s.start_date || total === 0) return false;
+      if (monthsElapsed(s.start_date) < thresholds.slowStartMonths) return false;
+      const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
+      return (spent / total) * 100 < thresholds.slowStartPercent;
+    });
+
+    const inactive = summaries.filter((s: ProjectAccountingSummary) => {
+      const total = parseCredits(s.total_credits);
+      if (!s.start_date || total === 0) return false;
+      if (monthsElapsed(s.start_date) < thresholds.inactiveMonths) return false;
+      if (parseCredits(s.current_month_spend) >= 0.01) return false;
+      const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
+      const remaining = total - spent;
+      return (remaining / total) * 100 > thresholds.inactiveRemainingPercent;
+    });
+
+    const depleted = summaries.filter((s: ProjectAccountingSummary) => {
+      const total = parseCredits(s.total_credits);
+      if (!s.end_date || total === 0) return false;
+      if (daysUntil(s.end_date) < thresholds.depletedDaysRemaining) return false;
+      const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
+      return (spent / total) * 100 >= thresholds.depletedSpentPercent;
+    });
+
+    return { slowStart, inactive, depleted };
+  }, [summaries, thresholds]);
+
   // ── Projects without end dates ──────────────────────────────────────────
   const noEndDateSummaries = useMemo(
     () => summaries.filter((s) => !s.end_date),
@@ -956,6 +1024,306 @@ export const OrganisationAllocationTab: FC = () => {
               );
             })}
           </ul>
+        </div>
+      )}
+
+      {/* ── Concerning projects ─────────────────────────────────────────── */}
+      {summaries.length > 0 && (
+        <div className="card mb-4">
+          <div className="card-header fw-semibold d-flex align-items-center gap-2">
+            <span>Concerning Projects</span>
+            {slowStart.length + inactive.length + depleted.length > 0 && (
+              <span className="badge bg-warning text-dark">
+                {new Set<string>([
+                  ...slowStart.map((s: ProjectAccountingSummary) => s.project_uuid),
+                  ...inactive.map((s: ProjectAccountingSummary) => s.project_uuid),
+                  ...depleted.map((s: ProjectAccountingSummary) => s.project_uuid),
+                ]).size}
+              </span>
+            )}
+            <button
+              type="button"
+              className={`btn btn-sm ms-auto btn-${showThresholds ? 'primary' : 'secondary'}`}
+              onClick={() => setShowThresholds((v: boolean) => !v)}
+            >
+              Thresholds
+            </button>
+          </div>
+
+          <div className="card-body">
+            {/* ── Threshold controls ──────────────────────────────────── */}
+            {showThresholds && (
+              <div className="p-3 mb-3 bg-light rounded small">
+                <div className="row g-2">
+                  <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
+                    <span className="fw-semibold" style={{ minWidth: 120 }}>
+                      Slow start:
+                    </span>
+                    <span>started ≥</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      min={0}
+                      value={thresholds.slowStartMonths}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setThreshold('slowStartMonths', e.target.value)}
+                    />
+                    <span>months ago with &lt;</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      min={0}
+                      max={100}
+                      value={thresholds.slowStartPercent}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setThreshold('slowStartPercent', e.target.value)}
+                    />
+                    <span>% of allocation spent</span>
+                  </div>
+                  <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
+                    <span className="fw-semibold" style={{ minWidth: 120 }}>
+                      Inactive:
+                    </span>
+                    <span>started ≥</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      min={0}
+                      value={thresholds.inactiveMonths}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setThreshold('inactiveMonths', e.target.value)}
+                    />
+                    <span>months ago, no spend this month, &gt;</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      min={0}
+                      max={100}
+                      value={thresholds.inactiveRemainingPercent}
+                      onChange={(e) =>
+                        setThreshold('inactiveRemainingPercent', e.target.value)
+                      }
+                    />
+                    <span>% remaining</span>
+                  </div>
+                  <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
+                    <span className="fw-semibold" style={{ minWidth: 120 }}>
+                      Nearly depleted:
+                    </span>
+                    <span>≥</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      min={0}
+                      max={100}
+                      value={thresholds.depletedSpentPercent}
+                      onChange={(e) =>
+                        setThreshold('depletedSpentPercent', e.target.value)
+                      }
+                    />
+                    <span>% spent with ≥</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 70 }}
+                      min={0}
+                      value={thresholds.depletedDaysRemaining}
+                      onChange={(e) =>
+                        setThreshold('depletedDaysRemaining', e.target.value)
+                      }
+                    />
+                    <span>days still remaining</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── All clear message ──────────────────────────────────── */}
+            {slowStart.length === 0 &&
+              inactive.length === 0 &&
+              depleted.length === 0 && (
+                <p className="text-muted mb-0">
+                  ✓ No concerning projects found with the current thresholds.
+                </p>
+              )}
+
+            {/* ── Tabs ──────────────────────────────────────────────── */}
+            {(slowStart.length > 0 ||
+              inactive.length > 0 ||
+              depleted.length > 0) && (
+              <>
+                <ul className="nav nav-tabs mb-3">
+                  <li className="nav-item">
+                    <button
+                      className={`nav-link ${concerningTab === 'slowStart' ? 'active' : ''}`}
+                      onClick={() => setConcerningTab('slowStart')}
+                    >
+                      Slow start
+                      {slowStart.length > 0 && (
+                        <span className="badge bg-warning text-dark ms-2">
+                          {slowStart.length}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className={`nav-link ${concerningTab === 'inactive' ? 'active' : ''}`}
+                      onClick={() => setConcerningTab('inactive')}
+                    >
+                      Inactive
+                      {inactive.length > 0 && (
+                        <span className="badge bg-warning text-dark ms-2">
+                          {inactive.length}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className={`nav-link ${concerningTab === 'depleted' ? 'active' : ''}`}
+                      onClick={() => setConcerningTab('depleted')}
+                    >
+                      Nearly depleted
+                      {depleted.length > 0 && (
+                        <span className="badge bg-danger ms-2">
+                          {depleted.length}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                </ul>
+
+                {concerningTab === 'slowStart' && (
+                  <div>
+                    <p className="text-muted small mb-2">
+                      Started ≥ {thresholds.slowStartMonths} month
+                      {thresholds.slowStartMonths !== 1 ? 's' : ''} ago but
+                      spent less than {thresholds.slowStartPercent}% of their
+                      allocation — may not have got going yet.
+                    </p>
+                    {slowStart.length === 0 ? (
+                      <p className="text-muted mb-0">None.</p>
+                    ) : (
+                      <ul className="mb-0">
+                        {slowStart.map((s: ProjectAccountingSummary) => {
+                          const total = parseCredits(s.total_credits);
+                          const spent =
+                            parseCredits(s.total_spend) +
+                            parseCredits(s.current_month_spend);
+                          const pct = ((spent / total) * 100).toFixed(1);
+                          return (
+                            <li key={s.project_uuid} className="mb-1">
+                              <a
+                                href={`/projects/${s.project_uuid}/`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {s.project_name}
+                              </a>
+                              {' — started '}
+                              {s.start_date}
+                              {', '}
+                              {pct}% spent ({fmtCredits(spent)} /{' '}
+                              {fmtCredits(total)} {currencyName})
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {concerningTab === 'inactive' && (
+                  <div>
+                    <p className="text-muted small mb-2">
+                      Started ≥ {thresholds.inactiveMonths} month
+                      {thresholds.inactiveMonths !== 1 ? 's' : ''} ago, no
+                      spend recorded this month, and more than{' '}
+                      {thresholds.inactiveRemainingPercent}% of allocation
+                      still remaining. Note: only the current month's activity
+                      is visible here.
+                    </p>
+                    {inactive.length === 0 ? (
+                      <p className="text-muted mb-0">None.</p>
+                    ) : (
+                      <ul className="mb-0">
+                        {inactive.map((s: ProjectAccountingSummary) => {
+                          const total = parseCredits(s.total_credits);
+                          const spent =
+                            parseCredits(s.total_spend) +
+                            parseCredits(s.current_month_spend);
+                          const remaining = total - spent;
+                          const pct = ((remaining / total) * 100).toFixed(1);
+                          return (
+                            <li key={s.project_uuid} className="mb-1">
+                              <a
+                                href={`/projects/${s.project_uuid}/`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {s.project_name}
+                              </a>
+                              {' — started '}
+                              {s.start_date}
+                              {', no spend this month, '}
+                              {pct}% remaining ({fmtCredits(remaining)}{' '}
+                              {currencyName})
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {concerningTab === 'depleted' && (
+                  <div>
+                    <p className="text-muted small mb-2">
+                      At least {thresholds.depletedSpentPercent}% of allocation
+                      spent, but still ≥ {thresholds.depletedDaysRemaining}{' '}
+                      days until the project ends — may need a top-up.
+                    </p>
+                    {depleted.length === 0 ? (
+                      <p className="text-muted mb-0">None.</p>
+                    ) : (
+                      <ul className="mb-0">
+                        {depleted.map((s: ProjectAccountingSummary) => {
+                          const total = parseCredits(s.total_credits);
+                          const spent =
+                            parseCredits(s.total_spend) +
+                            parseCredits(s.current_month_spend);
+                          const spentPct = ((spent / total) * 100).toFixed(1);
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          const end = new Date(s.end_date!);
+                          end.setHours(0, 0, 0, 0);
+                          const days = daysBetween(today, end);
+                          return (
+                            <li key={s.project_uuid} className="mb-1">
+                              <a
+                                href={`/projects/${s.project_uuid}/`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {s.project_name}
+                              </a>
+                              {' — '}
+                              {spentPct}% spent ({fmtCredits(spent)} /{' '}
+                              {fmtCredits(total)} {currencyName}), ends{' '}
+                              {s.end_date} ({days} days remaining)
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
 
