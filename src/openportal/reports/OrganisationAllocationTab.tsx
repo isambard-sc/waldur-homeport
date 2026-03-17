@@ -193,6 +193,135 @@ const buildChartOptions = (
   };
 };
 
+// ── Consumption chart builder ─────────────────────────────────────────────────
+
+/**
+ * Builds ECharts options for the predicted daily/monthly consumption chart.
+ * Each project's daily consumption rate = remaining / totalDays (linear burn).
+ * For monthly grouping, rates are summed over the active days in each month.
+ */
+const buildConsumptionChartOptions = (
+  summaries: ProjectAccountingSummary[],
+  chartType: ChartType,
+  groupBy: GroupBy,
+  currencyName: string,
+): object | null => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const eligible = summaries.filter((s) => {
+    if (!s.end_date) return false;
+    const end = new Date(s.end_date);
+    end.setHours(0, 0, 0, 0);
+    return end > today;
+  });
+
+  if (eligible.length === 0) return null;
+
+  const endDates = eligible.map((s) => {
+    const d = new Date(s.end_date!);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+  const maxEnd = new Date(Math.max(...endDates.map((d) => d.getTime())));
+
+  const isLine = chartType === 'line';
+
+  // Per-project: constant daily consumption rate over project lifetime
+  const projectData = eligible.map((s) => {
+    const remaining =
+      parseCredits(s.total_credits) -
+      parseCredits(s.total_spend) -
+      parseCredits(s.current_month_spend);
+    const end = new Date(s.end_date!);
+    end.setHours(0, 0, 0, 0);
+    const totalDays = Math.max(1, daysBetween(today, end));
+    return {
+      name: s.project_name,
+      dailyRate: Math.max(0, remaining) / totalDays,
+      end,
+    };
+  });
+
+  const round2 = (n: number) => Math.round(n * 100) / 100;
+
+  let xLabels: string[];
+  let series: object[];
+
+  if (groupBy === 'day') {
+    xLabels = [];
+    for (let i = 0; ; i++) {
+      const d = addDays(today, i);
+      if (d >= maxEnd) break;
+      xLabels.push(toDateStr(d));
+    }
+    series = projectData.map(({ name, dailyRate, end }) => ({
+      name,
+      type: isLine ? 'line' : 'bar',
+      stack: 'consumption',
+      ...(isLine ? { areaStyle: { opacity: 0.4 } } : {}),
+      data: xLabels.map((dateStr) => {
+        const d = new Date(dateStr);
+        return d < end ? round2(dailyRate) : 0;
+      }),
+    }));
+  } else {
+    // Monthly: sum dailyRate × active days in that month
+    xLabels = [];
+    const monthStarts: Date[] = [];
+    const cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor < maxEnd) {
+      xLabels.push(toDateStr(cursor).slice(0, 7));
+      monthStarts.push(new Date(cursor));
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+    series = projectData.map(({ name, dailyRate, end }) => ({
+      name,
+      type: isLine ? 'line' : 'bar',
+      stack: 'consumption',
+      ...(isLine ? { areaStyle: { opacity: 0.4 } } : {}),
+      data: monthStarts.map((monthStart) => {
+        const monthEnd = lastDayOfMonth(monthStart);
+        // Active window: [max(today, monthStart), min(end-1, monthEnd)]
+        const activeStart = monthStart >= today ? monthStart : today;
+        const projectLastDay = addDays(end, -1);
+        const activeEnd = projectLastDay <= monthEnd ? projectLastDay : monthEnd;
+        const activeDays =
+          activeEnd >= activeStart
+            ? daysBetween(activeStart, activeEnd) + 1
+            : 0;
+        return round2(dailyRate * activeDays);
+      }),
+    }));
+  }
+
+  if (xLabels.length === 0) return null;
+
+  return {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: isLine ? 'cross' : 'shadow' },
+    },
+    legend: { type: 'scroll', bottom: 0 },
+    grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: xLabels,
+      axisLabel: { rotate: 45, interval: groupBy === 'day' ? 6 : 0 },
+    },
+    yAxis: {
+      type: 'value',
+      name:
+        groupBy === 'day'
+          ? `${currencyName} / day`
+          : `${currencyName} / month`,
+    },
+    dataZoom: [{ type: 'inside' }, { type: 'slider', bottom: 35 }],
+    series,
+  };
+};
+
 // ── Project filter dialog ─────────────────────────────────────────────────────
 
 interface ProjectFilterDialogProps {
@@ -435,6 +564,9 @@ export const OrganisationAllocationTab: FC = () => {
   const effectiveSelected =
     selectedProjects.size > 0 ? selectedProjects : allProjectUuids;
 
+  // ── Lazy-load summaries — don't fire until user clicks "Load data" ───────
+  const [loadTriggered, setLoadTriggered] = useState(false);
+
   // ── Fetch accounting summaries for the organisation ─────────────────────
   const {
     data: allSummaries,
@@ -449,7 +581,7 @@ export const OrganisationAllocationTab: FC = () => {
           query: { customer_uuid: customer!.uuid, page_size: 100, page },
         }),
       ),
-    enabled: !!customer,
+    enabled: !!customer && loadTriggered,
   });
 
   // ── Filter summaries to selected projects ───────────────────────────────
@@ -475,9 +607,14 @@ export const OrganisationAllocationTab: FC = () => {
     };
   }, [summaries]);
 
-  // ── Chart controls ──────────────────────────────────────────────────────
+  // ── Burn-down chart controls ────────────────────────────────────────────
   const [chartType, setChartType] = useState<ChartType>('bar');
   const [groupBy, setGroupBy] = useState<GroupBy>('day');
+
+  // ── Consumption chart controls ──────────────────────────────────────────
+  const [consumptionChartType, setConsumptionChartType] =
+    useState<ChartType>('bar');
+  const [consumptionGroupBy, setConsumptionGroupBy] = useState<GroupBy>('day');
 
   const currencyName = ENV.plugins.WALDUR_CORE.CURRENCY_NAME;
 
@@ -485,6 +622,17 @@ export const OrganisationAllocationTab: FC = () => {
   const chartOptions = useMemo(
     () => buildChartOptions(summaries, chartType, groupBy, currencyName),
     [summaries, chartType, groupBy, currencyName],
+  );
+
+  const consumptionOptions = useMemo(
+    () =>
+      buildConsumptionChartOptions(
+        summaries,
+        consumptionChartType,
+        consumptionGroupBy,
+        currencyName,
+      ),
+    [summaries, consumptionChartType, consumptionGroupBy, currencyName],
   );
 
   // ── Projects without end dates ──────────────────────────────────────────
@@ -509,7 +657,6 @@ export const OrganisationAllocationTab: FC = () => {
     [noEndDateSummaries],
   );
 
-  const isLoading = projectsLoading || summariesLoading;
 
   return (
     <div className="container-fluid py-4">
@@ -538,7 +685,7 @@ export const OrganisationAllocationTab: FC = () => {
           className="btn btn-outline-secondary btn-sm ms-auto"
           onClick={() => {
             refetchProjects();
-            refetchSummaries();
+            if (loadTriggered) refetchSummaries();
           }}
         >
           Refresh
@@ -546,7 +693,7 @@ export const OrganisationAllocationTab: FC = () => {
       </div>
 
       {/* ── Status ─────────────────────────────────────────────────────── */}
-      {isLoading && <LoadingSpinner />}
+      {projectsLoading && <LoadingSpinner />}
 
       {projectsError && (
         <LoadingErred
@@ -562,7 +709,38 @@ export const OrganisationAllocationTab: FC = () => {
         />
       )}
 
-      {!isLoading && !projectsError && !summariesError && summaries.length === 0 && (
+      {/* Load prompt — shown before the user triggers the fetch */}
+      {!projectsLoading && !projectsError && !loadTriggered && (
+        <div className="card mb-4">
+          <div className="card-body d-flex align-items-center gap-3 flex-wrap">
+            <div>
+              <p className="mb-1 fw-semibold">Allocation data not yet loaded</p>
+              <p className="mb-0 text-muted small">
+                Loading computes summaries for every project in this
+                organisation and may take 10–15 seconds. You can optionally
+                filter to a subset of projects first to speed things up.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm ms-auto"
+              onClick={() => setLoadTriggered(true)}
+            >
+              Load data
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading spinner while summaries are being fetched */}
+      {summariesLoading && (
+        <div className="d-flex align-items-center gap-3 mb-4 text-muted">
+          <LoadingSpinner />
+          <span>Fetching allocation data for all projects…</span>
+        </div>
+      )}
+
+      {loadTriggered && !summariesLoading && !summariesError && summaries.length === 0 && (
         <p className="text-muted">
           No accounting summaries found for the selected projects.
         </p>
@@ -651,6 +829,78 @@ export const OrganisationAllocationTab: FC = () => {
           <div className="card-body">
             {chartOptions ? (
               <EChart options={chartOptions} height="420px" />
+            ) : (
+              <p className="text-muted mb-0">
+                No projects with future end dates — nothing to plot.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Consumption chart ───────────────────────────────────────────── */}
+      {summaries.length > 0 && (
+        <div className="card mb-4">
+          <div className="card-header fw-semibold d-flex align-items-center gap-3">
+            <span>Predicted daily consumption</span>
+
+            {consumptionOptions && (
+              <>
+                <div className="btn-group btn-group-sm ms-auto" role="group">
+                  <button
+                    type="button"
+                    className={`btn btn-${consumptionGroupBy === 'day' ? 'primary' : 'secondary'}`}
+                    onClick={() => setConsumptionGroupBy('day')}
+                  >
+                    Day
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-${consumptionGroupBy === 'month' ? 'primary' : 'secondary'}`}
+                    onClick={() => setConsumptionGroupBy('month')}
+                  >
+                    Month
+                  </button>
+                </div>
+
+                <div className="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    className={`btn btn-${consumptionChartType === 'bar' ? 'primary' : 'secondary'}`}
+                    onClick={() => setConsumptionChartType('bar')}
+                  >
+                    Bar
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-${consumptionChartType === 'line' ? 'primary' : 'secondary'}`}
+                    onClick={() => setConsumptionChartType('line')}
+                  >
+                    Line
+                  </button>
+                </div>
+              </>
+            )}
+
+            <Tip id="tip-consumption-excel" label="Download Excel">
+              <button
+                type="button"
+                className="text-btn text-hover-primary"
+                onClick={() =>
+                  downloadAllocationExcel(
+                    summaries,
+                    currencyName,
+                    `allocation-summary-${customer?.name ?? 'org'}`,
+                  )
+                }
+              >
+                <FileXlsIcon size={20} />
+              </button>
+            </Tip>
+          </div>
+          <div className="card-body">
+            {consumptionOptions ? (
+              <EChart options={consumptionOptions} height="420px" />
             ) : (
               <p className="text-muted mb-0">
                 No projects with future end dates — nothing to plot.
