@@ -605,6 +605,27 @@ function buildAllocationSheets(
     });
     const maxEnd = new Date(Math.max(...endDates.map((d) => d.getTime())));
 
+    const projectNames = eligible.map((s) => s.project_name);
+
+    // Pre-compute per-project remaining / totalDays
+    const projectData = eligible.map((s) => {
+      const remaining =
+        parseNum(s.total_credits) -
+        parseNum(s.total_spend) -
+        parseNum(s.current_month_spend);
+      const end = new Date(s.end_date!);
+      end.setHours(0, 0, 0, 0);
+      const totalDays = Math.max(1, daysBetweenLocal(today, end));
+      return { remaining, end, totalDays };
+    });
+
+    const remainingAt = (pd: typeof projectData[0], refDate: Date): number => {
+      if (refDate >= pd.end) return 0;
+      const daysLeft = pd.totalDays - daysBetweenLocal(today, refDate);
+      return round2(Math.max(0, (pd.remaining * daysLeft) / pd.totalDays));
+    };
+
+    // ── Daily burn-down sheet ─────────────────────────────────────────────
     const dates: string[] = [];
     for (let i = 0; ; i++) {
       const d = addDaysLocal(today, i);
@@ -612,29 +633,37 @@ function buildAllocationSheets(
       dates.push(toDateStrLocal(d));
     }
 
-    const projectNames = eligible.map((s) => s.project_name);
     const burnRows: any[][] = [
       ['Date', ...projectNames, `Total ${currencyName} remaining`],
       ...dates.map((dateStr) => {
         const d = new Date(dateStr);
-        const vals = eligible.map((s) => {
-          const remaining =
-            parseNum(s.total_credits) -
-            parseNum(s.total_spend) -
-            parseNum(s.current_month_spend);
-          const end = new Date(s.end_date!);
-          end.setHours(0, 0, 0, 0);
-          if (d >= end) return 0;
-          const totalDays = Math.max(1, daysBetweenLocal(today, end));
-          const daysFromToday = daysBetweenLocal(today, d);
-          const daysLeft = totalDays - daysFromToday;
-          return round2(Math.max(0, (remaining * daysLeft) / totalDays));
-        });
+        const vals = projectData.map((pd) => remainingAt(pd, d));
         return [dateStr, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
       }),
     ];
+    sheets.push({ name: 'Burn-down (daily)', rows: burnRows });
 
-    sheets.push({ name: 'Burn-down', rows: burnRows });
+    // ── Monthly burn-down sheet ───────────────────────────────────────────
+    // Sample remaining at the last day of each month (capped before maxEnd).
+    const monthRows: any[][] = [
+      ['Month', ...projectNames, `Total ${currencyName} remaining`],
+    ];
+    const cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor < maxEnd) {
+      const monthLabel = toDateStrLocal(cursor).slice(0, 7);
+      const monthEnd = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0);
+      monthEnd.setHours(0, 0, 0, 0);
+      const refDate = monthEnd < maxEnd ? monthEnd : addDaysLocal(maxEnd, -1);
+      const vals = projectData.map((pd) => remainingAt(pd, refDate));
+      monthRows.push([
+        monthLabel,
+        ...vals,
+        round2(vals.reduce((s, v) => s + v, 0)),
+      ]);
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+    sheets.push({ name: 'Burn-down (monthly)', rows: monthRows });
   }
 
   return sheets;

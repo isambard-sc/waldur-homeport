@@ -63,10 +63,36 @@ const daysBetween = (a: Date, b: Date): number =>
 // ── Chart builder ─────────────────────────────────────────────────────────────
 
 type ChartType = 'bar' | 'line';
+type GroupBy = 'day' | 'month';
+
+/** Last calendar day of the month containing `d`. */
+const lastDayOfMonth = (d: Date): Date => {
+  const out = new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  out.setHours(0, 0, 0, 0);
+  return out;
+};
+
+/**
+ * Compute remaining credits for a project at a given reference date.
+ * Returns 0 if the reference date is on or after the project end date.
+ */
+const remainingAtDate = (
+  remaining: number,
+  totalDays: number,
+  today: Date,
+  refDate: Date,
+  endDate: Date,
+): number => {
+  if (refDate >= endDate) return 0;
+  const daysFromToday = daysBetween(today, refDate);
+  const daysLeft = totalDays - daysFromToday;
+  return Math.max(0, Math.round((remaining * daysLeft) / totalDays));
+};
 
 const buildChartOptions = (
   summaries: ProjectAccountingSummary[],
   chartType: ChartType,
+  groupBy: GroupBy,
   currencyName: string,
 ): object | null => {
   const today = new Date();
@@ -89,17 +115,38 @@ const buildChartOptions = (
   });
   const maxEnd = new Date(Math.max(...endDates.map((d) => d.getTime())));
 
-  // Build the date axis: today → day before maxEnd (inclusive)
-  const dates: string[] = [];
-  for (let i = 0; ; i++) {
-    const d = addDays(today, i);
-    if (d >= maxEnd) break;
-    dates.push(toDateStr(d));
+  const isLine = chartType === 'line';
+
+  let xLabels: string[];
+  let refDates: Date[]; // the date used to sample remaining credits for each x point
+
+  if (groupBy === 'month') {
+    // One point per month: sample remaining credits at the last day of each month
+    // (capped to the day before maxEnd)
+    xLabels = [];
+    refDates = [];
+    const cursor = new Date(today.getFullYear(), today.getMonth(), 1);
+    cursor.setHours(0, 0, 0, 0);
+    while (cursor < maxEnd) {
+      const monthEnd = lastDayOfMonth(cursor);
+      const refDate = monthEnd < maxEnd ? monthEnd : addDays(maxEnd, -1);
+      xLabels.push(toDateStr(cursor).slice(0, 7)); // YYYY-MM
+      refDates.push(refDate);
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+  } else {
+    // One point per day: today → day before maxEnd
+    xLabels = [];
+    refDates = [];
+    for (let i = 0; ; i++) {
+      const d = addDays(today, i);
+      if (d >= maxEnd) break;
+      xLabels.push(toDateStr(d));
+      refDates.push(d);
+    }
   }
 
-  if (dates.length === 0) return null;
-
-  const isLine = chartType === 'line';
+  if (xLabels.length === 0) return null;
 
   const series = eligible.map((s) => {
     const remaining =
@@ -116,13 +163,9 @@ const buildChartOptions = (
       type: isLine ? 'line' : 'bar',
       stack: 'credits',
       ...(isLine ? { areaStyle: { opacity: 0.4 } } : {}),
-      data: dates.map((dateStr) => {
-        const d = new Date(dateStr);
-        if (d >= end) return 0;
-        const daysFromToday = daysBetween(today, d);
-        const daysLeft = totalDays - daysFromToday;
-        return Math.max(0, Math.round((remaining * daysLeft) / totalDays));
-      }),
+      data: refDates.map((refDate) =>
+        remainingAtDate(remaining, totalDays, today, refDate, end),
+      ),
     };
   });
 
@@ -135,11 +178,10 @@ const buildChartOptions = (
     grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
     xAxis: {
       type: 'category',
-      data: dates,
+      data: xLabels,
       axisLabel: {
         rotate: 45,
-        // Show one label per week to avoid crowding
-        interval: 6,
+        interval: groupBy === 'day' ? 6 : 0,
       },
     },
     yAxis: {
@@ -433,15 +475,16 @@ export const OrganisationAllocationTab: FC = () => {
     };
   }, [summaries]);
 
-  // ── Chart type toggle ───────────────────────────────────────────────────
+  // ── Chart controls ──────────────────────────────────────────────────────
   const [chartType, setChartType] = useState<ChartType>('bar');
+  const [groupBy, setGroupBy] = useState<GroupBy>('day');
 
   const currencyName = ENV.plugins.WALDUR_CORE.CURRENCY_NAME;
 
   // ── Chart options ───────────────────────────────────────────────────────
   const chartOptions = useMemo(
-    () => buildChartOptions(summaries, chartType, currencyName),
-    [summaries, chartType, currencyName],
+    () => buildChartOptions(summaries, chartType, groupBy, currencyName),
+    [summaries, chartType, groupBy, currencyName],
   );
 
   // ── Projects without end dates ──────────────────────────────────────────
@@ -552,22 +595,41 @@ export const OrganisationAllocationTab: FC = () => {
             <span>Predicted allocation burn-down</span>
 
             {chartOptions && (
-              <div className="btn-group btn-group-sm ms-auto" role="group">
-                <button
-                  type="button"
-                  className={`btn btn-${chartType === 'bar' ? 'primary' : 'secondary'}`}
-                  onClick={() => setChartType('bar')}
-                >
-                  Bar
-                </button>
-                <button
-                  type="button"
-                  className={`btn btn-${chartType === 'line' ? 'primary' : 'secondary'}`}
-                  onClick={() => setChartType('line')}
-                >
-                  Line
-                </button>
-              </div>
+              <>
+                <div className="btn-group btn-group-sm ms-auto" role="group">
+                  <button
+                    type="button"
+                    className={`btn btn-${groupBy === 'day' ? 'primary' : 'secondary'}`}
+                    onClick={() => setGroupBy('day')}
+                  >
+                    Day
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-${groupBy === 'month' ? 'primary' : 'secondary'}`}
+                    onClick={() => setGroupBy('month')}
+                  >
+                    Month
+                  </button>
+                </div>
+
+                <div className="btn-group btn-group-sm" role="group">
+                  <button
+                    type="button"
+                    className={`btn btn-${chartType === 'bar' ? 'primary' : 'secondary'}`}
+                    onClick={() => setChartType('bar')}
+                  >
+                    Bar
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-${chartType === 'line' ? 'primary' : 'secondary'}`}
+                    onClick={() => setChartType('line')}
+                  >
+                    Line
+                  </button>
+                </div>
+              </>
             )}
 
             <Tip id="tip-alloc-excel" label="Download Excel">
