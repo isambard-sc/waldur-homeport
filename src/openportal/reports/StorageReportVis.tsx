@@ -5,8 +5,10 @@
  * calls are made inside this component). Multiple reports are auto-combined.
  *
  * Interactive controls:
- *   - Chart type toggle: Bar (used vs limit per user) ↔ Treemap (hierarchical usage)
- *   - Volume filter: show all volumes or drill into a single one
+ *   - Chart type toggle: Bar (used vs limit per user) ↔ Timeline
+ *   - By user / By project toggle (shown when multiple projects)
+ *   - Day/Month toggle (timeline only)
+ *   - Volume filter: show all volumes or drill into a single one (bar view, user mode)
  *   - ECharts built-ins: tooltip, save-as-image
  *
  * All filter state is local — zero re-fetches on interaction.
@@ -23,10 +25,13 @@ import { downloadStorageExcel, downloadJson } from './reportExcel';
 import {
   buildStorageBarOptions,
   buildStorageTimeseriesOptions,
+  buildStorageProjectBarOptions,
+  buildStorageProjectTimeseriesOptions,
 } from './storageChartOptions';
 import { GroupBy } from './usageChartOptions';
 
 type ChartView = 'bar' | 'timeseries';
+type GroupMode = 'user' | 'project';
 
 interface Props {
   /** One or more already-fetched reports. Multiple are combined client-side. */
@@ -35,6 +40,11 @@ interface Props {
 }
 
 export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
+  const multipleProjects = useMemo(
+    () => new Set(reports.map((r) => r.project)).size > 1,
+    [reports],
+  );
+
   const report = useMemo(
     () =>
       reports.length === 0
@@ -55,19 +65,35 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
   const [view, setView] = useState<ChartView>('bar');
   const [volumeFilter, setVolumeFilter] = useState<string>('all');
   const [groupBy, setGroupBy] = useState<GroupBy>('day');
+  const [groupMode, setGroupMode] = useState<GroupMode>(
+    multipleProjects ? 'project' : 'user',
+  );
+
+  const fullNames = multipleProjects && groupMode === 'user';
 
   const options = useMemo(() => {
     if (!report) return {};
-    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy);
-    return buildStorageBarOptions(report, volumeFilter);
-  }, [report, view, volumeFilter, groupBy]);
+    if (groupMode === 'project') {
+      return view === 'timeseries'
+        ? buildStorageProjectTimeseriesOptions(reports, groupBy)
+        : buildStorageProjectBarOptions(reports);
+    }
+    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy, fullNames);
+    return buildStorageBarOptions(report, volumeFilter, fullNames);
+  }, [report, reports, view, volumeFilter, groupBy, groupMode, fullNames]);
 
   if (!report) {
     return <div className="text-muted p-4">No storage data available.</div>;
   }
 
   const numUsers = report.userIdentifiers().length;
-  const generated = report.generatedAt.toLocaleString();
+  const numProjects = new Set(reports.map((r) => r.project)).size;
+  const destination = reports[0]?.resource ?? '';
+  // Most recent generatedAt across all reports
+  const lastGenerated = reports.reduce(
+    (best, r) => (r.generatedAt > best ? r.generatedAt : best),
+    reports[0].generatedAt,
+  );
 
   return (
     <div>
@@ -75,17 +101,17 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
         {/* Summary badge */}
         <span className="text-muted small">
-          {report.project} &middot; {report.year}-
-          {String(report.month).padStart(2, '0')} &middot;{' '}
-          <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''} &middot;{' '}
-          generated {generated}
+          {destination} &middot; <strong>{numUsers}</strong> user
+          {numUsers !== 1 ? 's' : ''} &middot;{' '}
+          <strong>{numProjects}</strong> project{numProjects !== 1 ? 's' : ''}{' '}
+          &middot; Last generated {lastGenerated.toLocaleString()}
           {report.isEmpty && (
             <span className="badge bg-secondary ms-2">Empty</span>
           )}
         </span>
 
         {/* Chart type */}
-        <div className="btn-group btn-group-sm" role="group">
+        <div className="btn-group btn-group-sm ms-auto" role="group">
           <button
             type="button"
             className={`btn btn-${view === 'bar' ? 'primary' : 'secondary'}`}
@@ -124,8 +150,28 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
           </div>
         )}
 
-        {/* Volume filter — only relevant for bar view */}
-        {view === 'bar' && volumes.length > 1 && (
+        {/* By user / By project toggle — only when multiple projects */}
+        {multipleProjects && (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-${groupMode === 'user' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupMode('user')}
+            >
+              By user
+            </button>
+            <button
+              type="button"
+              className={`btn btn-${groupMode === 'project' ? 'primary' : 'secondary'}`}
+              onClick={() => setGroupMode('project')}
+            >
+              By project
+            </button>
+          </div>
+        )}
+
+        {/* Volume filter — only relevant for bar view, user mode */}
+        {view === 'bar' && groupMode === 'user' && volumes.length > 1 && (
           <select
             className="form-select form-select-sm"
             style={{ width: 'auto' }}
@@ -147,12 +193,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() =>
-                downloadStorageExcel(
-                  report,
-                  `storage_report`,
-                )
-              }
+              onClick={() => downloadStorageExcel(report, `storage_report`)}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -178,7 +219,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <EChart
         options={options}
         height={height}
-        exportTitle={`${report.project} storage ${report.year}-${String(report.month).padStart(2, '0')}`}
+        exportTitle={`${destination} storage`}
       />
     </div>
   );

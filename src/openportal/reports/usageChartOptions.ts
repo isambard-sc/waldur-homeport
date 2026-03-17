@@ -113,11 +113,10 @@ function baseTimeseriesConfig(
         type: 'slider',
         xAxisIndex: 0,
         bottom: 10,
-        height: 20,
+        height: 40,
         start: 0,
         end: 100,
       },
-      { type: 'inside', xAxisIndex: 0 },
     ],
     grid: { bottom: 120 },
     xAxis: {
@@ -163,11 +162,12 @@ export function buildTimeseriesOptions(
   report: ProjectUsageReport,
   component: UsageComponent = 'total',
   groupBy: GroupBy = 'day',
+  fullNames = false,
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = users.map(shortName);
+  const displayNames = fullNames ? users : users.map(shortName);
 
   const getHoursForDate = (user: string, date: string): number => {
     const daily = report.getReport(date);
@@ -228,6 +228,7 @@ export function buildTimeseriesOptions(
 export function buildPieOptions(
   report: ProjectUsageReport,
   component: UsageComponent = 'total',
+  fullNames = false,
 ): EChartsOption {
   const users = report.localUsers();
 
@@ -240,7 +241,7 @@ export function buildPieOptions(
               report.componentUsageForUser(component, user).seconds,
             );
       return {
-        name: shortName(user),
+        name: fullNames ? user : shortName(user),
         value: hours,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
@@ -408,11 +409,12 @@ export function buildProjectPieOptions(
 export function buildJobsTimeseriesOptions(
   report: ProjectUsageReport,
   groupBy: GroupBy = 'day',
+  fullNames = false,
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = users.map(shortName);
+  const displayNames = fullNames ? users : users.map(shortName);
   const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}');
 
   return {
@@ -462,6 +464,7 @@ export function buildJobsTimeseriesOptions(
  */
 export function buildJobsPieOptions(
   report: ProjectUsageReport,
+  fullNames = false,
 ): EChartsOption {
   const users = report.localUsers();
 
@@ -471,7 +474,7 @@ export function buildJobsPieOptions(
         .dailyReports()
         .reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
       return {
-        name: shortName(user),
+        name: fullNames ? user : shortName(user),
         value: total,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
@@ -604,11 +607,12 @@ export function buildProjectJobsPieOptions(
 export function buildAvgWaitTimeseriesOptions(
   report: ProjectUsageReport,
   groupBy: GroupBy = 'day',
+  fullNames = false,
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = users.map(shortName);
+  const displayNames = fullNames ? users : users.map(shortName);
   const base = baseTimeseriesConfig(
     labels,
     groupBy,
@@ -683,6 +687,7 @@ export function buildAvgWaitTimeseriesOptions(
  */
 export function buildAvgWaitPieOptions(
   report: ProjectUsageReport,
+  fullNames = false,
 ): EChartsOption {
   const users = report.localUsers();
 
@@ -696,7 +701,7 @@ export function buildAvgWaitPieOptions(
         .reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
       if (totalJobs === 0) return null;
       return {
-        name: shortName(user),
+        name: fullNames ? user : shortName(user),
         value: Math.round(totalWait / totalJobs / 60),
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };

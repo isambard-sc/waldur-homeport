@@ -5,16 +5,21 @@
  * extended to support multiple worksheets.
  *
  * Usage report sheets:
- *   "Daily totals"  — Date | Total usage (h) | Total jobs | Avg wait (min)
- *   "Usage by user" — Date | <user>... | Total (h)
- *   "Jobs by user"  — Date | <user>... | Total
- *   "Wait by user"  — Date | <user>... | Total avg (min)
- *   "Comp <name>"   — one per component, Date | <user>... | Total (h)
+ *   "Daily totals"        — Date | Total usage (h) | Total jobs | Avg wait (min)
+ *   "Monthly totals"      — Month | Total usage (h) | Total jobs | Avg wait (min)
+ *   "Usage by user"       — Date | <user>... | Total (h)
+ *   "Jobs by user"        — Date | <user>... | Total
+ *   "Wait by user"        — Date | <user>... | Total avg (min)
+ *   "Comp <name>"         — one per component, Date | <user>... | Total (h)
+ *   "Usage by project"    — Month | <project>... | Total (h)  [multi-project only]
+ *   "Jobs by project"     — Month | <project>... | Total      [multi-project only]
+ *   "Wait by project"     — Month | <project>... | Total avg  [multi-project only]
  *
  * Storage report sheets:
- *   "Snapshot"      — Type | User | Volume | Usage | Limit | % Used
- *   "Daily totals"  — Date | <user>... | Total (GB)
- *   "Vol <name>"    — one per volume, Date | Project (GB) | <user>... (GB)
+ *   "Snapshot"            — Type | User | Volume | Usage | Limit | % Used
+ *   "Daily user totals"   — Date | <user>... | Total (GB)
+ *   "Monthly user totals" — Month | <user>... | Total (GB)
+ *   "Vol <name>"          — one per volume, Date | Project (GB) | <user>... (GB)
  */
 
 import JSZip from 'jszip';
@@ -25,8 +30,6 @@ import { saveFile } from '@waldur/table/exporters/saveFile';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { secondsToHours } from './storage';
-
-const shortName = (s: string) => s.split('.')[0];
 
 // ── XML escaping ─────────────────────────────────────────────────────────────
 
@@ -67,7 +70,6 @@ function buildSheetXml(ss: SharedStrings, rows: any[][]): string {
   const colCount = rows.length > 0 ? rows[0].length : 0;
   let cols = '<cols>';
   for (let i = 1; i <= colCount; i++) {
-    // First column (date/label) slightly narrower; data columns wider
     const w = i === 1 ? 13 : 16;
     cols += `<col min="${i}" max="${i}" width="${w}" customWidth="1"/>`;
   }
@@ -186,15 +188,18 @@ async function downloadMultiSheetExcel(
 
 // ── Usage report ─────────────────────────────────────────────────────────────
 
-function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
+function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
+  // Combine all reports for the per-day/per-user sheets
+  const report =
+    reports.length === 1 ? reports[0] : ProjectUsageReport.combine(reports);
+
   const dates = report.dates;
-  const users = report.localUsers();
-  const displayNames = users.map(shortName);
+  const users = report.localUsers(); // full local_username e.g. "chris.aiproject"
   const components = report.componentNames();
 
   const round2 = (n: number) => +n.toFixed(2);
 
-  // Sheet 1: Daily totals
+  // ── Sheet 1: Daily totals ─────────────────────────────────────────────────
   const dailyTotals: any[][] = [
     ['Date', 'Total usage (h)', 'Total jobs', 'Avg wait (min)'],
     ...dates.map((date) => {
@@ -210,9 +215,34 @@ function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
     }),
   ];
 
-  // Sheet 2: Usage by user (hours)
+  // ── Sheet 2: Monthly totals ───────────────────────────────────────────────
+  const months = [...new Set(dates.map((d) => d.slice(0, 7)))].sort();
+  const monthlyTotals: any[][] = [
+    ['Month', 'Total usage (h)', 'Total jobs', 'Avg wait (min)'],
+    ...months.map((month) => {
+      const monthDates = dates.filter((d) => d.startsWith(month));
+      let totalSec = 0;
+      let totalJobs = 0;
+      let totalWaitSec = 0;
+      for (const date of monthDates) {
+        const daily = report.getReport(date);
+        if (!daily) continue;
+        totalSec += daily.totalUsage().seconds;
+        totalJobs += daily.numJobs;
+        totalWaitSec += daily.totalWaitSeconds;
+      }
+      return [
+        month,
+        round2(secondsToHours(totalSec)),
+        totalJobs,
+        totalJobs > 0 ? Math.round(totalWaitSec / totalJobs / 60) : '',
+      ];
+    }),
+  ];
+
+  // ── Sheet 3: Usage by user (hours) ───────────────────────────────────────
   const usageByUser: any[][] = [
-    ['Date', ...displayNames, 'Total (h)'],
+    ['Date', ...users, 'Total (h)'],
     ...dates.map((date) => {
       const daily = report.getReport(date);
       const vals = users.map((u) =>
@@ -222,9 +252,9 @@ function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
     }),
   ];
 
-  // Sheet 3: Jobs by user
+  // ── Sheet 4: Jobs by user ─────────────────────────────────────────────────
   const jobsByUser: any[][] = [
-    ['Date', ...displayNames, 'Total'],
+    ['Date', ...users, 'Total'],
     ...dates.map((date) => {
       const daily = report.getReport(date);
       const vals = users.map((u) => daily?.userJobCounts[u] ?? 0);
@@ -232,9 +262,9 @@ function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
     }),
   ];
 
-  // Sheet 4: Average wait by user (minutes)
+  // ── Sheet 5: Average wait by user (minutes) ───────────────────────────────
   const waitByUser: any[][] = [
-    ['Date', ...displayNames, 'Total avg (min)'],
+    ['Date', ...users, 'Total avg (min)'],
     ...dates.map((date) => {
       const daily = report.getReport(date);
       const vals = users.map((u) => {
@@ -255,15 +285,16 @@ function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
 
   const sheets: SheetSpec[] = [
     { name: 'Daily totals', rows: dailyTotals },
+    { name: 'Monthly totals', rows: monthlyTotals },
     { name: 'Usage by user', rows: usageByUser },
     { name: 'Jobs by user', rows: jobsByUser },
     { name: 'Wait by user', rows: waitByUser },
   ];
 
-  // Component sheets
+  // ── Per-component sheets ──────────────────────────────────────────────────
   for (const comp of components) {
     const compRows: any[][] = [
-      ['Date', ...displayNames, 'Total (h)'],
+      ['Date', ...users, 'Total (h)'],
       ...dates.map((date) => {
         const daily = report.getReport(date);
         const vals = users.map((u) =>
@@ -276,18 +307,115 @@ function buildUsageSheets(report: ProjectUsageReport): SheetSpec[] {
         return [date, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
       }),
     ];
-    // Sheet names max 31 chars in Excel
     sheets.push({ name: `Comp ${comp}`.slice(0, 31), rows: compRows });
+  }
+
+  // ── Per-project sheets (only when multiple distinct projects) ─────────────
+  const distinctProjects = [...new Set(reports.map((r) => r.project))].sort();
+  if (distinctProjects.length > 1) {
+    // Build a map: project → combined report for that project
+    const byProject = new Map<string, ProjectUsageReport>();
+    for (const r of reports) {
+      const existing = byProject.get(r.project);
+      byProject.set(
+        r.project,
+        existing ? ProjectUsageReport.combine([existing, r]) : r,
+      );
+    }
+
+    const allDates = [
+      ...new Set(reports.flatMap((r) => r.dates)),
+    ].sort();
+    const allMonths = [...new Set(allDates.map((d) => d.slice(0, 7)))].sort();
+
+    // Usage by project (monthly)
+    const usageByProject: any[][] = [
+      ['Month', ...distinctProjects, 'Total (h)'],
+      ...allMonths.map((month) => {
+        const monthDates = allDates.filter((d) => d.startsWith(month));
+        const vals = distinctProjects.map((proj) => {
+          const pr = byProject.get(proj);
+          if (!pr) return 0;
+          return round2(
+            monthDates.reduce((s, d) => {
+              const daily = pr.getReport(d);
+              return s + (daily ? secondsToHours(daily.totalUsage().seconds) : 0);
+            }, 0),
+          );
+        });
+        return [month, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
+      }),
+    ];
+
+    // Jobs by project (monthly)
+    const jobsByProject: any[][] = [
+      ['Month', ...distinctProjects, 'Total'],
+      ...allMonths.map((month) => {
+        const monthDates = allDates.filter((d) => d.startsWith(month));
+        const vals = distinctProjects.map((proj) => {
+          const pr = byProject.get(proj);
+          if (!pr) return 0;
+          return monthDates.reduce(
+            (s, d) => s + (pr.getReport(d)?.numJobs ?? 0),
+            0,
+          );
+        });
+        return [month, ...vals, vals.reduce((s, v) => s + v, 0)];
+      }),
+    ];
+
+    // Wait by project (monthly)
+    const waitByProject: any[][] = [
+      ['Month', ...distinctProjects, 'Total avg (min)'],
+      ...allMonths.map((month) => {
+        const monthDates = allDates.filter((d) => d.startsWith(month));
+        const vals = distinctProjects.map((proj) => {
+          const pr = byProject.get(proj);
+          if (!pr) return '';
+          let totalJobs = 0;
+          let totalWait = 0;
+          for (const d of monthDates) {
+            const daily = pr.getReport(d);
+            if (!daily) continue;
+            totalJobs += daily.numJobs;
+            totalWait += daily.totalWaitSeconds;
+          }
+          return totalJobs > 0 ? Math.round(totalWait / totalJobs / 60) : '';
+        });
+        // Overall avg wait for this month
+        let grandJobs = 0;
+        let grandWait = 0;
+        for (const proj of distinctProjects) {
+          const pr = byProject.get(proj);
+          if (!pr) continue;
+          for (const d of monthDates) {
+            const daily = pr.getReport(d);
+            if (!daily) continue;
+            grandJobs += daily.numJobs;
+            grandWait += daily.totalWaitSeconds;
+          }
+        }
+        return [
+          month,
+          ...vals,
+          grandJobs > 0 ? Math.round(grandWait / grandJobs / 60) : '',
+        ];
+      }),
+    ];
+
+    sheets.push({ name: 'Usage by project', rows: usageByProject });
+    sheets.push({ name: 'Jobs by project', rows: jobsByProject });
+    sheets.push({ name: 'Wait by project', rows: waitByProject });
   }
 
   return sheets;
 }
 
 export function downloadUsageExcel(
-  report: ProjectUsageReport,
+  reports: ProjectUsageReport[],
   title: string,
 ): void {
-  const sheets = buildUsageSheets(report);
+  const sheets = buildUsageSheets(reports);
   downloadMultiSheetExcel(`${title}.xlsx`, sheets);
 }
 
@@ -298,11 +426,12 @@ const toGB = (bytes: number) => +(bytes / GB).toFixed(3);
 
 function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
   const uids = report.userIdentifiers();
-  const displayNames = uids.map((uid) => shortName(report.users[uid] ?? uid));
+  // Use full local_username (e.g. "chris.aiproject") — unique across projects
+  const displayNames = uids.map((uid) => report.users[uid] ?? uid);
   const dates = report.dates;
   const volumes = report.volumes();
 
-  // Sheet 1: Snapshot — current quota state per user/volume
+  // ── Sheet 1: Snapshot — current quota state per user/volume ──────────────
   const snapshotRows: any[][] = [
     ['Type', 'User', 'Volume', 'Usage', 'Limit', '% Used'],
   ];
@@ -317,7 +446,7 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
     ]);
   }
   for (const uid of uids) {
-    const displayName = shortName(report.users[uid] ?? uid);
+    const displayName = report.users[uid] ?? uid;
     for (const [vol, q] of Object.entries(report.quotaForUser(uid))) {
       snapshotRows.push([
         'User',
@@ -330,7 +459,7 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
     }
   }
 
-  // Sheet 2: Daily user totals (GB)
+  // ── Sheet 2: Daily user totals (GB) ──────────────────────────────────────
   const dailyTotals: any[][] = [
     ['Date', ...displayNames, 'Total (GB)'],
     ...dates.map((date) => {
@@ -349,12 +478,35 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
     }),
   ];
 
+  // ── Sheet 3: Monthly user totals (last reading per month) ─────────────────
+  const allMonths = [...new Set(dates.map((d) => d.slice(0, 7)))].sort();
+  const monthlyTotals: any[][] = [
+    ['Month', ...displayNames, 'Total (GB)'],
+    ...allMonths.map((month) => {
+      const monthDates = dates.filter((d) => d.startsWith(month));
+      const lastDate = monthDates[monthDates.length - 1];
+      const daily = report.getReport(lastDate);
+      let totalBytes = 0;
+      const vals = uids.map((uid) => {
+        if (!daily) return 0;
+        const bytes = Object.values(daily.userQuotas[uid] ?? {}).reduce(
+          (s, q) => s + q.usageBytes,
+          0,
+        );
+        totalBytes += bytes;
+        return toGB(bytes);
+      });
+      return [month, ...vals, toGB(totalBytes)];
+    }),
+  ];
+
   const sheets: SheetSpec[] = [
     { name: 'Snapshot', rows: snapshotRows },
     { name: 'Daily user totals', rows: dailyTotals },
+    { name: 'Monthly user totals', rows: monthlyTotals },
   ];
 
-  // Per-volume sheets
+  // ── Per-volume sheets ─────────────────────────────────────────────────────
   for (const vol of volumes) {
     const volRows: any[][] = [
       ['Date', 'Project (GB)', ...displayNames],

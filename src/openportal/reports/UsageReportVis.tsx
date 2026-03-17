@@ -82,10 +82,12 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
   const [view, setView] = useState<ChartView>('timeseries');
   const [component, setComponent] = useState<UsageComponent>('total');
   const [groupBy, setGroupBy] = useState<GroupBy>('day');
-  // Default to 'project' when multiple projects are present
   const [groupMode, setGroupMode] = useState<GroupMode>(
     multipleProjects ? 'project' : 'user',
   );
+
+  // Use full usernames when viewing by user across multiple projects
+  const fullNames = multipleProjects && groupMode === 'user';
 
   const options = useMemo(() => {
     if (groupMode === 'project') {
@@ -107,18 +109,18 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
     if (!report) return {};
     if (metric === 'jobs') {
       return view === 'timeseries'
-        ? buildJobsTimeseriesOptions(report, groupBy)
-        : buildJobsPieOptions(report);
+        ? buildJobsTimeseriesOptions(report, groupBy, fullNames)
+        : buildJobsPieOptions(report, fullNames);
     }
     if (metric === 'avg_wait') {
       return view === 'timeseries'
-        ? buildAvgWaitTimeseriesOptions(report, groupBy)
-        : buildAvgWaitPieOptions(report);
+        ? buildAvgWaitTimeseriesOptions(report, groupBy, fullNames)
+        : buildAvgWaitPieOptions(report, fullNames);
     }
     return view === 'timeseries'
-      ? buildTimeseriesOptions(report, component, groupBy)
-      : buildPieOptions(report, component);
-  }, [report, reports, metric, view, component, groupBy, groupMode]);
+      ? buildTimeseriesOptions(report, component, groupBy, fullNames)
+      : buildPieOptions(report, component, fullNames);
+  }, [report, reports, metric, view, component, groupBy, groupMode, fullNames]);
 
   if (!report) {
     return <div className="text-muted p-4">No usage data available.</div>;
@@ -126,6 +128,8 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
 
   const totalHours = report.totalUsageHours();
   const numUsers = report.localUsers().length;
+  const numProjects = new Set(reports.map((r) => r.project)).size;
+  const destination = reports[0]?.resource ?? '';
 
   return (
     <div>
@@ -133,10 +137,10 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
         {/* Summary badge */}
         <span className="text-muted small">
-          {report.project} &middot; {report.year}-
-          {String(report.month).padStart(2, '0')} &middot;{' '}
-          <strong>{totalHours.toFixed(1)} h</strong> across{' '}
-          <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''}
+          {destination} &middot; <strong>{totalHours.toFixed(1)} h</strong>{' '}
+          across <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''}{' '}
+          and <strong>{numProjects}</strong> project
+          {numProjects !== 1 ? 's' : ''}
           {!report.isComplete && (
             <span className="badge bg-warning ms-2">In progress</span>
           )}
@@ -238,7 +242,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() => downloadUsageExcel(report, 'usage_report')}
+              onClick={() => downloadUsageExcel(reports, 'usage_report')}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -264,7 +268,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <EChart
         options={options}
         height={height}
-        exportTitle={`${report.project} ${METRIC_LABELS[metric]} ${report.year}-${String(report.month).padStart(2, '0')}`}
+        exportTitle={`${destination} ${METRIC_LABELS[metric]}`}
       />
     </div>
   );

@@ -49,7 +49,6 @@ const groupByMonth = <T extends { year: number; month: number }>(
 interface ProjectFilterDialogProps {
   projects: Project[];
   selected: Set<string>;
-  initialNameFilter?: string;
   onConfirm: (next: Set<string>) => void;
   onClose: () => void;
 }
@@ -57,12 +56,11 @@ interface ProjectFilterDialogProps {
 const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   projects,
   selected,
-  initialNameFilter = '',
   onConfirm,
   onClose,
 }) => {
   const [draft, setDraft] = useState(() => new Set(selected));
-  const [nameFilter, setNameFilter] = useState(initialNameFilter);
+  const [nameFilter, setNameFilter] = useState('');
   const [startAfter, setStartAfter] = useState('');
   const [endBefore, setEndBefore] = useState('');
 
@@ -119,6 +117,7 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
             {/* Filters */}
             <div className="row g-2 mb-3">
               <div className="col-12 col-md-4">
+                <label className="form-label small mb-1">Search</label>
                 <input
                   type="text"
                   className="form-control form-control-sm"
@@ -263,7 +262,6 @@ export const OrganisationReportsTab: FC = () => {
     new Set(),
   );
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [projectSearch, setProjectSearch] = useState('');
 
   // When projects first load, select them all
   const effectiveSelected =
@@ -361,28 +359,21 @@ export const OrganisationReportsTab: FC = () => {
     <div className="container-fluid py-4">
       {/* ── Toolbar ──────────────────────────────────────────────────── */}
       <div className="d-flex align-items-center gap-3 mb-4 flex-wrap">
-        <h4 className="mb-0">OpenPortal Reports</h4>
+        <h4 className="mb-0">Usage Report</h4>
 
-        {/* Project search + selector */}
+        {/* Project selector */}
         {projects && projects.length > 0 && (
           <div className="d-flex align-items-center gap-2">
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              style={{ width: 180 }}
-              placeholder="Search projects…"
-              value={projectSearch}
-              onChange={(e) => {
-                setProjectSearch(e.target.value);
-                setDialogOpen(true);
-              }}
-            />
+            <span className="text-muted small">
+              {effectiveSelected.size} of {projects.length} project
+              {projects.length !== 1 ? 's' : ''} selected
+            </span>
             <button
               type="button"
-              className="btn btn-outline-secondary btn-sm text-nowrap"
+              className="btn btn-outline-secondary btn-sm"
               onClick={() => setDialogOpen(true)}
             >
-              {effectiveSelected.size} / {projects.length} projects
+              Select projects
             </button>
           </div>
         )}
@@ -456,7 +447,7 @@ export const OrganisationReportsTab: FC = () => {
       )}
 
       {/* ── Status ───────────────────────────────────────────────────── */}
-      {projectsLoading && <LoadingSpinner />}
+      {isLoading && <LoadingSpinner />}
 
       {projectsError && (
         <LoadingErred
@@ -509,17 +500,12 @@ export const OrganisationReportsTab: FC = () => {
         <ProjectFilterDialog
           projects={projects}
           selected={effectiveSelected}
-          initialNameFilter={projectSearch}
           onConfirm={(next) => {
             setSelectedProjects(next);
             setSelectedMonth('all');
-            setProjectSearch('');
             setDialogOpen(false);
           }}
-          onClose={() => {
-            setProjectSearch('');
-            setDialogOpen(false);
-          }}
+          onClose={() => setDialogOpen(false)}
         />
       )}
     </div>
