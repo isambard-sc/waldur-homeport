@@ -16,6 +16,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Project, projectsList } from 'waldur-js-client';
+
+import { getAllPages } from '@waldur/core/api';
 import React, { FC, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -243,8 +245,8 @@ export const OrganisationReportsTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-org-projects', customer?.uuid],
     queryFn: () =>
-      projectsList({ query: { customer: customer!.uuid, page_size: 1000, o: 'name' } }).then(
-        (r) => r.data ?? [],
+      getAllPages<Project>((page) =>
+        projectsList({ query: { customer: customer!.uuid, page_size: 25, o: ['name'], page } }),
       ),
     enabled: !!customer,
   });
