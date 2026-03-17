@@ -43,8 +43,8 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('OpenPortal Usage'),
-      priority: 110,
+      breadcrumb: () => translate('Usage Report'),
+      priority: 99,
       permissions: [isStaffOrSupport],
     },
   },
