@@ -118,7 +118,7 @@ function baseTimeseriesConfig(
         end: 100,
       },
     ],
-    grid: { bottom: 120 },
+    grid: { bottom: 130 },
     xAxis: {
       type: 'category' as const,
       data: labels,
@@ -207,7 +207,7 @@ export function buildTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: displayNames, bottom: 50 },
+    legend: { data: displayNames, type: 'scroll', bottom: 60 },
     ...base,
     series: users.map((user, i) => ({
       name: displayNames[i],
@@ -343,7 +343,7 @@ export function buildProjectTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: projectReports.map((r) => r.project), bottom: 50 },
+    legend: { data: projectReports.map((r) => r.project), type: 'scroll', bottom: 60 },
     ...base,
     series: projectReports.map((r, i) => ({
       name: r.project,
@@ -439,7 +439,7 @@ export function buildJobsTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
       },
     },
-    legend: { data: displayNames, bottom: 50 },
+    legend: { data: displayNames, type: 'scroll', bottom: 60 },
     ...base,
     series: users.map((user, i) => ({
       name: displayNames[i],
@@ -541,7 +541,7 @@ export function buildProjectJobsTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
       },
     },
-    legend: { data: projectReports.map((r) => r.project), bottom: 50 },
+    legend: { data: projectReports.map((r) => r.project), type: 'scroll', bottom: 60 },
     ...base,
     series: projectReports.map((r, i) => ({
       name: r.project,
@@ -672,7 +672,7 @@ export function buildAvgWaitTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}`;
       },
     },
-    legend: { data: [...displayNames, 'Total avg'], bottom: 50 },
+    legend: { data: [...displayNames, 'Total avg'], type: 'scroll', bottom: 60 },
     ...base,
     toolbox: {
       right: 10,
@@ -786,7 +786,7 @@ export function buildProjectAvgWaitTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}`;
       },
     },
-    legend: { data: projectReports.map((r) => r.project), bottom: 50 },
+    legend: { data: projectReports.map((r) => r.project), type: 'scroll', bottom: 60 },
     ...base,
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     series,

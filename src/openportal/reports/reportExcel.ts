@@ -283,35 +283,10 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
     }),
   ];
 
-  const sheets: SheetSpec[] = [
-    { name: 'Daily totals', rows: dailyTotals },
-    { name: 'Monthly totals', rows: monthlyTotals },
-    { name: 'Usage by user', rows: usageByUser },
-    { name: 'Jobs by user', rows: jobsByUser },
-    { name: 'Wait by user', rows: waitByUser },
-  ];
-
-  // ── Per-component sheets ──────────────────────────────────────────────────
-  for (const comp of components) {
-    const compRows: any[][] = [
-      ['Date', ...users, 'Total (h)'],
-      ...dates.map((date) => {
-        const daily = report.getReport(date);
-        const vals = users.map((u) =>
-          round2(
-            secondsToHours(
-              (daily?.componentUsageForUser(comp, u) ?? { seconds: 0 }).seconds,
-            ),
-          ),
-        );
-        return [date, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
-      }),
-    ];
-    sheets.push({ name: `Comp ${comp}`.slice(0, 31), rows: compRows });
-  }
-
   // ── Per-project sheets (only when multiple distinct projects) ─────────────
+  // Built before per-user sheets so they appear first in the workbook.
   const distinctProjects = [...new Set(reports.map((r) => r.project))].sort();
+  const projectSheets: SheetSpec[] = [];
   if (distinctProjects.length > 1) {
     // Build a map: project → combined report for that project
     const byProject = new Map<string, ProjectUsageReport>();
@@ -403,9 +378,37 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
       }),
     ];
 
-    sheets.push({ name: 'Usage by project', rows: usageByProject });
-    sheets.push({ name: 'Jobs by project', rows: jobsByProject });
-    sheets.push({ name: 'Wait by project', rows: waitByProject });
+    projectSheets.push({ name: 'Usage by project', rows: usageByProject });
+    projectSheets.push({ name: 'Jobs by project', rows: jobsByProject });
+    projectSheets.push({ name: 'Wait by project', rows: waitByProject });
+  }
+
+  const sheets: SheetSpec[] = [
+    { name: 'Daily totals', rows: dailyTotals },
+    { name: 'Monthly totals', rows: monthlyTotals },
+    ...projectSheets,
+    { name: 'Usage by user', rows: usageByUser },
+    { name: 'Jobs by user', rows: jobsByUser },
+    { name: 'Wait by user', rows: waitByUser },
+  ];
+
+  // ── Per-component sheets ──────────────────────────────────────────────────
+  for (const comp of components) {
+    const compRows: any[][] = [
+      ['Date', ...users, 'Total (h)'],
+      ...dates.map((date) => {
+        const daily = report.getReport(date);
+        const vals = users.map((u) =>
+          round2(
+            secondsToHours(
+              (daily?.componentUsageForUser(comp, u) ?? { seconds: 0 }).seconds,
+            ),
+          ),
+        );
+        return [date, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
+      }),
+    ];
+    sheets.push({ name: `Comp ${comp}`.slice(0, 31), rows: compRows });
   }
 
   return sheets;
@@ -422,7 +425,8 @@ export function downloadUsageExcel(
 // ── Storage report ────────────────────────────────────────────────────────────
 
 const GB = 1024 ** 3;
-const toGB = (bytes: number) => +(bytes / GB).toFixed(3);
+// 6 decimal places: precise to ~1 KB, prevents small values rounding to zero
+const toGB = (bytes: number) => +(bytes / GB).toFixed(6);
 
 function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
   const uids = report.userIdentifiers();
@@ -433,15 +437,15 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
 
   // ── Sheet 1: Snapshot — current quota state per user/volume ──────────────
   const snapshotRows: any[][] = [
-    ['Type', 'User', 'Volume', 'Usage', 'Limit', '% Used'],
+    ['Type', 'User', 'Volume', 'Usage (GB)', 'Limit (GB)', '% Used'],
   ];
   for (const [vol, q] of Object.entries(report.projectQuotas)) {
     snapshotRows.push([
       'Project',
       '-',
       vol,
-      q.usageFormatted,
-      q.limitFormatted,
+      toGB(q.usageBytes),
+      isFinite(q.limitBytes) ? toGB(q.limitBytes) : '',
       +(q.usedFraction * 100).toFixed(1),
     ]);
   }
@@ -452,8 +456,8 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
         'User',
         displayName,
         vol,
-        q.usageFormatted,
-        q.limitFormatted,
+        toGB(q.usageBytes),
+        isFinite(q.limitBytes) ? toGB(q.limitBytes) : '',
         +(q.usedFraction * 100).toFixed(1),
       ]);
     }

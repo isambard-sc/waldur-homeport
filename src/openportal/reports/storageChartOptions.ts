@@ -354,7 +354,7 @@ export function buildStorageTimeseriesOptions(
         return `<b>${date}</b><br/>${rows}`;
       },
     },
-    legend: { data: allNames, type: 'scroll', bottom: 40 },
+    legend: { data: allNames, type: 'scroll', bottom: 60 },
     toolbox: {
       right: 10,
       feature: {
@@ -364,7 +364,7 @@ export function buildStorageTimeseriesOptions(
     dataZoom: [
       { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: 0, end: 100 },
     ],
-    grid: { bottom: 80 },
+    grid: { bottom: 130 },
     xAxis: {
       type: 'category',
       data: labels,
