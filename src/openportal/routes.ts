@@ -34,7 +34,7 @@ export const states: StateDeclaration[] = [
     },
   },
   {
-    name: 'support.openportal-usage',
+    name: 'support-openportal-usage',
     url: 'openportal-usage/',
     parent: 'support',
     component: lazyComponent(() =>
