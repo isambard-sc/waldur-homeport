@@ -13,10 +13,16 @@ import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { getProject } from '@waldur/workspace/selectors';
 
-import { fetchUsageReports, fetchStorageReports } from './api';
+import {
+  fetchUsageReports,
+  fetchStorageReports,
+  fetchOfferingMapping,
+  fetchUserMapping,
+} from './api';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
+import { NameMaps } from './usageChartOptions';
 import { UsageReportVis } from './UsageReportVis';
 
 /** Group reports by "year-month" so the user can select a specific month */
@@ -56,6 +62,33 @@ export const OpenPortalReportsTab: FC = () => {
     queryFn: () =>
       fetchStorageReports({ project_uuid: project?.uuid }),
     enabled: !!project,
+  });
+
+  const hasReports = !!(usageReports || storageReports);
+
+  // ── Fetch name mappings once reports are available ───────────────────────
+  const { data: nameMaps } = useQuery<NameMaps>({
+    queryKey: ['openportal-project-mappings', project?.uuid],
+    queryFn: async () => {
+      const usage = usageReports ?? [];
+      const storage = storageReports ?? [];
+      const offeringIds = [...new Set<string>([
+        ...usage.map((r) => r.resource),
+        ...storage.map((r) => r.resource),
+      ])];
+      const userIds = [...new Set<string>(
+        usage.flatMap((r) => Object.keys(r.users)),
+      )];
+      const [offerings, users] = await Promise.all([
+        fetchOfferingMapping(offeringIds),
+        fetchUserMapping(userIds),
+      ]);
+      return {
+        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+      } as NameMaps;
+    },
+    enabled: hasReports,
   });
 
   // Collect distinct resources across both report types
@@ -116,7 +149,7 @@ export const OpenPortalReportsTab: FC = () => {
           >
             {allResources.map((r) => (
               <option key={r} value={r}>
-                {r}
+                {nameMaps?.offering?.[r] ?? r}
               </option>
             ))}
           </select>
@@ -140,7 +173,7 @@ export const OpenPortalReportsTab: FC = () => {
         )}
         <button
           type="button"
-          className="btn btn-outline-secondary btn-sm ms-auto"
+          className="btn btn-secondary btn-sm ms-auto"
           onClick={() => { refetchUsage(); refetchStorage(); }}
         >
           Refresh
@@ -174,7 +207,7 @@ export const OpenPortalReportsTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
-            <UsageReportVis reports={activeUsage} height="400px" />
+            <UsageReportVis reports={activeUsage} height="400px" nameMaps={nameMaps} />
           </div>
         </div>
       )}
@@ -184,7 +217,7 @@ export const OpenPortalReportsTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
-            <StorageReportVis reports={activeStorage} height="360px" />
+            <StorageReportVis reports={activeStorage} height="360px" nameMaps={nameMaps} />
           </div>
         </div>
       )}
