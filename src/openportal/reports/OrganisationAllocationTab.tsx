@@ -173,6 +173,19 @@ const buildChartOptions = (
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: isLine ? 'cross' : 'shadow' },
+      formatter: (params: any[]) => {
+        const active = params
+          .filter((p) => p.value !== 0 && p.value != null)
+          .sort((a, b) => b.value - a.value);
+        if (active.length === 0) return params[0]?.axisValueLabel ?? '';
+        const rows = active
+          .map(
+            (p) =>
+              `${p.marker}${p.seriesName}: <b>${Number(p.value).toFixed(2)}</b>`,
+          )
+          .join('<br/>');
+        return `${active[0].axisValueLabel}<br/>${rows}`;
+      },
     },
     legend: { type: 'scroll', bottom: 0 },
     grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
@@ -302,6 +315,19 @@ const buildConsumptionChartOptions = (
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: isLine ? 'cross' : 'shadow' },
+      formatter: (params: any[]) => {
+        const active = params
+          .filter((p) => p.value !== 0 && p.value != null)
+          .sort((a, b) => b.value - a.value);
+        if (active.length === 0) return params[0]?.axisValueLabel ?? '';
+        const rows = active
+          .map(
+            (p) =>
+              `${p.marker}${p.seriesName}: <b>${Number(p.value).toFixed(2)}</b>`,
+          )
+          .join('<br/>');
+        return `${active[0].axisValueLabel}<br/>${rows}`;
+      },
     },
     legend: { type: 'scroll', bottom: 0 },
     grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },

@@ -44,7 +44,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Usage Report'),
-      priority: 99,
+      priority: 101,
       permissions: [isStaffOrSupport],
     },
   },
