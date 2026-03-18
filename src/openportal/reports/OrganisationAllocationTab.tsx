@@ -780,7 +780,7 @@ export const OrganisationAllocationTab: FC = () => {
 
         <button
           type="button"
-          className="btn btn-outline-secondary btn-sm ms-auto"
+          className="btn btn-secondary btn-sm ms-auto"
           onClick={() => {
             refetchProjects();
             if (loadTriggered) refetchSummaries();
@@ -808,7 +808,7 @@ export const OrganisationAllocationTab: FC = () => {
       )}
 
       {/* Load prompt — shown before the user triggers the fetch */}
-      {!loadTriggered && (
+      {!loadTriggered && !allSummaries && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>

@@ -417,7 +417,7 @@ export const OrganisationReportsTab: FC = () => {
 
         <button
           type="button"
-          className="btn btn-outline-secondary btn-sm ms-auto"
+          className="btn btn-secondary btn-sm ms-auto"
           onClick={() => {
             refetchProjects();
             if (loadTriggered) refetchReports();
@@ -428,7 +428,7 @@ export const OrganisationReportsTab: FC = () => {
       </div>
 
       {/* ── Load prompt ──────────────────────────────────────────────── */}
-      {!loadTriggered && (
+      {!loadTriggered && !reportData && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>
