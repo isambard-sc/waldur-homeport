@@ -25,7 +25,8 @@ import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { getCustomer } from '@waldur/workspace/selectors';
 
-import { fetchUsageReports, fetchStorageReports } from './api';
+import { fetchUsageReports, fetchStorageReports, fetchOfferingMapping, fetchProjectMapping, fetchUserMapping } from './api';
+import { NameMaps } from './usageChartOptions';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
@@ -236,6 +237,7 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
 
 export const OrganisationReportsTab: FC = () => {
   const customer = useSelector(getCustomer);
+  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // ── Fetch all projects in the organisation ──────────────────────────────
   const {
@@ -249,7 +251,7 @@ export const OrganisationReportsTab: FC = () => {
       getAllPages<Project>((page) =>
         projectsList({ query: { customer: customer!.uuid, page_size: 25, o: ['name'], page } }),
       ),
-    enabled: !!customer,
+    enabled: !!customer && loadTriggered,
   });
 
   // ── Project selection state ─────────────────────────────────────────────
@@ -262,7 +264,6 @@ export const OrganisationReportsTab: FC = () => {
     new Set(),
   );
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // When projects first load, select them all
   const effectiveSelected =
@@ -305,6 +306,37 @@ export const OrganisationReportsTab: FC = () => {
 
   const allUsage = reportData?.usage ?? [];
   const allStorage = reportData?.storage ?? [];
+
+  // ── Fetch human-readable name mappings ──────────────────────────────────
+  const { data: nameMaps } = useQuery<NameMaps>({
+    queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids],
+    queryFn: async () => {
+      const usageReports = reportData!.usage;
+      const storageReports = reportData!.storage;
+      const offeringIds = [...new Set([
+        ...usageReports.map((r) => r.resource),
+        ...storageReports.map((r) => r.resource),
+      ])];
+      const projectIds = [...new Set([
+        ...usageReports.map((r) => r.project),
+        ...storageReports.map((r) => r.project),
+      ])];
+      const userIds: string[] = [...new Set<string>(
+        usageReports.flatMap((r) => Object.keys(r.users)),
+      )];
+      const [offerings, projects, users] = await Promise.all([
+        fetchOfferingMapping(offeringIds),
+        fetchProjectMapping(projectIds),
+        fetchUserMapping(userIds),
+      ]);
+      return {
+        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+        project: Object.fromEntries(Object.entries(projects).map(([k, v]) => [k, v.name])),
+        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+      } as NameMaps;
+    },
+    enabled: !!reportData,
+  });
 
   // ── Resource filter ─────────────────────────────────────────────────────
   const allResources = useMemo(
@@ -392,7 +424,7 @@ export const OrganisationReportsTab: FC = () => {
           >
             {allResources.map((r) => (
               <option key={r} value={r}>
-                {r}
+                {nameMaps?.offering?.[r] ?? r}
               </option>
             ))}
           </select>
@@ -417,7 +449,7 @@ export const OrganisationReportsTab: FC = () => {
 
         <button
           type="button"
-          className="btn btn-outline-secondary btn-sm ms-auto"
+          className="btn btn-secondary btn-sm ms-auto"
           onClick={() => {
             refetchProjects();
             if (loadTriggered) refetchReports();
@@ -428,7 +460,7 @@ export const OrganisationReportsTab: FC = () => {
       </div>
 
       {/* ── Load prompt ──────────────────────────────────────────────── */}
-      {!loadTriggered && !projectsLoading && !projectsError && (
+      {!loadTriggered && !reportData && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>
@@ -505,7 +537,7 @@ export const OrganisationReportsTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
-            <UsageReportVis reports={activeUsage} height="400px" />
+            <UsageReportVis reports={activeUsage} height="400px" nameMaps={nameMaps} />
           </div>
         </div>
       )}
@@ -515,7 +547,7 @@ export const OrganisationReportsTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
-            <StorageReportVis reports={activeStorage} height="360px" />
+            <StorageReportVis reports={activeStorage} height="360px" nameMaps={nameMaps} />
           </div>
         </div>
       )}

@@ -27,7 +27,7 @@ const stringify_customer = (customer: any) => {
     }
     // customer.url is the URL. Render it as a link, using customer.name as the display text.
     const url = `/organizations/${customer.uuid}/dashboard/`;
-    return <a key={customer.uuid} href={url} target="_blank" rel="noopener noreferrer">{customer.display_name}</a>;
+    return <a key={customer.uuid} href={url} target="_blank" rel="noopener noreferrer">{customer.display_name || customer.name}</a>;
 }
 
 const stringify_offerings = (offerings: any[]) => {

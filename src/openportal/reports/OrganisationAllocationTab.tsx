@@ -173,6 +173,19 @@ const buildChartOptions = (
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: isLine ? 'cross' : 'shadow' },
+      formatter: (params: any[]) => {
+        const active = params
+          .filter((p) => p.value !== 0 && p.value != null)
+          .sort((a, b) => b.value - a.value);
+        if (active.length === 0) return params[0]?.axisValueLabel ?? '';
+        const rows = active
+          .map(
+            (p) =>
+              `${p.marker}${p.seriesName}: <b>${Number(p.value).toFixed(2)}</b>`,
+          )
+          .join('<br/>');
+        return `${active[0].axisValueLabel}<br/>${rows}`;
+      },
     },
     legend: { type: 'scroll', bottom: 0 },
     grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
@@ -188,7 +201,7 @@ const buildChartOptions = (
       type: 'value',
       name: `${currencyName} remaining`,
     },
-    dataZoom: [{ type: 'inside' }, { type: 'slider', bottom: 35 }],
+    dataZoom: [{ type: 'slider', bottom: 35 }],
     series,
   };
 };
@@ -302,6 +315,19 @@ const buildConsumptionChartOptions = (
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: isLine ? 'cross' : 'shadow' },
+      formatter: (params: any[]) => {
+        const active = params
+          .filter((p) => p.value !== 0 && p.value != null)
+          .sort((a, b) => b.value - a.value);
+        if (active.length === 0) return params[0]?.axisValueLabel ?? '';
+        const rows = active
+          .map(
+            (p) =>
+              `${p.marker}${p.seriesName}: <b>${Number(p.value).toFixed(2)}</b>`,
+          )
+          .join('<br/>');
+        return `${active[0].axisValueLabel}<br/>${rows}`;
+      },
     },
     legend: { type: 'scroll', bottom: 0 },
     grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
@@ -317,7 +343,7 @@ const buildConsumptionChartOptions = (
           ? `${currencyName} / day`
           : `${currencyName} / month`,
     },
-    dataZoom: [{ type: 'inside' }, { type: 'slider', bottom: 35 }],
+    dataZoom: [{ type: 'slider', bottom: 35 }],
     series,
   };
 };
@@ -534,6 +560,9 @@ const StatCard: FC<StatCardProps> = ({ label, value, variant = 'default' }) => {
 export const OrganisationAllocationTab: FC = () => {
   const customer = useSelector(getCustomer);
 
+  // ── Lazy-load — don't fire until user clicks "Load data" ─────────────────
+  const [loadTriggered, setLoadTriggered] = useState(false);
+
   // ── Fetch all projects in the organisation ──────────────────────────────
   const {
     data: projects,
@@ -548,7 +577,7 @@ export const OrganisationAllocationTab: FC = () => {
           query: { customer: customer!.uuid, page_size: 25, o: ['name'], page },
         }),
       ),
-    enabled: !!customer,
+    enabled: !!customer && loadTriggered,
   });
 
   // ── Project selection ───────────────────────────────────────────────────
@@ -563,9 +592,6 @@ export const OrganisationAllocationTab: FC = () => {
 
   const effectiveSelected =
     selectedProjects.size > 0 ? selectedProjects : allProjectUuids;
-
-  // ── Lazy-load summaries — don't fire until user clicks "Load data" ───────
-  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // ── Fetch accounting summaries for the organisation ─────────────────────
   const {
@@ -674,30 +700,34 @@ export const OrganisationAllocationTab: FC = () => {
       return daysBetween(today, end);
     };
 
+    // total_credits = remaining balance; totalAlloc = remaining + spent
     const slowStart = summaries.filter((s: ProjectAccountingSummary) => {
-      const total = parseCredits(s.total_credits);
-      if (!s.start_date || total === 0) return false;
+      if (!s.start_date) return false;
       if (monthsElapsed(s.start_date) < thresholds.slowStartMonths) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
-      return (spent / total) * 100 < thresholds.slowStartPercent;
+      const totalAlloc = parseCredits(s.total_credits) + spent;
+      if (totalAlloc === 0) return false;
+      return (spent / totalAlloc) * 100 < thresholds.slowStartPercent;
     });
 
     const inactive = summaries.filter((s: ProjectAccountingSummary) => {
-      const total = parseCredits(s.total_credits);
-      if (!s.start_date || total === 0) return false;
+      if (!s.start_date) return false;
       if (monthsElapsed(s.start_date) < thresholds.inactiveMonths) return false;
       if (parseCredits(s.current_month_spend) >= 0.01) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
-      const remaining = total - spent;
-      return (remaining / total) * 100 > thresholds.inactiveRemainingPercent;
+      const remaining = parseCredits(s.total_credits);
+      const totalAlloc = remaining + spent;
+      if (totalAlloc === 0) return false;
+      return (remaining / totalAlloc) * 100 > thresholds.inactiveRemainingPercent;
     });
 
     const depleted = summaries.filter((s: ProjectAccountingSummary) => {
-      const total = parseCredits(s.total_credits);
-      if (!s.end_date || total === 0) return false;
+      if (!s.end_date) return false;
       if (daysUntil(s.end_date) < thresholds.depletedDaysRemaining) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
-      return (spent / total) * 100 >= thresholds.depletedSpentPercent;
+      const totalAlloc = parseCredits(s.total_credits) + spent;
+      if (totalAlloc === 0) return false;
+      return (spent / totalAlloc) * 100 >= thresholds.depletedSpentPercent;
     });
 
     return { slowStart, inactive, depleted };
@@ -750,7 +780,7 @@ export const OrganisationAllocationTab: FC = () => {
 
         <button
           type="button"
-          className="btn btn-outline-secondary btn-sm ms-auto"
+          className="btn btn-secondary btn-sm ms-auto"
           onClick={() => {
             refetchProjects();
             if (loadTriggered) refetchSummaries();
@@ -778,7 +808,7 @@ export const OrganisationAllocationTab: FC = () => {
       )}
 
       {/* Load prompt — shown before the user triggers the fetch */}
-      {!projectsLoading && !projectsError && !loadTriggered && (
+      {!loadTriggered && !allSummaries && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>
@@ -1209,11 +1239,15 @@ export const OrganisationAllocationTab: FC = () => {
                     ) : (
                       <ul className="mb-0">
                         {slowStart.map((s: ProjectAccountingSummary) => {
-                          const total = parseCredits(s.total_credits);
                           const spent =
                             parseCredits(s.total_spend) +
                             parseCredits(s.current_month_spend);
-                          const pct = ((spent / total) * 100).toFixed(1);
+                          const totalAlloc =
+                            parseCredits(s.total_credits) + spent;
+                          const pct = (
+                            (spent / (totalAlloc || 1)) *
+                            100
+                          ).toFixed(1);
                           return (
                             <li key={s.project_uuid} className="mb-1">
                               <a
@@ -1227,7 +1261,7 @@ export const OrganisationAllocationTab: FC = () => {
                               {s.start_date}
                               {', '}
                               {pct}% spent ({fmtCredits(spent)} /{' '}
-                              {fmtCredits(total)} {currencyName})
+                              {fmtCredits(totalAlloc)} {currencyName})
                             </li>
                           );
                         })}
@@ -1251,12 +1285,15 @@ export const OrganisationAllocationTab: FC = () => {
                     ) : (
                       <ul className="mb-0">
                         {inactive.map((s: ProjectAccountingSummary) => {
-                          const total = parseCredits(s.total_credits);
                           const spent =
                             parseCredits(s.total_spend) +
                             parseCredits(s.current_month_spend);
-                          const remaining = total - spent;
-                          const pct = ((remaining / total) * 100).toFixed(1);
+                          const remaining = parseCredits(s.total_credits);
+                          const totalAlloc = remaining + spent;
+                          const pct = (
+                            (remaining / (totalAlloc || 1)) *
+                            100
+                          ).toFixed(1);
                           return (
                             <li key={s.project_uuid} className="mb-1">
                               <a
@@ -1269,8 +1306,8 @@ export const OrganisationAllocationTab: FC = () => {
                               {' — started '}
                               {s.start_date}
                               {', no spend this month, '}
-                              {pct}% remaining ({fmtCredits(remaining)}{' '}
-                              {currencyName})
+                              {pct}% remaining ({fmtCredits(remaining)} /{' '}
+                              {fmtCredits(totalAlloc)} {currencyName})
                             </li>
                           );
                         })}
@@ -1291,11 +1328,15 @@ export const OrganisationAllocationTab: FC = () => {
                     ) : (
                       <ul className="mb-0">
                         {depleted.map((s: ProjectAccountingSummary) => {
-                          const total = parseCredits(s.total_credits);
                           const spent =
                             parseCredits(s.total_spend) +
                             parseCredits(s.current_month_spend);
-                          const spentPct = ((spent / total) * 100).toFixed(1);
+                          const totalAlloc =
+                            parseCredits(s.total_credits) + spent;
+                          const spentPct = (
+                            (spent / (totalAlloc || 1)) *
+                            100
+                          ).toFixed(1);
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
                           const end = new Date(s.end_date!);
@@ -1312,7 +1353,7 @@ export const OrganisationAllocationTab: FC = () => {
                               </a>
                               {' — '}
                               {spentPct}% spent ({fmtCredits(spent)} /{' '}
-                              {fmtCredits(total)} {currencyName}), ends{' '}
+                              {fmtCredits(totalAlloc)} {currencyName}), ends{' '}
                               {s.end_date} ({days} days remaining)
                             </li>
                           );

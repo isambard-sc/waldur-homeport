@@ -26,6 +26,7 @@ import { ProjectUsageReport } from './ProjectUsageReport';
 import { downloadUsageExcel, downloadJson } from './reportExcel';
 import {
   GroupBy,
+  NameMaps,
   UsageComponent,
   UsageMetric,
   buildAvgWaitPieOptions,
@@ -55,9 +56,10 @@ interface Props {
   /** One or more already-fetched reports. Multiple are combined client-side. */
   reports: ProjectUsageReport[];
   height?: string;
+  nameMaps?: NameMaps;
 }
 
-export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
+export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps }) => {
   const multipleProjects = useMemo(
     () => new Set(reports.map((r) => r.project)).size > 1,
     [reports],
@@ -93,34 +95,34 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
     if (groupMode === 'project') {
       if (metric === 'jobs') {
         return view === 'timeseries'
-          ? buildProjectJobsTimeseriesOptions(reports, groupBy)
-          : buildProjectJobsPieOptions(reports);
+          ? buildProjectJobsTimeseriesOptions(reports, groupBy, nameMaps)
+          : buildProjectJobsPieOptions(reports, nameMaps);
       }
       if (metric === 'avg_wait') {
         return view === 'timeseries'
-          ? buildProjectAvgWaitTimeseriesOptions(reports, groupBy)
-          : buildProjectAvgWaitPieOptions(reports);
+          ? buildProjectAvgWaitTimeseriesOptions(reports, groupBy, nameMaps)
+          : buildProjectAvgWaitPieOptions(reports, nameMaps);
       }
       return view === 'timeseries'
-        ? buildProjectTimeseriesOptions(reports, component, groupBy)
-        : buildProjectPieOptions(reports);
+        ? buildProjectTimeseriesOptions(reports, component, groupBy, nameMaps)
+        : buildProjectPieOptions(reports, nameMaps);
     }
 
     if (!report) return {};
     if (metric === 'jobs') {
       return view === 'timeseries'
-        ? buildJobsTimeseriesOptions(report, groupBy, fullNames)
-        : buildJobsPieOptions(report, fullNames);
+        ? buildJobsTimeseriesOptions(report, groupBy, fullNames, nameMaps)
+        : buildJobsPieOptions(report, fullNames, nameMaps);
     }
     if (metric === 'avg_wait') {
       return view === 'timeseries'
-        ? buildAvgWaitTimeseriesOptions(report, groupBy, fullNames)
-        : buildAvgWaitPieOptions(report, fullNames);
+        ? buildAvgWaitTimeseriesOptions(report, groupBy, fullNames, nameMaps)
+        : buildAvgWaitPieOptions(report, fullNames, nameMaps);
     }
     return view === 'timeseries'
-      ? buildTimeseriesOptions(report, component, groupBy, fullNames)
-      : buildPieOptions(report, component, fullNames);
-  }, [report, reports, metric, view, component, groupBy, groupMode, fullNames]);
+      ? buildTimeseriesOptions(report, component, groupBy, fullNames, nameMaps)
+      : buildPieOptions(report, component, fullNames, nameMaps);
+  }, [report, reports, metric, view, component, groupBy, groupMode, fullNames, nameMaps]);
 
   if (!report) {
     return <div className="text-muted p-4">No usage data available.</div>;
@@ -130,6 +132,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
   const numUsers = report.localUsers().length;
   const numProjects = new Set(reports.map((r) => r.project)).size;
   const destination = reports[0]?.resource ?? '';
+  const destinationLabel = nameMaps?.offering?.[destination] ?? destination;
 
   return (
     <div>
@@ -137,7 +140,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
         {/* Summary badge */}
         <span className="text-muted small">
-          {destination} &middot; <strong>{totalHours.toFixed(1)} h</strong>{' '}
+          {destinationLabel} &middot; <strong>{totalHours.toFixed(1)} h</strong>{' '}
           across <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''}{' '}
           and <strong>{numProjects}</strong> project
           {numProjects !== 1 ? 's' : ''}
@@ -242,7 +245,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() => downloadUsageExcel(reports, 'usage_report')}
+              onClick={() => downloadUsageExcel(reports, 'usage_report', nameMaps)}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -268,7 +271,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <EChart
         options={options}
         height={height}
-        exportTitle={`${destination} ${METRIC_LABELS[metric]}`}
+        exportTitle={`${destinationLabel} ${METRIC_LABELS[metric]}`}
       />
     </div>
   );
