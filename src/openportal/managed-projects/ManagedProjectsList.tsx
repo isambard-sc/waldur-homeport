@@ -84,21 +84,29 @@ export const ManagedProjectsList = () => {
     const columns: Array<Column> = [
         {
             title: translate('Project'),
-            orderField: 'row.details.name',
+            orderField: 'details__name',
             render: ({ row }) => renderFieldOrDash(row.details.name),
             keys: ['name'],
             id: 'managedproject',
         },
         {
+            title: translate('Identifier'),
+            orderField: 'identifier',
+            render: ({ row }) => renderFieldOrDash(row.identifier),
+            keys: ['identifier'],
+            optional: true,
+            id: 'identifier',
+        },
+        {
             title: translate('Offering'),
-            orderField: 'row.offering',
+            orderField: 'project_template__offering',
             render: ({ row }) => renderOffering(row.destination),
             keys: ['offering'],
             id: 'offering',
         },
         {
             title: translate('Project Template'),
-            orderField: 'row.details.class',
+            orderField: 'project_template__name',
             render: ({ row }) => renderProjectTemplate(row),
             keys: ['project-template'],
             id: 'project-template',
@@ -112,6 +120,7 @@ export const ManagedProjectsList = () => {
         },
         {
             title: translate('Created'),
+            orderField: 'created',
             render: ({ row }) => (
                 <>
                     {row.created
@@ -157,6 +166,7 @@ export const ManagedProjectsList = () => {
         },
         {
             title: translate('State'),
+            orderField: 'state',
             render: ({ row }) => (
                 <>
                     {row.state}
@@ -175,6 +185,7 @@ export const ManagedProjectsList = () => {
             title={translate('Managed Projects')}
             showPageSizeSelector={true}
             standalone
+            hasQuery
             hasOptionalColumns
             expandableRowClassName="py-2 pe-2"
             expandableRow={ManagedProjectExpandableRow}
