@@ -28,7 +28,7 @@ import {
   buildStorageProjectBarOptions,
   buildStorageProjectTimeseriesOptions,
 } from './storageChartOptions';
-import { GroupBy } from './usageChartOptions';
+import { GroupBy, NameMaps } from './usageChartOptions';
 
 type ChartView = 'bar' | 'timeseries';
 type GroupMode = 'user' | 'project';
@@ -37,9 +37,10 @@ interface Props {
   /** One or more already-fetched reports. Multiple are combined client-side. */
   reports: ProjectStorageReport[];
   height?: string;
+  nameMaps?: NameMaps;
 }
 
-export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
+export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps }) => {
   const multipleProjects = useMemo(
     () => new Set(reports.map((r) => r.project)).size > 1,
     [reports],
@@ -75,12 +76,12 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
     if (!report) return {};
     if (groupMode === 'project') {
       return view === 'timeseries'
-        ? buildStorageProjectTimeseriesOptions(reports, groupBy)
-        : buildStorageProjectBarOptions(reports);
+        ? buildStorageProjectTimeseriesOptions(reports, groupBy, nameMaps)
+        : buildStorageProjectBarOptions(reports, nameMaps);
     }
-    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy, fullNames);
-    return buildStorageBarOptions(report, volumeFilter, fullNames);
-  }, [report, reports, view, volumeFilter, groupBy, groupMode, fullNames]);
+    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy, fullNames, nameMaps);
+    return buildStorageBarOptions(report, volumeFilter, fullNames, nameMaps);
+  }, [report, reports, view, volumeFilter, groupBy, groupMode, fullNames, nameMaps]);
 
   if (!report) {
     return <div className="text-muted p-4">No storage data available.</div>;
@@ -89,6 +90,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
   const numUsers = report.userIdentifiers().length;
   const numProjects = new Set(reports.map((r) => r.project)).size;
   const destination = reports[0]?.resource ?? '';
+  const destinationLabel = nameMaps?.offering?.[destination] ?? destination;
   // Most recent generatedAt across all reports
   const lastGenerated = reports.reduce(
     (best, r) => (r.generatedAt > best ? r.generatedAt : best),
@@ -101,7 +103,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
         {/* Summary badge */}
         <span className="text-muted small">
-          {destination} &middot; <strong>{numUsers}</strong> user
+          {destinationLabel} &middot; <strong>{numUsers}</strong> user
           {numUsers !== 1 ? 's' : ''} &middot;{' '}
           <strong>{numProjects}</strong> project{numProjects !== 1 ? 's' : ''}{' '}
           &middot; Last generated {lastGenerated.toLocaleString()}
@@ -193,7 +195,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() => downloadStorageExcel(report, `storage_report`)}
+              onClick={() => downloadStorageExcel(report, `storage_report`, nameMaps)}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -219,7 +221,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px' }) => {
       <EChart
         options={options}
         height={height}
-        exportTitle={`${destination} storage`}
+        exportTitle={`${destinationLabel} storage`}
       />
     </div>
   );

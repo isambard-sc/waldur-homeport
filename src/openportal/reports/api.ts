@@ -6,7 +6,7 @@
  * methods — no re-fetching occurs.
  */
 
-import { getAll } from '@waldur/core/api';
+import { get, getAll } from '@waldur/core/api';
 
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
@@ -54,3 +54,41 @@ export const fetchStorageReports = async (
   );
   return items.map(ProjectStorageReport.fromApiResponse);
 };
+
+// ── Identifier → name mapping endpoints ──────────────────────────────────────
+
+async function fetchMapping<T>(
+  endpoint: string,
+  identifiers: string[],
+): Promise<Record<string, T>> {
+  if (identifiers.length === 0) return {};
+  const params = new URLSearchParams();
+  for (const id of identifiers) params.append('identifier', id);
+  return get<Record<string, T>>(`/openportal/${endpoint}/?${params}`);
+}
+
+export interface OfferingInfo {
+  uuid: string;
+  name: string;
+  description: string;
+  slug: string;
+}
+export interface ProjectInfo {
+  uuid: string;
+  name: string;
+  customer_uuid: string;
+  customer_name: string;
+}
+export interface UserInfo {
+  uuid: string;
+  full_name: string;
+  username: string;
+  email: string;
+}
+
+export const fetchOfferingMapping = (ids: string[]) =>
+  fetchMapping<OfferingInfo>('offering_mapping', ids);
+export const fetchProjectMapping = (ids: string[]) =>
+  fetchMapping<ProjectInfo>('project_mapping', ids);
+export const fetchUserMapping = (ids: string[]) =>
+  fetchMapping<UserInfo>('user_mapping', ids);

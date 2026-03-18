@@ -32,6 +32,7 @@ import { ProjectAccountingSummary } from 'waldur-js-client';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { secondsToHours } from './storage';
+import { NameMaps } from './usageChartOptions';
 
 // ── XML escaping ─────────────────────────────────────────────────────────────
 
@@ -190,7 +191,7 @@ async function downloadMultiSheetExcel(
 
 // ── Usage report ─────────────────────────────────────────────────────────────
 
-function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
+function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): SheetSpec[] {
   // Combine all reports for the per-day/per-user sheets
   const report =
     reports.length === 1 ? reports[0] : ProjectUsageReport.combine(reports);
@@ -198,6 +199,12 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
   const dates = report.dates;
   const users = report.localUsers(); // full local_username e.g. "chris.aiproject"
   const components = report.componentNames();
+
+  // Resolve user display names
+  const userLabels = users.map((u) => {
+    const uid = report.localToIdentifier[u];
+    return (uid && nameMaps?.user?.[uid]) ? nameMaps.user[uid] : u;
+  });
 
   const round2 = (n: number) => +n.toFixed(2);
 
@@ -244,7 +251,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
 
   // ── Sheet 3: Usage by user (hours) ───────────────────────────────────────
   const usageByUser: any[][] = [
-    ['Date', ...users, 'Total (h)'],
+    ['Date', ...userLabels, 'Total (h)'],
     ...dates.map((date) => {
       const daily = report.getReport(date);
       const vals = users.map((u) =>
@@ -256,7 +263,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
 
   // ── Sheet 4: Jobs by user ─────────────────────────────────────────────────
   const jobsByUser: any[][] = [
-    ['Date', ...users, 'Total'],
+    ['Date', ...userLabels, 'Total'],
     ...dates.map((date) => {
       const daily = report.getReport(date);
       const vals = users.map((u) => daily?.userJobCounts[u] ?? 0);
@@ -266,7 +273,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
 
   // ── Sheet 5: Average wait by user (minutes) ───────────────────────────────
   const waitByUser: any[][] = [
-    ['Date', ...users, 'Total avg (min)'],
+    ['Date', ...userLabels, 'Total avg (min)'],
     ...dates.map((date) => {
       const daily = report.getReport(date);
       const vals = users.map((u) => {
@@ -288,6 +295,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
   // ── Per-project sheets (only when multiple distinct projects) ─────────────
   // Built before per-user sheets so they appear first in the workbook.
   const distinctProjects = [...new Set(reports.map((r) => r.project))].sort();
+  const projectLabels = distinctProjects.map((p) => nameMaps?.project?.[p] ?? p);
   const projectSheets: SheetSpec[] = [];
   if (distinctProjects.length > 1) {
     // Build a map: project → combined report for that project
@@ -307,7 +315,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
 
     // Usage by project (monthly)
     const usageByProject: any[][] = [
-      ['Month', ...distinctProjects, 'Total (h)'],
+      ['Month', ...projectLabels, 'Total (h)'],
       ...allMonths.map((month) => {
         const monthDates = allDates.filter((d) => d.startsWith(month));
         const vals = distinctProjects.map((proj) => {
@@ -326,7 +334,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
 
     // Jobs by project (monthly)
     const jobsByProject: any[][] = [
-      ['Month', ...distinctProjects, 'Total'],
+      ['Month', ...projectLabels, 'Total'],
       ...allMonths.map((month) => {
         const monthDates = allDates.filter((d) => d.startsWith(month));
         const vals = distinctProjects.map((proj) => {
@@ -343,7 +351,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
 
     // Wait by project (monthly)
     const waitByProject: any[][] = [
-      ['Month', ...distinctProjects, 'Total avg (min)'],
+      ['Month', ...projectLabels, 'Total avg (min)'],
       ...allMonths.map((month) => {
         const monthDates = allDates.filter((d) => d.startsWith(month));
         const vals = distinctProjects.map((proj) => {
@@ -397,7 +405,7 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
   // ── Per-component sheets ──────────────────────────────────────────────────
   for (const comp of components) {
     const compRows: any[][] = [
-      ['Date', ...users, 'Total (h)'],
+      ['Date', ...userLabels, 'Total (h)'],
       ...dates.map((date) => {
         const daily = report.getReport(date);
         const vals = users.map((u) =>
@@ -413,14 +421,41 @@ function buildUsageSheets(reports: ProjectUsageReport[]): SheetSpec[] {
     sheets.push({ name: `Comp ${comp}`.slice(0, 31), rows: compRows });
   }
 
+  // ── Mappings sheet (identifier → display name) ───────────────────────────
+  if (nameMaps) {
+    const mappingRows: any[][] = [['Type', 'Display Name', 'Identifier']];
+    if (nameMaps.offering) {
+      for (const [id, name] of Object.entries(nameMaps.offering)) {
+        mappingRows.push(['Offering', name, id]);
+      }
+    }
+    if (nameMaps.project) {
+      for (const [id, name] of Object.entries(nameMaps.project)) {
+        mappingRows.push(['Project', name, id]);
+      }
+    }
+    if (nameMaps.user) {
+      // Build reverse map: UserIdentifier → local_username for display
+      const localToUid = report.localToIdentifier;
+      for (const [id, name] of Object.entries(nameMaps.user)) {
+        const localUser = Object.entries(localToUid).find(([, uid]) => uid === id)?.[0] ?? id;
+        mappingRows.push(['User', name, localUser]);
+      }
+    }
+    if (mappingRows.length > 1) {
+      sheets.unshift({ name: 'Mappings', rows: mappingRows });
+    }
+  }
+
   return sheets;
 }
 
 export function downloadUsageExcel(
   reports: ProjectUsageReport[],
   title: string,
+  nameMaps?: NameMaps,
 ): void {
-  const sheets = buildUsageSheets(reports);
+  const sheets = buildUsageSheets(reports, nameMaps);
   downloadMultiSheetExcel(`${title}.xlsx`, sheets);
 }
 
@@ -430,10 +465,12 @@ const GB = 1024 ** 3;
 // 6 decimal places: precise to ~1 KB, prevents small values rounding to zero
 const toGB = (bytes: number) => +(bytes / GB).toFixed(6);
 
-function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
+function buildStorageSheets(report: ProjectStorageReport, nameMaps?: NameMaps): SheetSpec[] {
   const uids = report.userIdentifiers();
-  // Use full local_username (e.g. "chris.aiproject") — unique across projects
-  const displayNames = uids.map((uid) => report.users[uid] ?? uid);
+  // Use mapped full_name if available, otherwise local_username
+  const displayNames = uids.map((uid) =>
+    nameMaps?.user?.[uid] ?? (report.users[uid] ?? uid),
+  );
   const dates = report.dates;
   const volumes = report.volumes();
 
@@ -452,7 +489,7 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
     ]);
   }
   for (const uid of uids) {
-    const displayName = report.users[uid] ?? uid;
+    const displayName = nameMaps?.user?.[uid] ?? (report.users[uid] ?? uid);
     for (const [vol, q] of Object.entries(report.quotaForUser(uid))) {
       snapshotRows.push([
         'User',
@@ -528,14 +565,33 @@ function buildStorageSheets(report: ProjectStorageReport): SheetSpec[] {
     sheets.push({ name: `Vol ${vol}`.slice(0, 31), rows: volRows });
   }
 
+  // ── Mappings sheet ────────────────────────────────────────────────────────
+  if (nameMaps) {
+    const mappingRows: any[][] = [['Type', 'Display Name', 'Identifier']];
+    if (nameMaps.offering) {
+      for (const [id, name] of Object.entries(nameMaps.offering)) {
+        mappingRows.push(['Offering', name, id]);
+      }
+    }
+    if (nameMaps.user) {
+      for (const [uid, name] of Object.entries(nameMaps.user)) {
+        mappingRows.push(['User', name, report.users[uid] ?? uid]);
+      }
+    }
+    if (mappingRows.length > 1) {
+      sheets.unshift({ name: 'Mappings', rows: mappingRows });
+    }
+  }
+
   return sheets;
 }
 
 export function downloadStorageExcel(
   report: ProjectStorageReport,
   title: string,
+  nameMaps?: NameMaps,
 ): void {
-  const sheets = buildStorageSheets(report);
+  const sheets = buildStorageSheets(report, nameMaps);
   downloadMultiSheetExcel(`${title}.xlsx`, sheets);
 }
 

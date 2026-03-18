@@ -10,7 +10,7 @@
 import type { EChartsOption } from 'echarts';
 
 import { ProjectStorageReport, Quota } from './ProjectStorageReport';
-import { GroupBy } from './usageChartOptions';
+import { GroupBy, NameMaps } from './usageChartOptions';
 import { formatStorageBytes } from './storage';
 
 const PALETTE = [
@@ -53,16 +53,16 @@ export function buildStorageBarOptions(
   report: ProjectStorageReport,
   volumeFilter: string | 'all' = 'all',
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectQuotas = report.projectQuotas;
   const projectVolNames = Object.keys(projectQuotas).sort();
 
   const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) =>
-    fullNames
-      ? (report.users[uid] ?? uid)
-      : shortName(report.users[uid] ?? uid),
-  );
+  const localNames = uids.map((uid) => {
+    if (nameMaps?.user?.[uid]) return nameMaps.user[uid];
+    return fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
+  });
 
   // Derive user-level volume names from actual quota data
   const userVolSet = new Set<string>();
@@ -244,6 +244,7 @@ export function buildStorageTimeseriesOptions(
   report: ProjectStorageReport,
   groupBy: GroupBy = 'day',
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const allDates = report.dates;
 
@@ -264,11 +265,10 @@ export function buildStorageTimeseriesOptions(
   const labels =
     groupBy === 'month' ? dates.map((d) => d.slice(0, 7)) : dates;
   const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) =>
-    fullNames
-      ? (report.users[uid] ?? uid)
-      : shortName(report.users[uid] ?? uid),
-  );
+  const localNames = uids.map((uid) => {
+    if (nameMaps?.user?.[uid]) return nameMaps.user[uid];
+    return fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
+  });
 
   // Project volumes present across any daily snapshot
   const projectVolSet = new Set<string>();
@@ -403,9 +403,11 @@ function groupStorageByProject(
  */
 export function buildStorageProjectBarOptions(
   reports: ProjectStorageReport[],
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupStorageByProject(reports);
-  const projectNames = projectReports.map((r) => r.project);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
+  const projectNames = projectReports.map((r) => resolveProject(r.project));
 
   let maxBytes = 0;
   const totals = projectReports.map((r) => {
@@ -471,8 +473,10 @@ export function buildStorageProjectBarOptions(
 export function buildStorageProjectTimeseriesOptions(
   reports: ProjectStorageReport[],
   groupBy: GroupBy = 'day',
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupStorageByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
   const allDates = [
     ...new Set(projectReports.flatMap((r) => r.dates)),
   ].sort();
@@ -520,7 +524,7 @@ export function buildStorageProjectTimeseriesOptions(
   const toUnit = (bytes: number) => +(bytes / unitDivisor).toFixed(3);
 
   const series = projectReports.map((r, i) => ({
-    name: r.project,
+    name: resolveProject(r.project),
     type: 'bar' as const,
     stack: 'projects',
     emphasis: { focus: 'series' as const },
@@ -560,7 +564,7 @@ export function buildStorageProjectTimeseriesOptions(
       },
     },
     legend: {
-      data: projectReports.map((r) => r.project),
+      data: projectReports.map((r) => resolveProject(r.project)),
       type: 'scroll',
       bottom: 60,
     },

@@ -43,6 +43,12 @@ export type UsageMetric = 'usage' | 'jobs' | 'avg_wait';
 export type UsageComponent = 'total' | string;
 export type GroupBy = 'day' | 'month';
 
+export interface NameMaps {
+  offering?: Record<string, string>; // resource identifier → offering name
+  project?: Record<string, string>;  // project identifier → project name
+  user?: Record<string, string>;     // UserIdentifier → full_name
+}
+
 /** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
 const shortName = (s: string) => s.split('.')[0];
 
@@ -163,11 +169,18 @@ export function buildTimeseriesOptions(
   component: UsageComponent = 'total',
   groupBy: GroupBy = 'day',
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = fullNames ? users : users.map(shortName);
+  const displayNames = users.map((u) => {
+    if (nameMaps?.user) {
+      const uid = report.localToIdentifier[u];
+      if (uid && nameMaps.user[uid]) return nameMaps.user[uid];
+    }
+    return fullNames ? u : shortName(u);
+  });
 
   const getHoursForDate = (user: string, date: string): number => {
     const daily = report.getReport(date);
@@ -229,6 +242,7 @@ export function buildPieOptions(
   report: ProjectUsageReport,
   component: UsageComponent = 'total',
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const users = report.localUsers();
 
@@ -240,8 +254,15 @@ export function buildPieOptions(
           : secondsToHours(
               report.componentUsageForUser(component, user).seconds,
             );
+      let displayName: string;
+      if (nameMaps?.user) {
+        const uid = report.localToIdentifier[user];
+        displayName = (uid && nameMaps.user[uid]) ? nameMaps.user[uid] : (fullNames ? user : shortName(user));
+      } else {
+        displayName = fullNames ? user : shortName(user);
+      }
       return {
-        name: fullNames ? user : shortName(user),
+        name: displayName,
         value: hours,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
@@ -286,8 +307,10 @@ export function buildProjectTimeseriesOptions(
   reports: ProjectUsageReport[],
   component: UsageComponent = 'total',
   groupBy: GroupBy = 'day',
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
   const allDates = [
     ...new Set(projectReports.flatMap((r) => r.dates)),
   ].sort();
@@ -343,10 +366,10 @@ export function buildProjectTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: projectReports.map((r) => r.project), type: 'scroll', bottom: 60 },
+    legend: { data: projectReports.map((r) => resolveProject(r.project)), type: 'scroll', bottom: 60 },
     ...base,
     series: projectReports.map((r, i) => ({
-      name: r.project,
+      name: resolveProject(r.project),
       type: 'bar',
       stack: 'usage',
       emphasis: { focus: 'series' },
@@ -365,12 +388,14 @@ export function buildProjectTimeseriesOptions(
  */
 export function buildProjectPieOptions(
   reports: ProjectUsageReport[],
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
 
   const data = projectReports
     .map((r, i) => ({
-      name: r.project,
+      name: resolveProject(r.project),
       value: r.totalUsageHours(),
       itemStyle: { color: PALETTE[i % PALETTE.length] },
     }))
@@ -410,11 +435,18 @@ export function buildJobsTimeseriesOptions(
   report: ProjectUsageReport,
   groupBy: GroupBy = 'day',
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = fullNames ? users : users.map(shortName);
+  const displayNames = users.map((u) => {
+    if (nameMaps?.user) {
+      const uid = report.localToIdentifier[u];
+      if (uid && nameMaps.user[uid]) return nameMaps.user[uid];
+    }
+    return fullNames ? u : shortName(u);
+  });
   const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}');
 
   return {
@@ -465,6 +497,7 @@ export function buildJobsTimeseriesOptions(
 export function buildJobsPieOptions(
   report: ProjectUsageReport,
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const users = report.localUsers();
 
@@ -473,8 +506,15 @@ export function buildJobsPieOptions(
       const total = report
         .dailyReports()
         .reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
+      let displayName: string;
+      if (nameMaps?.user) {
+        const uid = report.localToIdentifier[user];
+        displayName = (uid && nameMaps.user[uid]) ? nameMaps.user[uid] : (fullNames ? user : shortName(user));
+      } else {
+        displayName = fullNames ? user : shortName(user);
+      }
       return {
-        name: fullNames ? user : shortName(user),
+        name: displayName,
         value: total,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
@@ -511,8 +551,10 @@ export function buildJobsPieOptions(
 export function buildProjectJobsTimeseriesOptions(
   reports: ProjectUsageReport[],
   groupBy: GroupBy = 'day',
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
   const allDates = [
     ...new Set(projectReports.flatMap((r) => r.dates)),
   ].sort();
@@ -541,10 +583,10 @@ export function buildProjectJobsTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
       },
     },
-    legend: { data: projectReports.map((r) => r.project), type: 'scroll', bottom: 60 },
+    legend: { data: projectReports.map((r) => resolveProject(r.project)), type: 'scroll', bottom: 60 },
     ...base,
     series: projectReports.map((r, i) => ({
-      name: r.project,
+      name: resolveProject(r.project),
       type: 'bar',
       stack: 'jobs',
       emphasis: { focus: 'series' },
@@ -563,12 +605,14 @@ export function buildProjectJobsTimeseriesOptions(
 
 export function buildProjectJobsPieOptions(
   reports: ProjectUsageReport[],
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
 
   const data = projectReports
     .map((r, i) => ({
-      name: r.project,
+      name: resolveProject(r.project),
       value: r.dailyReports().reduce((s, d) => s + d.numJobs, 0),
       itemStyle: { color: PALETTE[i % PALETTE.length] },
     }))
@@ -608,11 +652,18 @@ export function buildAvgWaitTimeseriesOptions(
   report: ProjectUsageReport,
   groupBy: GroupBy = 'day',
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = fullNames ? users : users.map(shortName);
+  const displayNames = users.map((u) => {
+    if (nameMaps?.user) {
+      const uid = report.localToIdentifier[u];
+      if (uid && nameMaps.user[uid]) return nameMaps.user[uid];
+    }
+    return fullNames ? u : shortName(u);
+  });
   const base = baseTimeseriesConfig(
     labels,
     groupBy,
@@ -688,6 +739,7 @@ export function buildAvgWaitTimeseriesOptions(
 export function buildAvgWaitPieOptions(
   report: ProjectUsageReport,
   fullNames = false,
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const users = report.localUsers();
 
@@ -700,8 +752,15 @@ export function buildAvgWaitPieOptions(
         .dailyReports()
         .reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
       if (totalJobs === 0) return null;
+      let displayName: string;
+      if (nameMaps?.user) {
+        const uid = report.localToIdentifier[user];
+        displayName = (uid && nameMaps.user[uid]) ? nameMaps.user[uid] : (fullNames ? user : shortName(user));
+      } else {
+        displayName = fullNames ? user : shortName(user);
+      }
       return {
-        name: fullNames ? user : shortName(user),
+        name: displayName,
         value: Math.round(totalWait / totalJobs / 60),
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
@@ -738,8 +797,10 @@ export function buildAvgWaitPieOptions(
 export function buildProjectAvgWaitTimeseriesOptions(
   reports: ProjectUsageReport[],
   groupBy: GroupBy = 'day',
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
   const allDates = [
     ...new Set(projectReports.flatMap((r) => r.dates)),
   ].sort();
@@ -752,7 +813,7 @@ export function buildProjectAvgWaitTimeseriesOptions(
   );
 
   const series = projectReports.map((r, i) => ({
-    name: r.project,
+    name: resolveProject(r.project),
     type: 'line' as const,
     connectNulls: false,
     emphasis: { focus: 'series' as const },
@@ -786,7 +847,7 @@ export function buildProjectAvgWaitTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}`;
       },
     },
-    legend: { data: projectReports.map((r) => r.project), type: 'scroll', bottom: 60 },
+    legend: { data: projectReports.map((r) => resolveProject(r.project)), type: 'scroll', bottom: 60 },
     ...base,
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     series,
@@ -795,8 +856,10 @@ export function buildProjectAvgWaitTimeseriesOptions(
 
 export function buildProjectAvgWaitPieOptions(
   reports: ProjectUsageReport[],
+  nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
+  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
 
   const data = projectReports
     .map((r, i) => {
@@ -806,7 +869,7 @@ export function buildProjectAvgWaitPieOptions(
         .reduce((s, d) => s + d.totalWaitSeconds, 0);
       if (totalJobs === 0) return null;
       return {
-        name: r.project,
+        name: resolveProject(r.project),
         value: Math.round(totalWait / totalJobs / 60),
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };

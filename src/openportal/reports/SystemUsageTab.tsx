@@ -19,10 +19,17 @@ import React, { FC, useMemo, useState } from 'react';
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 
-import { fetchUsageReports, fetchStorageReports } from './api';
+import {
+  fetchUsageReports,
+  fetchStorageReports,
+  fetchOfferingMapping,
+  fetchProjectMapping,
+  fetchUserMapping,
+} from './api';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { StorageReportVis } from './StorageReportVis';
+import { NameMaps } from './usageChartOptions';
 import { UsageReportVis } from './UsageReportVis';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -61,6 +68,35 @@ export const SystemUsageTab: FC = () => {
 
   const allUsage = reportData?.usage ?? [];
   const allStorage = reportData?.storage ?? [];
+
+  // ── Fetch human-readable name mappings ──────────────────────────────────
+  const { data: nameMaps } = useQuery<NameMaps>({
+    queryKey: ['openportal-system-mappings'],
+    queryFn: async () => {
+      const offeringIds = [...new Set<string>([
+        ...allUsage.map((r) => r.resource),
+        ...allStorage.map((r) => r.resource),
+      ])];
+      const projectIds = [...new Set<string>([
+        ...allUsage.map((r) => r.project),
+        ...allStorage.map((r) => r.project),
+      ])];
+      const userIds = [...new Set<string>(
+        allUsage.flatMap((r) => Object.keys(r.users)),
+      )];
+      const [offerings, projects, users] = await Promise.all([
+        fetchOfferingMapping(offeringIds),
+        fetchProjectMapping(projectIds),
+        fetchUserMapping(userIds),
+      ]);
+      return {
+        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+        project: Object.fromEntries(Object.entries(projects).map(([k, v]) => [k, v.name])),
+        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+      } as NameMaps;
+    },
+    enabled: !!reportData,
+  });
 
   // ── Resource filter ─────────────────────────────────────────────────────
   const allResources = useMemo(
@@ -126,7 +162,7 @@ export const SystemUsageTab: FC = () => {
           >
             {allResources.map((r) => (
               <option key={r} value={r}>
-                {r}
+                {nameMaps?.offering?.[r] ?? r}
               </option>
             ))}
           </select>
@@ -151,7 +187,7 @@ export const SystemUsageTab: FC = () => {
 
         <button
           type="button"
-          className="btn btn-outline-secondary btn-sm ms-auto"
+          className="btn btn-secondary btn-sm ms-auto"
           onClick={() => {
             if (loadTriggered) refetchReports();
           }}
@@ -161,7 +197,7 @@ export const SystemUsageTab: FC = () => {
       </div>
 
       {/* ── Load prompt ─────────────────────────────────────────────────── */}
-      {!loadTriggered && (
+      {!loadTriggered && !reportData && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>
@@ -205,7 +241,7 @@ export const SystemUsageTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
-            <UsageReportVis reports={activeUsage} height="400px" />
+            <UsageReportVis reports={activeUsage} height="400px" nameMaps={nameMaps} />
           </div>
         </div>
       )}
@@ -215,7 +251,7 @@ export const SystemUsageTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
-            <StorageReportVis reports={activeStorage} height="360px" />
+            <StorageReportVis reports={activeStorage} height="360px" nameMaps={nameMaps} />
           </div>
         </div>
       )}
