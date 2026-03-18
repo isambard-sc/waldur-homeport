@@ -15,7 +15,7 @@ import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { showErrorResponse } from '@waldur/store/notify';
 import { get } from '@waldur/core/api';
-import { patch } from '../api';
+import { patch, fixURL } from '../api';
 import { getCustomerURL } from '../utils';
 
 import { RoleMappingField } from './RoleMappingField';
@@ -97,7 +97,7 @@ const updateProjectTemplate = async (formData: ProjectTemplateFormValues, curren
     customer: getCustomerURL(formData.customer),
     key: formData.key,
     shortname: formData.shortname,
-    offerings: formData.offerings?.map((offering) => offering.url) || [],
+    offerings: formData.offerings?.map((offering) => offering.url || fixURL(`/marketplace-provider-offerings/${offering.uuid}/`)) || [],
     approval_limit: formData.approval_limit,
     max_credit_limit: formData.max_credit_limit,
     role_mapping: formData.role_mapping || {},
