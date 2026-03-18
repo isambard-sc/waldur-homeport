@@ -560,6 +560,9 @@ const StatCard: FC<StatCardProps> = ({ label, value, variant = 'default' }) => {
 export const OrganisationAllocationTab: FC = () => {
   const customer = useSelector(getCustomer);
 
+  // ── Lazy-load — don't fire until user clicks "Load data" ─────────────────
+  const [loadTriggered, setLoadTriggered] = useState(false);
+
   // ── Fetch all projects in the organisation ──────────────────────────────
   const {
     data: projects,
@@ -574,7 +577,7 @@ export const OrganisationAllocationTab: FC = () => {
           query: { customer: customer!.uuid, page_size: 25, o: ['name'], page },
         }),
       ),
-    enabled: !!customer,
+    enabled: !!customer && loadTriggered,
   });
 
   // ── Project selection ───────────────────────────────────────────────────
@@ -589,9 +592,6 @@ export const OrganisationAllocationTab: FC = () => {
 
   const effectiveSelected =
     selectedProjects.size > 0 ? selectedProjects : allProjectUuids;
-
-  // ── Lazy-load summaries — don't fire until user clicks "Load data" ───────
-  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // ── Fetch accounting summaries for the organisation ─────────────────────
   const {
@@ -808,7 +808,7 @@ export const OrganisationAllocationTab: FC = () => {
       )}
 
       {/* Load prompt — shown before the user triggers the fetch */}
-      {!projectsLoading && !projectsError && !loadTriggered && (
+      {!loadTriggered && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>

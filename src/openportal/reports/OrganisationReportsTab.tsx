@@ -236,6 +236,7 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
 
 export const OrganisationReportsTab: FC = () => {
   const customer = useSelector(getCustomer);
+  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // ── Fetch all projects in the organisation ──────────────────────────────
   const {
@@ -249,7 +250,7 @@ export const OrganisationReportsTab: FC = () => {
       getAllPages<Project>((page) =>
         projectsList({ query: { customer: customer!.uuid, page_size: 25, o: ['name'], page } }),
       ),
-    enabled: !!customer,
+    enabled: !!customer && loadTriggered,
   });
 
   // ── Project selection state ─────────────────────────────────────────────
@@ -262,7 +263,6 @@ export const OrganisationReportsTab: FC = () => {
     new Set(),
   );
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [loadTriggered, setLoadTriggered] = useState(false);
 
   // When projects first load, select them all
   const effectiveSelected =
@@ -428,7 +428,7 @@ export const OrganisationReportsTab: FC = () => {
       </div>
 
       {/* ── Load prompt ──────────────────────────────────────────────── */}
-      {!loadTriggered && !projectsLoading && !projectsError && (
+      {!loadTriggered && (
         <div className="card mb-4">
           <div className="card-body d-flex align-items-center gap-3 flex-wrap">
             <div>
