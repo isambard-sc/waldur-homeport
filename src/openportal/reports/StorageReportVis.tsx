@@ -101,9 +101,8 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
 
   return (
     <div>
-      {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
-        {/* Summary badge */}
+      {/* ── Row 1: summary + downloads ───────────────────────────────── */}
+      <div className="d-flex align-items-center gap-3 mb-2 flex-wrap">
         <span className="text-muted small">
           {destinationLabel} &middot; <strong>{numUsers}</strong> user
           {numUsers !== 1 ? 's' : ''} &middot;{' '}
@@ -114,8 +113,37 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
           )}
         </span>
 
+        <div className="d-flex gap-2 ms-auto">
+          <Tip id="tip-storage-excel" label="Download Excel">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() => downloadStorageExcel(report, `storage_report`, nameMaps)}
+            >
+              <FileXlsIcon size={20} />
+            </button>
+          </Tip>
+          <Tip id="tip-storage-json" label="Download JSON">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() =>
+                downloadJson(
+                  reports.map((r) => r.apiItem),
+                  `storage_report.json`,
+                )
+              }
+            >
+              <FileArrowDownIcon size={20} />
+            </button>
+          </Tip>
+        </div>
+      </div>
+
+      {/* ── Row 2: toggle controls ────────────────────────────────────── */}
+      <div className="d-flex align-items-center gap-2 mb-3 flex-wrap">
         {/* Chart type */}
-        <div className="btn-group btn-group-sm ms-auto" role="group">
+        <div className="btn-group btn-group-sm" role="group">
           <button
             type="button"
             className={`btn btn-${view === 'bar' ? 'primary' : 'secondary'}`}
@@ -210,33 +238,6 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
             ))}
           </select>
         )}
-
-        {/* Download buttons */}
-        <div className="d-flex gap-2 ms-auto">
-          <Tip id="tip-storage-excel" label="Download Excel">
-            <button
-              type="button"
-              className="text-btn text-hover-primary"
-              onClick={() => downloadStorageExcel(report, `storage_report`, nameMaps)}
-            >
-              <FileXlsIcon size={20} />
-            </button>
-          </Tip>
-          <Tip id="tip-storage-json" label="Download JSON">
-            <button
-              type="button"
-              className="text-btn text-hover-primary"
-              onClick={() =>
-                downloadJson(
-                  reports.map((r) => r.apiItem),
-                  `storage_report.json`,
-                )
-              }
-            >
-              <FileArrowDownIcon size={20} />
-            </button>
-          </Tip>
-        </div>
       </div>
 
       {/* ── Chart ────────────────────────────────────────────────────── */}

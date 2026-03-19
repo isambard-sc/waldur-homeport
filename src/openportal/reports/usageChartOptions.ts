@@ -162,7 +162,7 @@ function sumOverLabel(
 const MAX_PLAUSIBLE_WAIT_MINUTES = 1440; // 24 hours
 
 /** Returns true when a day's aggregate wait data looks spurious. */
-function isDayWaitSpurious(waitSec: number, jobs: number): boolean {
+export function isDayWaitSpurious(waitSec: number, jobs: number): boolean {
   if (jobs === 0) return false;
   return waitSec / jobs / 60 > MAX_PLAUSIBLE_WAIT_MINUTES;
 }
@@ -745,8 +745,18 @@ export function buildAvgWaitPieOptions(
 
   const rawData = users
     .map((user, i) => {
-      const totalJobs = report.dailyReports().reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
-      const totalWait = report.dailyReports().reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
+      // Exclude spurious days (same threshold as the timeseries chart)
+      const cleanDays = report
+        .dailyReports()
+        .filter(
+          (d) =>
+            !isDayWaitSpurious(
+              d.userWaitSeconds[user] ?? 0,
+              d.userJobCounts[user] ?? 0,
+            ),
+        );
+      const totalJobs = cleanDays.reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
+      const totalWait = cleanDays.reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
       if (totalJobs === 0) return null;
       return {
         name: resolveUserName(user, report, fullNames, nameMaps),
@@ -853,8 +863,12 @@ export function buildProjectAvgWaitPieOptions(
 
   const rawData = projectReports
     .map((r, i) => {
-      const totalJobs = r.dailyReports().reduce((s, d) => s + d.numJobs, 0);
-      const totalWait = r.dailyReports().reduce((s, d) => s + d.totalWaitSeconds, 0);
+      // Exclude spurious days (same threshold as the timeseries chart)
+      const cleanDays = r
+        .dailyReports()
+        .filter((d) => !isDayWaitSpurious(d.totalWaitSeconds, d.numJobs));
+      const totalJobs = cleanDays.reduce((s, d) => s + d.numJobs, 0);
+      const totalWait = cleanDays.reduce((s, d) => s + d.totalWaitSeconds, 0);
       if (totalJobs === 0) return null;
       return {
         name: resolveProjectName(r.project, nameMaps),
