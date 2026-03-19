@@ -15,6 +15,15 @@ import {
   fetchUserMapping,
   mappingBatchCount,
 } from './api';
+import {
+  getCached,
+  setCached,
+  clearCached,
+  getCacheAge,
+  formatCacheAge,
+  TTL,
+} from './localStorageCache';
+import { UsageReportApiItem, StorageReportApiItem } from './types';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { StageProgress } from './StageProgress';
@@ -70,6 +79,22 @@ export const SystemUsageTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-system-reports', filterYear, filterMonth],
     queryFn: async () => {
+      // Cache only when a specific year+month is selected (unfiltered data is too large)
+      const reportsCacheKey = filterYear && filterMonth
+        ? `system-reports-${filterYear}-${filterMonth}`
+        : null;
+      if (reportsCacheKey) {
+        const cached = getCached<{ usage: UsageReportApiItem[]; storage: StorageReportApiItem[] }>(
+          reportsCacheKey, TTL.REPORTS,
+        );
+        if (cached) {
+          setFetchPhase('done');
+          return {
+            usage: cached.usage.map(ProjectUsageReport.fromApiResponse),
+            storage: cached.storage.map(ProjectStorageReport.fromApiResponse),
+          };
+        }
+      }
       setUsageProgress({ page: 0, total: 0 });
       setStorageProgress({ page: 0, total: 0 });
       setFetchPhase('usage');
@@ -83,6 +108,12 @@ export const SystemUsageTab: FC = () => {
         (page, totalPages) => setStorageProgress({ page, total: totalPages ?? 0 }),
       );
       setFetchPhase('done');
+      if (reportsCacheKey) {
+        setCached(reportsCacheKey, {
+          usage: usage.map((r) => r.apiItem),
+          storage: storage.map((r) => r.apiItem),
+        });
+      }
       return { usage, storage };
     },
     enabled: loadTriggered,
@@ -101,6 +132,9 @@ export const SystemUsageTab: FC = () => {
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
+      const mapsCacheKey = `system-mappings-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`;
+      const cached = getCached<NameMaps>(mapsCacheKey, TTL.MAPPINGS);
+      if (cached) return cached;
       const offeringIds = [
         ...new Set<string>([
           ...allUsage.map((r) => r.resource),
@@ -137,11 +171,13 @@ export const SystemUsageTab: FC = () => {
         setMappingsProgress({ done: ob + pb + done, total, statusMsg: `User names — ${done} of ${ub}` }),
       );
 
-      return {
+      const maps = {
         offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
         project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
         user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
       } as NameMaps;
+      setCached(mapsCacheKey, maps);
+      return maps;
     },
     enabled: !!reportData,
   });
@@ -225,15 +261,33 @@ export const SystemUsageTab: FC = () => {
           </select>
         )}
 
-        <button
-          type="button"
-          className="btn btn-secondary btn-sm ms-auto"
-          onClick={() => {
-            if (loadTriggered) refetchReports();
-          }}
-        >
-          Refresh
-        </button>
+        <div className="ms-auto d-flex align-items-center gap-2">
+          {(() => {
+            const reportsCacheKey = filterYear && filterMonth
+              ? `system-reports-${filterYear}-${filterMonth}`
+              : null;
+            const age = reportsCacheKey ? getCacheAge(reportsCacheKey) : null;
+            return age ? (
+              <span className="text-muted small">Cached {formatCacheAge(age)}</span>
+            ) : null;
+          })()}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              const reportsCacheKey = filterYear && filterMonth
+                ? `system-reports-${filterYear}-${filterMonth}`
+                : null;
+              clearCached(
+                ...(reportsCacheKey ? [reportsCacheKey] : []),
+                `system-mappings-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`,
+              );
+              if (loadTriggered) refetchReports();
+            }}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* ── Load prompt ─────────────────────────────────────────────────── */}

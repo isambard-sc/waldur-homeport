@@ -35,6 +35,14 @@ import { Tip } from '@waldur/core/Tooltip';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { downloadAllocationExcel } from './reportExcel';
+import {
+  getCached,
+  setCached,
+  clearCached,
+  getCacheAge,
+  formatCacheAge,
+  TTL,
+} from './localStorageCache';
 import { StageProgress } from './StageProgress';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -574,6 +582,9 @@ export const OrganisationAllocationTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-alloc-projects', customer?.uuid],
     queryFn: async () => {
+      const cacheKey = `alloc-projects-${customer!.uuid}`;
+      const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
+      if (cached) return cached;
       let allProjects: Project[] = [];
       let page = 1;
       let totalPages: number | undefined;
@@ -597,6 +608,7 @@ export const OrganisationAllocationTab: FC = () => {
         if (!getNextPageUrl(result.response)) break;
         page++;
       }
+      setCached(cacheKey, allProjects);
       return allProjects;
     },
     enabled: !!customer && loadTriggered,
@@ -628,6 +640,9 @@ export const OrganisationAllocationTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-accounting-summary', customer?.uuid],
     queryFn: async () => {
+      const cacheKey = `alloc-summaries-${customer!.uuid}`;
+      const cached = getCached<ProjectAccountingSummary[]>(cacheKey, TTL.LISTS);
+      if (cached) return cached;
       let allItems: ProjectAccountingSummary[] = [];
       let page = 1;
       let totalPages: number | undefined;
@@ -651,6 +666,7 @@ export const OrganisationAllocationTab: FC = () => {
         if (!getNextPageUrl(result.response)) break;
         page++;
       }
+      setCached(cacheKey, allItems);
       return allItems;
     },
     enabled: !!customer && loadTriggered,
@@ -826,16 +842,30 @@ export const OrganisationAllocationTab: FC = () => {
           </div>
         )}
 
-        <button
-          type="button"
-          className="btn btn-secondary btn-sm ms-auto"
-          onClick={() => {
-            refetchProjects();
-            if (loadTriggered) refetchSummaries();
-          }}
-        >
-          Refresh
-        </button>
+        <div className="ms-auto d-flex align-items-center gap-2">
+          {(() => {
+            const age = customer ? getCacheAge(`alloc-summaries-${customer.uuid}`) : null;
+            return age ? (
+              <span className="text-muted small">Cached {formatCacheAge(age)}</span>
+            ) : null;
+          })()}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              if (customer) {
+                clearCached(
+                  `alloc-projects-${customer.uuid}`,
+                  `alloc-summaries-${customer.uuid}`,
+                );
+              }
+              refetchProjects();
+              if (loadTriggered) refetchSummaries();
+            }}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* ── Status ─────────────────────────────────────────────────────── */}

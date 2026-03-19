@@ -20,6 +20,14 @@ import {
   fetchUserMapping,
   mappingBatchCount,
 } from './api';
+import {
+  getCached,
+  setCached,
+  clearCached,
+  getCacheAge,
+  formatCacheAge,
+  TTL,
+} from './localStorageCache';
 import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
 import { ProjectUsageReport } from './ProjectUsageReport';
@@ -226,6 +234,9 @@ export const OrganisationReportsTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-org-projects', customer?.uuid],
     queryFn: async () => {
+      const cacheKey = `org-projects-${customer!.uuid}`;
+      const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
+      if (cached) return cached;
       let allProjects: Project[] = [];
       let page = 1;
       let totalPages: number | undefined;
@@ -249,6 +260,7 @@ export const OrganisationReportsTab: FC = () => {
         if (!getNextPageUrl(result.response)) break;
         page++;
       }
+      setCached(cacheKey, allProjects);
       return allProjects;
     },
     enabled: !!customer && loadTriggered,
@@ -309,6 +321,9 @@ export const OrganisationReportsTab: FC = () => {
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
+      const mapsCacheKey = `org-mappings-${customer!.uuid}-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`;
+      const cached = getCached<NameMaps>(mapsCacheKey, TTL.MAPPINGS);
+      if (cached) return cached;
       const usageReports = reportData!.usage;
       const storageReports = reportData!.storage;
       const offeringIds = [
@@ -353,11 +368,13 @@ export const OrganisationReportsTab: FC = () => {
         setMappingsProgress({ done: cum, total, statusMsg: `User names — ${done} of ${ub}` });
       });
 
-      return {
+      const maps = {
         offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
         project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
         user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
       } as NameMaps;
+      setCached(mapsCacheKey, maps);
+      return maps;
     },
     enabled: !!reportData,
   });
@@ -464,16 +481,30 @@ export const OrganisationReportsTab: FC = () => {
           </select>
         )}
 
-        <button
-          type="button"
-          className="btn btn-secondary btn-sm ms-auto"
-          onClick={() => {
-            refetchProjects();
-            if (loadTriggered) refetchReports();
-          }}
-        >
-          Refresh
-        </button>
+        <div className="ms-auto d-flex align-items-center gap-2">
+          {(() => {
+            const age = customer ? getCacheAge(`org-projects-${customer.uuid}`) : null;
+            return age ? (
+              <span className="text-muted small">Cached {formatCacheAge(age)}</span>
+            ) : null;
+          })()}
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => {
+              if (customer) {
+                clearCached(
+                  `org-projects-${customer.uuid}`,
+                  `org-mappings-${customer.uuid}-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`,
+                );
+              }
+              refetchProjects();
+              if (loadTriggered) refetchReports();
+            }}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* ── Load prompt ──────────────────────────────────────────────── */}
