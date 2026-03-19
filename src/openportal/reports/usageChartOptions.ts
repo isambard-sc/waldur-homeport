@@ -1,21 +1,6 @@
 /**
  * Pure functions that build EChartsOption objects from ProjectUsageReport data.
  * No React, no API calls — accepts wrapper class instances and returns options.
- *
- * Grouping dimensions:
- *   groupBy  — 'day' (default) | 'month'  aggregates daily bars into monthly bars
- *   groupMode — the Vis component decides whether to call buildProject* functions
- *               (one series per project) or the regular per-user functions.
- *
- * Three metrics, two views each:
- *   buildTimeseriesOptions / buildPieOptions  — CPU-hours (or component hours)
- *   buildJobsTimeseriesOptions / buildJobsPieOptions  — job counts per user
- *   buildAvgWaitTimeseriesOptions / buildAvgWaitPieOptions  — avg scheduler wait
- *
- * Project-level equivalents (one series per project, not per user):
- *   buildProjectTimeseriesOptions / buildProjectPieOptions
- *   buildProjectJobsTimeseriesOptions / buildProjectJobsPieOptions
- *   buildProjectAvgWaitTimeseriesOptions / buildProjectAvgWaitPieOptions
  */
 
 import type { EChartsOption } from 'echarts';
@@ -23,7 +8,7 @@ import type { EChartsOption } from 'echarts';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { secondsToHours } from './storage';
 
-/** Colour palette — matches the one used in openportal/details/constants.ts */
+/** Colour palette */
 const PALETTE = [
   '#003366',
   '#006699',
@@ -44,17 +29,108 @@ export type UsageComponent = 'total' | string;
 export type GroupBy = 'day' | 'month';
 
 export interface NameMaps {
-  offering?: Record<string, string>; // resource identifier → offering name
-  project?: Record<string, string>;  // project identifier → project name
-  user?: Record<string, string>;     // UserIdentifier → full_name
+  offering?: Record<string, string>;
+  project?: Record<string, string>;
+  user?: Record<string, string>;
 }
+
+// ── Label helpers ──────────────────────────────────────────────────────────────
 
 /** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
 const shortName = (s: string) => s.split('.')[0];
 
-// ── Aggregation helpers ───────────────────────────────────────────────────────
+/** Truncate a string at the last word boundary ≤ maxLen characters */
+export function truncateLabel(s: string, maxLen = 32): string {
+  if (s.length <= maxLen) return s;
+  const cut = s.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 4 ? cut.slice(0, lastSpace) : cut) + '…';
+}
 
-/** Derive x-axis labels from raw dates according to the groupBy mode. */
+// ── Tooltip helpers ────────────────────────────────────────────────────────────
+
+const MAX_TOOLTIP_ITEMS = 15;
+const MAX_PIE_SLICES = 15;
+
+const tooltipDot = (color: string) =>
+  `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:4px"></span>`;
+
+/**
+ * Build tooltip rows from axis params, sorted largest-first.
+ * Shows at most MAX_TOOLTIP_ITEMS entries with an "others" summary.
+ * Returns both the rows HTML and the grand total.
+ */
+export function buildTooltipRows(
+  params: any[],
+  fmtVal: (v: number) => string,
+): { rows: string; total: number } {
+  const active = (params as any[]).filter((p) => (p.value as number) > 0);
+  active.sort((a, b) => (b.value as number) - (a.value as number));
+  const shown = active.slice(0, MAX_TOOLTIP_ITEMS);
+  const rest = active.slice(MAX_TOOLTIP_ITEMS);
+  const othersTotal = rest.reduce((s: number, p: any) => s + (p.value as number), 0);
+  const total = active.reduce((s: number, p: any) => s + (p.value as number), 0);
+  const rowLines = [
+    ...shown.map(
+      (p: any) =>
+        `${tooltipDot(p.color)}${p.seriesName}: <b>${fmtVal(p.value as number)}</b>`,
+    ),
+    ...(rest.length > 0
+      ? [
+          `<i style="color:#888">…${rest.length} others: <b>${fmtVal(othersTotal)}</b></i>`,
+        ]
+      : []),
+  ];
+  return { rows: rowLines.join('<br/>'), total };
+}
+
+/** Top-N pie data: sort by value desc, merge tail into "Others (N)" */
+export function topNPieData(
+  data: Array<{ name: string; value: number; itemStyle: { color: string } }>,
+): Array<{ name: string; value: number; itemStyle: { color: string } }> {
+  const sorted = [...data].sort((a, b) => b.value - a.value);
+  if (sorted.length <= MAX_PIE_SLICES) return sorted;
+  const shown = sorted.slice(0, MAX_PIE_SLICES);
+  const rest = sorted.slice(MAX_PIE_SLICES);
+  return [
+    ...shown,
+    {
+      name: `Others (${rest.length})`,
+      value: rest.reduce((s, d) => s + d.value, 0),
+      itemStyle: { color: '#bbb' },
+    },
+  ];
+}
+
+// ── X-axis range helper ────────────────────────────────────────────────────────
+
+/**
+ * Compute dataZoom start/end percentages so the chart shows only the range
+ * that contains non-zero data (hides leading/trailing empty periods).
+ */
+export function computeDataZoomRange(
+  labels: string[],
+  seriesData: (number | null)[][],
+): { start: number; end: number } {
+  let firstIdx = labels.length;
+  let lastIdx = -1;
+  for (const data of seriesData) {
+    for (let i = 0; i < data.length; i++) {
+      const v = data[i];
+      if (v !== null && v !== undefined && (v as number) > 0) {
+        if (i < firstIdx) firstIdx = i;
+        if (i > lastIdx) lastIdx = i;
+      }
+    }
+  }
+  if (firstIdx > lastIdx || labels.length === 0) return { start: 0, end: 100 };
+  const start = Math.max(0, Math.floor((firstIdx / labels.length) * 100));
+  const end = Math.min(100, Math.ceil(((lastIdx + 1) / labels.length) * 100));
+  return { start, end };
+}
+
+// ── Aggregation helpers ────────────────────────────────────────────────────────
+
 function computeLabels(dates: string[], groupBy: GroupBy): string[] {
   if (groupBy === 'month') {
     return [...new Set(dates.map((d) => d.slice(0, 7)))].sort();
@@ -62,7 +138,6 @@ function computeLabels(dates: string[], groupBy: GroupBy): string[] {
   return dates;
 }
 
-/** Sum a per-date value over all dates within a label (day or month bucket). */
 function sumOverLabel(
   dates: string[],
   label: string,
@@ -78,9 +153,20 @@ function sumOverLabel(
 }
 
 /**
- * Weighted-average wait time (minutes) over a label bucket.
- * Returns null when there are zero jobs (gap in line chart).
+ * Maximum plausible average job wait before a day is considered spurious.
+ * Jobs that waited through maintenance windows or ran out of credits can
+ * inflate daily aggregates to thousands of minutes. Any day whose per-day
+ * average exceeds this threshold is excluded from both day-mode and
+ * month-mode aggregations.
  */
+const MAX_PLAUSIBLE_WAIT_MINUTES = 1440; // 24 hours
+
+/** Returns true when a day's aggregate wait data looks spurious. */
+function isDayWaitSpurious(waitSec: number, jobs: number): boolean {
+  if (jobs === 0) return false;
+  return waitSec / jobs / 60 > MAX_PLAUSIBLE_WAIT_MINUTES;
+}
+
 function avgWaitOverLabel(
   dates: string[],
   label: string,
@@ -90,8 +176,16 @@ function avgWaitOverLabel(
 ): number | null {
   const relevantDates =
     groupBy === 'month' ? dates.filter((d) => d.startsWith(label)) : [label];
-  const totalJobs = relevantDates.reduce((s, d) => s + getJobs(d), 0);
-  const totalWait = relevantDates.reduce((s, d) => s + getTotalWaitSec(d), 0);
+
+  // Exclude days whose per-day average wait exceeds the plausibility threshold.
+  // In month mode this means bad days are simply skipped when summing; the
+  // remaining good days still contribute an aggregate for that month.
+  const cleanDates = relevantDates.filter(
+    (d) => !isDayWaitSpurious(getTotalWaitSec(d), getJobs(d)),
+  );
+
+  const totalJobs = cleanDates.reduce((s, d) => s + getJobs(d), 0);
+  const totalWait = cleanDates.reduce((s, d) => s + getTotalWaitSec(d), 0);
   return totalJobs > 0 ? Math.round(totalWait / totalJobs / 60) : null;
 }
 
@@ -102,6 +196,7 @@ function baseTimeseriesConfig(
   groupBy: GroupBy,
   yName: string,
   yFormatter: string,
+  dataZoomRange: { start: number; end: number } = { start: 0, end: 100 },
 ) {
   return {
     toolbox: {
@@ -120,8 +215,8 @@ function baseTimeseriesConfig(
         xAxisIndex: 0,
         bottom: 10,
         height: 40,
-        start: 0,
-        end: 100,
+        start: dataZoomRange.start,
+        end: dataZoomRange.end,
       },
     ],
     grid: { bottom: 130 },
@@ -144,10 +239,6 @@ function baseTimeseriesConfig(
 
 // ── Group reports by project ──────────────────────────────────────────────────
 
-/**
- * Combine multiple monthly reports for the same project into one per project.
- * Preserves project separation so "by project" charts can show one series each.
- */
 function groupByProject(reports: ProjectUsageReport[]): ProjectUsageReport[] {
   const map = new Map<string, ProjectUsageReport[]>();
   for (const r of reports) {
@@ -159,11 +250,27 @@ function groupByProject(reports: ProjectUsageReport[]): ProjectUsageReport[] {
   );
 }
 
+// ── Resolve display names ─────────────────────────────────────────────────────
+
+function resolveUserName(
+  u: string,
+  report: ProjectUsageReport,
+  fullNames: boolean,
+  nameMaps?: NameMaps,
+): string {
+  if (nameMaps?.user) {
+    const uid = report.localToIdentifier[u];
+    if (uid && nameMaps.user[uid]) return truncateLabel(nameMaps.user[uid]);
+  }
+  return truncateLabel(fullNames ? u : shortName(u));
+}
+
+function resolveProjectName(projId: string, nameMaps?: NameMaps): string {
+  return truncateLabel(nameMaps?.project?.[projId] ?? projId);
+}
+
 // ─── Usage (hours) ────────────────────────────────────────────────────────────
 
-/**
- * Stacked bar chart: daily or monthly usage per user.
- */
 export function buildTimeseriesOptions(
   report: ProjectUsageReport,
   component: UsageComponent = 'total',
@@ -174,13 +281,7 @@ export function buildTimeseriesOptions(
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = users.map((u) => {
-    if (nameMaps?.user) {
-      const uid = report.localToIdentifier[u];
-      if (uid && nameMaps.user[uid]) return nameMaps.user[uid];
-    }
-    return fullNames ? u : shortName(u);
-  });
+  const displayNames = users.map((u) => resolveUserName(u, report, fullNames, nameMaps));
 
   const getHoursForDate = (user: string, date: string): number => {
     const daily = report.getReport(date);
@@ -196,7 +297,13 @@ export function buildTimeseriesOptions(
       ? 'Usage (hours)'
       : `${component.charAt(0).toUpperCase()}${component.slice(1)} (hours)`;
 
-  const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h');
+  const seriesData = users.map((user) =>
+    labels.map((label) =>
+      sumOverLabel(dates, label, groupBy, (d) => getHoursForDate(user, d)),
+    ),
+  );
+  const zoom = computeDataZoomRange(labels, seriesData);
+  const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h', zoom);
 
   return {
     color: PALETTE,
@@ -206,38 +313,23 @@ export function buildTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const label = params[0].axisValueLabel ?? params[0].name;
-        const total = (params as any[]).reduce(
-          (s: number, p: any) => s + (p.value as number),
-          0,
-        );
-        const rows = (params as any[])
-          .filter((p: any) => (p.value as number) > 0)
-          .map(
-            (p: any) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} h</b>`,
-          )
-          .join('<br/>');
+        const { rows, total } = buildTooltipRows(params, (v) => `${v.toFixed(2)} h`);
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
     legend: { data: displayNames, type: 'scroll', bottom: 60 },
     ...base,
-    series: users.map((user, i) => ({
+    series: users.map((_user, i) => ({
       name: displayNames[i],
       type: 'bar',
       stack: 'usage',
       emphasis: { focus: 'series' },
       itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: labels.map((label) =>
-        sumOverLabel(dates, label, groupBy, (d) => getHoursForDate(user, d)),
-      ),
+      data: seriesData[i],
     })),
   };
 }
 
-/**
- * Donut pie chart: total usage per user across the selected period.
- */
 export function buildPieOptions(
   report: ProjectUsageReport,
   component: UsageComponent = 'total',
@@ -246,31 +338,22 @@ export function buildPieOptions(
 ): EChartsOption {
   const users = report.localUsers();
 
-  const data = users
+  const rawData = users
     .map((user, i) => {
       const hours =
         component === 'total'
           ? secondsToHours(report.usageForUser(user).seconds)
-          : secondsToHours(
-              report.componentUsageForUser(component, user).seconds,
-            );
-      let displayName: string;
-      if (nameMaps?.user) {
-        const uid = report.localToIdentifier[user];
-        displayName = (uid && nameMaps.user[uid]) ? nameMaps.user[uid] : (fullNames ? user : shortName(user));
-      } else {
-        displayName = fullNames ? user : shortName(user);
-      }
+          : secondsToHours(report.componentUsageForUser(component, user).seconds);
       return {
-        name: displayName,
+        name: resolveUserName(user, report, fullNames, nameMaps),
         value: hours,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
     })
     .filter((d) => d.value > 0);
 
-  const label =
-    component === 'total' ? 'Total usage' : `${component} usage`;
+  const data = topNPieData(rawData);
+  const label = component === 'total' ? 'Total usage' : `${component} usage`;
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} h ({d}%)' },
@@ -285,11 +368,7 @@ export function buildPieOptions(
         label: { show: true, formatter: '{b}\n{d}%' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
+          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
         },
         data,
       },
@@ -299,10 +378,6 @@ export function buildPieOptions(
 
 // ─── Usage by project ─────────────────────────────────────────────────────────
 
-/**
- * Stacked bar chart: daily or monthly usage, one series per project.
- * Used when multiple projects are present and the user selects "By project".
- */
 export function buildProjectTimeseriesOptions(
   reports: ProjectUsageReport[],
   component: UsageComponent = 'total',
@@ -310,29 +385,17 @@ export function buildProjectTimeseriesOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
-  const allDates = [
-    ...new Set(projectReports.flatMap((r) => r.dates)),
-  ].sort();
+  const allDates = [...new Set(projectReports.flatMap((r) => r.dates))].sort();
   const labels = computeLabels(allDates, groupBy);
 
-  const getTotalHoursForDate = (
-    r: ProjectUsageReport,
-    date: string,
-  ): number => {
+  const getTotalHoursForDate = (r: ProjectUsageReport, date: string): number => {
     const daily = r.getReport(date);
     if (!daily) return 0;
-    if (component === 'total') {
-      return secondsToHours(daily.totalUsage().seconds);
-    }
+    if (component === 'total') return secondsToHours(daily.totalUsage().seconds);
     return r
       .localUsers()
       .reduce(
-        (s, user) =>
-          s +
-          secondsToHours(
-            daily.componentUsageForUser(component, user).seconds,
-          ),
+        (s, user) => s + secondsToHours(daily.componentUsageForUser(component, user).seconds),
         0,
       );
   };
@@ -342,7 +405,14 @@ export function buildProjectTimeseriesOptions(
       ? 'Usage (hours)'
       : `${component.charAt(0).toUpperCase()}${component.slice(1)} (hours)`;
 
-  const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h');
+  const seriesData = projectReports.map((r) =>
+    labels.map((label) =>
+      sumOverLabel(allDates, label, groupBy, (d) => getTotalHoursForDate(r, d)),
+    ),
+  );
+  const zoom = computeDataZoomRange(labels, seriesData);
+  const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h', zoom);
+  const projNames = projectReports.map((r) => resolveProjectName(r.project, nameMaps));
 
   return {
     color: PALETTE,
@@ -352,54 +422,38 @@ export function buildProjectTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const label = params[0].axisValueLabel ?? params[0].name;
-        const total = (params as any[]).reduce(
-          (s: number, p: any) => s + (p.value as number),
-          0,
-        );
-        const rows = (params as any[])
-          .filter((p: any) => (p.value as number) > 0)
-          .map(
-            (p: any) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} h</b>`,
-          )
-          .join('<br/>');
+        const { rows, total } = buildTooltipRows(params, (v) => `${v.toFixed(2)} h`);
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: projectReports.map((r) => resolveProject(r.project)), type: 'scroll', bottom: 60 },
+    legend: { data: projNames, type: 'scroll', bottom: 60 },
     ...base,
-    series: projectReports.map((r, i) => ({
-      name: resolveProject(r.project),
+    series: projectReports.map((_r, i) => ({
+      name: projNames[i],
       type: 'bar',
       stack: 'usage',
       emphasis: { focus: 'series' },
       itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: labels.map((label) =>
-        sumOverLabel(allDates, label, groupBy, (d) =>
-          getTotalHoursForDate(r, d),
-        ),
-      ),
+      data: seriesData[i],
     })),
   };
 }
 
-/**
- * Donut pie: total usage per project.
- */
 export function buildProjectPieOptions(
   reports: ProjectUsageReport[],
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
 
-  const data = projectReports
+  const rawData = projectReports
     .map((r, i) => ({
-      name: resolveProject(r.project),
+      name: resolveProjectName(r.project, nameMaps),
       value: r.totalUsageHours(),
       itemStyle: { color: PALETTE[i % PALETTE.length] },
     }))
     .filter((d) => d.value > 0);
+
+  const data = topNPieData(rawData);
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} h ({d}%)' },
@@ -414,11 +468,7 @@ export function buildProjectPieOptions(
         label: { show: true, formatter: '{b}\n{d}%' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
+          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
         },
         data,
       },
@@ -428,9 +478,6 @@ export function buildProjectPieOptions(
 
 // ─── Jobs ─────────────────────────────────────────────────────────────────────
 
-/**
- * Stacked bar chart: number of jobs per user per day/month.
- */
 export function buildJobsTimeseriesOptions(
   report: ProjectUsageReport,
   groupBy: GroupBy = 'day',
@@ -440,14 +487,15 @@ export function buildJobsTimeseriesOptions(
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = users.map((u) => {
-    if (nameMaps?.user) {
-      const uid = report.localToIdentifier[u];
-      if (uid && nameMaps.user[uid]) return nameMaps.user[uid];
-    }
-    return fullNames ? u : shortName(u);
-  });
-  const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}');
+  const displayNames = users.map((u) => resolveUserName(u, report, fullNames, nameMaps));
+
+  const seriesData = users.map((user) =>
+    labels.map((label) =>
+      sumOverLabel(dates, label, groupBy, (d) => report.getReport(d)?.userJobCounts[user] ?? 0),
+    ),
+  );
+  const zoom = computeDataZoomRange(labels, seriesData);
+  const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}', zoom);
 
   return {
     color: PALETTE,
@@ -457,43 +505,23 @@ export function buildJobsTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const label = params[0].axisValueLabel ?? params[0].name;
-        const total = (params as any[]).reduce(
-          (s, p) => s + (p.value as number),
-          0,
-        );
-        const rows = (params as any[])
-          .filter((p) => (p.value as number) > 0)
-          .map(
-            (p) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value}</b>`,
-          )
-          .join('<br/>');
-        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
+        const { rows, total } = buildTooltipRows(params, (v) => String(Math.round(v)));
+        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${Math.round(total)}</b>`;
       },
     },
     legend: { data: displayNames, type: 'scroll', bottom: 60 },
     ...base,
-    series: users.map((user, i) => ({
+    series: users.map((_user, i) => ({
       name: displayNames[i],
       type: 'bar',
       stack: 'jobs',
       emphasis: { focus: 'series' },
       itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: labels.map((label) =>
-        sumOverLabel(
-          dates,
-          label,
-          groupBy,
-          (d) => report.getReport(d)?.userJobCounts[user] ?? 0,
-        ),
-      ),
+      data: seriesData[i],
     })),
   };
 }
 
-/**
- * Donut pie chart: total jobs per user.
- */
 export function buildJobsPieOptions(
   report: ProjectUsageReport,
   fullNames = false,
@@ -501,25 +529,18 @@ export function buildJobsPieOptions(
 ): EChartsOption {
   const users = report.localUsers();
 
-  const data = users
+  const rawData = users
     .map((user, i) => {
-      const total = report
-        .dailyReports()
-        .reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
-      let displayName: string;
-      if (nameMaps?.user) {
-        const uid = report.localToIdentifier[user];
-        displayName = (uid && nameMaps.user[uid]) ? nameMaps.user[uid] : (fullNames ? user : shortName(user));
-      } else {
-        displayName = fullNames ? user : shortName(user);
-      }
+      const total = report.dailyReports().reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
       return {
-        name: displayName,
+        name: resolveUserName(user, report, fullNames, nameMaps),
         value: total,
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
     })
     .filter((d) => d.value > 0);
+
+  const data = topNPieData(rawData);
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
@@ -534,11 +555,7 @@ export function buildJobsPieOptions(
         label: { show: true, formatter: '{b}\n{d}%' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
+          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
         },
         data,
       },
@@ -554,12 +571,17 @@ export function buildProjectJobsTimeseriesOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
-  const allDates = [
-    ...new Set(projectReports.flatMap((r) => r.dates)),
-  ].sort();
+  const allDates = [...new Set(projectReports.flatMap((r) => r.dates))].sort();
   const labels = computeLabels(allDates, groupBy);
-  const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}');
+  const projNames = projectReports.map((r) => resolveProjectName(r.project, nameMaps));
+
+  const seriesData = projectReports.map((r) =>
+    labels.map((label) =>
+      sumOverLabel(allDates, label, groupBy, (d) => r.getReport(d)?.numJobs ?? 0),
+    ),
+  );
+  const zoom = computeDataZoomRange(labels, seriesData);
+  const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}', zoom);
 
   return {
     color: PALETTE,
@@ -569,36 +591,19 @@ export function buildProjectJobsTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const label = params[0].axisValueLabel ?? params[0].name;
-        const total = (params as any[]).reduce(
-          (s, p) => s + (p.value as number),
-          0,
-        );
-        const rows = (params as any[])
-          .filter((p) => (p.value as number) > 0)
-          .map(
-            (p) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value}</b>`,
-          )
-          .join('<br/>');
-        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total}</b>`;
+        const { rows, total } = buildTooltipRows(params, (v) => String(Math.round(v)));
+        return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${Math.round(total)}</b>`;
       },
     },
-    legend: { data: projectReports.map((r) => resolveProject(r.project)), type: 'scroll', bottom: 60 },
+    legend: { data: projNames, type: 'scroll', bottom: 60 },
     ...base,
-    series: projectReports.map((r, i) => ({
-      name: resolveProject(r.project),
+    series: projectReports.map((_r, i) => ({
+      name: projNames[i],
       type: 'bar',
       stack: 'jobs',
       emphasis: { focus: 'series' },
       itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: labels.map((label) =>
-        sumOverLabel(
-          allDates,
-          label,
-          groupBy,
-          (d) => r.getReport(d)?.numJobs ?? 0,
-        ),
-      ),
+      data: seriesData[i],
     })),
   };
 }
@@ -608,15 +613,16 @@ export function buildProjectJobsPieOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
 
-  const data = projectReports
+  const rawData = projectReports
     .map((r, i) => ({
-      name: resolveProject(r.project),
+      name: resolveProjectName(r.project, nameMaps),
       value: r.dailyReports().reduce((s, d) => s + d.numJobs, 0),
       itemStyle: { color: PALETTE[i % PALETTE.length] },
     }))
     .filter((d) => d.value > 0);
+
+  const data = topNPieData(rawData);
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
@@ -631,11 +637,7 @@ export function buildProjectJobsPieOptions(
         label: { show: true, formatter: '{b}\n{d}%' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
+          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
         },
         data,
       },
@@ -645,9 +647,6 @@ export function buildProjectJobsPieOptions(
 
 // ─── Average wait ─────────────────────────────────────────────────────────────
 
-/**
- * Line chart: average scheduler wait per user per day/month (minutes).
- */
 export function buildAvgWaitTimeseriesOptions(
   report: ProjectUsageReport,
   groupBy: GroupBy = 'day',
@@ -657,27 +656,10 @@ export function buildAvgWaitTimeseriesOptions(
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
   const users = report.localUsers();
-  const displayNames = users.map((u) => {
-    if (nameMaps?.user) {
-      const uid = report.localToIdentifier[u];
-      if (uid && nameMaps.user[uid]) return nameMaps.user[uid];
-    }
-    return fullNames ? u : shortName(u);
-  });
-  const base = baseTimeseriesConfig(
-    labels,
-    groupBy,
-    'Avg wait (min)',
-    '{value} min',
-  );
+  const displayNames = users.map((u) => resolveUserName(u, report, fullNames, nameMaps));
 
-  const userSeries = users.map((user, i) => ({
-    name: displayNames[i],
-    type: 'line' as const,
-    connectNulls: false,
-    emphasis: { focus: 'series' as const },
-    itemStyle: { color: PALETTE[i % PALETTE.length] },
-    data: labels.map((label) =>
+  const userSeriesData = users.map((user) =>
+    labels.map((label) =>
       avgWaitOverLabel(
         dates,
         label,
@@ -686,6 +668,30 @@ export function buildAvgWaitTimeseriesOptions(
         (d) => report.getReport(d)?.userJobCounts[user] ?? 0,
       ),
     ),
+  );
+  const totalSeriesData = labels.map((label) =>
+    avgWaitOverLabel(
+      dates,
+      label,
+      groupBy,
+      (d) => report.getReport(d)?.totalWaitSeconds ?? 0,
+      (d) => report.getReport(d)?.numJobs ?? 0,
+    ),
+  );
+
+  const zoom = computeDataZoomRange(
+    labels,
+    [...userSeriesData, totalSeriesData].map((d) => d.map((v) => v ?? 0)),
+  );
+  const base = baseTimeseriesConfig(labels, groupBy, 'Avg wait (min)', '{value} min', zoom);
+
+  const userSeries = users.map((_user, i) => ({
+    name: displayNames[i],
+    type: 'line' as const,
+    connectNulls: false,
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[i % PALETTE.length] },
+    data: userSeriesData[i],
   }));
 
   const totalSeries = {
@@ -694,15 +700,7 @@ export function buildAvgWaitTimeseriesOptions(
     lineStyle: { type: 'dashed' as const, width: 2 },
     itemStyle: { color: '#999' },
     connectNulls: false,
-    data: labels.map((label) =>
-      avgWaitOverLabel(
-        dates,
-        label,
-        groupBy,
-        (d) => report.getReport(d)?.totalWaitSeconds ?? 0,
-        (d) => report.getReport(d)?.numJobs ?? 0,
-      ),
-    ),
+    data: totalSeriesData,
   };
 
   return {
@@ -713,29 +711,31 @@ export function buildAvgWaitTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const label = params[0].axisValueLabel ?? params[0].name;
-        const rows = (params as any[])
-          .filter((p) => p.value !== null && p.value !== undefined)
-          .map(
-            (p) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value} min</b>`,
-          )
-          .join('<br/>');
-        return `<b>${label}</b><br/>${rows}`;
+        const active = (params as any[]).filter(
+          (p) => p.value !== null && p.value !== undefined,
+        );
+        active.sort((a, b) => (b.value as number) - (a.value as number));
+        const shown = active.slice(0, MAX_TOOLTIP_ITEMS);
+        const rest = active.slice(MAX_TOOLTIP_ITEMS);
+        const rowLines = [
+          ...shown.map(
+            (p: any) =>
+              `${tooltipDot(p.color)}${p.seriesName}: <b>${p.value} min</b>`,
+          ),
+          ...(rest.length > 0
+            ? [`<i style="color:#888">…${rest.length} others</i>`]
+            : []),
+        ];
+        return `<b>${label}</b><br/>${rowLines.join('<br/>')}`;
       },
     },
     legend: { data: [...displayNames, 'Total avg'], type: 'scroll', bottom: 60 },
     ...base,
-    toolbox: {
-      right: 10,
-      feature: { saveAsImage: { title: 'Save image' } },
-    },
+    toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     series: [...userSeries, totalSeries],
   };
 }
 
-/**
- * Donut pie: average wait per user across all days.
- */
 export function buildAvgWaitPieOptions(
   report: ProjectUsageReport,
   fullNames = false,
@@ -743,29 +743,20 @@ export function buildAvgWaitPieOptions(
 ): EChartsOption {
   const users = report.localUsers();
 
-  const data = users
+  const rawData = users
     .map((user, i) => {
-      const totalJobs = report
-        .dailyReports()
-        .reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
-      const totalWait = report
-        .dailyReports()
-        .reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
+      const totalJobs = report.dailyReports().reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0);
+      const totalWait = report.dailyReports().reduce((s, d) => s + (d.userWaitSeconds[user] ?? 0), 0);
       if (totalJobs === 0) return null;
-      let displayName: string;
-      if (nameMaps?.user) {
-        const uid = report.localToIdentifier[user];
-        displayName = (uid && nameMaps.user[uid]) ? nameMaps.user[uid] : (fullNames ? user : shortName(user));
-      } else {
-        displayName = fullNames ? user : shortName(user);
-      }
       return {
-        name: displayName,
+        name: resolveUserName(user, report, fullNames, nameMaps),
         value: Math.round(totalWait / totalJobs / 60),
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
     })
     .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
+
+  const data = topNPieData(rawData);
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
@@ -780,11 +771,7 @@ export function buildAvgWaitPieOptions(
         label: { show: true, formatter: '{b}\n{c} min' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
+          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
         },
         data,
       },
@@ -800,25 +787,12 @@ export function buildProjectAvgWaitTimeseriesOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
-  const allDates = [
-    ...new Set(projectReports.flatMap((r) => r.dates)),
-  ].sort();
+  const allDates = [...new Set(projectReports.flatMap((r) => r.dates))].sort();
   const labels = computeLabels(allDates, groupBy);
-  const base = baseTimeseriesConfig(
-    labels,
-    groupBy,
-    'Avg wait (min)',
-    '{value} min',
-  );
+  const projNames = projectReports.map((r) => resolveProjectName(r.project, nameMaps));
 
-  const series = projectReports.map((r, i) => ({
-    name: resolveProject(r.project),
-    type: 'line' as const,
-    connectNulls: false,
-    emphasis: { focus: 'series' as const },
-    itemStyle: { color: PALETTE[i % PALETTE.length] },
-    data: labels.map((label) =>
+  const seriesData = projectReports.map((r) =>
+    labels.map((label) =>
       avgWaitOverLabel(
         allDates,
         label,
@@ -827,6 +801,17 @@ export function buildProjectAvgWaitTimeseriesOptions(
         (d) => r.getReport(d)?.numJobs ?? 0,
       ),
     ),
+  );
+  const zoom = computeDataZoomRange(labels, seriesData.map((d) => d.map((v) => v ?? 0)));
+  const base = baseTimeseriesConfig(labels, groupBy, 'Avg wait (min)', '{value} min', zoom);
+
+  const series = projectReports.map((_r, i) => ({
+    name: projNames[i],
+    type: 'line' as const,
+    connectNulls: false,
+    emphasis: { focus: 'series' as const },
+    itemStyle: { color: PALETTE[i % PALETTE.length] },
+    data: seriesData[i],
   }));
 
   return {
@@ -837,17 +822,23 @@ export function buildProjectAvgWaitTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const label = params[0].axisValueLabel ?? params[0].name;
-        const rows = (params as any[])
-          .filter((p) => p.value !== null && p.value !== undefined)
-          .map(
-            (p) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${p.value} min</b>`,
-          )
-          .join('<br/>');
-        return `<b>${label}</b><br/>${rows}`;
+        const active = (params as any[]).filter(
+          (p) => p.value !== null && p.value !== undefined,
+        );
+        active.sort((a, b) => (b.value as number) - (a.value as number));
+        const shown = active.slice(0, MAX_TOOLTIP_ITEMS);
+        const rest = active.slice(MAX_TOOLTIP_ITEMS);
+        const rowLines = [
+          ...shown.map(
+            (p: any) =>
+              `${tooltipDot(p.color)}${p.seriesName}: <b>${p.value} min</b>`,
+          ),
+          ...(rest.length > 0 ? [`<i style="color:#888">…${rest.length} others</i>`] : []),
+        ];
+        return `<b>${label}</b><br/>${rowLines.join('<br/>')}`;
       },
     },
-    legend: { data: projectReports.map((r) => resolveProject(r.project)), type: 'scroll', bottom: 60 },
+    legend: { data: projNames, type: 'scroll', bottom: 60 },
     ...base,
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     series,
@@ -859,22 +850,21 @@ export function buildProjectAvgWaitPieOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
 
-  const data = projectReports
+  const rawData = projectReports
     .map((r, i) => {
       const totalJobs = r.dailyReports().reduce((s, d) => s + d.numJobs, 0);
-      const totalWait = r
-        .dailyReports()
-        .reduce((s, d) => s + d.totalWaitSeconds, 0);
+      const totalWait = r.dailyReports().reduce((s, d) => s + d.totalWaitSeconds, 0);
       if (totalJobs === 0) return null;
       return {
-        name: resolveProject(r.project),
+        name: resolveProjectName(r.project, nameMaps),
         value: Math.round(totalWait / totalJobs / 60),
         itemStyle: { color: PALETTE[i % PALETTE.length] },
       };
     })
     .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
+
+  const data = topNPieData(rawData);
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
@@ -889,11 +879,7 @@ export function buildProjectAvgWaitPieOptions(
         label: { show: true, formatter: '{b}\n{c} min' },
         emphasis: {
           label: { show: true, fontWeight: 'bold' },
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.3)',
-          },
+          itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.3)' },
         },
         data,
       },

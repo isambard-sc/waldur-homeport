@@ -69,19 +69,21 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
   const [groupMode, setGroupMode] = useState<GroupMode>(
     multipleProjects ? 'project' : 'user',
   );
+  const [showMapped, setShowMapped] = useState(true);
 
   const fullNames = multipleProjects && groupMode === 'user';
+  const activeMaps = showMapped ? nameMaps : undefined;
 
   const options = useMemo(() => {
     if (!report) return {};
     if (groupMode === 'project') {
       return view === 'timeseries'
-        ? buildStorageProjectTimeseriesOptions(reports, groupBy, nameMaps)
-        : buildStorageProjectBarOptions(reports, nameMaps);
+        ? buildStorageProjectTimeseriesOptions(reports, groupBy, activeMaps)
+        : buildStorageProjectBarOptions(reports, activeMaps);
     }
-    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy, fullNames, nameMaps);
-    return buildStorageBarOptions(report, volumeFilter, fullNames, nameMaps);
-  }, [report, reports, view, volumeFilter, groupBy, groupMode, fullNames, nameMaps]);
+    if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy, fullNames, activeMaps);
+    return buildStorageBarOptions(report, volumeFilter, fullNames, activeMaps);
+  }, [report, reports, view, volumeFilter, groupBy, groupMode, fullNames, activeMaps]);
 
   if (!report) {
     return <div className="text-muted p-4">No storage data available.</div>;
@@ -168,6 +170,26 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
               onClick={() => setGroupMode('project')}
             >
               By project
+            </button>
+          </div>
+        )}
+
+        {/* Mapped names toggle — only shown when mappings are available */}
+        {nameMaps && (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-${showMapped ? 'primary' : 'secondary'}`}
+              onClick={() => setShowMapped(true)}
+            >
+              Names
+            </button>
+            <button
+              type="button"
+              className={`btn btn-${!showMapped ? 'primary' : 'secondary'}`}
+              onClick={() => setShowMapped(false)}
+            >
+              IDs
             </button>
           </div>
         )}

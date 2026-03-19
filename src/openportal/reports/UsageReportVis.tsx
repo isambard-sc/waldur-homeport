@@ -87,42 +87,47 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
   const [groupMode, setGroupMode] = useState<GroupMode>(
     multipleProjects ? 'project' : 'user',
   );
+  // When nameMaps are available, default to showing mapped names; can be toggled
+  const [showMapped, setShowMapped] = useState(true);
 
   // Use full usernames when viewing by user across multiple projects
   const fullNames = multipleProjects && groupMode === 'user';
+
+  // Only pass nameMaps when the toggle is on
+  const activeMaps = showMapped ? nameMaps : undefined;
 
   const options = useMemo(() => {
     if (groupMode === 'project') {
       if (metric === 'jobs') {
         return view === 'timeseries'
-          ? buildProjectJobsTimeseriesOptions(reports, groupBy, nameMaps)
-          : buildProjectJobsPieOptions(reports, nameMaps);
+          ? buildProjectJobsTimeseriesOptions(reports, groupBy, activeMaps)
+          : buildProjectJobsPieOptions(reports, activeMaps);
       }
       if (metric === 'avg_wait') {
         return view === 'timeseries'
-          ? buildProjectAvgWaitTimeseriesOptions(reports, groupBy, nameMaps)
-          : buildProjectAvgWaitPieOptions(reports, nameMaps);
+          ? buildProjectAvgWaitTimeseriesOptions(reports, groupBy, activeMaps)
+          : buildProjectAvgWaitPieOptions(reports, activeMaps);
       }
       return view === 'timeseries'
-        ? buildProjectTimeseriesOptions(reports, component, groupBy, nameMaps)
-        : buildProjectPieOptions(reports, nameMaps);
+        ? buildProjectTimeseriesOptions(reports, component, groupBy, activeMaps)
+        : buildProjectPieOptions(reports, activeMaps);
     }
 
     if (!report) return {};
     if (metric === 'jobs') {
       return view === 'timeseries'
-        ? buildJobsTimeseriesOptions(report, groupBy, fullNames, nameMaps)
-        : buildJobsPieOptions(report, fullNames, nameMaps);
+        ? buildJobsTimeseriesOptions(report, groupBy, fullNames, activeMaps)
+        : buildJobsPieOptions(report, fullNames, activeMaps);
     }
     if (metric === 'avg_wait') {
       return view === 'timeseries'
-        ? buildAvgWaitTimeseriesOptions(report, groupBy, fullNames, nameMaps)
-        : buildAvgWaitPieOptions(report, fullNames, nameMaps);
+        ? buildAvgWaitTimeseriesOptions(report, groupBy, fullNames, activeMaps)
+        : buildAvgWaitPieOptions(report, fullNames, activeMaps);
     }
     return view === 'timeseries'
-      ? buildTimeseriesOptions(report, component, groupBy, fullNames, nameMaps)
-      : buildPieOptions(report, component, fullNames, nameMaps);
-  }, [report, reports, metric, view, component, groupBy, groupMode, fullNames, nameMaps]);
+      ? buildTimeseriesOptions(report, component, groupBy, fullNames, activeMaps)
+      : buildPieOptions(report, component, fullNames, activeMaps);
+  }, [report, reports, metric, view, component, groupBy, groupMode, fullNames, activeMaps]);
 
   if (!report) {
     return <div className="text-muted p-4">No usage data available.</div>;
@@ -217,6 +222,26 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
               onClick={() => setGroupMode('project')}
             >
               By project
+            </button>
+          </div>
+        )}
+
+        {/* Mapped names toggle — only shown when mappings are available */}
+        {nameMaps && (
+          <div className="btn-group btn-group-sm" role="group">
+            <button
+              type="button"
+              className={`btn btn-${showMapped ? 'primary' : 'secondary'}`}
+              onClick={() => setShowMapped(true)}
+            >
+              Names
+            </button>
+            <button
+              type="button"
+              className={`btn btn-${!showMapped ? 'primary' : 'secondary'}`}
+              onClick={() => setShowMapped(false)}
+            >
+              IDs
             </button>
           </div>
         )}
