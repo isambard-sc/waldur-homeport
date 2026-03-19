@@ -152,6 +152,21 @@ function sumOverLabel(
   return getValue(label);
 }
 
+/**
+ * Maximum plausible average job wait before a day is considered spurious.
+ * Jobs that waited through maintenance windows or ran out of credits can
+ * inflate daily aggregates to thousands of minutes. Any day whose per-day
+ * average exceeds this threshold is excluded from both day-mode and
+ * month-mode aggregations.
+ */
+const MAX_PLAUSIBLE_WAIT_MINUTES = 1440; // 24 hours
+
+/** Returns true when a day's aggregate wait data looks spurious. */
+function isDayWaitSpurious(waitSec: number, jobs: number): boolean {
+  if (jobs === 0) return false;
+  return waitSec / jobs / 60 > MAX_PLAUSIBLE_WAIT_MINUTES;
+}
+
 function avgWaitOverLabel(
   dates: string[],
   label: string,
@@ -161,8 +176,16 @@ function avgWaitOverLabel(
 ): number | null {
   const relevantDates =
     groupBy === 'month' ? dates.filter((d) => d.startsWith(label)) : [label];
-  const totalJobs = relevantDates.reduce((s, d) => s + getJobs(d), 0);
-  const totalWait = relevantDates.reduce((s, d) => s + getTotalWaitSec(d), 0);
+
+  // Exclude days whose per-day average wait exceeds the plausibility threshold.
+  // In month mode this means bad days are simply skipped when summing; the
+  // remaining good days still contribute an aggregate for that month.
+  const cleanDates = relevantDates.filter(
+    (d) => !isDayWaitSpurious(getTotalWaitSec(d), getJobs(d)),
+  );
+
+  const totalJobs = cleanDates.reduce((s, d) => s + getJobs(d), 0);
+  const totalWait = cleanDates.reduce((s, d) => s + getTotalWaitSec(d), 0);
   return totalJobs > 0 ? Math.round(totalWait / totalJobs / 60) : null;
 }
 
