@@ -16,6 +16,7 @@ import {
 } from './api';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
+import { StageProgress } from './StageProgress';
 import { StorageReportVis } from './StorageReportVis';
 import { NameMaps } from './usageChartOptions';
 import { UsageReportVis } from './UsageReportVis';
@@ -43,37 +44,6 @@ const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
-
-// ── Stage progress bar ────────────────────────────────────────────────────────
-
-interface StageProgressProps {
-  stage: number;
-  total: number;
-  label: string;
-  done: number;
-  max: number;
-}
-
-const StageProgress: FC<StageProgressProps> = ({ stage, total, label, done, max }) => (
-  <div className="mb-3">
-    <div className="d-flex justify-content-between small text-muted mb-1">
-      <span>
-        Stage {stage} of {total} — {label}
-      </span>
-      {max > 1 && (
-        <span>
-          {done} / {max}
-        </span>
-      )}
-    </div>
-    <div className="progress" style={{ height: 8 }}>
-      <div
-        className="progress-bar progress-bar-striped progress-bar-animated"
-        style={{ width: `${max <= 1 ? 100 : Math.round((done / max) * 100)}%` }}
-      />
-    </div>
-  </div>
-);
 
 // ── Main tab ──────────────────────────────────────────────────────────────────
 
@@ -339,7 +309,7 @@ export const SystemUsageTab: FC = () => {
         )}
 
       {/* ── Charts ────────────────────────────────────────────────────── */}
-      {activeUsage.length > 0 && (
+      {activeUsage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -348,7 +318,7 @@ export const SystemUsageTab: FC = () => {
         </div>
       )}
 
-      {activeStorage.length > 0 && (
+      {activeStorage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">

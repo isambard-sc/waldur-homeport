@@ -203,7 +203,7 @@ export const OpenPortalReportsTab: FC = () => {
       )}
 
       {/* Usage chart */}
-      {activeUsage.length > 0 && (
+      {activeUsage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -213,7 +213,7 @@ export const OpenPortalReportsTab: FC = () => {
       )}
 
       {/* Storage chart */}
-      {activeStorage.length > 0 && (
+      {activeStorage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
