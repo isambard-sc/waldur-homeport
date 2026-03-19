@@ -5,7 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Project, projectsList } from 'waldur-js-client';
 
-import { getAllPages } from '@waldur/core/api';
+import { getNextPageUrl } from '@waldur/core/api';
 import React, { FC, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -19,6 +19,7 @@ import {
   fetchProjectMapping,
   fetchUserMapping,
 } from './api';
+import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
@@ -203,40 +204,6 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   );
 };
 
-// ── Stage progress bar ────────────────────────────────────────────────────────
-
-interface StageProgressProps {
-  stage: number;    // 1-based current stage
-  total: number;    // total stages
-  label: string;
-  done: number;
-  max: number;
-}
-
-const StageProgress: FC<StageProgressProps> = ({ stage, total, label, done, max }) => {
-  const pct = max > 0 ? Math.round((done / max) * 100) : 0;
-  return (
-    <div className="mb-3">
-      <div className="d-flex justify-content-between small text-muted mb-1">
-        <span>
-          Stage {stage} of {total} — {label}
-        </span>
-        {max > 1 && (
-          <span>
-            {done} / {max}
-          </span>
-        )}
-      </div>
-      <div className="progress" style={{ height: 8 }}>
-        <div
-          className="progress-bar progress-bar-striped progress-bar-animated"
-          style={{ width: `${max <= 1 ? 100 : pct}%` }}
-        />
-      </div>
-    </div>
-  );
-};
-
 // ── Main tab ──────────────────────────────────────────────────────────────────
 
 export const OrganisationReportsTab: FC = () => {
@@ -248,6 +215,8 @@ export const OrganisationReportsTab: FC = () => {
   const [filterMonth, setFilterMonth] = useState<number | undefined>(undefined);
 
   // ── Stage 1: Fetch all projects ──────────────────────────────────────────
+  const [projectProgress, setProjectProgress] = useState({ done: 0, total: 0, statusMsg: '' });
+
   const {
     data: projects,
     isLoading: projectsLoading,
@@ -255,13 +224,35 @@ export const OrganisationReportsTab: FC = () => {
     refetch: refetchProjects,
   } = useQuery({
     queryKey: ['openportal-org-projects', customer?.uuid],
-    queryFn: () =>
-      getAllPages<Project>((page) =>
-        projectsList({
+    queryFn: async () => {
+      let allProjects: Project[] = [];
+      let page = 1;
+      let totalPages: number | undefined;
+      setProjectProgress({ done: 0, total: 0, statusMsg: 'Starting…' });
+      while (true) {
+        const result = await projectsList({
           query: { customer: customer!.uuid, page_size: 25, o: ['name'], page },
-        }),
-      ),
+        });
+        allProjects = allProjects.concat(result.data);
+        if (page === 1) {
+          const count = (result.response as any)?.data?.count;
+          if (typeof count === 'number') totalPages = Math.ceil(count / 25);
+        }
+        setProjectProgress({
+          done: page,
+          total: totalPages ?? 0,
+          statusMsg: totalPages
+            ? `Downloading page ${page} of ${totalPages}`
+            : `Downloading page ${page}…`,
+        });
+        if (!getNextPageUrl(result.response)) break;
+        page++;
+      }
+      return allProjects;
+    },
     enabled: !!customer && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // ── Project selection state ──────────────────────────────────────────────
@@ -302,6 +293,8 @@ export const OrganisationReportsTab: FC = () => {
       };
     },
     enabled: selectedUuids.length > 0 && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const allUsage = reportData?.usage ?? [];
@@ -312,6 +305,8 @@ export const OrganisationReportsTab: FC = () => {
 
   const { data: nameMaps } = useQuery<NameMaps>({
     queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids, filterYear, filterMonth],
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
     queryFn: async () => {
       setMappingsLoading(true);
       try {
@@ -537,8 +532,9 @@ export const OrganisationReportsTab: FC = () => {
           stage={1}
           total={3}
           label="Loading project list"
-          done={0}
-          max={0}
+          done={projectProgress.done}
+          max={projectProgress.total}
+          statusMsg={projectProgress.statusMsg || undefined}
         />
       )}
       {loadingStage === 2 && (
@@ -582,7 +578,7 @@ export const OrganisationReportsTab: FC = () => {
         )}
 
       {/* ── Charts ───────────────────────────────────────────────────── */}
-      {activeUsage.length > 0 && (
+      {activeUsage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -591,7 +587,7 @@ export const OrganisationReportsTab: FC = () => {
         </div>
       )}
 
-      {activeStorage.length > 0 && (
+      {activeStorage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">

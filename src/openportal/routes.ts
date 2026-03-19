@@ -1,7 +1,19 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
-import { isStaffOrSupport } from '@waldur/workspace/selectors';
+import {
+  isStaffOrSupport,
+  isOwnerOrStaffOrReader,
+} from '@waldur/workspace/selectors';
+
+/**
+ * Grants access to organisation owners, organisation viewers (readers),
+ * staff, and support users.
+ * Uses the current customer from workspace state, which is available in
+ * both the 'organization' and 'project' route contexts.
+ */
+const isOrganisationMemberOrStaffOrSupport = (state) =>
+  isOwnerOrStaffOrReader(state) || isStaffOrSupport(state);
 
 export const states: StateDeclaration[] = [
   {
@@ -15,7 +27,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Usage Report'),
       priority: 105,
-      permissions: [isStaffOrSupport],
+      permissions: [isOrganisationMemberOrStaffOrSupport],
     },
   },
   {
@@ -30,7 +42,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Usage Report'),
       priority: 105,
-      permissions: [isStaffOrSupport],
+      permissions: [isOrganisationMemberOrStaffOrSupport],
     },
   },
   {
@@ -60,7 +72,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Allocation Summary'),
       priority: 106,
-      permissions: [isStaffOrSupport],
+      permissions: [isOrganisationMemberOrStaffOrSupport],
     },
   },
 ];

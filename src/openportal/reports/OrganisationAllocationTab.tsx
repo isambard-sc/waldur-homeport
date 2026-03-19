@@ -27,15 +27,15 @@ import { useSelector } from 'react-redux';
 
 import { FileXlsIcon } from '@phosphor-icons/react';
 
-import { getAllPages } from '@waldur/core/api';
+import { getNextPageUrl } from '@waldur/core/api';
 import { ENV } from '@waldur/core/config';
 import { EChart } from '@waldur/core/EChart';
 import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 import { Tip } from '@waldur/core/Tooltip';
 import { getCustomer } from '@waldur/workspace/selectors';
 
 import { downloadAllocationExcel } from './reportExcel';
+import { StageProgress } from './StageProgress';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -564,6 +564,8 @@ export const OrganisationAllocationTab: FC = () => {
   const [loadTriggered, setLoadTriggered] = useState(false);
 
   // ── Fetch all projects in the organisation ──────────────────────────────
+  const [projectProgress, setProjectProgress] = useState({ done: 0, total: 0, statusMsg: '' });
+
   const {
     data: projects,
     isLoading: projectsLoading,
@@ -571,13 +573,35 @@ export const OrganisationAllocationTab: FC = () => {
     refetch: refetchProjects,
   } = useQuery({
     queryKey: ['openportal-alloc-projects', customer?.uuid],
-    queryFn: () =>
-      getAllPages<Project>((page) =>
-        projectsList({
+    queryFn: async () => {
+      let allProjects: Project[] = [];
+      let page = 1;
+      let totalPages: number | undefined;
+      setProjectProgress({ done: 0, total: 0, statusMsg: 'Starting…' });
+      while (true) {
+        const result = await projectsList({
           query: { customer: customer!.uuid, page_size: 25, o: ['name'], page },
-        }),
-      ),
+        });
+        allProjects = allProjects.concat(result.data);
+        if (page === 1) {
+          const count = (result.response as any)?.data?.count;
+          if (typeof count === 'number') totalPages = Math.ceil(count / 25);
+        }
+        setProjectProgress({
+          done: page,
+          total: totalPages ?? 0,
+          statusMsg: totalPages
+            ? `Downloading page ${page} of ${totalPages}`
+            : `Downloading page ${page}…`,
+        });
+        if (!getNextPageUrl(result.response)) break;
+        page++;
+      }
+      return allProjects;
+    },
     enabled: !!customer && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // ── Project selection ───────────────────────────────────────────────────
@@ -594,6 +618,8 @@ export const OrganisationAllocationTab: FC = () => {
     selectedProjects.size > 0 ? selectedProjects : allProjectUuids;
 
   // ── Fetch accounting summaries for the organisation ─────────────────────
+  const [summariesProgress, setSummariesProgress] = useState({ done: 0, total: 0, statusMsg: '' });
+
   const {
     data: allSummaries,
     isLoading: summariesLoading,
@@ -601,13 +627,35 @@ export const OrganisationAllocationTab: FC = () => {
     refetch: refetchSummaries,
   } = useQuery({
     queryKey: ['openportal-accounting-summary', customer?.uuid],
-    queryFn: () =>
-      getAllPages<ProjectAccountingSummary>((page) =>
-        openportalAccountingSummaryList({
+    queryFn: async () => {
+      let allItems: ProjectAccountingSummary[] = [];
+      let page = 1;
+      let totalPages: number | undefined;
+      setSummariesProgress({ done: 0, total: 0, statusMsg: 'Starting…' });
+      while (true) {
+        const result = await openportalAccountingSummaryList({
           query: { customer_uuid: customer!.uuid, page_size: 100, page },
-        }),
-      ),
+        });
+        allItems = allItems.concat(result.data);
+        if (page === 1) {
+          const count = (result.response as any)?.data?.count;
+          if (typeof count === 'number') totalPages = Math.ceil(count / 100);
+        }
+        setSummariesProgress({
+          done: page,
+          total: totalPages ?? 0,
+          statusMsg: totalPages
+            ? `Downloading page ${page} of ${totalPages}`
+            : `Downloading page ${page}…`,
+        });
+        if (!getNextPageUrl(result.response)) break;
+        page++;
+      }
+      return allItems;
+    },
     enabled: !!customer && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // ── Filter summaries to selected projects ───────────────────────────────
@@ -791,7 +839,16 @@ export const OrganisationAllocationTab: FC = () => {
       </div>
 
       {/* ── Status ─────────────────────────────────────────────────────── */}
-      {projectsLoading && <LoadingSpinner />}
+      {projectsLoading && (
+        <StageProgress
+          stage={1}
+          total={2}
+          label="Loading project list"
+          done={projectProgress.done}
+          max={projectProgress.total}
+          statusMsg={projectProgress.statusMsg || undefined}
+        />
+      )}
 
       {projectsError && (
         <LoadingErred
@@ -830,12 +887,16 @@ export const OrganisationAllocationTab: FC = () => {
         </div>
       )}
 
-      {/* Loading spinner while summaries are being fetched */}
+      {/* Progress bar while summaries are being fetched */}
       {summariesLoading && (
-        <div className="d-flex align-items-center gap-3 mb-4 text-muted">
-          <LoadingSpinner />
-          <span>Fetching allocation data for all projects…</span>
-        </div>
+        <StageProgress
+          stage={2}
+          total={2}
+          label="Loading allocation summaries"
+          done={summariesProgress.done}
+          max={summariesProgress.total}
+          statusMsg={summariesProgress.statusMsg || undefined}
+        />
       )}
 
       {loadTriggered && !summariesLoading && !summariesError && summaries.length === 0 && (

@@ -141,9 +141,8 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
 
   return (
     <div>
-      {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
-        {/* Summary badge */}
+      {/* ── Row 1: summary + downloads ───────────────────────────────── */}
+      <div className="d-flex align-items-center gap-3 mb-2 flex-wrap">
         <span className="text-muted small">
           {destinationLabel} &middot; <strong>{totalHours.toFixed(1)} h</strong>{' '}
           across <strong>{numUsers}</strong> user{numUsers !== 1 ? 's' : ''}{' '}
@@ -154,8 +153,37 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
           )}
         </span>
 
+        <div className="d-flex gap-2 ms-auto">
+          <Tip id="tip-usage-excel" label="Download Excel">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() => downloadUsageExcel(reports, 'usage_report', nameMaps)}
+            >
+              <FileXlsIcon size={20} />
+            </button>
+          </Tip>
+          <Tip id="tip-usage-json" label="Download JSON">
+            <button
+              type="button"
+              className="text-btn text-hover-primary"
+              onClick={() =>
+                downloadJson(
+                  reports.map((r) => r.apiItem),
+                  'usage_report.json',
+                )
+              }
+            >
+              <FileArrowDownIcon size={20} />
+            </button>
+          </Tip>
+        </div>
+      </div>
+
+      {/* ── Row 2: toggle controls ────────────────────────────────────── */}
+      <div className="d-flex align-items-center gap-2 mb-3 flex-wrap">
         {/* Metric selector */}
-        <div className="btn-group btn-group-sm ms-auto" role="group">
+        <div className="btn-group btn-group-sm" role="group">
           {(Object.keys(METRIC_LABELS) as UsageMetric[]).map((m) => (
             <button
               key={m}
@@ -263,33 +291,6 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
             ))}
           </select>
         )}
-
-        {/* Download buttons */}
-        <div className="d-flex gap-2 ms-auto">
-          <Tip id="tip-usage-excel" label="Download Excel">
-            <button
-              type="button"
-              className="text-btn text-hover-primary"
-              onClick={() => downloadUsageExcel(reports, 'usage_report', nameMaps)}
-            >
-              <FileXlsIcon size={20} />
-            </button>
-          </Tip>
-          <Tip id="tip-usage-json" label="Download JSON">
-            <button
-              type="button"
-              className="text-btn text-hover-primary"
-              onClick={() =>
-                downloadJson(
-                  reports.map((r) => r.apiItem),
-                  'usage_report.json',
-                )
-              }
-            >
-              <FileArrowDownIcon size={20} />
-            </button>
-          </Tip>
-        </div>
       </div>
 
       {/* ── Chart ────────────────────────────────────────────────────── */}
