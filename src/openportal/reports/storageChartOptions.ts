@@ -424,15 +424,16 @@ export function buildStorageProjectBarOptions(
   let maxBytes = 0;
   const totals = projectReports.map((r) => {
     const uids = r.userIdentifiers();
-    const bytes = uids.reduce((s, uid) => {
-      return (
-        s +
-        Object.values(r.quotaForUser(uid)).reduce(
-          (ss, q) => ss + q.usageBytes,
-          0,
-        )
-      );
-    }, 0);
+    const userBytes = uids.reduce(
+      (s, uid) =>
+        s + Object.values(r.quotaForUser(uid)).reduce((ss, q) => ss + q.usageBytes, 0),
+      0,
+    );
+    const projectBytes = Object.values(r.projectQuotas).reduce(
+      (s, q) => s + q.usageBytes,
+      0,
+    );
+    const bytes = userBytes + projectBytes;
     if (bytes > maxBytes) maxBytes = bytes;
     return bytes;
   });
