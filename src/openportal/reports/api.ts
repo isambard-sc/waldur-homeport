@@ -63,14 +63,35 @@ export const fetchStorageReports = async (
 
 // ── Identifier → name mapping endpoints ──────────────────────────────────────
 
-async function fetchMapping<T>(
+const MAPPING_BATCH_SIZE = 25;
+
+/** Number of batches that will be needed for `ids`. */
+export const mappingBatchCount = (ids: string[]): number =>
+  Math.ceil(ids.length / MAPPING_BATCH_SIZE);
+
+export type MappingProgressCallback = (batchesDone: number) => void;
+
+/**
+ * Fetch an identifier→info mapping in batches of MAPPING_BATCH_SIZE.
+ * Calls `onProgress(batchesDone)` after each batch so callers can track
+ * progress. Batches are fetched sequentially to avoid overwhelming the server.
+ */
+async function fetchMappingBatched<T>(
   endpoint: string,
   identifiers: string[],
+  onProgress?: MappingProgressCallback,
 ): Promise<Record<string, T>> {
   if (identifiers.length === 0) return {};
-  const params = new URLSearchParams();
-  for (const id of identifiers) params.append('identifier', id);
-  return get<Record<string, T>>(`/openportal/${endpoint}/?${params}`);
+  const result: Record<string, T> = {};
+  for (let i = 0; i < identifiers.length; i += MAPPING_BATCH_SIZE) {
+    const chunk = identifiers.slice(i, i + MAPPING_BATCH_SIZE);
+    const params = new URLSearchParams();
+    for (const id of chunk) params.append('identifier', id);
+    const data = await get<Record<string, T>>(`/openportal/${endpoint}/?${params}`);
+    Object.assign(result, data);
+    if (onProgress) onProgress(Math.floor(i / MAPPING_BATCH_SIZE) + 1);
+  }
+  return result;
 }
 
 export interface OfferingInfo {
@@ -92,9 +113,9 @@ export interface UserInfo {
   email: string;
 }
 
-export const fetchOfferingMapping = (ids: string[]) =>
-  fetchMapping<OfferingInfo>('offering_mapping', ids);
-export const fetchProjectMapping = (ids: string[]) =>
-  fetchMapping<ProjectInfo>('project_mapping', ids);
-export const fetchUserMapping = (ids: string[]) =>
-  fetchMapping<UserInfo>('user_mapping', ids);
+export const fetchOfferingMapping = (ids: string[], onProgress?: MappingProgressCallback) =>
+  fetchMappingBatched<OfferingInfo>('offering_mapping', ids, onProgress);
+export const fetchProjectMapping = (ids: string[], onProgress?: MappingProgressCallback) =>
+  fetchMappingBatched<ProjectInfo>('project_mapping', ids, onProgress);
+export const fetchUserMapping = (ids: string[], onProgress?: MappingProgressCallback) =>
+  fetchMappingBatched<UserInfo>('user_mapping', ids, onProgress);
