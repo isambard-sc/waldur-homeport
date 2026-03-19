@@ -1,23 +1,11 @@
 /**
  * System-wide OpenPortal usage and storage tab for staff / support users.
- *
- * Fetches every OpenPortal usage and storage report in the system (no customer
- * or project filter) and presents them through the same UsageReportVis /
- * StorageReportVis components used by the per-organisation view.
- *
- * Controls:
- *   - Resource dropdown  — filter by HPC destination
- *   - Month dropdown     — "All time" or a specific YYYY-MM
- *   - Lazy load prompt   — data is only fetched when the user clicks "Load"
- *
- * Visible to staff and support users only (via route permissions).
  */
 
 import { useQuery } from '@tanstack/react-query';
 import React, { FC, useMemo, useState } from 'react';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
 
 import {
   fetchUsageReports,
@@ -45,60 +33,124 @@ const groupByMonth = <T extends { year: number; month: number }>(
   return groups;
 };
 
+const CURRENT_YEAR = new Date().getFullYear();
+const YEAR_OPTIONS = Array.from(
+  { length: CURRENT_YEAR - 2024 + 1 },
+  (_, i) => 2024 + i,
+);
+const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+// ── Stage progress bar ────────────────────────────────────────────────────────
+
+interface StageProgressProps {
+  stage: number;
+  total: number;
+  label: string;
+  done: number;
+  max: number;
+}
+
+const StageProgress: FC<StageProgressProps> = ({ stage, total, label, done, max }) => (
+  <div className="mb-3">
+    <div className="d-flex justify-content-between small text-muted mb-1">
+      <span>
+        Stage {stage} of {total} — {label}
+      </span>
+      {max > 1 && (
+        <span>
+          {done} / {max}
+        </span>
+      )}
+    </div>
+    <div className="progress" style={{ height: 8 }}>
+      <div
+        className="progress-bar progress-bar-striped progress-bar-animated"
+        style={{ width: `${max <= 1 ? 100 : Math.round((done / max) * 100)}%` }}
+      />
+    </div>
+  </div>
+);
+
 // ── Main tab ──────────────────────────────────────────────────────────────────
 
 export const SystemUsageTab: FC = () => {
-  // ── Lazy load ───────────────────────────────────────────────────────────
   const [loadTriggered, setLoadTriggered] = useState(false);
 
-  // ── Fetch all reports system-wide ───────────────────────────────────────
+  // ── Pre-filter: year / month ─────────────────────────────────────────────
+  const [filterYear, setFilterYear] = useState<number | undefined>(undefined);
+  const [filterMonth, setFilterMonth] = useState<number | undefined>(undefined);
+
+  // ── Stage 1 & 2 combined: Fetch all reports system-wide ─────────────────
+  // (No project list needed for system tab — reports fetched directly)
   const {
     data: reportData,
     isLoading: reportsLoading,
     error: reportsError,
     refetch: refetchReports,
   } = useQuery({
-    queryKey: ['openportal-system-reports'],
+    queryKey: ['openportal-system-reports', filterYear, filterMonth],
     queryFn: () =>
-      Promise.all([fetchUsageReports(), fetchStorageReports()]).then(
-        ([usage, storage]) => ({ usage, storage }),
-      ),
+      Promise.all([
+        fetchUsageReports({ year: filterYear, month: filterMonth }),
+        fetchStorageReports({ year: filterYear, month: filterMonth }),
+      ]).then(([usage, storage]) => ({ usage, storage })),
     enabled: loadTriggered,
   });
 
   const allUsage = reportData?.usage ?? [];
   const allStorage = reportData?.storage ?? [];
 
-  // ── Fetch human-readable name mappings ──────────────────────────────────
+  // ── Stage 3: Fetch name mappings ─────────────────────────────────────────
+  const [mappingsLoading, setMappingsLoading] = useState(false);
+
   const { data: nameMaps } = useQuery<NameMaps>({
-    queryKey: ['openportal-system-mappings'],
+    queryKey: ['openportal-system-mappings', filterYear, filterMonth],
     queryFn: async () => {
-      const offeringIds = [...new Set<string>([
-        ...allUsage.map((r) => r.resource),
-        ...allStorage.map((r) => r.resource),
-      ])];
-      const projectIds = [...new Set<string>([
-        ...allUsage.map((r) => r.project),
-        ...allStorage.map((r) => r.project),
-      ])];
-      const userIds = [...new Set<string>(
-        allUsage.flatMap((r) => Object.keys(r.users)),
-      )];
-      const [offerings, projects, users] = await Promise.all([
-        fetchOfferingMapping(offeringIds),
-        fetchProjectMapping(projectIds),
-        fetchUserMapping(userIds),
-      ]);
-      return {
-        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
-        project: Object.fromEntries(Object.entries(projects).map(([k, v]) => [k, v.name])),
-        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
-      } as NameMaps;
+      setMappingsLoading(true);
+      try {
+        const offeringIds = [
+          ...new Set<string>([
+            ...allUsage.map((r) => r.resource),
+            ...allStorage.map((r) => r.resource),
+          ]),
+        ];
+        const projectIds = [
+          ...new Set<string>([
+            ...allUsage.map((r) => r.project),
+            ...allStorage.map((r) => r.project),
+          ]),
+        ];
+        const userIds = [
+          ...new Set<string>(allUsage.flatMap((r) => Object.keys(r.users))),
+        ];
+        const [offerings, projMaps, users] = await Promise.all([
+          fetchOfferingMapping(offeringIds),
+          fetchProjectMapping(projectIds),
+          fetchUserMapping(userIds),
+        ]);
+        return {
+          offering: Object.fromEntries(
+            Object.entries(offerings).map(([k, v]) => [k, v.name]),
+          ),
+          project: Object.fromEntries(
+            Object.entries(projMaps).map(([k, v]) => [k, v.name]),
+          ),
+          user: Object.fromEntries(
+            Object.entries(users).map(([k, v]) => [k, v.full_name]),
+          ),
+        } as NameMaps;
+      } finally {
+        setMappingsLoading(false);
+      }
     },
     enabled: !!reportData,
   });
 
-  // ── Resource filter ─────────────────────────────────────────────────────
+  // ── Resource filter ──────────────────────────────────────────────────────
   const allResources = useMemo(
     () =>
       [
@@ -116,18 +168,13 @@ export const SystemUsageTab: FC = () => {
     : (allResources[0] ?? '');
 
   const usageForResource = allUsage.filter((r) => r.resource === activeResource);
-  const storageForResource = allStorage.filter(
-    (r) => r.resource === activeResource,
-  );
+  const storageForResource = allStorage.filter((r) => r.resource === activeResource);
 
-  // ── Month filter ────────────────────────────────────────────────────────
+  // ── Month filter ─────────────────────────────────────────────────────────
   const usageByMonth = groupByMonth(usageForResource);
   const storageByMonth = groupByMonth(storageForResource);
   const allMonths = [
-    ...new Set([
-      ...Object.keys(usageByMonth),
-      ...Object.keys(storageByMonth),
-    ]),
+    ...new Set([...Object.keys(usageByMonth), ...Object.keys(storageByMonth)]),
   ]
     .sort()
     .reverse();
@@ -135,13 +182,12 @@ export const SystemUsageTab: FC = () => {
   const [selectedMonth, setSelectedMonth] = useState('all');
 
   const activeUsage: ProjectUsageReport[] =
-    selectedMonth === 'all'
-      ? usageForResource
-      : (usageByMonth[selectedMonth] ?? []);
+    selectedMonth === 'all' ? usageForResource : (usageByMonth[selectedMonth] ?? []);
   const activeStorage: ProjectStorageReport[] =
-    selectedMonth === 'all'
-      ? storageForResource
-      : (storageByMonth[selectedMonth] ?? []);
+    selectedMonth === 'all' ? storageForResource : (storageByMonth[selectedMonth] ?? []);
+
+  // ── Current loading stage ────────────────────────────────────────────────
+  const loadingStage = reportsLoading ? 2 : mappingsLoading ? 3 : 0;
 
   return (
     <div className="container-fluid py-4">
@@ -149,7 +195,6 @@ export const SystemUsageTab: FC = () => {
       <div className="d-flex align-items-center gap-3 mb-4 flex-wrap">
         <h4 className="mb-0">System Usage Report</h4>
 
-        {/* Resource picker */}
         {allResources.length > 1 && (
           <select
             className="form-select form-select-sm"
@@ -168,7 +213,6 @@ export const SystemUsageTab: FC = () => {
           </select>
         )}
 
-        {/* Month picker */}
         {allMonths.length > 0 && (
           <select
             className="form-select form-select-sm"
@@ -199,17 +243,57 @@ export const SystemUsageTab: FC = () => {
       {/* ── Load prompt ─────────────────────────────────────────────────── */}
       {!loadTriggered && !reportData && (
         <div className="card mb-4">
-          <div className="card-body d-flex align-items-center gap-3 flex-wrap">
-            <div>
-              <p className="mb-1 fw-semibold">System usage data not yet loaded</p>
-              <p className="mb-0 text-muted small">
-                Loading fetches all OpenPortal usage and storage reports across
-                every project in the system. This may take 10–15 seconds.
-              </p>
+          <div className="card-body">
+            <p className="mb-2 fw-semibold">System usage data not yet loaded</p>
+
+            {/* Year / Month pre-filters */}
+            <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
+              <div>
+                <label className="form-label small mb-1">Year</label>
+                <select
+                  className="form-select form-select-sm"
+                  style={{ width: 'auto' }}
+                  value={filterYear ?? ''}
+                  onChange={(e) =>
+                    setFilterYear(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                >
+                  <option value="">All years</option>
+                  {YEAR_OPTIONS.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="form-label small mb-1">Month</label>
+                <select
+                  className="form-select form-select-sm"
+                  style={{ width: 'auto' }}
+                  value={filterMonth ?? ''}
+                  onChange={(e) =>
+                    setFilterMonth(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                >
+                  <option value="">All months</option>
+                  {MONTH_OPTIONS.map((m) => (
+                    <option key={m} value={m}>
+                      {MONTH_NAMES[m - 1]}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+
+            <p className="text-muted small mb-3">
+              Fetches all OpenPortal usage and storage reports across every project in the system.
+              Filtering to a specific year or month will be much faster.
+            </p>
+
             <button
               type="button"
-              className="btn btn-primary btn-sm ms-auto"
+              className="btn btn-primary btn-sm"
               onClick={() => setLoadTriggered(true)}
             >
               Load reports
@@ -218,9 +302,27 @@ export const SystemUsageTab: FC = () => {
         </div>
       )}
 
-      {/* ── Status ─────────────────────────────────────────────────────── */}
-      {reportsLoading && <LoadingSpinner />}
+      {/* ── Progress bars ───────────────────────────────────────────────── */}
+      {loadingStage === 2 && (
+        <StageProgress
+          stage={2}
+          total={3}
+          label="Loading reports"
+          done={0}
+          max={0}
+        />
+      )}
+      {loadingStage === 3 && (
+        <StageProgress
+          stage={3}
+          total={3}
+          label="Loading name mappings"
+          done={0}
+          max={0}
+        />
+      )}
 
+      {/* ── Errors ─────────────────────────────────────────────────────── */}
       {reportsError && (
         <LoadingErred
           message="Failed to load system usage reports"
@@ -236,7 +338,7 @@ export const SystemUsageTab: FC = () => {
           <p className="text-muted">No OpenPortal reports found.</p>
         )}
 
-      {/* ── Usage chart ──────────────────────────────────────────────── */}
+      {/* ── Charts ────────────────────────────────────────────────────── */}
       {activeUsage.length > 0 && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
@@ -246,7 +348,6 @@ export const SystemUsageTab: FC = () => {
         </div>
       )}
 
-      {/* ── Storage chart ────────────────────────────────────────────── */}
       {activeStorage.length > 0 && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>

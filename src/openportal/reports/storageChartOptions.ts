@@ -10,7 +10,13 @@
 import type { EChartsOption } from 'echarts';
 
 import { ProjectStorageReport, Quota } from './ProjectStorageReport';
-import { GroupBy, NameMaps } from './usageChartOptions';
+import {
+  GroupBy,
+  NameMaps,
+  buildTooltipRows,
+  computeDataZoomRange,
+  truncateLabel,
+} from './usageChartOptions';
 import { formatStorageBytes } from './storage';
 
 const PALETTE = [
@@ -60,8 +66,9 @@ export function buildStorageBarOptions(
 
   const uids = report.userIdentifiers();
   const localNames = uids.map((uid) => {
-    if (nameMaps?.user?.[uid]) return nameMaps.user[uid];
-    return fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
+    if (nameMaps?.user?.[uid]) return truncateLabel(nameMaps.user[uid]);
+    const raw = fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
+    return truncateLabel(raw);
   });
 
   // Derive user-level volume names from actual quota data
@@ -266,8 +273,9 @@ export function buildStorageTimeseriesOptions(
     groupBy === 'month' ? dates.map((d) => d.slice(0, 7)) : dates;
   const uids = report.userIdentifiers();
   const localNames = uids.map((uid) => {
-    if (nameMaps?.user?.[uid]) return nameMaps.user[uid];
-    return fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
+    if (nameMaps?.user?.[uid]) return truncateLabel(nameMaps.user[uid]);
+    const raw = fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
+    return truncateLabel(raw);
   });
 
   // Project volumes present across any daily snapshot
@@ -336,6 +344,12 @@ export function buildStorageTimeseriesOptions(
 
   const allNames = [...projectVols.map((v) => `Project · ${v}`), ...localNames];
 
+  const allSeriesData = [
+    ...projectSeries.map((s) => s.data as number[]),
+    ...userSeries.map((s) => s.data as number[]),
+  ];
+  const zoom = computeDataZoomRange(labels, allSeriesData);
+
   return {
     color: PALETTE,
     tooltip: {
@@ -344,13 +358,10 @@ export function buildStorageTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const date = params[0].axisValueLabel ?? params[0].name;
-        const rows = (params as any[])
-          .filter((p: any) => (p.value as number) > 0)
-          .map(
-            (p: any) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} ${unitLabel}</b>`,
-          )
-          .join('<br/>');
+        const { rows } = buildTooltipRows(
+          params,
+          (v) => `${v.toFixed(2)} ${unitLabel}`,
+        );
         return `<b>${date}</b><br/>${rows}`;
       },
     },
@@ -362,7 +373,7 @@ export function buildStorageTimeseriesOptions(
       },
     },
     dataZoom: [
-      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: 0, end: 100 },
+      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: zoom.start, end: zoom.end },
     ],
     grid: { bottom: 130 },
     xAxis: {
@@ -406,7 +417,8 @@ export function buildStorageProjectBarOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupStorageByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
+  const resolveProject = (projId: string) =>
+    truncateLabel(nameMaps?.project?.[projId] ?? projId);
   const projectNames = projectReports.map((r) => resolveProject(r.project));
 
   let maxBytes = 0;
@@ -545,6 +557,8 @@ export function buildStorageProjectTimeseriesOptions(
     }),
   }));
 
+  const zoom = computeDataZoomRange(labels, series.map((s) => s.data as number[]));
+
   return {
     color: PALETTE,
     tooltip: {
@@ -553,13 +567,7 @@ export function buildStorageProjectTimeseriesOptions(
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
         const date = params[0].axisValueLabel ?? params[0].name;
-        const rows = (params as any[])
-          .filter((p: any) => (p.value as number) > 0)
-          .map(
-            (p: any) =>
-              `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:4px"></span>${p.seriesName}: <b>${(p.value as number).toFixed(2)} ${unitLabel}</b>`,
-          )
-          .join('<br/>');
+        const { rows } = buildTooltipRows(params, (v) => `${v.toFixed(2)} ${unitLabel}`);
         return `<b>${date}</b><br/>${rows}`;
       },
     },
@@ -570,7 +578,7 @@ export function buildStorageProjectTimeseriesOptions(
     },
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     dataZoom: [
-      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: 0, end: 100 },
+      { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: zoom.start, end: zoom.end },
     ],
     grid: { bottom: 120 },
     xAxis: {
