@@ -654,6 +654,8 @@ export const OrganisationAllocationTab: FC = () => {
       return allItems;
     },
     enabled: !!customer && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // ── Filter summaries to selected projects ───────────────────────────────
