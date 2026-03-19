@@ -600,6 +600,8 @@ export const OrganisationAllocationTab: FC = () => {
       return allProjects;
     },
     enabled: !!customer && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // ── Project selection ───────────────────────────────────────────────────

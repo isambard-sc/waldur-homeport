@@ -6,7 +6,7 @@
  * methods — no re-fetching occurs.
  */
 
-import { get, getAll } from '@waldur/core/api';
+import { get, getAll, getAllWithProgress } from '@waldur/core/api';
 
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
@@ -32,12 +32,16 @@ function buildQuery(filters: object): string {
  * Returns one ProjectUsageReport per API envelope item.
  * Use ProjectUsageReport.combine() to merge them if needed.
  */
+type ProgressCallback = (page: number, totalPages: number | undefined) => void;
+
 export const fetchUsageReports = async (
   filters: UsageReportFilters = {},
+  onProgress?: ProgressCallback,
 ): Promise<ProjectUsageReport[]> => {
-  const items = await getAll<UsageReportApiItem>(
-    `/openportal-project-usage-reports/${buildQuery(filters)}`,
-  );
+  const endpoint = `/openportal-project-usage-reports/${buildQuery(filters)}`;
+  const items = onProgress
+    ? await getAllWithProgress<UsageReportApiItem>(endpoint, onProgress)
+    : await getAll<UsageReportApiItem>(endpoint);
   return items.map(ProjectUsageReport.fromApiResponse);
 };
 
@@ -48,10 +52,12 @@ export const fetchUsageReports = async (
  */
 export const fetchStorageReports = async (
   filters: StorageReportFilters = {},
+  onProgress?: ProgressCallback,
 ): Promise<ProjectStorageReport[]> => {
-  const items = await getAll<StorageReportApiItem>(
-    `/openportal-project-storage-reports/${buildQuery(filters)}`,
-  );
+  const endpoint = `/openportal-project-storage-reports/${buildQuery(filters)}`;
+  const items = onProgress
+    ? await getAllWithProgress<StorageReportApiItem>(endpoint, onProgress)
+    : await getAll<StorageReportApiItem>(endpoint);
   return items.map(ProjectStorageReport.fromApiResponse);
 };
 

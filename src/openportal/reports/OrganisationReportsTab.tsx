@@ -251,6 +251,8 @@ export const OrganisationReportsTab: FC = () => {
       return allProjects;
     },
     enabled: !!customer && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // ── Project selection state ──────────────────────────────────────────────
@@ -291,6 +293,8 @@ export const OrganisationReportsTab: FC = () => {
       };
     },
     enabled: selectedUuids.length > 0 && loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const allUsage = reportData?.usage ?? [];
@@ -301,6 +305,8 @@ export const OrganisationReportsTab: FC = () => {
 
   const { data: nameMaps } = useQuery<NameMaps>({
     queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids, filterYear, filterMonth],
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
     queryFn: async () => {
       setMappingsLoading(true);
       try {

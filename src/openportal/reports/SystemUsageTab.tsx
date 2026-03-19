@@ -54,8 +54,13 @@ export const SystemUsageTab: FC = () => {
   const [filterYear, setFilterYear] = useState<number | undefined>(undefined);
   const [filterMonth, setFilterMonth] = useState<number | undefined>(undefined);
 
-  // ── Stage 1 & 2 combined: Fetch all reports system-wide ─────────────────
-  // (No project list needed for system tab — reports fetched directly)
+  // ── Stage 2: Fetch all reports system-wide ──────────────────────────────
+  // (No project list for system tab — reports fetched directly)
+  const [usageProgress, setUsageProgress] = useState({ page: 0, total: 0 });
+  const [storageProgress, setStorageProgress] = useState({ page: 0, total: 0 });
+  // 'idle' | 'usage' | 'storage' | 'done'
+  const [fetchPhase, setFetchPhase] = useState<'idle' | 'usage' | 'storage' | 'done'>('idle');
+
   const {
     data: reportData,
     isLoading: reportsLoading,
@@ -63,12 +68,25 @@ export const SystemUsageTab: FC = () => {
     refetch: refetchReports,
   } = useQuery({
     queryKey: ['openportal-system-reports', filterYear, filterMonth],
-    queryFn: () =>
-      Promise.all([
-        fetchUsageReports({ year: filterYear, month: filterMonth }),
-        fetchStorageReports({ year: filterYear, month: filterMonth }),
-      ]).then(([usage, storage]) => ({ usage, storage })),
+    queryFn: async () => {
+      setUsageProgress({ page: 0, total: 0 });
+      setStorageProgress({ page: 0, total: 0 });
+      setFetchPhase('usage');
+      const usage = await fetchUsageReports(
+        { year: filterYear, month: filterMonth },
+        (page, totalPages) => setUsageProgress({ page, total: totalPages ?? 0 }),
+      );
+      setFetchPhase('storage');
+      const storage = await fetchStorageReports(
+        { year: filterYear, month: filterMonth },
+        (page, totalPages) => setStorageProgress({ page, total: totalPages ?? 0 }),
+      );
+      setFetchPhase('done');
+      return { usage, storage };
+    },
     enabled: loadTriggered,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const allUsage = reportData?.usage ?? [];
@@ -79,6 +97,8 @@ export const SystemUsageTab: FC = () => {
 
   const { data: nameMaps } = useQuery<NameMaps>({
     queryKey: ['openportal-system-mappings', filterYear, filterMonth],
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
     queryFn: async () => {
       setMappingsLoading(true);
       try {
@@ -273,19 +293,42 @@ export const SystemUsageTab: FC = () => {
       )}
 
       {/* ── Progress bars ───────────────────────────────────────────────── */}
-      {loadingStage === 2 && (
+      {loadingStage === 2 && fetchPhase === 'usage' && (
         <StageProgress
           stage={2}
-          total={3}
-          label="Loading reports"
-          done={0}
-          max={0}
+          total={4}
+          label="Downloading usage reports"
+          done={usageProgress.page}
+          max={usageProgress.total}
+          statusMsg={
+            usageProgress.total
+              ? `Page ${usageProgress.page} of ${usageProgress.total}`
+              : usageProgress.page > 0
+                ? `Page ${usageProgress.page}…`
+                : undefined
+          }
+        />
+      )}
+      {loadingStage === 2 && fetchPhase === 'storage' && (
+        <StageProgress
+          stage={3}
+          total={4}
+          label="Downloading storage reports"
+          done={storageProgress.page}
+          max={storageProgress.total}
+          statusMsg={
+            storageProgress.total
+              ? `Page ${storageProgress.page} of ${storageProgress.total}`
+              : storageProgress.page > 0
+                ? `Page ${storageProgress.page}…`
+                : undefined
+          }
         />
       )}
       {loadingStage === 3 && (
         <StageProgress
-          stage={3}
-          total={3}
+          stage={4}
+          total={4}
           label="Loading name mappings"
           done={0}
           max={0}

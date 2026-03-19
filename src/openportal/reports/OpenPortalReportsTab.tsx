@@ -50,6 +50,8 @@ export const OpenPortalReportsTab: FC = () => {
     queryFn: () =>
       fetchUsageReports({ project_uuid: project?.uuid }),
     enabled: !!project,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const {
@@ -62,6 +64,8 @@ export const OpenPortalReportsTab: FC = () => {
     queryFn: () =>
       fetchStorageReports({ project_uuid: project?.uuid }),
     enabled: !!project,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   const hasReports = !!(usageReports || storageReports);
@@ -69,6 +73,8 @@ export const OpenPortalReportsTab: FC = () => {
   // ── Fetch name mappings once reports are available ───────────────────────
   const { data: nameMaps } = useQuery<NameMaps>({
     queryKey: ['openportal-project-mappings', project?.uuid],
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
     queryFn: async () => {
       const usage = usageReports ?? [];
       const storage = storageReports ?? [];
