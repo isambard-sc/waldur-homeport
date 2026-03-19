@@ -13,6 +13,7 @@ import {
   fetchOfferingMapping,
   fetchProjectMapping,
   fetchUserMapping,
+  mappingBatchCount,
 } from './api';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
@@ -92,50 +93,55 @@ export const SystemUsageTab: FC = () => {
   const allUsage = reportData?.usage ?? [];
   const allStorage = reportData?.storage ?? [];
 
-  // ── Stage 3: Fetch name mappings ─────────────────────────────────────────
-  const [mappingsLoading, setMappingsLoading] = useState(false);
+  // ── Stage 4: Fetch name mappings ─────────────────────────────────────────
+  const [mappingsProgress, setMappingsProgress] = useState({ done: 0, total: 0, statusMsg: '' });
 
   const { data: nameMaps } = useQuery<NameMaps>({
     queryKey: ['openportal-system-mappings', filterYear, filterMonth],
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
-      setMappingsLoading(true);
-      try {
-        const offeringIds = [
-          ...new Set<string>([
-            ...allUsage.map((r) => r.resource),
-            ...allStorage.map((r) => r.resource),
-          ]),
-        ];
-        const projectIds = [
-          ...new Set<string>([
-            ...allUsage.map((r) => r.project),
-            ...allStorage.map((r) => r.project),
-          ]),
-        ];
-        const userIds = [
-          ...new Set<string>(allUsage.flatMap((r) => Object.keys(r.users))),
-        ];
-        const [offerings, projMaps, users] = await Promise.all([
-          fetchOfferingMapping(offeringIds),
-          fetchProjectMapping(projectIds),
-          fetchUserMapping(userIds),
-        ]);
-        return {
-          offering: Object.fromEntries(
-            Object.entries(offerings).map(([k, v]) => [k, v.name]),
-          ),
-          project: Object.fromEntries(
-            Object.entries(projMaps).map(([k, v]) => [k, v.name]),
-          ),
-          user: Object.fromEntries(
-            Object.entries(users).map(([k, v]) => [k, v.full_name]),
-          ),
-        } as NameMaps;
-      } finally {
-        setMappingsLoading(false);
-      }
+      const offeringIds = [
+        ...new Set<string>([
+          ...allUsage.map((r) => r.resource),
+          ...allStorage.map((r) => r.resource),
+        ]),
+      ];
+      const projectIds = [
+        ...new Set<string>([
+          ...allUsage.map((r) => r.project),
+          ...allStorage.map((r) => r.project),
+        ]),
+      ];
+      const userIds = [
+        ...new Set<string>(allUsage.flatMap((r) => Object.keys(r.users))),
+      ];
+
+      const ob = mappingBatchCount(offeringIds);
+      const pb = mappingBatchCount(projectIds);
+      const ub = mappingBatchCount(userIds);
+      const total = ob + pb + ub;
+      setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
+
+      const offerings = await fetchOfferingMapping(offeringIds, (done) =>
+        setMappingsProgress({ done, total, statusMsg: `Offering names — ${done} of ${ob}` }),
+      );
+      setMappingsProgress({ done: ob, total, statusMsg: 'Project names…' });
+
+      const projMaps = await fetchProjectMapping(projectIds, (done) =>
+        setMappingsProgress({ done: ob + done, total, statusMsg: `Project names — ${done} of ${pb}` }),
+      );
+      setMappingsProgress({ done: ob + pb, total, statusMsg: 'User names…' });
+
+      const users = await fetchUserMapping(userIds, (done) =>
+        setMappingsProgress({ done: ob + pb + done, total, statusMsg: `User names — ${done} of ${ub}` }),
+      );
+
+      return {
+        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+        project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
+        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+      } as NameMaps;
     },
     enabled: !!reportData,
   });
@@ -177,7 +183,7 @@ export const SystemUsageTab: FC = () => {
     selectedMonth === 'all' ? storageForResource : (storageByMonth[selectedMonth] ?? []);
 
   // ── Current loading stage ────────────────────────────────────────────────
-  const loadingStage = reportsLoading ? 2 : mappingsLoading ? 3 : 0;
+  const loadingStage = reportsLoading ? 2 : (!!reportData && nameMaps === undefined) ? 4 : 0;
 
   return (
     <div className="container-fluid py-4">
@@ -325,13 +331,14 @@ export const SystemUsageTab: FC = () => {
           }
         />
       )}
-      {loadingStage === 3 && (
+      {loadingStage === 4 && (
         <StageProgress
           stage={4}
           total={4}
           label="Loading name mappings"
-          done={0}
-          max={0}
+          done={mappingsProgress.done}
+          max={mappingsProgress.total}
+          statusMsg={mappingsProgress.statusMsg || undefined}
         />
       )}
 

@@ -18,6 +18,7 @@ import {
   fetchOfferingMapping,
   fetchProjectMapping,
   fetchUserMapping,
+  mappingBatchCount,
 } from './api';
 import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
@@ -301,51 +302,62 @@ export const OrganisationReportsTab: FC = () => {
   const allStorage = reportData?.storage ?? [];
 
   // ── Stage 3: Fetch name mappings ─────────────────────────────────────────
-  const [mappingsLoading, setMappingsLoading] = useState(false);
+  const [mappingsProgress, setMappingsProgress] = useState({ done: 0, total: 0, statusMsg: '' });
 
   const { data: nameMaps } = useQuery<NameMaps>({
     queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids, filterYear, filterMonth],
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
-      setMappingsLoading(true);
-      try {
-        const usageReports = reportData!.usage;
-        const storageReports = reportData!.storage;
-        const offeringIds = [
-          ...new Set([
-            ...usageReports.map((r) => r.resource),
-            ...storageReports.map((r) => r.resource),
-          ]),
-        ];
-        const projectIds = [
-          ...new Set([
-            ...usageReports.map((r) => r.project),
-            ...storageReports.map((r) => r.project),
-          ]),
-        ];
-        const userIds: string[] = [
-          ...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users))),
-        ];
-        const [offerings, projMaps, users] = await Promise.all([
-          fetchOfferingMapping(offeringIds),
-          fetchProjectMapping(projectIds),
-          fetchUserMapping(userIds),
-        ]);
-        return {
-          offering: Object.fromEntries(
-            Object.entries(offerings).map(([k, v]) => [k, v.name]),
-          ),
-          project: Object.fromEntries(
-            Object.entries(projMaps).map(([k, v]) => [k, v.name]),
-          ),
-          user: Object.fromEntries(
-            Object.entries(users).map(([k, v]) => [k, v.full_name]),
-          ),
-        } as NameMaps;
-      } finally {
-        setMappingsLoading(false);
-      }
+      const usageReports = reportData!.usage;
+      const storageReports = reportData!.storage;
+      const offeringIds = [
+        ...new Set([
+          ...usageReports.map((r) => r.resource),
+          ...storageReports.map((r) => r.resource),
+        ]),
+      ];
+      const projectIds = [
+        ...new Set([
+          ...usageReports.map((r) => r.project),
+          ...storageReports.map((r) => r.project),
+        ]),
+      ];
+      const userIds: string[] = [
+        ...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users))),
+      ];
+
+      const ob = mappingBatchCount(offeringIds);
+      const pb = mappingBatchCount(projectIds);
+      const ub = mappingBatchCount(userIds);
+      const total = ob + pb + ub;
+      let cum = 0;
+      setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
+
+      const offerings = await fetchOfferingMapping(offeringIds, (done) => {
+        cum = done;
+        setMappingsProgress({ done: cum, total, statusMsg: `Offering names — ${done} of ${ob}` });
+      });
+      cum = ob;
+      setMappingsProgress({ done: cum, total, statusMsg: 'Project names…' });
+
+      const projMaps = await fetchProjectMapping(projectIds, (done) => {
+        cum = ob + done;
+        setMappingsProgress({ done: cum, total, statusMsg: `Project names — ${done} of ${pb}` });
+      });
+      cum = ob + pb;
+      setMappingsProgress({ done: cum, total, statusMsg: 'User names…' });
+
+      const users = await fetchUserMapping(userIds, (done) => {
+        cum = ob + pb + done;
+        setMappingsProgress({ done: cum, total, statusMsg: `User names — ${done} of ${ub}` });
+      });
+
+      return {
+        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+        project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
+        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+      } as NameMaps;
     },
     enabled: !!reportData,
   });
@@ -392,7 +404,7 @@ export const OrganisationReportsTab: FC = () => {
       ? 1
       : reportsLoading
         ? 2
-        : mappingsLoading
+        : !!reportData && nameMaps === undefined
           ? 3
           : 0;
 
@@ -551,8 +563,9 @@ export const OrganisationReportsTab: FC = () => {
           stage={3}
           total={3}
           label="Loading name mappings"
-          done={0}
-          max={0}
+          done={mappingsProgress.done}
+          max={mappingsProgress.total}
+          statusMsg={mappingsProgress.statusMsg || undefined}
         />
       )}
 

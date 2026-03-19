@@ -85,10 +85,8 @@ export const OpenPortalReportsTab: FC = () => {
       const userIds = [...new Set<string>(
         usage.flatMap((r) => Object.keys(r.users)),
       )];
-      const [offerings, users] = await Promise.all([
-        fetchOfferingMapping(offeringIds),
-        fetchUserMapping(userIds),
-      ]);
+      const offerings = await fetchOfferingMapping(offeringIds);
+      const users = await fetchUserMapping(userIds);
       return {
         offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
         user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
