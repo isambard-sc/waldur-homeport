@@ -102,7 +102,7 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
   // Animation auto-detect effect
   useEffect(() => {
     const elapsed = performance.now() - computeStartRef.current;
-    if (elapsed > 150 && animationsEnabled) {
+    if (elapsed > 1000 && animationsEnabled) {
       setAnimationsEnabled(false);
       try { localStorage.setItem('openportal-animations-disabled', '1'); } catch {}
     }

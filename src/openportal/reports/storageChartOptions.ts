@@ -15,6 +15,8 @@ import {
   NameMaps,
   buildTooltipRows,
   computeDataZoomRange,
+  gridOverride,
+  timeseriesLegend,
   truncateLabel,
   truncateMiddle,
 } from './usageChartOptions';
@@ -250,9 +252,9 @@ export function buildStorageBarOptions(
         return lines.join('<br/>');
       },
     },
-    legend: { data: legendItems, bottom: 0 },
+    legend: legendItems.length > 15 ? { show: false } : { data: legendItems, bottom: 0 },
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
-    grid: { left: '18%', right: '5%', bottom: 40 },
+    grid: { left: '18%', right: '5%', bottom: legendItems.length > 15 ? 10 : 40 },
     xAxis: {
       type: 'value',
       name: unitLabel,
@@ -446,7 +448,7 @@ export function buildStorageTimeseriesOptions(
         return `<b>${date}</b><br/>${rows}`;
       },
     },
-    legend: { data: allNames, type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend(allNames),
     toolbox: {
       right: 10,
       feature: {
@@ -457,6 +459,7 @@ export function buildStorageTimeseriesOptions(
       { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: zoom.start, end: zoom.end },
     ],
     grid: { bottom: 130 },
+    ...gridOverride(allNames.length, 70),
     xAxis: {
       type: 'category',
       data: labels,
@@ -705,16 +708,13 @@ export function buildStorageProjectTimeseriesOptions(
         return `<b>${date}</b><br/>${rows}`;
       },
     },
-    legend: {
-      data: allNames,
-      type: 'scroll',
-      bottom: 60,
-    },
+    legend: timeseriesLegend(allNames),
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     dataZoom: [
       { type: 'slider', xAxisIndex: 0, bottom: 10, height: 40, start: zoom.start, end: zoom.end },
     ],
     grid: { bottom: 120 },
+    ...gridOverride(allNames.length, 70),
     xAxis: {
       type: 'category',
       data: labels,
