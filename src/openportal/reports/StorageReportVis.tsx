@@ -15,7 +15,7 @@
  */
 
 import { FileArrowDownIcon, FileXlsIcon } from '@phosphor-icons/react';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { EChart } from '@waldur/core/EChart';
 import { Tip } from '@waldur/core/Tooltip';
@@ -66,15 +66,29 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
   const [view, setView] = useState<ChartView>('bar');
   const [volumeFilter, setVolumeFilter] = useState<string>('all');
   const [groupBy, setGroupBy] = useState<GroupBy>('day');
-  const [groupMode, setGroupMode] = useState<GroupMode>(
+  const [groupMode] = useState<GroupMode>(
     multipleProjects ? 'project' : 'user',
   );
   const [showMapped, setShowMapped] = useState(true);
+
+  // Animation auto-detect: disable animations when data sets are large
+  const [animationsEnabled, setAnimationsEnabled] = useState(() => {
+    try { return localStorage.getItem('openportal-animations-disabled') !== '1'; } catch { return true; }
+  });
+  const computeStartRef = useRef(0);
+
+  // Updating indicator
+  const [isUpdating, setIsUpdating] = useState(false);
+  const updateRafRef = useRef<number | undefined>(undefined);
+
+  // Excel download progress
+  const [excelProgress, setExcelProgress] = useState<{ current: number; total: number } | null>(null);
 
   const fullNames = multipleProjects && groupMode === 'user';
   const activeMaps = showMapped ? nameMaps : undefined;
 
   const options = useMemo(() => {
+    computeStartRef.current = performance.now();
     if (!report) return {};
     if (groupMode === 'project') {
       return view === 'timeseries'
@@ -84,6 +98,28 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
     if (view === 'timeseries') return buildStorageTimeseriesOptions(report, groupBy, fullNames, activeMaps);
     return buildStorageBarOptions(report, volumeFilter, fullNames, activeMaps);
   }, [report, reports, view, volumeFilter, groupBy, groupMode, fullNames, activeMaps]);
+
+  // Animation auto-detect effect
+  useEffect(() => {
+    const elapsed = performance.now() - computeStartRef.current;
+    if (elapsed > 150 && animationsEnabled) {
+      setAnimationsEnabled(false);
+      try { localStorage.setItem('openportal-animations-disabled', '1'); } catch {}
+    }
+  }, [options]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Updating indicator effect
+  useEffect(() => {
+    setIsUpdating(true);
+    updateRafRef.current = requestAnimationFrame(() => {
+      updateRafRef.current = requestAnimationFrame(() => {
+        setIsUpdating(false);
+      });
+    });
+    return () => {
+      if (updateRafRef.current !== undefined) cancelAnimationFrame(updateRafRef.current);
+    };
+  }, [options]);
 
   if (!report) {
     return <div className="text-muted p-4">No storage data available.</div>;
@@ -118,7 +154,13 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() => downloadStorageExcel(report, `storage_report`, nameMaps)}
+              onClick={async () => {
+                setExcelProgress({ current: 0, total: 1 });
+                await downloadStorageExcel(report, `storage_report`, nameMaps, (current, total) =>
+                  setExcelProgress({ current, total }),
+                );
+                setExcelProgress(null);
+              }}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -138,6 +180,11 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
             </button>
           </Tip>
         </div>
+        {excelProgress && (
+          <span className="text-muted small ms-2">
+            Preparing Excel — sheet {excelProgress.current} of {excelProgress.total}…
+          </span>
+        )}
       </div>
 
       {/* ── Row 2: toggle controls ────────────────────────────────────── */}
@@ -182,26 +229,6 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
           </div>
         )}
 
-        {/* By user / By project toggle — only when multiple projects */}
-        {multipleProjects && (
-          <div className="btn-group btn-group-sm" role="group">
-            <button
-              type="button"
-              className={`btn btn-${groupMode === 'user' ? 'primary' : 'secondary'}`}
-              onClick={() => setGroupMode('user')}
-            >
-              By user
-            </button>
-            <button
-              type="button"
-              className={`btn btn-${groupMode === 'project' ? 'primary' : 'secondary'}`}
-              onClick={() => setGroupMode('project')}
-            >
-              By project
-            </button>
-          </div>
-        )}
-
         {/* Mapped names toggle — only shown when mappings are available */}
         {nameMaps && (
           <div className="btn-group btn-group-sm" role="group">
@@ -241,8 +268,15 @@ export const StorageReportVis: FC<Props> = ({ reports, height = '420px', nameMap
       </div>
 
       {/* ── Chart ────────────────────────────────────────────────────── */}
+      {/* Updating indicator */}
+      {isUpdating && (
+        <div className="text-muted small mb-1" style={{ minHeight: '1.2em' }}>
+          <span className="spinner-border spinner-border-sm me-1" style={{ width: '0.75rem', height: '0.75rem' }} />
+          Updating...
+        </div>
+      )}
       <EChart
-        options={options}
+        options={animationsEnabled ? options : { ...options, animation: false }}
         height={height}
         exportTitle={`${destinationLabel} storage`}
       />

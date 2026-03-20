@@ -51,6 +51,7 @@ export function truncateLabel(s: string, maxLen = 32): string {
 
 const MAX_TOOLTIP_ITEMS = 15;
 const MAX_PIE_SLICES = 15;
+const TOP_N_USERS = 20;
 
 const tooltipDot = (color: string) =>
   `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:4px"></span>`;
@@ -302,7 +303,29 @@ export function buildTimeseriesOptions(
       sumOverLabel(dates, label, groupBy, (d) => getHoursForDate(user, d)),
     ),
   );
-  const zoom = computeDataZoomRange(labels, seriesData);
+
+  // Rank users by total, keep top N
+  const userTotals = seriesData.map((data) => data.reduce((s, v) => s + v, 0));
+  const ranked = users
+    .map((user, i) => ({
+      user,
+      display: displayNames[i],
+      total: userTotals[i],
+      data: seriesData[i],
+    }))
+    .sort((a, b) => b.total - a.total);
+  const topUsers = ranked.slice(0, TOP_N_USERS);
+  const hiddenUsers = ranked.slice(TOP_N_USERS).filter((u) => u.total > 0);
+  const otherData =
+    hiddenUsers.length > 0
+      ? labels.map((_, li) => hiddenUsers.reduce((s, u) => s + (u.data[li] ?? 0), 0))
+      : null;
+  const allNames = [
+    ...topUsers.map((u) => u.display),
+    ...(otherData ? [`Others (${hiddenUsers.length})`] : []),
+  ];
+
+  const zoom = computeDataZoomRange(labels, topUsers.map((u) => u.data));
   const base = baseTimeseriesConfig(labels, groupBy, yLabel, '{value} h', zoom);
 
   return {
@@ -317,16 +340,30 @@ export function buildTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: displayNames, type: 'scroll', bottom: 60 },
+    legend: { data: allNames, type: 'scroll', bottom: 60 },
     ...base,
-    series: users.map((_user, i) => ({
-      name: displayNames[i],
-      type: 'bar',
-      stack: 'usage',
-      emphasis: { focus: 'series' },
-      itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: seriesData[i],
-    })),
+    series: [
+      ...topUsers.map((info, i) => ({
+        name: info.display,
+        type: 'bar',
+        stack: 'usage',
+        emphasis: { focus: 'series' },
+        itemStyle: { color: PALETTE[i % PALETTE.length] },
+        data: info.data,
+      })),
+      ...(otherData
+        ? [
+            {
+              name: `Others (${hiddenUsers.length})`,
+              type: 'bar',
+              stack: 'usage',
+              emphasis: { focus: 'series' },
+              itemStyle: { color: '#bbb' },
+              data: otherData,
+            },
+          ]
+        : []),
+    ],
   };
 }
 
@@ -494,7 +531,29 @@ export function buildJobsTimeseriesOptions(
       sumOverLabel(dates, label, groupBy, (d) => report.getReport(d)?.userJobCounts[user] ?? 0),
     ),
   );
-  const zoom = computeDataZoomRange(labels, seriesData);
+
+  // Rank users by total jobs, keep top N
+  const userTotals = seriesData.map((data) => data.reduce((s, v) => s + v, 0));
+  const ranked = users
+    .map((user, i) => ({
+      user,
+      display: displayNames[i],
+      total: userTotals[i],
+      data: seriesData[i],
+    }))
+    .sort((a, b) => b.total - a.total);
+  const topUsers = ranked.slice(0, TOP_N_USERS);
+  const hiddenUsers = ranked.slice(TOP_N_USERS).filter((u) => u.total > 0);
+  const otherData =
+    hiddenUsers.length > 0
+      ? labels.map((_, li) => hiddenUsers.reduce((s, u) => s + (u.data[li] ?? 0), 0))
+      : null;
+  const allNames = [
+    ...topUsers.map((u) => u.display),
+    ...(otherData ? [`Others (${hiddenUsers.length})`] : []),
+  ];
+
+  const zoom = computeDataZoomRange(labels, topUsers.map((u) => u.data));
   const base = baseTimeseriesConfig(labels, groupBy, 'Jobs', '{value}', zoom);
 
   return {
@@ -509,16 +568,30 @@ export function buildJobsTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${Math.round(total)}</b>`;
       },
     },
-    legend: { data: displayNames, type: 'scroll', bottom: 60 },
+    legend: { data: allNames, type: 'scroll', bottom: 60 },
     ...base,
-    series: users.map((_user, i) => ({
-      name: displayNames[i],
-      type: 'bar',
-      stack: 'jobs',
-      emphasis: { focus: 'series' },
-      itemStyle: { color: PALETTE[i % PALETTE.length] },
-      data: seriesData[i],
-    })),
+    series: [
+      ...topUsers.map((info, i) => ({
+        name: info.display,
+        type: 'bar',
+        stack: 'jobs',
+        emphasis: { focus: 'series' },
+        itemStyle: { color: PALETTE[i % PALETTE.length] },
+        data: info.data,
+      })),
+      ...(otherData
+        ? [
+            {
+              name: `Others (${hiddenUsers.length})`,
+              type: 'bar',
+              stack: 'jobs',
+              emphasis: { focus: 'series' },
+              itemStyle: { color: '#bbb' },
+              data: otherData,
+            },
+          ]
+        : []),
+    ],
   };
 }
 
@@ -655,7 +728,16 @@ export function buildAvgWaitTimeseriesOptions(
 ): EChartsOption {
   const dates = report.dates;
   const labels = computeLabels(dates, groupBy);
-  const users = report.localUsers();
+  const allUsers = report.localUsers();
+
+  // Rank users by total jobs, keep top N
+  const allUserTotals = allUsers.map((user) =>
+    report.dailyReports().reduce((s, d) => s + (d.userJobCounts[user] ?? 0), 0),
+  );
+  const rankedUsers = allUsers
+    .map((user, i) => ({ user, total: allUserTotals[i] }))
+    .sort((a, b) => b.total - a.total);
+  const users = rankedUsers.slice(0, TOP_N_USERS).map((u) => u.user);
   const displayNames = users.map((u) => resolveUserName(u, report, fullNames, nameMaps));
 
   const userSeriesData = users.map((user) =>

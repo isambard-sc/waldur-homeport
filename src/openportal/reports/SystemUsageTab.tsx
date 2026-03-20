@@ -3,7 +3,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 
@@ -19,6 +19,7 @@ import {
   getCached,
   setCached,
   clearCached,
+  clearMappingCache,
   getCacheAge,
   formatCacheAge,
   TTL,
@@ -30,6 +31,10 @@ import { StageProgress } from './StageProgress';
 import { StorageReportVis } from './StorageReportVis';
 import { NameMaps } from './usageChartOptions';
 import { UsageReportVis } from './UsageReportVis';
+
+// ── Constants ─────────────────────────────────────────────────────────────────
+
+const MAX_USER_MAPPINGS = 100;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -59,6 +64,8 @@ const MONTH_NAMES = [
 
 export const SystemUsageTab: FC = () => {
   const [loadTriggered, setLoadTriggered] = useState(false);
+  const [loadAllUserMappings, setLoadAllUserMappings] = useState(false);
+  const [showSlowWarning, setShowSlowWarning] = useState(false);
 
   // ── Pre-filter: year / month ─────────────────────────────────────────────
   const [filterYear, setFilterYear] = useState<number | undefined>(undefined);
@@ -127,14 +134,11 @@ export const SystemUsageTab: FC = () => {
   // ── Stage 4: Fetch name mappings ─────────────────────────────────────────
   const [mappingsProgress, setMappingsProgress] = useState({ done: 0, total: 0, statusMsg: '' });
 
-  const { data: nameMaps } = useQuery<NameMaps>({
-    queryKey: ['openportal-system-mappings', filterYear, filterMonth],
+  const { data: mapsResult } = useQuery<{ maps: NameMaps; truncatedUserCount: number }>({
+    queryKey: ['openportal-system-mappings', filterYear, filterMonth, loadAllUserMappings],
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
-      const mapsCacheKey = `system-mappings-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`;
-      const cached = getCached<NameMaps>(mapsCacheKey, TTL.MAPPINGS);
-      if (cached) return cached;
       const offeringIds = [
         ...new Set<string>([
           ...allUsage.map((r) => r.resource),
@@ -147,9 +151,26 @@ export const SystemUsageTab: FC = () => {
           ...allStorage.map((r) => r.project),
         ]),
       ];
-      const userIds = [
-        ...new Set<string>(allUsage.flatMap((r) => Object.keys(r.users))),
-      ];
+      const allUserIds = [...new Set<string>(allUsage.flatMap((r) => Object.keys(r.users)))];
+      const usageByUid: Record<string, number> = {};
+      for (const r of allUsage) {
+        for (const [uid, localName] of Object.entries(r.users)) {
+          let sec = 0;
+          for (const date of r.dates) {
+            sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
+          }
+          usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
+        }
+      }
+      const usersWithUsage = allUserIds
+        .filter((uid) => (usageByUid[uid] ?? 0) > 0)
+        .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
+      const userIds = loadAllUserMappings
+        ? usersWithUsage
+        : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
+      const truncatedUserCount = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS
+        ? usersWithUsage.length - MAX_USER_MAPPINGS
+        : 0;
 
       const ob = mappingBatchCount(offeringIds);
       const pb = mappingBatchCount(projectIds);
@@ -176,11 +197,12 @@ export const SystemUsageTab: FC = () => {
         project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
         user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
       } as NameMaps;
-      setCached(mapsCacheKey, maps);
-      return maps;
+      return { maps, truncatedUserCount };
     },
     enabled: !!reportData,
   });
+  const nameMaps = mapsResult?.maps;
+  const usersTruncatedCount = mapsResult?.truncatedUserCount ?? 0;
 
   // ── Resource filter ──────────────────────────────────────────────────────
   const allResources = useMemo(
@@ -220,6 +242,17 @@ export const SystemUsageTab: FC = () => {
 
   // ── Current loading stage ────────────────────────────────────────────────
   const loadingStage = reportsLoading ? 2 : (!!reportData && nameMaps === undefined) ? 4 : 0;
+
+  // ── Slow-load warning ────────────────────────────────────────────────────
+  useEffect(() => {
+    const isLoading = reportsLoading || loadingStage === 4;
+    if (!isLoading) {
+      setShowSlowWarning(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowSlowWarning(true), 5000);
+    return () => clearTimeout(timer);
+  }, [reportsLoading, loadingStage]);
 
   return (
     <div className="container-fluid py-4">
@@ -275,13 +308,11 @@ export const SystemUsageTab: FC = () => {
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={() => {
+              clearMappingCache();
               const reportsCacheKey = filterYear && filterMonth
                 ? `system-reports-${filterYear}-${filterMonth}`
                 : null;
-              clearCached(
-                ...(reportsCacheKey ? [reportsCacheKey] : []),
-                `system-mappings-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`,
-              );
+              if (reportsCacheKey) clearCached(reportsCacheKey);
               if (loadTriggered) refetchReports();
             }}
           >
@@ -396,6 +427,26 @@ export const SystemUsageTab: FC = () => {
         />
       )}
 
+      {/* ── Slow-load warning ───────────────────────────────────────────── */}
+      {showSlowWarning && (
+        <div className="alert alert-warning d-flex align-items-start gap-3 mb-3">
+          <div className="flex-grow-1">
+            <strong>This is taking a while.</strong>
+            <div className="small mt-1">
+              To speed things up: select a specific year and month filter before loading.
+              System-wide data across all projects and users can be very large.
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-warning btn-sm flex-shrink-0"
+            onClick={() => window.location.reload()}
+          >
+            Cancel &amp; reload
+          </button>
+        </div>
+      )}
+
       {/* ── Errors ─────────────────────────────────────────────────────── */}
       {reportsError && (
         <LoadingErred
@@ -411,6 +462,23 @@ export const SystemUsageTab: FC = () => {
         allStorage.length === 0 && (
           <p className="text-muted">No OpenPortal reports found.</p>
         )}
+
+      {/* ── User mapping truncation notice ──────────────────────────────── */}
+      {usersTruncatedCount > 0 && nameMaps !== undefined && (
+        <div className="alert alert-info d-flex align-items-center gap-2 mb-3 py-2">
+          <small>
+            User names shown for top {MAX_USER_MAPPINGS} users by usage only.{' '}
+            {usersTruncatedCount} more user{usersTruncatedCount !== 1 ? 's' : ''} not mapped.
+          </small>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-primary ms-auto"
+            onClick={() => setLoadAllUserMappings(true)}
+          >
+            Load all user names
+          </button>
+        </div>
+      )}
 
       {/* ── Charts ────────────────────────────────────────────────────── */}
       {activeUsage.length > 0 && nameMaps !== undefined && (

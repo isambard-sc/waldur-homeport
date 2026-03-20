@@ -17,7 +17,7 @@
  */
 
 import { FileArrowDownIcon, FileXlsIcon } from '@phosphor-icons/react';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 
 import { EChart } from '@waldur/core/EChart';
 import { Tip } from '@waldur/core/Tooltip';
@@ -90,6 +90,19 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
   // When nameMaps are available, default to showing mapped names; can be toggled
   const [showMapped, setShowMapped] = useState(true);
 
+  // Animation auto-detect: disable animations when data sets are large
+  const [animationsEnabled, setAnimationsEnabled] = useState(() => {
+    try { return localStorage.getItem('openportal-animations-disabled') !== '1'; } catch { return true; }
+  });
+  const computeStartRef = useRef(0);
+
+  // Updating indicator
+  const [isUpdating, setIsUpdating] = useState(false);
+  const updateRafRef = useRef<number | undefined>(undefined);
+
+  // Excel download progress
+  const [excelProgress, setExcelProgress] = useState<{ current: number; total: number } | null>(null);
+
   // Use full usernames when viewing by user across multiple projects
   const fullNames = multipleProjects && groupMode === 'user';
 
@@ -97,6 +110,7 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
   const activeMaps = showMapped ? nameMaps : undefined;
 
   const options = useMemo(() => {
+    computeStartRef.current = performance.now();
     if (groupMode === 'project') {
       if (metric === 'jobs') {
         return view === 'timeseries'
@@ -129,6 +143,28 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
       : buildPieOptions(report, component, fullNames, activeMaps);
   }, [report, reports, metric, view, component, groupBy, groupMode, fullNames, activeMaps]);
 
+  // Animation auto-detect effect
+  useEffect(() => {
+    const elapsed = performance.now() - computeStartRef.current;
+    if (elapsed > 150 && animationsEnabled) {
+      setAnimationsEnabled(false);
+      try { localStorage.setItem('openportal-animations-disabled', '1'); } catch {}
+    }
+  }, [options]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Updating indicator effect
+  useEffect(() => {
+    setIsUpdating(true);
+    updateRafRef.current = requestAnimationFrame(() => {
+      updateRafRef.current = requestAnimationFrame(() => {
+        setIsUpdating(false);
+      });
+    });
+    return () => {
+      if (updateRafRef.current !== undefined) cancelAnimationFrame(updateRafRef.current);
+    };
+  }, [options]);
+
   if (!report) {
     return <div className="text-muted p-4">No usage data available.</div>;
   }
@@ -158,7 +194,13 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
             <button
               type="button"
               className="text-btn text-hover-primary"
-              onClick={() => downloadUsageExcel(reports, 'usage_report', nameMaps)}
+              onClick={async () => {
+                setExcelProgress({ current: 0, total: 1 });
+                await downloadUsageExcel(reports, 'usage_report', nameMaps, (current, total) =>
+                  setExcelProgress({ current, total }),
+                );
+                setExcelProgress(null);
+              }}
             >
               <FileXlsIcon size={20} />
             </button>
@@ -178,6 +220,11 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
             </button>
           </Tip>
         </div>
+        {excelProgress && (
+          <span className="text-muted small ms-2">
+            Preparing Excel — sheet {excelProgress.current} of {excelProgress.total}…
+          </span>
+        )}
       </div>
 
       {/* ── Row 2: toggle controls ────────────────────────────────────── */}
@@ -294,8 +341,15 @@ export const UsageReportVis: FC<Props> = ({ reports, height = '420px', nameMaps 
       </div>
 
       {/* ── Chart ────────────────────────────────────────────────────── */}
+      {/* Updating indicator */}
+      {isUpdating && (
+        <div className="text-muted small mb-1" style={{ minHeight: '1.2em' }}>
+          <span className="spinner-border spinner-border-sm me-1" style={{ width: '0.75rem', height: '0.75rem' }} />
+          Updating...
+        </div>
+      )}
       <EChart
-        options={options}
+        options={animationsEnabled ? options : { ...options, animation: false }}
         height={height}
         exportTitle={`${destinationLabel} ${METRIC_LABELS[metric]}`}
       />

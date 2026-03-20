@@ -22,7 +22,7 @@ import {
   projectsList,
   ProjectAccountingSummary,
 } from 'waldur-js-client';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { FileXlsIcon } from '@phosphor-icons/react';
@@ -570,6 +570,9 @@ export const OrganisationAllocationTab: FC = () => {
 
   // ── Lazy-load — don't fire until user clicks "Load data" ─────────────────
   const [loadTriggered, setLoadTriggered] = useState(false);
+  const [projectSearch, setProjectSearch] = useState('');
+  const [projectStartAfter, setProjectStartAfter] = useState('');
+  const [projectEndBefore, setProjectEndBefore] = useState('');
 
   // ── Fetch all projects in the organisation ──────────────────────────────
   const [projectProgress, setProjectProgress] = useState({ done: 0, total: 0, statusMsg: '' });
@@ -580,9 +583,9 @@ export const OrganisationAllocationTab: FC = () => {
     error: projectsError,
     refetch: refetchProjects,
   } = useQuery({
-    queryKey: ['openportal-alloc-projects', customer?.uuid],
+    queryKey: ['openportal-alloc-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore],
     queryFn: async () => {
-      const cacheKey = `alloc-projects-${customer!.uuid}`;
+      const cacheKey = `alloc-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -591,7 +594,15 @@ export const OrganisationAllocationTab: FC = () => {
       setProjectProgress({ done: 0, total: 0, statusMsg: 'Starting…' });
       while (true) {
         const result = await projectsList({
-          query: { customer: customer!.uuid, page_size: 25, o: ['name'], page },
+          query: {
+            customer: customer!.uuid,
+            page_size: 25,
+            o: ['name'],
+            page,
+            ...(projectSearch ? { query: projectSearch } : {}),
+            ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
+            ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
+          } as any,
         });
         allProjects = allProjects.concat(result.data);
         if (page === 1) {
@@ -705,6 +716,24 @@ export const OrganisationAllocationTab: FC = () => {
   const [consumptionChartType, setConsumptionChartType] =
     useState<ChartType>('bar');
   const [consumptionGroupBy, setConsumptionGroupBy] = useState<GroupBy>('day');
+
+  // ── Slow-load warning ───────────────────────────────────────────────────
+  const [showSlowWarning, setShowSlowWarning] = useState(false);
+
+  const loadingStage = projectsLoading ? 1 : summariesLoading ? 2 : 0;
+
+  useEffect(() => {
+    const isLoading = projectsLoading || summariesLoading;
+    if (!isLoading) {
+      setShowSlowWarning(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowSlowWarning(true), 5000);
+    return () => clearTimeout(timer);
+  }, [projectsLoading, summariesLoading]);
+
+  // ── Excel download progress ─────────────────────────────────────────────
+  const [excelProgress, setExcelProgress] = useState<{current: number; total: number} | null>(null);
 
   const currencyName = ENV.plugins.WALDUR_CORE.CURRENCY_NAME;
 
@@ -869,7 +898,7 @@ export const OrganisationAllocationTab: FC = () => {
       </div>
 
       {/* ── Status ─────────────────────────────────────────────────────── */}
-      {projectsLoading && (
+      {loadingStage === 1 && (
         <StageProgress
           stage={1}
           total={2}
@@ -897,18 +926,49 @@ export const OrganisationAllocationTab: FC = () => {
       {/* Load prompt — shown before the user triggers the fetch */}
       {!loadTriggered && !allSummaries && (
         <div className="card mb-4">
-          <div className="card-body d-flex align-items-center gap-3 flex-wrap">
-            <div>
-              <p className="mb-1 fw-semibold">Allocation data not yet loaded</p>
-              <p className="mb-0 text-muted small">
-                Loading computes summaries for every project in this
-                organisation and may take 10–15 seconds. You can optionally
-                filter to a subset of projects first to speed things up.
-              </p>
+          <div className="card-body">
+            <p className="mb-1 fw-semibold">Allocation data not yet loaded</p>
+            <p className="mb-3 text-muted small">
+              Loading computes summaries for every project in this
+              organisation and may take 10–15 seconds. You can optionally
+              filter to a subset of projects first to speed things up.
+            </p>
+
+            {/* Project pre-filters */}
+            <div className="row g-2 mb-3">
+              <div className="col-12 col-md-4">
+                <label className="form-label small mb-1">Project search</label>
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  placeholder="Name search (applied at load time)…"
+                  value={projectSearch}
+                  onChange={(e) => setProjectSearch(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-4">
+                <label className="form-label small mb-1">Started after</label>
+                <input
+                  type="date"
+                  className="form-control form-control-sm"
+                  value={projectStartAfter}
+                  onChange={(e) => setProjectStartAfter(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-4">
+                <label className="form-label small mb-1">Started before</label>
+                <input
+                  type="date"
+                  className="form-control form-control-sm"
+                  value={projectEndBefore}
+                  onChange={(e) => setProjectEndBefore(e.target.value)}
+                />
+              </div>
             </div>
+
             <button
               type="button"
-              className="btn btn-primary btn-sm ms-auto"
+              className="btn btn-primary btn-sm"
               onClick={() => setLoadTriggered(true)}
             >
               Load data
@@ -918,7 +978,7 @@ export const OrganisationAllocationTab: FC = () => {
       )}
 
       {/* Progress bar while summaries are being fetched */}
-      {summariesLoading && (
+      {loadingStage === 2 && (
         <StageProgress
           stage={2}
           total={2}
@@ -927,6 +987,24 @@ export const OrganisationAllocationTab: FC = () => {
           max={summariesProgress.total}
           statusMsg={summariesProgress.statusMsg || undefined}
         />
+      )}
+
+      {showSlowWarning && (
+        <div className="alert alert-warning d-flex align-items-start gap-3 mb-3">
+          <div className="flex-grow-1">
+            <strong>This is taking a while.</strong>
+            <div className="small mt-1">
+              To speed things up: use the project search or date filters to load fewer projects.
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-warning btn-sm flex-shrink-0"
+            onClick={() => window.location.reload()}
+          >
+            Cancel &amp; reload
+          </button>
+        </div>
       )}
 
       {loadTriggered && !summariesLoading && !summariesError && summaries.length === 0 && (
@@ -1003,17 +1081,25 @@ export const OrganisationAllocationTab: FC = () => {
               <button
                 type="button"
                 className="text-btn text-hover-primary"
-                onClick={() =>
-                  downloadAllocationExcel(
+                onClick={async () => {
+                  setExcelProgress({ current: 0, total: 1 });
+                  await downloadAllocationExcel(
                     summaries,
                     currencyName,
                     `allocation-summary-${customer?.name ?? 'org'}`,
-                  )
-                }
+                    (current, total) => setExcelProgress({ current, total }),
+                  );
+                  setExcelProgress(null);
+                }}
               >
                 <FileXlsIcon size={20} />
               </button>
             </Tip>
+            {excelProgress && (
+              <span className="text-muted small ms-2">
+                Preparing Excel — sheet {excelProgress.current} of {excelProgress.total}…
+              </span>
+            )}
           </div>
           <div className="card-body">
             {chartOptions ? (
@@ -1075,17 +1161,25 @@ export const OrganisationAllocationTab: FC = () => {
               <button
                 type="button"
                 className="text-btn text-hover-primary"
-                onClick={() =>
-                  downloadAllocationExcel(
+                onClick={async () => {
+                  setExcelProgress({ current: 0, total: 1 });
+                  await downloadAllocationExcel(
                     summaries,
                     currencyName,
                     `allocation-summary-${customer?.name ?? 'org'}`,
-                  )
-                }
+                    (current, total) => setExcelProgress({ current, total }),
+                  );
+                  setExcelProgress(null);
+                }}
               >
                 <FileXlsIcon size={20} />
               </button>
             </Tip>
+            {excelProgress && (
+              <span className="text-muted small ms-2">
+                Preparing Excel — sheet {excelProgress.current} of {excelProgress.total}…
+              </span>
+            )}
           </div>
           <div className="card-body">
             {consumptionOptions ? (

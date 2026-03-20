@@ -3,11 +3,16 @@
  *
  * Data is fetched once and returned as wrapper class instances.
  * All subsequent filtering/aggregation is done client-side via the class
- * methods — no re-fetching occurs.
+ * methods — no re-fetches occur.
+ *
+ * Identifier → name mappings are cached per-identifier in localStorage so
+ * that a storage-quota failure only affects individual entries rather than
+ * losing the entire mapping dictionary.
  */
 
 import { get, getAll, getAllWithProgress } from '@waldur/core/api';
 
+import { getCached, setCached, TTL } from './localStorageCache';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import {
@@ -72,9 +77,16 @@ export const mappingBatchCount = (ids: string[]): number =>
 export type MappingProgressCallback = (batchesDone: number) => void;
 
 /**
- * Fetch an identifier→info mapping in batches of MAPPING_BATCH_SIZE.
- * Calls `onProgress(batchesDone)` after each batch so callers can track
- * progress. Batches are fetched sequentially to avoid overwhelming the server.
+ * Fetch an identifier→info mapping, using per-identifier localStorage caching.
+ *
+ * Each identifier is stored individually (key: `map-{endpoint}-{id}`) so a
+ * localStorage quota failure only evicts single entries rather than the
+ * entire dictionary — preventing the endless refetch cycle that occurred
+ * when a large NameMaps blob was rejected.
+ *
+ * Progress callback semantics: `onProgress(batchesDone)` where batches are
+ * counted across ALL identifiers (cached hits count as instant batches) so
+ * the denominator computed by `mappingBatchCount(ids)` stays accurate.
  */
 async function fetchMappingBatched<T>(
   endpoint: string,
@@ -82,15 +94,40 @@ async function fetchMappingBatched<T>(
   onProgress?: MappingProgressCallback,
 ): Promise<Record<string, T>> {
   if (identifiers.length === 0) return {};
+
   const result: Record<string, T> = {};
-  for (let i = 0; i < identifiers.length; i += MAPPING_BATCH_SIZE) {
-    const chunk = identifiers.slice(i, i + MAPPING_BATCH_SIZE);
+  const uncachedIds: string[] = [];
+
+  // Check per-identifier cache first
+  for (const id of identifiers) {
+    const cached = getCached<T>(`map-${endpoint}-${id}`, TTL.MAPPINGS);
+    if (cached !== null) {
+      result[id] = cached;
+    } else {
+      uncachedIds.push(id);
+    }
+  }
+
+  // Report cached batches as immediately completed (rapid progress advance)
+  const cachedCount = identifiers.length - uncachedIds.length;
+  const cachedBatches = Math.ceil(cachedCount / MAPPING_BATCH_SIZE);
+  if (cachedBatches > 0 && onProgress) {
+    for (let b = 1; b <= cachedBatches; b++) onProgress(b);
+  }
+
+  // Fetch uncached identifiers in batches
+  for (let i = 0; i < uncachedIds.length; i += MAPPING_BATCH_SIZE) {
+    const chunk = uncachedIds.slice(i, i + MAPPING_BATCH_SIZE);
     const params = new URLSearchParams();
     for (const id of chunk) params.append('identifier', id);
     const data = await get<Record<string, T>>(`/openportal/${endpoint}/?${params}`);
-    Object.assign(result, data);
-    if (onProgress) onProgress(Math.floor(i / MAPPING_BATCH_SIZE) + 1);
+    for (const [id, value] of Object.entries(data)) {
+      setCached(`map-${endpoint}-${id}`, value);
+      result[id] = value as T;
+    }
+    if (onProgress) onProgress(cachedBatches + Math.floor(i / MAPPING_BATCH_SIZE) + 1);
   }
+
   return result;
 }
 
