@@ -866,12 +866,12 @@ export const OrganisationAllocationTab: FC = () => {
               className="btn btn-primary btn-sm"
               onClick={() => setDialogOpen(true)}
             >
-              Select projects
+              Filter selected projects
             </button>
           </div>
         )}
 
-        <div className="ms-auto d-flex align-items-center gap-2">
+        {loadTriggered && <div className="ms-auto d-flex align-items-center gap-2">
           {(() => {
             const age = customer ? getCacheAge(`alloc-summaries-${customer.uuid}`) : null;
             return age ? (
@@ -894,7 +894,7 @@ export const OrganisationAllocationTab: FC = () => {
           >
             Refresh
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* ── Status ─────────────────────────────────────────────────────── */}
