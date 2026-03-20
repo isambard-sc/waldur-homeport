@@ -95,6 +95,7 @@ function buildSheetXml(ss: SharedStrings, rows: any[][]): string {
 async function downloadMultiSheetExcel(
   filename: string,
   sheets: SheetSpec[],
+  onProgress?: (current: number, total: number) => void,
 ): Promise<void> {
   const zip = new JSZip();
   const ss = new SharedStrings();
@@ -174,9 +175,12 @@ async function downloadMultiSheetExcel(
   );
 
   // worksheets
-  sheets.forEach((sheet, i) => {
-    zip.file(`xl/worksheets/sheet${i + 1}.xml`, buildSheetXml(ss, sheet.rows));
-  });
+  for (let i = 0; i < sheets.length; i++) {
+    if (onProgress) onProgress(i + 1, sheets.length);
+    // Small yield to allow React to re-render the progress
+    await new Promise((r) => setTimeout(r, 0));
+    zip.file(`xl/worksheets/sheet${i + 1}.xml`, buildSheetXml(ss, sheets[i].rows));
+  }
 
   zip.file('xl/sharedStrings.xml', ss.serialize());
   zip.file('xl/styles.xml', STYLES_XML);
@@ -450,13 +454,14 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
   return sheets;
 }
 
-export function downloadUsageExcel(
+export async function downloadUsageExcel(
   reports: ProjectUsageReport[],
   title: string,
   nameMaps?: NameMaps,
-): void {
+  onProgress?: (current: number, total: number) => void,
+): Promise<void> {
   const sheets = buildUsageSheets(reports, nameMaps);
-  downloadMultiSheetExcel(`${title}.xlsx`, sheets);
+  await downloadMultiSheetExcel(`${title}.xlsx`, sheets, onProgress);
 }
 
 // ── Storage report ────────────────────────────────────────────────────────────
@@ -586,13 +591,14 @@ function buildStorageSheets(report: ProjectStorageReport, nameMaps?: NameMaps): 
   return sheets;
 }
 
-export function downloadStorageExcel(
+export async function downloadStorageExcel(
   report: ProjectStorageReport,
   title: string,
   nameMaps?: NameMaps,
-): void {
+  onProgress?: (current: number, total: number) => void,
+): Promise<void> {
   const sheets = buildStorageSheets(report, nameMaps);
-  downloadMultiSheetExcel(`${title}.xlsx`, sheets);
+  await downloadMultiSheetExcel(`${title}.xlsx`, sheets, onProgress);
 }
 
 // ── Allocation summary ────────────────────────────────────────────────────────
@@ -774,13 +780,14 @@ function buildAllocationSheets(
   return sheets;
 }
 
-export function downloadAllocationExcel(
+export async function downloadAllocationExcel(
   summaries: ProjectAccountingSummary[],
   currencyName: string,
   title: string,
-): void {
+  onProgress?: (current: number, total: number) => void,
+): Promise<void> {
   const sheets = buildAllocationSheets(summaries, currencyName);
-  downloadMultiSheetExcel(`${title}.xlsx`, sheets);
+  await downloadMultiSheetExcel(`${title}.xlsx`, sheets, onProgress);
 }
 
 // ── JSON download ─────────────────────────────────────────────────────────────

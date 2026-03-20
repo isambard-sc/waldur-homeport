@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Project, projectsList } from 'waldur-js-client';
 
 import { getNextPageUrl } from '@waldur/core/api';
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useMemo, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
@@ -24,12 +24,14 @@ import {
   getCached,
   setCached,
   clearCached,
+  clearMappingCache,
   getCacheAge,
   formatCacheAge,
   TTL,
 } from './localStorageCache';
 import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
+import { StorageReportApiItem, UsageReportApiItem } from './types';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
@@ -58,6 +60,7 @@ const MONTH_NAMES = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
+const MAX_USER_MAPPINGS = 100;
 
 // ── Project filter dialog ─────────────────────────────────────────────────────
 
@@ -223,6 +226,17 @@ export const OrganisationReportsTab: FC = () => {
   const [filterYear, setFilterYear] = useState<number | undefined>(undefined);
   const [filterMonth, setFilterMonth] = useState<number | undefined>(undefined);
 
+  // ── Pre-filter: project search / date range ──────────────────────────────
+  const [projectSearch, setProjectSearch] = useState('');
+  const [projectStartAfter, setProjectStartAfter] = useState('');
+  const [projectEndBefore, setProjectEndBefore] = useState('');
+
+  // ── User mapping: load-all toggle ────────────────────────────────────────
+  const [loadAllUserMappings, setLoadAllUserMappings] = useState(false);
+
+  // ── Slow-load warning ────────────────────────────────────────────────────
+  const [showSlowWarning, setShowSlowWarning] = useState(false);
+
   // ── Stage 1: Fetch all projects ──────────────────────────────────────────
   const [projectProgress, setProjectProgress] = useState({ done: 0, total: 0, statusMsg: '' });
 
@@ -232,9 +246,9 @@ export const OrganisationReportsTab: FC = () => {
     error: projectsError,
     refetch: refetchProjects,
   } = useQuery({
-    queryKey: ['openportal-org-projects', customer?.uuid],
+    queryKey: ['openportal-org-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore],
     queryFn: async () => {
-      const cacheKey = `org-projects-${customer!.uuid}`;
+      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -243,7 +257,15 @@ export const OrganisationReportsTab: FC = () => {
       setProjectProgress({ done: 0, total: 0, statusMsg: 'Starting…' });
       while (true) {
         const result = await projectsList({
-          query: { customer: customer!.uuid, page_size: 25, o: ['name'], page },
+          query: {
+            customer: customer!.uuid,
+            page_size: 25,
+            o: ['name'],
+            page,
+            ...(projectSearch ? { query: projectSearch } : {}),
+            ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
+            ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
+          } as any,
         });
         allProjects = allProjects.concat(result.data);
         if (page === 1) {
@@ -289,15 +311,32 @@ export const OrganisationReportsTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-org-reports', customer?.uuid, selectedUuids, filterYear, filterMonth],
     queryFn: async () => {
+      const yearTag = filterYear ?? 'all';
+      const monthTag = filterMonth ?? 'all';
       setFetchProgress({ done: 0, total: selectedUuids.length });
       const results = await Promise.all(
         selectedUuids.map(async (uuid) => {
-          const result = await Promise.all([
-            fetchUsageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
-            fetchStorageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
-          ]);
+          const uKey = `usage-report-${uuid}-${yearTag}-${monthTag}`;
+          const sKey = `storage-report-${uuid}-${yearTag}-${monthTag}`;
+          const cachedUsage = getCached<UsageReportApiItem[]>(uKey, TTL.REPORTS);
+          const cachedStorage = getCached<StorageReportApiItem[]>(sKey, TTL.REPORTS);
+          let usage: ProjectUsageReport[];
+          let storage: ProjectStorageReport[];
+          if (cachedUsage && cachedStorage) {
+            usage = cachedUsage.map(ProjectUsageReport.fromApiResponse);
+            storage = cachedStorage.map(ProjectStorageReport.fromApiResponse);
+          } else {
+            [usage, storage] = await Promise.all([
+              fetchUsageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
+              fetchStorageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
+            ]);
+            if (usage.every((r) => r.apiItem.is_complete)) {
+              setCached(uKey, usage.map((r) => r.apiItem));
+              setCached(sKey, storage.map((r) => r.apiItem));
+            }
+          }
           setFetchProgress((prev) => ({ ...prev, done: prev.done + 1 }));
-          return result;
+          return [usage, storage] as const;
         }),
       );
       return {
@@ -316,14 +355,11 @@ export const OrganisationReportsTab: FC = () => {
   // ── Stage 3: Fetch name mappings ─────────────────────────────────────────
   const [mappingsProgress, setMappingsProgress] = useState({ done: 0, total: 0, statusMsg: '' });
 
-  const { data: nameMaps } = useQuery<NameMaps>({
-    queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids, filterYear, filterMonth],
+  const { data: mapsResult } = useQuery<{ maps: NameMaps; truncatedUserCount: number }>({
+    queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids, filterYear, filterMonth, loadAllUserMappings],
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
-      const mapsCacheKey = `org-mappings-${customer!.uuid}-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`;
-      const cached = getCached<NameMaps>(mapsCacheKey, TTL.MAPPINGS);
-      if (cached) return cached;
       const usageReports = reportData!.usage;
       const storageReports = reportData!.storage;
       const offeringIds = [
@@ -338,13 +374,30 @@ export const OrganisationReportsTab: FC = () => {
           ...storageReports.map((r) => r.project),
         ]),
       ];
-      const userIds: string[] = [
-        ...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users))),
-      ];
+
+      // Compute total usage per uid (only users with non-zero usage)
+      const allUserIds = [...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users)))];
+      const usageByUid: Record<string, number> = {};
+      for (const r of usageReports) {
+        for (const [uid, localName] of Object.entries(r.users)) {
+          let sec = 0;
+          for (const date of r.dates) {
+            sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
+          }
+          usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
+        }
+      }
+      const usersWithUsage = allUserIds
+        .filter((uid) => (usageByUid[uid] ?? 0) > 0)
+        .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
+      const userIdsCapped = loadAllUserMappings
+        ? usersWithUsage
+        : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
+      const usersMappingsTruncated = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS;
 
       const ob = mappingBatchCount(offeringIds);
       const pb = mappingBatchCount(projectIds);
-      const ub = mappingBatchCount(userIds);
+      const ub = mappingBatchCount(userIdsCapped);
       const total = ob + pb + ub;
       let cum = 0;
       setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
@@ -363,7 +416,7 @@ export const OrganisationReportsTab: FC = () => {
       cum = ob + pb;
       setMappingsProgress({ done: cum, total, statusMsg: 'User names…' });
 
-      const users = await fetchUserMapping(userIds, (done) => {
+      const users = await fetchUserMapping(userIdsCapped, (done) => {
         cum = ob + pb + done;
         setMappingsProgress({ done: cum, total, statusMsg: `User names — ${done} of ${ub}` });
       });
@@ -373,11 +426,15 @@ export const OrganisationReportsTab: FC = () => {
         project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
         user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
       } as NameMaps;
-      setCached(mapsCacheKey, maps);
-      return maps;
+      return {
+        maps,
+        truncatedUserCount: usersMappingsTruncated ? usersWithUsage.length - MAX_USER_MAPPINGS : 0,
+      };
     },
     enabled: !!reportData,
   });
+  const nameMaps = mapsResult?.maps;
+  const usersTruncatedCount = mapsResult?.truncatedUserCount ?? 0;
 
   // ── Resource filter ──────────────────────────────────────────────────────
   const allResources = useMemo(
@@ -425,6 +482,17 @@ export const OrganisationReportsTab: FC = () => {
           ? 3
           : 0;
 
+  // ── Slow-load warning timer ──────────────────────────────────────────────
+  useEffect(() => {
+    const isLoading = projectsLoading || reportsLoading || loadingStage === 3;
+    if (!isLoading) {
+      setShowSlowWarning(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowSlowWarning(true), 5000);
+    return () => clearTimeout(timer);
+  }, [projectsLoading, reportsLoading, loadingStage]);
+
   return (
     <div className="container-fluid py-4">
       {/* ── Toolbar ──────────────────────────────────────────────────── */}
@@ -442,7 +510,7 @@ export const OrganisationReportsTab: FC = () => {
               className="btn btn-primary btn-sm"
               onClick={() => setDialogOpen(true)}
             >
-              Select projects
+              Filter selected projects
             </button>
           </div>
         )}
@@ -481,7 +549,7 @@ export const OrganisationReportsTab: FC = () => {
           </select>
         )}
 
-        <div className="ms-auto d-flex align-items-center gap-2">
+        {loadTriggered && <div className="ms-auto d-flex align-items-center gap-2">
           {(() => {
             const age = customer ? getCacheAge(`org-projects-${customer.uuid}`) : null;
             return age ? (
@@ -492,10 +560,10 @@ export const OrganisationReportsTab: FC = () => {
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={() => {
+              clearMappingCache();
               if (customer) {
                 clearCached(
                   `org-projects-${customer.uuid}`,
-                  `org-mappings-${customer.uuid}-${filterYear ?? 'all'}-${filterMonth ?? 'all'}`,
                 );
               }
               refetchProjects();
@@ -504,7 +572,7 @@ export const OrganisationReportsTab: FC = () => {
           >
             Refresh
           </button>
-        </div>
+        </div>}
       </div>
 
       {/* ── Load prompt ──────────────────────────────────────────────── */}
@@ -512,6 +580,38 @@ export const OrganisationReportsTab: FC = () => {
         <div className="card mb-4">
           <div className="card-body">
             <p className="mb-2 fw-semibold">Usage reports not yet loaded</p>
+
+            {/* Project pre-filters */}
+            <div className="row g-2 mb-3">
+              <div className="col-12 col-md-4">
+                <label className="form-label small mb-1">Project search</label>
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  placeholder="Name search (applied at load time)…"
+                  value={projectSearch}
+                  onChange={(e) => setProjectSearch(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-4">
+                <label className="form-label small mb-1">Started after</label>
+                <input
+                  type="date"
+                  className="form-control form-control-sm"
+                  value={projectStartAfter}
+                  onChange={(e) => setProjectStartAfter(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-4">
+                <label className="form-label small mb-1">Started before</label>
+                <input
+                  type="date"
+                  className="form-control form-control-sm"
+                  value={projectEndBefore}
+                  onChange={(e) => setProjectEndBefore(e.target.value)}
+                />
+              </div>
+            </div>
 
             {/* Year / Month pre-filters */}
             <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
@@ -555,7 +655,8 @@ export const OrganisationReportsTab: FC = () => {
 
             <p className="text-muted small mb-3">
               Fetches reports for each project in parallel — this may take 15–30 seconds for large
-              organisations. Filtering to a specific year or month will be much faster.
+              organisations. Tip: use the project search and date filters above to load only the
+              projects you need — much faster for large organisations.
             </p>
 
             <button
@@ -600,6 +701,26 @@ export const OrganisationReportsTab: FC = () => {
         />
       )}
 
+      {/* ── Slow-load warning ────────────────────────────────────────── */}
+      {showSlowWarning && (
+        <div className="alert alert-warning d-flex align-items-start gap-3 mb-3">
+          <div className="flex-grow-1">
+            <strong>This is taking a while.</strong>
+            <div className="small mt-1">
+              To speed things up: use a specific year/month filter, or search for fewer projects when loading.
+              Large datasets with many users and projects take longer to process.
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn-warning btn-sm flex-shrink-0"
+            onClick={() => window.location.reload()}
+          >
+            Cancel &amp; reload
+          </button>
+        </div>
+      )}
+
       {/* ── Errors ───────────────────────────────────────────────────── */}
       {projectsError && (
         <LoadingErred message="Failed to load projects" loadData={refetchProjects} />
@@ -620,6 +741,25 @@ export const OrganisationReportsTab: FC = () => {
             No OpenPortal reports found for the selected projects.
           </p>
         )}
+
+      {/* ── Truncated user mapping notice ────────────────────────────── */}
+      {usersTruncatedCount > 0 && nameMaps !== undefined && (
+        <div className="alert alert-info d-flex align-items-center gap-2 mb-3 py-2">
+          <small>
+            User names shown for top {MAX_USER_MAPPINGS} users by usage only.{' '}
+            {usersTruncatedCount} more user{usersTruncatedCount !== 1 ? 's' : ''} not mapped.
+          </small>
+          <button
+            type="button"
+            className="btn btn-sm btn-outline-primary ms-auto"
+            onClick={() => {
+              setLoadAllUserMappings(true);
+            }}
+          >
+            Load all user names
+          </button>
+        </div>
+      )}
 
       {/* ── Charts ───────────────────────────────────────────────────── */}
       {activeUsage.length > 0 && nameMaps !== undefined && (

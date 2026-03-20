@@ -23,6 +23,7 @@ import {
   getCached,
   setCached,
   clearCached,
+  clearMappingCache,
   getCacheAge,
   formatCacheAge,
   TTL,
@@ -33,6 +34,8 @@ import { StorageReportVis } from './StorageReportVis';
 import { UsageReportApiItem, StorageReportApiItem } from './types';
 import { NameMaps } from './usageChartOptions';
 import { UsageReportVis } from './UsageReportVis';
+
+const MAX_USER_MAPPINGS = 100;
 
 /** Group reports by "year-month" so the user can select a specific month */
 const groupByMonth = <T extends { year: number; month: number }>(
@@ -97,25 +100,33 @@ export const OpenPortalReportsTab: FC = () => {
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
-      const cacheKey = `project-mappings-${project!.uuid}`;
-      const cached = getCached<NameMaps>(cacheKey, TTL.MAPPINGS);
-      if (cached) return cached;
       const usage = usageReports ?? [];
       const storage = storageReports ?? [];
       const offeringIds = [...new Set<string>([
         ...usage.map((r) => r.resource),
         ...storage.map((r) => r.resource),
       ])];
-      const userIds = [...new Set<string>(
-        usage.flatMap((r) => Object.keys(r.users)),
-      )];
+      const allUserIds = [...new Set<string>(usage.flatMap((r) => Object.keys(r.users)))];
+      const usageByUid: Record<string, number> = {};
+      for (const r of usage) {
+        for (const [uid, localName] of Object.entries(r.users)) {
+          let sec = 0;
+          for (const date of r.dates) {
+            sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
+          }
+          usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
+        }
+      }
+      const userIds = allUserIds
+        .filter((uid) => (usageByUid[uid] ?? 0) > 0)
+        .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0))
+        .slice(0, MAX_USER_MAPPINGS);
       const offerings = await fetchOfferingMapping(offeringIds);
       const users = await fetchUserMapping(userIds);
       const maps = {
         offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
         user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
       } as NameMaps;
-      setCached(cacheKey, maps);
       return maps;
     },
     enabled: hasReports,
@@ -215,11 +226,11 @@ export const OpenPortalReportsTab: FC = () => {
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={() => {
+              clearMappingCache();
               if (project) {
                 clearCached(
                   `project-usage-${project.uuid}`,
                   `project-storage-${project.uuid}`,
-                  `project-mappings-${project.uuid}`,
                 );
               }
               refetchUsage();

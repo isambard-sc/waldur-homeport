@@ -87,6 +87,22 @@ export function clearCached(...keys: string[]): void {
   }
 }
 
+/**
+ * Remove all per-identifier mapping cache entries (keys prefixed with
+ * `map-`). Called by Refresh buttons so the next load re-fetches fresh
+ * names from the API.
+ */
+export function clearMappingCache(): void {
+  const mapPrefix = `${PREFIX}map-`;
+  try {
+    Object.keys(localStorage)
+      .filter((k) => k.startsWith(mapPrefix))
+      .forEach((k) => localStorage.removeItem(k));
+  } catch {
+    // ignore
+  }
+}
+
 /** Format a cache age for display, e.g. "3 h 12 min ago". */
 export function formatCacheAge(cachedAt: Date): string {
   const ms = Date.now() - cachedAt.getTime();

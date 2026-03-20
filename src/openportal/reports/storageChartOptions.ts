@@ -32,6 +32,8 @@ const PALETTE = [
   '#1abc9c',
 ];
 
+const TOP_N_USERS = 20;
+
 /** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
 const shortName = (s: string) => s.split('.')[0];
 
@@ -64,16 +66,29 @@ export function buildStorageBarOptions(
   const projectQuotas = report.projectQuotas;
   const projectVolNames = Object.keys(projectQuotas).sort();
 
-  const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) => {
+  const allUids = report.userIdentifiers();
+  const allLocalNames = allUids.map((uid) => {
     if (nameMaps?.user?.[uid]) return truncateLabel(nameMaps.user[uid]);
     const raw = fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
     return truncateLabel(raw);
   });
 
+  // Rank uids by total usage, keep top N
+  const userTotals = allUids.map((uid) =>
+    Object.values(report.quotaForUser(uid)).reduce((s, q) => s + q.usageBytes, 0),
+  );
+  const uidRanked = allUids
+    .map((uid, i) => ({ uid, name: allLocalNames[i], total: userTotals[i] }))
+    .sort((a, b) => b.total - a.total);
+  const topUids = uidRanked.slice(0, TOP_N_USERS);
+  const hiddenUids = uidRanked.slice(TOP_N_USERS).filter((u) => u.total > 0);
+
+  const uids = topUids.map((u) => u.uid);
+  const localNames = topUids.map((u) => u.name);
+
   // Derive user-level volume names from actual quota data
   const userVolSet = new Set<string>();
-  for (const uid of uids) {
+  for (const uid of allUids) {
     for (const v of Object.keys(report.quotaForUser(uid))) userVolSet.add(v);
   }
   const userVolNames = [...userVolSet].sort();
@@ -87,9 +102,14 @@ export function buildStorageBarOptions(
       ? userVolNames
       : userVolNames.filter((v) => v === volumeFilter);
 
-  // Y-axis: project rows first, then user rows
+  // Y-axis: project rows first, then top user rows, then optional "Others" row
   const projectRowLabels = visibleProjectVols.map((v) => `Project · ${v}`);
-  const yAxisData = [...projectRowLabels, ...localNames];
+  const othersLabel = hiddenUids.length > 0 ? `Others (${hiddenUids.length})` : null;
+  const yAxisData = [
+    ...projectRowLabels,
+    ...localNames,
+    ...(othersLabel ? [othersLabel] : []),
+  ];
   const totalRows = yAxisData.length;
   const projectRowCount = projectRowLabels.length;
 
@@ -150,20 +170,30 @@ export function buildStorageBarOptions(
   visibleUserVols.forEach((vol, vi) => {
     const color = PALETTE[(visibleProjectVols.length + vi) % PALETTE.length];
 
-    // Data array: zeros for project rows, then one value per user row
+    // Data array: zeros for project rows, then one value per top user row, then optional Others row
+    const othersUsed = hiddenUids.reduce((s, u) => {
+      const q = report.quotaForUser(u.uid)[vol];
+      return s + (q ? q.usageBytes : 0);
+    }, 0);
     const usedData = [
       ...Array(projectRowCount).fill(0),
       ...uids.map((uid) => {
         const q = report.quotaForUser(uid)[vol];
         return q ? toUnit(q.usageBytes) : 0;
       }),
+      ...(othersLabel ? [toUnit(othersUsed)] : []),
     ];
+    const othersLimit = hiddenUids.reduce((s, u) => {
+      const q = report.quotaForUser(u.uid)[vol];
+      return s + (q && isFinite(q.limitBytes) ? q.limitBytes : 0);
+    }, 0);
     const limitData = [
       ...Array(projectRowCount).fill(0),
       ...uids.map((uid) => {
         const q = report.quotaForUser(uid)[vol];
         return q && isFinite(q.limitBytes) ? toUnit(q.limitBytes) : 0;
       }),
+      ...(othersLabel ? [toUnit(othersLimit)] : []),
     ];
 
     legendItems.push(vol);
@@ -271,12 +301,28 @@ export function buildStorageTimeseriesOptions(
   // Labels shown on x-axis
   const labels =
     groupBy === 'month' ? dates.map((d) => d.slice(0, 7)) : dates;
-  const uids = report.userIdentifiers();
-  const localNames = uids.map((uid) => {
+  const allUids = report.userIdentifiers();
+  const allLocalNames = allUids.map((uid) => {
     if (nameMaps?.user?.[uid]) return truncateLabel(nameMaps.user[uid]);
     const raw = fullNames ? (report.users[uid] ?? uid) : shortName(report.users[uid] ?? uid);
     return truncateLabel(raw);
   });
+
+  // Rank uids by total bytes across all dates
+  const userTotals = allUids.map((uid) =>
+    dates.reduce((s, date) => {
+      const daily = report.getReport(date);
+      return s + Object.values(daily?.userQuotas[uid] ?? {}).reduce((ss, q) => ss + q.usageBytes, 0);
+    }, 0),
+  );
+  const ranked = allUids
+    .map((uid, i) => ({ uid, name: allLocalNames[i], total: userTotals[i] }))
+    .sort((a, b) => b.total - a.total);
+  const topN = ranked.slice(0, TOP_N_USERS);
+  const hidden = ranked.slice(TOP_N_USERS).filter((u) => u.total > 0);
+
+  const uids = topN.map((u) => u.uid);
+  const localNames = topN.map((u) => u.name);
 
   // Project volumes present across any daily snapshot
   const projectVolSet = new Set<string>();
@@ -295,7 +341,7 @@ export function buildStorageTimeseriesOptions(
     for (const q of Object.values(daily.projectQuotas)) {
       maxBytes = Math.max(maxBytes, q.usageBytes);
     }
-    for (const uid of uids) {
+    for (const uid of allUids) {
       const total = Object.values(daily.userQuotas[uid] ?? {}).reduce(
         (s, q) => s + q.usageBytes,
         0,
@@ -324,7 +370,7 @@ export function buildStorageTimeseriesOptions(
     }),
   }));
 
-  // Per-user series (stacked together)
+  // Per-user series for top N (stacked together)
   const userSeries = uids.map((uid, i) => ({
     name: localNames[i],
     type: 'bar' as const,
@@ -342,7 +388,40 @@ export function buildStorageTimeseriesOptions(
     }),
   }));
 
-  const allNames = [...projectVols.map((v) => `Project · ${v}`), ...localNames];
+  // "Others" series summing hidden users
+  const othersSeries =
+    hidden.length > 0
+      ? [
+          {
+            name: `Others (${hidden.length})`,
+            type: 'bar' as const,
+            stack: 'users',
+            emphasis: { focus: 'series' as const },
+            itemStyle: { color: '#bbb' },
+            data: dates.map((date) => {
+              const daily = report.getReport(date);
+              if (!daily) return 0;
+              return toUnit(
+                hidden.reduce(
+                  (s, u) =>
+                    s +
+                    Object.values(daily.userQuotas[u.uid] ?? {}).reduce(
+                      (ss, q) => ss + q.usageBytes,
+                      0,
+                    ),
+                  0,
+                ),
+              );
+            }),
+          },
+        ]
+      : [];
+
+  const allNames = [
+    ...projectVols.map((v) => `Project · ${v}`),
+    ...localNames,
+    ...(hidden.length > 0 ? [`Others (${hidden.length})`] : []),
+  ];
 
   const allSeriesData = [
     ...projectSeries.map((s) => s.data as number[]),
@@ -389,7 +468,7 @@ export function buildStorageTimeseriesOptions(
       name: unitLabel,
       axisLabel: { formatter: `{value} ${unitLabel}` },
     },
-    series: [...projectSeries, ...userSeries],
+    series: [...projectSeries, ...userSeries, ...othersSeries],
   };
 }
 
