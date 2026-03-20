@@ -31,6 +31,7 @@ import {
 } from './localStorageCache';
 import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
+import { StorageReportApiItem, UsageReportApiItem } from './types';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
@@ -310,15 +311,32 @@ export const OrganisationReportsTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-org-reports', customer?.uuid, selectedUuids, filterYear, filterMonth],
     queryFn: async () => {
+      const yearTag = filterYear ?? 'all';
+      const monthTag = filterMonth ?? 'all';
       setFetchProgress({ done: 0, total: selectedUuids.length });
       const results = await Promise.all(
         selectedUuids.map(async (uuid) => {
-          const result = await Promise.all([
-            fetchUsageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
-            fetchStorageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
-          ]);
+          const uKey = `usage-report-${uuid}-${yearTag}-${monthTag}`;
+          const sKey = `storage-report-${uuid}-${yearTag}-${monthTag}`;
+          const cachedUsage = getCached<UsageReportApiItem[]>(uKey, TTL.REPORTS);
+          const cachedStorage = getCached<StorageReportApiItem[]>(sKey, TTL.REPORTS);
+          let usage: ProjectUsageReport[];
+          let storage: ProjectStorageReport[];
+          if (cachedUsage && cachedStorage) {
+            usage = cachedUsage.map(ProjectUsageReport.fromApiResponse);
+            storage = cachedStorage.map(ProjectStorageReport.fromApiResponse);
+          } else {
+            [usage, storage] = await Promise.all([
+              fetchUsageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
+              fetchStorageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
+            ]);
+            if (usage.every((r) => r.apiItem.is_complete)) {
+              setCached(uKey, usage.map((r) => r.apiItem));
+              setCached(sKey, storage.map((r) => r.apiItem));
+            }
+          }
           setFetchProgress((prev) => ({ ...prev, done: prev.done + 1 }));
-          return result;
+          return [usage, storage] as const;
         }),
       );
       return {
