@@ -186,13 +186,21 @@ const buildChartOptions = (
           .filter((p) => p.value !== 0 && p.value != null)
           .sort((a, b) => b.value - a.value);
         if (active.length === 0) return params[0]?.axisValueLabel ?? '';
-        const rows = active
+        const TOP = 25;
+        const shown = active.slice(0, TOP);
+        const rest = active.slice(TOP);
+        const othersTotal = rest.reduce((s, p) => s + Number(p.value), 0);
+        const rows = shown
           .map(
             (p) =>
               `${p.marker}${p.seriesName}: <b>${Number(p.value).toFixed(2)}</b>`,
           )
           .join('<br/>');
-        return `${active[0].axisValueLabel}<br/>${rows}`;
+        const othersRow =
+          rest.length > 0
+            ? `<br/>Others (${rest.length}): <b>${othersTotal.toFixed(2)}</b>`
+            : '';
+        return `${active[0].axisValueLabel}<br/>${rows}${othersRow}`;
       },
     },
     legend: { type: 'scroll', bottom: 0 },
@@ -328,13 +336,21 @@ const buildConsumptionChartOptions = (
           .filter((p) => p.value !== 0 && p.value != null)
           .sort((a, b) => b.value - a.value);
         if (active.length === 0) return params[0]?.axisValueLabel ?? '';
-        const rows = active
+        const TOP = 25;
+        const shown = active.slice(0, TOP);
+        const rest = active.slice(TOP);
+        const othersTotal = rest.reduce((s, p) => s + Number(p.value), 0);
+        const rows = shown
           .map(
             (p) =>
               `${p.marker}${p.seriesName}: <b>${Number(p.value).toFixed(2)}</b>`,
           )
           .join('<br/>');
-        return `${active[0].axisValueLabel}<br/>${rows}`;
+        const othersRow =
+          rest.length > 0
+            ? `<br/>Others (${rest.length}): <b>${othersTotal.toFixed(2)}</b>`
+            : '';
+        return `${active[0].axisValueLabel}<br/>${rows}${othersRow}`;
       },
     },
     legend: { type: 'scroll', bottom: 0 },

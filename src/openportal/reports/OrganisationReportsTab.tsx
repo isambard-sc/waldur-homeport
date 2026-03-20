@@ -31,7 +31,6 @@ import {
 } from './localStorageCache';
 import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
-import { StorageReportApiItem, UsageReportApiItem } from './types';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
@@ -312,30 +311,13 @@ export const OrganisationReportsTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-org-reports', customer?.uuid, selectedUuids, filterYear, filterMonth],
     queryFn: async () => {
-      const yearTag = filterYear ?? 'all';
-      const monthTag = filterMonth ?? 'all';
       setFetchProgress({ done: 0, total: selectedUuids.length });
       const results = await Promise.all(
         selectedUuids.map(async (uuid) => {
-          const uKey = `usage-report-${uuid}-${yearTag}-${monthTag}`;
-          const sKey = `storage-report-${uuid}-${yearTag}-${monthTag}`;
-          const cachedUsage = getCached<UsageReportApiItem[]>(uKey, TTL.REPORTS);
-          const cachedStorage = getCached<StorageReportApiItem[]>(sKey, TTL.REPORTS);
-          let usage: ProjectUsageReport[];
-          let storage: ProjectStorageReport[];
-          if (cachedUsage && cachedStorage) {
-            usage = cachedUsage.map(ProjectUsageReport.fromApiResponse);
-            storage = cachedStorage.map(ProjectStorageReport.fromApiResponse);
-          } else {
-            [usage, storage] = await Promise.all([
-              fetchUsageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
-              fetchStorageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
-            ]);
-            if (usage.every((r) => r.apiItem.is_complete)) {
-              setCached(uKey, usage.map((r) => r.apiItem));
-              setCached(sKey, storage.map((r) => r.apiItem));
-            }
-          }
+          const [usage, storage] = await Promise.all([
+            fetchUsageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
+            fetchStorageReports({ project_uuid: uuid, year: filterYear, month: filterMonth }),
+          ]);
           setFetchProgress((prev) => ({ ...prev, done: prev.done + 1 }));
           return [usage, storage] as const;
         }),
@@ -355,72 +337,110 @@ export const OrganisationReportsTab: FC = () => {
 
   // ── Stage 3: Fetch name mappings ─────────────────────────────────────────
   const [mappingsProgress, setMappingsProgress] = useState({ done: 0, total: 0, statusMsg: '' });
+  const [mapsResult, setMapsResult] = useState<{ maps: NameMaps; truncatedUserCount: number } | undefined>(undefined);
+  const [mappingsLoading, setMappingsLoading] = useState(false);
 
-  const { data: mapsResult } = useQuery<{ maps: NameMaps; truncatedUserCount: number }>({
-    queryKey: ['openportal-org-mappings', customer?.uuid, selectedUuids, filterYear, filterMonth, loadAllUserMappings],
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-    queryFn: async () => {
-      const usageReports = reportData!.usage;
-      const storageReports = reportData!.storage;
-      const offeringIds = [
-        ...new Set([
-          ...usageReports.map((r) => r.resource),
-          ...storageReports.map((r) => r.resource),
-        ]),
-      ];
-      const projectIds = [
-        ...new Set([
-          ...usageReports.map((r) => r.project),
-          ...storageReports.map((r) => r.project),
-        ]),
-      ];
+  useEffect(() => {
+    if (!reportData) {
+      setMapsResult(undefined);
+      return;
+    }
+    let cancelled = false;
+    const run = async () => {
+      setMapsResult(undefined);
+      setMappingsLoading(true);
+      setMappingsProgress({ done: 0, total: 0, statusMsg: '' });
+      try {
+        const usageReports = reportData.usage;
+        const storageReports = reportData.storage;
+        const offeringIds = [
+          ...new Set([
+            ...usageReports.map((r) => r.resource),
+            ...storageReports.map((r) => r.resource),
+          ]),
+        ];
+        const projectIds = [
+          ...new Set([
+            ...usageReports.map((r) => r.project),
+            ...storageReports.map((r) => r.project),
+          ]),
+        ];
 
-      // All user identifiers across all usage reports, up to cap
-      const allUserIds = [...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users)))];
-      const userIdsCapped = loadAllUserMappings
-        ? allUserIds
-        : allUserIds.slice(0, MAX_USER_MAPPINGS);
-      const usersMappingsTruncated = !loadAllUserMappings && allUserIds.length > MAX_USER_MAPPINGS;
+        // Top users by usage, capped at MAX_USER_MAPPINGS
+        const allUserIds = [...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users)))];
+        const usageByUid: Record<string, number> = {};
+        for (const r of usageReports) {
+          for (const [uid, localName] of Object.entries(r.users)) {
+            let sec = 0;
+            for (const date of r.dates) {
+              sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
+            }
+            usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
+          }
+        }
+        const usersWithUsage = allUserIds
+          .filter((uid) => (usageByUid[uid] ?? 0) > 0)
+          .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
+        const userIdsCapped = loadAllUserMappings
+          ? usersWithUsage
+          : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
+        const usersMappingsTruncated = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS;
 
-      const ob = mappingBatchCount(offeringIds);
-      const pb = mappingBatchCount(projectIds);
-      const ub = mappingBatchCount(userIdsCapped);
-      const total = ob + pb + ub;
-      let cum = 0;
-      setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
+        const ob = mappingBatchCount(offeringIds);
+        const pb = mappingBatchCount(projectIds);
+        const ub = mappingBatchCount(userIdsCapped);
+        const total = ob + pb + ub;
+        let cum = 0;
 
-      const offerings = await fetchOfferingMapping(offeringIds, (done) => {
-        cum = done;
-        setMappingsProgress({ done: cum, total, statusMsg: `Offering names — ${done} of ${ob}` });
-      });
-      cum = ob;
-      setMappingsProgress({ done: cum, total, statusMsg: 'Project names…' });
+        console.debug('[OpenPortal org] mappings start:', { offerings: offeringIds.length, projects: projectIds.length, users: userIdsCapped.length, total });
+        setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
 
-      const projMaps = await fetchProjectMapping(projectIds, (done) => {
-        cum = ob + done;
-        setMappingsProgress({ done: cum, total, statusMsg: `Project names — ${done} of ${pb}` });
-      });
-      cum = ob + pb;
-      setMappingsProgress({ done: cum, total, statusMsg: 'User names…' });
+        const offerings = await fetchOfferingMapping(offeringIds, (done) => {
+          if (cancelled) return;
+          cum = done;
+          setMappingsProgress({ done: cum, total, statusMsg: `Offering names — ${done} of ${ob}` });
+        });
+        if (cancelled) return;
+        cum = ob;
+        setMappingsProgress({ done: cum, total, statusMsg: 'Project names…' });
 
-      const users = await fetchUserMapping(userIdsCapped, (done) => {
-        cum = ob + pb + done;
-        setMappingsProgress({ done: cum, total, statusMsg: `User names — ${done} of ${ub}` });
-      });
+        const projMaps = await fetchProjectMapping(projectIds, (done) => {
+          if (cancelled) return;
+          cum = ob + done;
+          setMappingsProgress({ done: cum, total, statusMsg: `Project names — ${done} of ${pb}` });
+        });
+        if (cancelled) return;
+        cum = ob + pb;
+        setMappingsProgress({ done: cum, total, statusMsg: 'User names…' });
 
-      const maps = {
-        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
-        project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
-        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
-      } as NameMaps;
-      return {
-        maps,
-        truncatedUserCount: usersMappingsTruncated ? allUserIds.length - MAX_USER_MAPPINGS : 0,
-      };
-    },
-    enabled: !!reportData,
-  });
+        const users = await fetchUserMapping(userIdsCapped, (done) => {
+          if (cancelled) return;
+          cum = ob + pb + done;
+          setMappingsProgress({ done: cum, total, statusMsg: `User names — ${done} of ${ub}` });
+        });
+        if (cancelled) return;
+
+        console.debug('[OpenPortal org] mappings done:', { offerings: Object.keys(offerings).length, projects: Object.keys(projMaps).length, users: Object.keys(users).length });
+
+        const maps = {
+          offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+          project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
+          user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+        } as NameMaps;
+        setMapsResult({
+          maps,
+          truncatedUserCount: usersMappingsTruncated ? usersWithUsage.length - MAX_USER_MAPPINGS : 0,
+        });
+      } catch (err) {
+        console.error('[OpenPortal org] mapping error:', err);
+      } finally {
+        if (!cancelled) setMappingsLoading(false);
+      }
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [reportData, loadAllUserMappings]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const nameMaps = mapsResult?.maps;
   const usersTruncatedCount = mapsResult?.truncatedUserCount ?? 0;
 
@@ -466,7 +486,7 @@ export const OrganisationReportsTab: FC = () => {
       ? 1
       : reportsLoading
         ? 2
-        : !!reportData && nameMaps === undefined
+        : mappingsLoading
           ? 3
           : 0;
 
@@ -757,7 +777,7 @@ export const OrganisationReportsTab: FC = () => {
       )}
 
       {/* ── Charts ───────────────────────────────────────────────────── */}
-      {activeUsage.length > 0 && !!reportData && !showLoadPrompt && (
+      {activeUsage.length > 0 && nameMaps !== undefined && !showLoadPrompt && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -766,7 +786,7 @@ export const OrganisationReportsTab: FC = () => {
         </div>
       )}
 
-      {activeStorage.length > 0 && !!reportData && !showLoadPrompt && (
+      {activeStorage.length > 0 && nameMaps !== undefined && !showLoadPrompt && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">

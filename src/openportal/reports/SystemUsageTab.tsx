@@ -16,15 +16,8 @@ import {
   mappingBatchCount,
 } from './api';
 import {
-  getCached,
-  setCached,
-  clearCached,
   clearMappingCache,
-  getCacheAge,
-  formatCacheAge,
-  TTL,
 } from './localStorageCache';
-import { UsageReportApiItem, StorageReportApiItem } from './types';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { StageProgress } from './StageProgress';
@@ -87,22 +80,6 @@ export const SystemUsageTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-system-reports', filterYear, filterMonth],
     queryFn: async () => {
-      // Cache only when a specific year+month is selected (unfiltered data is too large)
-      const reportsCacheKey = filterYear && filterMonth
-        ? `system-reports-${filterYear}-${filterMonth}`
-        : null;
-      if (reportsCacheKey) {
-        const cached = getCached<{ usage: UsageReportApiItem[]; storage: StorageReportApiItem[] }>(
-          reportsCacheKey, TTL.REPORTS,
-        );
-        if (cached) {
-          setFetchPhase('done');
-          return {
-            usage: cached.usage.map(ProjectUsageReport.fromApiResponse),
-            storage: cached.storage.map(ProjectStorageReport.fromApiResponse),
-          };
-        }
-      }
       setUsageProgress({ page: 0, total: 0 });
       setStorageProgress({ page: 0, total: 0 });
       setFetchPhase('usage');
@@ -116,12 +93,6 @@ export const SystemUsageTab: FC = () => {
         (page, totalPages) => setStorageProgress({ page, total: totalPages ?? 0 }),
       );
       setFetchPhase('done');
-      if (reportsCacheKey) {
-        setCached(reportsCacheKey, {
-          usage: usage.map((r) => r.apiItem),
-          storage: storage.map((r) => r.apiItem),
-        });
-      }
       return { usage, storage };
     },
     enabled: loadTriggered,
@@ -134,74 +105,101 @@ export const SystemUsageTab: FC = () => {
 
   // ── Stage 4: Fetch name mappings ─────────────────────────────────────────
   const [mappingsProgress, setMappingsProgress] = useState({ done: 0, total: 0, statusMsg: '' });
+  const [mapsResult, setMapsResult] = useState<{ maps: NameMaps; truncatedUserCount: number } | undefined>(undefined);
+  const [mappingsLoading, setMappingsLoading] = useState(false);
 
-  const { data: mapsResult } = useQuery<{ maps: NameMaps; truncatedUserCount: number }>({
-    queryKey: ['openportal-system-mappings', filterYear, filterMonth, loadAllUserMappings],
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
-    queryFn: async () => {
-      const offeringIds = [
-        ...new Set<string>([
-          ...allUsage.map((r) => r.resource),
-          ...allStorage.map((r) => r.resource),
-        ]),
-      ];
-      const projectIds = [
-        ...new Set<string>([
-          ...allUsage.map((r) => r.project),
-          ...allStorage.map((r) => r.project),
-        ]),
-      ];
-      const allUserIds = [...new Set<string>(allUsage.flatMap((r) => Object.keys(r.users)))];
-      const usageByUid: Record<string, number> = {};
-      for (const r of allUsage) {
-        for (const [uid, localName] of Object.entries(r.users)) {
-          let sec = 0;
-          for (const date of r.dates) {
-            sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
+  useEffect(() => {
+    if (!reportData) {
+      setMapsResult(undefined);
+      return;
+    }
+    let cancelled = false;
+    const run = async () => {
+      setMapsResult(undefined);
+      setMappingsLoading(true);
+      setMappingsProgress({ done: 0, total: 0, statusMsg: '' });
+      try {
+        const usageReports = reportData.usage;
+        const storageReports = reportData.storage;
+        const offeringIds = [
+          ...new Set<string>([
+            ...usageReports.map((r) => r.resource),
+            ...storageReports.map((r) => r.resource),
+          ]),
+        ];
+        const projectIds = [
+          ...new Set<string>([
+            ...usageReports.map((r) => r.project),
+            ...storageReports.map((r) => r.project),
+          ]),
+        ];
+        const allUserIds = [...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users)))];
+        const usageByUid: Record<string, number> = {};
+        for (const r of usageReports) {
+          for (const [uid, localName] of Object.entries(r.users)) {
+            let sec = 0;
+            for (const date of r.dates) {
+              sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
+            }
+            usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
           }
-          usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
         }
+        const usersWithUsage = allUserIds
+          .filter((uid) => (usageByUid[uid] ?? 0) > 0)
+          .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
+        const userIds = loadAllUserMappings
+          ? usersWithUsage
+          : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
+        const truncatedUserCount = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS
+          ? usersWithUsage.length - MAX_USER_MAPPINGS
+          : 0;
+
+        const ob = mappingBatchCount(offeringIds);
+        const pb = mappingBatchCount(projectIds);
+        const ub = mappingBatchCount(userIds);
+        const total = ob + pb + ub;
+
+        console.debug('[OpenPortal system] mappings start:', { offerings: offeringIds.length, projects: projectIds.length, users: userIds.length, total });
+        setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
+
+        const offerings = await fetchOfferingMapping(offeringIds, (done) => {
+          if (cancelled) return;
+          setMappingsProgress({ done, total, statusMsg: `Offering names — ${done} of ${ob}` });
+        });
+        if (cancelled) return;
+        setMappingsProgress({ done: ob, total, statusMsg: 'Project names…' });
+
+        const projMaps = await fetchProjectMapping(projectIds, (done) => {
+          if (cancelled) return;
+          setMappingsProgress({ done: ob + done, total, statusMsg: `Project names — ${done} of ${pb}` });
+        });
+        if (cancelled) return;
+        setMappingsProgress({ done: ob + pb, total, statusMsg: 'User names…' });
+
+        const users = await fetchUserMapping(userIds, (done) => {
+          if (cancelled) return;
+          setMappingsProgress({ done: ob + pb + done, total, statusMsg: `User names — ${done} of ${ub}` });
+        });
+        if (cancelled) return;
+
+        console.debug('[OpenPortal system] mappings done:', { offerings: Object.keys(offerings).length, projects: Object.keys(projMaps).length, users: Object.keys(users).length });
+
+        const maps = {
+          offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
+          project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
+          user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+        } as NameMaps;
+        setMapsResult({ maps, truncatedUserCount });
+      } catch (err) {
+        console.error('[OpenPortal system] mapping error:', err);
+      } finally {
+        if (!cancelled) setMappingsLoading(false);
       }
-      const usersWithUsage = allUserIds
-        .filter((uid) => (usageByUid[uid] ?? 0) > 0)
-        .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
-      const userIds = loadAllUserMappings
-        ? usersWithUsage
-        : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
-      const truncatedUserCount = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS
-        ? usersWithUsage.length - MAX_USER_MAPPINGS
-        : 0;
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [reportData, loadAllUserMappings]); // eslint-disable-line react-hooks/exhaustive-deps
 
-      const ob = mappingBatchCount(offeringIds);
-      const pb = mappingBatchCount(projectIds);
-      const ub = mappingBatchCount(userIds);
-      const total = ob + pb + ub;
-      setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
-
-      const offerings = await fetchOfferingMapping(offeringIds, (done) =>
-        setMappingsProgress({ done, total, statusMsg: `Offering names — ${done} of ${ob}` }),
-      );
-      setMappingsProgress({ done: ob, total, statusMsg: 'Project names…' });
-
-      const projMaps = await fetchProjectMapping(projectIds, (done) =>
-        setMappingsProgress({ done: ob + done, total, statusMsg: `Project names — ${done} of ${pb}` }),
-      );
-      setMappingsProgress({ done: ob + pb, total, statusMsg: 'User names…' });
-
-      const users = await fetchUserMapping(userIds, (done) =>
-        setMappingsProgress({ done: ob + pb + done, total, statusMsg: `User names — ${done} of ${ub}` }),
-      );
-
-      const maps = {
-        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
-        project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
-        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
-      } as NameMaps;
-      return { maps, truncatedUserCount };
-    },
-    enabled: !!reportData,
-  });
   const nameMaps = mapsResult?.maps;
   const usersTruncatedCount = mapsResult?.truncatedUserCount ?? 0;
 
@@ -242,7 +240,7 @@ export const SystemUsageTab: FC = () => {
     selectedMonth === 'all' ? storageForResource : (storageByMonth[selectedMonth] ?? []);
 
   // ── Current loading stage ────────────────────────────────────────────────
-  const loadingStage = reportsLoading ? 2 : (!!reportData && nameMaps === undefined) ? 4 : 0;
+  const loadingStage = reportsLoading ? 2 : mappingsLoading ? 4 : 0;
 
   // ── Slow-load warning ────────────────────────────────────────────────────
   useEffect(() => {
@@ -296,25 +294,12 @@ export const SystemUsageTab: FC = () => {
         )}
 
         <div className="ms-auto d-flex align-items-center gap-2">
-          {(() => {
-            const reportsCacheKey = filterYear && filterMonth
-              ? `system-reports-${filterYear}-${filterMonth}`
-              : null;
-            const age = reportsCacheKey ? getCacheAge(reportsCacheKey) : null;
-            return age ? (
-              <span className="text-muted small">Cached {formatCacheAge(age)}</span>
-            ) : null;
-          })()}
           <button
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={() => {
               clearMappingCache();
-              const reportsCacheKey = filterYear && filterMonth
-                ? `system-reports-${filterYear}-${filterMonth}`
-                : null;
-              if (reportsCacheKey) clearCached(reportsCacheKey);
-              if (loadTriggered) refetchReports();
+              refetchReports();
             }}
           >
             Refresh
@@ -489,7 +474,7 @@ export const SystemUsageTab: FC = () => {
       )}
 
       {/* ── Charts ────────────────────────────────────────────────────── */}
-      {activeUsage.length > 0 && !!reportData && (
+      {activeUsage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -498,7 +483,7 @@ export const SystemUsageTab: FC = () => {
         </div>
       )}
 
-      {activeStorage.length > 0 && !!reportData && (
+      {activeStorage.length > 0 && nameMaps !== undefined && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
