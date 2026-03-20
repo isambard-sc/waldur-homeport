@@ -40,7 +40,7 @@ export interface NameMaps {
 const shortName = (s: string) => s.split('.')[0];
 
 /** Truncate a string at the last word boundary ≤ maxLen characters */
-export function truncateLabel(s: string, maxLen = 32): string {
+export function truncateLabel(s: string, maxLen = 50): string {
   if (s.length <= maxLen) return s;
   const cut = s.slice(0, maxLen);
   const lastSpace = cut.lastIndexOf(' ');
@@ -53,16 +53,38 @@ export function truncateLabel(s: string, maxLen = 32): string {
  * "AIRR-GF01 - 2024-01 - A very long project description" where both the
  * code prefix and the trailing description are meaningful.
  */
-export function truncateMiddle(s: string, head = 22, tail = 14): string {
+export function truncateMiddle(s: string, head = 28, tail = 18): string {
   if (s.length <= head + tail + 1) return s;
   return `${s.slice(0, head)}…${s.slice(-tail)}`;
 }
 
 // ── Tooltip helpers ────────────────────────────────────────────────────────────
 
-const MAX_TOOLTIP_ITEMS = 15;
-const MAX_PIE_SLICES = 15;
+const MAX_TOOLTIP_ITEMS = 25;
+const MAX_PIE_SLICES = 40;
+const OTHERS_THRESHOLD = 0.05; // include items until "Others" < this fraction of total
 const TOP_N_USERS = 20;
+export const LEGEND_HIDE_THRESHOLD = 15; // hide legend when more than this many series
+
+/** Legend config for timeseries/bar charts; hides when series count exceeds threshold. */
+export function timeseriesLegend(names: string[]): object {
+  if (names.length > LEGEND_HIDE_THRESHOLD) return { show: false };
+  return { data: names, type: 'scroll', bottom: 60 };
+}
+
+/** Legend config for pie charts; hides when slice count exceeds threshold. */
+export function pieLegend(itemCount: number): object {
+  if (itemCount > LEGEND_HIDE_THRESHOLD) return { show: false };
+  return { orient: 'vertical', right: 10, type: 'scroll' };
+}
+
+/**
+ * When the legend is hidden, override grid.bottom to reclaim the space it
+ * would have occupied (legend sits at bottom=60 above the dataZoom slider).
+ */
+export function gridOverride(seriesCount: number, hiddenBottom = 70): object {
+  return seriesCount > LEGEND_HIDE_THRESHOLD ? { grid: { bottom: hiddenBottom } } : {};
+}
 
 const tooltipDot = (color: string) =>
   `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:4px"></span>`;
@@ -96,14 +118,33 @@ export function buildTooltipRows(
   return { rows: rowLines.join('<br/>'), total };
 }
 
-/** Top-N pie data: sort by value desc, merge tail into "Others (N)" */
+/**
+ * Dynamic pie data: sort largest-first, then include items until the
+ * remaining "Others" slice is < OTHERS_THRESHOLD (5%) of the total, capped
+ * at MAX_PIE_SLICES (40).  This prevents the "Others" wedge from dominating
+ * the chart when usage is spread across many users/projects.
+ */
 export function topNPieData(
   data: Array<{ name: string; value: number; itemStyle: { color: string } }>,
 ): Array<{ name: string; value: number; itemStyle: { color: string } }> {
   const sorted = [...data].sort((a, b) => b.value - a.value);
   if (sorted.length <= MAX_PIE_SLICES) return sorted;
-  const shown = sorted.slice(0, MAX_PIE_SLICES);
-  const rest = sorted.slice(MAX_PIE_SLICES);
+
+  const total = sorted.reduce((s, d) => s + d.value, 0);
+  let n = MAX_PIE_SLICES;
+  if (total > 0) {
+    let cumulative = 0;
+    for (let i = 0; i < Math.min(sorted.length - 1, MAX_PIE_SLICES); i++) {
+      cumulative += sorted[i].value;
+      if ((total - cumulative) / total < OTHERS_THRESHOLD) {
+        n = i + 1;
+        break;
+      }
+    }
+  }
+
+  const shown = sorted.slice(0, n);
+  const rest = sorted.slice(n);
   return [
     ...shown,
     {
@@ -351,8 +392,9 @@ export function buildTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: allNames, type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend(allNames),
     ...base,
+    ...gridOverride(allNames.length),
     series: [
       ...topUsers.map((info, i) => ({
         name: info.display,
@@ -405,7 +447,7 @@ export function buildPieOptions(
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} h ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    legend: pieLegend(data.length),
     series: [
       {
         name: label,
@@ -475,8 +517,9 @@ export function buildProjectTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${total.toFixed(2)} h</b>`;
       },
     },
-    legend: { data: projNames, type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend(projNames),
     ...base,
+    ...gridOverride(projNames.length),
     series: projectReports.map((_r, i) => ({
       name: projNames[i],
       type: 'bar',
@@ -506,7 +549,7 @@ export function buildProjectPieOptions(
 
   return {
     tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} h ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    legend: pieLegend(data.length),
     series: [
       {
         name: 'Usage by project',
@@ -580,8 +623,9 @@ export function buildJobsTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${Math.round(total)}</b>`;
       },
     },
-    legend: { data: allNames, type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend(allNames),
     ...base,
+    ...gridOverride(allNames.length),
     series: [
       ...topUsers.map((info, i) => ({
         name: info.display,
@@ -629,7 +673,7 @@ export function buildJobsPieOptions(
 
   return {
     tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} jobs ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    legend: pieLegend(data.length),
     series: [
       {
         name: 'Jobs',
@@ -681,8 +725,9 @@ export function buildProjectJobsTimeseriesOptions(
         return `<b>${label}</b><br/>${rows}<br/><hr style="margin:4px 0"/>Total: <b>${Math.round(total)}</b>`;
       },
     },
-    legend: { data: projNames, type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend(projNames),
     ...base,
+    ...gridOverride(projNames.length),
     series: projectReports.map((_r, i) => ({
       name: projNames[i],
       type: 'bar',
@@ -712,7 +757,7 @@ export function buildProjectJobsPieOptions(
 
   return {
     tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} jobs ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    legend: pieLegend(data.length),
     series: [
       {
         name: 'Jobs by project',
@@ -824,8 +869,9 @@ export function buildAvgWaitTimeseriesOptions(
         return `<b>${label}</b><br/>${rowLines.join('<br/>')}`;
       },
     },
-    legend: { data: [...displayNames, 'Total avg'], type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend([...displayNames, 'Total avg']),
     ...base,
+    ...gridOverride(displayNames.length + 1),
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     series: [...userSeries, totalSeries],
   };
@@ -865,7 +911,7 @@ export function buildAvgWaitPieOptions(
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    legend: pieLegend(data.length),
     series: [
       {
         name: 'Avg wait',
@@ -944,8 +990,9 @@ export function buildProjectAvgWaitTimeseriesOptions(
         return `<b>${label}</b><br/>${rowLines.join('<br/>')}`;
       },
     },
-    legend: { data: projNames, type: 'scroll', bottom: 60 },
+    legend: timeseriesLegend(projNames),
     ...base,
+    ...gridOverride(projNames.length),
     toolbox: { right: 10, feature: { saveAsImage: { title: 'Save image' } } },
     series,
   };
@@ -978,7 +1025,7 @@ export function buildProjectAvgWaitPieOptions(
 
   return {
     tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} min avg ({d}%)' },
-    legend: { orient: 'vertical', right: 10, type: 'scroll' },
+    legend: pieLegend(data.length),
     series: [
       {
         name: 'Avg wait by project',
