@@ -423,9 +423,9 @@ export const OrganisationReportsTab: FC = () => {
         console.debug('[OpenPortal org] mappings done:', { offerings: Object.keys(offerings).length, projects: Object.keys(projMaps).length, users: Object.keys(users).length });
 
         const maps = {
-          offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
-          project: Object.fromEntries(Object.entries(projMaps).map(([k, v]) => [k, v.name])),
-          user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
+          offering: Object.fromEntries(Object.entries(offerings).filter(([, v]) => v != null).map(([k, v]) => [k, v.name])),
+          project: Object.fromEntries(Object.entries(projMaps).filter(([, v]) => v != null).map(([k, v]) => [k, v.name])),
+          user: Object.fromEntries(Object.entries(users).filter(([, v]) => v != null).map(([k, v]) => [k, v.full_name])),
         } as NameMaps;
         setMapsResult({
           maps,
@@ -582,7 +582,7 @@ export const OrganisationReportsTab: FC = () => {
           </button>
           <button
             type="button"
-            className="btn btn-outline-secondary btn-sm"
+            className="btn btn-secondary btn-sm"
             onClick={() => setShowLoadPrompt(true)}
           >
             Load new data…

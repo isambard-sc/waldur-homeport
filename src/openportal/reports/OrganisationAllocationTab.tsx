@@ -913,7 +913,7 @@ export const OrganisationAllocationTab: FC = () => {
           </button>
           <button
             type="button"
-            className="btn btn-outline-secondary btn-sm"
+            className="btn btn-secondary btn-sm"
             onClick={() => { setShowLoadPrompt(true); setLoadTriggered(false); }}
           >
             Load new data…
