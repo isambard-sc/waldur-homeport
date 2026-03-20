@@ -47,6 +47,17 @@ export function truncateLabel(s: string, maxLen = 32): string {
   return (lastSpace > 4 ? cut.slice(0, lastSpace) : cut) + '…';
 }
 
+/**
+ * Middle-truncate a string: keep the first `head` characters and the last
+ * `tail` characters, joined with "…".  Works well for names like
+ * "AIRR-GF01 - 2024-01 - A very long project description" where both the
+ * code prefix and the trailing description are meaningful.
+ */
+export function truncateMiddle(s: string, head = 22, tail = 14): string {
+  if (s.length <= head + tail + 1) return s;
+  return `${s.slice(0, head)}…${s.slice(-tail)}`;
+}
+
 // ── Tooltip helpers ────────────────────────────────────────────────────────────
 
 const MAX_TOOLTIP_ITEMS = 15;
@@ -267,7 +278,7 @@ function resolveUserName(
 }
 
 function resolveProjectName(projId: string, nameMaps?: NameMaps): string {
-  return truncateLabel(nameMaps?.project?.[projId] ?? projId);
+  return truncateMiddle(nameMaps?.project?.[projId] ?? projId);
 }
 
 // ─── Usage (hours) ────────────────────────────────────────────────────────────
@@ -455,6 +466,7 @@ export function buildProjectTimeseriesOptions(
     color: PALETTE,
     tooltip: {
       trigger: 'axis',
+      confine: true,
       axisPointer: { type: 'cross' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
@@ -493,7 +505,7 @@ export function buildProjectPieOptions(
   const data = topNPieData(rawData);
 
   return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} h ({d}%)' },
+    tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} h ({d}%)' },
     legend: { orient: 'vertical', right: 10, type: 'scroll' },
     series: [
       {
@@ -616,7 +628,7 @@ export function buildJobsPieOptions(
   const data = topNPieData(rawData);
 
   return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
+    tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} jobs ({d}%)' },
     legend: { orient: 'vertical', right: 10, type: 'scroll' },
     series: [
       {
@@ -660,6 +672,7 @@ export function buildProjectJobsTimeseriesOptions(
     color: PALETTE,
     tooltip: {
       trigger: 'axis',
+      confine: true,
       axisPointer: { type: 'cross' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
@@ -698,7 +711,7 @@ export function buildProjectJobsPieOptions(
   const data = topNPieData(rawData);
 
   return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} jobs ({d}%)' },
+    tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} jobs ({d}%)' },
     legend: { orient: 'vertical', right: 10, type: 'scroll' },
     series: [
       {
@@ -910,6 +923,7 @@ export function buildProjectAvgWaitTimeseriesOptions(
     color: PALETTE,
     tooltip: {
       trigger: 'axis',
+      confine: true,
       axisPointer: { type: 'cross' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
@@ -963,7 +977,7 @@ export function buildProjectAvgWaitPieOptions(
   const data = topNPieData(rawData);
 
   return {
-    tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
+    tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} min avg ({d}%)' },
     legend: { orient: 'vertical', right: 10, type: 'scroll' },
     series: [
       {

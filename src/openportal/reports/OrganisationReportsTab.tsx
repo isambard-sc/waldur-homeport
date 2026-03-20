@@ -221,6 +221,7 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
 export const OrganisationReportsTab: FC = () => {
   const customer = useSelector(getCustomer);
   const [loadTriggered, setLoadTriggered] = useState(false);
+  const [showLoadPrompt, setShowLoadPrompt] = useState(true);
 
   // ── Pre-filter: year / month ─────────────────────────────────────────────
   const [filterYear, setFilterYear] = useState<number | undefined>(undefined);
@@ -375,25 +376,12 @@ export const OrganisationReportsTab: FC = () => {
         ]),
       ];
 
-      // Compute total usage per uid (only users with non-zero usage)
+      // All user identifiers across all usage reports, up to cap
       const allUserIds = [...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users)))];
-      const usageByUid: Record<string, number> = {};
-      for (const r of usageReports) {
-        for (const [uid, localName] of Object.entries(r.users)) {
-          let sec = 0;
-          for (const date of r.dates) {
-            sec += r.getReport(date)?.usageForUser(localName)?.seconds ?? 0;
-          }
-          usageByUid[uid] = (usageByUid[uid] ?? 0) + sec;
-        }
-      }
-      const usersWithUsage = allUserIds
-        .filter((uid) => (usageByUid[uid] ?? 0) > 0)
-        .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
       const userIdsCapped = loadAllUserMappings
-        ? usersWithUsage
-        : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
-      const usersMappingsTruncated = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS;
+        ? allUserIds
+        : allUserIds.slice(0, MAX_USER_MAPPINGS);
+      const usersMappingsTruncated = !loadAllUserMappings && allUserIds.length > MAX_USER_MAPPINGS;
 
       const ob = mappingBatchCount(offeringIds);
       const pb = mappingBatchCount(projectIds);
@@ -428,7 +416,7 @@ export const OrganisationReportsTab: FC = () => {
       } as NameMaps;
       return {
         maps,
-        truncatedUserCount: usersMappingsTruncated ? usersWithUsage.length - MAX_USER_MAPPINGS : 0,
+        truncatedUserCount: usersMappingsTruncated ? allUserIds.length - MAX_USER_MAPPINGS : 0,
       };
     },
     enabled: !!reportData,
@@ -572,11 +560,18 @@ export const OrganisationReportsTab: FC = () => {
           >
             Refresh
           </button>
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => setShowLoadPrompt(true)}
+          >
+            Load new data…
+          </button>
         </div>}
       </div>
 
       {/* ── Load prompt ──────────────────────────────────────────────── */}
-      {!loadTriggered && !reportData && (
+      {showLoadPrompt && !projectsLoading && !reportsLoading && (
         <div className="card mb-4">
           <div className="card-body">
             <p className="mb-2 fw-semibold">Usage reports not yet loaded</p>
@@ -662,7 +657,7 @@ export const OrganisationReportsTab: FC = () => {
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={() => setLoadTriggered(true)}
+              onClick={() => { setLoadTriggered(true); setShowLoadPrompt(false); }}
             >
               Load reports
             </button>
@@ -762,7 +757,7 @@ export const OrganisationReportsTab: FC = () => {
       )}
 
       {/* ── Charts ───────────────────────────────────────────────────── */}
-      {activeUsage.length > 0 && nameMaps !== undefined && (
+      {activeUsage.length > 0 && !!reportData && !showLoadPrompt && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -771,7 +766,7 @@ export const OrganisationReportsTab: FC = () => {
         </div>
       )}
 
-      {activeStorage.length > 0 && nameMaps !== undefined && (
+      {activeStorage.length > 0 && !!reportData && !showLoadPrompt && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
