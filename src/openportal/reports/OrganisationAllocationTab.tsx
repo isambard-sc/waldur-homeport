@@ -570,6 +570,7 @@ export const OrganisationAllocationTab: FC = () => {
 
   // ── Lazy-load — don't fire until user clicks "Load data" ─────────────────
   const [loadTriggered, setLoadTriggered] = useState(false);
+  const [showLoadPrompt, setShowLoadPrompt] = useState(true);
   const [projectSearch, setProjectSearch] = useState('');
   const [projectStartAfter, setProjectStartAfter] = useState('');
   const [projectEndBefore, setProjectEndBefore] = useState('');
@@ -894,6 +895,13 @@ export const OrganisationAllocationTab: FC = () => {
           >
             Refresh
           </button>
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => { setShowLoadPrompt(true); setLoadTriggered(false); }}
+          >
+            Load new data…
+          </button>
         </div>}
       </div>
 
@@ -924,7 +932,7 @@ export const OrganisationAllocationTab: FC = () => {
       )}
 
       {/* Load prompt — shown before the user triggers the fetch */}
-      {!loadTriggered && !allSummaries && (
+      {showLoadPrompt && !loadTriggered && (
         <div className="card mb-4">
           <div className="card-body">
             <p className="mb-1 fw-semibold">Allocation data not yet loaded</p>
@@ -969,7 +977,7 @@ export const OrganisationAllocationTab: FC = () => {
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={() => setLoadTriggered(true)}
+              onClick={() => { setLoadTriggered(true); setShowLoadPrompt(false); }}
             >
               Load data
             </button>

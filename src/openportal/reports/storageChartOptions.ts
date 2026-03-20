@@ -16,6 +16,7 @@ import {
   buildTooltipRows,
   computeDataZoomRange,
   truncateLabel,
+  truncateMiddle,
 } from './usageChartOptions';
 import { formatStorageBytes } from './storage';
 
@@ -33,6 +34,7 @@ const PALETTE = [
 ];
 
 const TOP_N_USERS = 20;
+const TOP_N_PROJECTS = 15;
 
 /** Strip the project suffix from a local username: "chris.aiproject" → "chris" */
 const shortName = (s: string) => s.split('.')[0];
@@ -497,11 +499,10 @@ export function buildStorageProjectBarOptions(
 ): EChartsOption {
   const projectReports = groupStorageByProject(reports);
   const resolveProject = (projId: string) =>
-    truncateLabel(nameMaps?.project?.[projId] ?? projId);
-  const projectNames = projectReports.map((r) => resolveProject(r.project));
+    truncateMiddle(nameMaps?.project?.[projId] ?? projId);
 
-  let maxBytes = 0;
-  const totals = projectReports.map((r) => {
+  // Rank by total bytes, keep top N
+  const withTotals = projectReports.map((r) => {
     const uids = r.userIdentifiers();
     const userBytes = uids.reduce(
       (s, uid) =>
@@ -512,11 +513,23 @@ export function buildStorageProjectBarOptions(
       (s, q) => s + q.usageBytes,
       0,
     );
-    const bytes = userBytes + projectBytes;
-    if (bytes > maxBytes) maxBytes = bytes;
-    return bytes;
-  });
+    return { r, bytes: userBytes + projectBytes };
+  }).sort((a, b) => b.bytes - a.bytes);
 
+  const topN = withTotals.slice(0, TOP_N_PROJECTS);
+  const hidden = withTotals.slice(TOP_N_PROJECTS).filter((p) => p.bytes > 0);
+  const othersBytes = hidden.reduce((s, p) => s + p.bytes, 0);
+
+  const yAxisData = [
+    ...topN.map((p) => resolveProject(p.r.project)),
+    ...(hidden.length > 0 ? [`Others (${hidden.length})`] : []),
+  ];
+  const barValues = [
+    ...topN.map((p, i) => ({ value: p.bytes, idx: i })),
+    ...(hidden.length > 0 ? [{ value: othersBytes, idx: topN.length }] : []),
+  ];
+
+  const maxBytes = Math.max(...barValues.map((b) => b.value), 0);
   const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'] as const;
   const unitIndex =
     maxBytes > 0
@@ -530,6 +543,7 @@ export function buildStorageProjectBarOptions(
     color: PALETTE,
     tooltip: {
       trigger: 'axis',
+      confine: true,
       axisPointer: { type: 'shadow' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
@@ -544,14 +558,14 @@ export function buildStorageProjectBarOptions(
       name: unitLabel,
       axisLabel: { formatter: `{value} ${unitLabel}` },
     },
-    yAxis: { type: 'category', data: projectNames },
+    yAxis: { type: 'category', data: yAxisData },
     series: [
       {
         name: 'Storage',
         type: 'bar',
-        data: totals.map((b, i) => ({
-          value: toUnit(b),
-          itemStyle: { color: PALETTE[i % PALETTE.length] },
+        data: barValues.map(({ value, idx }) => ({
+          value: toUnit(value),
+          itemStyle: { color: idx < topN.length ? PALETTE[idx % PALETTE.length] : '#bbb' },
         })),
         emphasis: { focus: 'series' as const },
       },
@@ -568,7 +582,8 @@ export function buildStorageProjectTimeseriesOptions(
   nameMaps?: NameMaps,
 ): EChartsOption {
   const projectReports = groupStorageByProject(reports);
-  const resolveProject = (projId: string) => nameMaps?.project?.[projId] ?? projId;
+  const resolveProject = (projId: string) =>
+    truncateMiddle(nameMaps?.project?.[projId] ?? projId);
   const allDates = [
     ...new Set(projectReports.flatMap((r) => r.dates)),
   ].sort();
@@ -615,34 +630,73 @@ export function buildStorageProjectTimeseriesOptions(
   const unitLabel = units[unitIndex];
   const toUnit = (bytes: number) => +(bytes / unitDivisor).toFixed(3);
 
-  const series = projectReports.map((r, i) => ({
+  // Rank projects by total bytes, keep top N
+  const getProjectTotal = (r: ProjectStorageReport) =>
+    dates.reduce((s, date) => {
+      const daily = r.getReport(date);
+      if (!daily) return s;
+      return s +
+        Object.values(daily.userQuotas).reduce(
+          (ss, vols) => ss + Object.values(vols).reduce((sss, q) => sss + q.usageBytes, 0),
+          0,
+        ) +
+        Object.values(daily.projectQuotas).reduce((ss, q) => ss + q.usageBytes, 0);
+    }, 0);
+
+  const ranked = projectReports
+    .map((r) => ({ r, total: getProjectTotal(r) }))
+    .sort((a, b) => b.total - a.total);
+  const topN = ranked.slice(0, TOP_N_PROJECTS);
+  const hidden = ranked.slice(TOP_N_PROJECTS).filter((p) => p.total > 0);
+
+  const getDateTotal = (r: ProjectStorageReport, date: string) => {
+    const daily = r.getReport(date);
+    if (!daily) return 0;
+    const userBytes = Object.values(daily.userQuotas).reduce(
+      (s, vols) => s + Object.values(vols).reduce((ss, q) => ss + q.usageBytes, 0),
+      0,
+    );
+    const projectBytes = Object.values(daily.projectQuotas).reduce(
+      (s, q) => s + q.usageBytes,
+      0,
+    );
+    return toUnit(userBytes + projectBytes);
+  };
+
+  const topSeries = topN.map(({ r }, i) => ({
     name: resolveProject(r.project),
     type: 'bar' as const,
     stack: 'projects',
     emphasis: { focus: 'series' as const },
     itemStyle: { color: PALETTE[i % PALETTE.length] },
-    data: dates.map((date) => {
-      const daily = r.getReport(date);
-      if (!daily) return 0;
-      const userBytes = Object.values(daily.userQuotas).reduce(
-        (s, vols) =>
-          s + Object.values(vols).reduce((ss, q) => ss + q.usageBytes, 0),
-        0,
-      );
-      const projectBytes = Object.values(daily.projectQuotas).reduce(
-        (s, q) => s + q.usageBytes,
-        0,
-      );
-      return toUnit(userBytes + projectBytes);
-    }),
+    data: dates.map((date) => getDateTotal(r, date)),
   }));
 
-  const zoom = computeDataZoomRange(labels, series.map((s) => s.data as number[]));
+  const othersSeries = hidden.length > 0
+    ? [{
+        name: `Others (${hidden.length})`,
+        type: 'bar' as const,
+        stack: 'projects',
+        emphasis: { focus: 'series' as const },
+        itemStyle: { color: '#bbb' },
+        data: dates.map((date) =>
+          hidden.reduce((s, { r }) => s + getDateTotal(r, date), 0),
+        ),
+      }]
+    : [];
+
+  const allSeries = [...topSeries, ...othersSeries];
+  const allNames = [
+    ...topN.map(({ r }) => resolveProject(r.project)),
+    ...(hidden.length > 0 ? [`Others (${hidden.length})`] : []),
+  ];
+  const zoom = computeDataZoomRange(labels, allSeries.map((s) => s.data as number[]));
 
   return {
     color: PALETTE,
     tooltip: {
       trigger: 'axis',
+      confine: true,
       axisPointer: { type: 'cross' },
       formatter: (params: any) => {
         if (!Array.isArray(params) || params.length === 0) return '';
@@ -652,7 +706,7 @@ export function buildStorageProjectTimeseriesOptions(
       },
     },
     legend: {
-      data: projectReports.map((r) => resolveProject(r.project)),
+      data: allNames,
       type: 'scroll',
       bottom: 60,
     },
@@ -674,7 +728,7 @@ export function buildStorageProjectTimeseriesOptions(
       name: unitLabel,
       axisLabel: { formatter: `{value} ${unitLabel}` },
     },
-    series,
+    series: allSeries,
   };
 }
 

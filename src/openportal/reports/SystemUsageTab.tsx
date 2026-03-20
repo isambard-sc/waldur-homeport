@@ -64,6 +64,7 @@ const MONTH_NAMES = [
 
 export const SystemUsageTab: FC = () => {
   const [loadTriggered, setLoadTriggered] = useState(false);
+  const [showLoadPrompt, setShowLoadPrompt] = useState(true);
   const [loadAllUserMappings, setLoadAllUserMappings] = useState(false);
   const [showSlowWarning, setShowSlowWarning] = useState(false);
 
@@ -318,11 +319,18 @@ export const SystemUsageTab: FC = () => {
           >
             Refresh
           </button>
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => { setShowLoadPrompt(true); setLoadTriggered(false); }}
+          >
+            Load new data…
+          </button>
         </div>
       </div>
 
       {/* ── Load prompt ─────────────────────────────────────────────────── */}
-      {!loadTriggered && !reportData && (
+      {showLoadPrompt && !loadTriggered && (
         <div className="card mb-4">
           <div className="card-body">
             <p className="mb-2 fw-semibold">System usage data not yet loaded</p>
@@ -375,7 +383,7 @@ export const SystemUsageTab: FC = () => {
             <button
               type="button"
               className="btn btn-primary btn-sm"
-              onClick={() => setLoadTriggered(true)}
+              onClick={() => { setLoadTriggered(true); setShowLoadPrompt(false); }}
             >
               Load reports
             </button>
@@ -481,7 +489,7 @@ export const SystemUsageTab: FC = () => {
       )}
 
       {/* ── Charts ────────────────────────────────────────────────────── */}
-      {activeUsage.length > 0 && nameMaps !== undefined && (
+      {activeUsage.length > 0 && !!reportData && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Usage</div>
           <div className="card-body">
@@ -490,7 +498,7 @@ export const SystemUsageTab: FC = () => {
         </div>
       )}
 
-      {activeStorage.length > 0 && nameMaps !== undefined && (
+      {activeStorage.length > 0 && !!reportData && (
         <div className="card mb-4">
           <div className="card-header fw-semibold">Storage</div>
           <div className="card-body">
