@@ -192,6 +192,12 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
                         {p.start_date ?? '?'} → {p.end_date ?? 'ongoing'}
                       </span>
                     )}
+                    {p.is_in_grace_period && (
+                      <span className="badge bg-warning text-dark ms-2" style={{ fontSize: '0.7em' }}>In grace</span>
+                    )}
+                    {p.is_expired && !p.is_in_grace_period && (
+                      <span className="badge bg-secondary ms-2" style={{ fontSize: '0.7em' }}>Finished</span>
+                    )}
                   </label>
                 </div>
               ))}
@@ -246,9 +252,9 @@ export const OrganisationReportsTab: FC = () => {
     error: projectsError,
     refetch: refetchProjects,
   } = useQuery({
-    queryKey: ['openportal-org-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore],
+    queryKey: ['openportal-org-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, 'terminated'],
     queryFn: async () => {
-      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}`;
+      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-terminated`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -262,6 +268,7 @@ export const OrganisationReportsTab: FC = () => {
             page_size: 25,
             o: ['name'],
             page,
+            is_terminated: true,
             ...(projectSearch ? { query: projectSearch } : {}),
             ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
             ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
@@ -549,11 +556,14 @@ export const OrganisationReportsTab: FC = () => {
             onChange={(e) => setSelectedMonth(e.target.value)}
           >
             <option value="all">All time</option>
-            {allMonths.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
-            ))}
+            {allMonths.map((m) => {
+              const [y, mo] = m.split('-');
+              return (
+                <option key={m} value={m}>
+                  {MONTH_NAMES[parseInt(mo, 10) - 1]} {y}
+                </option>
+              );
+            })}
           </select>
         )}
 
@@ -618,7 +628,7 @@ export const OrganisationReportsTab: FC = () => {
                 />
               </div>
               <div className="col-6 col-md-4">
-                <label className="form-label small mb-1">Started before</label>
+                <label className="form-label small mb-1">Ended before</label>
                 <input
                   type="date"
                   className="form-control form-control-sm"
