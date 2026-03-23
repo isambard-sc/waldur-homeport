@@ -254,7 +254,7 @@ export const OrganisationReportsTab: FC = () => {
   } = useQuery({
     queryKey: ['openportal-org-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, 'terminated'],
     queryFn: async () => {
-      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-terminated`;
+      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-include_terminated`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -268,7 +268,7 @@ export const OrganisationReportsTab: FC = () => {
             page_size: 25,
             o: ['name'],
             page,
-            is_terminated: true,
+            include_terminated: true,
             ...(projectSearch ? { query: projectSearch } : {}),
             ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
             ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
