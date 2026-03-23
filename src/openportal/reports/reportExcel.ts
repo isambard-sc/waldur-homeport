@@ -34,7 +34,7 @@ import { ProjectAccountingSummary } from 'waldur-js-client';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { secondsToHours } from './storage';
-import { NameMaps } from './usageChartOptions';
+import { isDayWaitSpurious, NameMaps } from './usageChartOptions';
 
 // ── XML escaping ─────────────────────────────────────────────────────────────
 
@@ -223,7 +223,7 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
       const totalH = round2(secondsToHours(daily.totalUsage().seconds));
       const totalJobs = daily.numJobs;
       const avgWait =
-        totalJobs > 0
+        totalJobs > 0 && !isDayWaitSpurious(daily.totalWaitSeconds, totalJobs)
           ? Math.round(daily.totalWaitSeconds / totalJobs / 60)
           : '';
       return [date, totalH, totalJobs, avgWait];
@@ -244,7 +244,8 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
         if (!daily) continue;
         totalSec += daily.totalUsage().seconds;
         totalJobs += daily.numJobs;
-        totalWaitSec += daily.totalWaitSeconds;
+        if (!isDayWaitSpurious(daily.totalWaitSeconds, daily.numJobs))
+          totalWaitSec += daily.totalWaitSeconds;
       }
       return [
         month,
@@ -285,14 +286,16 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
       const vals = users.map((u) => {
         if (!daily) return '';
         const jobs = daily.userJobCounts[u] ?? 0;
-        return jobs > 0
-          ? Math.round((daily.userWaitSeconds[u] ?? 0) / jobs / 60)
+        const waitSec = daily.userWaitSeconds[u] ?? 0;
+        return jobs > 0 && !isDayWaitSpurious(waitSec, jobs)
+          ? Math.round(waitSec / jobs / 60)
           : '';
       });
       const totalJobs = daily?.numJobs ?? 0;
+      const totalWaitSec = daily?.totalWaitSeconds ?? 0;
       const avgAll =
-        totalJobs > 0
-          ? Math.round((daily?.totalWaitSeconds ?? 0) / totalJobs / 60)
+        totalJobs > 0 && !isDayWaitSpurious(totalWaitSec, totalJobs)
+          ? Math.round(totalWaitSec / totalJobs / 60)
           : '';
       return [date, ...vals, avgAll];
     }),
@@ -354,13 +357,14 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
           if (!pr) return '';
           const daily = pr.getReport(date);
           if (!daily || daily.numJobs === 0) return '';
+          if (isDayWaitSpurious(daily.totalWaitSeconds, daily.numJobs)) return '';
           return Math.round(daily.totalWaitSeconds / daily.numJobs / 60);
         });
         let grandJobs = 0;
         let grandWait = 0;
         for (const proj of distinctProjects) {
           const daily = byProject.get(proj)?.getReport(date);
-          if (!daily) continue;
+          if (!daily || isDayWaitSpurious(daily.totalWaitSeconds, daily.numJobs)) continue;
           grandJobs += daily.numJobs;
           grandWait += daily.totalWaitSeconds;
         }
