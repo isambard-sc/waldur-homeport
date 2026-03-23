@@ -262,6 +262,7 @@ export const OrganisationReportsTab: FC = () => {
             page_size: 25,
             o: ['name'],
             page,
+            is_terminated: true,
             ...(projectSearch ? { query: projectSearch } : {}),
             ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
             ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
