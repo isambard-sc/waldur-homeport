@@ -5,15 +5,17 @@
  * extended to support multiple worksheets.
  *
  * Usage report sheets:
+ *   "Mappings"            — Type | Display Name | Identifier  [if nameMaps provided]
+ *   "Project members"     — Project name | Project identifier | User name | User identifier
  *   "Daily totals"        — Date | Total usage (h) | Total jobs | Avg wait (min)
  *   "Monthly totals"      — Month | Total usage (h) | Total jobs | Avg wait (min)
+ *   "Usage by project"    — Date | <project>... | Total (h)  [multi-project only]
+ *   "Jobs by project"     — Date | <project>... | Total      [multi-project only]
+ *   "Wait by project"     — Date | <project>... | Total avg  [multi-project only]
  *   "Usage by user"       — Date | <user>... | Total (h)
  *   "Jobs by user"        — Date | <user>... | Total
  *   "Wait by user"        — Date | <user>... | Total avg (min)
  *   "Comp <name>"         — one per component, Date | <user>... | Total (h)
- *   "Usage by project"    — Month | <project>... | Total (h)  [multi-project only]
- *   "Jobs by project"     — Month | <project>... | Total      [multi-project only]
- *   "Wait by project"     — Month | <project>... | Total avg  [multi-project only]
  *
  * Storage report sheets:
  *   "Snapshot"            — Type | User | Volume | Usage | Limit | % Used
@@ -315,77 +317,55 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
     const allDates = [
       ...new Set(reports.flatMap((r) => r.dates)),
     ].sort();
-    const allMonths = [...new Set(allDates.map((d) => d.slice(0, 7)))].sort();
 
-    // Usage by project (monthly)
+    // Usage by project (daily)
     const usageByProject: any[][] = [
-      ['Month', ...projectLabels, 'Total (h)'],
-      ...allMonths.map((month) => {
-        const monthDates = allDates.filter((d) => d.startsWith(month));
+      ['Date', ...projectLabels, 'Total (h)'],
+      ...allDates.map((date) => {
         const vals = distinctProjects.map((proj) => {
           const pr = byProject.get(proj);
           if (!pr) return 0;
-          return round2(
-            monthDates.reduce((s, d) => {
-              const daily = pr.getReport(d);
-              return s + (daily ? secondsToHours(daily.totalUsage().seconds) : 0);
-            }, 0),
-          );
+          const daily = pr.getReport(date);
+          return round2(daily ? secondsToHours(daily.totalUsage().seconds) : 0);
         });
-        return [month, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
+        return [date, ...vals, round2(vals.reduce((s, v) => s + v, 0))];
       }),
     ];
 
-    // Jobs by project (monthly)
+    // Jobs by project (daily)
     const jobsByProject: any[][] = [
-      ['Month', ...projectLabels, 'Total'],
-      ...allMonths.map((month) => {
-        const monthDates = allDates.filter((d) => d.startsWith(month));
+      ['Date', ...projectLabels, 'Total'],
+      ...allDates.map((date) => {
         const vals = distinctProjects.map((proj) => {
           const pr = byProject.get(proj);
           if (!pr) return 0;
-          return monthDates.reduce(
-            (s, d) => s + (pr.getReport(d)?.numJobs ?? 0),
-            0,
-          );
+          return pr.getReport(date)?.numJobs ?? 0;
         });
-        return [month, ...vals, vals.reduce((s, v) => s + v, 0)];
+        return [date, ...vals, vals.reduce((s, v) => s + v, 0)];
       }),
     ];
 
-    // Wait by project (monthly)
+    // Wait by project (daily)
     const waitByProject: any[][] = [
-      ['Month', ...projectLabels, 'Total avg (min)'],
-      ...allMonths.map((month) => {
-        const monthDates = allDates.filter((d) => d.startsWith(month));
+      ['Date', ...projectLabels, 'Total avg (min)'],
+      ...allDates.map((date) => {
         const vals = distinctProjects.map((proj) => {
           const pr = byProject.get(proj);
           if (!pr) return '';
-          let totalJobs = 0;
-          let totalWait = 0;
-          for (const d of monthDates) {
-            const daily = pr.getReport(d);
-            if (!daily) continue;
-            totalJobs += daily.numJobs;
-            totalWait += daily.totalWaitSeconds;
-          }
-          return totalJobs > 0 ? Math.round(totalWait / totalJobs / 60) : '';
+          const daily = pr.getReport(date);
+          if (!daily || daily.numJobs === 0) return '';
+          return Math.round(daily.totalWaitSeconds / daily.numJobs / 60);
         });
-        // Overall avg wait for this month
         let grandJobs = 0;
         let grandWait = 0;
         for (const proj of distinctProjects) {
-          const pr = byProject.get(proj);
-          if (!pr) continue;
-          for (const d of monthDates) {
-            const daily = pr.getReport(d);
-            if (!daily) continue;
-            grandJobs += daily.numJobs;
-            grandWait += daily.totalWaitSeconds;
-          }
+          const daily = byProject.get(proj)?.getReport(date);
+          if (!daily) continue;
+          grandJobs += daily.numJobs;
+          grandWait += daily.totalWaitSeconds;
         }
         return [
-          month,
+          date,
           ...vals,
           grandJobs > 0 ? Math.round(grandWait / grandJobs / 60) : '',
         ];
@@ -424,6 +404,28 @@ function buildUsageSheets(reports: ProjectUsageReport[], nameMaps?: NameMaps): S
     ];
     sheets.push({ name: `Comp ${comp}`.slice(0, 31), rows: compRows });
   }
+
+  // ── Project members sheet ────────────────────────────────────────────────
+  const memberRows: any[][] = [
+    ['Project name', 'Project identifier', 'User name', 'User identifier'],
+  ];
+  for (const projId of [...new Set(reports.map((r) => r.project))].sort()) {
+    const projName = nameMaps?.project?.[projId] ?? projId;
+    // Collect all users across every monthly report for this project
+    const userMap: Record<string, string> = {}; // userId → localUsername
+    for (const r of reports) {
+      if (r.project !== projId) continue;
+      for (const [uid, local] of Object.entries(r.users)) {
+        userMap[uid] = local;
+      }
+    }
+    for (const [uid, local] of Object.entries(userMap).sort(([, a], [, b]) =>
+      a.localeCompare(b),
+    )) {
+      memberRows.push([projName, projId, nameMaps?.user?.[uid] ?? local, uid]);
+    }
+  }
+  sheets.unshift({ name: 'Project members', rows: memberRows });
 
   // ── Mappings sheet (identifier → display name) ───────────────────────────
   if (nameMaps) {

@@ -120,13 +120,24 @@ export function buildTooltipRows(
 
 /**
  * Dynamic pie data: sort largest-first, then include items until the
- * remaining "Others" slice is < OTHERS_THRESHOLD (5%) of the total, capped
+ * remaining "Others" slice is < threshold (default 5%) of the total, capped
  * at MAX_PIE_SLICES (40).  This prevents the "Others" wedge from dominating
  * the chart when usage is spread across many users/projects.
+ *
+ * `othersLabelFn` overrides the label for the aggregated slice; receives the
+ * hidden items and the shown items so callers can derive a contextual label.
  */
 export function topNPieData(
   data: Array<{ name: string; value: number; itemStyle: { color: string } }>,
+  options?: {
+    threshold?: number;
+    othersLabelFn?: (
+      rest: Array<{ name: string; value: number }>,
+      shown: Array<{ name: string; value: number }>,
+    ) => string;
+  },
 ): Array<{ name: string; value: number; itemStyle: { color: string } }> {
+  const threshold = options?.threshold ?? OTHERS_THRESHOLD;
   const sorted = [...data].sort((a, b) => b.value - a.value);
   if (sorted.length <= MAX_PIE_SLICES) return sorted;
 
@@ -136,7 +147,7 @@ export function topNPieData(
     let cumulative = 0;
     for (let i = 0; i < Math.min(sorted.length - 1, MAX_PIE_SLICES); i++) {
       cumulative += sorted[i].value;
-      if ((total - cumulative) / total < OTHERS_THRESHOLD) {
+      if ((total - cumulative) / total < threshold) {
         n = i + 1;
         break;
       }
@@ -145,10 +156,13 @@ export function topNPieData(
 
   const shown = sorted.slice(0, n);
   const rest = sorted.slice(n);
+  const label = options?.othersLabelFn
+    ? options.othersLabelFn(rest, shown)
+    : `Others (${rest.length})`;
   return [
     ...shown,
     {
-      name: `Others (${rest.length})`,
+      name: label,
       value: rest.reduce((s, d) => s + d.value, 0),
       itemStyle: { color: '#bbb' },
     },
@@ -907,7 +921,10 @@ export function buildAvgWaitPieOptions(
     })
     .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
 
-  const data = topNPieData(rawData);
+  const data = topNPieData(rawData, {
+    threshold: 0.10,
+    othersLabelFn: (_, shown) => `< ${shown[shown.length - 1].value} min (others)`,
+  });
 
   return {
     tooltip: { trigger: 'item', formatter: '{b}: {c} min avg ({d}%)' },
@@ -1021,7 +1038,10 @@ export function buildProjectAvgWaitPieOptions(
     })
     .filter((d): d is NonNullable<typeof d> => d !== null && d.value > 0);
 
-  const data = topNPieData(rawData);
+  const data = topNPieData(rawData, {
+    threshold: 0.10,
+    othersLabelFn: (_, shown) => `< ${shown[shown.length - 1].value} min (others)`,
+  });
 
   return {
     tooltip: { trigger: 'item', confine: true, formatter: '{b}: {c} min avg ({d}%)' },
