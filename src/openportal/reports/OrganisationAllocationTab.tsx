@@ -823,6 +823,8 @@ export const OrganisationAllocationTab: FC = () => {
     inactiveRemainingPercent: 10,
     depletedSpentPercent: 90,
     depletedDaysRemaining: 60,
+    offTrackPercent: 40,
+    offTrackDayOfMonth: 5,
   });
   const setThreshold = (
     key: keyof typeof thresholds,
@@ -833,10 +835,10 @@ export const OrganisationAllocationTab: FC = () => {
   };
   const [showThresholds, setShowThresholds] = useState(false);
   const [concerningTab, setConcerningTab] = useState<
-    'slowStart' | 'inactive' | 'depleted'
+    'slowStart' | 'inactive' | 'depleted' | 'offTrack'
   >('slowStart');
 
-  const { slowStart, inactive, depleted } = useMemo(() => {
+  const { slowStart, inactive, depleted, offTrack } = useMemo(() => {
     const now = new Date();
     const monthsElapsed = (dateStr: string) => {
       const s = new Date(dateStr);
@@ -854,8 +856,7 @@ export const OrganisationAllocationTab: FC = () => {
     };
 
     const slowStart = summaries.filter((s: ProjectAccountingSummary) => {
-      if (!s.start_date) return false;
-      if (monthsElapsed(s.start_date) < thresholds.slowStartMonths) return false;
+      if (s.start_date && monthsElapsed(s.start_date) < thresholds.slowStartMonths) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
       const totalAlloc = parseCredits(s.total_credits);
       if (totalAlloc === 0) return false;
@@ -863,9 +864,8 @@ export const OrganisationAllocationTab: FC = () => {
     });
 
     const inactive = summaries.filter((s: ProjectAccountingSummary) => {
-      if (!s.start_date) return false;
       if (now.getDate() < thresholds.inactiveDayOfMonth) return false;
-      if (monthsElapsed(s.start_date) < thresholds.inactiveMonths) return false;
+      if (s.start_date && monthsElapsed(s.start_date) < thresholds.inactiveMonths) return false;
       if (parseCredits(s.current_month_spend) >= 0.01) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
       const totalAlloc = parseCredits(s.total_credits);
@@ -883,7 +883,28 @@ export const OrganisationAllocationTab: FC = () => {
       return (spent / totalAlloc) * 100 >= thresholds.depletedSpentPercent;
     });
 
-    return { slowStart, inactive, depleted };
+    const offTrack = summaries.filter((s: ProjectAccountingSummary) => {
+      if (!s.end_date) return false;
+      const end = new Date(s.end_date);
+      end.setHours(0, 0, 0, 0);
+      if (end <= now) return false;
+      if (now.getDate() < thresholds.offTrackDayOfMonth) return false;
+      const remaining = Math.max(
+        0,
+        parseCredits(s.total_credits) -
+          parseCredits(s.total_spend) -
+          parseCredits(s.current_month_spend),
+      );
+      const predictedDaily = remaining / Math.max(1, daysBetween(now, end));
+      if (predictedDaily === 0) return false;
+      const actualDaily =
+        parseCredits(s.current_month_spend) / Math.max(1, now.getDate());
+      const ratio = actualDaily / predictedDaily;
+      const deviation = thresholds.offTrackPercent / 100;
+      return ratio < 1 - deviation || ratio > 1 + deviation;
+    });
+
+    return { slowStart, inactive, depleted, offTrack };
   }, [summaries, thresholds]);
 
   // ── Projects without end dates ──────────────────────────────────────────
@@ -1334,12 +1355,13 @@ export const OrganisationAllocationTab: FC = () => {
         <div className="card mb-4">
           <div className="card-header fw-semibold d-flex align-items-center gap-2">
             <span>Concerning Projects</span>
-            {slowStart.length + inactive.length + depleted.length > 0 && (
+            {slowStart.length + inactive.length + depleted.length + offTrack.length > 0 && (
               <span className="badge bg-warning text-dark">
                 {new Set<string>([
                   ...slowStart.map((s: ProjectAccountingSummary) => s.project_uuid),
                   ...inactive.map((s: ProjectAccountingSummary) => s.project_uuid),
                   ...depleted.map((s: ProjectAccountingSummary) => s.project_uuid),
+                  ...offTrack.map((s: ProjectAccountingSummary) => s.project_uuid),
                 ]).size}
               </span>
             )}
@@ -1413,6 +1435,28 @@ export const OrganisationAllocationTab: FC = () => {
                   </div>
                   <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
                     <span className="fw-semibold" style={{ minWidth: 120 }}>
+                      Off track:
+                    </span>
+                    <span>after the</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      value={thresholds.offTrackDayOfMonth}
+                      onChange={(e) => setThreshold('offTrackDayOfMonth', e.target.value)}
+                    />
+                    <span>th of the month, actual daily avg differs from predicted by &gt;</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
+                      value={thresholds.offTrackPercent}
+                      onChange={(e) => setThreshold('offTrackPercent', e.target.value)}
+                    />
+                    <span>%</span>
+                  </div>
+                  <div className="col-12 d-flex align-items-center gap-2 flex-wrap">
+                    <span className="fw-semibold" style={{ minWidth: 120 }}>
                       Nearly depleted:
                     </span>
                     <span>≥</span>
@@ -1444,7 +1488,8 @@ export const OrganisationAllocationTab: FC = () => {
             {/* ── All clear message ──────────────────────────────────── */}
             {slowStart.length === 0 &&
               inactive.length === 0 &&
-              depleted.length === 0 && (
+              depleted.length === 0 &&
+              offTrack.length === 0 && (
                 <p className="text-muted mb-0">
                   ✓ No concerning projects found with the current thresholds.
                 </p>
@@ -1453,7 +1498,8 @@ export const OrganisationAllocationTab: FC = () => {
             {/* ── Tabs ──────────────────────────────────────────────── */}
             {(slowStart.length > 0 ||
               inactive.length > 0 ||
-              depleted.length > 0) && (
+              depleted.length > 0 ||
+              offTrack.length > 0) && (
               <>
                 <ul className="nav nav-tabs mb-3">
                   <li className="nav-item">
@@ -1491,6 +1537,19 @@ export const OrganisationAllocationTab: FC = () => {
                       {depleted.length > 0 && (
                         <span className="badge bg-danger ms-2">
                           {depleted.length}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button
+                      className={`nav-link ${concerningTab === 'offTrack' ? 'active' : ''}`}
+                      onClick={() => setConcerningTab('offTrack')}
+                    >
+                      Off track
+                      {offTrack.length > 0 && (
+                        <span className="badge bg-warning text-dark ms-2">
+                          {offTrack.length}
                         </span>
                       )}
                     </button>
@@ -1624,6 +1683,62 @@ export const OrganisationAllocationTab: FC = () => {
                               {spentPct}% spent ({fmtCredits(spent)} /{' '}
                               {fmtCredits(totalAlloc)} {currencyName}), ends{' '}
                               {s.end_date} ({days} days remaining)
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {concerningTab === 'offTrack' && (
+                  <div>
+                    <p className="text-muted small mb-2">
+                      After the {thresholds.offTrackDayOfMonth}th of the month,
+                      actual daily average spend differs from predicted by more
+                      than {thresholds.offTrackPercent}%.
+                    </p>
+                    {offTrack.length === 0 ? (
+                      <p className="text-muted mb-0">None.</p>
+                    ) : (
+                      <ul className="mb-0">
+                        {offTrack.map((s: ProjectAccountingSummary) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          const end = new Date(s.end_date!);
+                          end.setHours(0, 0, 0, 0);
+                          const remaining = Math.max(
+                            0,
+                            parseCredits(s.total_credits) -
+                              parseCredits(s.total_spend) -
+                              parseCredits(s.current_month_spend),
+                          );
+                          const predictedDaily =
+                            remaining / Math.max(1, daysBetween(today, end));
+                          const actualDaily =
+                            parseCredits(s.current_month_spend) /
+                            Math.max(1, today.getDate());
+                          const pct = (
+                            ((actualDaily - predictedDaily) /
+                              (predictedDaily || 1)) *
+                            100
+                          ).toFixed(1);
+                          const direction =
+                            actualDaily > predictedDaily ? 'over' : 'under';
+                          return (
+                            <li key={s.project_uuid} className="mb-1">
+                              <a
+                                href={`/projects/${s.project_uuid}/`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {s.project_name}
+                              </a>
+                              {' — '}
+                              {Math.abs(parseFloat(pct)).toFixed(1)}%{' '}
+                              {direction} (actual{' '}
+                              {fmtCredits(actualDaily)} vs predicted{' '}
+                              {fmtCredits(predictedDaily)} {currencyName}/day)
                             </li>
                           );
                         })}
