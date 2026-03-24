@@ -25,7 +25,7 @@ import {
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-import { FileXlsIcon } from '@phosphor-icons/react';
+import { FileXlsIcon, WarningCircleIcon } from '@phosphor-icons/react';
 
 import { getNextPageUrl } from '@waldur/core/api';
 import { ENV } from '@waldur/core/config';
@@ -574,11 +574,24 @@ const StatCard: FC<StatCardProps> = ({ label, value, variant = 'default' }) => {
         : variant === 'danger'
           ? 'border-danger'
           : '';
+  const textClass =
+    variant === 'success'
+      ? 'text-success'
+      : variant === 'warning'
+        ? 'text-warning'
+        : variant === 'danger'
+          ? 'text-danger'
+          : '';
   return (
     <div className={`card flex-fill ${borderClass}`} style={{ minWidth: 180 }}>
       <div className="card-body py-3">
         <div className="text-muted small mb-1">{label}</div>
-        <div className="fs-5 fw-bold">{value}</div>
+        <div className={`fs-5 fw-bold ${textClass}`}>
+          {(variant === 'warning' || variant === 'danger') && (
+            <WarningCircleIcon className="me-1" size={18} weight="fill" />
+          )}
+          {value}
+        </div>
       </div>
     </div>
   );
@@ -719,20 +732,39 @@ export const OrganisationAllocationTab: FC = () => {
 
   // ── Aggregate stats ─────────────────────────────────────────────────────
   const stats = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     let totalCredits = 0;
     let totalSpent = 0;
     let totalSpentThisMonth = 0;
+    let predictedDailyToday = 0;
     for (const s of summaries) {
       totalCredits += parseCredits(s.total_credits);
       totalSpent +=
         parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
       totalSpentThisMonth += parseCredits(s.current_month_spend);
+      if (s.end_date) {
+        const end = new Date(s.end_date);
+        end.setHours(0, 0, 0, 0);
+        if (end > today) {
+          const remaining = Math.max(
+            0,
+            parseCredits(s.total_credits) -
+              parseCredits(s.total_spend) -
+              parseCredits(s.current_month_spend),
+          );
+          predictedDailyToday += remaining / Math.max(1, daysBetween(today, end));
+        }
+      }
     }
+    const actualDailyAvg = totalSpentThisMonth / Math.max(1, today.getDate());
     return {
       totalCredits,
       totalSpent,
       totalSpentThisMonth,
       remaining: totalCredits - totalSpent,
+      predictedDailyToday,
+      actualDailyAvg,
     };
   }, [summaries]);
 
@@ -1058,17 +1090,32 @@ export const OrganisationAllocationTab: FC = () => {
           <StatCard
             label={`Total ${currencyName} spent (all time)`}
             value={fmtCredits(stats.totalSpent)}
-            variant="warning"
           />
           <StatCard
             label={`Total ${currencyName} spent (this month)`}
             value={fmtCredits(stats.totalSpentThisMonth)}
-            variant="warning"
+          />
+          <StatCard
+            label={`Predicted daily spend (today)`}
+            value={fmtCredits(stats.predictedDailyToday)}
+          />
+          <StatCard
+            label={`Actual daily avg (this month)`}
+            value={fmtCredits(stats.actualDailyAvg)}
+            variant={
+              stats.predictedDailyToday > 0
+                ? (() => {
+                    const ratio = stats.actualDailyAvg / stats.predictedDailyToday;
+                    if (ratio >= 0.8 && ratio <= 1.2) return 'success';
+                    if (ratio >= 0.6 && ratio <= 1.4) return 'warning';
+                    return 'danger';
+                  })()
+                : undefined
+            }
           />
           <StatCard
             label={`Remaining ${currencyName}`}
             value={fmtCredits(stats.remaining)}
-            variant={stats.remaining > 0 ? 'success' : 'danger'}
           />
         </div>
       )}
