@@ -391,9 +391,6 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   const [nameFilter, setNameFilter] = useState('');
   const [startAfter, setStartAfter] = useState('');
   const [endBefore, setEndBefore] = useState('');
-  const [showFinished, setShowFinished] = useState(true);
-  const [showInGrace, setShowInGrace] = useState(true);
-
   const visible = useMemo(
     () =>
       projects.filter((p) => {
@@ -405,11 +402,9 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
         if (startAfter && p.start_date && p.start_date < startAfter)
           return false;
         if (endBefore && p.end_date && p.end_date > endBefore) return false;
-        if (!showFinished && p.is_expired && !p.is_in_grace_period) return false;
-        if (!showInGrace && p.is_in_grace_period) return false;
         return true;
       }),
-    [projects, nameFilter, startAfter, endBefore, showFinished, showInGrace],
+    [projects, nameFilter, startAfter, endBefore],
   );
 
   const allVisibleSelected = visible.every((p) => draft.has(p.uuid));
@@ -473,30 +468,6 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
                   value={endBefore}
                   onChange={(e) => setEndBefore(e.target.value)}
                 />
-              </div>
-            </div>
-
-            <div className="d-flex align-items-center gap-4 mb-3 flex-wrap">
-              <div className="form-check mb-0">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="alloc-showFinished"
-                  checked={showFinished}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowFinished(e.target.checked)}
-                />
-                <label className="form-check-label small" htmlFor="alloc-showFinished">Finished</label>
-              </div>
-              <div className="form-check mb-0">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="alloc-showInGrace"
-                  checked={showInGrace}
-                  disabled={!showFinished}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowInGrace(e.target.checked)}
-                />
-                <label className={`form-check-label small${!showFinished ? ' text-muted' : ''}`} htmlFor="alloc-showInGrace">In grace period</label>
               </div>
             </div>
 
@@ -624,8 +595,7 @@ export const OrganisationAllocationTab: FC = () => {
   const [projectSearch, setProjectSearch] = useState('');
   const [projectStartAfter, setProjectStartAfter] = useState('');
   const [projectEndBefore, setProjectEndBefore] = useState('');
-  const [includeFinished, setIncludeFinished] = useState(true);
-  const [includeInGrace, setIncludeInGrace] = useState(true);
+
 
   // ── Fetch all projects in the organisation ──────────────────────────────
   const [projectProgress, setProjectProgress] = useState({ done: 0, total: 0, statusMsg: '' });
@@ -636,9 +606,9 @@ export const OrganisationAllocationTab: FC = () => {
     error: projectsError,
     refetch: refetchProjects,
   } = useQuery({
-    queryKey: ['openportal-alloc-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, includeFinished, includeInGrace, 'terminated'],
+    queryKey: ['openportal-alloc-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, 'terminated'],
     queryFn: async () => {
-      const cacheKey = `alloc-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-${includeFinished}-${includeInGrace}-include_terminated`;
+      const cacheKey = `alloc-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-include_terminated`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -656,8 +626,7 @@ export const OrganisationAllocationTab: FC = () => {
             ...(projectSearch ? { query: projectSearch } : {}),
             ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
             ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
-            ...(!includeFinished ? { ended: false } : {}),
-            ...(includeFinished && !includeInGrace ? { in_grace: false } : {}),
+            ended: false,
           } as any,
         });
         allProjects = allProjects.concat(result.data);
@@ -1027,31 +996,6 @@ export const OrganisationAllocationTab: FC = () => {
                   value={projectEndBefore}
                   onChange={(e) => setProjectEndBefore(e.target.value)}
                 />
-              </div>
-            </div>
-
-            {/* Project status checkboxes */}
-            <div className="d-flex align-items-center gap-4 mb-3 flex-wrap">
-              <div className="form-check mb-0">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="alloc-includeFinished"
-                  checked={includeFinished}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludeFinished(e.target.checked)}
-                />
-                <label className="form-check-label small" htmlFor="alloc-includeFinished">Finished</label>
-              </div>
-              <div className="form-check mb-0">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="alloc-includeInGrace"
-                  checked={includeInGrace}
-                  disabled={!includeFinished}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludeInGrace(e.target.checked)}
-                />
-                <label className={`form-check-label small${!includeFinished ? ' text-muted' : ''}`} htmlFor="alloc-includeInGrace">In grace period</label>
               </div>
             </div>
 
