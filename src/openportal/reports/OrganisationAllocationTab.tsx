@@ -391,6 +391,8 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   const [nameFilter, setNameFilter] = useState('');
   const [startAfter, setStartAfter] = useState('');
   const [endBefore, setEndBefore] = useState('');
+  const [showFinished, setShowFinished] = useState(true);
+  const [showInGrace, setShowInGrace] = useState(true);
 
   const visible = useMemo(
     () =>
@@ -403,9 +405,11 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
         if (startAfter && p.start_date && p.start_date < startAfter)
           return false;
         if (endBefore && p.end_date && p.end_date > endBefore) return false;
+        if (!showFinished && p.is_expired && !p.is_in_grace_period) return false;
+        if (!showInGrace && p.is_in_grace_period) return false;
         return true;
       }),
-    [projects, nameFilter, startAfter, endBefore],
+    [projects, nameFilter, startAfter, endBefore, showFinished, showInGrace],
   );
 
   const allVisibleSelected = visible.every((p) => draft.has(p.uuid));
@@ -472,6 +476,30 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
               </div>
             </div>
 
+            <div className="d-flex align-items-center gap-4 mb-3 flex-wrap">
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="alloc-showFinished"
+                  checked={showFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowFinished(e.target.checked)}
+                />
+                <label className="form-check-label small" htmlFor="alloc-showFinished">Finished</label>
+              </div>
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="alloc-showInGrace"
+                  checked={showInGrace}
+                  disabled={!showFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowInGrace(e.target.checked)}
+                />
+                <label className={`form-check-label small${!showFinished ? ' text-muted' : ''}`} htmlFor="alloc-showInGrace">In grace period</label>
+              </div>
+            </div>
+
             <div className="d-flex align-items-center gap-2 mb-2">
               <input
                 type="checkbox"
@@ -523,6 +551,12 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
                       <span className="text-muted small ms-2">
                         {p.start_date ?? '?'} → {p.end_date ?? 'ongoing'}
                       </span>
+                    )}
+                    {p.is_in_grace_period && (
+                      <span className="badge bg-warning text-dark ms-2" style={{ fontSize: '0.7em' }}>In grace</span>
+                    )}
+                    {p.is_expired && !p.is_in_grace_period && (
+                      <span className="badge bg-secondary ms-2" style={{ fontSize: '0.7em' }}>Finished</span>
                     )}
                   </label>
                 </div>
@@ -590,6 +624,8 @@ export const OrganisationAllocationTab: FC = () => {
   const [projectSearch, setProjectSearch] = useState('');
   const [projectStartAfter, setProjectStartAfter] = useState('');
   const [projectEndBefore, setProjectEndBefore] = useState('');
+  const [includeFinished, setIncludeFinished] = useState(true);
+  const [includeInGrace, setIncludeInGrace] = useState(true);
 
   // ── Fetch all projects in the organisation ──────────────────────────────
   const [projectProgress, setProjectProgress] = useState({ done: 0, total: 0, statusMsg: '' });
@@ -600,9 +636,9 @@ export const OrganisationAllocationTab: FC = () => {
     error: projectsError,
     refetch: refetchProjects,
   } = useQuery({
-    queryKey: ['openportal-alloc-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore],
+    queryKey: ['openportal-alloc-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, includeFinished, includeInGrace, 'terminated'],
     queryFn: async () => {
-      const cacheKey = `alloc-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}`;
+      const cacheKey = `alloc-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-${includeFinished}-${includeInGrace}-include_terminated`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -620,6 +656,8 @@ export const OrganisationAllocationTab: FC = () => {
             ...(projectSearch ? { query: projectSearch } : {}),
             ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
             ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
+            ...(!includeFinished ? { ended: false } : {}),
+            ...(includeFinished && !includeInGrace ? { in_grace: false } : {}),
           } as any,
         });
         allProjects = allProjects.concat(result.data);
@@ -774,9 +812,10 @@ export const OrganisationAllocationTab: FC = () => {
 
   // ── Concerning projects ─────────────────────────────────────────────────
   const [thresholds, setThresholds] = useState({
-    slowStartMonths: 1,
+    slowStartMonths: 2,
     slowStartPercent: 5,
     inactiveMonths: 2,
+    inactiveDayOfMonth: 10,
     inactiveRemainingPercent: 10,
     depletedSpentPercent: 90,
     depletedDaysRemaining: 60,
@@ -786,8 +825,7 @@ export const OrganisationAllocationTab: FC = () => {
     raw: string,
   ) => {
     const v = parseFloat(raw);
-    if (!isNaN(v) && v >= 0)
-      setThresholds((prev: typeof thresholds) => ({ ...prev, [key]: v }));
+    setThresholds((prev: typeof thresholds) => ({ ...prev, [key]: isNaN(v) || v < 0 ? 0 : v }));
   };
   const [showThresholds, setShowThresholds] = useState(false);
   const [concerningTab, setConcerningTab] = useState<
@@ -823,6 +861,7 @@ export const OrganisationAllocationTab: FC = () => {
 
     const inactive = summaries.filter((s: ProjectAccountingSummary) => {
       if (!s.start_date) return false;
+      if (now.getDate() < thresholds.inactiveDayOfMonth) return false;
       if (monthsElapsed(s.start_date) < thresholds.inactiveMonths) return false;
       if (parseCredits(s.current_month_spend) >= 0.01) return false;
       const spent = parseCredits(s.total_spend) + parseCredits(s.current_month_spend);
@@ -981,13 +1020,38 @@ export const OrganisationAllocationTab: FC = () => {
                 />
               </div>
               <div className="col-6 col-md-4">
-                <label className="form-label small mb-1">Started before</label>
+                <label className="form-label small mb-1">Ended before</label>
                 <input
                   type="date"
                   className="form-control form-control-sm"
                   value={projectEndBefore}
                   onChange={(e) => setProjectEndBefore(e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Project status checkboxes */}
+            <div className="d-flex align-items-center gap-4 mb-3 flex-wrap">
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="alloc-includeFinished"
+                  checked={includeFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludeFinished(e.target.checked)}
+                />
+                <label className="form-check-label small" htmlFor="alloc-includeFinished">Finished</label>
+              </div>
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="alloc-includeInGrace"
+                  checked={includeInGrace}
+                  disabled={!includeFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludeInGrace(e.target.checked)}
+                />
+                <label className={`form-check-label small${!includeFinished ? ' text-muted' : ''}`} htmlFor="alloc-includeInGrace">In grace period</label>
               </div>
             </div>
 
@@ -1304,7 +1368,6 @@ export const OrganisationAllocationTab: FC = () => {
                       type="number"
                       className="form-control form-control-sm"
                       style={{ width: 60 }}
-                      min={0}
                       value={thresholds.slowStartMonths}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setThreshold('slowStartMonths', e.target.value)}
                     />
@@ -1313,8 +1376,6 @@ export const OrganisationAllocationTab: FC = () => {
                       type="number"
                       className="form-control form-control-sm"
                       style={{ width: 60 }}
-                      min={0}
-                      max={100}
                       value={thresholds.slowStartPercent}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setThreshold('slowStartPercent', e.target.value)}
                     />
@@ -1329,17 +1390,22 @@ export const OrganisationAllocationTab: FC = () => {
                       type="number"
                       className="form-control form-control-sm"
                       style={{ width: 60 }}
-                      min={0}
                       value={thresholds.inactiveMonths}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setThreshold('inactiveMonths', e.target.value)}
                     />
-                    <span>months ago, no spend this month, &gt;</span>
+                    <span>months ago, after the</span>
                     <input
                       type="number"
                       className="form-control form-control-sm"
                       style={{ width: 60 }}
-                      min={0}
-                      max={100}
+                      value={thresholds.inactiveDayOfMonth}
+                      onChange={(e) => setThreshold('inactiveDayOfMonth', e.target.value)}
+                    />
+                    <span>th of the month, no spend this month, &gt;</span>
+                    <input
+                      type="number"
+                      className="form-control form-control-sm"
+                      style={{ width: 60 }}
                       value={thresholds.inactiveRemainingPercent}
                       onChange={(e) =>
                         setThreshold('inactiveRemainingPercent', e.target.value)
@@ -1356,8 +1422,6 @@ export const OrganisationAllocationTab: FC = () => {
                       type="number"
                       className="form-control form-control-sm"
                       style={{ width: 60 }}
-                      min={0}
-                      max={100}
                       value={thresholds.depletedSpentPercent}
                       onChange={(e) =>
                         setThreshold('depletedSpentPercent', e.target.value)
@@ -1368,7 +1432,6 @@ export const OrganisationAllocationTab: FC = () => {
                       type="number"
                       className="form-control form-control-sm"
                       style={{ width: 70 }}
-                      min={0}
                       value={thresholds.depletedDaysRemaining}
                       onChange={(e) =>
                         setThreshold('depletedDaysRemaining', e.target.value)

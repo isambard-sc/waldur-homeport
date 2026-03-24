@@ -80,6 +80,8 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   const [nameFilter, setNameFilter] = useState('');
   const [startAfter, setStartAfter] = useState('');
   const [endBefore, setEndBefore] = useState('');
+  const [showFinished, setShowFinished] = useState(true);
+  const [showInGrace, setShowInGrace] = useState(true);
 
   const visible = useMemo(() => {
     return projects.filter((p) => {
@@ -87,9 +89,11 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
         return false;
       if (startAfter && p.start_date && p.start_date < startAfter) return false;
       if (endBefore && p.end_date && p.end_date > endBefore) return false;
+      if (!showFinished && p.is_expired && !p.is_in_grace_period) return false;
+      if (!showInGrace && p.is_in_grace_period) return false;
       return true;
     });
-  }, [projects, nameFilter, startAfter, endBefore]);
+  }, [projects, nameFilter, startAfter, endBefore, showFinished, showInGrace]);
 
   const allVisibleSelected = visible.every((p) => draft.has(p.uuid));
 
@@ -153,6 +157,30 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
                 />
               </div>
             </div>
+            <div className="d-flex align-items-center gap-4 mb-3 flex-wrap">
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="dlg-showFinished"
+                  checked={showFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowFinished(e.target.checked)}
+                />
+                <label className="form-check-label small" htmlFor="dlg-showFinished">Finished</label>
+              </div>
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="dlg-showInGrace"
+                  checked={showInGrace}
+                  disabled={!showFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setShowInGrace(e.target.checked)}
+                />
+                <label className={`form-check-label small${!showFinished ? ' text-muted' : ''}`} htmlFor="dlg-showInGrace">In grace period</label>
+              </div>
+            </div>
+
             <div className="d-flex align-items-center gap-2 mb-2">
               <input
                 type="checkbox"
@@ -237,6 +265,10 @@ export const OrganisationReportsTab: FC = () => {
   const [projectStartAfter, setProjectStartAfter] = useState('');
   const [projectEndBefore, setProjectEndBefore] = useState('');
 
+  // ── Pre-filter: project status checkboxes ────────────────────────────────
+  const [includeFinished, setIncludeFinished] = useState(true);
+  const [includeInGrace, setIncludeInGrace] = useState(true);
+
   // ── User mapping: load-all toggle ────────────────────────────────────────
   const [loadAllUserMappings, setLoadAllUserMappings] = useState(false);
 
@@ -252,9 +284,14 @@ export const OrganisationReportsTab: FC = () => {
     error: projectsError,
     refetch: refetchProjects,
   } = useQuery({
-    queryKey: ['openportal-org-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, 'terminated'],
+    queryKey: ['openportal-org-projects', customer?.uuid, projectSearch, projectStartAfter, projectEndBefore, filterYear, filterMonth, includeFinished, includeInGrace, 'terminated'],
     queryFn: async () => {
-      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-include_terminated`;
+      const activeDuring = filterYear
+        ? filterMonth
+          ? `${filterYear}-${String(filterMonth).padStart(2, '0')}`
+          : String(filterYear)
+        : '';
+      const cacheKey = `org-projects-${customer!.uuid}-${projectSearch}-${projectStartAfter}-${projectEndBefore}-${activeDuring}-${includeFinished}-${includeInGrace}-include_terminated`;
       const cached = getCached<Project[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allProjects: Project[] = [];
@@ -272,6 +309,9 @@ export const OrganisationReportsTab: FC = () => {
             ...(projectSearch ? { query: projectSearch } : {}),
             ...(projectStartAfter ? { start_date_after: projectStartAfter } : {}),
             ...(projectEndBefore ? { end_date_before: projectEndBefore } : {}),
+            ...(activeDuring ? { active_during: activeDuring } : {}),
+            ...(!includeFinished ? { ended: false } : {}),
+            ...(includeFinished && !includeInGrace ? { in_grace: false } : {}),
           } as any,
         });
         allProjects = allProjects.concat(result.data);
@@ -638,6 +678,31 @@ export const OrganisationReportsTab: FC = () => {
               </div>
             </div>
 
+            {/* Project status checkboxes */}
+            <div className="d-flex align-items-center gap-4 mb-3 flex-wrap">
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="includeFinished"
+                  checked={includeFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludeFinished(e.target.checked)}
+                />
+                <label className="form-check-label small" htmlFor="includeFinished">Finished</label>
+              </div>
+              <div className="form-check mb-0">
+                <input
+                  type="checkbox"
+                  className="form-check-input"
+                  id="includeInGrace"
+                  checked={includeInGrace}
+                  disabled={!includeFinished}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIncludeInGrace(e.target.checked)}
+                />
+                <label className={`form-check-label small${!includeFinished ? ' text-muted' : ''}`} htmlFor="includeInGrace">In grace period</label>
+              </div>
+            </div>
+
             {/* Year / Month pre-filters */}
             <div className="d-flex align-items-center gap-3 mb-3 flex-wrap">
               <div>
@@ -680,8 +745,8 @@ export const OrganisationReportsTab: FC = () => {
 
             <p className="text-muted small mb-3">
               Fetches reports for each project in parallel — this may take 15–30 seconds for large
-              organisations. Tip: use the project search and date filters above to load only the
-              projects you need — much faster for large organisations.
+              organisations. Tip: selecting a year or month limits projects to those active during
+              that period, which is usually the fastest way to narrow the load for large organisations.
             </p>
 
             <button
