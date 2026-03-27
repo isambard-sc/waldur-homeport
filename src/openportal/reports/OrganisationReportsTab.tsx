@@ -414,7 +414,21 @@ export const OrganisationReportsTab: FC = () => {
         ];
 
         // Top users by usage, capped at MAX_USER_MAPPINGS
-        const allUserIds = [...new Set<string>(usageReports.flatMap((r) => Object.keys(r.users)))];
+        // For each uid, determine the lookup identifier for the mapping API:
+        // if the users value contains '@' it is an email (remote report) — use the email;
+        // otherwise it is a unix username (local report) — use the UserIdentifier (key).
+        const uidToLookupId: Record<string, string> = {};
+        for (const r of usageReports) {
+          for (const [uid, localOrEmail] of Object.entries(r.users) as [string, string][]) {
+            uidToLookupId[uid] = localOrEmail.includes('@') ? localOrEmail : uid;
+          }
+        }
+        // Reverse map so we can key nameMaps.user by UserIdentifier after the fetch.
+        const lookupIdToUid: Record<string, string> = Object.fromEntries(
+          Object.entries(uidToLookupId).map(([uid, lookupId]) => [lookupId, uid]),
+        );
+
+        const allUserIds = Object.keys(uidToLookupId);
         const usageByUid: Record<string, number> = {};
         for (const r of usageReports) {
           for (const [uid, localName] of Object.entries(r.users)) {
@@ -432,14 +446,31 @@ export const OrganisationReportsTab: FC = () => {
           ? usersWithUsage
           : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
         const usersMappingsTruncated = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS;
+        const lookupIdsCapped = userIdsCapped.map((uid) => uidToLookupId[uid] ?? uid);
+
+        // Find email identifiers that appear in daily reports but have no entry in
+        // report.users (i.e. no UserIdentifier maps to them). These are unmapped
+        // remote users — we can still look them up by email and store the result
+        // keyed by email in nameMaps.user.
+        const mappedLocalIds = new Set<string>(
+          usageReports.flatMap((r: ProjectUsageReport) => Object.values(r.users) as string[]),
+        );
+        const unmappedEmailIds = [
+          ...new Set<string>(
+            usageReports.flatMap((r: ProjectUsageReport) =>
+              r.localUsers().filter((u: string) => !mappedLocalIds.has(u) && u.includes('@')),
+            ),
+          ),
+        ];
+        const allLookupIds = [...lookupIdsCapped, ...unmappedEmailIds];
 
         const ob = mappingBatchCount(offeringIds);
         const pb = mappingBatchCount(projectIds);
-        const ub = mappingBatchCount(userIdsCapped);
+        const ub = mappingBatchCount(allLookupIds);
         const total = ob + pb + ub;
         let cum = 0;
 
-        console.debug('[OpenPortal org] mappings start:', { offerings: offeringIds.length, projects: projectIds.length, users: userIdsCapped.length, total });
+        console.debug('[OpenPortal org] mappings start:', { offerings: offeringIds.length, projects: projectIds.length, users: allLookupIds.length, total });
         setMappingsProgress({ done: 0, total, statusMsg: 'Offering names…' });
 
         const offerings = await fetchOfferingMapping(offeringIds, (done) => {
@@ -460,7 +491,7 @@ export const OrganisationReportsTab: FC = () => {
         cum = ob + pb;
         setMappingsProgress({ done: cum, total, statusMsg: 'User names…' });
 
-        const users = await fetchUserMapping(userIdsCapped, (done) => {
+        const users = await fetchUserMapping(allLookupIds, (done) => {
           if (cancelled) return;
           cum = ob + pb + done;
           setMappingsProgress({ done: cum, total, statusMsg: `User names — ${done} of ${ub}` });
@@ -472,7 +503,7 @@ export const OrganisationReportsTab: FC = () => {
         const maps = {
           offering: Object.fromEntries(Object.entries(offerings).filter(([, v]) => v != null).map(([k, v]) => [k, v.name])),
           project: Object.fromEntries(Object.entries(projMaps).filter(([, v]) => v != null).map(([k, v]) => [k, v.name])),
-          user: Object.fromEntries(Object.entries(users).filter(([, v]) => v != null).map(([k, v]) => [k, v.full_name])),
+          user: Object.fromEntries(Object.entries(users).filter(([, v]) => v != null).map(([k, v]) => [lookupIdToUid[k] ?? k, v.full_name])),
         } as NameMaps;
         setMapsResult({
           maps,

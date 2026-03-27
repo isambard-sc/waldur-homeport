@@ -328,6 +328,8 @@ function resolveUserName(
   if (nameMaps?.user) {
     const uid = report.localToIdentifier[u];
     if (uid && nameMaps.user[uid]) return truncateLabel(nameMaps.user[uid]);
+    // Unmapped users (no UserIdentifier) may be keyed directly by their email.
+    if (nameMaps.user[u]) return truncateLabel(nameMaps.user[u]);
   }
   return truncateLabel(fullNames ? u : shortName(u));
 }
