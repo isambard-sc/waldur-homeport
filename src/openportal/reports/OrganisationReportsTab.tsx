@@ -31,7 +31,7 @@ import {
 } from './localStorageCache';
 import { StageProgress } from './StageProgress';
 import { NameMaps } from './usageChartOptions';
-import { ProjectUsageReport } from './ProjectUsageReport';
+import { DailyProjectUsageReport, ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
 import { UsageReportVis } from './UsageReportVis';
@@ -492,6 +492,15 @@ export const OrganisationReportsTab: FC = () => {
   const usersTruncatedCount = mapsResult?.truncatedUserCount ?? 0;
 
   // ── Resource filter ──────────────────────────────────────────────────────
+  const resourceConsumption = useMemo(() => {
+    const totals: Record<string, number> = {};
+    for (const r of allUsage) {
+      const sec = r.dailyReports().reduce((sum: number, d: DailyProjectUsageReport) => sum + d.totalUsage().seconds, 0);
+      totals[r.resource] = (totals[r.resource] ?? 0) + sec;
+    }
+    return totals;
+  }, [allUsage]);
+
   const allResources = useMemo(
     () =>
       [
@@ -499,8 +508,10 @@ export const OrganisationReportsTab: FC = () => {
           ...allUsage.map((r) => r.resource),
           ...allStorage.map((r) => r.resource),
         ]),
-      ].sort(),
-    [allUsage, allStorage],
+      ]
+        .filter((resource) => (resourceConsumption[resource] ?? 0) > 0)
+        .sort((a, b) => (resourceConsumption[b] ?? 0) - (resourceConsumption[a] ?? 0)),
+    [allUsage, allStorage, resourceConsumption],
   );
 
   const [selectedResource, setSelectedResource] = useState('');
