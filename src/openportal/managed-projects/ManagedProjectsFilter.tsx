@@ -5,6 +5,7 @@ import {
     REACT_MULTI_SELECT_TABLE_FILTER,
     Select,
 } from '@waldur/form/themed-select';
+import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
 import { translate } from '@waldur/i18n';
 import { TableFilterItem } from '@waldur/table/TableFilterItem';
 
@@ -33,25 +34,38 @@ const choices = [
 ];
 
 const PureManagedProjectsFilter: FunctionComponent = () => (
-    <TableFilterItem
-        name="state"
-        title={translate('State')}
-        instantApply={false}
-    >
-        <Field
+    <>
+        <TableFilterItem
             name="state"
-            component={(fieldProps) => (
-                <Select
-                    placeholder={translate('Select state...')}
-                    options={choices}
-                    value={fieldProps.input.value}
-                    onChange={(item) => fieldProps.input.onChange(item)}
-                    isClearable={true}
-                    {...REACT_MULTI_SELECT_TABLE_FILTER}
-                />
-            )}
-        />
-    </TableFilterItem>
+            title={translate('State')}
+            instantApply={false}
+        >
+            <Field
+                name="state"
+                component={(fieldProps) => (
+                    <Select
+                        placeholder={translate('Select state...')}
+                        options={choices}
+                        value={fieldProps.input.value}
+                        onChange={(item) => fieldProps.input.onChange(item)}
+                        isClearable={true}
+                        {...REACT_MULTI_SELECT_TABLE_FILTER}
+                    />
+                )}
+            />
+        </TableFilterItem>
+        <TableFilterItem
+            name="hide_embargoed"
+            title={translate('Hide embargoed')}
+            instantApply={true}
+        >
+            <Field
+                name="hide_embargoed"
+                label={translate('Hide embargoed projects')}
+                component={AwesomeCheckboxField}
+            />
+        </TableFilterItem>
+    </>
 );
 
 export const ManagedProjectsFilter = reduxForm({

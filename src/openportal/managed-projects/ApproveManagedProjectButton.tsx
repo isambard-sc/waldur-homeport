@@ -4,10 +4,13 @@ import { useDispatch } from 'react-redux';
 
 import { post } from '../api';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
+import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
 import { ActionItem } from '@waldur/resource/actions/ActionItem';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { wrapTooltip } from '@waldur/table/ActionButton';
+
+import { embargoedUntil } from './utils';
 
 export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => {
     const project = row; // Assuming row is the project object
@@ -17,6 +20,7 @@ export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => 
     }
 
     const dispatch = useDispatch();
+    const embargo = embargoedUntil(project);
     const { mutate, isPending: isLoading } = useMutation({
         mutationFn: async () => {
             try {
@@ -33,8 +37,12 @@ export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => 
         },
     });
 
+    const tooltip = embargo
+        ? translate('Embargoed until {{date}} — cannot approve yet.', { date: formatDateTime(embargo) })
+        : translate('Click to approve this project.');
+
     return wrapTooltip(
-        translate('Click to approve this project.'),
+        tooltip,
         <>
             {isLoading ? (
                 <LoadingSpinnerIcon className="me-1" />
@@ -44,7 +52,7 @@ export const ApproveManagedProjectButton = ({ row, as, className, refetch }) => 
                     className={className + ' w-100'}
                     title={translate('Approve')}
                     action={mutate}
-                    disabled={isLoading}
+                    disabled={isLoading || !!embargo}
                     iconNode={<CheckCircleIcon weight="bold" />}
                     size="sm"
                 />

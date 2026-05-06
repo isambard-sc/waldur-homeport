@@ -16,6 +16,7 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 import { isEmpty } from '@waldur/core/utils';
 
 import type { AwardDetails } from '../bindings/AwardDetails';
+import { isEmbargoed } from './utils';
 
 import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
 import { ManagedProjectActions } from './ManagedProjectActions';
@@ -27,26 +28,30 @@ const mapStateToFilter = createSelector(
     getFormValues('managedProjectsFilter'),
     (userFilter: any) => {
         if (!userFilter) {
-            // If no filter is set, default to pending
             return { state: ['pending'] };
         }
 
-        const filter = {
-            ...userFilter,
-            feature: userFilter?.feature?.map((option) => option.value),
+        // hide_embargoed is a client-side-only toggle — strip it before sending to the API
+        const { hide_embargoed: _, ...rest } = userFilter;
+
+        const filter: any = {
+            ...rest,
+            feature: rest?.feature?.map((option) => option.value),
         };
 
-        // Handle state filter
-        if (userFilter.state && Array.isArray(userFilter.state) && userFilter.state.length > 0) {
-            // If state is selected, map to values
-            filter.state = userFilter.state.map((option) => option.value);
-        } else if (isEmpty(userFilter.state)) {
-            // If no state is selected, default to pending
+        if (rest.state && Array.isArray(rest.state) && rest.state.length > 0) {
+            filter.state = rest.state.map((option) => option.value);
+        } else if (isEmpty(rest.state)) {
             filter.state = ['pending'];
         }
 
         return filter;
     },
+);
+
+const selectHideEmbargoed = createSelector(
+    getFormValues('managedProjectsFilter'),
+    (values: any) => values?.hide_embargoed ?? false,
 );
 
 const renderProjectTemplate = (row: any) => {
@@ -70,8 +75,8 @@ const renderOffering = (destination: string) => {
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
 
-    // Get filter values from redux-form
     const filter = useSelector(mapStateToFilter);
+    const hideEmbargoed = useSelector(selectHideEmbargoed);
 
     const tableProps = useTable({
         table: `ManagedProjectsList`,
@@ -169,6 +174,11 @@ export const ManagedProjectsList = () => {
             render: ({ row }) => (
                 <>
                     {row.state}
+                    {isEmbargoed(row) && (
+                        <span className="badge bg-warning text-dark ms-1">
+                            {translate('Embargoed')}
+                        </span>
+                    )}
                 </>
             ),
             keys: ['state'],
@@ -176,9 +186,14 @@ export const ManagedProjectsList = () => {
         },
     ];
 
+    const rows = hideEmbargoed
+        ? (tableProps.rows || []).filter((row) => !isEmbargoed(row))
+        : tableProps.rows;
+
     return (
         <Table
             {...tableProps}
+            rows={rows}
             columns={columns}
             verboseName={translate('Managed Projects')}
             title={translate('Managed Projects')}
