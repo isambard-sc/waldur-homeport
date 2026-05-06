@@ -15,6 +15,8 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { isEmpty } from '@waldur/core/utils';
 
+import type { AwardDetails } from '../bindings/AwardDetails';
+
 import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
 import { ManagedProjectActions } from './ManagedProjectActions';
 
@@ -52,11 +54,8 @@ const renderProjectTemplate = (row: any) => {
         return row.project_template_data.name;
     }
 
-    if (row.details.template) {
-        return row.details.template;
-    }
-
-    return renderFieldOrDash(row.details.class);
+    const details = row.details as AwardDetails;
+    return renderFieldOrDash(details.template);
 }
 
 const renderOffering = (destination: string) => {
@@ -85,7 +84,7 @@ export const ManagedProjectsList = () => {
         {
             title: translate('Project'),
             orderField: 'details__name',
-            render: ({ row }) => renderFieldOrDash(row.details.name),
+            render: ({ row }) => renderFieldOrDash((row.details as AwardDetails).name),
             keys: ['name'],
             id: 'managedproject',
         },
@@ -113,7 +112,7 @@ export const ManagedProjectsList = () => {
         },
         {
             title: translate('Description'),
-            render: ({ row }) => renderFieldOrDash(row.details.description),
+            render: ({ row }) => renderFieldOrDash((row.details as AwardDetails).description),
             keys: ['description'],
             optional: true,
             id: 'description',
@@ -136,8 +135,8 @@ export const ManagedProjectsList = () => {
             title: translate('Start Date'),
             render: ({ row }) => (
                 <>
-                    {row.details.start_date
-                        ? formatDate(row.details.start_date)
+                    {(row.details as AwardDetails).start_date
+                        ? formatDate((row.details as AwardDetails).start_date)
                         : DASH_ESCAPE_CODE}
                 </>
             ),
@@ -149,8 +148,8 @@ export const ManagedProjectsList = () => {
             title: translate('End Date'),
             render: ({ row }) => (
                 <>
-                    {row.details.end_date
-                        ? formatDate(row.details.end_date)
+                    {(row.details as AwardDetails).end_date
+                        ? formatDate((row.details as AwardDetails).end_date)
                         : DASH_ESCAPE_CODE}
                 </>
             ),
@@ -160,7 +159,7 @@ export const ManagedProjectsList = () => {
         },
         {
             title: translate('Allocation'),
-            render: ({ row }) => renderFieldOrDash(row.details.allocation),
+            render: ({ row }) => renderFieldOrDash((row.details as AwardDetails).allocation),
             keys: ['allocation'],
             id: 'allocation',
         },
