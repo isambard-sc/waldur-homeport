@@ -34,7 +34,7 @@ import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { ProjectDashboardCredit } from './ProjectDashboardCredit';
 import { ProjectDashboardBalance } from './ProjectDashboardBalance';
 import { getProjectTeamChart } from './utils';
-import { MembershipLockedDialog } from './MembershipLockedDialog';
+import { membershipLockedDialog } from './MembershipLockedDialog';
 import { useProjectAwardDetails } from './useProjectAwardDetails';
 
 const EditFieldDialog = lazyComponent(() =>
@@ -103,7 +103,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   const membershipLocked = !canChangeMembership(awardDetails?.membership_control);
 
   const handleAddClick = membershipLocked && awardDetails
-    ? () => dispatch(openModalDialog(MembershipLockedDialog, { resolve: { awardDetails } }))
+    ? () => dispatch(membershipLockedDialog(awardDetails))
     : callback;
 
   const {

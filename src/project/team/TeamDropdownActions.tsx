@@ -18,7 +18,7 @@ import { getTableState } from '@waldur/table/selectors';
 import { useUser } from '@waldur/workspace/hooks';
 
 import { CourseAccountCreateButton } from '../course-accounts/CourseAccountCreateAction';
-import { MembershipLockedDialog } from '../MembershipLockedDialog';
+import { membershipLockedDialog } from '../MembershipLockedDialog';
 import { useProjectAwardDetails } from '../useProjectAwardDetails';
 
 import { AddUserButton } from './AddUserButton';
@@ -73,13 +73,7 @@ export const TeamDropdownActions = ({
       <Button
         variant="primary"
         className="btn-icon-right"
-        onClick={() =>
-          dispatch(
-            openModalDialog(MembershipLockedDialog, {
-              resolve: { awardDetails },
-            }),
-          )
-        }
+        onClick={() => dispatch(membershipLockedDialog(awardDetails))}
       >
         <span className="svg-icon svg-icon-2">
           <PlusCircleIcon weight="bold" />

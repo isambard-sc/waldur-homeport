@@ -4,10 +4,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { EditAction } from '@waldur/form/EditAction';
 import { openModalDialog } from '@waldur/modal/actions';
+import { canChangeRoles } from '@waldur/openportal/bindings/helpers';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { GenericPermission } from '@waldur/permissions/types';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+
+import { rolesLockedDialog } from '../MembershipLockedDialog';
+import { useProjectAwardDetails } from '../useProjectAwardDetails';
 
 const EditUserDialog = lazyComponent(() =>
   import('./EditUserDialog').then((module) => ({
@@ -47,14 +51,12 @@ export const EditUserButton: React.FC<EditUserButtonProps> = ({
     return null;
   }
 
-  const callback = () =>
-    dispatch(
-      openModalDialog(EditUserDialog, {
-        resolve: {
-          permission,
-          refetch,
-        },
-      }),
-    );
+  const { data: awardDetails } = useProjectAwardDetails(projectId);
+  const rolesLocked = !canChangeRoles(awardDetails?.membership_control);
+
+  const callback = rolesLocked && awardDetails
+    ? () => dispatch(rolesLockedDialog(awardDetails))
+    : () => dispatch(openModalDialog(EditUserDialog, { resolve: { permission, refetch } }));
+
   return <EditAction action={callback} size="sm" />;
 };
