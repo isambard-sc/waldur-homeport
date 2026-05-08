@@ -214,7 +214,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             showChart
             onBadgeClick={isProjectRemoved ? undefined : goToUsers}
             onAddClick={isProjectRemoved ? undefined : handleAddClick}
-            showAdd={canInvite && !isProjectRemoved}
+            showAdd={(canInvite || membershipLocked) && !isProjectRemoved}
             loadingAdd={loadingProjects}
             className="h-100"
             nameKey="user_full_name"

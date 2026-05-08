@@ -1,7 +1,8 @@
 import { FunctionComponent } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 
 import { translate } from '@waldur/i18n';
+import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
 
 import type { AwardDetails } from '@waldur/openportal/bindings/AwardDetails';
 
@@ -34,19 +35,16 @@ export const MembershipLockedDialog: FunctionComponent<MembershipLockedDialogPro
       </Modal.Body>
       <Modal.Footer>
         {awardUrl && (
-          <Button
-            variant="primary"
+          <a
             href={awardUrl}
             target="_blank"
             rel="noopener noreferrer"
-            as="a"
+            className="btn btn-primary"
           >
             {translate('Go to award')}
-          </Button>
+          </a>
         )}
-        <Button variant="secondary" data-bs-dismiss="modal">
-          {translate('Close')}
-        </Button>
+        <CloseDialogButton label={translate('Close')} variant="secondary" />
       </Modal.Footer>
     </>
   );

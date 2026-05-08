@@ -4,18 +4,22 @@ import {
   SpinnerIcon,
 } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { Dropdown } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { Button, Dropdown } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { Project } from 'waldur-js-client';
 
 import { count } from '@waldur/core/api';
 import { ServiceAccountCreateButton } from '@waldur/customer/service-accounts/ServiceAccountCreateAction';
 import { translate } from '@waldur/i18n';
 import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
+import { openModalDialog } from '@waldur/modal/actions';
+import { canChangeMembership } from '@waldur/openportal/bindings/helpers';
 import { getTableState } from '@waldur/table/selectors';
 import { useUser } from '@waldur/workspace/hooks';
 
 import { CourseAccountCreateButton } from '../course-accounts/CourseAccountCreateAction';
+import { MembershipLockedDialog } from '../MembershipLockedDialog';
+import { useProjectAwardDetails } from '../useProjectAwardDetails';
 
 import { AddUserButton } from './AddUserButton';
 import { hasCurrentCustomerPermission } from './utils';
@@ -55,9 +59,34 @@ export const TeamDropdownActions = ({
     },
   });
 
+  const dispatch = useDispatch();
+  const { data: awardDetails } = useProjectAwardDetails(project?.uuid);
+  const membershipLocked = !canChangeMembership(awardDetails?.membership_control);
+
   // Don't render Add dropdown for removed projects
   if (project.is_removed) {
     return null;
+  }
+
+  if (membershipLocked && awardDetails) {
+    return (
+      <Button
+        variant="primary"
+        className="btn-icon-right"
+        onClick={() =>
+          dispatch(
+            openModalDialog(MembershipLockedDialog, {
+              resolve: { awardDetails },
+            }),
+          )
+        }
+      >
+        <span className="svg-icon svg-icon-2">
+          <PlusCircleIcon weight="bold" />
+        </span>
+        {translate('Add')}
+      </Button>
+    );
   }
 
   return (
