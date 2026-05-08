@@ -8,9 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { openportalManagedProjectsList, Project, proposalProposalsList } from 'waldur-js-client';
-
-import type { AwardDetails } from '@waldur/openportal/bindings/AwardDetails';
+import { Project, proposalProposalsList } from 'waldur-js-client';
 
 import { Badge } from '@waldur/core/Badge';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
@@ -22,6 +20,8 @@ import { ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { isOwnerOrStaff as isOwnerOrStaffSelector } from '@waldur/workspace/selectors';
+
+import { useProjectAwardDetails } from './useProjectAwardDetails';
 
 interface ProjectProfileProps {
   project: Project;
@@ -119,22 +119,7 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const { data: awardDetails } = useQuery({
-    queryKey: ['project-managed', project.uuid],
-    queryFn: async () => {
-      const { data } = await openportalManagedProjectsList({
-        query: {
-          project_uuid: project.uuid,
-          state: ['approved', 'pending', 'rejected'],
-          page_size: 1,
-        },
-      });
-      if (!Array.isArray(data) || data.length === 0) return null;
-      return data[0].details as AwardDetails;
-    },
-    staleTime: 5 * 60 * 1000,
-    enabled: Boolean(project.uuid),
-  });
+  const { data: awardDetails } = useProjectAwardDetails(project.uuid);
 
   return (
     <PublicDashboardHero

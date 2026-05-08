@@ -27,11 +27,15 @@ import { useUser } from '@waldur/workspace/hooks';
 import { getProject, getUser } from '@waldur/workspace/selectors';
 import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 
+import { canChangeMembership } from '@waldur/openportal/bindings/helpers';
+
 import { ProjectLimitUsageBasedResources } from './dashboard/ProjectLimitUsageBasedResources';
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { ProjectDashboardCredit } from './ProjectDashboardCredit';
 import { ProjectDashboardBalance } from './ProjectDashboardBalance';
 import { getProjectTeamChart } from './utils';
+import { MembershipLockedDialog } from './MembershipLockedDialog';
+import { useProjectAwardDetails } from './useProjectAwardDetails';
 
 const EditFieldDialog = lazyComponent(() =>
   import('./manage/EditFieldDialog').then((module) => ({
@@ -94,6 +98,13 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   });
 
   const isProjectRemoved = Boolean(project?.is_removed);
+
+  const { data: awardDetails } = useProjectAwardDetails(project?.uuid);
+  const membershipLocked = !canChangeMembership(awardDetails?.membership_control);
+
+  const handleAddClick = membershipLocked && awardDetails
+    ? () => dispatch(openModalDialog(MembershipLockedDialog, { resolve: { awardDetails } }))
+    : callback;
 
   const {
     data: aggregateLimitData,
@@ -202,7 +213,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             chartData={teamData}
             showChart
             onBadgeClick={isProjectRemoved ? undefined : goToUsers}
-            onAddClick={isProjectRemoved ? undefined : callback}
+            onAddClick={isProjectRemoved ? undefined : handleAddClick}
             showAdd={canInvite && !isProjectRemoved}
             loadingAdd={loadingProjects}
             className="h-100"
