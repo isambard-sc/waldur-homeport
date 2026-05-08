@@ -8,7 +8,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { Stack } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
-import { Project, proposalProposalsList } from 'waldur-js-client';
+import { openportalManagedProjectsList, Project, proposalProposalsList } from 'waldur-js-client';
+
+import type { AwardDetails } from '@waldur/openportal/bindings/AwardDetails';
 
 import { Badge } from '@waldur/core/Badge';
 import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
@@ -117,6 +119,23 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: awardDetails } = useQuery({
+    queryKey: ['project-managed', project.uuid],
+    queryFn: async () => {
+      const { data } = await openportalManagedProjectsList({
+        query: {
+          project_uuid: project.uuid,
+          state: ['approved', 'pending', 'rejected'],
+          page_size: 1,
+        },
+      });
+      if (!Array.isArray(data) || data.length === 0) return null;
+      return data[0].details as AwardDetails;
+    },
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(project.uuid),
+  });
+
   return (
     <PublicDashboardHero
       hideQuickSection={project.kind === 'default'}
@@ -156,6 +175,41 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
           </span>
         )}
       </Stack>
+      {awardDetails && (awardDetails.award || awardDetails.call) && (
+        <Stack direction="horizontal" className="gap-6 mt-2">
+          {awardDetails.award && (
+            <>
+              <span className="fw-semibold text-dark">{translate('Award:')}</span>
+              {awardDetails.award.url ? (
+                <a href={awardDetails.award.url} target="_blank" rel="noopener noreferrer">
+                  {awardDetails.award.id || awardDetails.award.url}
+                </a>
+              ) : (
+                <span>{awardDetails.award.id}</span>
+              )}
+            </>
+          )}
+          {awardDetails.call && (awardDetails.call.id || awardDetails.call.url) && (
+            <>
+              <span className="fw-semibold text-dark">{translate('Call:')}</span>
+              {awardDetails.call.url ? (
+                <a href={awardDetails.call.url} target="_blank" rel="noopener noreferrer">
+                  {awardDetails.call.id || awardDetails.call.url}
+                </a>
+              ) : (
+                <span>{awardDetails.call.id}</span>
+              )}
+            </>
+          )}
+        </Stack>
+      )}
+      {awardDetails?.renewal?.url && (
+        <Stack direction="horizontal" className="gap-3 mt-1">
+          <a href={awardDetails.renewal.url} target="_blank" rel="noopener noreferrer">
+            {translate('Apply for a renewal')} &rarr;
+          </a>
+        </Stack>
+      )}
       {!isLoadingProposals && proposals && proposals.length > 0 && (
         <Stack direction="horizontal" className="gap-3 mt-2">
           <span className="fw-semibold text-dark">
