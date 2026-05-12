@@ -1,6 +1,7 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
 import { translate } from '@waldur/i18n';
+import { OpenPortalFeatures, isOpenPortalFeatureVisible } from './OpenPortalFeaturesEnums';
 import {
   isStaffOrSupport,
   isOwnerOrStaffOrReader,
@@ -58,6 +59,24 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Usage Report'),
       priority: 101,
       permissions: [isStaffOrSupport],
+    },
+  },
+  {
+    name: 'organization-remote-projects',
+    url: 'remote-projects/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./remote-projects/RemoteProjectsList').then((m) => ({
+        default: m.RemoteProjectsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Remote Projects'),
+      priority: 156,
+      permissions: [
+        isOwnerOrStaffOrReader,
+        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
+      ],
     },
   },
   {
