@@ -1,9 +1,15 @@
-import { FC, ReactNode } from 'react';
-import type { RemoteProject } from 'waldur-js-client';
+import { useMutation } from '@tanstack/react-query';
+import { FC, ReactNode, useState } from 'react';
+import { Button, Form } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { openportalRemoteProjectsAddNote } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
+import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import { getUser } from '@waldur/workspace/selectors';
 
 import { RemoteProjectStateField } from './RemoteProjectStateField';
 
@@ -44,8 +50,67 @@ const JsonBlock = ({ value }: { value: any }) => {
   );
 };
 
+const NotesList: FC<{ uuid: string; initialNotes: any[] }> = ({ uuid, initialNotes }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const [notes, setNotes] = useState<any[]>(initialNotes);
+  const [text, setText] = useState('');
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: () =>
+      openportalRemoteProjectsAddNote({
+        path: { uuid },
+        body: { author: user?.full_name || user?.username || '', text },
+      }),
+    onSuccess: () => {
+      setNotes((prev) => [
+        ...prev,
+        { author: user?.full_name || user?.username || '', text, timestamp: new Date().toISOString() },
+      ]);
+      setText('');
+      dispatch(showSuccess(translate('Note added.')));
+    },
+    onError: (error) => dispatch(showErrorResponse(error, translate('Unable to add note.'))),
+  });
+
+  return (
+    <div>
+      {notes.length === 0 ? (
+        <div className="text-muted mb-2">{translate('No notes yet.')}</div>
+      ) : (
+        <div className="mb-2">
+          {notes.map((note, i) => (
+            <div key={i} className="border rounded p-2 mb-1 bg-light">
+              <div className="d-flex justify-content-between">
+                <strong>{note.author}</strong>
+                <small className="text-muted">{formatDateTime(note.timestamp)}</small>
+              </div>
+              <div>{note.text}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      <Form onSubmit={(e) => { e.preventDefault(); if (text.trim()) mutate(); }}>
+        <Form.Control
+          as="textarea"
+          rows={2}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={translate('Add a note...')}
+          className="mb-1"
+          disabled={isPending}
+        />
+        <Button type="submit" size="sm" disabled={isPending || !text.trim()}>
+          {isPending && <LoadingSpinnerIcon className="me-1" />}
+          {translate('Add note')}
+        </Button>
+      </Form>
+    </div>
+  );
+};
+
 interface Props {
-  row: RemoteProject;
+  row: any;
 }
 
 export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
@@ -57,7 +122,9 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
         {row.state ? <RemoteProjectStateField state={row.state} /> : '—'}
       </Row>
       <Row label={translate('Destination')}>{row.destination || '—'}</Row>
-      <Row label={translate('Identifier')}>{row.identifier || <span className="text-muted">{translate('Not yet assigned')}</span>}</Row>
+      <Row label={translate('Identifier')}>
+        {row.identifier || <span className="text-muted">{translate('Not yet assigned')}</span>}
+      </Row>
       {row.error_message && (
         <div className="col-12 mb-2">
           <span className="fw-semibold me-1">{translate('Error')}:</span>
@@ -78,9 +145,7 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
           <div className="col-12 mb-2">
             <span className="fw-semibold me-1">{translate('Breakdown')}:</span>
             {Object.entries(row.breakdown as Record<string, unknown>).map(([k, v]) => (
-              <span key={k} className="me-3">
-                {k}: {String(v)}
-              </span>
+              <span key={k} className="me-3">{k}: {String(v)}</span>
             ))}
           </div>
         )}
@@ -112,35 +177,21 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
       )}
 
       {row.notes !== null && row.notes !== undefined && (
-        <div className="col-12 mb-2">
-          <span className="fw-semibold">{translate('Notes')}:</span>
-          {Array.isArray(row.notes) && row.notes.length === 0 ? (
-            <span className="ms-2 text-muted">{translate('None')}</span>
-          ) : (
-            <div className="mt-1">
-              {(row.notes as any[]).map((note, i) => (
-                <div key={i} className="border rounded p-2 mb-1 bg-light">
-                  <div className="d-flex justify-content-between">
-                    <strong>{note.author}</strong>
-                    <small className="text-muted">{formatDateTime(note.timestamp)}</small>
-                  </div>
-                  <div>{note.text}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <>
+          <SectionHeading title={translate('Notes')} />
+          <div className="col-12 mb-2">
+            <NotesList uuid={row.uuid} initialNotes={row.notes as any[]} />
+          </div>
+        </>
       )}
 
       {row.pending_details !== null && row.pending_details !== undefined && (
         <>
-          {row.pending_since === null
-            ? null
-            : (
-              <SectionHeading title={translate('Pending sync')} />
-            )}
           {row.pending_since && (
-            <Row label={translate('Pending since')}>{formatDateTime(row.pending_since)}</Row>
+            <>
+              <SectionHeading title={translate('Pending sync')} />
+              <Row label={translate('Pending since')}>{formatDateTime(row.pending_since)}</Row>
+            </>
           )}
           <div className="col-12 mb-2">
             <span className="fw-semibold me-1">{translate('Pending details')}:</span>
