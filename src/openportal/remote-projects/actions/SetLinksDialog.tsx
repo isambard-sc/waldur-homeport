@@ -17,7 +17,6 @@ interface LinkValue {
 interface FormValues {
   award: LinkValue;
   call: LinkValue;
-  project_link: LinkValue;
   renewal: LinkValue;
 }
 
@@ -78,7 +77,6 @@ export const SetLinksDialog = ({ row, resolve }: Props) => {
         body: {
           award: linkToBody(values.award),
           call: linkToBody(values.call),
-          project_link: linkToBody(values.project_link),
           renewal: linkToBody(values.renewal),
         },
       }),
@@ -101,7 +99,6 @@ export const SetLinksDialog = ({ row, resolve }: Props) => {
       initialValues={{
         award: linkFromRow(row.link_award),
         call: linkFromRow(row.link_call),
-        project_link: linkFromRow(row.link_project),
         renewal: linkFromRow(row.link_renewal),
       }}
       render={({ handleSubmit, submitting, invalid }) => (
@@ -120,7 +117,6 @@ export const SetLinksDialog = ({ row, resolve }: Props) => {
           >
             <LinkFields prefix="award" label={translate('Award')} />
             <LinkFields prefix="call" label={translate('Call')} />
-            <LinkFields prefix="project_link" label={translate('Project')} />
             <LinkFields prefix="renewal" label={translate('Renewal')} />
           </ModalDialog>
         </form>

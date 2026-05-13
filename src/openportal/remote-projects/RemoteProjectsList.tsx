@@ -4,6 +4,7 @@ import { createSelector } from 'reselect';
 import { openportalRemoteProjectsList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 import Table from '@waldur/table/Table';
@@ -14,6 +15,7 @@ import { useTable } from '@waldur/table/useTable';
 import { getCustomer, isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
 
 import { RemoteProjectActions } from './RemoteProjectActions';
+import { RemoteProjectExpandableRow } from './RemoteProjectExpandableRow';
 import { RemoteProjectStateField } from './RemoteProjectStateField';
 import { RemoteProjectsFilter } from './RemoteProjectsFilter';
 
@@ -75,7 +77,11 @@ export const RemoteProjectsList = () => {
       title: translate('State'),
       orderField: 'state',
       render: ({ row }) =>
-        row.state ? <RemoteProjectStateField state={row.state} /> : DASH_ESCAPE_CODE,
+        row.state ? (
+          <Tip id={`state-${row.uuid}`} label={row.error_message}>
+            <RemoteProjectStateField state={row.state} />
+          </Tip>
+        ) : DASH_ESCAPE_CODE,
       keys: ['state'],
       id: 'state',
     },
@@ -122,6 +128,8 @@ export const RemoteProjectsList = () => {
       standalone
       hasQuery
       hasOptionalColumns
+      expandableRow={RemoteProjectExpandableRow}
+      expandableRowClassName="py-2 pe-2"
       rowActions={
         canEdit
           ? ({ row }) => (
