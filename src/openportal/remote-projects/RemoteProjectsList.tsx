@@ -11,7 +11,7 @@ import { createFetcher } from '@waldur/table/api';
 import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { Column } from '@waldur/table/types';
 import { useTable } from '@waldur/table/useTable';
-import { isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
+import { getCustomer, isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
 
 import { RemoteProjectActions } from './RemoteProjectActions';
 import { RemoteProjectStateField } from './RemoteProjectStateField';
@@ -19,15 +19,11 @@ import { RemoteProjectsFilter } from './RemoteProjectsFilter';
 
 const mapStateToFilter = createSelector(
   getFormValues('remoteProjectsFilter'),
-  (userFilter: any) => {
-    if (!userFilter) {
-      return { state: ['pending', 'active'] };
-    }
-    const filter: any = { ...userFilter };
-    if (Array.isArray(userFilter.state) && userFilter.state.length > 0) {
+  getCustomer,
+  (userFilter: any, customer) => {
+    const filter: any = { customer_uuid: customer?.uuid };
+    if (Array.isArray(userFilter?.state) && userFilter.state.length > 0) {
       filter.state = userFilter.state.map((opt) => opt.value);
-    } else {
-      filter.state = ['pending', 'active'];
     }
     return filter;
   },
