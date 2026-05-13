@@ -34,7 +34,8 @@ const PureRemoteProjectsFilter: FunctionComponent = () => (
 export const RemoteProjectsFilter = reduxForm({
   form: 'remoteProjectsFilter',
   initialValues: {
-    state: [STATE_CHOICES[0], STATE_CHOICES[1]],
+    // Show all non-deleted states by default so errors are visible immediately
+    state: STATE_CHOICES.filter((c) => c.value !== 'deleted'),
   },
   destroyOnUnmount: false,
 })(PureRemoteProjectsFilter);
