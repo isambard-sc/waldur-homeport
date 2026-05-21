@@ -164,6 +164,7 @@ const SyncDetailsButton: FC<{ sent: any; confirmed: any }> = ({ sent, confirmed 
   );
 };
 
+
 const NotesList: FC<{ uuid: string; initialNotes: any[] }> = ({ uuid, initialNotes }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
@@ -227,102 +228,117 @@ interface Props {
   row: any;
 }
 
-export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
-  <ExpandableContainer>
-    <div className="row g-0">
+export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => {
+  const d = parseDetails(row.award_details);
 
-      <SectionHeading title={translate('Connection')} />
-      <Row label={translate('State')}>
-        {row.state ? <RemoteProjectStateField state={row.state} /> : '—'}
-      </Row>
-      <Row label={translate('Destination')}>{row.destination || '—'}</Row>
-      <Row label={translate('Identifier')}>
-        {row.identifier || <span className="text-muted">{translate('Not yet assigned')}</span>}
-      </Row>
-      {row.error_message && (
-        <div className="col-12 mb-2">
-          <span className="fw-semibold me-1">{translate('Error')}:</span>
-          <span className="text-danger">{row.error_message}</span>
-        </div>
-      )}
-      <Row label={translate('Last contact')}>
-        {row.last_contact_time ? formatDateTime(row.last_contact_time) : '—'}
-      </Row>
-      <Row label={translate('Created')}>{formatDateTime(row.created)}</Row>
-      <Row label={translate('Modified')}>{formatDateTime(row.modified)}</Row>
+  const allocation = d.allocation ?? row.current_allocation;
+  const breakdown = d.breakdown ?? row.breakdown;
+  const linkAward = d.award ?? row.link_award;
+  const linkCall = d.call ?? row.link_call;
+  const linkProject = d.project_link ?? row.link_project;
+  const linkRenewal = d.renewal ?? row.link_renewal;
+  const membershipControl = d.membership_control ?? row.membership_control;
+  const allowedDomains = d.allowed_domains ?? row.allowed_domains;
+  const earliestApprove = d.earliest_approve ?? row.earliest_approve;
+  const notes = d.notes ?? row.notes;
 
-      <SectionHeading title={translate('Allocation')} />
-      <Row label={translate('Current')}>{row.current_allocation ?? '—'}</Row>
-      <Row label={translate('Pending')}>{row.pending_allocation ?? '—'}</Row>
-      {row.breakdown && typeof row.breakdown === 'object' &&
-        Object.keys(row.breakdown).length > 0 && (
+  return (
+    <ExpandableContainer>
+      <div className="row g-0">
+
+        <SectionHeading title={translate('Connection')} />
+        <Row label={translate('State')}>
+          {row.state ? <RemoteProjectStateField state={row.state} /> : '—'}
+        </Row>
+        <Row label={translate('Destination')}>{row.destination || '—'}</Row>
+        <Row label={translate('Identifier')}>
+          {row.identifier || <span className="text-muted">{translate('Not yet assigned')}</span>}
+        </Row>
+        {row.error_message && (
           <div className="col-12 mb-2">
-            <span className="fw-semibold me-1">{translate('Breakdown')}:</span>
-            {Object.entries(row.breakdown as Record<string, unknown>).map(([k, v]) => (
-              <span key={k} className="me-3">{k}: {String(v)}</span>
-            ))}
+            <span className="fw-semibold me-1">{translate('Error')}:</span>
+            <span className="text-danger">{row.error_message}</span>
           </div>
         )}
+        <Row label={translate('Last contact')}>
+          {row.last_contact_time ? formatDateTime(row.last_contact_time) : '—'}
+        </Row>
+        <Row label={translate('Created')}>{formatDateTime(row.created)}</Row>
+        <Row label={translate('Modified')}>{formatDateTime(row.modified)}</Row>
 
-      <SectionHeading title={translate('Links')} />
-      <Row label={translate('Award')}>{renderLink(row.link_award)}</Row>
-      <Row label={translate('Call')}>{renderLink(row.link_call)}</Row>
-      <Row label={translate('Project')}>{renderLink(row.link_project)}</Row>
-      <Row label={translate('Renewal')}>{renderLink(row.link_renewal)}</Row>
-
-      <SectionHeading title={translate('Access control')} />
-      <Row label={translate('Membership control')}>
-        {row.membership_control ?? <span className="text-muted">{translate('Open')}</span>}
-      </Row>
-      <Row label={translate('Allowed domains')}>
-        {Array.isArray(row.allowed_domains) && row.allowed_domains.length > 0
-          ? (row.allowed_domains as string[]).join(', ')
-          : <span className="text-muted">{translate('All domains')}</span>}
-      </Row>
-
-      {/* Privileged fields — null for non-privileged users */}
-      {row.earliest_approve !== null && row.earliest_approve !== undefined && (
-        <>
-          <SectionHeading title={translate('Administration')} />
-          <Row label={translate('Earliest approve')}>
-            {formatDateTime(row.earliest_approve)}
-          </Row>
-        </>
-      )}
-
-      {(row.last_sent_details !== null && row.last_sent_details !== undefined) ||
-       (row.last_confirmed_details !== null && row.last_confirmed_details !== undefined) ? (
-        <>
-          <SectionHeading title={translate('Sync status')} />
-          <div className="col-12 mb-2">
-            <SyncDetailsButton sent={row.last_sent_details} confirmed={row.last_confirmed_details} />
-          </div>
-        </>
-      ) : null}
-
-      {row.notes !== null && row.notes !== undefined && (
-        <>
-          <SectionHeading title={translate('Notes')} />
-          <div className="col-12 mb-2">
-            <NotesList uuid={row.uuid} initialNotes={row.notes as any[]} />
-          </div>
-        </>
-      )}
-
-      {row.pending_details !== null && row.pending_details !== undefined && (
-        <>
-          {row.pending_since && (
-            <>
-              <SectionHeading title={translate('Pending sync')} />
-              <Row label={translate('Pending since')}>{formatDateTime(row.pending_since)}</Row>
-            </>
+        <SectionHeading title={translate('Allocation')} />
+        <Row label={translate('Current')}>{String(allocation ?? '—')}</Row>
+        <Row label={translate('Pending')}>{row.pending_allocation ?? '—'}</Row>
+        {breakdown && typeof breakdown === 'object' &&
+          Object.keys(breakdown as object).length > 0 && (
+            <div className="col-12 mb-2">
+              <span className="fw-semibold me-1">{translate('Breakdown')}:</span>
+              {Object.entries(breakdown as Record<string, unknown>).map(([k, v]) => (
+                <span key={k} className="me-3">{k}: {String(v)}</span>
+              ))}
+            </div>
           )}
-          <div className="col-12 mb-2">
-            <span className="fw-semibold me-1">{translate('Pending details')}:</span>
-            <JsonBlock value={row.pending_details} />
-          </div>
-        </>
-      )}
-    </div>
-  </ExpandableContainer>
-);
+
+        <SectionHeading title={translate('Links')} />
+        <Row label={translate('Award')}>{renderLink(linkAward)}</Row>
+        <Row label={translate('Call')}>{renderLink(linkCall)}</Row>
+        <Row label={translate('Project')}>{renderLink(linkProject)}</Row>
+        <Row label={translate('Renewal')}>{renderLink(linkRenewal)}</Row>
+
+        <SectionHeading title={translate('Access control')} />
+        <Row label={translate('Membership control')}>
+          {membershipControl ?? <span className="text-muted">{translate('Open')}</span>}
+        </Row>
+        <Row label={translate('Allowed domains')}>
+          {Array.isArray(allowedDomains) && (allowedDomains as string[]).length > 0
+            ? (allowedDomains as string[]).join(', ')
+            : <span className="text-muted">{translate('All domains')}</span>}
+        </Row>
+
+        {/* Privileged fields — null for non-privileged users */}
+        {earliestApprove !== null && earliestApprove !== undefined && (
+          <>
+            <SectionHeading title={translate('Administration')} />
+            <Row label={translate('Earliest approve')}>
+              {formatDateTime(earliestApprove as string)}
+            </Row>
+          </>
+        )}
+
+        {(row.last_sent_details !== null && row.last_sent_details !== undefined) ||
+         (row.last_confirmed_details !== null && row.last_confirmed_details !== undefined) ? (
+          <>
+            <SectionHeading title={translate('Sync status')} />
+            <div className="col-12 mb-2">
+              <SyncDetailsButton sent={row.last_sent_details} confirmed={row.last_confirmed_details} />
+            </div>
+          </>
+        ) : null}
+
+        {notes !== null && notes !== undefined && (
+          <>
+            <SectionHeading title={translate('Notes')} />
+            <div className="col-12 mb-2">
+              <NotesList uuid={row.uuid} initialNotes={notes as any[]} />
+            </div>
+          </>
+        )}
+
+        {row.pending_details !== null && row.pending_details !== undefined && (
+          <>
+            {row.pending_since && (
+              <>
+                <SectionHeading title={translate('Pending sync')} />
+                <Row label={translate('Pending since')}>{formatDateTime(row.pending_since)}</Row>
+              </>
+            )}
+            <div className="col-12 mb-2">
+              <span className="fw-semibold me-1">{translate('Pending details')}:</span>
+              <JsonBlock value={row.pending_details} />
+            </div>
+          </>
+        )}
+      </div>
+    </ExpandableContainer>
+  );
+};
