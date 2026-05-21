@@ -50,6 +50,82 @@ const JsonBlock = ({ value }: { value: any }) => {
   );
 };
 
+const renderValue = (v: unknown): ReactNode => {
+  if (v === null || v === undefined) return <span className="text-muted">—</span>;
+  if (typeof v === 'boolean') return v ? 'true' : 'false';
+  if (typeof v !== 'object') return String(v);
+  return (
+    <pre className="mb-0 fs-8" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+      {JSON.stringify(v, null, 2)}
+    </pre>
+  );
+};
+
+const sortedStringify = (value: unknown): string => {
+  if (value === null || value === undefined) return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(sortedStringify).join(',')}]`;
+  if (typeof value === 'object') {
+    const sorted = Object.keys(value as object)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${sortedStringify((value as any)[k])}`);
+    return `{${sorted.join(',')}}`;
+  }
+  return JSON.stringify(value);
+};
+
+const parseDetails = (value: any): Record<string, unknown> => {
+  if (!value) return {};
+  if (typeof value === 'string') {
+    try { return JSON.parse(value); } catch { return {}; }
+  }
+  if (typeof value === 'object') return value;
+  return {};
+};
+
+const DetailsDiff: FC<{ sent: any; confirmed: any }> = ({ sent, confirmed }) => {
+  const sentObj = parseDetails(sent);
+  const confirmedObj = parseDetails(confirmed);
+  const hasBoth = Object.keys(sentObj).length > 0 && Object.keys(confirmedObj).length > 0;
+  const keys = Array.from(new Set([...Object.keys(sentObj), ...Object.keys(confirmedObj)])).sort();
+
+  if (keys.length === 0) {
+    return <span className="text-muted">—</span>;
+  }
+
+  return (
+    <div className="table-responsive">
+      <table className="table table-bordered table-sm mb-0 fs-8">
+        <thead className="table-light">
+          <tr>
+            <th style={{ width: '25%' }}>{translate('Field')}</th>
+            <th style={{ width: '37.5%' }}>{translate('Last sent')}</th>
+            <th style={{ width: '37.5%' }}>
+              {translate('Last confirmed')}
+              {!confirmed && (
+                <span className="ms-1 badge bg-secondary fw-normal">{translate('Not yet confirmed')}</span>
+              )}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {keys.map((key) => {
+            const sentVal = sentObj[key];
+            const confirmedVal = confirmedObj[key];
+            const differs = hasBoth && JSON.stringify(sentVal) !== JSON.stringify(confirmedVal);
+            return (
+              <tr key={key} className={differs ? 'table-warning' : undefined}>
+                <td className="fw-semibold align-top">{key}</td>
+                <td className="align-top">{renderValue(sentVal)}</td>
+                <td className="align-top">{renderValue(confirmedVal)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 const NotesList: FC<{ uuid: string; initialNotes: any[] }> = ({ uuid, initialNotes }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
@@ -200,19 +276,15 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
         </>
       )}
 
-      {row.last_sent_details !== null && row.last_sent_details !== undefined && (
-        <div className="col-12 mb-2">
-          <span className="fw-semibold me-1">{translate('Last sent details')}:</span>
-          <JsonBlock value={row.last_sent_details} />
-        </div>
-      )}
-
-      {row.last_confirmed_details !== null && row.last_confirmed_details !== undefined && (
-        <div className="col-12 mb-2">
-          <span className="fw-semibold me-1">{translate('Last confirmed details')}:</span>
-          <JsonBlock value={row.last_confirmed_details} />
-        </div>
-      )}
+      {(row.last_sent_details !== null && row.last_sent_details !== undefined) ||
+       (row.last_confirmed_details !== null && row.last_confirmed_details !== undefined) ? (
+        <>
+          <SectionHeading title={translate('Sync details')} />
+          <div className="col-12 mb-2">
+            <DetailsDiff sent={row.last_sent_details} confirmed={row.last_confirmed_details} />
+          </div>
+        </>
+      ) : null}
     </div>
   </ExpandableContainer>
 );
