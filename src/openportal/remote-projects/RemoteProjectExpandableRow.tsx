@@ -111,7 +111,7 @@ const DetailsDiff: FC<{ sent: any; confirmed: any }> = ({ sent, confirmed }) => 
           {keys.map((key) => {
             const sentVal = sentObj[key];
             const confirmedVal = confirmedObj[key];
-            const differs = hasBoth && JSON.stringify(sentVal) !== JSON.stringify(confirmedVal);
+            const differs = hasBoth && sortedStringify(sentVal) !== sortedStringify(confirmedVal);
             return (
               <tr key={key} className={differs ? 'table-warning' : undefined}>
                 <td className="fw-semibold align-top">{key}</td>
@@ -123,6 +123,44 @@ const DetailsDiff: FC<{ sent: any; confirmed: any }> = ({ sent, confirmed }) => 
         </tbody>
       </table>
     </div>
+  );
+};
+
+const SyncDetailsButton: FC<{ sent: any; confirmed: any }> = ({ sent, confirmed }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button variant="outline-primary" size="sm" onClick={() => setOpen(true)}>
+        {translate('View sync report')}
+      </Button>
+      {open && (
+        <div
+          className="modal d-block"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="modal-dialog modal-xl modal-dialog-scrollable"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{translate('Sync details comparison')}</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setOpen(false)}
+                  aria-label={translate('Close')}
+                />
+              </div>
+              <div className="modal-body">
+                <DetailsDiff sent={sent} confirmed={confirmed} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -252,6 +290,16 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
         </>
       )}
 
+      {(row.last_sent_details !== null && row.last_sent_details !== undefined) ||
+       (row.last_confirmed_details !== null && row.last_confirmed_details !== undefined) ? (
+        <>
+          <SectionHeading title={translate('Sync status')} />
+          <div className="col-12 mb-2">
+            <SyncDetailsButton sent={row.last_sent_details} confirmed={row.last_confirmed_details} />
+          </div>
+        </>
+      ) : null}
+
       {row.notes !== null && row.notes !== undefined && (
         <>
           <SectionHeading title={translate('Notes')} />
@@ -275,16 +323,6 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => (
           </div>
         </>
       )}
-
-      {(row.last_sent_details !== null && row.last_sent_details !== undefined) ||
-       (row.last_confirmed_details !== null && row.last_confirmed_details !== undefined) ? (
-        <>
-          <SectionHeading title={translate('Sync details')} />
-          <div className="col-12 mb-2">
-            <DetailsDiff sent={row.last_sent_details} confirmed={row.last_confirmed_details} />
-          </div>
-        </>
-      ) : null}
     </div>
   </ExpandableContainer>
 );
