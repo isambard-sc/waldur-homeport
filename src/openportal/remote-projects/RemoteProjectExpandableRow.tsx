@@ -1,8 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { FC, ReactNode, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { openportalRemoteProjectsAddNote } from 'waldur-js-client';
+import { openportalRemoteProjectsAddNote, openportalRemoteProjectsRetrieve } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
@@ -229,18 +229,29 @@ interface Props {
 }
 
 export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => {
-  const d = parseDetails(row.award_details);
+  const { data: detail, isLoading } = useQuery({
+    queryKey: ['remote-project-detail', row.uuid],
+    queryFn: async () => {
+      const result = await openportalRemoteProjectsRetrieve({ path: { uuid: row.uuid } });
+      return result.data;
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: false,
+  });
 
-  const allocation = d.allocation ?? row.current_allocation;
-  const breakdown = d.breakdown ?? row.breakdown;
-  const linkAward = d.award ?? row.link_award;
-  const linkCall = d.call ?? row.link_call;
-  const linkProject = d.project_link ?? row.link_project;
-  const linkRenewal = d.renewal ?? row.link_renewal;
-  const membershipControl = d.membership_control ?? row.membership_control;
-  const allowedDomains = d.allowed_domains ?? row.allowed_domains;
-  const earliestApprove = d.earliest_approve ?? row.earliest_approve;
-  const notes = d.notes ?? row.notes;
+  const src = detail || row;
+  const d = parseDetails(src.award_details);
+
+  const allocation = d.allocation ?? src.current_allocation;
+  const breakdown = d.breakdown ?? src.breakdown;
+  const linkAward = d.award ?? src.link_award;
+  const linkCall = d.call ?? src.link_call;
+  const linkProject = d.project_link ?? src.link_project;
+  const linkRenewal = d.renewal ?? src.link_renewal;
+  const membershipControl = d.membership_control ?? src.membership_control;
+  const allowedDomains = d.allowed_domains ?? src.allowed_domains;
+  const earliestApprove = d.earliest_approve ?? src.earliest_approve;
+  const notes = d.notes ?? src.notes;
 
   return (
     <ExpandableContainer>
@@ -266,6 +277,13 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => {
         <Row label={translate('Created')}>{formatDateTime(row.created)}</Row>
         <Row label={translate('Modified')}>{formatDateTime(row.modified)}</Row>
 
+        {isLoading && !detail ? (
+          <div className="col-12 py-3 text-center text-muted">
+            <LoadingSpinnerIcon className="me-1" />
+            {translate('Loading details...')}
+          </div>
+        ) : (
+          <>
         <SectionHeading title={translate('Allocation')} />
         <Row label={translate('Current')}>{String(allocation ?? '—')}</Row>
         <Row label={translate('Pending')}>{row.pending_allocation ?? '—'}</Row>
@@ -305,12 +323,12 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => {
           </>
         )}
 
-        {(row.last_sent_details !== null && row.last_sent_details !== undefined) ||
-         (row.last_confirmed_details !== null && row.last_confirmed_details !== undefined) ? (
+        {(src.last_sent_details !== null && src.last_sent_details !== undefined) ||
+         (src.last_confirmed_details !== null && src.last_confirmed_details !== undefined) ? (
           <>
             <SectionHeading title={translate('Sync status')} />
             <div className="col-12 mb-2">
-              <SyncDetailsButton sent={row.last_sent_details} confirmed={row.last_confirmed_details} />
+              <SyncDetailsButton sent={src.last_sent_details} confirmed={src.last_confirmed_details} />
             </div>
           </>
         ) : null}
@@ -319,23 +337,29 @@ export const RemoteProjectExpandableRow: FC<Props> = ({ row }) => {
           <>
             <SectionHeading title={translate('Notes')} />
             <div className="col-12 mb-2">
-              <NotesList uuid={row.uuid} initialNotes={notes as any[]} />
+              <NotesList
+                key={(notes as any[])?.length ?? 0}
+                uuid={row.uuid}
+                initialNotes={notes as any[]}
+              />
             </div>
           </>
         )}
 
-        {row.pending_details !== null && row.pending_details !== undefined && (
+        {src.pending_details !== null && src.pending_details !== undefined && (
           <>
-            {row.pending_since && (
+            {src.pending_since && (
               <>
                 <SectionHeading title={translate('Pending sync')} />
-                <Row label={translate('Pending since')}>{formatDateTime(row.pending_since)}</Row>
+                <Row label={translate('Pending since')}>{formatDateTime(src.pending_since)}</Row>
               </>
             )}
             <div className="col-12 mb-2">
               <span className="fw-semibold me-1">{translate('Pending details')}:</span>
-              <JsonBlock value={row.pending_details} />
+              <JsonBlock value={src.pending_details} />
             </div>
+          </>
+        )}
           </>
         )}
       </div>

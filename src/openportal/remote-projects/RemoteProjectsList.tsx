@@ -1,7 +1,10 @@
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 import { openportalRemoteProjectsList } from 'waldur-js-client';
+
+import { queryClient } from '@waldur/Application';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { Tip } from '@waldur/core/Tooltip';
@@ -50,6 +53,15 @@ export const RemoteProjectsList = () => {
     filter,
   });
 
+  // When the table finishes a refresh, invalidate any open expanded-row detail queries
+  const prevLoading = useRef(false);
+  useEffect(() => {
+    if (prevLoading.current && !tableProps.loading) {
+      queryClient.invalidateQueries({ queryKey: ['remote-project-detail'] });
+    }
+    prevLoading.current = !!tableProps.loading;
+  }, [tableProps.loading]);
+
   const columns: Array<Column> = [
     {
       title: translate('Project'),
@@ -82,7 +94,7 @@ export const RemoteProjectsList = () => {
             <RemoteProjectStateField state={row.state} />
           </Tip>
         ) : DASH_ESCAPE_CODE,
-      keys: ['state'],
+      keys: ['state', 'error_message'],
       id: 'state',
     },
     {
