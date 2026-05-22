@@ -57,6 +57,23 @@ export async function put(endpoint: string, data?: object) {
 }
 
 
+export async function get<T = any>(endpoint: string): Promise<T> {
+    const response = await fetch(fixURL(endpoint), {
+        headers: { Authorization: `Token ${AuthTokenStorage.get()}` },
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error('Unauthorized access.');
+        } else {
+            throw new Error(`Failed call: ${response.statusText}`);
+        }
+    }
+
+    return response.json();
+}
+
+
 export async function patch(endpoint: string, data?: object) {
     const response = await fetch(fixURL(endpoint), {
         method: 'PATCH',
