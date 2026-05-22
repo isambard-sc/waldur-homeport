@@ -90,6 +90,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Remote Project'),
+      skipBreadcrumb: true,
       permissions: [
         isOwnerOrStaffOrReader,
         () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),

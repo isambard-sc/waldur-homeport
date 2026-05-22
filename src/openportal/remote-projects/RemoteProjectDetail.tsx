@@ -4,7 +4,7 @@ import {
   ArrowLeftIcon,
   GearSixIcon,
 } from '@phosphor-icons/react';
-import { FC, ReactNode, forwardRef, useRef, useState } from 'react';
+import { FC, ReactNode, forwardRef, useEffect, useRef, useState } from 'react';
 import { Button, Dropdown, Form, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
@@ -179,11 +179,15 @@ const NotesSection: FC<{
   const [text, setText] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () =>
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: 'smooth',
-    });
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
 
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
@@ -218,15 +222,13 @@ const NotesSection: FC<{
               </div>
             ))}
           </div>
-          <div className="text-end mb-3">
-            <button
-              className="btn btn-sm btn-link text-muted p-0 border-0"
-              onClick={scrollToBottom}
-              title={translate('Scroll to latest')}
-            >
-              <ArrowDownIcon size={16} />
-            </button>
-          </div>
+          <button
+            className="btn btn-sm btn-outline-secondary w-100 d-flex justify-content-center align-items-center py-1 mb-2"
+            onClick={scrollToBottom}
+            title={translate('Scroll to latest')}
+          >
+            <ArrowDownIcon size={14} />
+          </button>
         </>
       ) : (
         <div className="text-muted mb-3">{translate('No notes yet.')}</div>
@@ -278,6 +280,8 @@ export const RemoteProjectDetail = () => {
     refetchIntervalInBackground: false,
   });
 
+  const doRefetch = (): Promise<void> => refetch().then(() => {});
+
   const { mutate: approveNow } = useMutation({
     mutationFn: () =>
       openportalRemoteProjectsApproveNow({
@@ -319,16 +323,14 @@ export const RemoteProjectDetail = () => {
 
   if (!data) return null;
 
-  const doRefetch = (): Promise<void> => refetch().then(() => {});
-
   const openLinks = () =>
-    dispatch(openModalDialog(SetLinksDialog, { resolve: { row: data, refetch: doRefetch } }));
+    dispatch(openModalDialog(SetLinksDialog, { row: data, resolve: { refetch: doRefetch }, dialogClassName: 'modal-dialog-centered' }));
   const openMembership = () =>
-    dispatch(openModalDialog(SetMembershipControlDialog, { resolve: { row: data, refetch: doRefetch } }));
+    dispatch(openModalDialog(SetMembershipControlDialog, { row: data, resolve: { refetch: doRefetch }, dialogClassName: 'modal-dialog-centered' }));
   const openAllowedDomains = () =>
-    dispatch(openModalDialog(SetAllowedDomainsDialog, { resolve: { row: data, refetch: doRefetch } }));
+    dispatch(openModalDialog(SetAllowedDomainsDialog, { row: data, resolve: { refetch: doRefetch }, dialogClassName: 'modal-dialog-centered' }));
   const openEarliestApprove = () =>
-    dispatch(openModalDialog(SetEarliestApproveDialog, { resolve: { row: data, refetch: doRefetch } }));
+    dispatch(openModalDialog(SetEarliestApproveDialog, { row: data, resolve: { refetch: doRefetch }, dialogClassName: 'modal-dialog-centered' }));
 
   const d = parseDetails(data.award_details);
   const allocation = d.allocation ?? data.current_allocation;
@@ -351,7 +353,7 @@ export const RemoteProjectDetail = () => {
       <div className="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
         <div className="d-flex align-items-center gap-2 flex-wrap">
           <Button
-            variant="outline-secondary"
+            variant="outline-primary"
             size="sm"
             onClick={() => router.stateService.go('organization-remote-projects')}
             title={translate('Back to Remote Projects')}
