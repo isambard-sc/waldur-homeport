@@ -81,7 +81,7 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'organization-remote-project-detail',
-    url: 'remote-projects/:uuid/',
+    url: 'remote-projects/:remoteProjectUuid/',
     parent: 'organization',
     component: lazyComponent(() =>
       import('./remote-projects/RemoteProjectDetail').then((m) => ({

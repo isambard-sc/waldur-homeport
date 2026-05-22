@@ -223,7 +223,7 @@ const NotesSection: FC<{
             ))}
           </div>
           <button
-            className="btn btn-sm btn-outline-secondary w-100 d-flex justify-content-center align-items-center py-1 mb-2"
+            className="btn btn-sm btn-secondary w-100 d-flex justify-content-center align-items-center py-1 mb-2"
             onClick={scrollToBottom}
             title={translate('Scroll to latest')}
           >
@@ -261,7 +261,7 @@ const NotesSection: FC<{
 
 export const RemoteProjectDetail = () => {
   const { params } = useCurrentStateAndParams();
-  const uuid = params.uuid as string;
+  const uuid = params.remoteProjectUuid as string;
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -280,7 +280,10 @@ export const RemoteProjectDetail = () => {
     refetchIntervalInBackground: false,
   });
 
-  const doRefetch = (): Promise<void> => refetch().then(() => {});
+  const doRefetch = async (): Promise<void> => {
+    await new Promise((r) => setTimeout(r, 500));
+    await refetch();
+  };
 
   const { mutate: approveNow } = useMutation({
     mutationFn: () =>

@@ -57,7 +57,7 @@ export const RemoteProjectsList = () => {
       render: ({ row }) => (
         <Link
           state="organization-remote-project-detail"
-          params={{ uuid: row.uuid }}
+          params={{ remoteProjectUuid: row.uuid }}
         >
           {row.current_project_name || DASH_ESCAPE_CODE}
         </Link>
