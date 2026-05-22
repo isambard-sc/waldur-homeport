@@ -1,21 +1,32 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { FC, ReactNode, useState } from 'react';
-import { Button, Card, Form } from 'react-bootstrap';
+import {
+  ArrowDownIcon,
+  ArrowLeftIcon,
+  GearSixIcon,
+} from '@phosphor-icons/react';
+import { FC, ReactNode, forwardRef, useRef, useState } from 'react';
+import { Button, Dropdown, Form, Card } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { useCurrentStateAndParams } from '@uirouter/react';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import {
   openportalRemoteProjectsAddNote,
+  openportalRemoteProjectsApproveNow,
+  openportalRemoteProjectsHoldIndefinitely,
   openportalRemoteProjectsRetrieve,
 } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
 import { useTitle } from '@waldur/navigation/title';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getUser, isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
 
-import { RemoteProjectActions } from './RemoteProjectActions';
+import { SetAllowedDomainsDialog } from './actions/SetAllowedDomainsDialog';
+import { SetEarliestApproveDialog } from './actions/SetEarliestApproveDialog';
+import { SetLinksDialog } from './actions/SetLinksDialog';
+import { SetMembershipControlDialog } from './actions/SetMembershipControlDialog';
 import { RemoteProjectStateField } from './RemoteProjectStateField';
 
 // --- Helpers ---
@@ -68,12 +79,33 @@ const renderValue = (v: unknown): ReactNode => {
   );
 };
 
-// --- Layout primitives ---
+// --- Layout ---
 
-const Section: FC<{ title: string; children: ReactNode }> = ({ title, children }) => (
+const GearToggle = forwardRef<HTMLButtonElement, { onClick?: React.MouseEventHandler }>(
+  ({ onClick }, ref) => (
+    <button
+      ref={ref}
+      className="btn btn-sm btn-link text-muted p-0 border-0"
+      onClick={(e) => {
+        e.preventDefault();
+        onClick?.(e);
+      }}
+    >
+      <GearSixIcon size={16} />
+    </button>
+  ),
+);
+GearToggle.displayName = 'GearToggle';
+
+const Section: FC<{ title: string; actions?: ReactNode; children: ReactNode }> = ({
+  title,
+  actions,
+  children,
+}) => (
   <Card>
-    <Card.Header className="py-2">
+    <Card.Header className="py-2 d-flex align-items-center justify-content-between">
       <span className="text-muted text-uppercase fs-8 fw-bold">{title}</span>
+      {actions && <div>{actions}</div>}
     </Card.Header>
     <Card.Body className="py-3">{children}</Card.Body>
   </Card>
@@ -145,6 +177,13 @@ const NotesSection: FC<{
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const [text, setText] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () =>
+    scrollRef.current?.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
 
   const { mutate, isPending } = useMutation({
     mutationFn: () =>
@@ -163,17 +202,32 @@ const NotesSection: FC<{
   return (
     <div>
       {notes.length > 0 ? (
-        <div style={{ maxHeight: 300, overflowY: 'auto' }} className="mb-3 pe-1">
-          {notes.map((note, i) => (
-            <div key={i} className="border rounded p-2 mb-1 bg-light">
-              <div className="d-flex justify-content-between align-items-baseline">
-                <strong>{note.author}</strong>
-                <small className="text-muted ms-2">{formatDateTime(note.timestamp)}</small>
+        <>
+          <div
+            ref={scrollRef}
+            style={{ maxHeight: 300, overflowY: 'auto' }}
+            className="mb-1 pe-1"
+          >
+            {notes.map((note, i) => (
+              <div key={i} className="border rounded p-2 mb-1 bg-light">
+                <div className="d-flex justify-content-between align-items-baseline">
+                  <strong>{note.author}</strong>
+                  <small className="text-muted ms-2">{formatDateTime(note.timestamp)}</small>
+                </div>
+                <div className="mt-1">{note.text}</div>
               </div>
-              <div className="mt-1">{note.text}</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <div className="text-end mb-3">
+            <button
+              className="btn btn-sm btn-link text-muted p-0 border-0"
+              onClick={scrollToBottom}
+              title={translate('Scroll to latest')}
+            >
+              <ArrowDownIcon size={16} />
+            </button>
+          </div>
+        </>
       ) : (
         <div className="text-muted mb-3">{translate('No notes yet.')}</div>
       )}
@@ -206,12 +260,14 @@ const NotesSection: FC<{
 export const RemoteProjectDetail = () => {
   const { params } = useCurrentStateAndParams();
   const uuid = params.uuid as string;
+  const router = useRouter();
+  const dispatch = useDispatch();
 
   const ownerOrStaff = useSelector(isOwnerOrStaff);
   const support = useSelector(isSupport);
   const canEdit = ownerOrStaff || support;
 
-  const { data, isLoading, isFetching, refetch, dataUpdatedAt } = useQuery({
+  const { data, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['remote-project-detail', uuid],
     queryFn: async () => {
       const result = await openportalRemoteProjectsRetrieve({ path: { uuid } });
@@ -220,6 +276,34 @@ export const RemoteProjectDetail = () => {
     staleTime: 0,
     refetchInterval: 60_000,
     refetchIntervalInBackground: false,
+  });
+
+  const { mutate: approveNow } = useMutation({
+    mutationFn: () =>
+      openportalRemoteProjectsApproveNow({
+        path: { uuid },
+        body: { destination: data?.destination ?? '', identifier: data?.identifier ?? '' },
+      }),
+    onSuccess: async () => {
+      dispatch(showSuccess(translate('Remote project will be approved immediately.')));
+      await doRefetch();
+    },
+    onError: (error) =>
+      dispatch(showErrorResponse(error, translate('Unable to approve remote project.'))),
+  });
+
+  const { mutate: holdIndefinitely } = useMutation({
+    mutationFn: () =>
+      openportalRemoteProjectsHoldIndefinitely({
+        path: { uuid },
+        body: { destination: data?.destination ?? '', identifier: data?.identifier ?? '' },
+      }),
+    onSuccess: async () => {
+      dispatch(showSuccess(translate('Remote project is now held indefinitely.')));
+      await doRefetch();
+    },
+    onError: (error) =>
+      dispatch(showErrorResponse(error, translate('Unable to hold remote project.'))),
   });
 
   useTitle(data?.current_project_name || translate('Remote Project'), '', 'browser');
@@ -234,6 +318,17 @@ export const RemoteProjectDetail = () => {
   }
 
   if (!data) return null;
+
+  const doRefetch = (): Promise<void> => refetch().then(() => {});
+
+  const openLinks = () =>
+    dispatch(openModalDialog(SetLinksDialog, { resolve: { row: data, refetch: doRefetch } }));
+  const openMembership = () =>
+    dispatch(openModalDialog(SetMembershipControlDialog, { resolve: { row: data, refetch: doRefetch } }));
+  const openAllowedDomains = () =>
+    dispatch(openModalDialog(SetAllowedDomainsDialog, { resolve: { row: data, refetch: doRefetch } }));
+  const openEarliestApprove = () =>
+    dispatch(openModalDialog(SetEarliestApproveDialog, { resolve: { row: data, refetch: doRefetch } }));
 
   const d = parseDetails(data.award_details);
   const allocation = d.allocation ?? data.current_allocation;
@@ -250,40 +345,35 @@ export const RemoteProjectDetail = () => {
     (data.last_sent_details !== null && data.last_sent_details !== undefined) ||
     (data.last_confirmed_details !== null && data.last_confirmed_details !== undefined);
 
-  const doRefetch = (): Promise<void> => refetch().then(() => {});
-
   return (
     <div>
       {/* Header */}
-      <div className="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-2">
+      <div className="d-flex align-items-start justify-content-between flex-wrap gap-2 mb-3">
         <div className="d-flex align-items-center gap-2 flex-wrap">
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() => router.stateService.go('organization-remote-projects')}
+            title={translate('Back to Remote Projects')}
+          >
+            <ArrowLeftIcon size={16} />
+          </Button>
           {data.state && <RemoteProjectStateField state={data.state} />}
           <h4 className="mb-0">{data.current_project_name || '—'}</h4>
           {data.destination && (
             <span className="text-muted fs-6">· {data.destination}</span>
           )}
         </div>
-        <div className="d-flex align-items-center gap-2">
-          {canEdit && <RemoteProjectActions row={data} refetch={doRefetch} />}
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            onClick={doRefetch}
-            disabled={isFetching}
-          >
-            {isFetching && <LoadingSpinnerIcon className="me-1" />}
-            {translate('Refresh')}
-          </Button>
-        </div>
+        <Button
+          variant="outline-primary"
+          size="sm"
+          onClick={doRefetch}
+          disabled={isFetching}
+        >
+          {isFetching && <LoadingSpinnerIcon className="me-1" />}
+          {translate('Refresh')}
+        </Button>
       </div>
-
-      {dataUpdatedAt > 0 && (
-        <div className="text-muted fs-8 mb-3">
-          {translate('Last refreshed:')} {formatDateTime(new Date(dataUpdatedAt).toISOString())}
-          {' · '}
-          {translate('Auto-refreshes every 60s')}
-        </div>
-      )}
 
       {data.error_message && (
         <div className="alert alert-danger py-2 mb-3">
@@ -329,7 +419,20 @@ export const RemoteProjectDetail = () => {
 
         {/* Links */}
         <div className="col-md-6">
-          <Section title={translate('Links')}>
+          <Section
+            title={translate('Links')}
+            actions={
+              canEdit && (
+                <button
+                  className="btn btn-sm btn-link text-muted p-0 border-0"
+                  onClick={openLinks}
+                  title={translate('Edit links')}
+                >
+                  <GearSixIcon size={16} />
+                </button>
+              )
+            }
+          >
             <Field label={translate('Award')}>{renderLink(linkAward)}</Field>
             <Field label={translate('Call')}>{renderLink(linkCall)}</Field>
             <Field label={translate('Project')}>{renderLink(linkProject)}</Field>
@@ -337,9 +440,26 @@ export const RemoteProjectDetail = () => {
           </Section>
         </div>
 
-        {/* Access control */}
+        {/* Membership control */}
         <div className="col-md-6">
-          <Section title={translate('Access control')}>
+          <Section
+            title={translate('Membership')}
+            actions={
+              canEdit && (
+                <Dropdown align="end">
+                  <Dropdown.Toggle as={GearToggle} />
+                  <Dropdown.Menu>
+                    <Dropdown.Item onClick={openMembership}>
+                      {translate('Set membership control')}
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={openAllowedDomains}>
+                      {translate('Set allowed domains')}
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              )
+            }
+          >
             <Field label={translate('Membership control')}>
               {membershipControl ?? (
                 <span className="text-muted">{translate('Open')}</span>
@@ -353,13 +473,46 @@ export const RemoteProjectDetail = () => {
           </Section>
         </div>
 
-        {/* Administration (privileged) */}
+        {/* Embargo (privileged) */}
         {earliestApprove !== null && earliestApprove !== undefined && (
           <div className="col-md-6">
-            <Section title={translate('Administration')}>
+            <Section
+              title={translate('Embargo')}
+              actions={
+                canEdit && (
+                  <Dropdown align="end">
+                    <Dropdown.Toggle as={GearToggle} />
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={openEarliestApprove}>
+                        {translate('Set earliest approve')}
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => approveNow()}>
+                        {translate('Approve now')}
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => holdIndefinitely()}>
+                        {translate('Hold indefinitely')}
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                )
+              }
+            >
               <Field label={translate('Earliest approve')}>
                 {formatDateTime(earliestApprove)}
               </Field>
+            </Section>
+          </div>
+        )}
+
+        {/* Notes (privileged) */}
+        {notes !== null && notes !== undefined && (
+          <div className="col-12">
+            <Section title={translate('Notes')}>
+              <NotesSection
+                uuid={data.uuid}
+                notes={notes as any[]}
+                onAdded={doRefetch}
+              />
             </Section>
           </div>
         )}
@@ -391,19 +544,6 @@ export const RemoteProjectDetail = () => {
               >
                 {JSON.stringify(data.pending_details, null, 2)}
               </pre>
-            </Section>
-          </div>
-        )}
-
-        {/* Notes (privileged) */}
-        {notes !== null && notes !== undefined && (
-          <div className="col-12">
-            <Section title={translate('Notes')}>
-              <NotesSection
-                uuid={data.uuid}
-                notes={notes as any[]}
-                onAdded={doRefetch}
-              />
             </Section>
           </div>
         )}
