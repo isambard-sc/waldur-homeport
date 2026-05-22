@@ -5,6 +5,7 @@ import { createSelector } from 'reselect';
 import { openportalManagedProjectsList } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { Link } from '@waldur/core/Link';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
@@ -18,7 +19,6 @@ import { isEmpty } from '@waldur/core/utils';
 import type { AwardDetails } from '../bindings/AwardDetails';
 import { isEmbargoed } from './utils';
 
-import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
 import { ManagedProjectActions } from './ManagedProjectActions';
 
 import { ManagedProjectsFilter } from './ManagedProjectsFilter';
@@ -89,7 +89,14 @@ export const ManagedProjectsList = () => {
         {
             title: translate('Project'),
             orderField: 'details__name',
-            render: ({ row }) => renderFieldOrDash((row.details as AwardDetails).name),
+            render: ({ row }) => (
+                <Link
+                    state="marketplace-provider-managed-project-detail"
+                    params={{ identifier: row.identifier, destination: row.destination }}
+                >
+                    {(row.details as AwardDetails).name || row.identifier || '—'}
+                </Link>
+            ),
             keys: ['name'],
             id: 'managedproject',
         },
@@ -201,8 +208,6 @@ export const ManagedProjectsList = () => {
             standalone
             hasQuery
             hasOptionalColumns
-            expandableRowClassName="py-2 pe-2"
-            expandableRow={ManagedProjectExpandableRow}
             rowActions={({ row }) => (
                 <ManagedProjectActions project={row} refetch={tableProps.fetch} />
             )}
