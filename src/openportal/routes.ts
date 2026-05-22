@@ -80,6 +80,23 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'organization-remote-project-detail',
+    url: 'remote-projects/:uuid/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./remote-projects/RemoteProjectDetail').then((m) => ({
+        default: m.RemoteProjectDetail,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Remote Project'),
+      permissions: [
+        isOwnerOrStaffOrReader,
+        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
+      ],
+    },
+  },
+  {
     name: 'organization-openportal-allocation',
     url: 'openportal-allocation/',
     parent: 'organization',

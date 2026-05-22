@@ -1,12 +1,10 @@
-import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 import { openportalRemoteProjectsList } from 'waldur-js-client';
 
-import { queryClient } from '@waldur/Application';
-
 import { formatDateTime } from '@waldur/core/dateUtils';
+import { Link } from '@waldur/core/Link';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
@@ -18,7 +16,6 @@ import { useTable } from '@waldur/table/useTable';
 import { getCustomer, isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
 
 import { RemoteProjectActions } from './RemoteProjectActions';
-import { RemoteProjectExpandableRow } from './RemoteProjectExpandableRow';
 import { RemoteProjectStateField } from './RemoteProjectStateField';
 import { RemoteProjectsFilter } from './RemoteProjectsFilter';
 
@@ -53,20 +50,18 @@ export const RemoteProjectsList = () => {
     filter,
   });
 
-  // When the table finishes a refresh, invalidate any open expanded-row detail queries
-  const prevLoading = useRef(false);
-  useEffect(() => {
-    if (prevLoading.current && !tableProps.loading) {
-      queryClient.invalidateQueries({ queryKey: ['remote-project-detail'] });
-    }
-    prevLoading.current = !!tableProps.loading;
-  }, [tableProps.loading]);
-
   const columns: Array<Column> = [
     {
       title: translate('Project'),
       orderField: 'current_project_name',
-      render: ({ row }) => row.current_project_name || DASH_ESCAPE_CODE,
+      render: ({ row }) => (
+        <Link
+          state="organization-remote-project-detail"
+          params={{ uuid: row.uuid }}
+        >
+          {row.current_project_name || DASH_ESCAPE_CODE}
+        </Link>
+      ),
       keys: ['current_project_name'],
       id: 'project',
     },
@@ -140,8 +135,6 @@ export const RemoteProjectsList = () => {
       standalone
       hasQuery
       hasOptionalColumns
-      expandableRow={RemoteProjectExpandableRow}
-      expandableRowClassName="py-2 pe-2"
       rowActions={
         canEdit
           ? ({ row }) => (
