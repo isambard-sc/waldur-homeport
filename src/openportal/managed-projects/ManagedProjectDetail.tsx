@@ -8,6 +8,7 @@ import { openportalManagedProjectsRetrieveGet } from 'waldur-js-client';
 
 import { formatDate, formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
+import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
@@ -315,10 +316,18 @@ export const ManagedProjectDetail = () => {
             </Field>
             <Field label={translate('Offering')}>{renderOffering(data.destination)}</Field>
             <Field label={translate('Template')}>
-              {(data.project_template_data as any)?.name ||
-                details.template || (
-                  <span className="text-muted">{translate('Not assigned')}</span>
-                )}
+              {(data.project_template_data as any)?.uuid ? (
+                <Link
+                  state="marketplace-provider-project-template-detail"
+                  params={{ uuid: (data.project_template_data as any).uuid }}
+                >
+                  {(data.project_template_data as any).name || details.template || translate('Template')}
+                </Link>
+              ) : details.template ? (
+                details.template
+              ) : (
+                <span className="text-muted">{translate('Not assigned')}</span>
+              )}
             </Field>
             <Field label={translate('Description')}>
               {details.description || <span className="text-muted">—</span>}

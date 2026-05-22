@@ -44,6 +44,7 @@ export enum OpenstackFeatures {
 }
 
 export enum ProjectFeatures {
+  enforce_allowed_domains = 'project.enforce_allowed_domains',
   estimated_cost = 'project.estimated_cost',
   mandatory_end_date = 'project.mandatory_end_date',
   mandatory_start_date = 'project.mandatory_start_date',

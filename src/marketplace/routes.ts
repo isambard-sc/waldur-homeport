@@ -626,6 +626,21 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-provider-project-template-detail',
+    url: 'project-templates/:uuid/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/project-templates/ProjectTemplateDetail').then(
+        (module) => ({ default: module.ProjectTemplateDetail }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      breadcrumb: () => translate('Project Template'),
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
     name: 'marketplace-resource-container',
     url: '',
     abstract: true,

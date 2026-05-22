@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 import { openportalProjectTemplateList } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { Link } from '@waldur/core/Link';
 import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
 import { createFetcher } from '@waldur/table/api';
 import Table from '@waldur/table/Table';
@@ -11,7 +12,6 @@ import { renderFieldOrDash } from '@waldur/table/utils';
 import { ProjectTemplateCreateButton } from './ProjectTemplateCreateButton';
 import { ProjectTemplateDeleteButton } from './ProjectTemplateDeleteButton';
 import { ProjectTemplateEditButton } from './ProjectTemplateEditButton';
-import { ProjectTemplateExpandableRow } from './ProjectTemplateExpandableRow';
 
 const ProjectTemplateRowActions = ({ row, fetch }) => (
   <ActionsDropdown
@@ -43,7 +43,14 @@ export const ProjectTemplateList: FunctionComponent<{}> = () => {
       columns={[
         {
           title: translate('Name'),
-          render: ({ row }) => renderFieldOrDash(row.name),
+          render: ({ row }) => (
+            <Link
+              state="marketplace-provider-project-template-detail"
+              params={{ uuid: row.uuid }}
+            >
+              {row.name || '—'}
+            </Link>
+          ),
         },
         {
           title: translate('Offering'),
@@ -64,7 +71,6 @@ export const ProjectTemplateList: FunctionComponent<{}> = () => {
       ]}
       verboseName={translate('Project Templates')}
       rowActions={ProjectTemplateRowActions}
-      expandableRow={ProjectTemplateExpandableRow}
       tableActions={<ProjectTemplateCreateButton refetch={props.fetch} />}
     />
   );

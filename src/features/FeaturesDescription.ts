@@ -147,6 +147,10 @@ export const FeaturesDescription: FeatureSection[] = [
     description: translate('Project workspace'),
     items: [
       {
+        key: 'enforce_allowed_domains',
+        description: translate('Enforce allowed-domain restrictions from OpenPortal AwardDetails when adding or inviting users to a project.'),
+      },
+      {
         key: 'estimated_cost',
         description: translate('Render estimated cost column in projects list.'),
       },
