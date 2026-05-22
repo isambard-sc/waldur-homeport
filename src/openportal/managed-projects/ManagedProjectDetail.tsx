@@ -319,7 +319,7 @@ export const ManagedProjectDetail = () => {
               {(data.project_template_data as any)?.uuid ? (
                 <Link
                   state="marketplace-provider-project-template-detail"
-                  params={{ uuid: (data.project_template_data as any).uuid }}
+                  params={{ templateUuid: (data.project_template_data as any).uuid }}
                 >
                   {(data.project_template_data as any).name || details.template || translate('Template')}
                 </Link>

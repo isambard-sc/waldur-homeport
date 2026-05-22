@@ -46,7 +46,7 @@ export const ProjectTemplateList: FunctionComponent<{}> = () => {
           render: ({ row }) => (
             <Link
               state="marketplace-provider-project-template-detail"
-              params={{ uuid: row.uuid }}
+              params={{ templateUuid: row.uuid }}
             >
               {row.name || '—'}
             </Link>

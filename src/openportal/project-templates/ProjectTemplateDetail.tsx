@@ -108,13 +108,13 @@ const renderOrganisation = (customer: any): ReactNode => {
   );
 };
 
-const renderOfferings = (offerings: any[]): ReactNode => {
+const renderOfferings = (offerings: any[], providerUuid: string): ReactNode => {
   if (!offerings || offerings.length === 0)
     return <span className="text-muted">{translate('No offerings')}</span>;
   return (
     <div>
       {offerings.map((offering) => {
-        const url = `/providers/${offering.customer_uuid}/marketplace-provider-offering-details/${offering.uuid}/`;
+        const url = `/providers/${providerUuid}/marketplace-provider-offering-details/${offering.uuid}/`;
         return (
           <div key={offering.uuid}>
             <a href={url} target="_blank" rel="noopener noreferrer">
@@ -148,9 +148,8 @@ const renderAllocationMapping = (allocationMapping: any): ReactNode => {
   return (
     <div>
       {Object.entries(allocationMapping).map(([key, value]: [string, any]) => (
-        <div key={key} className="row mb-1">
-          <div className="col-5 text-muted">{key}</div>
-          <div className="col-7">1 credit = {String(value)}</div>
+        <div key={key} className="mb-1">
+          1 credit = {String(value)} {key}
         </div>
       ))}
     </div>
@@ -161,7 +160,7 @@ const renderAllocationMapping = (allocationMapping: any): ReactNode => {
 
 export const ProjectTemplateDetail = () => {
   const { params } = useCurrentStateAndParams();
-  const uuid = params.uuid as string;
+  const uuid = params.templateUuid as string;
   const router = useRouter();
 
   const goBack = () => router.stateService.go('marketplace-provider-project-templates');
@@ -182,11 +181,14 @@ export const ProjectTemplateDetail = () => {
     await refetch();
   };
 
-  useTitle(
-    data ? (data.name || translate('Project Template')) : translate('Project Template'),
-    '',
-    'browser',
-  );
+  const offeringLabel = data?.offering
+    ? data.offering.split('.').pop()
+    : null;
+  const pageTitle = data
+    ? [data.name, offeringLabel].filter(Boolean).join(' | ')
+    : translate('Project Template');
+
+  useTitle(pageTitle || translate('Project Template'), '', 'browser');
 
   if (isLoading && !data) {
     return (
@@ -214,7 +216,7 @@ export const ProjectTemplateDetail = () => {
           >
             <ArrowLeftIcon size={16} />
           </Button>
-          <h4 className="mb-0">{data.name || '—'}</h4>
+          <h4 className="mb-0">{pageTitle}</h4>
         </div>
         <div className="d-flex gap-2 align-items-center">
           <Button
@@ -267,7 +269,7 @@ export const ProjectTemplateDetail = () => {
         {/* Offerings */}
         <div className="col-md-6">
           <Section title={translate('Offerings')}>
-            {renderOfferings((data as any).offerings_data)}
+            {renderOfferings((data as any).offerings_data, data.provider_data?.uuid)}
           </Section>
         </div>
 
