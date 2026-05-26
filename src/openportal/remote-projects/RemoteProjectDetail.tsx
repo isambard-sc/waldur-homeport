@@ -432,20 +432,13 @@ export const RemoteProjectDetail = () => {
             <Field label={translate('Created')}>{formatDateTime(data.created)}</Field>
             <Field label={translate('Modified')}>{formatDateTime(data.modified)}</Field>
             {data.state === 'pending' && (
-              <>
-                <Field label={translate('State')}>
-                  <RemoteProjectStateField state={data.state} />
-                </Field>
-                {data.pending_since && (
-                  <Field label={translate('Pending since')}>
-                    {formatDateTime(data.pending_since)}
-                  </Field>
-                )}
-              </>
-            )}
-            {data.state === 'rejected' && (
               <Field label={translate('State')}>
                 <RemoteProjectStateField state={data.state} />
+              </Field>
+            )}
+            {data.pending_since && (
+              <Field label={translate('Pending since')}>
+                {formatDateTime(data.pending_since)}
               </Field>
             )}
           </Section>
