@@ -335,19 +335,6 @@ export const ManagedProjectDetail = () => {
           </Section>
         </div>
 
-        {/* Dates */}
-        <div className="col-md-6">
-          <Section title={translate('Dates')}>
-            <Field label={translate('Created')}>{formatDateTime(data.created)}</Field>
-            <Field label={translate('Start date')}>
-              {details.start_date ? formatDate(details.start_date) : '—'}
-            </Field>
-            <Field label={translate('End date')}>
-              {details.end_date ? formatDate(details.end_date) : '—'}
-            </Field>
-          </Section>
-        </div>
-
         {/* Allocation */}
         <div className="col-md-6">
           <Section title={translate('Allocation')}>
@@ -364,6 +351,19 @@ export const ManagedProjectDetail = () => {
                 ))}
               </>
             )}
+          </Section>
+        </div>
+
+        {/* Dates */}
+        <div className="col-md-6">
+          <Section title={translate('Dates')}>
+            <Field label={translate('Created')}>{formatDateTime(data.created)}</Field>
+            <Field label={translate('Start date')}>
+              {details.start_date ? formatDate(details.start_date) : '—'}
+            </Field>
+            <Field label={translate('End date')}>
+              {details.end_date ? formatDate(details.end_date) : '—'}
+            </Field>
           </Section>
         </div>
 
