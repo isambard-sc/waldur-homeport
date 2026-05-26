@@ -2,6 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
+  CaretDownIcon,
   GearSixIcon,
 } from '@phosphor-icons/react';
 import { FC, ReactNode, forwardRef, useEffect, useRef, useState } from 'react';
@@ -97,19 +98,42 @@ const GearToggle = forwardRef<HTMLButtonElement, { onClick?: React.MouseEventHan
 );
 GearToggle.displayName = 'GearToggle';
 
-const Section: FC<{ title: string; actions?: ReactNode; children: ReactNode }> = ({
-  title,
-  actions,
-  children,
-}) => (
-  <Card>
-    <Card.Header className="py-2 d-flex align-items-center justify-content-between">
-      <span className="text-muted text-uppercase fs-8 fw-bold">{title}</span>
-      {actions && <div>{actions}</div>}
-    </Card.Header>
-    <Card.Body className="py-3">{children}</Card.Body>
-  </Card>
-);
+const Section: FC<{
+  title: string;
+  actions?: ReactNode;
+  children: ReactNode;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
+}> = ({ title, actions, children, collapsible = false, defaultCollapsed = false }) => {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
+  return (
+    <Card>
+      <Card.Header
+        className="py-2 d-flex align-items-center justify-content-between"
+        style={collapsible ? { cursor: 'pointer' } : undefined}
+        onClick={collapsible ? () => setCollapsed((c: boolean) => !c) : undefined}
+      >
+        <span className="text-muted text-uppercase fs-8 fw-bold">{title}</span>
+        <div className="d-flex align-items-center gap-2">
+          {actions && (
+            <div onClick={(e) => e.stopPropagation()}>{actions}</div>
+          )}
+          {collapsible && (
+            <CaretDownIcon
+              size={14}
+              className="text-muted"
+              style={{
+                transform: collapsed ? 'rotate(-90deg)' : 'none',
+                transition: 'transform 0.15s',
+              }}
+            />
+          )}
+        </div>
+      </Card.Header>
+      {!collapsed && <Card.Body className="py-3">{children}</Card.Body>}
+    </Card>
+  );
+};
 
 const Field: FC<{ label: string; children: ReactNode }> = ({ label, children }) => (
   <div className="row mb-2">
@@ -336,8 +360,14 @@ export const RemoteProjectDetail = () => {
     dispatch(openModalDialog(SetEarliestApproveDialog, { row: data, resolve: { refetch: doRefetch }, dialogClassName: 'modal-dialog-centered' }));
 
   const d = parseDetails(data.award_details);
-  const allocation = d.allocation ?? data.current_allocation;
-  const breakdown = (d.breakdown ?? data.breakdown) as Record<string, unknown> | null;
+  const confirmed = parseDetails(data.last_confirmed_details);
+  const pending = parseDetails(data.pending_details);
+  const allocation = confirmed.allocation ?? data.current_allocation;
+  const breakdown = (confirmed.breakdown ?? data.breakdown) as Record<string, unknown> | null;
+  const pendingAllocation = pending.allocation ?? data.pending_allocation;
+  const pendingAllocationDiffers =
+    pendingAllocation != null &&
+    (allocation == null || String(pendingAllocation) !== String(allocation));
   const linkAward = d.award ?? data.link_award;
   const linkCall = d.call ?? data.link_call;
   const linkProject = d.project_link ?? data.link_project;
@@ -401,6 +431,23 @@ export const RemoteProjectDetail = () => {
             </Field>
             <Field label={translate('Created')}>{formatDateTime(data.created)}</Field>
             <Field label={translate('Modified')}>{formatDateTime(data.modified)}</Field>
+            {data.state === 'pending' && (
+              <>
+                <Field label={translate('State')}>
+                  <RemoteProjectStateField state={data.state} />
+                </Field>
+                {data.pending_since && (
+                  <Field label={translate('Pending since')}>
+                    {formatDateTime(data.pending_since)}
+                  </Field>
+                )}
+              </>
+            )}
+            {data.state === 'rejected' && (
+              <Field label={translate('State')}>
+                <RemoteProjectStateField state={data.state} />
+              </Field>
+            )}
           </Section>
         </div>
 
@@ -408,7 +455,11 @@ export const RemoteProjectDetail = () => {
         <div className="col-md-6">
           <Section title={translate('Allocation')}>
             <Field label={translate('Current')}>{String(allocation ?? '—')}</Field>
-            <Field label={translate('Pending')}>{data.pending_allocation ?? '—'}</Field>
+            {pendingAllocationDiffers && (
+              <Field label={translate('Pending')}>
+                <strong>{String(pendingAllocation)}</strong>
+              </Field>
+            )}
             {breakdown && Object.keys(breakdown).length > 0 && (
               <>
                 <div className="fw-semibold text-muted mt-2 mb-1 fs-8 text-uppercase">
@@ -525,7 +576,7 @@ export const RemoteProjectDetail = () => {
         {/* Sync details */}
         {hasSyncData && (
           <div className="col-12">
-            <Section title={translate('Sync details')}>
+            <Section title={translate('Sync details')} collapsible defaultCollapsed>
               <DetailsDiff
                 sent={data.last_sent_details}
                 confirmed={data.last_confirmed_details}
@@ -537,7 +588,7 @@ export const RemoteProjectDetail = () => {
         {/* Pending sync */}
         {data.pending_details !== null && data.pending_details !== undefined && (
           <div className="col-12">
-            <Section title={translate('Pending sync')}>
+            <Section title={translate('Pending sync')} collapsible defaultCollapsed>
               {data.pending_since && (
                 <Field label={translate('Pending since')}>
                   {formatDateTime(data.pending_since)}
