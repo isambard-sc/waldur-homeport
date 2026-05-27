@@ -1,17 +1,18 @@
-import { ArrowLeftIcon } from '@phosphor-icons/react';
-import { useEffect, useRef, useState } from 'react';
+import { ArrowLeftIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useRouter } from '@uirouter/react';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { translate } from '@waldur/i18n';
+import { Link } from '@waldur/core/Link';
 import { useTitle } from '@waldur/navigation/title';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 
-import { DetailsDiff, renderValue } from '../DetailsDiff';
+import { DetailsDiff, renderValue, parseDetails } from '../DetailsDiff';
 
 const EVENT_OPTIONS = [
   { value: 'award_attempted', label: 'Award attempted', badge: 'bg-primary' },
@@ -72,6 +73,11 @@ const ExpandedRow = ({ row }: { row: any }) => {
   );
 };
 
+const projectName = (row: any): string => {
+  const details = parseDetails(row.new_details ?? row.previous_details);
+  return (details.name as string) || '—';
+};
+
 const columns = [
   {
     title: translate('Timestamp'),
@@ -85,6 +91,35 @@ const columns = [
     render: ({ row }) => <EventBadge type={row.event_type} />,
     id: 'event_type',
     keys: ['event_type'],
+  },
+  {
+    title: translate('Project'),
+    render: ({ row }) => {
+      const name = projectName(row);
+      const uuid = (row as any).remote_project_uuid;
+      if (uuid) {
+        return (
+          <Link
+            state="organization-remote-project-detail"
+            params={{ remoteProjectUuid: uuid }}
+          >
+            {name}
+          </Link>
+        );
+      }
+      return (
+        <span className="d-inline-flex align-items-center gap-1">
+          <span className="text-muted">{name !== '—' ? name : '—'}</span>
+          <WarningCircleIcon
+            size={14}
+            className="text-warning flex-shrink-0"
+            title={translate('Associated project has been deleted')}
+          />
+        </span>
+      );
+    },
+    id: 'project',
+    keys: ['new_details', 'previous_details'],
   },
   {
     title: translate('Performed by'),
@@ -133,13 +168,13 @@ export const AllRemoteProjectsAuditLog = () => {
   const setFilter = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value }));
 
-  const filter = {
+  const filter = useMemo(() => ({
     o: filters.o,
     ...(debouncedQ ? { q: debouncedQ } : {}),
     ...(filters.event_type ? { event_type: filters.event_type } : {}),
     ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
     ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-  };
+  }), [filters, debouncedQ]);
 
   const tableProps = useTable({
     table: 'AllRemoteProjectsAuditLog',

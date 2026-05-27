@@ -1,5 +1,5 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { openportalManagedProjectAuditList } from 'waldur-js-client';
@@ -116,7 +116,7 @@ export const ManagedProjectAuditLog = () => {
   const setFilter = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value }));
 
-  const filter = {
+  const filter = useMemo(() => ({
     managed_project_identifier: identifier,
     managed_project_destination: destination,
     o: filters.o,
@@ -124,7 +124,7 @@ export const ManagedProjectAuditLog = () => {
     ...(filters.event_type ? { event_type: filters.event_type } : {}),
     ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
     ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-  };
+  }), [identifier, destination, filters, debouncedQ]);
 
   const tableProps = useTable({
     table: 'ManagedProjectAuditLog',

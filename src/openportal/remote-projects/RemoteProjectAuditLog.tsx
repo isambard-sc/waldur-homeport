@@ -1,5 +1,5 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
@@ -136,14 +136,14 @@ export const RemoteProjectAuditLog = () => {
   const setFilter = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value }));
 
-  const filter = {
+  const filter = useMemo(() => ({
     remote_project_uuid: uuid,
     o: filters.o,
     ...(debouncedQ ? { q: debouncedQ } : {}),
     ...(filters.event_type ? { event_type: filters.event_type } : {}),
     ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
     ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-  };
+  }), [uuid, filters, debouncedQ]);
 
   const tableProps = useTable({
     table: 'RemoteProjectAuditLog',
