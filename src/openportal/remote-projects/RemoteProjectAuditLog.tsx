@@ -1,5 +1,5 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
@@ -11,6 +11,7 @@ import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 
+import { AuditDateRange } from '../AuditDateRange';
 import { DetailsDiff, renderValue } from '../DetailsDiff';
 
 const EVENT_OPTIONS = [
@@ -108,13 +109,7 @@ interface Filters {
   o: string;
 }
 
-const INITIAL_FILTERS: Filters = {
-  q: '',
-  event_type: '',
-  timestamp_after: '',
-  timestamp_before: '',
-  o: '-timestamp',
-};
+const INITIAL_FILTERS: Filters = { q: '', event_type: '', timestamp_after: '', timestamp_before: '', o: '-timestamp' };
 
 export const RemoteProjectAuditLog = () => {
   const { params } = useCurrentStateAndParams();
@@ -124,14 +119,6 @@ export const RemoteProjectAuditLog = () => {
   useTitle(translate('Audit Log'), '', 'browser');
 
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
-  const [debouncedQ, setDebouncedQ] = useState('');
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedQ(filters.q), 400);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [filters.q]);
 
   const setFilter = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value }));
@@ -139,11 +126,11 @@ export const RemoteProjectAuditLog = () => {
   const filter = useMemo(() => ({
     remote_project_uuid: uuid,
     o: filters.o,
-    ...(debouncedQ ? { q: debouncedQ } : {}),
+    ...(filters.q ? { q: filters.q } : {}),
     ...(filters.event_type ? { event_type: filters.event_type } : {}),
     ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
     ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-  }), [uuid, filters, debouncedQ]);
+  }), [uuid, filters]);
 
   const tableProps = useTable({
     table: 'RemoteProjectAuditLog',
@@ -195,25 +182,16 @@ export const RemoteProjectAuditLog = () => {
             ))}
           </Form.Select>
         </div>
-        <div className="col-md-2">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('From')}</Form.Label>
-          <Form.Control
-            size="sm"
-            type="datetime-local"
-            value={filters.timestamp_after}
-            onChange={(e) =>
-              setFilter('timestamp_after', e.target.value ? `${e.target.value}:00Z` : '')
+        <div className="col-md-3">
+          <Form.Label className="fs-8 text-muted mb-1">{translate('Date range')}</Form.Label>
+          <AuditDateRange
+            after={filters.timestamp_after}
+            before={filters.timestamp_before}
+            onChange={(after, before) =>
+              setFilters((f) => ({ ...f, timestamp_after: after, timestamp_before: before }))
             }
-          />
-        </div>
-        <div className="col-md-2">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('To')}</Form.Label>
-          <Form.Control
-            size="sm"
-            type="datetime-local"
-            value={filters.timestamp_before}
-            onChange={(e) =>
-              setFilter('timestamp_before', e.target.value ? `${e.target.value}:00Z` : '')
+            onClear={() =>
+              setFilters((f) => ({ ...f, timestamp_after: '', timestamp_before: '' }))
             }
           />
         </div>
@@ -235,7 +213,7 @@ export const RemoteProjectAuditLog = () => {
             variant="outline-secondary"
             size="sm"
             className="w-100"
-            onClick={() => { setFilters(INITIAL_FILTERS); setDebouncedQ(''); }}
+            onClick={() => setFilters(INITIAL_FILTERS)}
           >
             {translate('Reset')}
           </Button>

@@ -1,5 +1,5 @@
-import { ArrowLeftIcon, WarningCircleIcon } from '@phosphor-icons/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowLeftIcon } from '@phosphor-icons/react';
+import { useMemo, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { useRouter } from '@uirouter/react';
 import { openportalManagedProjectAuditList } from 'waldur-js-client';
@@ -12,6 +12,7 @@ import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 
+import { AuditDateRange } from '../AuditDateRange';
 import { DetailsDiff, parseDetails } from '../DetailsDiff';
 
 const EVENT_OPTIONS = [
@@ -75,8 +76,7 @@ const columns = [
     title: translate('Project'),
     render: ({ row }) => {
       const name = projectName(row);
-      const exists = (row as any).managed_project_uuid != null;
-      if (exists) {
+      if (row.identifier && row.destination) {
         return (
           <Link
             state="marketplace-provider-managed-project-detail"
@@ -86,16 +86,7 @@ const columns = [
           </Link>
         );
       }
-      return (
-        <span className="d-inline-flex align-items-center gap-1">
-          <span className="text-muted">{name}</span>
-          <WarningCircleIcon
-            size={14}
-            className="text-warning flex-shrink-0"
-            title={translate('Associated project has been deleted')}
-          />
-        </span>
-      );
+      return <span className="text-muted">{name}</span>;
     },
     id: 'project',
     keys: ['identifier', 'destination', 'new_details', 'previous_details'],
@@ -122,38 +113,24 @@ interface Filters {
   o: string;
 }
 
-const INITIAL_FILTERS: Filters = {
-  q: '',
-  event_type: '',
-  timestamp_after: '',
-  timestamp_before: '',
-  o: '-timestamp',
-};
+const INITIAL_FILTERS: Filters = { q: '', event_type: '', timestamp_after: '', timestamp_before: '', o: '-timestamp' };
 
 export const AllManagedProjectsAuditLog = () => {
   const router = useRouter();
   useTitle(translate('Managed Projects Audit Log'), '', 'browser');
 
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
-  const [debouncedQ, setDebouncedQ] = useState('');
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setDebouncedQ(filters.q), 400);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [filters.q]);
 
   const setFilter = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value }));
 
   const filter = useMemo(() => ({
     o: filters.o,
-    ...(debouncedQ ? { q: debouncedQ } : {}),
+    ...(filters.q ? { q: filters.q } : {}),
     ...(filters.event_type ? { event_type: filters.event_type } : {}),
     ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
     ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-  }), [filters, debouncedQ]);
+  }), [filters]);
 
   const tableProps = useTable({
     table: 'AllManagedProjectsAuditLog',
@@ -201,25 +178,16 @@ export const AllManagedProjectsAuditLog = () => {
             ))}
           </Form.Select>
         </div>
-        <div className="col-md-2">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('From')}</Form.Label>
-          <Form.Control
-            size="sm"
-            type="datetime-local"
-            value={filters.timestamp_after}
-            onChange={(e) =>
-              setFilter('timestamp_after', e.target.value ? `${e.target.value}:00Z` : '')
+        <div className="col-md-3">
+          <Form.Label className="fs-8 text-muted mb-1">{translate('Date range')}</Form.Label>
+          <AuditDateRange
+            after={filters.timestamp_after}
+            before={filters.timestamp_before}
+            onChange={(after, before) =>
+              setFilters((f) => ({ ...f, timestamp_after: after, timestamp_before: before }))
             }
-          />
-        </div>
-        <div className="col-md-2">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('To')}</Form.Label>
-          <Form.Control
-            size="sm"
-            type="datetime-local"
-            value={filters.timestamp_before}
-            onChange={(e) =>
-              setFilter('timestamp_before', e.target.value ? `${e.target.value}:00Z` : '')
+            onClear={() =>
+              setFilters((f) => ({ ...f, timestamp_after: '', timestamp_before: '' }))
             }
           />
         </div>
@@ -241,7 +209,7 @@ export const AllManagedProjectsAuditLog = () => {
             variant="outline-secondary"
             size="sm"
             className="w-100"
-            onClick={() => { setFilters(INITIAL_FILTERS); setDebouncedQ(''); }}
+            onClick={() => setFilters(INITIAL_FILTERS)}
           >
             {translate('Reset')}
           </Button>
