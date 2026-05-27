@@ -1,6 +1,6 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Form, OverlayTrigger, Popover } from 'react-bootstrap';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
 
@@ -44,15 +44,24 @@ const EventBadge = ({ type }: { type: string }) => {
 };
 
 const ExpandedRow = ({ row }: { row: any }) => {
+  const hasNote = !!row.note;
   const hasDiff = row.previous_details != null || row.new_details != null;
   const hasRemote = row.remote_response != null;
-  if (!hasDiff && !hasRemote) {
+  if (!hasNote && !hasDiff && !hasRemote) {
     return (
       <p className="text-muted mb-0">{translate('No detail changes recorded for this event.')}</p>
     );
   }
   return (
     <div>
+      {hasNote && (
+        <div className={hasDiff || hasRemote ? 'mb-3' : undefined}>
+          <div className="fw-semibold text-muted fs-8 text-uppercase mb-1">
+            {translate('Note')}
+          </div>
+          <p className="mb-0" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{row.note}</p>
+        </div>
+      )}
       {hasDiff && (
         <DetailsDiff
           before={row.previous_details}
@@ -62,7 +71,7 @@ const ExpandedRow = ({ row }: { row: any }) => {
         />
       )}
       {hasRemote && (
-        <div className={hasDiff ? 'mt-3' : undefined}>
+        <div className={hasDiff || hasNote ? 'mt-3' : undefined}>
           <div className="fw-semibold text-muted fs-8 text-uppercase mb-1">
             {translate('Remote response')}
           </div>
@@ -95,7 +104,30 @@ const columns = [
   },
   {
     title: translate('Note'),
-    render: ({ row }) => row.note || <span className="text-muted">—</span>,
+    render: ({ row }) => {
+      if (!row.note) return <span className="text-muted">—</span>;
+      if (row.note.length <= 80) return row.note;
+      return (
+        <OverlayTrigger
+          trigger={['hover', 'focus']}
+          placement="auto"
+          overlay={
+            <Popover>
+              <Popover.Body className="fs-8" style={{ maxWidth: 360, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {row.note}
+              </Popover.Body>
+            </Popover>
+          }
+        >
+          <span
+            className="d-inline-block text-truncate"
+            style={{ maxWidth: 240, cursor: 'help', verticalAlign: 'bottom' }}
+          >
+            {row.note}
+          </span>
+        </OverlayTrigger>
+      );
+    },
     id: 'note',
     keys: ['note'],
   },
