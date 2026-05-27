@@ -285,6 +285,18 @@ export const ManagedProjectDetail = () => {
         </div>
         <div className="d-flex gap-2 align-items-center">
           <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() =>
+              router.stateService.go('marketplace-provider-managed-project-audit', {
+                identifier,
+                destination,
+              })
+            }
+          >
+            {translate('Audit Log')}
+          </Button>
+          <Button
             variant="outline-primary"
             size="sm"
             onClick={doRefetch}

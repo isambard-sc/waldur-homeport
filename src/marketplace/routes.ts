@@ -611,6 +611,21 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-provider-managed-project-audit',
+    url: 'managed-projects/:identifier/:destination/audit/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/managed-projects/ManagedProjectAuditLog').then(
+        (module) => ({ default: module.ManagedProjectAuditLog }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      breadcrumb: () => translate('Audit Log'),
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
     name: 'marketplace-provider-project-templates',
     url: 'project-templates/',
     component: lazyComponent(() =>

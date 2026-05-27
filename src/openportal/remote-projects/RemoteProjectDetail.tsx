@@ -24,6 +24,7 @@ import { useTitle } from '@waldur/navigation/title';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { getUser, isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
 
+import { DetailsDiff, parseDetails } from '../DetailsDiff';
 import { SetAllowedDomainsDialog } from './actions/SetAllowedDomainsDialog';
 import { SetEarliestApproveDialog } from './actions/SetEarliestApproveDialog';
 import { SetLinksDialog } from './actions/SetLinksDialog';
@@ -44,41 +45,6 @@ const renderLink = (link: any, fallback = '—'): ReactNode => {
   return <span>{label || fallback}</span>;
 };
 
-const parseDetails = (value: any): Record<string, unknown> => {
-  if (!value) return {};
-  if (typeof value === 'string') {
-    try {
-      return JSON.parse(value);
-    } catch {
-      return {};
-    }
-  }
-  if (typeof value === 'object') return value;
-  return {};
-};
-
-const sortedStringify = (value: unknown): string => {
-  if (value === null || value === undefined) return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(sortedStringify).join(',')}]`;
-  if (typeof value === 'object') {
-    const sorted = Object.keys(value as object)
-      .sort()
-      .map((k) => `${JSON.stringify(k)}:${sortedStringify((value as any)[k])}`);
-    return `{${sorted.join(',')}}`;
-  }
-  return JSON.stringify(value);
-};
-
-const renderValue = (v: unknown): ReactNode => {
-  if (v === null || v === undefined) return <span className="text-muted">—</span>;
-  if (typeof v === 'boolean') return v ? 'true' : 'false';
-  if (typeof v !== 'object') return String(v);
-  return (
-    <pre className="mb-0 fs-8" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-      {JSON.stringify(v, null, 2)}
-    </pre>
-  );
-};
 
 // --- Layout ---
 
@@ -141,55 +107,6 @@ const Field: FC<{ label: string; children: ReactNode }> = ({ label, children }) 
     <div className="col-7">{children}</div>
   </div>
 );
-
-// --- Sync diff ---
-
-const DetailsDiff: FC<{ sent: any; confirmed: any }> = ({ sent, confirmed }) => {
-  const sentObj = parseDetails(sent);
-  const confirmedObj = parseDetails(confirmed);
-  const hasBoth = Object.keys(sentObj).length > 0 && Object.keys(confirmedObj).length > 0;
-  const keys = Array.from(
-    new Set([...Object.keys(sentObj), ...Object.keys(confirmedObj)]),
-  ).sort();
-
-  if (keys.length === 0) return <span className="text-muted">—</span>;
-
-  return (
-    <div className="table-responsive">
-      <table className="table table-bordered table-sm mb-0 fs-8">
-        <thead className="table-light">
-          <tr>
-            <th style={{ width: '20%' }}>{translate('Field')}</th>
-            <th style={{ width: '40%' }}>{translate('Last sent')}</th>
-            <th style={{ width: '40%' }}>
-              {translate('Last confirmed')}
-              {!confirmed && (
-                <span className="ms-1 badge bg-secondary fw-normal">
-                  {translate('Not yet confirmed')}
-                </span>
-              )}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {keys.map((key) => {
-            const sentVal = sentObj[key];
-            const confirmedVal = confirmedObj[key];
-            const differs =
-              hasBoth && sortedStringify(sentVal) !== sortedStringify(confirmedVal);
-            return (
-              <tr key={key} className={differs ? 'table-warning' : undefined}>
-                <td className="fw-semibold align-top">{key}</td>
-                <td className="align-top">{renderValue(sentVal)}</td>
-                <td className="align-top">{renderValue(confirmedVal)}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-};
 
 // --- Notes ---
 
@@ -399,15 +316,28 @@ export const RemoteProjectDetail = () => {
             <span className="text-muted fs-6">· {data.destination}</span>
           )}
         </div>
-        <Button
-          variant="outline-primary"
-          size="sm"
-          onClick={doRefetch}
-          disabled={isFetching}
-        >
-          {isFetching && <LoadingSpinnerIcon className="me-1" />}
-          {translate('Refresh')}
-        </Button>
+        <div className="d-flex gap-2">
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() =>
+              router.stateService.go('organization-remote-project-audit', {
+                remoteProjectUuid: uuid,
+              })
+            }
+          >
+            {translate('Audit Log')}
+          </Button>
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={doRefetch}
+            disabled={isFetching}
+          >
+            {isFetching && <LoadingSpinnerIcon className="me-1" />}
+            {translate('Refresh')}
+          </Button>
+        </div>
       </div>
 
       {data.error_message && (
@@ -571,8 +501,17 @@ export const RemoteProjectDetail = () => {
           <div className="col-12">
             <Section title={translate('Sync details')} collapsible defaultCollapsed>
               <DetailsDiff
-                sent={data.last_sent_details}
-                confirmed={data.last_confirmed_details}
+                before={data.last_sent_details}
+                after={data.last_confirmed_details}
+                beforeLabel={translate('Last sent')}
+                afterLabel={translate('Last confirmed')}
+                afterNote={
+                  !data.last_confirmed_details && (
+                    <span className="badge bg-secondary fw-normal">
+                      {translate('Not yet confirmed')}
+                    </span>
+                  )
+                }
               />
             </Section>
           </div>

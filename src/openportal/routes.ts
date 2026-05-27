@@ -97,6 +97,25 @@ export const states: StateDeclaration[] = [
       ],
     },
   },
+
+  {
+    name: 'organization-remote-project-audit',
+    url: 'remote-projects/:remoteProjectUuid/audit/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./remote-projects/RemoteProjectAuditLog').then((m) => ({
+        default: m.RemoteProjectAuditLog,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Audit Log'),
+      skipBreadcrumb: true,
+      permissions: [
+        isOwnerOrStaffOrReader,
+        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
+      ],
+    },
+  },
   {
     name: 'organization-openportal-allocation',
     url: 'openportal-allocation/',
