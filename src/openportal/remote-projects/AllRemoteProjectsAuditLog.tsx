@@ -1,18 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { ArrowLeftIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react';
+import { ArrowLeftIcon } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Form, Pagination } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
 import { useRouter } from '@uirouter/react';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
+import Table from '@waldur/table/Table';
+import { createFetcher } from '@waldur/table/api';
+import { useTable } from '@waldur/table/useTable';
 
 import { DetailsDiff, renderValue } from '../DetailsDiff';
-
-const PAGE_SIZE = 20;
 
 const EVENT_OPTIONS = [
   { value: 'award_attempted', label: 'Award attempted', badge: 'bg-primary' },
@@ -43,59 +42,63 @@ const EventBadge = ({ type }: { type: string }) => {
   return <span className={`badge ${cls} fw-normal`}>{label}</span>;
 };
 
-const AuditRow = ({ entry }: { entry: any }) => {
-  const [expanded, setExpanded] = useState(false);
-  const hasDiff =
-    entry.previous_details !== null ||
-    entry.new_details !== null ||
-    entry.remote_response !== null;
-
+const ExpandedRow = ({ row }: { row: any }) => {
+  const hasDiff = row.previous_details != null || row.new_details != null;
+  const hasRemote = row.remote_response != null;
+  if (!hasDiff && !hasRemote) {
+    return (
+      <p className="text-muted mb-0">{translate('No detail changes recorded for this event.')}</p>
+    );
+  }
   return (
-    <>
-      <tr
-        style={hasDiff ? { cursor: 'pointer' } : undefined}
-        onClick={hasDiff ? () => setExpanded((e) => !e) : undefined}
-      >
-        <td className="text-nowrap">{formatDateTime(entry.timestamp)}</td>
-        <td><EventBadge type={entry.event_type} /></td>
-        <td>{entry.performed_by_full_name || '—'}</td>
-        <td>{entry.note || <span className="text-muted">—</span>}</td>
-        <td className="text-center" style={{ width: 32 }}>
-          {hasDiff &&
-            (expanded ? (
-              <CaretDownIcon size={14} className="text-muted" />
-            ) : (
-              <CaretRightIcon size={14} className="text-muted" />
-            ))}
-        </td>
-      </tr>
-      {expanded && (
-        <tr>
-          <td colSpan={5} className="p-0">
-            <div className="p-3 bg-light border-top">
-              {(entry.previous_details !== null || entry.new_details !== null) && (
-                <DetailsDiff
-                  before={entry.previous_details}
-                  after={entry.new_details}
-                  beforeLabel={translate('Previous')}
-                  afterLabel={translate('New')}
-                />
-              )}
-              {entry.remote_response !== null && entry.remote_response !== undefined && (
-                <div className="mt-3">
-                  <div className="fw-semibold text-muted fs-8 text-uppercase mb-1">
-                    {translate('Remote response')}
-                  </div>
-                  {renderValue(entry.remote_response)}
-                </div>
-              )}
-            </div>
-          </td>
-        </tr>
+    <div>
+      {hasDiff && (
+        <DetailsDiff
+          before={row.previous_details}
+          after={row.new_details}
+          beforeLabel={translate('Previous')}
+          afterLabel={translate('New')}
+        />
       )}
-    </>
+      {hasRemote && (
+        <div className={hasDiff ? 'mt-3' : undefined}>
+          <div className="fw-semibold text-muted fs-8 text-uppercase mb-1">
+            {translate('Remote response')}
+          </div>
+          {renderValue(row.remote_response)}
+        </div>
+      )}
+    </div>
   );
 };
+
+const columns = [
+  {
+    title: translate('Timestamp'),
+    render: ({ row }) => formatDateTime(row.timestamp),
+    orderField: 'timestamp',
+    id: 'timestamp',
+    keys: ['timestamp'],
+  },
+  {
+    title: translate('Event'),
+    render: ({ row }) => <EventBadge type={row.event_type} />,
+    id: 'event_type',
+    keys: ['event_type'],
+  },
+  {
+    title: translate('Performed by'),
+    render: ({ row }) => row.performed_by_full_name || '—',
+    id: 'performed_by',
+    keys: ['performed_by_full_name'],
+  },
+  {
+    title: translate('Note'),
+    render: ({ row }) => row.note || <span className="text-muted">—</span>,
+    id: 'note',
+    keys: ['note'],
+  },
+];
 
 interface Filters {
   q: string;
@@ -119,7 +122,6 @@ export const AllRemoteProjectsAuditLog = () => {
 
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [debouncedQ, setDebouncedQ] = useState('');
-  const [page, setPage] = useState(1);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -128,40 +130,22 @@ export const AllRemoteProjectsAuditLog = () => {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [filters.q]);
 
-  const setFilter = (key: keyof Filters, value: string) => {
+  const setFilter = (key: keyof Filters, value: string) =>
     setFilters((f) => ({ ...f, [key]: value }));
-    if (key !== 'o') setPage(1);
+
+  const filter = {
+    o: filters.o,
+    ...(debouncedQ ? { q: debouncedQ } : {}),
+    ...(filters.event_type ? { event_type: filters.event_type } : {}),
+    ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
+    ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
   };
 
-  const { data, isLoading, isFetching } = useQuery({
-    queryKey: [
-      'remote-projects-audit-all',
-      debouncedQ,
-      filters.event_type,
-      filters.timestamp_after,
-      filters.timestamp_before,
-      filters.o,
-      page,
-    ],
-    queryFn: async () => {
-      const result = await openportalRemoteProjectAuditList({
-        query: {
-          page,
-          page_size: PAGE_SIZE,
-          o: filters.o || undefined,
-          ...(debouncedQ ? { q: debouncedQ } : {}),
-          ...(filters.event_type ? { event_type: filters.event_type } : {}),
-          ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
-          ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-        },
-      });
-      return result.data;
-    },
+  const tableProps = useTable({
+    table: 'AllRemoteProjectsAuditLog',
+    fetchData: createFetcher(openportalRemoteProjectAuditList),
+    filter,
   });
-
-  const entries: any[] = Array.isArray(data) ? data : (data as any)?.results ?? [];
-  const count: number = Array.isArray(data) ? data.length : (data as any)?.count ?? 0;
-  const totalPages = Math.ceil(count / PAGE_SIZE);
 
   return (
     <div>
@@ -176,7 +160,6 @@ export const AllRemoteProjectsAuditLog = () => {
           <ArrowLeftIcon size={16} />
         </Button>
         <h4 className="mb-0">{translate('Remote Projects — Audit Log')}</h4>
-        {isFetching && <LoadingSpinnerIcon className="text-muted" />}
       </div>
 
       {/* Filters */}
@@ -210,7 +193,9 @@ export const AllRemoteProjectsAuditLog = () => {
             size="sm"
             type="datetime-local"
             value={filters.timestamp_after}
-            onChange={(e) => setFilter('timestamp_after', e.target.value ? `${e.target.value}:00Z` : '')}
+            onChange={(e) =>
+              setFilter('timestamp_after', e.target.value ? `${e.target.value}:00Z` : '')
+            }
           />
         </div>
         <div className="col-md-2">
@@ -219,7 +204,9 @@ export const AllRemoteProjectsAuditLog = () => {
             size="sm"
             type="datetime-local"
             value={filters.timestamp_before}
-            onChange={(e) => setFilter('timestamp_before', e.target.value ? `${e.target.value}:00Z` : '')}
+            onChange={(e) =>
+              setFilter('timestamp_before', e.target.value ? `${e.target.value}:00Z` : '')
+            }
           />
         </div>
         <div className="col-md-2">
@@ -240,77 +227,20 @@ export const AllRemoteProjectsAuditLog = () => {
             variant="outline-secondary"
             size="sm"
             className="w-100"
-            onClick={() => { setFilters(INITIAL_FILTERS); setDebouncedQ(''); setPage(1); }}
+            onClick={() => { setFilters(INITIAL_FILTERS); setDebouncedQ(''); }}
           >
             {translate('Reset')}
           </Button>
         </div>
       </div>
 
-      {/* Table */}
-      {isLoading ? (
-        <div className="d-flex justify-content-center align-items-center py-5 text-muted">
-          <LoadingSpinnerIcon className="me-2" />
-          {translate('Loading…')}
-        </div>
-      ) : entries.length === 0 ? (
-        <div className="text-muted py-4 text-center">{translate('No audit entries found.')}</div>
-      ) : (
-        <>
-          <div className="table-responsive">
-            <table className="table table-bordered table-sm align-middle">
-              <thead className="table-light">
-                <tr>
-                  <th>{translate('Timestamp')}</th>
-                  <th>{translate('Event')}</th>
-                  <th>{translate('Performed by')}</th>
-                  <th>{translate('Note')}</th>
-                  <th style={{ width: 32 }} />
-                </tr>
-              </thead>
-              <tbody>
-                {entries.map((entry) => (
-                  <AuditRow key={entry.id} entry={entry} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="d-flex justify-content-between align-items-center mt-2">
-            <small className="text-muted">
-              {translate('Showing')} {(page - 1) * PAGE_SIZE + 1}–
-              {Math.min(page * PAGE_SIZE, count)} {translate('of')} {count}
-            </small>
-            {totalPages > 1 && (
-              <Pagination size="sm" className="mb-0">
-                <Pagination.Prev disabled={page === 1} onClick={() => setPage((p) => p - 1)} />
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
-                  .reduce<(number | '…')[]>((acc, p, i, arr) => {
-                    if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push('…');
-                    acc.push(p);
-                    return acc;
-                  }, [])
-                  .map((p, i) =>
-                    p === '…' ? (
-                      <Pagination.Ellipsis key={`e${i}`} disabled />
-                    ) : (
-                      <Pagination.Item
-                        key={p}
-                        active={p === page}
-                        onClick={() => setPage(p as number)}
-                      >
-                        {p}
-                      </Pagination.Item>
-                    ),
-                  )}
-                <Pagination.Next disabled={page === totalPages} onClick={() => setPage((p) => p + 1)} />
-              </Pagination>
-            )}
-          </div>
-        </>
-      )}
+      <Table
+        {...tableProps}
+        columns={columns}
+        verboseName={translate('audit entries')}
+        showPageSizeSelector
+        expandableRow={ExpandedRow}
+      />
     </div>
   );
 };
