@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Form, Pagination } from 'react-bootstrap';
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useRouter } from '@uirouter/react';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -113,12 +113,9 @@ const INITIAL_FILTERS: Filters = {
   o: '-timestamp',
 };
 
-export const RemoteProjectAuditLog = () => {
-  const { params } = useCurrentStateAndParams();
-  const uuid = params.remoteProjectUuid as string;
+export const AllRemoteProjectsAuditLog = () => {
   const router = useRouter();
-
-  useTitle(translate('Audit Log'), '', 'browser');
+  useTitle(translate('Remote Projects Audit Log'), '', 'browser');
 
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [debouncedQ, setDebouncedQ] = useState('');
@@ -138,8 +135,7 @@ export const RemoteProjectAuditLog = () => {
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [
-      'remote-project-audit',
-      uuid,
+      'remote-projects-audit-all',
       debouncedQ,
       filters.event_type,
       filters.timestamp_after,
@@ -150,7 +146,6 @@ export const RemoteProjectAuditLog = () => {
     queryFn: async () => {
       const result = await openportalRemoteProjectAuditList({
         query: {
-          remote_project_uuid: uuid,
           page,
           page_size: PAGE_SIZE,
           o: filters.o || undefined,
@@ -175,16 +170,12 @@ export const RemoteProjectAuditLog = () => {
         <Button
           variant="outline-primary"
           size="sm"
-          onClick={() =>
-            router.stateService.go('organization-remote-project-detail', {
-              remoteProjectUuid: uuid,
-            })
-          }
-          title={translate('Back to Remote Project')}
+          onClick={() => router.stateService.go('organization-remote-projects')}
+          title={translate('Back to Remote Projects')}
         >
           <ArrowLeftIcon size={16} />
         </Button>
-        <h4 className="mb-0">{translate('Audit Log')}</h4>
+        <h4 className="mb-0">{translate('Remote Projects — Audit Log')}</h4>
         {isFetching && <LoadingSpinnerIcon className="text-muted" />}
       </div>
 

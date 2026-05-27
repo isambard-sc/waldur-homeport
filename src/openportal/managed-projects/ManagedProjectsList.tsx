@@ -208,6 +208,14 @@ export const ManagedProjectsList = () => {
             standalone
             hasQuery
             hasOptionalColumns
+            tableActions={
+              <Link
+                state="marketplace-provider-managed-projects-audit"
+                className="btn btn-sm btn-outline-primary"
+              >
+                {translate('Audit Log')}
+              </Link>
+            }
             rowActions={({ row }) => (
                 <ManagedProjectActions project={row} refetch={tableProps.fetch} />
             )}

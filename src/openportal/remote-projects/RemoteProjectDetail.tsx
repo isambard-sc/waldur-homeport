@@ -318,7 +318,7 @@ export const RemoteProjectDetail = () => {
         </div>
         <div className="d-flex gap-2">
           <Button
-            variant="outline-secondary"
+            variant="outline-primary"
             size="sm"
             onClick={() =>
               router.stateService.go('organization-remote-project-audit', {

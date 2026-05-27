@@ -285,7 +285,7 @@ export const ManagedProjectDetail = () => {
         </div>
         <div className="d-flex gap-2 align-items-center">
           <Button
-            variant="outline-secondary"
+            variant="outline-primary"
             size="sm"
             onClick={() =>
               router.stateService.go('marketplace-provider-managed-project-audit', {

@@ -135,6 +135,14 @@ export const RemoteProjectsList = () => {
       standalone
       hasQuery
       hasOptionalColumns
+      tableActions={
+        <Link
+          state="organization-remote-projects-audit"
+          className="btn btn-sm btn-outline-primary"
+        >
+          {translate('Audit Log')}
+        </Link>
+      }
       rowActions={
         canEdit
           ? ({ row }) => (

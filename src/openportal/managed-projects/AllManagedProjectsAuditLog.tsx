@@ -2,35 +2,27 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeftIcon, CaretDownIcon, CaretRightIcon } from '@phosphor-icons/react';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Form, Pagination } from 'react-bootstrap';
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
-import { openportalRemoteProjectAuditList } from 'waldur-js-client';
+import { useRouter } from '@uirouter/react';
+import { openportalManagedProjectAuditList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
 import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
 import { translate } from '@waldur/i18n';
 import { useTitle } from '@waldur/navigation/title';
 
-import { DetailsDiff, renderValue } from '../DetailsDiff';
+import { DetailsDiff } from '../DetailsDiff';
 
 const PAGE_SIZE = 20;
 
 const EVENT_OPTIONS = [
-  { value: 'award_attempted', label: 'Award attempted', badge: 'bg-primary' },
-  { value: 'award_rejected', label: 'Award rejected', badge: 'bg-danger' },
-  { value: 'award_created', label: 'Award created', badge: 'bg-success' },
-  { value: 'award_confirmed', label: 'Award confirmed', badge: 'bg-success' },
-  { value: 'award_updated', label: 'Award updated', badge: 'bg-warning text-dark' },
-  { value: 'award_update_confirmed', label: 'Award update confirmed', badge: 'bg-success' },
-  { value: 'award_update_rejected', label: 'Award update rejected', badge: 'bg-danger' },
-  { value: 'award_fetched', label: 'Award fetched', badge: 'bg-info text-dark' },
-  { value: 'allocation_changed', label: 'Allocation changed', badge: 'bg-warning text-dark' },
-  { value: 'allocation_confirmed', label: 'Allocation confirmed', badge: 'bg-success' },
-  { value: 'allocation_rejected', label: 'Allocation rejected', badge: 'bg-danger' },
+  { value: 'created', label: 'Created', badge: 'bg-success' },
+  { value: 'approved', label: 'Approved', badge: 'bg-success' },
+  { value: 'rejected', label: 'Rejected', badge: 'bg-danger' },
+  { value: 'deleted', label: 'Deleted', badge: 'bg-danger' },
+  { value: 'note_added', label: 'Note added', badge: 'bg-info text-dark' },
+  { value: 'details_updated', label: 'Details updated', badge: 'bg-warning text-dark' },
   { value: 'project_attached', label: 'Project attached', badge: 'bg-primary' },
   { value: 'project_detached', label: 'Project detached', badge: 'bg-warning text-dark' },
-  { value: 'state_changed', label: 'State changed', badge: 'bg-info text-dark' },
-  { value: 'resource_deleted', label: 'Resource deleted', badge: 'bg-danger' },
-  { value: 'resource_restored', label: 'Resource restored', badge: 'bg-success' },
 ];
 
 const EVENT_BADGE: Record<string, string> = Object.fromEntries(
@@ -45,10 +37,7 @@ const EventBadge = ({ type }: { type: string }) => {
 
 const AuditRow = ({ entry }: { entry: any }) => {
   const [expanded, setExpanded] = useState(false);
-  const hasDiff =
-    entry.previous_details !== null ||
-    entry.new_details !== null ||
-    entry.remote_response !== null;
+  const hasDiff = entry.previous_details !== null || entry.new_details !== null;
 
   return (
     <>
@@ -58,6 +47,8 @@ const AuditRow = ({ entry }: { entry: any }) => {
       >
         <td className="text-nowrap">{formatDateTime(entry.timestamp)}</td>
         <td><EventBadge type={entry.event_type} /></td>
+        <td>{entry.identifier || <span className="text-muted">—</span>}</td>
+        <td>{entry.destination || <span className="text-muted">—</span>}</td>
         <td>{entry.performed_by_full_name || '—'}</td>
         <td>{entry.note || <span className="text-muted">—</span>}</td>
         <td className="text-center" style={{ width: 32 }}>
@@ -71,24 +62,14 @@ const AuditRow = ({ entry }: { entry: any }) => {
       </tr>
       {expanded && (
         <tr>
-          <td colSpan={5} className="p-0">
+          <td colSpan={7} className="p-0">
             <div className="p-3 bg-light border-top">
-              {(entry.previous_details !== null || entry.new_details !== null) && (
-                <DetailsDiff
-                  before={entry.previous_details}
-                  after={entry.new_details}
-                  beforeLabel={translate('Previous')}
-                  afterLabel={translate('New')}
-                />
-              )}
-              {entry.remote_response !== null && entry.remote_response !== undefined && (
-                <div className="mt-3">
-                  <div className="fw-semibold text-muted fs-8 text-uppercase mb-1">
-                    {translate('Remote response')}
-                  </div>
-                  {renderValue(entry.remote_response)}
-                </div>
-              )}
+              <DetailsDiff
+                before={entry.previous_details}
+                after={entry.new_details}
+                beforeLabel={translate('Previous')}
+                afterLabel={translate('New')}
+              />
             </div>
           </td>
         </tr>
@@ -113,12 +94,9 @@ const INITIAL_FILTERS: Filters = {
   o: '-timestamp',
 };
 
-export const RemoteProjectAuditLog = () => {
-  const { params } = useCurrentStateAndParams();
-  const uuid = params.remoteProjectUuid as string;
+export const AllManagedProjectsAuditLog = () => {
   const router = useRouter();
-
-  useTitle(translate('Audit Log'), '', 'browser');
+  useTitle(translate('Managed Projects Audit Log'), '', 'browser');
 
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [debouncedQ, setDebouncedQ] = useState('');
@@ -138,8 +116,7 @@ export const RemoteProjectAuditLog = () => {
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: [
-      'remote-project-audit',
-      uuid,
+      'managed-projects-audit-all',
       debouncedQ,
       filters.event_type,
       filters.timestamp_after,
@@ -148,9 +125,8 @@ export const RemoteProjectAuditLog = () => {
       page,
     ],
     queryFn: async () => {
-      const result = await openportalRemoteProjectAuditList({
+      const result = await openportalManagedProjectAuditList({
         query: {
-          remote_project_uuid: uuid,
           page,
           page_size: PAGE_SIZE,
           o: filters.o || undefined,
@@ -175,16 +151,12 @@ export const RemoteProjectAuditLog = () => {
         <Button
           variant="outline-primary"
           size="sm"
-          onClick={() =>
-            router.stateService.go('organization-remote-project-detail', {
-              remoteProjectUuid: uuid,
-            })
-          }
-          title={translate('Back to Remote Project')}
+          onClick={() => router.stateService.go('marketplace-provider-managed-projects')}
+          title={translate('Back to Managed Projects')}
         >
           <ArrowLeftIcon size={16} />
         </Button>
-        <h4 className="mb-0">{translate('Audit Log')}</h4>
+        <h4 className="mb-0">{translate('Managed Projects — Audit Log')}</h4>
         {isFetching && <LoadingSpinnerIcon className="text-muted" />}
       </div>
 
@@ -195,7 +167,7 @@ export const RemoteProjectAuditLog = () => {
           <Form.Control
             size="sm"
             type="text"
-            placeholder={translate('Search notes, details, performer…')}
+            placeholder={translate('Search notes, details, identifier, performer…')}
             value={filters.q}
             onChange={(e) => setFilter('q', e.target.value)}
           />
@@ -272,6 +244,8 @@ export const RemoteProjectAuditLog = () => {
                 <tr>
                   <th>{translate('Timestamp')}</th>
                   <th>{translate('Event')}</th>
+                  <th>{translate('Identifier')}</th>
+                  <th>{translate('Destination')}</th>
                   <th>{translate('Performed by')}</th>
                   <th>{translate('Note')}</th>
                   <th style={{ width: 32 }} />
