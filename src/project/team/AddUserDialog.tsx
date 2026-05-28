@@ -44,6 +44,7 @@ import { useUser } from '@waldur/workspace/hooks';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 import { Project, User } from '@waldur/workspace/types';
 
+import { DomainRestrictionNotice } from './DomainRestrictionNotice';
 import { ExpirationTimeGroup } from './ExpirationTimeGroup';
 import { RoleGroup } from './RoleGroup';
 import { UserListOptionInline } from './UserListOptionInline';
@@ -347,6 +348,11 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
             iconNode={<UserPlusIcon weight="bold" />}
             iconColor="success"
           >
+            <DomainRestrictionNotice
+              allowedDomains={emailPolicy?.allowed_domains}
+              contactEmail={currentCustomer.email}
+              projectName={currentProject?.name}
+            />
             <FormGroup label={translate('User')} required>
               <AsyncSelectFieldFinal
                 name="user"
