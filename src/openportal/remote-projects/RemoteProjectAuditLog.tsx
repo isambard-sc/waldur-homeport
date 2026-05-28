@@ -1,7 +1,9 @@
 import { ArrowLeftIcon } from '@phosphor-icons/react';
-import { useMemo, useState } from 'react';
-import { Button, Form, OverlayTrigger, Popover } from 'react-bootstrap';
+import { useMemo } from 'react';
+import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { getFormValues } from 'redux-form';
 import { openportalRemoteProjectAuditList } from 'waldur-js-client';
 
 import { formatDateTime } from '@waldur/core/dateUtils';
@@ -11,35 +13,34 @@ import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
 
-import { AuditDateRange } from '../AuditDateRange';
 import { DetailsDiff, renderValue } from '../DetailsDiff';
+import {
+  RemoteProjectAuditFilter,
+  REMOTE_AUDIT_EVENT_OPTIONS,
+} from './RemoteProjectAuditFilter';
 
-const EVENT_OPTIONS = [
-  { value: 'award_attempted', label: 'Award attempted', badge: 'bg-primary' },
-  { value: 'award_rejected', label: 'Award rejected', badge: 'bg-danger' },
-  { value: 'award_created', label: 'Award created', badge: 'bg-success' },
-  { value: 'award_confirmed', label: 'Award confirmed', badge: 'bg-success' },
-  { value: 'award_updated', label: 'Award updated', badge: 'bg-warning text-dark' },
-  { value: 'award_update_confirmed', label: 'Award update confirmed', badge: 'bg-success' },
-  { value: 'award_update_rejected', label: 'Award update rejected', badge: 'bg-danger' },
-  { value: 'award_fetched', label: 'Award fetched', badge: 'bg-info text-dark' },
-  { value: 'allocation_changed', label: 'Allocation changed', badge: 'bg-warning text-dark' },
-  { value: 'allocation_confirmed', label: 'Allocation confirmed', badge: 'bg-success' },
-  { value: 'allocation_rejected', label: 'Allocation rejected', badge: 'bg-danger' },
-  { value: 'project_attached', label: 'Project attached', badge: 'bg-primary' },
-  { value: 'project_detached', label: 'Project detached', badge: 'bg-warning text-dark' },
-  { value: 'state_changed', label: 'State changed', badge: 'bg-info text-dark' },
-  { value: 'resource_deleted', label: 'Resource deleted', badge: 'bg-danger' },
-  { value: 'resource_restored', label: 'Resource restored', badge: 'bg-success' },
-];
+const FORM_ID = 'RemoteProjectAuditLogFilter';
 
 const EVENT_BADGE: Record<string, string> = Object.fromEntries(
-  EVENT_OPTIONS.map((e) => [e.value, e.badge]),
+  REMOTE_AUDIT_EVENT_OPTIONS.map((e) => [
+    e.value,
+    {
+      award_attempted: 'bg-primary',
+      award_rejected: 'bg-danger',
+      award_created: 'bg-success',
+      award_updated: 'bg-warning text-dark',
+      award_update_confirmed: 'bg-success',
+      award_update_rejected: 'bg-danger',
+      state_changed: 'bg-info text-dark',
+      resource_deleted: 'bg-danger',
+    }[e.value] ?? 'bg-secondary',
+  ]),
 );
 
 const EventBadge = ({ type }: { type: string }) => {
   const cls = EVENT_BADGE[type] ?? 'bg-secondary';
-  const label = EVENT_OPTIONS.find((e) => e.value === type)?.label ?? type;
+  const label =
+    REMOTE_AUDIT_EVENT_OPTIONS.find((e) => e.value === type)?.label ?? type;
   return <span className={`badge ${cls} fw-normal`}>{label}</span>;
 };
 
@@ -49,7 +50,9 @@ const ExpandedRow = ({ row }: { row: any }) => {
   const hasRemote = row.remote_response != null;
   if (!hasNote && !hasDiff && !hasRemote) {
     return (
-      <p className="text-muted mb-0">{translate('No detail changes recorded for this event.')}</p>
+      <p className="text-muted mb-0">
+        {translate('No detail changes recorded for this event.')}
+      </p>
     );
   }
   return (
@@ -59,7 +62,12 @@ const ExpandedRow = ({ row }: { row: any }) => {
           <div className="fw-semibold text-muted fs-8 text-uppercase mb-1">
             {translate('Note')}
           </div>
-          <p className="mb-0" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{row.note}</p>
+          <p
+            className="mb-0"
+            style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
+          >
+            {row.note}
+          </p>
         </div>
       )}
       {hasDiff && (
@@ -93,6 +101,8 @@ const columns = [
   {
     title: translate('Event'),
     render: ({ row }) => <EventBadge type={row.event_type} />,
+    orderField: 'event_type',
+    filter: 'event_type',
     id: 'event_type',
     keys: ['event_type'],
   },
@@ -101,6 +111,7 @@ const columns = [
     render: ({ row }) => row.performed_by_full_name || '—',
     id: 'performed_by',
     keys: ['performed_by_full_name'],
+    optional: true,
   },
   {
     title: translate('Note'),
@@ -113,7 +124,14 @@ const columns = [
           placement="auto"
           overlay={
             <Popover>
-              <Popover.Body className="fs-8" style={{ maxWidth: 360, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+              <Popover.Body
+                className="fs-8"
+                style={{
+                  maxWidth: 360,
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                }}
+              >
                 {row.note}
               </Popover.Body>
             </Popover>
@@ -130,18 +148,9 @@ const columns = [
     },
     id: 'note',
     keys: ['note'],
+    optional: true,
   },
 ];
-
-interface Filters {
-  q: string;
-  event_type: string;
-  timestamp_after: string;
-  timestamp_before: string;
-  o: string;
-}
-
-const INITIAL_FILTERS: Filters = { q: '', event_type: '', timestamp_after: '', timestamp_before: '', o: '-timestamp' };
 
 export const RemoteProjectAuditLog = () => {
   const { params } = useCurrentStateAndParams();
@@ -150,29 +159,32 @@ export const RemoteProjectAuditLog = () => {
 
   useTitle(translate('Audit Log'), '', 'browser');
 
-  const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
-
-  const setFilter = (key: keyof Filters, value: string) =>
-    setFilters((f) => ({ ...f, [key]: value }));
-
-  const filter = useMemo(() => ({
-    remote_project_uuid: uuid,
-    o: filters.o,
-    ...(filters.q ? { q: filters.q } : {}),
-    ...(filters.event_type ? { event_type: filters.event_type } : {}),
-    ...(filters.timestamp_after ? { timestamp_after: filters.timestamp_after } : {}),
-    ...(filters.timestamp_before ? { timestamp_before: filters.timestamp_before } : {}),
-  }), [uuid, filters]);
+  const filterValues: any = useSelector(getFormValues(FORM_ID));
+  const filter = useMemo(
+    () => ({
+      remote_project_uuid: uuid,
+      ...(filterValues?.event_type?.value
+        ? { event_type: filterValues.event_type.value }
+        : {}),
+      ...(filterValues?.date_range?.after
+        ? { timestamp_after: filterValues.date_range.after }
+        : {}),
+      ...(filterValues?.date_range?.before
+        ? { timestamp_before: filterValues.date_range.before }
+        : {}),
+    }),
+    [uuid, filterValues],
+  );
 
   const tableProps = useTable({
     table: 'RemoteProjectAuditLog',
     fetchData: createFetcher(openportalRemoteProjectAuditList),
     filter,
+    queryField: 'q',
   });
 
   return (
     <div>
-      {/* Header */}
       <div className="d-flex align-items-center gap-2 mb-3">
         <Button
           variant="outline-primary"
@@ -189,75 +201,16 @@ export const RemoteProjectAuditLog = () => {
         <h4 className="mb-0">{translate('Audit Log')}</h4>
       </div>
 
-      {/* Filters */}
-      <div className="row g-2 mb-3 align-items-end">
-        <div className="col-md-3">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('Search')}</Form.Label>
-          <Form.Control
-            size="sm"
-            type="text"
-            placeholder={translate('Search notes, details, performer…')}
-            value={filters.q}
-            onChange={(e) => setFilter('q', e.target.value)}
-          />
-        </div>
-        <div className="col-md-2">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('Event type')}</Form.Label>
-          <Form.Select
-            size="sm"
-            value={filters.event_type}
-            onChange={(e) => setFilter('event_type', e.target.value)}
-          >
-            <option value="">{translate('All events')}</option>
-            {EVENT_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </Form.Select>
-        </div>
-        <div className="col-md-3">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('Date range')}</Form.Label>
-          <AuditDateRange
-            after={filters.timestamp_after}
-            before={filters.timestamp_before}
-            onChange={(after, before) =>
-              setFilters((f) => ({ ...f, timestamp_after: after, timestamp_before: before }))
-            }
-            onClear={() =>
-              setFilters((f) => ({ ...f, timestamp_after: '', timestamp_before: '' }))
-            }
-          />
-        </div>
-        <div className="col-md-2">
-          <Form.Label className="fs-8 text-muted mb-1">{translate('Sort')}</Form.Label>
-          <Form.Select
-            size="sm"
-            value={filters.o}
-            onChange={(e) => setFilter('o', e.target.value)}
-          >
-            <option value="-timestamp">{translate('Newest first')}</option>
-            <option value="timestamp">{translate('Oldest first')}</option>
-            <option value="event_type">{translate('Event type A–Z')}</option>
-            <option value="-event_type">{translate('Event type Z–A')}</option>
-          </Form.Select>
-        </div>
-        <div className="col-md-1">
-          <Button
-            variant="outline-secondary"
-            size="sm"
-            className="w-100"
-            onClick={() => setFilters(INITIAL_FILTERS)}
-          >
-            {translate('Reset')}
-          </Button>
-        </div>
-      </div>
-
       <Table
         {...tableProps}
         columns={columns}
         verboseName={translate('audit entries')}
         showPageSizeSelector
         expandableRow={ExpandedRow}
+        filters={<RemoteProjectAuditFilter form={FORM_ID} />}
+        hasQuery
+        initialSorting={{ field: 'timestamp', mode: 'desc' }}
+        hasOptionalColumns
       />
     </div>
   );
