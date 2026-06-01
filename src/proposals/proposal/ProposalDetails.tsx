@@ -18,6 +18,7 @@ import { ProposalUsersListSummary } from '../team/ProposalUsersListSummary';
 import { Proposal, ProposalReview } from '../types';
 
 import { ProjectDetailsSummary } from './create/ProjectDetailsSummary';
+import { ProposalNotesSection } from './ProposalNotesSection';
 import { ProposalDecisionResult } from './create/ProposalDecisionResult';
 import { ProposalDetailsOverviewStep } from './create/ProposalDetailsOverviewStep';
 import { ResourceRequestsSummary } from './create/ResourceRequestsSummary';
@@ -70,6 +71,9 @@ export const ProposalDetails = ({
         <div id="step-team">
           <ProposalUsersListSummary scope={proposal} reviews={reviews} />
         </div>
+        {isCallManagerView && (
+          <ProposalNotesSection proposal={proposal} refetch={refetch} />
+        )}
       </SidebarLayout.Body>
       <SidebarLayout.Sidebar transparent>
         <Panel title={translate('Progress')} cardBordered className="mb-5">

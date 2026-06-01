@@ -2,11 +2,27 @@ import { FunctionComponent, useMemo } from 'react';
 
 import { formatISOWithoutZone, parseDate } from '@waldur/core/dateUtils';
 import { required } from '@waldur/core/validators';
-import { FormContainer, NumberField } from '@waldur/form';
+import { FormContainer, NumberField, SelectField, TextField } from '@waldur/form';
 import { DateTimeField } from '@waldur/form/DateTimeField';
 import { TimezoneField } from '@waldur/form/TimezoneField';
 import { WizardForm, WizardFormStepProps } from '@waldur/form/WizardForm';
 import { translate } from '@waldur/i18n';
+
+const MEMBERSHIP_CONTROL_CHOICES = [
+  { label: translate('Open (no restriction)'), value: 'open' },
+  { label: translate('Members only'), value: 'members_only' },
+  { label: translate('Roles only'), value: 'roles_only' },
+  { label: translate('Locked'), value: 'locked' },
+];
+
+const domainsToText = (value: unknown): string =>
+  Array.isArray(value) ? (value as string[]).join('\n') : '';
+
+const textToDomains = (text: string): string[] =>
+  text
+    .split(/[\n,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 
 export const WizardFormFirstPage: FunctionComponent<WizardFormStepProps> = (
   props,
@@ -66,6 +82,27 @@ export const WizardFormFirstPage: FunctionComponent<WizardFormStepProps> = (
               )}
               min={0}
               step={1}
+            />
+            <SelectField
+              label={translate('Default membership control')}
+              name="default_membership_control"
+              options={MEMBERSHIP_CONTROL_CHOICES}
+              simpleValue
+              isClearable={false}
+              description={translate(
+                'Default membership control policy for projects created from proposals in this round.',
+              )}
+            />
+            <TextField
+              label={translate('Default allowed domains')}
+              name="default_allowed_domains"
+              rows={4}
+              placeholder={'@example.ac.uk\n*.bristol.ac.uk'}
+              format={domainsToText}
+              parse={textToDomains}
+              description={translate(
+                'Enter one domain pattern per line. Leave empty to allow all domains.',
+              )}
             />
           </FormContainer>
         );

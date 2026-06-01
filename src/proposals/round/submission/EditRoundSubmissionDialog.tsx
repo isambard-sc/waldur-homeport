@@ -70,6 +70,8 @@ export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
         start_time: props.resolve.round.start_time,
         cutoff_time: props.resolve.round.cutoff_time,
         minimum_required_uploads: props.resolve.round.minimum_required_uploads ?? 0,
+        default_membership_control: props.resolve.round.default_membership_control ?? 'open',
+        default_allowed_domains: props.resolve.round.default_allowed_domains ?? [],
       }}
       validate={validate}
     />

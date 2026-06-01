@@ -8,6 +8,22 @@ import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
 import { Call } from '@waldur/proposals/types';
 
+const MEMBERSHIP_CONTROL_LABELS: Record<string, string> = {
+  open: translate('Open (no restriction)'),
+  members_only: translate('Members only'),
+  roles_only: translate('Roles only'),
+  locked: translate('Locked'),
+};
+
+const formatMembershipControl = (value: string | null | undefined): string =>
+  MEMBERSHIP_CONTROL_LABELS[value ?? 'open'] ?? value ?? translate('Open (no restriction)');
+
+const formatAllowedDomains = (value: unknown): string => {
+  if (!Array.isArray(value) || value.length === 0)
+    return translate('All domains allowed');
+  return (value as string[]).join(', ');
+};
+
 import { EditSubmissionInfoButton } from './EditSubmissionInfoButton';
 
 interface RoundSubmissionSectionProps {
@@ -71,9 +87,17 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
         {translate('Duration')}: {duration || '-'}
         <ReadOnlyFormControl
           label={translate('Minimum required uploads')}
-          value={
-            round.minimum_required_uploads ?? 0
-          }
+          value={round.minimum_required_uploads ?? 0}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default membership control')}
+          value={formatMembershipControl(round.default_membership_control)}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default allowed domains')}
+          value={formatAllowedDomains(round.default_allowed_domains)}
           className="col-12 col-md-6"
         />
       </Card.Body>

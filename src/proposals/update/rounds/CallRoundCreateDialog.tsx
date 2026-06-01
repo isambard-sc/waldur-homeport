@@ -88,6 +88,8 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
       initialValues={{
         timezone: DateTime.local().zoneName,
         minimum_required_uploads: 0,
+        default_membership_control: 'open',
+        default_allowed_domains: [],
       }}
       submitLabel={translate('Create')}
       validate={validate}
