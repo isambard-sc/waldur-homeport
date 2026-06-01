@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { FunctionComponent, useMemo } from 'react';
-import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 import { projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
@@ -23,6 +22,7 @@ import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/Aggre
 import { NON_TERMINATED_STATES } from '@waldur/marketplace/resources/list/constants';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
+import { RoleEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { useUser } from '@waldur/workspace/hooks';
 import { getProject, getUser } from '@waldur/workspace/selectors';
@@ -166,6 +166,15 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
 
   const showBillingInfo = project.customer_display_billing_info_in_projects;
 
+  const isProjectPI = Boolean(
+    userFromSelector?.permissions?.some(
+      (permission) =>
+        permission.scope_type === 'project' &&
+        permission.scope_uuid === project?.uuid &&
+        permission.role_name === RoleEnum.PROJECT_MANAGER,
+    ),
+  );
+
   // Check if current date is on or after project end date
   const shouldShowSurvey = useMemo(() => {
     if (!project?.end_date) return false;
@@ -188,6 +197,16 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     
     return today >= dayBeforeEndDate;
   }, [project?.end_date]);
+
+  const surveySrc = useMemo(() => {
+    const params = new URLSearchParams({ embed: 'true' });
+
+    if (project?.uuid) {
+      params.set('project_uuid', project.uuid);
+    }
+
+    return `https://formbricks.localhost/s/cmmh0nsu8000imt016lsfhwo7?${params.toString()}`;
+  }, [project?.uuid]);
 
   if (!project || !user) {
     return null;
@@ -332,22 +351,16 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       )}
 
       {/* Formbricks Survey - Only shown on/after project end date */}
-      {shouldShowSurveyTest && (
+      {shouldShowSurveyTest && isProjectPI && (
         <Row className="mb-6">
           <Col>
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title mb-4">{translate('Project Feedback')}</h5>
-                <div style={{ position: 'relative', height: '80dvh', overflow: 'auto' }}> 
-                  <iframe 
-                    src="https://formbricks.localhost/s/cmmh0nsu8000imt016lsfhwo7" 
-                    frameBorder="0" 
-                    style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', border: 0 }}
-                    title="Project Feedback Survey"
-                  />
-                </div>
-              </div>
-            </div>
+            <h5 className="mb-3">{translate('Project Feedback')}</h5>
+            <iframe
+              src={surveySrc}
+              frameBorder="0"
+              style={{width: '100%', height: '500px', border: 'none', borderRadius: '8px', display: 'block'}}
+              title="Project Feedback Survey"
+            />
           </Col>
         </Row>
       )}
