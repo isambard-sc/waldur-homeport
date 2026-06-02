@@ -1,3 +1,4 @@
+import { ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { FC, ReactNode } from 'react';
@@ -5,6 +6,7 @@ import { Col, Row } from 'react-bootstrap';
 import { openportalRemoteProjectsList } from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
+import { Link } from '@waldur/core/Link';
 import { Panel } from '@waldur/core/Panel';
 import { translate } from '@waldur/i18n';
 
@@ -60,24 +62,24 @@ export const RemoteProjectDashboardCards: FC<Props> = ({ projectUuid, customerEm
   return (
     <Row>
       {remoteProjects.map((rp) => {
+        const resourceUuid = (rp as any).resource_uuid as string | null | undefined;
+        const resourceName = (rp as any).resource_name as string | null | undefined;
+        const allocationString = (rp as any).allocation_string as string | null | undefined;
         const projectUrl = getLinkUrl(rp.link_project);
-        const awardUrl = getLinkUrl(rp.link_award);
-        const awardLabel = getLinkLabel(rp.link_award);
         const embargoed = isEmbargoed(rp.earliest_approve);
         const pendingTooLong =
           !embargoed && rp.has_pending_change && daysSince(rp.pending_since) > 7;
-        const allocationString = (rp as any).allocation_string as string | null | undefined;
         const breakdown =
           rp.breakdown &&
-          typeof rp.breakdown === 'object' &&
-          Object.keys(rp.breakdown as object).length > 0
+            typeof rp.breakdown === 'object' &&
+            Object.keys(rp.breakdown as object).length > 0
             ? (rp.breakdown as Record<string, unknown>)
             : null;
 
         const mailtoHref = customerEmail
           ? `mailto:${customerEmail}?subject=${encodeURIComponent(
-              `Query about remote project ${rp.identifier ?? ''} on ${rp.destination}`,
-            )}`
+            `Query about remote project ${rp.identifier ?? ''} on ${rp.destination}`,
+          )}`
           : undefined;
 
         const allocatorLink: ReactNode = mailtoHref ? (
@@ -94,89 +96,105 @@ export const RemoteProjectDashboardCards: FC<Props> = ({ projectUuid, customerEm
             <Panel
               title={
                 <div className="d-flex justify-content-between align-items-center gap-3 w-100">
-                  <span>{rp.destination}</span>
+                  <div>
+                    {resourceUuid ? (
+                      <Link
+                        state="marketplace-resource-details"
+                        params={{ resource_uuid: resourceUuid }}
+                      >
+                        {resourceName ?? rp.destination}
+                      </Link>
+                    ) : (
+                      <span>{resourceName ?? rp.destination}</span>
+                    )}
+                    {resourceName && (
+                      <div className="fs-7 fw-normal text-muted mt-1">{rp.destination}</div>
+                    )}
+                  </div>
                   {rp.state && <RemoteProjectStateField state={rp.state} />}
                 </div>
               }
               cardBordered
             >
-              {rp.identifier && (
-                <div className="mb-2">
-                  <span className="text-muted me-2">{translate('Identifier:')}</span>
-                  <code>{rp.identifier}</code>
-                </div>
-              )}
-              {(allocationString || rp.current_allocation) && (
-                <div className="mb-2">
-                  <div>
-                    <span className="text-muted me-2">{translate('Allocation:')}</span>
-                    {allocationString ?? rp.current_allocation}
-                    {rp.has_pending_change && rp.pending_allocation && (
-                      <span className="text-muted ms-2 fs-7">
-                        ({translate('pending:')} {rp.pending_allocation})
+              <div className="d-flex align-items-stretch gap-3">
+                {/* Left: details */}
+                <div className="flex-grow-1 d-flex flex-column gap-2">
+                  {(allocationString || rp.current_allocation) && (
+                    <div>
+                      <span className="text-muted me-2">{translate('Allocation:')}</span>
+                      <span className="fw-semibold">
+                        {allocationString ?? rp.current_allocation}
                       </span>
-                    )}
-                  </div>
-                  {breakdown && (
-                    <div className="ms-2 mt-1 fs-7 text-muted">
-                      {Object.entries(breakdown).map(([k, v]) => (
-                        <span key={k} className="me-3">{k}: {String(v)}</span>
-                      ))}
+                      {rp.has_pending_change && rp.pending_allocation && (
+                        <span className="text-muted ms-2 fs-7">
+                          ({translate('pending:')} {rp.pending_allocation})
+                        </span>
+                      )}
+                      {breakdown && (
+                        <div className="ms-2 mt-1 fs-7 text-muted">
+                          {Object.entries(breakdown).map(([k, v]) => (
+                            <span key={k} className="me-3">{k}: {String(v)}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {rp.identifier && (
+                    <div className="fs-7 text-muted">
+                      <span className="me-2">{translate('Identifier:')}</span>
+                      <code>{rp.identifier}</code>
+                    </div>
+                  )}
+                  {!projectUrl && rp.state !== 'active' && (
+                    <div className="alert alert-warning p-2 mb-0 fs-7">
+                      {embargoed ? (
+                        <>
+                          <div>{translate(
+                            'This resource will not be allocated before {date}.',
+                            { date: formatDate(rp.earliest_approve) },
+                          )}</div>
+                          <div>{allocatorLink}</div>
+                        </>
+                      ) : (
+                        <>
+                          <div>{translate(
+                            'The allocated resource is not yet ready. This can take up to 5 working days.',
+                          )}</div>
+                          <div>{allocatorLink}</div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
-              {awardUrl && awardLabel && (
-                <div className="mb-2">
-                  <span className="text-muted me-2">{translate('Award:')}</span>
-                  <a href={awardUrl} target="_blank" rel="noopener noreferrer">
-                    {awardLabel}
-                  </a>
-                </div>
-              )}
-              <div className="mt-3">
-                {projectUrl ? (
+
+                {/* Right: full-height project link button */}
+                {projectUrl && (
                   <a
                     href={projectUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-sm btn-outline-primary"
+                    className="btn btn-primary d-flex flex-column align-items-center justify-content-center gap-2 px-4"
                   >
-                    {translate('Open in remote portal')}
+                    <ArrowSquareOutIcon size={22} weight="bold" />
+                    <span className="fs-7 lh-sm text-center">
+                      {translate('Go to')}<br />{translate('project')}
+                    </span>
                   </a>
-                ) : rp.state !== 'active' ? (
-                  <div className="alert alert-warning p-2 mb-0 fs-7">
-                    {embargoed ? (
-                      <>
-                        {translate(
-                          'This project is under embargo and cannot be activated before {date}.',
-                          { date: formatDate(rp.earliest_approve) },
-                        )}{' '}
-                        {allocatorLink}
-                      </>
-                    ) : (
-                      <>
-                        {translate(
-                          'This project is not yet ready on the remote portal.',
-                        )}{' '}
-                        {allocatorLink}
-                      </>
-                    )}
-                  </div>
-                ) : null}
+                )}
               </div>
+
               {pendingTooLong && (
-                <div className="alert alert-warning p-2 mt-2 mb-0 fs-7">
-                  {translate(
+                <div className="alert alert-warning p-2 mt-3 mb-0 fs-7">
+                  <div>{translate(
                     'It looks like it is taking longer than normal to make this change.',
-                  )}{' '}
-                  {allocatorLink}
+                  )}</div>
+                  <div>{allocatorLink}</div>
                 </div>
               )}
               {rp.state === 'error' && (
-                <div className="alert alert-danger p-2 mt-2 mb-0 fs-7">
-                  {translate('This project is in an error state.')}{' '}
-                  {allocatorLink}
+                <div className="alert alert-danger p-2 mt-3 mb-0 fs-7">
+                  <div>{translate('The allocation of the resource failed or is in an error state.')}</div>
+                  <div>{allocatorLink}</div>
                 </div>
               )}
             </Panel>
