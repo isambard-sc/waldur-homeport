@@ -3,7 +3,7 @@ import { useRouter } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
+import { openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
 
 import { count, parseSelectData } from '@waldur/core/api';
 import { Badge } from '@waldur/core/Badge';
@@ -90,6 +90,20 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       }),
     );
   };
+
+  const { data: remoteProjects } = useQuery({
+    queryKey: ['remote-projects-for-project', project?.uuid],
+    queryFn: () =>
+      openportalRemoteProjectsList({ query: { project_uuid: project.uuid } }).then(
+        (r) => r.data,
+      ),
+    enabled: showRemoteProjects && Boolean(project?.uuid),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const remoteCount = remoteProjects?.length ?? 0;
+  const hasAnyRemoteProjects = showRemoteProjects && remoteCount > 0;
+  const hasManyRemoteProjects = showRemoteProjects && remoteCount > 1;
 
   const { data: teamData } = useQuery({
     queryKey: ['projectTeamData', project?.uuid],
@@ -188,45 +202,60 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     <>
       {shouldShowLimitBasedResources && <ProjectLimitUsageBasedResources />}
       <Row>
-        {!shouldConcealPrices && showBillingInfo && show_resource_limits && (
+        {!shouldConcealPrices && showBillingInfo && show_resource_limits && !hasManyRemoteProjects && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardCostLimits project={project} />
           </Col>
         )}
-        <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-          <ProjectDashboardBalance project={project} className="mb-5" />
-        </Col>
-        <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-          <TeamWidget
-            api={() =>
-              projectsListUsersList({
-                path: { uuid: project.uuid },
-                query: {
-                  field: [
-                    'user_uuid',
-                    'user_full_name',
-                    'user_email',
-                    'user_image',
-                    'role_name',
-                  ],
-
-                  page_size: 5,
-                },
-              }).then(parseSelectData)
-            }
-            scope={project}
-            chartData={teamData}
-            showChart
-            onBadgeClick={isProjectRemoved ? undefined : goToUsers}
-            onAddClick={isProjectRemoved ? undefined : handleAddClick}
-            showAdd={(canInvite || membershipLocked) && !isProjectRemoved}
-            loadingAdd={loadingProjects}
-            className="h-100"
-            nameKey="user_full_name"
-            emailKey="user_email"
-            imageKey="user_image"
+        {hasAnyRemoteProjects && remoteProjects && (
+          <RemoteProjectDashboardCards
+            remoteProjects={remoteProjects}
+            customerEmail={customer?.email}
           />
-        </Col>
+        )}
+        {!hasManyRemoteProjects && (
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+            <ProjectDashboardBalance project={project} className="mb-5" />
+          </Col>
+        )}
+        {!hasAnyRemoteProjects && (
+          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+            <TeamWidget
+              api={() =>
+                projectsListUsersList({
+                  path: { uuid: project.uuid },
+                  query: {
+                    field: [
+                      'user_uuid',
+                      'user_full_name',
+                      'user_email',
+                      'user_image',
+                      'role_name',
+                    ],
+                    page_size: 5,
+                  },
+                }).then(parseSelectData)
+              }
+              scope={project}
+              chartData={teamData}
+              showChart
+              onBadgeClick={isProjectRemoved ? undefined : goToUsers}
+              onAddClick={isProjectRemoved ? undefined : handleAddClick}
+              showAdd={(canInvite || membershipLocked) && !isProjectRemoved}
+              loadingAdd={loadingProjects}
+              className="h-100"
+              nameKey="user_full_name"
+              emailKey="user_email"
+              imageKey="user_image"
+            />
+          </Col>
+        )}
+        {hasAnyRemoteProjects && remoteProjects && (
+          <RemoteProjectDashboardCards
+            remoteProjects={remoteProjects}
+            customerEmail={customer?.email}
+          />
+        )}
         {shouldShowCurrentMonthWidget && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <AggregateLimitWidget
@@ -250,7 +279,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             />
           </Col>
         )}
-        {showBillingInfo && (
+        {showBillingInfo && !hasManyRemoteProjects && (
           <ProjectDashboardCredit project={project} className="mb-5" />
         )}
       </Row>
@@ -321,12 +350,6 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             </Col>
           )}
         </Row>
-      )}
-      {showRemoteProjects && project?.uuid && (
-        <RemoteProjectDashboardCards
-          projectUuid={project.uuid}
-          customerEmail={customer?.email}
-        />
       )}
     </>
   );
