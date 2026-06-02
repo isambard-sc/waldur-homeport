@@ -250,12 +250,6 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             />
           </Col>
         )}
-        {hasAnyRemoteProjects && remoteProjects && (
-          <RemoteProjectDashboardCards
-            remoteProjects={remoteProjects}
-            customerEmail={customer?.email}
-          />
-        )}
         {shouldShowCurrentMonthWidget && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <AggregateLimitWidget

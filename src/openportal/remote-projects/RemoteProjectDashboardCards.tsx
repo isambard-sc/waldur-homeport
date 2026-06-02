@@ -39,6 +39,12 @@ function isEmbargoed(earliestApprove: string | null | undefined): boolean {
   return dt.isValid && dt.diffNow('hours').hours > 24;
 }
 
+function isIndefiniteEmbargo(earliestApprove: string | null | undefined): boolean {
+  if (!earliestApprove) return false;
+  const dt = DateTime.fromISO(earliestApprove);
+  return dt.isValid && dt.diffNow('years').years > 1;
+}
+
 function daysSince(since: string | null | undefined): number {
   if (!since) return 0;
   const dt = DateTime.fromISO(since);
@@ -135,10 +141,13 @@ export const RemoteProjectDashboardCards: FC<Props> = ({ remoteProjects, custome
                   <div className="alert alert-warning p-2 mb-0 fs-7">
                     {embargoed ? (
                       <>
-                        <div>{translate(
-                          'This resource will not be allocated before {date}.',
-                          { date: formatDate(rp.earliest_approve) },
-                        )}</div>
+                        <div>{isIndefiniteEmbargo(rp.earliest_approve)
+                          ? translate('Allocation of this resource is currently on hold.')
+                          : translate(
+                              'This resource will not be allocated before {date}.',
+                              { date: formatDate(rp.earliest_approve) },
+                            )
+                        }</div>
                         <div>{allocatorLink}</div>
                       </>
                     ) : (
