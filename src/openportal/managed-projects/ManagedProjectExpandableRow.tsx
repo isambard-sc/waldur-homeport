@@ -140,7 +140,7 @@ const NotesList: FC<{ notes: Note[]; identifier: string; destination: string }> 
                                 <strong>{note.author}</strong>
                                 <small className="text-muted">{formatDateTime(note.timestamp)}</small>
                             </div>
-                            <div>{note.text}</div>
+                            <div style={{ whiteSpace: 'pre-wrap' }}>{note.text}</div>
                         </div>
                     ))}
                 </div>

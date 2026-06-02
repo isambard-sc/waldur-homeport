@@ -76,7 +76,7 @@ export const ProposalNotesSection = ({
                     {formatDateTime(note.timestamp)}
                   </small>
                 </div>
-                <div className="mt-1">{note.text}</div>
+                <div className="mt-1" style={{ whiteSpace: 'pre-wrap' }}>{note.text}</div>
               </div>
             ))}
           </div>

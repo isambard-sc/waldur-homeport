@@ -1,5 +1,6 @@
+import { ChatTeardropTextIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 import {
@@ -9,6 +10,7 @@ import {
 
 import { Link } from '@waldur/core/Link';
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
 import {
   getNonCanceledProposalStates,
   getProposalStateOptions,
@@ -22,6 +24,7 @@ import { getCustomer } from '@waldur/workspace/selectors';
 import { PROPOSALS_FILTER_FORM_ID } from '../constants';
 import { EndingField } from '../EndingField';
 import { ProposalExpandableRow } from '../round/proposals/ProposalExpandableRow';
+import { ProposalNotesDialog } from '../round/proposals/ProposalNotesDialog';
 
 import { ProposalBadge } from './ProposalBadge';
 import { ProposalRowActions } from './ProposalRowActions';
@@ -51,6 +54,7 @@ const mapStateToFilter = createSelector(
 );
 
 export const CustomerProposalsList: FC<{}> = () => {
+  const dispatch = useDispatch();
   const filter = useSelector(mapStateToFilter);
   const tableProps = useTable({
     table: 'ProposalsList',
@@ -77,6 +81,30 @@ export const CustomerProposalsList: FC<{}> = () => {
           title: translate('ID'),
           render: ({ row }) => <span className="fw-semibold">{row.slug}</span>,
           className: 'text-nowrap',
+        },
+        {
+          title: translate('Notes'),
+          render: ({ row }) => {
+            const count = (row.notes ?? []).length;
+            return (
+              <button
+                className="btn btn-sm btn-light-primary btn-icon-text"
+                onClick={() =>
+                  dispatch(
+                    openModalDialog(ProposalNotesDialog as any, {
+                      resolve: { proposal: row, refetch: tableProps.fetch },
+                      size: 'md',
+                    } as any),
+                  )
+                }
+              >
+                <ChatTeardropTextIcon className="me-1" />
+                {count}
+              </button>
+            );
+          },
+          keys: ['notes'],
+          id: 'notes',
         },
         {
           title: translate('Applicant'),
