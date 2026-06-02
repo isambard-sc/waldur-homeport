@@ -139,14 +139,15 @@ export const ProposalsList: FC<RoundProposalsListProps> = (props) => {
         return (
           <button
             className="btn btn-sm btn-light-primary btn-icon-text"
-            onClick={() =>
+            onClick={(e) => {
+              e.currentTarget.blur();
               dispatch(
                 openModalDialog(ProposalNotesDialog, {
                   resolve: { proposal: row, refetch: tableProps.fetch },
                   size: 'md',
                 }),
-              )
-            }
+              );
+            }}
           >
             <ChatTeardropTextIcon className="me-1" />
             {count}
