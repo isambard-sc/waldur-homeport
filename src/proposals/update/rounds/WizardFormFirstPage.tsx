@@ -15,11 +15,11 @@ const MEMBERSHIP_CONTROL_CHOICES = [
   { label: translate('Locked'), value: 'locked' },
 ];
 
-const domainsToText = (value: unknown): string =>
+export const domainsToText = (value: unknown): string =>
   Array.isArray(value) ? (value as string[]).join('\n') : '';
 
-const textToDomains = (text: string): string[] =>
-  text
+export const textToDomains = (text: string): string[] =>
+  (text ?? '')
     .split(/[\n,]+/)
     .map((s) => s.trim())
     .filter(Boolean);
@@ -98,8 +98,6 @@ export const WizardFormFirstPage: FunctionComponent<WizardFormStepProps> = (
               name="default_allowed_domains"
               rows={4}
               placeholder={'@example.ac.uk\n*.bristol.ac.uk'}
-              format={domainsToText}
-              parse={textToDomains}
               description={translate(
                 'Enter one domain pattern per line. Leave empty to allow all domains.',
               )}

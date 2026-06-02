@@ -69,11 +69,15 @@ export const WizardFormContainer: FC<WizardFormContainerProps> = ({
     uniq(
       Object.keys(props.initialValues).concat(Object.keys(formValues)),
     ).forEach((key) => {
-      if (props.initialValues?.[key]) {
-        dispatch(change(form, key, props.initialValues[key], false, false));
-      } else {
-        dispatch(change(form, key, null, false, false));
-      }
+      dispatch(
+        change(
+          form,
+          key,
+          key in props.initialValues ? props.initialValues[key] : null,
+          false,
+          false,
+        ),
+      );
     });
     setInitialized(true);
   }, [initialized, setInitialized, dispatch, formValues]);

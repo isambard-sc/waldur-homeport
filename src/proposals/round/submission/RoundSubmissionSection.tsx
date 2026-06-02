@@ -1,12 +1,15 @@
-import { FC, useMemo } from 'react';
+import { useCurrentStateAndParams } from '@uirouter/react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Card } from 'react-bootstrap';
-import { ProtectedRound } from 'waldur-js-client';
+import { proposalProtectedCallsRoundsRetrieve, ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime, parseDate } from '@waldur/core/dateUtils';
 import { ReadOnlyFormControl } from '@waldur/form/ReadOnlyFormControl';
 import { translate } from '@waldur/i18n';
 import { RefreshButton } from '@waldur/marketplace/offerings/update/components/RefreshButton';
 import { Call } from '@waldur/proposals/types';
+
+import { EditSubmissionInfoButton } from './EditSubmissionInfoButton';
 
 const MEMBERSHIP_CONTROL_LABELS: Record<string, string> = {
   open: translate('Open (no restriction)'),
@@ -24,21 +27,36 @@ const formatAllowedDomains = (value: unknown): string => {
   return (value as string[]).join(', ');
 };
 
-import { EditSubmissionInfoButton } from './EditSubmissionInfoButton';
-
 interface RoundSubmissionSectionProps {
   round: ProtectedRound;
   call: Call;
-  refetch(): void;
-  loading: boolean;
+  refetch?(): void;
+  loading?: boolean;
 }
 
 export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
-  round,
+  round: roundProp,
   call,
-  refetch,
-  loading,
 }) => {
+  const { params } = useCurrentStateAndParams();
+  const call_uuid = (params.call_uuid as string) ?? call.uuid;
+  const round_uuid = (params.round_uuid as string) ?? roundProp.uuid;
+
+  const [round, setRound] = useState<ProtectedRound>(roundProp);
+  const [isRefetching, setIsRefetching] = useState(false);
+
+  const refetch = useCallback(async () => {
+    setIsRefetching(true);
+    try {
+      const response = await proposalProtectedCallsRoundsRetrieve({
+        path: { uuid: call_uuid, obj_uuid: round_uuid },
+      });
+      if (response.data) setRound(response.data);
+    } finally {
+      setIsRefetching(false);
+    }
+  }, [call_uuid, round_uuid]);
+
   const duration = useMemo(() => {
     if (!round.start_time || !round.cutoff_time) return null;
     const startDate = parseDate(round.start_time);
@@ -55,7 +73,7 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
       <Card.Header>
         <Card.Title>
           {translate('Submission strategy')}
-          <RefreshButton refetch={refetch} loading={loading} />
+          <RefreshButton refetch={refetch} loading={isRefetching} />
         </Card.Title>
         <div className="card-toolbar">
           <EditSubmissionInfoButton

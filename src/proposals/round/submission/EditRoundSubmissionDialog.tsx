@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   proposalProtectedCallsRoundsUpdate,
@@ -12,7 +12,11 @@ import { WizardFormContainer } from '@waldur/form/WizardFormContainer';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { Call } from '@waldur/proposals/types';
-import { WizardFormFirstPage } from '@waldur/proposals/update/rounds/WizardFormFirstPage';
+import {
+  domainsToText,
+  textToDomains,
+  WizardFormFirstPage,
+} from '@waldur/proposals/update/rounds/WizardFormFirstPage';
 import { getRoundInitialValues } from '@waldur/proposals/utils';
 
 interface EditRoundSubmissionDialogProps {
@@ -34,17 +38,22 @@ const validate = (values: ProtectedRoundRequest) => {
 export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
   props,
 ) => {
+  const initialValues = useMemo(
+    () => getRoundInitialValues(props.resolve.round),
+    [props.resolve],
+  );
   const dispatch = useDispatch();
   const submit = useCallback(
-    (formData: ProtectedRoundRequest, _dispatch, formProps) => {
+    (formData: any, _dispatch, formProps) => {
       return proposalProtectedCallsRoundsUpdate({
         path: {
           uuid: props.resolve.call.uuid,
           obj_uuid: props.resolve.round.uuid,
         },
         body: {
-          ...getRoundInitialValues(props.resolve.round),
+          ...initialValues,
           ...formData,
+          default_allowed_domains: textToDomains(formData.default_allowed_domains ?? ''),
         },
       }).then(() => {
         formProps.destroy();
@@ -52,7 +61,7 @@ export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
         props.resolve.refetch();
       });
     },
-    [dispatch, props.resolve],
+    [dispatch, props.resolve, initialValues],
   );
 
   return (
@@ -67,11 +76,11 @@ export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
       wizardForms={[WizardFormFirstPage]}
       initialValues={{
         timezone: DateTime.local().zoneName,
-        start_time: props.resolve.round.start_time,
-        cutoff_time: props.resolve.round.cutoff_time,
-        minimum_required_uploads: props.resolve.round.minimum_required_uploads ?? 0,
-        default_membership_control: props.resolve.round.default_membership_control ?? 'open',
-        default_allowed_domains: props.resolve.round.default_allowed_domains ?? [],
+        start_time: initialValues.start_time,
+        cutoff_time: initialValues.cutoff_time,
+        minimum_required_uploads: initialValues.minimum_required_uploads ?? 0,
+        default_membership_control: initialValues.default_membership_control ?? 'open',
+        default_allowed_domains: domainsToText(initialValues.default_allowed_domains),
       }}
       validate={validate}
     />
