@@ -14,7 +14,7 @@ import { filterComponentsWithUsage } from '@waldur/customer/dashboard/utils';
 import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
 import { TeamWidget } from '@waldur/dashboard/TeamWidget';
 import { isFeatureVisible } from '@waldur/features/connect';
-import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
+import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { EditButton } from '@waldur/form/EditButton';
 import { translate } from '@waldur/i18n';
 import { useCreateInvitation } from '@waldur/invitations/actions/useCreateInvitation';
@@ -24,10 +24,11 @@ import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { useUser } from '@waldur/workspace/hooks';
-import { getProject, getUser } from '@waldur/workspace/selectors';
+import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 
 import { canChangeMembership } from '@waldur/openportal/bindings/helpers';
+import { RemoteProjectDashboardCards } from '@waldur/openportal/remote-projects/RemoteProjectDashboardCards';
 
 import { ProjectLimitUsageBasedResources } from './dashboard/ProjectLimitUsageBasedResources';
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
@@ -52,6 +53,10 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   const user = useUser();
   const userFromSelector = useSelector(getUser);
   const project = useSelector(getProject);
+  const customer = useSelector(getCustomer);
+  const showRemoteProjects = isFeatureVisible(
+    CustomerFeatures.show_openportal_remote_projects,
+  );
 
   const router = useRouter();
   const goToUsers = () => router.stateService.go('project-users');
@@ -316,6 +321,12 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             </Col>
           )}
         </Row>
+      )}
+      {showRemoteProjects && project?.uuid && (
+        <RemoteProjectDashboardCards
+          projectUuid={project.uuid}
+          customerEmail={customer?.email}
+        />
       )}
     </>
   );
