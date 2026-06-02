@@ -1,10 +1,13 @@
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { StateDeclaration } from '@waldur/core/types';
+import { isFeatureVisible } from '@waldur/features/connect';
+import { CustomerFeatures, ProjectFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
-import { OpenPortalFeatures, isOpenPortalFeatureVisible } from './OpenPortalFeaturesEnums';
 import {
   isStaffOrSupport,
   isOwnerOrStaffOrReader,
+  getUser,
+  getProject,
 } from '@waldur/workspace/selectors';
 
 /**
@@ -15,6 +18,16 @@ import {
  */
 const isOrganisationMemberOrStaffOrSupport = (state) =>
   isOwnerOrStaffOrReader(state) || isStaffOrSupport(state);
+
+const isCurrentProjectMember = (state) => {
+  const user = getUser(state);
+  const project = getProject(state);
+  return !!user?.permissions?.some(
+    (permission) =>
+      permission.scope_type === 'project' &&
+      permission.scope_uuid === project?.uuid,
+  );
+};
 
 export const states: StateDeclaration[] = [
   {
@@ -28,7 +41,12 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Usage Report'),
       priority: 105,
-      permissions: [isOrganisationMemberOrStaffOrSupport],
+      permissions: [
+        (state) =>
+          isOrganisationMemberOrStaffOrSupport(state) ||
+          (isFeatureVisible(ProjectFeatures.show_openportal_accounting_pages) &&
+            isCurrentProjectMember(state)),
+      ],
     },
   },
   {
@@ -47,6 +65,24 @@ export const states: StateDeclaration[] = [
     },
   },
   {
+    name: 'organization-remote-projects',
+    url: 'remote-projects/',
+    parent: 'organization',
+    component: lazyComponent(() =>
+      import('./remote-projects/RemoteProjectsList').then((m) => ({
+        default: m.RemoteProjectsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Remotes'),
+      priority: 101,
+      permissions: [
+        isOwnerOrStaffOrReader,
+        () => isFeatureVisible(CustomerFeatures.show_openportal_remote_projects),
+      ],
+    },
+  },
+  {
     name: 'support-openportal-usage',
     url: 'openportal-usage/',
     parent: 'support',
@@ -59,24 +95,6 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Usage Report'),
       priority: 101,
       permissions: [isStaffOrSupport],
-    },
-  },
-  {
-    name: 'organization-remote-projects',
-    url: 'remote-projects/',
-    parent: 'organization',
-    component: lazyComponent(() =>
-      import('./remote-projects/RemoteProjectsList').then((m) => ({
-        default: m.RemoteProjectsList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Remote Projects'),
-      priority: 156,
-      permissions: [
-        isOwnerOrStaffOrReader,
-        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
-      ],
     },
   },
   {
@@ -93,7 +111,7 @@ export const states: StateDeclaration[] = [
       skipBreadcrumb: true,
       permissions: [
         isOwnerOrStaffOrReader,
-        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
+        () => isFeatureVisible(CustomerFeatures.show_openportal_remote_projects),
       ],
     },
   },
@@ -112,7 +130,7 @@ export const states: StateDeclaration[] = [
       skipBreadcrumb: true,
       permissions: [
         isOwnerOrStaffOrReader,
-        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
+        () => isFeatureVisible(CustomerFeatures.show_openportal_remote_projects),
       ],
     },
   },
@@ -131,7 +149,7 @@ export const states: StateDeclaration[] = [
       skipBreadcrumb: true,
       permissions: [
         isOwnerOrStaffOrReader,
-        () => isOpenPortalFeatureVisible(OpenPortalFeatures.show_remote_projects),
+        () => isFeatureVisible(CustomerFeatures.show_openportal_remote_projects),
       ],
     },
   },

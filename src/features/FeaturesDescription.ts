@@ -21,6 +21,10 @@ export const FeaturesDescription: FeatureSection[] = [
         description: translate('Allows to hide domain field in organization detail.'),
       },
       {
+        key: 'show_openportal_remote_projects',
+        description: translate('Allows to show OpenPortal Remote Projects (remotes) in an organization.'),
+      },
+      {
         key: 'show_permission_reviews',
         description: translate('Allows to show permission reviews tab and popups for organisations.'),
       },
@@ -189,6 +193,10 @@ export const FeaturesDescription: FeatureSection[] = [
       {
         key: 'show_kind_in_create_dialog',
         description: translate('Show kind field in project create dialog.'),
+      },
+      {
+        key: 'show_openportal_accounting_pages',
+        description: translate('Show OpenPortal accounting pages to users in the project workspace.'),
       },
       {
         key: 'show_permission_reviews',

@@ -1,10 +1,12 @@
-import { useSelector } from 'react-redux';
+import { ChatTeardropTextIcon } from '@phosphor-icons/react';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { openportalManagedProjectsList } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
 import { Link } from '@waldur/core/Link';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
@@ -20,6 +22,7 @@ import type { AwardDetails } from '../bindings/AwardDetails';
 import { isEmbargoed } from './utils';
 
 import { ManagedProjectActions } from './ManagedProjectActions';
+import { ManagedProjectNotesDialog } from './ManagedProjectNotesDialog';
 
 import { ManagedProjectsFilter } from './ManagedProjectsFilter';
 
@@ -75,6 +78,7 @@ const renderOffering = (destination: string) => {
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
 
+    const dispatch = useDispatch();
     const filter = useSelector(mapStateToFilter);
     const hideEmbargoed = useSelector(selectHideEmbargoed);
 
@@ -99,6 +103,31 @@ export const ManagedProjectsList = () => {
             ),
             keys: ['name'],
             id: 'managedproject',
+        },
+        {
+            title: translate('Notes'),
+            render: ({ row }) => {
+                const count = ((row.details as AwardDetails).notes ?? []).length;
+                return (
+                    <button
+                        className="btn btn-sm btn-light-primary btn-icon-text"
+                        onClick={(e) => {
+                            e.currentTarget.blur();
+                            dispatch(
+                                openModalDialog(ManagedProjectNotesDialog as any, {
+                                    resolve: { row, refetch: tableProps.fetch },
+                                    size: 'md',
+                                } as any),
+                            );
+                        }}
+                    >
+                        <ChatTeardropTextIcon className="me-1" />
+                        {count}
+                    </button>
+                );
+            },
+            keys: ['notes'],
+            id: 'notes',
         },
         {
             title: translate('Identifier'),

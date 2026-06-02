@@ -1,4 +1,5 @@
-import { useSelector } from 'react-redux';
+import { ChatTeardropTextIcon } from '@phosphor-icons/react';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 import { openportalRemoteProjectsList } from 'waldur-js-client';
@@ -7,6 +8,7 @@ import { formatDateTime } from '@waldur/core/dateUtils';
 import { Link } from '@waldur/core/Link';
 import { Tip } from '@waldur/core/Tooltip';
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
 import { useTitle } from '@waldur/navigation/title';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
@@ -16,6 +18,7 @@ import { useTable } from '@waldur/table/useTable';
 import { getCustomer, isOwnerOrStaff, isSupport } from '@waldur/workspace/selectors';
 
 import { RemoteProjectActions } from './RemoteProjectActions';
+import { RemoteProjectNotesDialog } from './RemoteProjectNotesDialog';
 import { RemoteProjectStateField } from './RemoteProjectStateField';
 import { RemoteProjectsFilter } from './RemoteProjectsFilter';
 
@@ -40,6 +43,7 @@ const selectCanEdit = createSelector(
 export const RemoteProjectsList = () => {
   useTitle(translate('Remote Projects'), '', 'browser');
 
+  const dispatch = useDispatch();
   const filter = useSelector(mapStateToFilter);
   const canEdit = useSelector(selectCanEdit);
 
@@ -64,6 +68,31 @@ export const RemoteProjectsList = () => {
       ),
       keys: ['current_project_name'],
       id: 'project',
+    },
+    {
+      title: translate('Notes'),
+      render: ({ row }) => {
+        const count = ((row.award_details as any)?.notes ?? row.notes ?? []).length;
+        return (
+          <button
+            className="btn btn-sm btn-light-primary btn-icon-text"
+            onClick={(e) => {
+              e.currentTarget.blur();
+              dispatch(
+                openModalDialog(RemoteProjectNotesDialog as any, {
+                  resolve: { row, refetch: tableProps.fetch },
+                  size: 'md',
+                } as any),
+              );
+            }}
+          >
+            <ChatTeardropTextIcon className="me-1" />
+            {count}
+          </button>
+        );
+      },
+      keys: ['notes'],
+      id: 'notes',
     },
     {
       title: translate('Destination'),
