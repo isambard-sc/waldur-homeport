@@ -22,10 +22,13 @@ const isOrganisationMemberOrStaffOrSupport = (state) =>
 const isCurrentProjectMember = (state) => {
   const user = getUser(state);
   const project = getProject(state);
+  // If the project hasn't been resolved into the store yet (hard reload),
+  // return true so the route isn't rejected before the workspace is ready.
+  if (!project) return true;
   return !!user?.permissions?.some(
     (permission) =>
       permission.scope_type === 'project' &&
-      permission.scope_uuid === project?.uuid,
+      permission.scope_uuid === project.uuid,
   );
 };
 

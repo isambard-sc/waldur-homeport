@@ -11,6 +11,7 @@ import { useSelector } from 'react-redux';
 
 import { LoadingErred } from '@waldur/core/LoadingErred';
 import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
+import { translate } from '@waldur/i18n';
 import { getProject } from '@waldur/workspace/selectors';
 
 import {
@@ -95,7 +96,7 @@ export const OpenPortalReportsTab: FC = () => {
   const hasReports = !!(usageReports || storageReports);
 
   // ── Fetch name mappings once reports are available ───────────────────────
-  const { data: nameMaps } = useQuery<NameMaps>({
+  const { data: nameMaps = { offering: {}, user: {} } } = useQuery<NameMaps>({
     queryKey: ['openportal-project-mappings', project?.uuid],
     refetchOnWindowFocus: false,
     staleTime: Infinity,
@@ -123,10 +124,18 @@ export const OpenPortalReportsTab: FC = () => {
         .slice(0, MAX_USER_MAPPINGS);
       const offerings = await fetchOfferingMapping(offeringIds);
       const users = await fetchUserMapping(userIds);
-      const maps = {
-        offering: Object.fromEntries(Object.entries(offerings).map(([k, v]) => [k, v.name])),
-        user: Object.fromEntries(Object.entries(users).map(([k, v]) => [k, v.full_name])),
-      } as NameMaps;
+      const maps: NameMaps = {
+        offering: Object.fromEntries(
+          Object.entries(offerings)
+            .filter(([, v]) => v != null)
+            .map(([k, v]) => [k, v!.name]),
+        ),
+        user: Object.fromEntries(
+          Object.entries(users)
+            .filter(([, v]) => v != null)
+            .map(([k, v]) => [k, v!.full_name]),
+        ),
+      };
       return maps;
     },
     enabled: hasReports,
@@ -258,9 +267,9 @@ export const OpenPortalReportsTab: FC = () => {
         />
       )}
 
-      {!isLoading && !usageError && !storageError && allMonths.length === 0 && (
+      {!isLoading && allMonths.length === 0 && (
         <p className="text-muted">
-          No OpenPortal reports found for this project.
+          {translate('No usage data available yet. This page will show usage once your project resources are in active use.')}
         </p>
       )}
 
