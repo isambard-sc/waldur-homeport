@@ -69,6 +69,8 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
           body: {
             ...formData,
             default_allowed_domains: textToDomains(formData.default_allowed_domains as any ?? ''),
+            default_reapply_url: formData.default_reapply_url || null,
+            default_reapply_text: formData.default_reapply_text || null,
           },
         });
         formProps.destroy();
@@ -93,6 +95,8 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
         minimum_required_uploads: 0,
         default_membership_control: 'open',
         default_allowed_domains: '',
+        default_reapply_url: '',
+        default_reapply_text: '',
       }}
       submitLabel={translate('Create')}
       validate={validate}

@@ -54,6 +54,8 @@ export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
           ...initialValues,
           ...formData,
           default_allowed_domains: textToDomains(formData.default_allowed_domains ?? ''),
+          default_reapply_url: formData.default_reapply_url || null,
+          default_reapply_text: formData.default_reapply_text || null,
         },
       }).then(() => {
         formProps.destroy();
@@ -81,6 +83,8 @@ export const EditRoundSubmissionDialog: FC<EditRoundSubmissionDialogProps> = (
         minimum_required_uploads: initialValues.minimum_required_uploads ?? 0,
         default_membership_control: initialValues.default_membership_control ?? 'open',
         default_allowed_domains: domainsToText(initialValues.default_allowed_domains),
+        default_reapply_url: initialValues.default_reapply_url ?? '',
+        default_reapply_text: initialValues.default_reapply_text ?? '',
       }}
       validate={validate}
     />

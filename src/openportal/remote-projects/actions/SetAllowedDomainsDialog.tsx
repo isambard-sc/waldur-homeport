@@ -17,8 +17,8 @@ interface Props {
 const domainsToText = (domains: string[] | null | undefined): string =>
   (domains ?? []).join('\n');
 
-const textToDomains = (text: string): string[] =>
-  text
+const textToDomains = (text: string | null | undefined): string[] =>
+  (text ?? '')
     .split(/[\n,]+/)
     .map((s) => s.trim())
     .filter(Boolean);

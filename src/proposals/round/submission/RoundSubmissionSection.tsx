@@ -118,6 +118,16 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
           value={formatAllowedDomains(round.default_allowed_domains)}
           className="col-12 col-md-6"
         />
+        <ReadOnlyFormControl
+          label={translate('Default reapply URL')}
+          value={round.default_reapply_url || '-'}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default reapply link text')}
+          value={round.default_reapply_text || '-'}
+          className="col-12 col-md-6"
+        />
       </Card.Body>
     </Card>
   );
