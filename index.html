@@ -9,6 +9,8 @@
     <title>Waldur | Cloud Service Management</title>
     <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
     <meta name="api-url" content="%VITE_API_URL%" />
+    <!-- Allow Formbricks iframe -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; frame-src 'self' https://formbricks.localhost;" />
   </head>
   <body class="fixed-sidebar">
     <noscript>
