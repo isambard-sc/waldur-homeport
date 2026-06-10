@@ -14,7 +14,7 @@ import { closeModalDialog } from '@waldur/modal/actions';
 import { Call } from '@waldur/proposals/types';
 import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 
-import { WizardFormFirstPage } from './WizardFormFirstPage';
+import { textToDomains, WizardFormFirstPage } from './WizardFormFirstPage';
 import { WizardFormSecondPage } from './WizardFormSecondPage';
 import { WizardFormThirdPage } from './WizardFormThirdPage';
 
@@ -66,7 +66,12 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
       try {
         await proposalProtectedCallsRoundsSet({
           path: { uuid: props.resolve.call.uuid },
-          body: formData,
+          body: {
+            ...formData,
+            default_allowed_domains: textToDomains(formData.default_allowed_domains as any ?? ''),
+            default_reapply_url: formData.default_reapply_url || null,
+            default_reapply_text: formData.default_reapply_text || null,
+          },
         });
         formProps.destroy();
         dispatch(closeModalDialog());
@@ -88,6 +93,10 @@ export const CallRoundCreateDialog: FC<CallRoundCreateDialogProps> = (
       initialValues={{
         timezone: DateTime.local().zoneName,
         minimum_required_uploads: 0,
+        default_membership_control: 'open',
+        default_allowed_domains: '',
+        default_reapply_url: '',
+        default_reapply_text: '',
       }}
       submitLabel={translate('Create')}
       validate={validate}

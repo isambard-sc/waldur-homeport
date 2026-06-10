@@ -29,6 +29,7 @@ export const states: StateDeclaration[] = [
     url: '',
     data: {
       breadcrumb: () => translate('Logs'),
+      priority: 106,
     },
   },
 
@@ -114,7 +115,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Broadcast'),
-      priority: 100,
+      priority: 104,
     },
   },
 
@@ -128,7 +129,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Check user access'),
-      priority: 100,
+      priority: 102,
     },
   },
 
@@ -142,7 +143,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Broadcast templates'),
-      priority: 101,
+      priority: 105,
     },
   },
 
@@ -156,7 +157,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Maintenance'),
-      priority: 100,
+      priority: 103,
     },
   },
 

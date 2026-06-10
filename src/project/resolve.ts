@@ -35,6 +35,7 @@ export function loadProject(transition: Transition) {
         'name',
         'native_name',
         'abbreviation',
+        'email',
         'customer_credit',
         'is_service_provider',
       ]);

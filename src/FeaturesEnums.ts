@@ -1,10 +1,10 @@
-// WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_features_enums.py
 // Do not edit it manually. All manual changes would be overridden.
 
 export enum CustomerFeatures {
   payments_for_staff_only = 'customer.payments_for_staff_only',
   show_banking_data = 'customer.show_banking_data',
   show_domain = 'customer.show_domain',
+  show_openportal_remote_projects = 'customer.show_openportal_remote_projects',
   show_permission_reviews = 'customer.show_permission_reviews',
 }
 
@@ -44,6 +44,7 @@ export enum OpenstackFeatures {
 }
 
 export enum ProjectFeatures {
+  enforce_allowed_domains = 'project.enforce_allowed_domains',
   estimated_cost = 'project.estimated_cost',
   mandatory_end_date = 'project.mandatory_end_date',
   mandatory_start_date = 'project.mandatory_start_date',
@@ -54,6 +55,7 @@ export enum ProjectFeatures {
   show_image_in_create_dialog = 'project.show_image_in_create_dialog',
   show_industry_flag = 'project.show_industry_flag',
   show_kind_in_create_dialog = 'project.show_kind_in_create_dialog',
+  show_openportal_accounting_pages = 'project.show_openportal_accounting_pages',
   show_permission_reviews = 'project.show_permission_reviews',
   show_start_date_in_create_dialog = 'project.show_start_date_in_create_dialog',
   show_type_in_create_dialog = 'project.show_type_in_create_dialog',

@@ -238,6 +238,84 @@ export async function getAllPages<T>(
   return results;
 }
 
+/**
+ * Fetch all pages of a custom (non-SDK) paginated endpoint sequentially,
+ * following the Link header returned by the server.
+ *
+ * Uses page_size=25 by default so each response is small and the server
+ * is not burdened by one giant query.
+ */
+export async function getAll<T = any>(
+  endpoint: string,
+  pageSize = 25,
+): Promise<T[]> {
+  const results: T[] = [];
+  const sep = endpoint.includes('?') ? '&' : '?';
+  let url: string | null = fixURL(`${endpoint}${sep}page_size=${pageSize}`);
+
+  while (url) {
+    const response = await fetch(
+      url,
+      AuthTokenStorage.get()
+        ? { headers: { Authorization: getAuthHeader() } }
+        : {},
+    );
+    const data = (await response.json()) as T[];
+    results.push(...data);
+    url = getNextPageUrl(response);
+  }
+
+  return results;
+}
+
+/**
+ * Parse the `rel="last"` URL from a Link header to get the total page count.
+ * Returns undefined if the header is missing or the URL can't be parsed.
+ */
+const getLastPageCount = (response: Response): number | undefined => {
+  const link = response.headers.get('link');
+  if (!link) return undefined;
+  const lastLink = link.split(', ').find((s) => s.includes('rel="last"'));
+  if (!lastLink) return undefined;
+  const lastUrl = lastLink.split(';')[0].slice(1, -1);
+  const match = lastUrl.match(/[?&]page=(\d+)/);
+  return match ? parseInt(match[1], 10) : undefined;
+};
+
+/**
+ * Like `getAll` but calls `onProgress(currentPage, totalPages)` after each
+ * page fetch. `totalPages` is extracted from the `rel="last"` Link header on
+ * the first response and may be undefined if that header is absent.
+ */
+export async function getAllWithProgress<T = any>(
+  endpoint: string,
+  onProgress: (page: number, totalPages: number | undefined) => void,
+  pageSize = 25,
+): Promise<T[]> {
+  const results: T[] = [];
+  const sep = endpoint.includes('?') ? '&' : '?';
+  let url: string | null = fixURL(`${endpoint}${sep}page_size=${pageSize}`);
+  let page = 1;
+  let totalPages: number | undefined;
+
+  while (url) {
+    const response = await fetch(
+      url,
+      AuthTokenStorage.get()
+        ? { headers: { Authorization: getAuthHeader() } }
+        : {},
+    );
+    const data = (await response.json()) as T[];
+    results.push(...data);
+    if (page === 1) totalPages = getLastPageCount(response);
+    onProgress(page, totalPages);
+    url = getNextPageUrl(response);
+    page++;
+  }
+
+  return results;
+}
+
 export const formDataOptions = {
   ...formDataBodySerializer,
   headers: {

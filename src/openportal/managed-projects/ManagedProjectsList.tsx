@@ -1,10 +1,13 @@
-import { useSelector } from 'react-redux';
+import { ChatTeardropTextIcon } from '@phosphor-icons/react';
+import { useDispatch, useSelector } from 'react-redux';
 import { getFormValues } from 'redux-form';
 import { createSelector } from 'reselect';
 
 import { openportalManagedProjectsList } from 'waldur-js-client';
 
 import { translate } from '@waldur/i18n';
+import { openModalDialog } from '@waldur/modal/actions';
+import { Link } from '@waldur/core/Link';
 import Table from '@waldur/table/Table';
 import { createFetcher } from '@waldur/table/api';
 import { useTable } from '@waldur/table/useTable';
@@ -15,8 +18,11 @@ import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
 import { renderFieldOrDash } from '@waldur/table/utils';
 import { isEmpty } from '@waldur/core/utils';
 
-import { ManagedProjectExpandableRow } from './ManagedProjectExpandableRow';
+import type { AwardDetails } from '../bindings/AwardDetails';
+import { isEmbargoed } from './utils';
+
 import { ManagedProjectActions } from './ManagedProjectActions';
+import { ManagedProjectNotesDialog } from './ManagedProjectNotesDialog';
 
 import { ManagedProjectsFilter } from './ManagedProjectsFilter';
 
@@ -25,21 +31,20 @@ const mapStateToFilter = createSelector(
     getFormValues('managedProjectsFilter'),
     (userFilter: any) => {
         if (!userFilter) {
-            // If no filter is set, default to pending
             return { state: ['pending'] };
         }
 
-        const filter = {
-            ...userFilter,
-            feature: userFilter?.feature?.map((option) => option.value),
+        // hide_embargoed is a client-side-only toggle — strip it before sending to the API
+        const { hide_embargoed: _, ...rest } = userFilter;
+
+        const filter: any = {
+            ...rest,
+            feature: rest?.feature?.map((option) => option.value),
         };
 
-        // Handle state filter
-        if (userFilter.state && Array.isArray(userFilter.state) && userFilter.state.length > 0) {
-            // If state is selected, map to values
-            filter.state = userFilter.state.map((option) => option.value);
-        } else if (isEmpty(userFilter.state)) {
-            // If no state is selected, default to pending
+        if (rest.state && Array.isArray(rest.state) && rest.state.length > 0) {
+            filter.state = rest.state.map((option) => option.value);
+        } else if (isEmpty(rest.state)) {
             filter.state = ['pending'];
         }
 
@@ -47,16 +52,18 @@ const mapStateToFilter = createSelector(
     },
 );
 
+const selectHideEmbargoed = createSelector(
+    getFormValues('managedProjectsFilter'),
+    (values: any) => values?.hide_embargoed ?? false,
+);
+
 const renderProjectTemplate = (row: any) => {
     if (row.project_template_data) {
         return row.project_template_data.name;
     }
 
-    if (row.details.template) {
-        return row.details.template;
-    }
-
-    return renderFieldOrDash(row.details.class);
+    const details = row.details as AwardDetails;
+    return renderFieldOrDash(details.template);
 }
 
 const renderOffering = (destination: string) => {
@@ -71,8 +78,9 @@ const renderOffering = (destination: string) => {
 export const ManagedProjectsList = () => {
     useTitle(translate('Managed Projects'), '', 'browser');
 
-    // Get filter values from redux-form
+    const dispatch = useDispatch();
     const filter = useSelector(mapStateToFilter);
+    const hideEmbargoed = useSelector(selectHideEmbargoed);
 
     const tableProps = useTable({
         table: `ManagedProjectsList`,
@@ -84,34 +92,75 @@ export const ManagedProjectsList = () => {
     const columns: Array<Column> = [
         {
             title: translate('Project'),
-            orderField: 'row.details.name',
-            render: ({ row }) => renderFieldOrDash(row.details.name),
+            orderField: 'details__name',
+            render: ({ row }) => (
+                <Link
+                    state="marketplace-provider-managed-project-detail"
+                    params={{ identifier: row.identifier, destination: row.destination }}
+                >
+                    {(row.details as AwardDetails).name || row.identifier || '—'}
+                </Link>
+            ),
             keys: ['name'],
             id: 'managedproject',
         },
         {
+            title: translate('Notes'),
+            render: ({ row }) => {
+                const count = ((row.details as AwardDetails).notes ?? []).length;
+                return (
+                    <button
+                        className="btn btn-sm btn-light-primary btn-icon-text"
+                        onClick={(e) => {
+                            e.currentTarget.blur();
+                            dispatch(
+                                openModalDialog(ManagedProjectNotesDialog as any, {
+                                    resolve: { row, refetch: tableProps.fetch },
+                                    size: 'md',
+                                } as any),
+                            );
+                        }}
+                    >
+                        <ChatTeardropTextIcon className="me-1" />
+                        {count}
+                    </button>
+                );
+            },
+            keys: ['notes'],
+            id: 'notes',
+        },
+        {
+            title: translate('Identifier'),
+            orderField: 'identifier',
+            render: ({ row }) => renderFieldOrDash(row.identifier),
+            keys: ['identifier'],
+            optional: true,
+            id: 'identifier',
+        },
+        {
             title: translate('Offering'),
-            orderField: 'row.offering',
+            orderField: 'project_template__offering',
             render: ({ row }) => renderOffering(row.destination),
             keys: ['offering'],
             id: 'offering',
         },
         {
             title: translate('Project Template'),
-            orderField: 'row.details.class',
+            orderField: 'project_template__name',
             render: ({ row }) => renderProjectTemplate(row),
             keys: ['project-template'],
             id: 'project-template',
         },
         {
             title: translate('Description'),
-            render: ({ row }) => renderFieldOrDash(row.details.description),
+            render: ({ row }) => renderFieldOrDash((row.details as AwardDetails).description),
             keys: ['description'],
             optional: true,
             id: 'description',
         },
         {
             title: translate('Created'),
+            orderField: 'created',
             render: ({ row }) => (
                 <>
                     {row.created
@@ -127,8 +176,8 @@ export const ManagedProjectsList = () => {
             title: translate('Start Date'),
             render: ({ row }) => (
                 <>
-                    {row.details.start_date
-                        ? formatDate(row.details.start_date)
+                    {(row.details as AwardDetails).start_date
+                        ? formatDate((row.details as AwardDetails).start_date)
                         : DASH_ESCAPE_CODE}
                 </>
             ),
@@ -140,8 +189,8 @@ export const ManagedProjectsList = () => {
             title: translate('End Date'),
             render: ({ row }) => (
                 <>
-                    {row.details.end_date
-                        ? formatDate(row.details.end_date)
+                    {(row.details as AwardDetails).end_date
+                        ? formatDate((row.details as AwardDetails).end_date)
                         : DASH_ESCAPE_CODE}
                 </>
             ),
@@ -151,15 +200,21 @@ export const ManagedProjectsList = () => {
         },
         {
             title: translate('Allocation'),
-            render: ({ row }) => renderFieldOrDash(row.details.allocation),
+            render: ({ row }) => renderFieldOrDash((row.details as AwardDetails).allocation),
             keys: ['allocation'],
             id: 'allocation',
         },
         {
             title: translate('State'),
+            orderField: 'state',
             render: ({ row }) => (
                 <>
                     {row.state}
+                    {isEmbargoed(row) && (
+                        <span className="badge bg-warning text-dark ms-1">
+                            {translate('Embargoed')}
+                        </span>
+                    )}
                 </>
             ),
             keys: ['state'],
@@ -167,17 +222,29 @@ export const ManagedProjectsList = () => {
         },
     ];
 
+    const rows = hideEmbargoed
+        ? (tableProps.rows || []).filter((row) => !isEmbargoed(row))
+        : tableProps.rows;
+
     return (
         <Table
             {...tableProps}
+            rows={rows}
             columns={columns}
             verboseName={translate('Managed Projects')}
             title={translate('Managed Projects')}
             showPageSizeSelector={true}
             standalone
+            hasQuery
             hasOptionalColumns
-            expandableRowClassName="py-2 pe-2"
-            expandableRow={ManagedProjectExpandableRow}
+            tableActions={
+              <Link
+                state="marketplace-provider-managed-projects-audit"
+                className="btn btn-sm btn-outline-primary"
+              >
+                {translate('Audit Log')}
+              </Link>
+            }
             rowActions={({ row }) => (
                 <ManagedProjectActions project={row} refetch={tableProps.fetch} />
             )}

@@ -21,6 +21,8 @@ import { translate } from '@waldur/i18n';
 import { getItemAbbreviation } from '@waldur/navigation/workspace/context-selector/utils';
 import { isOwnerOrStaff as isOwnerOrStaffSelector } from '@waldur/workspace/selectors';
 
+import { useProjectAwardDetails } from './useProjectAwardDetails';
+
 interface ProjectProfileProps {
   project: Project;
 }
@@ -117,6 +119,8 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: awardDetails } = useProjectAwardDetails(project.uuid);
+
   return (
     <PublicDashboardHero
       hideQuickSection={project.kind === 'default'}
@@ -156,6 +160,41 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
           </span>
         )}
       </Stack>
+      {awardDetails && (awardDetails.award || awardDetails.call) && (
+        <Stack direction="horizontal" className="gap-6 mt-2">
+          {awardDetails.award && (
+            <>
+              <span className="fw-semibold text-dark">{translate('Award:')}</span>
+              {awardDetails.award.url ? (
+                <a href={awardDetails.award.url} target="_blank" rel="noopener noreferrer">
+                  {awardDetails.award.id || awardDetails.award.url}
+                </a>
+              ) : (
+                <span>{awardDetails.award.id}</span>
+              )}
+            </>
+          )}
+          {awardDetails.call && (awardDetails.call.id || awardDetails.call.url) && (
+            <>
+              <span className="fw-semibold text-dark">{translate('Call:')}</span>
+              {awardDetails.call.url ? (
+                <a href={awardDetails.call.url} target="_blank" rel="noopener noreferrer">
+                  {awardDetails.call.id || awardDetails.call.url}
+                </a>
+              ) : (
+                <span>{awardDetails.call.id}</span>
+              )}
+            </>
+          )}
+        </Stack>
+      )}
+      {awardDetails?.renewal?.url && (
+        <Stack direction="horizontal" className="gap-3 mt-1">
+          <a href={awardDetails.renewal.url} target="_blank" rel="noopener noreferrer">
+            {translate('Apply for a renewal')} &rarr;
+          </a>
+        </Stack>
+      )}
       {!isLoadingProposals && proposals && proposals.length > 0 && (
         <Stack direction="horizontal" className="gap-3 mt-2">
           <span className="fw-semibold text-dark">

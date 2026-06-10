@@ -596,6 +596,51 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'marketplace-provider-managed-projects-audit',
+    url: 'managed-projects/audit/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/managed-projects/AllManagedProjectsAuditLog').then(
+        (module) => ({ default: module.AllManagedProjectsAuditLog }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      breadcrumb: () => translate('Audit Log'),
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-managed-project-detail',
+    url: 'managed-projects/:identifier/:destination/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/managed-projects/ManagedProjectDetail').then(
+        (module) => ({ default: module.ManagedProjectDetail }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      breadcrumb: () => translate('Managed Project'),
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-managed-project-audit',
+    url: 'managed-projects/:identifier/:destination/audit/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/managed-projects/ManagedProjectAuditLog').then(
+        (module) => ({ default: module.ManagedProjectAuditLog }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      breadcrumb: () => translate('Audit Log'),
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
     name: 'marketplace-provider-project-templates',
     url: 'project-templates/',
     component: lazyComponent(() =>
@@ -607,6 +652,21 @@ export const states: StateDeclaration[] = [
     data: {
       //feature: MarketplaceFeatures.show_managed_project_functionality,
       breadcrumb: () => translate('Available managed project templates'),
+    },
+  },
+
+  {
+    name: 'marketplace-provider-project-template-detail',
+    url: 'project-templates/:templateUuid/',
+    component: lazyComponent(() =>
+      import('@waldur/openportal/project-templates/ProjectTemplateDetail').then(
+        (module) => ({ default: module.ProjectTemplateDetail }),
+      ),
+    ),
+    parent: 'managed-projects',
+    data: {
+      breadcrumb: () => translate('Project Template'),
+      skipBreadcrumb: true,
     },
   },
 

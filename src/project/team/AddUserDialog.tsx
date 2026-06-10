@@ -1,5 +1,5 @@
 import { PlusIcon, UserPlusIcon } from '@phosphor-icons/react';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Field, Form } from 'react-final-form';
 import { components } from 'react-select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,6 +18,8 @@ import { parseSelectData } from '@waldur/core/api';
 import { ENV } from '@waldur/core/config';
 import { returnReactSelectAsyncPaginateObject } from '@waldur/core/utils';
 import { required } from '@waldur/core/validators';
+import { isEmailAllowed } from '@waldur/openportal/bindings/helpers';
+import { useProjectEmailPolicy } from '@waldur/project/useProjectEmailPolicy';
 import { OrganizationProjectSelectField } from '@waldur/customer/team/OrganizationProjectSelectField';
 import { usersAutocomplete } from '@waldur/customer/team/utils';
 import { UserFeatures } from '@waldur/FeaturesEnums';
@@ -42,6 +44,7 @@ import { useUser } from '@waldur/workspace/hooks';
 import { getCustomer, getProject } from '@waldur/workspace/selectors';
 import { Project, User } from '@waldur/workspace/types';
 
+import { DomainRestrictionNotice } from './DomainRestrictionNotice';
 import { ExpirationTimeGroup } from './ExpirationTimeGroup';
 import { RoleGroup } from './RoleGroup';
 import { UserListOptionInline } from './UserListOptionInline';
@@ -151,6 +154,21 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
   const currentProject = useSelector(getProject);
   const currentCustomer = useSelector(getCustomer);
   const hasCustomerPermission = useSelector(hasCurrentCustomerPermission);
+
+  const { data: emailPolicy } = useProjectEmailPolicy(
+    level === 'project' ? currentProject?.uuid : undefined,
+  );
+
+  const userEmailValidator = useMemo(() => {
+    if (!emailPolicy) return undefined;
+    const { allowed_domains: domains } = emailPolicy;
+    return (user: any) => {
+      if (!user?.email) return undefined;
+      return isEmailAllowed(domains, user.email)
+        ? undefined
+        : translate('This user\'s email address is not permitted for this project.');
+    };
+  }, [emailPolicy]);
 
   const loadUsers = useCallback(
     async (query, prevOptions, page, showAllUsers: boolean) => {
@@ -330,6 +348,11 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
             iconNode={<UserPlusIcon weight="bold" />}
             iconColor="success"
           >
+            <DomainRestrictionNotice
+              allowedDomains={emailPolicy?.allowed_domains}
+              contactEmail={currentCustomer.email}
+              projectName={currentProject?.name}
+            />
             <FormGroup label={translate('User')} required>
               <AsyncSelectFieldFinal
                 name="user"
@@ -361,7 +384,9 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
                   }),
                 }}
                 required={true}
-                validate={required}
+                validate={(value) =>
+                  required(value) || userEmailValidator?.(value)
+                }
               />
             </FormGroup>
 

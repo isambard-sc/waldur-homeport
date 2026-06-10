@@ -22,6 +22,7 @@ export const EmailsListGroup = ({
   customer,
   project,
   disabled,
+  emailDomainValidator,
 }) => {
   const [warn, setWarn] = useState(false);
 
@@ -100,7 +101,7 @@ export const EmailsListGroup = ({
                             placeholder={translate('Enter email address')}
                             required={true}
                             component={EmailField}
-                            validate={[required, email]}
+                            validate={emailDomainValidator ? [required, email, emailDomainValidator] : [required, email]}
                           />
                         </td>
                         {isFeatureVisible(

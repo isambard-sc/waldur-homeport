@@ -1,6 +1,7 @@
-import { FC, useMemo } from 'react';
+import { useCurrentStateAndParams } from '@uirouter/react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { Card } from 'react-bootstrap';
-import { ProtectedRound } from 'waldur-js-client';
+import { proposalProtectedCallsRoundsRetrieve, ProtectedRound } from 'waldur-js-client';
 
 import { formatDateTime, parseDate } from '@waldur/core/dateUtils';
 import { ReadOnlyFormControl } from '@waldur/form/ReadOnlyFormControl';
@@ -10,19 +11,52 @@ import { Call } from '@waldur/proposals/types';
 
 import { EditSubmissionInfoButton } from './EditSubmissionInfoButton';
 
+const MEMBERSHIP_CONTROL_LABELS: Record<string, string> = {
+  open: translate('Open (no restriction)'),
+  members_only: translate('Members only'),
+  roles_only: translate('Roles only'),
+  locked: translate('Locked'),
+};
+
+const formatMembershipControl = (value: string | null | undefined): string =>
+  MEMBERSHIP_CONTROL_LABELS[value ?? 'open'] ?? value ?? translate('Open (no restriction)');
+
+const formatAllowedDomains = (value: unknown): string => {
+  if (!Array.isArray(value) || value.length === 0)
+    return translate('All domains allowed');
+  return (value as string[]).join(', ');
+};
+
 interface RoundSubmissionSectionProps {
   round: ProtectedRound;
   call: Call;
-  refetch(): void;
-  loading: boolean;
+  refetch?(): void;
+  loading?: boolean;
 }
 
 export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
-  round,
+  round: roundProp,
   call,
-  refetch,
-  loading,
 }) => {
+  const { params } = useCurrentStateAndParams();
+  const call_uuid = (params.call_uuid as string) ?? call.uuid;
+  const round_uuid = (params.round_uuid as string) ?? roundProp.uuid;
+
+  const [round, setRound] = useState<ProtectedRound>(roundProp);
+  const [isRefetching, setIsRefetching] = useState(false);
+
+  const refetch = useCallback(async () => {
+    setIsRefetching(true);
+    try {
+      const response = await proposalProtectedCallsRoundsRetrieve({
+        path: { uuid: call_uuid, obj_uuid: round_uuid },
+      });
+      if (response.data) setRound(response.data);
+    } finally {
+      setIsRefetching(false);
+    }
+  }, [call_uuid, round_uuid]);
+
   const duration = useMemo(() => {
     if (!round.start_time || !round.cutoff_time) return null;
     const startDate = parseDate(round.start_time);
@@ -39,7 +73,7 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
       <Card.Header>
         <Card.Title>
           {translate('Submission strategy')}
-          <RefreshButton refetch={refetch} loading={loading} />
+          <RefreshButton refetch={refetch} loading={isRefetching} />
         </Card.Title>
         <div className="card-toolbar">
           <EditSubmissionInfoButton
@@ -71,9 +105,27 @@ export const RoundSubmissionSection: FC<RoundSubmissionSectionProps> = ({
         {translate('Duration')}: {duration || '-'}
         <ReadOnlyFormControl
           label={translate('Minimum required uploads')}
-          value={
-            round.minimum_required_uploads ?? 0
-          }
+          value={round.minimum_required_uploads ?? 0}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default membership control')}
+          value={formatMembershipControl(round.default_membership_control)}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default allowed domains')}
+          value={formatAllowedDomains(round.default_allowed_domains)}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default reapply URL')}
+          value={round.default_reapply_url || '-'}
+          className="col-12 col-md-6"
+        />
+        <ReadOnlyFormControl
+          label={translate('Default reapply link text')}
+          value={round.default_reapply_text || '-'}
           className="col-12 col-md-6"
         />
       </Card.Body>
