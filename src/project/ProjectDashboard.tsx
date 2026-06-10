@@ -201,12 +201,24 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   const surveySrc = useMemo(() => {
     const params = new URLSearchParams({ embed: 'true' });
 
-    if (project?.uuid) {
-      params.set('project_uuid', project.uuid);
+    if (project?.name) {
+      params.set('project_name', project.name);
+    }
+
+    if (project?.slug) {
+      params.set('project_slug', project.slug);
+    }
+
+    if (user?.full_name) {
+      params.set('user_name', user.full_name);
+    }
+
+    if (user?.email) {
+      params.set('user_email', user.email);
     }
 
     return `https://formbricks.localhost/s/cmmh0nsu8000imt016lsfhwo7?${params.toString()}`;
-  }, [project?.uuid]);
+  }, [project?.name, project?.slug, user?.full_name, user?.email]);
 
   if (!project || !user) {
     return null;
@@ -230,7 +242,6 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
                 path: { uuid: project.uuid },
                 query: {
                   field: [
-                    'user_uuid',
                     'user_full_name',
                     'user_email',
                     'user_image',
