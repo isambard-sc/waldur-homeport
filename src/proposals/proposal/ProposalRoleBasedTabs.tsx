@@ -6,10 +6,11 @@ import { Proposal, ProposalReview, PublicCall } from 'waldur-js-client';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
+import { checkIsCallManager } from '@waldur/proposals/utils';
 import { RootState } from '@waldur/store/reducers';
 import {
-  isOwnerOrStaff,
-  isServiceManagerSelector,
+  checkCustomerUser,
+  getUser,
 } from '@waldur/workspace/selectors';
 
 export const ProposalRoleBasedTabs = ({
@@ -54,10 +55,14 @@ export const ProposalRoleBasedTabs = ({
     router.stateService.go(state, params);
   };
 
-  const isStaffOrOwnerOrManager = useSelector(
-    (state: RootState) =>
-      isOwnerOrStaff(state) || isServiceManagerSelector(state),
-  );
+  const isStaffOrOwnerOrManager = useSelector((state: RootState) => {
+    const user = getUser(state);
+    if (user?.is_staff) return true;
+    if (checkCustomerUser({ uuid: call?.customer_uuid } as any, user))
+      return true;
+    if (checkIsCallManager(call, user)) return true;
+    return false;
+  });
   const showCallManagement = isFeatureVisible(
     MarketplaceFeatures.show_call_management_functionality,
   );
