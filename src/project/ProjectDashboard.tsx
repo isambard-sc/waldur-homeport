@@ -3,7 +3,7 @@ import { useRouter } from '@uirouter/react';
 import { FunctionComponent, useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
+import { openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve, proposalProposalsList, proposalProtectedCallsRetrieve } from 'waldur-js-client';
 
 import { count, parseSelectData } from '@waldur/core/api';
 import { Badge } from '@waldur/core/Badge';
@@ -121,6 +121,27 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
 
   const { data: awardDetails } = useProjectAwardDetails(project?.uuid);
   const membershipLocked = !canChangeMembership(awardDetails?.membership_control);
+
+  const { data: projectProposal } = useQuery({
+    queryKey: ['project-proposal', project?.uuid],
+    queryFn: () =>
+      proposalProposalsList({
+        query: { project_uuid: project.uuid, page_size: 1 },
+      }).then((r) => r.data?.[0] ?? null),
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(project?.uuid),
+  });
+
+  const { data: proposalCall } = useQuery({
+    queryKey: ['proposal-call', projectProposal?.call_uuid],
+    queryFn: () =>
+      proposalProtectedCallsRetrieve({
+        path: { uuid: projectProposal.call_uuid },
+        query: { field: ['reference_code'] },
+      }).then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(projectProposal?.call_uuid),
+  });
 
   const handleAddClick = membershipLocked && awardDetails
     ? () => dispatch(membershipLockedDialog(awardDetails))
@@ -247,8 +268,17 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       params.set('user_email', user.email);
     }
 
+    const callRef = proposalCall?.reference_code ?? awardDetails?.call?.id;
+    const roundStart = projectProposal?.round?.start_time
+      ? new Date(projectProposal.round.start_time).toISOString().split('T')[0]
+      : undefined;
+    const callReference = [callRef, roundStart].filter(Boolean).join(' ');
+    if (callReference) {
+      params.set('call_reference', callReference);
+    }
+
     return `https://formbricks.localhost/s/cmmh0nsu8000imt016lsfhwo7?${params.toString()}`;
-  }, [project?.name, project?.slug, user?.full_name, user?.email]);
+  }, [project?.name, project?.slug, user?.full_name, user?.email, proposalCall?.reference_code, awardDetails?.call?.id, projectProposal?.round?.start_time]);
 
   if (!project || !user) {
     return null;
