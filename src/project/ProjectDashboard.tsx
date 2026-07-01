@@ -22,7 +22,6 @@ import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/Aggre
 import { NON_TERMINATED_STATES } from '@waldur/marketplace/resources/list/constants';
 import { openModalDialog } from '@waldur/modal/actions';
 import { PermissionEnum } from '@waldur/permissions/enums';
-import { RoleEnum } from '@waldur/permissions/enums';
 import { hasPermission } from '@waldur/permissions/hasPermission';
 import { useUser } from '@waldur/workspace/hooks';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
@@ -218,12 +217,16 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   const showBillingInfo = project.customer_display_billing_info_in_projects;
 
   const isProjectPI = Boolean(
-    userFromSelector?.permissions?.some(
-      (permission) =>
-        permission.scope_type === 'project' &&
-        permission.scope_uuid === project?.uuid &&
-        permission.role_name === RoleEnum.PROJECT_MANAGER,
-    ),
+    userFromSelector &&
+      project &&
+      (hasPermission(userFromSelector, {
+        permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
+        projectId: project.uuid,
+      }) ||
+        hasPermission(userFromSelector, {
+          permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
+          customerId: project.customer_uuid,
+        })),
   );
 
   // Check if current date is on or after project end date
