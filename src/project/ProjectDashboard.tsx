@@ -216,6 +216,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
 
   const showBillingInfo = project.customer_display_billing_info_in_projects;
 
+  // Permissions are set so project PI and organisation-level owners can see the survey
   const isProjectPI = Boolean(
     userFromSelector &&
       project &&
@@ -237,20 +238,6 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     return today >= endDate;
   }, [project?.end_date]);
 
-  const shouldShowSurveyTest = useMemo(() => {
-    if (!project?.end_date) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
-    
-    const endDate = new Date(project.end_date);
-    endDate.setHours(0, 0, 0, 0); // Reset time to start of day
-    
-    // Calculate the day before end date
-    const dayBeforeEndDate = new Date(endDate);
-    dayBeforeEndDate.setDate(endDate.getDate() - 1);
-    
-    return today >= dayBeforeEndDate;
-  }, [project?.end_date]);
 
   const surveySrc = useMemo(() => {
     const params = new URLSearchParams({ embed: 'true' });
@@ -275,7 +262,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     const roundStart = projectProposal?.round?.start_time
       ? new Date(projectProposal.round.start_time).toISOString().split('T')[0]
       : undefined;
-    const callReference = [callRef, roundStart].filter(Boolean).join(' ');
+    const callReference = [callRef, roundStart].filter(Boolean).join(' - ');
     if (callReference) {
       params.set('call_reference', callReference);
     }
@@ -435,7 +422,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       )}
 
       {/* Formbricks Survey - Only shown on/after project end date */}
-      {shouldShowSurveyTest && isProjectPI && (
+      {shouldShowSurvey && isProjectPI && (
         <Row className="mb-6">
           <Col>
             <h5 className="mb-3">{translate('Project Feedback')}</h5>
