@@ -276,6 +276,22 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   return (
     <>
       {shouldShowLimitBasedResources && <ProjectLimitUsageBasedResources />}
+
+      {/* Formbricks Survey - Only shown on/after project end date */}
+      {shouldShowSurvey && isProjectPI && (
+        <Row className="mb-6">
+          <Col>
+            <h5 className="mb-3">{translate('Project Feedback')}</h5>
+            <iframe
+              src={surveySrc}
+              frameBorder="0"
+              style={{width: '100%', height: '500px', border: 'none', borderRadius: '8px', display: 'block'}}
+              title="Project Feedback Survey"
+            />
+          </Col>
+        </Row>
+      )}
+
       <Row>
         {!shouldConcealPrices && showBillingInfo && show_resource_limits && !hasManyRemoteProjects && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
@@ -418,21 +434,6 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
               </Panel>
             </Col>
           )}
-        </Row>
-      )}
-
-      {/* Formbricks Survey - Only shown on/after project end date */}
-      {shouldShowSurvey && isProjectPI && (
-        <Row className="mb-6">
-          <Col>
-            <h5 className="mb-3">{translate('Project Feedback')}</h5>
-            <iframe
-              src={surveySrc}
-              frameBorder="0"
-              style={{width: '100%', height: '500px', border: 'none', borderRadius: '8px', display: 'block'}}
-              title="Project Feedback Survey"
-            />
-          </Col>
         </Row>
       )}
     </>
