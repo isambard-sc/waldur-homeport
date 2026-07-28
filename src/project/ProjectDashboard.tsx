@@ -267,7 +267,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       params.set('call_reference', callReference);
     }
 
-    return `https://formbricks.localhost/s/cmmh0nsu8000imt016lsfhwo7?${params.toString()}`;
+    return `https://formbricks.localhost/s/p37680a7p797zn2j19y2q2t6?${params.toString()}`;
   }, [project?.name, project?.slug, user?.full_name, user?.email, proposalCall?.reference_code, awardDetails?.call?.id, projectProposal?.round?.start_time]);
 
   if (!project || !user) {
@@ -285,7 +285,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             <iframe
               src={surveySrc}
               frameBorder="0"
-              style={{width: '100%', height: '500px', border: 'none', borderRadius: '8px', display: 'block'}}
+              style={{width: '100%', height: '525px', border: 'none', borderRadius: '8px', display: 'block'}}
               title="Project Feedback Survey"
             />
           </Col>
