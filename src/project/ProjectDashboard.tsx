@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
+import { openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve, proposalProposalsList, proposalProtectedCallsRetrieve } from 'waldur-js-client';
 
 import { count, parseSelectData } from '@waldur/core/api';
 import { Badge } from '@waldur/core/Badge';
@@ -121,6 +121,27 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   const { data: awardDetails } = useProjectAwardDetails(project?.uuid);
   const membershipLocked = !canChangeMembership(awardDetails?.membership_control);
 
+  const { data: projectProposal } = useQuery({
+    queryKey: ['project-proposal', project?.uuid],
+    queryFn: () =>
+      proposalProposalsList({
+        query: { project_uuid: project.uuid, page_size: 1 },
+      }).then((r) => r.data?.[0] ?? null),
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(project?.uuid),
+  });
+
+  const { data: proposalCall } = useQuery({
+    queryKey: ['proposal-call', projectProposal?.call_uuid],
+    queryFn: () =>
+      proposalProtectedCallsRetrieve({
+        path: { uuid: projectProposal.call_uuid },
+        query: { field: ['reference_code'] },
+      }).then((r) => r.data),
+    staleTime: 5 * 60 * 1000,
+    enabled: Boolean(projectProposal?.call_uuid),
+  });
+
   const handleAddClick = membershipLocked && awardDetails
     ? () => dispatch(membershipLockedDialog(awardDetails))
     : callback;
@@ -195,12 +216,82 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
 
   const showBillingInfo = project.customer_display_billing_info_in_projects;
 
+  // Permissions are set so project PI and organisation-level owners can see the survey
+  const isProjectPI = Boolean(
+    userFromSelector &&
+      project &&
+      (hasPermission(userFromSelector, {
+        permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
+        projectId: project.uuid,
+      }) ||
+        hasPermission(userFromSelector, {
+          permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
+          customerId: project.customer_uuid,
+        })),
+  );
+
+  // Check if current date is on or after project end date
+  const shouldShowSurvey = useMemo(() => {
+    if (!project?.end_date) return false;
+    const today = new Date();
+    const endDate = new Date(project.end_date);
+    return today >= endDate;
+  }, [project?.end_date]);
+
+
+  const surveySrc = useMemo(() => {
+    const params = new URLSearchParams({ embed: 'true' });
+
+    if (project?.name) {
+      params.set('project_name', project.name);
+    }
+
+    if (project?.slug) {
+      params.set('project_slug', project.slug);
+    }
+
+    if (user?.full_name) {
+      params.set('user_name', user.full_name);
+    }
+
+    if (user?.email) {
+      params.set('user_email', user.email);
+    }
+
+    const callRef = proposalCall?.reference_code ?? awardDetails?.call?.id;
+    const roundStart = projectProposal?.round?.start_time
+      ? new Date(projectProposal.round.start_time).toISOString().split('T')[0]
+      : undefined;
+    const callReference = [callRef, roundStart].filter(Boolean).join(' - ');
+    if (callReference) {
+      params.set('call_reference', callReference);
+    }
+
+    return `https://forms-airr.isambard.ac.uk/s/cms6adb6t0007uk01zr97jsxc?${params.toString()}`;
+  }, [project?.name, project?.slug, user?.full_name, user?.email, proposalCall?.reference_code, awardDetails?.call?.id, projectProposal?.round?.start_time]);
+
   if (!project || !user) {
     return null;
   }
   return (
     <>
       {shouldShowLimitBasedResources && <ProjectLimitUsageBasedResources />}
+
+      {/* Formbricks Survey - Only shown on/after project end date */}
+      {shouldShowSurvey && isProjectPI && (
+        <Row className="mb-6">
+          <Col>
+            <h5 className="mb-3">{translate('Project Feedback')}</h5>
+            <iframe
+              src={surveySrc}
+              frameBorder="0"
+              style={{width: '100%', height: '525px', border: 'none', borderRadius: '8px', display: 'block'}}
+              title="Project Feedback Survey"
+            />
+          </Col>
+        </Row>
+      )}
+
       <Row>
         {!shouldConcealPrices && showBillingInfo && show_resource_limits && !hasManyRemoteProjects && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
