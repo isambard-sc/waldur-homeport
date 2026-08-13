@@ -19,6 +19,7 @@ import {
   fetchProjectMapping,
   fetchUserMapping,
   mappingBatchCount,
+  selectUserMappingIds,
 } from './api';
 import {
   getCached,
@@ -442,11 +443,10 @@ export const OrganisationReportsTab: FC = () => {
         const usersWithUsage = allUserIds
           .filter((uid) => (usageByUid[uid] ?? 0) > 0)
           .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
-        const userIdsCapped = loadAllUserMappings
-          ? usersWithUsage
-          : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
-        const usersMappingsTruncated = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS;
-        const lookupIdsCapped = userIdsCapped.map((uid) => uidToLookupId[uid] ?? uid);
+        const candidateLookupIds = usersWithUsage.map((uid) => uidToLookupId[uid] ?? uid);
+        const { ids: lookupIdsCapped, truncatedCount: truncatedUserCount } = loadAllUserMappings
+          ? { ids: candidateLookupIds, truncatedCount: 0 }
+          : selectUserMappingIds(candidateLookupIds, MAX_USER_MAPPINGS);
 
         // Find email identifiers that appear in daily reports but have no entry in
         // report.users (i.e. no UserIdentifier maps to them). These are unmapped
@@ -505,10 +505,7 @@ export const OrganisationReportsTab: FC = () => {
           project: Object.fromEntries(Object.entries(projMaps).filter(([, v]) => v != null).map(([k, v]) => [k, v.name])),
           user: Object.fromEntries(Object.entries(users).filter(([, v]) => v != null).map(([k, v]) => [lookupIdToUid[k] ?? k, v.full_name])),
         } as NameMaps;
-        setMapsResult({
-          maps,
-          truncatedUserCount: usersMappingsTruncated ? usersWithUsage.length - MAX_USER_MAPPINGS : 0,
-        });
+        setMapsResult({ maps, truncatedUserCount });
       } catch (err) {
         console.error('[OpenPortal org] mapping error:', err);
       } finally {

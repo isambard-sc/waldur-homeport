@@ -14,6 +14,7 @@ import {
   fetchProjectMapping,
   fetchUserMapping,
   mappingBatchCount,
+  selectUserMappingIds,
 } from './api';
 import {
   clearMappingCache,
@@ -147,12 +148,9 @@ export const SystemUsageTab: FC = () => {
         const usersWithUsage = allUserIds
           .filter((uid) => (usageByUid[uid] ?? 0) > 0)
           .sort((a, b) => (usageByUid[b] ?? 0) - (usageByUid[a] ?? 0));
-        const userIds = loadAllUserMappings
-          ? usersWithUsage
-          : usersWithUsage.slice(0, MAX_USER_MAPPINGS);
-        const truncatedUserCount = !loadAllUserMappings && usersWithUsage.length > MAX_USER_MAPPINGS
-          ? usersWithUsage.length - MAX_USER_MAPPINGS
-          : 0;
+        const { ids: userIds, truncatedCount: truncatedUserCount } = loadAllUserMappings
+          ? { ids: usersWithUsage, truncatedCount: 0 }
+          : selectUserMappingIds(usersWithUsage, MAX_USER_MAPPINGS);
 
         const ob = mappingBatchCount(offeringIds);
         const pb = mappingBatchCount(projectIds);
