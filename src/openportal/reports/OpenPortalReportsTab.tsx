@@ -20,19 +20,10 @@ import {
   fetchOfferingMapping,
   fetchUserMapping,
 } from './api';
-import {
-  getCached,
-  setCached,
-  clearCached,
-  clearMappingCache,
-  getCacheAge,
-  formatCacheAge,
-  TTL,
-} from './localStorageCache';
+import { clearMappingCache } from './localStorageCache';
 import { ProjectUsageReport } from './ProjectUsageReport';
 import { ProjectStorageReport } from './ProjectStorageReport';
 import { StorageReportVis } from './StorageReportVis';
-import { UsageReportApiItem, StorageReportApiItem } from './types';
 import { NameMaps } from './usageChartOptions';
 import { UsageReportVis } from './UsageReportVis';
 
@@ -60,14 +51,7 @@ export const OpenPortalReportsTab: FC = () => {
     refetch: refetchUsage,
   } = useQuery({
     queryKey: ['openportal-usage-reports', project?.uuid],
-    queryFn: async () => {
-      const cacheKey = `project-usage-${project!.uuid}`;
-      const cached = getCached<UsageReportApiItem[]>(cacheKey, TTL.REPORTS);
-      if (cached) return cached.map(ProjectUsageReport.fromApiResponse);
-      const reports = await fetchUsageReports({ project_uuid: project!.uuid });
-      setCached(cacheKey, reports.map((r) => r.apiItem));
-      return reports;
-    },
+    queryFn: () => fetchUsageReports({ project_uuid: project!.uuid }),
     enabled: !!project,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
@@ -80,14 +64,7 @@ export const OpenPortalReportsTab: FC = () => {
     refetch: refetchStorage,
   } = useQuery({
     queryKey: ['openportal-storage-reports', project?.uuid],
-    queryFn: async () => {
-      const cacheKey = `project-storage-${project!.uuid}`;
-      const cached = getCached<StorageReportApiItem[]>(cacheKey, TTL.REPORTS);
-      if (cached) return cached.map(ProjectStorageReport.fromApiResponse);
-      const reports = await fetchStorageReports({ project_uuid: project!.uuid });
-      setCached(cacheKey, reports.map((r) => r.apiItem));
-      return reports;
-    },
+    queryFn: () => fetchStorageReports({ project_uuid: project!.uuid }),
     enabled: !!project,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
@@ -182,10 +159,6 @@ export const OpenPortalReportsTab: FC = () => {
 
   const isLoading = usageLoading || storageLoading;
 
-  const reportsCacheAge = !isLoading && project
-    ? getCacheAge(`project-usage-${project.uuid}`)
-    : null;
-
   return (
     <div className="container-fluid py-4">
       <div className="d-flex align-items-center gap-3 mb-4">
@@ -226,22 +199,11 @@ export const OpenPortalReportsTab: FC = () => {
           </select>
         )}
         <div className="ms-auto d-flex align-items-center gap-2">
-          {reportsCacheAge && (
-            <span className="text-muted small">
-              Cached {formatCacheAge(reportsCacheAge)}
-            </span>
-          )}
           <button
             type="button"
             className="btn btn-secondary btn-sm"
             onClick={() => {
               clearMappingCache();
-              if (project) {
-                clearCached(
-                  `project-usage-${project.uuid}`,
-                  `project-storage-${project.uuid}`,
-                );
-              }
               refetchUsage();
               refetchStorage();
             }}
