@@ -6,6 +6,7 @@ import {
   RoundReviewer,
 } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { Call } from '@waldur/proposals/types';
 import Table from '@waldur/table/Table';
@@ -23,7 +24,6 @@ interface RoundReviewersListProps {
 
 // Enhanced RoundReviewer with computed statistics
 interface EnhancedRoundReviewer extends RoundReviewer {
-  reviewer_uuid?: string;
   outstanding_reviews?: number;
   declined_reviews?: number;
   in_progress_reviews?: number;
@@ -61,15 +61,19 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
 
         const reviewers = reviewersResponse.data || [];
 
-        // Fetch all reviews for this call
-        const query: any = { page_size: 1000 };
-        if (callUuid) {
-          query.call_uuid = callUuid;
-        }
+        // Fetch all reviews for this call, following pagination — the
+        // backend caps page_size, so a single request can silently miss
+        // reviews once a call has more than one page's worth.
+        const allReviews = await getAllPages((page) =>
+          proposalReviewsList({
+            query: {
+              ...(callUuid ? { call_uuid: callUuid } : {}),
+              page,
+            },
+          }),
+        );
 
-        const allReviews = await proposalReviewsList({ query });
-
-        const reviewsData = (allReviews.data || []).filter(
+        const reviewsData = allReviews.filter(
           (review) => review.round_uuid === roundUuid,
         );
 
@@ -77,11 +81,8 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
         let enhanced: EnhancedRoundReviewer[] = reviewers.map((reviewer) => {
           // Find all reviews for this reviewer
           const reviewerReviews = reviewsData.filter(
-            (review) => review.reviewer_full_name === reviewer.full_name,
+            (review) => review.reviewer_uuid === reviewer.uuid,
           );
-
-          // Extract reviewer_uuid if available
-          const reviewer_uuid = reviewerReviews[0]?.reviewer_uuid;
 
           // Count reviews by state
           const outstanding = reviewerReviews.filter(
@@ -117,7 +118,6 @@ const createEnhancedReviewersFetcher = (roundUuid: string, callUuid?: string) =>
 
           return {
             ...reviewer,
-            reviewer_uuid,
             outstanding_reviews: outstanding,
             declined_reviews: declined,
             in_progress_reviews: inProgress,

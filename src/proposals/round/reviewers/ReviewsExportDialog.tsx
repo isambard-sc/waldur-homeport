@@ -4,6 +4,7 @@ import { Button, Form, ProgressBar, Spinner } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { proposalReviewsList, ProposalReview } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
 import { ModalDialog } from '@waldur/modal/ModalDialog';
@@ -58,17 +59,21 @@ export const ReviewsExportDialog: FC<ReviewsExportDialogProps> = ({
     setExportProgress(null);
 
     try {
-      // Fetch all reviews for the call
+      // Fetch all reviews for the call, following pagination — the backend
+      // caps page_size, so a single request can silently miss reviews once
+      // a call has more than one page's worth.
       setExportProgress({ current: 0, total: 1 });
 
-      const reviewsResponse = await proposalReviewsList({
-        query: {
-          call_uuid: callUuid,
-          page_size: 1000,
-        },
-      });
+      const reviewsData = await getAllPages((page) =>
+        proposalReviewsList({
+          query: {
+            call_uuid: callUuid,
+            page,
+          },
+        }),
+      );
 
-      const allReviews: ProposalReview[] = (reviewsResponse.data || []).filter(
+      const allReviews: ProposalReview[] = reviewsData.filter(
         (review) =>
           review.round_uuid === roundUuid &&
           selectedStates.has(review.state as ReviewState),
