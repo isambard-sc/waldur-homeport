@@ -8,6 +8,7 @@ import {
   Proposal,
 } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog, openModalDialog } from '@waldur/modal/actions';
@@ -66,16 +67,19 @@ export const DownloadAttachmentsDialog: FC<DownloadAttachmentsDialogProps> = ({
 
       for (const state of selectedStates) {
         try {
-          const response = await proposalProposalsList({
-            query: {
-              round: roundUuid,
-              state: state,
-              page_size: 1000,
-            },
-          });
-          if (response.data && Array.isArray(response.data)) {
-            proposalsByState.push(response.data);
-          }
+          // Follow pagination — the backend caps page_size, so a single
+          // request can silently miss proposals once a round has more than
+          // one page's worth.
+          const proposals = await getAllPages((page) =>
+            proposalProposalsList({
+              query: {
+                round: roundUuid,
+                state: state,
+                page,
+              },
+            }),
+          );
+          proposalsByState.push(proposals);
         } catch (error) {
           console.error(`Error fetching proposals for state ${state}:`, error);
         }

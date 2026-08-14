@@ -9,6 +9,7 @@ import {
   proposalProposalsResourcesList,
 } from 'waldur-js-client';
 
+import { getAllPages } from '@waldur/core/api';
 import { ENV } from '@waldur/core/config';
 import { translate } from '@waldur/i18n';
 import { closeModalDialog } from '@waldur/modal/actions';
@@ -80,16 +81,19 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
       const proposalsByState: Proposal[][] = [];
       for (const state of selectedStates) {
         try {
-          const response = await proposalProposalsList({
-            query: {
-              round: roundUuid,
-              state: state,
-              page_size: 1000,
-            },
-          });
-          if (response.data && Array.isArray(response.data)) {
-            proposalsByState.push(response.data);
-          }
+          // Follow pagination — the backend caps page_size, so a single
+          // request can silently miss proposals once a round has more than
+          // one page's worth.
+          const proposals = await getAllPages((page) =>
+            proposalProposalsList({
+              query: {
+                round: roundUuid,
+                state: state,
+                page,
+              },
+            }),
+          );
+          proposalsByState.push(proposals);
         } catch (error) {
           console.error(`Error fetching proposals for state ${state}:`, error);
           showError(
@@ -108,23 +112,26 @@ export const ProposalsExportDialog: FC<ProposalsExportDialogProps> = ({
           setExportProgress({ current: processedCount, total: totalProposals });
 
           try {
-            // Fetch team members
-            const usersResponse = await proposalProposalsListUsersList({
-              path: { uuid: proposal.uuid },
-              query: { page_size: 1000 },
-            });
-
-            // Fetch resources
-            const resourcesResponse =
-              await proposalProposalsResourcesList({
-                path: { uuid: proposal.uuid },
-                query: { page_size: 1000 },
-              });
+            // Fetch team members and resources, following pagination
+            const [users, resources] = await Promise.all([
+              getAllPages((page) =>
+                proposalProposalsListUsersList({
+                  path: { uuid: proposal.uuid },
+                  query: { page },
+                }),
+              ),
+              getAllPages((page) =>
+                proposalProposalsResourcesList({
+                  path: { uuid: proposal.uuid },
+                  query: { page },
+                }),
+              ),
+            ]);
 
             allProposals.push({
               ...proposal,
-              users: usersResponse.data || [],
-              resources: resourcesResponse.data || [],
+              users,
+              resources,
             });
           } catch (error) {
             console.error(

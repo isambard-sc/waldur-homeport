@@ -13,7 +13,7 @@ import { useTable } from '@waldur/table/useTable';
 import { ProposalReviewsRowActions } from '../proposals/ProposalReviewsRowActions';
 
 interface ReviewerExpandableRowProps {
-  row: RoundReviewer & { reviewer_uuid?: string; reviews?: ProposalReview[] };
+  row: RoundReviewer & { reviews?: ProposalReview[] };
 }
 
 const renderReviewScoreField = ({ row }) => {
@@ -42,7 +42,7 @@ export const ReviewerExpandableRow: React.FC<ReviewerExpandableRowProps> = ({
   }, [reviews]);
 
   const tableProps = useTable({
-    table: 'ReviewerReviewsList' + (row.reviewer_uuid || row.email),
+    table: 'ReviewerReviewsList' + row.uuid,
     fetchData,
   });
 
