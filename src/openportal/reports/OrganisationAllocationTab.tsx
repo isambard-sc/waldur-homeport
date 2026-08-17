@@ -6,6 +6,10 @@
  *
  * Features:
  *   - Project filter dialog  — same look as OrganisationReportsTab
+ *   - Offering filter dialog — restricts to projects with a matching active
+ *                              offering (offering_names, from
+ *                              include_offering_names=true); credit totals
+ *                              stay per-project, not split out per offering
  *   - Summary statistics     — total credits awarded / spent / remaining
  *   - Stacked bar chart      — predicted daily credits-remaining per project,
  *                              assuming linear burn from today → end date
@@ -557,6 +561,129 @@ const ProjectFilterDialog: FC<ProjectFilterDialogProps> = ({
   );
 };
 
+// ── Offering filter dialog ────────────────────────────────────────────────────
+
+interface OfferingFilterDialogProps {
+  offeringNames: string[];
+  selected: Set<string>;
+  onConfirm: (next: Set<string>) => void;
+  onClose: () => void;
+}
+
+const OfferingFilterDialog: FC<OfferingFilterDialogProps> = ({
+  offeringNames,
+  selected,
+  onConfirm,
+  onClose,
+}) => {
+  const [draft, setDraft] = useState(() => new Set(selected));
+
+  const allSelected =
+    offeringNames.length > 0 && offeringNames.every((o) => draft.has(o));
+
+  const toggleAll = () => {
+    setDraft(allSelected ? new Set() : new Set(offeringNames));
+  };
+
+  const toggle = (name: string) => {
+    const next = new Set(draft);
+    if (next.has(name)) next.delete(name);
+    else next.add(name);
+    setDraft(next);
+  };
+
+  return (
+    <div
+      className="modal fade show"
+      style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div className="modal-dialog modal-dialog-scrollable">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">Filter by offering</h5>
+            <button type="button" className="btn-close" onClick={onClose} />
+          </div>
+          <div className="modal-body">
+            <p className="text-muted small">
+              Show only projects with at least one active offering matching
+              the selection below. Leave nothing selected to show all
+              projects. Note: credit totals are per-project and are not split
+              out by offering.
+            </p>
+
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                checked={allSelected}
+                onChange={toggleAll}
+                id="alloc-offering-select-all"
+              />
+              <label
+                htmlFor="alloc-offering-select-all"
+                className="form-check-label small"
+              >
+                {allSelected ? 'Deselect' : 'Select'} all (
+                {offeringNames.length})
+              </label>
+              <span className="ms-auto text-muted small">
+                {draft.size === 0 ? 'All shown' : `${draft.size} selected`}
+              </span>
+            </div>
+
+            <div
+              style={{ maxHeight: 320, overflowY: 'auto' }}
+              className="border rounded p-2"
+            >
+              {offeringNames.length === 0 && (
+                <p className="text-muted small mb-0 p-2">
+                  No offerings found.
+                </p>
+              )}
+              {offeringNames.map((name, idx) => (
+                <div key={name} className="d-flex align-items-start gap-2 py-1">
+                  <input
+                    type="checkbox"
+                    className="form-check-input mt-1"
+                    checked={draft.has(name)}
+                    onChange={() => toggle(name)}
+                    id={`alloc-offering-${idx}`}
+                  />
+                  <label
+                    htmlFor={`alloc-offering-${idx}`}
+                    className="form-check-label flex-grow-1"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    {name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => onConfirm(draft)}
+            >
+              Apply {draft.size > 0 ? `(${draft.size})` : '(all)'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // ── Summary stat card ─────────────────────────────────────────────────────────
 
 interface StatCardProps {
@@ -687,9 +814,9 @@ export const OrganisationAllocationTab: FC = () => {
     error: summariesError,
     refetch: refetchSummaries,
   } = useQuery({
-    queryKey: ['openportal-accounting-summary', customer?.uuid],
+    queryKey: ['openportal-accounting-summary', customer?.uuid, 'offering_names'],
     queryFn: async () => {
-      const cacheKey = `alloc-summaries-${customer!.uuid}`;
+      const cacheKey = `alloc-summaries-v2-${customer!.uuid}`;
       const cached = getCached<ProjectAccountingSummary[]>(cacheKey, TTL.LISTS);
       if (cached) return cached;
       let allItems: ProjectAccountingSummary[] = [];
@@ -698,7 +825,12 @@ export const OrganisationAllocationTab: FC = () => {
       setSummariesProgress({ done: 0, total: 0, statusMsg: 'Starting…' });
       while (true) {
         const result = await openportalAccountingSummaryList({
-          query: { customer_uuid: customer!.uuid, page_size: 100, page },
+          query: {
+            customer_uuid: customer!.uuid,
+            page_size: 100,
+            page,
+            include_offering_names: true,
+          },
         });
         allItems = allItems.concat(result.data);
         if (page === 1) {
@@ -723,11 +855,31 @@ export const OrganisationAllocationTab: FC = () => {
     staleTime: Infinity,
   });
 
-  // ── Filter summaries to selected projects ───────────────────────────────
+  // ── Offering (resource) selection ───────────────────────────────────────
+  const allOfferingNames = useMemo(() => {
+    const names = new Set<string>();
+    (allSummaries ?? []).forEach((s) =>
+      (s.offering_names ?? []).forEach((o) => names.add(o)),
+    );
+    return [...names].sort();
+  }, [allSummaries]);
+  const [selectedOfferings, setSelectedOfferings] = useState<Set<string>>(
+    new Set(),
+  );
+  const [offeringDialogOpen, setOfferingDialogOpen] = useState(false);
+
+  // ── Filter summaries to selected projects and offerings ─────────────────
+  // An empty selectedOfferings means "no offering filter applied" — projects
+  // with no active offerings must still show up by default.
   const summaries = useMemo(
     () =>
-      (allSummaries ?? []).filter((s) => effectiveSelected.has(s.project_uuid)),
-    [allSummaries, effectiveSelected],
+      (allSummaries ?? []).filter(
+        (s) =>
+          effectiveSelected.has(s.project_uuid) &&
+          (selectedOfferings.size === 0 ||
+            (s.offering_names ?? []).some((o) => selectedOfferings.has(o))),
+      ),
+    [allSummaries, effectiveSelected, selectedOfferings],
   );
 
   // ── Aggregate stats ─────────────────────────────────────────────────────
@@ -952,9 +1104,28 @@ export const OrganisationAllocationTab: FC = () => {
           </div>
         )}
 
+        {allOfferingNames.length > 0 && (
+          <div className="d-flex align-items-center gap-2">
+            <span className="text-muted small">
+              {selectedOfferings.size === 0
+                ? 'All'
+                : selectedOfferings.size}{' '}
+              of {allOfferingNames.length} offering
+              {allOfferingNames.length !== 1 ? 's' : ''} selected
+            </span>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => setOfferingDialogOpen(true)}
+            >
+              Filter by offering
+            </button>
+          </div>
+        )}
+
         {loadTriggered && <div className="ms-auto d-flex align-items-center gap-2">
           {(() => {
-            const age = customer ? getCacheAge(`alloc-summaries-${customer.uuid}`) : null;
+            const age = customer ? getCacheAge(`alloc-summaries-v2-${customer.uuid}`) : null;
             return age ? (
               <span className="text-muted small">Cached {formatCacheAge(age)}</span>
             ) : null;
@@ -966,7 +1137,7 @@ export const OrganisationAllocationTab: FC = () => {
               if (customer) {
                 clearCached(
                   `alloc-projects-${customer.uuid}`,
-                  `alloc-summaries-${customer.uuid}`,
+                  `alloc-summaries-v2-${customer.uuid}`,
                 );
               }
               refetchProjects();
@@ -1762,6 +1933,19 @@ export const OrganisationAllocationTab: FC = () => {
             setDialogOpen(false);
           }}
           onClose={() => setDialogOpen(false)}
+        />
+      )}
+
+      {/* ── Offering filter dialog ───────────────────────────────────────── */}
+      {offeringDialogOpen && (
+        <OfferingFilterDialog
+          offeringNames={allOfferingNames}
+          selected={selectedOfferings}
+          onConfirm={(next) => {
+            setSelectedOfferings(next);
+            setOfferingDialogOpen(false);
+          }}
+          onClose={() => setOfferingDialogOpen(false)}
         />
       )}
     </div>
