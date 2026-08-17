@@ -61,6 +61,7 @@ export const EditRoundReviewDialog: FC<EditRoundReviewDialogProps> = (
         review_strategy: initialValues.review_strategy,
         review_duration_in_days: initialValues.review_duration_in_days,
         minimum_number_of_reviewers: initialValues.minimum_number_of_reviewers,
+        fixed_review_end_date: initialValues.fixed_review_end_date,
         cutoff_time: initialValues.cutoff_time, // this is only for calculate "Latest review completion date"
       }}
     />

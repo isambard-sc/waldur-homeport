@@ -25,6 +25,9 @@ export const RoundReviewSection: FC<RoundReviewSectionProps> = ({
   loading,
 }) => {
   const latestReviewDate = useMemo(() => {
+    if (round.fixed_review_end_date) {
+      return formatDateTime(parseDate(round.fixed_review_end_date));
+    }
     if (!round.cutoff_time || !round.review_duration_in_days) return null;
     return formatDateTime(
       parseDate(round.cutoff_time).plus({
@@ -55,12 +58,20 @@ export const RoundReviewSection: FC<RoundReviewSectionProps> = ({
           value={round.review_duration_in_days}
           className="col-12 col-md-6"
           addon="days"
+          disabled={Boolean(round.fixed_review_end_date)}
         />
         <ReadOnlyFormControl
           label={translate('Minimum reviewers')}
           value={round.minimum_number_of_reviewers}
           className="col-12 col-md-6"
         />
+        {round.fixed_review_end_date && (
+          <ReadOnlyFormControl
+            label={translate('Fixed review end date')}
+            value={formatDateTime(parseDate(round.fixed_review_end_date))}
+            className="col-12 col-md-6"
+          />
+        )}
         {translate('Latest review completion date')}: {latestReviewDate}
       </Card.Body>
     </Card>
