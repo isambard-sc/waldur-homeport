@@ -3,7 +3,8 @@ import { useRouter } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
-import { openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
+import { openportalManagedProjectsList, openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
+import type { ManagedProject, RemoteProject } from 'waldur-js-client';
 
 import { count, parseSelectData } from '@waldur/core/api';
 import { Badge } from '@waldur/core/Badge';
@@ -28,6 +29,7 @@ import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
 
 import { canChangeMembership } from '@waldur/openportal/bindings/helpers';
+import { ManagedProjectDashboardCards } from '@waldur/openportal/managed-projects/ManagedProjectDashboardCards';
 import { RemoteProjectDashboardCards } from '@waldur/openportal/remote-projects/RemoteProjectDashboardCards';
 
 import { ProjectLimitUsageBasedResources } from './dashboard/ProjectLimitUsageBasedResources';
@@ -101,9 +103,31 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
     staleTime: 5 * 60 * 1000,
   });
 
-  const remoteCount = remoteProjects?.length ?? 0;
+  const remoteCount =
+    remoteProjects?.filter((rp: RemoteProject) => rp.state !== 'deleted')
+      .length ?? 0;
   const hasAnyRemoteProjects = showRemoteProjects && remoteCount > 0;
   const hasManyRemoteProjects = showRemoteProjects && remoteCount > 1;
+
+  const showManagedProjects = isFeatureVisible(
+    MarketplaceFeatures.show_managed_projects,
+  );
+
+  const { data: managedProjects } = useQuery({
+    queryKey: ['managed-projects-for-project', project?.uuid],
+    queryFn: () =>
+      openportalManagedProjectsList({
+        query: { project_uuid: project.uuid },
+      }).then((r) => r.data),
+    enabled: showManagedProjects && Boolean(project?.uuid),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const hasAnyManagedProjects =
+    showManagedProjects &&
+    (managedProjects?.filter(
+      (mp: ManagedProject) => mp.state === 'approved' || mp.state === 'pending',
+    ).length ?? 0) > 0;
 
   const { data: teamData } = useQuery({
     queryKey: ['projectTeamData', project?.uuid],
@@ -213,7 +237,13 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             customerEmail={customer?.email}
           />
         )}
-        {!hasManyRemoteProjects && (
+        {hasAnyManagedProjects && managedProjects && (
+          <ManagedProjectDashboardCards
+            managedProjects={managedProjects}
+            project={project}
+          />
+        )}
+        {!hasManyRemoteProjects && !hasAnyManagedProjects && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <ProjectDashboardBalance project={project} className="mb-5" />
           </Col>
