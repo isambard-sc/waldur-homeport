@@ -10,6 +10,7 @@ import { IBreadcrumbItem } from '@waldur/navigation/types';
 import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
 
 import { ProjectBreadcrumbPopover } from './ProjectBreadcrumbPopover';
+import { ProjectGracePeriodBanner } from './ProjectGracePeriodBanner';
 import { ProjectProfile } from './ProjectProfile';
 import { canEditProject } from './utils';
 
@@ -49,6 +50,7 @@ const PageHero = ({ project }) => {
         </Tab.Container>
       )}
       <ProjectProfile project={project} />
+      <ProjectGracePeriodBanner project={project} />
     </div>
   );
 };
