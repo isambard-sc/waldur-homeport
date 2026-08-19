@@ -93,6 +93,20 @@ export const isOwnerOrStaff = createSelector(
   },
 );
 
+export const isOwnerOrStaffOrSupport = createSelector(
+  getUser,
+  isOwner,
+  (user: User, userIsOwner: boolean): boolean => {
+    if (!user) {
+      return false;
+    }
+    if (user.is_staff || user.is_support) {
+      return true;
+    }
+    return userIsOwner;
+  },
+);
+
 export const isReader = createSelector(getCustomer, getUser, checkIsReader);
 
 export const isOwnerOrStaffOrReader = createSelector(
