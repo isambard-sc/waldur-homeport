@@ -94,7 +94,6 @@ const RemoteProjectCard: FC<CardProps> = ({ rp, customerEmail }) => {
       openportalRemoteProjectsTotalUsageRetrieve({ path: { uuid: rp.uuid } }).then(
         (r) => (r.data as any).total_hours as number,
       ),
-    enabled: rp.state === 'active',
     staleTime: 5 * 60 * 1000,
   });
 
@@ -250,8 +249,10 @@ const RemoteProjectCard: FC<CardProps> = ({ rp, customerEmail }) => {
 
 export const RemoteProjectDashboardCards: FC<Props> = ({ remoteProjects, customerEmail }) => (
   <>
-    {remoteProjects.map((rp) => (
-      <RemoteProjectCard key={rp.uuid} rp={rp} customerEmail={customerEmail} />
-    ))}
+    {remoteProjects
+      .filter((rp) => rp.state !== 'deleted')
+      .map((rp) => (
+        <RemoteProjectCard key={rp.uuid} rp={rp} customerEmail={customerEmail} />
+      ))}
   </>
 );
