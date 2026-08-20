@@ -1,16 +1,19 @@
 import { ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { Col } from 'react-bootstrap';
-import type { ManagedProject, Project } from 'waldur-js-client';
+import {
+  ManagedProject,
+  openportalManagedProjectAccountingSummaryList,
+  Project,
+} from 'waldur-js-client';
 
 import { formatDate } from '@waldur/core/dateUtils';
+import { defaultCurrency } from '@waldur/core/formatCurrency';
 import { Panel } from '@waldur/core/Panel';
 import { translate } from '@waldur/i18n';
 
 import type { AwardDetails } from '../bindings/AwardDetails';
-import { fetchUsageReports } from '../reports/api';
-import { ProjectUsageReport } from '../reports/ProjectUsageReport';
 import { embargoedUntil } from './utils';
 
 interface Props {
@@ -18,20 +21,9 @@ interface Props {
   project: Project;
 }
 
-// Matches the Usage Report tab's cache TTL expectation: shows a same-day total
-// without re-fetching the full report history on every dashboard load. Manually
-// refetching on the Usage Report tab (project.openportal-reports) updates the
-// same react-query cache entry, so this widget picks up the fresh total too.
-const USAGE_STALE_TIME = 12 * 60 * 60 * 1000;
+const ACCOUNTING_SUMMARY_STALE_TIME = 5 * 60 * 1000;
 
-function allocationUnit(allocationString: string | null | undefined): string | undefined {
-  if (!allocationString) return undefined;
-  const parts = allocationString.trim().split(/\s+/);
-  return parts.length > 1 ? parts.slice(1).join(' ') : undefined;
-}
-
-function usagePercent(used: number, allocationString: string | null | undefined): number {
-  const total = parseFloat(allocationString?.trim().split(/\s+/)[0] ?? '0');
+function usagePercent(used: number, total: number | null | undefined): number {
   if (!total) return 0;
   return Math.min(100, (used / total) * 100);
 }
@@ -42,10 +34,6 @@ function progressVariant(pct: number): string {
   return 'bg-primary';
 }
 
-function formatUsage(hours: number): string {
-  return parseFloat(hours.toFixed(2)).toString();
-}
-
 interface CardProps {
   mp: ManagedProject;
   project: Project;
@@ -54,26 +42,43 @@ interface CardProps {
 const ManagedProjectCard: FC<CardProps> = ({ mp, project }) => {
   const details = mp.details as AwardDetails;
   const embargo = embargoedUntil(mp);
-  const unit = allocationUnit(details.allocation);
   const projectLinkUrl = details.project_link?.url;
   const breakdown =
     details.breakdown && Object.keys(details.breakdown).length > 0
       ? details.breakdown
       : null;
 
-  const { data: usageReports } = useQuery({
-    queryKey: ['openportal-usage-reports', project.uuid],
-    queryFn: () => fetchUsageReports({ project_uuid: project.uuid }),
+  const { data: accountingSummary } = useQuery({
+    queryKey: ['managed-project-accounting-summary', project.uuid],
+    queryFn: () =>
+      openportalManagedProjectAccountingSummaryList({
+        query: { project_uuid: project.uuid },
+      }).then((r) => r.data?.[0] ?? null),
     enabled: Boolean(project.uuid),
-    staleTime: USAGE_STALE_TIME,
+    staleTime: ACCOUNTING_SUMMARY_STALE_TIME,
   });
 
-  const usedHours =
-    usageReports === undefined
-      ? undefined
-      : usageReports.length > 0
-        ? ProjectUsageReport.combine(usageReports).totalUsageHours()
-        : 0;
+  const allocationCredits = accountingSummary?.allocation_credits;
+  const usageCredits = accountingSummary?.usage_credits;
+  const remainingCredits = accountingSummary?.remaining_credits;
+
+  useEffect(() => {
+    if (
+      allocationCredits == null ||
+      usageCredits == null ||
+      remainingCredits == null
+    ) {
+      return;
+    }
+    const expected = allocationCredits - usageCredits;
+    if (Math.abs(remainingCredits - expected) > 0.01) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'ManagedProjectAccountingSummary: remaining_credits does not equal allocation_credits - usage_credits',
+        { project_uuid: project.uuid, allocationCredits, usageCredits, remainingCredits },
+      );
+    }
+  }, [project.uuid, allocationCredits, usageCredits, remainingCredits]);
 
   return (
     <Col md={6} sm={12} className="mb-5">
@@ -81,13 +86,13 @@ const ManagedProjectCard: FC<CardProps> = ({ mp, project }) => {
         <div className="d-flex align-items-stretch gap-3">
           {/* Left: details */}
           <div className="flex-grow-1 d-flex flex-column gap-3">
-            {details.allocation && (
+            {allocationCredits != null && (
               <div>
                 <div className="fs-6 text-muted fw-bold mb-1">
                   {translate('Allocation')}
                 </div>
                 <div className="display-6 fw-boldest">
-                  {details.allocation}
+                  {defaultCurrency(allocationCredits)}
                 </div>
                 {breakdown && (
                   <div className="mt-1 fs-7 text-muted">
@@ -98,23 +103,32 @@ const ManagedProjectCard: FC<CardProps> = ({ mp, project }) => {
                 )}
               </div>
             )}
-            {usedHours !== undefined && (
+            {usageCredits != null && (
               <div>
                 <div className="fs-6 text-muted fw-bold mb-1">
                   {translate('Used')}
                 </div>
                 <div className="display-6 fw-boldest">
-                  {formatUsage(usedHours)}{unit ? ` ${unit}` : ''}
+                  {defaultCurrency(usageCredits)}
                 </div>
-                {(() => {
-                  const pct = usagePercent(usedHours, details.allocation);
+                {allocationCredits != null && (() => {
+                  const pct = usagePercent(usageCredits, allocationCredits);
                   return (
-                    <div className="progress mt-2" style={{ height: 6 }}>
-                      <div
-                        className={`progress-bar ${progressVariant(pct)}`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+                    <>
+                      <div className="progress mt-2" style={{ height: 6 }}>
+                        <div
+                          className={`progress-bar ${progressVariant(pct)}`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      {remainingCredits != null && (
+                        <div className="fs-8 text-muted mt-1">
+                          {translate('{amount} remaining', {
+                            amount: defaultCurrency(remainingCredits),
+                          })}
+                        </div>
+                      )}
+                    </>
                   );
                 })()}
               </div>
