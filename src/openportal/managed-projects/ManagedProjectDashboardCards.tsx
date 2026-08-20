@@ -42,7 +42,7 @@ interface CardProps {
 const ManagedProjectCard: FC<CardProps> = ({ mp, project }) => {
   const details = mp.details as AwardDetails;
   const embargo = embargoedUntil(mp);
-  const projectLinkUrl = details.project_link?.url;
+  const awardUrl = details.award?.url;
   const breakdown =
     details.breakdown && Object.keys(details.breakdown).length > 0
       ? details.breakdown
@@ -143,9 +143,9 @@ const ManagedProjectCard: FC<CardProps> = ({ mp, project }) => {
           </div>
 
           {/* Right: full-height award link button */}
-          {projectLinkUrl && (
+          {awardUrl && (
             <a
-              href={projectLinkUrl}
+              href={awardUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-primary d-flex flex-column align-items-center justify-content-center gap-2 px-4"
