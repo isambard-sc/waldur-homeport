@@ -10,7 +10,8 @@ import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { showInfo } from '@waldur/store/notify';
+import { proposalProposalsStartFormbricksFlow } from '@waldur/proposals/formbricksApi';
+import { showErrorResponse, showInfo } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
 
 import { Call } from '../types';
@@ -62,6 +63,18 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
     }, [call, round]);
 
   const dispatch = useDispatch();
+
+  const startFormbricksFlow = useCallback(async () => {
+    try {
+      const { data } = await proposalProposalsStartFormbricksFlow({
+        body: { round_uuid: (activeRound as NestedRound).uuid },
+      });
+      window.location.assign(data.redirect_url);
+    } catch (error) {
+      dispatch(showErrorResponse(error, translate('Unable to start proposal')));
+    }
+  }, [activeRound, dispatch]);
+
   const openAddProposalDialog = useCallback(
     (e) => {
       if (!user) {
@@ -76,6 +89,8 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
         call.external_url
       ) {
         document.location.href = call.external_url;
+      } else if ((call as any).formbricks_flow_key && activeRound) {
+        startFormbricksFlow();
       } else if (activeRound) {
         dispatch(
           openModalDialog(ProposalCreateDialog, {
@@ -85,7 +100,7 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
       }
       e.preventDefault();
     },
-    [dispatch, activeRound],
+    [dispatch, activeRound, startFormbricksFlow],
   );
   if (isFeatureVisible(MarketplaceFeatures.call_only) && !call.external_url) {
     return null;

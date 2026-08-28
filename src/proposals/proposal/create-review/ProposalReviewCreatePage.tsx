@@ -36,6 +36,7 @@ import { showErrorResponse, showSuccess } from '@waldur/store/notify';
 import { RootState } from '@waldur/store/reducers';
 import store from '@waldur/store/store';
 
+import { FormResponsesSection } from '../FormResponsesSection';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 
 import { CreatePageSidebar } from './CreatePageSidebar';
@@ -228,6 +229,9 @@ export const ProposalReviewCreatePage = (props) => {
                     />
                   </div>
                 ))}
+                <FormResponsesSection
+                  formResponses={(data.review as any).form_responses}
+                />
               </SidebarLayout.Body>
               <SidebarLayout.Sidebar transparent>
                 <CreatePageSidebar

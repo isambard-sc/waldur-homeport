@@ -24,6 +24,7 @@ import { getUser } from '@waldur/workspace/selectors';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 
+import { FormbricksProposalProgress } from './FormbricksProposalProgress';
 import { ProgressSteps } from './ProgressSteps';
 import { ProposalHeader } from './ProposalHeader';
 import { ProposalSubmissionStep } from './ProposalSubmissionStep';
@@ -79,7 +80,13 @@ export const ProposalManagePage = () => {
       proposal?.call_uuid
         ? proposalPublicCallsRetrieve({
             path: { uuid: proposal.call_uuid },
-            query: { field: ['uuid', 'customer_uuid'] },
+            // 'formbricks_flow_key' isn't in the generated field enum yet -
+            // the SDK hasn't been regenerated since this backend field was
+            // added (see src/proposals/formbricksApi.ts). Cast narrows
+            // just this call site; drop the cast once regenerated.
+            query: {
+              field: ['uuid', 'customer_uuid', 'formbricks_flow_key'] as any,
+            },
           }).then((res) => res.data)
         : null,
     refetchOnWindowFocus: false,
@@ -149,18 +156,22 @@ export const ProposalManagePage = () => {
           <ProposalRoleBasedTabs
             review={userReview}
             proposal={proposal}
-            call={call}
+            call={call as any}
           />
           <ProposalHeader proposal={proposal} className="mb-7" />
           <ProgressSteps proposal={proposal} bgClass="bg-body" />
         </div>
       </SidebarLayout.Header>
       {proposal.state === 'draft' && isEditPage && hasPermissionToSubmit ? (
-        <ProposalSubmissionStep
-          proposal={proposal}
-          refetch={refetch}
-          reviews={submittedReviews}
-        />
+        (call as any)?.formbricks_flow_key ? (
+          <FormbricksProposalProgress proposal={proposal} />
+        ) : (
+          <ProposalSubmissionStep
+            proposal={proposal}
+            refetch={refetch}
+            reviews={submittedReviews}
+          />
+        )
       ) : (
         <ProposalDetails
           proposal={proposal}

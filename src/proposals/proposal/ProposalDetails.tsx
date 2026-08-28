@@ -18,12 +18,13 @@ import { ProposalUsersListSummary } from '../team/ProposalUsersListSummary';
 import { Proposal, ProposalReview } from '../types';
 
 import { ProjectDetailsSummary } from './create/ProjectDetailsSummary';
-import { ProposalNotesSection } from './ProposalNotesSection';
 import { ProposalDecisionResult } from './create/ProposalDecisionResult';
 import { ProposalDetailsOverviewStep } from './create/ProposalDetailsOverviewStep';
 import { ResourceRequestsSummary } from './create/ResourceRequestsSummary';
 import { createProposalSteps } from './create/steps';
 import { useProposalDecisionActions } from './create/utils';
+import { FormResponsesSection } from './FormResponsesSection';
+import { ProposalNotesSection } from './ProposalNotesSection';
 
 interface ProposalDetails {
   proposal: Proposal;
@@ -71,6 +72,9 @@ export const ProposalDetails = ({
         <div id="step-team">
           <ProposalUsersListSummary scope={proposal} reviews={reviews} />
         </div>
+        <FormResponsesSection
+          formResponses={(proposal as any).form_responses}
+        />
         {isCallManagerView && (
           <ProposalNotesSection proposal={proposal} refetch={refetch} />
         )}
