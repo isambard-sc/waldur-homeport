@@ -80,13 +80,7 @@ export const ProposalManagePage = () => {
       proposal?.call_uuid
         ? proposalPublicCallsRetrieve({
             path: { uuid: proposal.call_uuid },
-            // 'formbricks_flow_key' isn't in the generated field enum yet -
-            // the SDK hasn't been regenerated since this backend field was
-            // added (see src/proposals/formbricksApi.ts). Cast narrows
-            // just this call site; drop the cast once regenerated.
-            query: {
-              field: ['uuid', 'customer_uuid', 'formbricks_flow_key'] as any,
-            },
+            query: { field: ['uuid', 'customer_uuid', 'formbricks_flow_key'] },
           }).then((res) => res.data)
         : null,
     refetchOnWindowFocus: false,
@@ -164,7 +158,7 @@ export const ProposalManagePage = () => {
       </SidebarLayout.Header>
       {proposal.state === 'draft' && isEditPage && hasPermissionToSubmit ? (
         (call as any)?.formbricks_flow_key ? (
-          <FormbricksProposalProgress proposal={proposal} />
+          <FormbricksProposalProgress proposal={proposal} refetch={refetch} />
         ) : (
           <ProposalSubmissionStep
             proposal={proposal}

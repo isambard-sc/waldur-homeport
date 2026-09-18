@@ -3,14 +3,17 @@ import { FC, useCallback, useMemo } from 'react';
 import { Button } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/types';
 import { useDispatch } from 'react-redux';
-import { NestedRound, ProtectedRound } from 'waldur-js-client';
+import {
+  NestedRound,
+  ProtectedRound,
+  proposalProposalsStartFormbricksFlow,
+} from 'waldur-js-client';
 
 import { lazyComponent } from '@waldur/core/lazyComponent';
 import { isFeatureVisible } from '@waldur/features/connect';
 import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
 import { translate } from '@waldur/i18n';
 import { openModalDialog } from '@waldur/modal/actions';
-import { proposalProposalsStartFormbricksFlow } from '@waldur/proposals/formbricksApi';
 import { showErrorResponse, showInfo } from '@waldur/store/notify';
 import { useUser } from '@waldur/workspace/hooks';
 
@@ -69,7 +72,11 @@ export const PublicCallApplyButton: FC<PublicCallApplyButtonProps> = ({
       const { data } = await proposalProposalsStartFormbricksFlow({
         body: { round_uuid: (activeRound as NestedRound).uuid },
       });
-      window.location.assign(data.redirect_url);
+      // The backend action's response isn't declared with a serializer
+      // (see StartFormbricksFlowSerializer's docstring in views.py), so
+      // drf-spectacular can't type its body - cast to what it actually
+      // returns (see ProposalViewSet.start_formbricks_flow).
+      window.location.assign((data as { redirect_url: string }).redirect_url);
     } catch (error) {
       dispatch(showErrorResponse(error, translate('Unable to start proposal')));
     }

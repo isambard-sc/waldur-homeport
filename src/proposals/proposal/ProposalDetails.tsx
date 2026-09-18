@@ -53,6 +53,11 @@ export const ProposalDetails = ({
   } = useProposalDecisionActions(proposal, refetch);
 
   const isCallManagerView = state.name?.startsWith('call-management');
+  // form_responses is an array only for Formbricks-driven proposals (null
+  // otherwise) - use it as the signal to hide the native project-details
+  // summary, which would otherwise duplicate what's already shown in
+  // FormResponsesSection below in the applicant's own words.
+  const isFormbricksProposal = Array.isArray((proposal as any).form_responses);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -67,7 +72,9 @@ export const ProposalDetails = ({
           <ProposalDecisionResult proposal={proposal} reviews={reviews} />
         )}
         <ProposalDetailsOverviewStep id="step-general" params={{ proposal }} />
-        <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
+        {!isFormbricksProposal && (
+          <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
+        )}
         <ResourceRequestsSummary proposal={proposal} reviews={reviews} />
         <div id="step-team">
           <ProposalUsersListSummary scope={proposal} reviews={reviews} />

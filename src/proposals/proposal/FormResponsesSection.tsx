@@ -2,7 +2,22 @@ import { Fragment } from 'react';
 
 import FormTable from '@waldur/form/FormTable';
 import { translate } from '@waldur/i18n';
-import { FormResponseGroup } from '@waldur/proposals/formbricksApi';
+
+// The generated SDK types `Proposal.form_responses`/`ProposalReview.form_responses`
+// as `Array<{[key: string]: unknown}> | null` - drf-spectacular can't infer
+// the precise shape of a SerializerMethodField. These describe what the
+// backend (waldur_mastermind/proposal/formbricks_mapper.py::serialize_form_responses)
+// actually returns.
+export interface FormResponseQuestion {
+  question_id: string;
+  label: string;
+  answer: unknown;
+}
+
+export interface FormResponseGroup {
+  step_key: string;
+  questions: FormResponseQuestion[];
+}
 
 export const STEP_LABELS: Record<string, string> = {
   project_details: translate('Project details'),
@@ -45,10 +60,14 @@ export const FormResponsesSection = ({
       className={className ?? 'card-bordered mb-7'}
     >
       <FormTable detailsMode>
-        {formResponses.map((step) => (
+        {formResponses.map((step, index) => (
           <Fragment key={step.step_key}>
             <tr className="gray-bg">
-              <th colSpan={2}>{STEP_LABELS[step.step_key] ?? step.step_key}</th>
+              <th colSpan={2} className={index > 0 ? 'pt-5' : undefined}>
+                <span className="fs-4 fw-bolder text-dark">
+                  {STEP_LABELS[step.step_key] ?? step.step_key}
+                </span>
+              </th>
             </tr>
             {step.questions.map((question) => (
               <FormTable.Item
