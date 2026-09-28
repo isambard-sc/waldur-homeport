@@ -35,8 +35,6 @@ export interface AwardUsage {
   months: CachedProjectUsageReport[];
   /** The award's storage snapshots, as one row per calendar month. */
   storageMonths: CachedProjectStorageReport[];
-  /** The same snapshots as one row over the whole range. */
-  storageAll: CachedProjectStorageReport | null;
   /** Which project held the award, when. Disjoint, oldest first. */
   windows: RemoteProjectUsageWindow[];
   totalHours: number;
@@ -83,11 +81,8 @@ const storageSnapshots = (report: StorageJson): SnapshotJson[] => {
 
 /**
  * One storage row holding the given snapshots: the newest at the top level —
- * what the bar chart reads as "current" — and every one of them, the newest
- * included, in `daily_reports`, which is what the time series plots.
- *
- * The award's own report keeps the newest snapshot out of `daily_reports`, so
- * a series read from `daily_reports` alone would stop one point short.
+ * what the bar chart reads as "current" — and all of them in `daily_reports`,
+ * which is what the time series plots.
  */
 const storageRow = (
   snapshots: SnapshotJson[],
@@ -134,21 +129,6 @@ export const splitStorageByMonth = (
 };
 
 /**
- * The award's storage over its whole range as a single row, for "All time".
- *
- * Handed to the chart on its own so it is never merged with the monthly rows:
- * merging storage rows adds their quotas together, which for snapshots of the
- * same volumes means nothing.
- */
-export const wholeStorageRow = (
-  report: StorageJson,
-  resource: string,
-): CachedProjectStorageReport | null => {
-  const snapshots = storageSnapshots(report);
-  return snapshots.length > 0 ? storageRow(snapshots, report, resource) : null;
-};
-
-/**
  * The awards to report on for a project: one per destination, since a project
  * holds at most one award per cluster at a time.
  *
@@ -186,9 +166,6 @@ export const fetchAwardUsage = async (
       storageMonths: storageReport
         ? splitStorageByMonth(storageReport, remoteProject.destination)
         : [],
-      storageAll: storageReport
-        ? wholeStorageRow(storageReport, remoteProject.destination)
-        : null,
       windows: usage?.windows ?? [],
       totalHours: usage?.total_hours ?? 0,
     };

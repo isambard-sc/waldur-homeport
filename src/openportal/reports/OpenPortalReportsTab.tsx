@@ -326,18 +326,9 @@ export const OpenPortalReportsTab: FC = () => {
     activeMonth === 'all'
       ? usageForResource
       : (usageByMonth[activeMonth] ?? []);
-  // An award's "All time" is its one whole-range row, never the monthly rows
-  // merged: merging storage rows adds snapshots of the same volumes together.
-  const awardStorageAll = awards.find(
-    (award) => award.remoteProject.destination === activeResource,
-  )?.storageAll;
   const activeStorage: ProjectStorageReport[] =
     activeMonth === 'all'
-      ? hasAwards
-        ? awardStorageAll
-          ? [ProjectStorageReport.fromApiResponse(awardStorageAll)]
-          : []
-        : storageForResource
+      ? storageForResource
       : (storageByMonth[activeMonth] ?? []);
 
   const isLoading =

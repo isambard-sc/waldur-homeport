@@ -123,10 +123,14 @@ class DailyStorageReport {
  * additional API calls are made by any method on this class.
  */
 export class ProjectStorageReport {
+  private readonly json: ProjectStorageReportJson;
+
   constructor(
-    private readonly json: ProjectStorageReportJson,
+    json: ProjectStorageReportJson,
     readonly apiItem: StorageReportApiItem,
-  ) {}
+  ) {
+    this.json = withLatestInSeries(json);
+  }
 
   // ─── Identity ───────────────────────────────────────────────────────────────
 
@@ -218,6 +222,16 @@ export class ProjectStorageReport {
 
   // ─── Daily snapshots ────────────────────────────────────────────────────────
 
+  /** @internal The report's JSON, for combining. */
+  rawJson(): ProjectStorageReportJson {
+    return this.json;
+  }
+
+  /** @internal The series as JSON, for combining. */
+  dailyJson(): Record<string, DailyStorageReportJson> {
+    return this.json.daily_reports ?? {};
+  }
+
   /** All dates with daily snapshots, sorted ascending. */
   get dates(): string[] {
     return Object.keys(this.json.daily_reports ?? {}).sort();
@@ -239,22 +253,35 @@ export class ProjectStorageReport {
   // ─── Static constructors ────────────────────────────────────────────────────
 
   /**
-   * Combine multiple storage reports by merging user maps and summing usage
-   * bytes for volumes with the same name.
+   * Combine storage reports into one.
    *
-   * This is meaningful when combining reports from the same project across
-   * different resources where volume names do not overlap. When names do
-   * overlap the usage is summed (giving a cross-resource total).
+   * Storage is a snapshot, not an amount, so two reports of the same project on
+   * the same resource — two months, say — are never added up: the later one is
+   * what is held now, and the earlier ones only add points to the series.
+   * Reports of different projects or resources are different volumes held at
+   * the same time, so those are summed, giving a cross-project total.
    */
   static combine(reports: ProjectStorageReport[]): ProjectStorageReport {
     if (reports.length === 0) throw new Error('Cannot combine empty array');
     if (reports.length === 1) return reports[0];
 
+    // One report per project and resource: the latest snapshot, carrying the
+    // whole series of every report in its group.
+    const groups = new Map<string, ProjectStorageReport[]>();
+    for (const r of reports) {
+      const key = `${r.project}\u0000${r.resource}`;
+      groups.set(key, [...(groups.get(key) ?? []), r]);
+    }
+    const latestPerGroup = [...groups.values()].map(latestOf);
+    if (latestPerGroup.length === 1) {
+      return latestPerGroup[0];
+    }
+
     const users: Record<string, string> = {};
     const project_quotas: Record<string, QuotaJson> = {};
     const user_quotas: Record<string, Record<string, QuotaJson>> = {};
 
-    for (const r of reports) {
+    for (const r of latestPerGroup) {
       Object.assign(users, r.json.users);
 
       for (const [vol, q] of Object.entries(r.json.project_quotas)) {
@@ -291,16 +318,14 @@ export class ProjectStorageReport {
       }
     }
 
-    // Merge daily_reports across all monthly reports (later entries for the
-    // same date from later reports win, which is fine for cross-month merges).
     const daily_reports: Record<string, DailyStorageReportJson> = {};
-    for (const r of reports) {
+    for (const r of latestPerGroup) {
       if (r.json.daily_reports) {
         Object.assign(daily_reports, r.json.daily_reports);
       }
     }
 
-    const first = reports[0];
+    const first = latestPerGroup[0];
     return new ProjectStorageReport(
       {
         ...first.json,
@@ -312,7 +337,9 @@ export class ProjectStorageReport {
       },
       {
         ...first.apiItem,
-        resource: reports.map((r) => r.resource).join(', '),
+        resource: [...new Set(latestPerGroup.map((r) => r.resource))].join(
+          ', ',
+        ),
       },
     );
   }
@@ -321,3 +348,47 @@ export class ProjectStorageReport {
     return new ProjectStorageReport(item.report, item);
   }
 }
+
+/**
+ * The report with its own top-level snapshot added to its series.
+ *
+ * The library writes the newest snapshot at the top level and only the earlier
+ * ones in `daily_reports`, so a graph drawn from `daily_reports` stopped one
+ * point short — and a report with a single snapshot had no series at all.
+ */
+const withLatestInSeries = (
+  json: ProjectStorageReportJson,
+): ProjectStorageReportJson => {
+  if (!json.generated_at) return json;
+  const { daily_reports, users: _users, ...latest } = json;
+  return {
+    ...json,
+    daily_reports: {
+      ...daily_reports,
+      [json.generated_at.slice(0, 10)]: latest,
+    },
+  };
+};
+
+/**
+ * Several reports of one project on one resource as one: the latest snapshot
+ * as what is held now, and every snapshot of every report as the series.
+ */
+const latestOf = (group: ProjectStorageReport[]): ProjectStorageReport => {
+  if (group.length === 1) return group[0];
+  const latest = group.reduce((best, r) =>
+    r.generatedAt > best.generatedAt ? r : best,
+  );
+  const users: Record<string, string> = {};
+  const daily_reports: Record<string, DailyStorageReportJson> = {};
+  for (const r of [...group].sort(
+    (a, b) => a.generatedAt.getTime() - b.generatedAt.getTime(),
+  )) {
+    Object.assign(users, r.users);
+    Object.assign(daily_reports, r.dailyJson());
+  }
+  return new ProjectStorageReport(
+    { ...latest.rawJson(), users, daily_reports },
+    latest.apiItem,
+  );
+};

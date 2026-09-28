@@ -11,7 +11,6 @@ import {
   fetchAwardUsage,
   splitByMonth,
   splitStorageByMonth,
-  wholeStorageRow,
 } from './awardUsage';
 import { ProjectUsageReport } from './ProjectUsageReport';
 
@@ -111,22 +110,6 @@ describe('splitStorageByMonth', () => {
 
     expect(months).toHaveLength(1);
     expect(Object.keys(months[0].report.daily_reports)).toEqual(['2026-08-02']);
-  });
-});
-
-describe('wholeStorageRow', () => {
-  // "All time" is the latest snapshot, not the months' snapshots added up.
-  it('reports the latest snapshot over the whole series', () => {
-    const row = wholeStorageRow(STORAGE, 'airr.brics');
-
-    expect(row.report.project_quotas.home.usage).toBe('30.00 GB');
-    expect(Object.keys(row.report.daily_reports)).toHaveLength(4);
-  });
-
-  it('is null with no snapshots', () => {
-    expect(
-      wholeStorageRow({ ...snapshot('', ''), users: {} } as any, 'airr.brics'),
-    ).toBeNull();
   });
 });
 
