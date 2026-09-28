@@ -7,7 +7,7 @@
  * A project backed by awards (remote projects) takes its usage from each
  * award's own stitched report instead of the raw monthly rows, which are keyed
  * by project and so split — and can double-count — an award that has moved.
- * See awardUsage.ts.
+ * Storage is the same, from each award's storage-report. See awardUsage.ts.
  */
 
 import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
@@ -38,6 +38,7 @@ import {
 } from './api';
 import {
   AwardUsage,
+  awardStorageReports,
   awardUsageReports,
   fetchAllAwardUsage,
   fetchProjectAwards,
@@ -98,7 +99,7 @@ export const OpenPortalReportsTab: FC = () => {
   } = useQuery<AwardUsageResult>({
     queryKey: ['openportal-award-usage', project?.uuid],
     queryFn: async () => {
-      const cacheKey = `project-award-usage-${project!.uuid}`;
+      const cacheKey = `project-award-reports-${project!.uuid}`;
       const cached = getCached<AwardUsageResult>(cacheKey, TTL.REPORTS);
       if (cached) return cached;
       const remoteProjects = await fetchProjectAwards(project!.uuid);
@@ -153,10 +154,10 @@ export const OpenPortalReportsTab: FC = () => {
   };
 
   const {
-    data: storageReports,
-    isLoading: storageLoading,
-    error: storageError,
-    refetch: refetchStorage,
+    data: projectStorageReports,
+    isLoading: projectStorageLoading,
+    error: projectStorageError,
+    refetch: refetchProjectStorage,
   } = useQuery({
     queryKey: ['openportal-storage-reports', project?.uuid],
     queryFn: async () => {
@@ -172,10 +173,19 @@ export const OpenPortalReportsTab: FC = () => {
       );
       return reports;
     },
-    enabled: !!project,
+    enabled: !!project && awardsSettled && !hasAwards,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
+
+  // Storage for an award comes with its usage, from the same award lookup.
+  const awardStorage = useMemo(() => awardStorageReports(awards), [awards]);
+  const storageReports = hasAwards ? awardStorage : projectStorageReports;
+  const storageLoading = !hasAwards && projectStorageLoading;
+  const storageError = !hasAwards && projectStorageError;
+  const refetchStorage = () => {
+    if (!hasAwards) refetchProjectStorage();
+  };
 
   const hasReports = !!(usageReports || storageReports);
 
@@ -316,9 +326,18 @@ export const OpenPortalReportsTab: FC = () => {
     activeMonth === 'all'
       ? usageForResource
       : (usageByMonth[activeMonth] ?? []);
+  // An award's "All time" is its one whole-range row, never the monthly rows
+  // merged: merging storage rows adds snapshots of the same volumes together.
+  const awardStorageAll = awards.find(
+    (award) => award.remoteProject.destination === activeResource,
+  )?.storageAll;
   const activeStorage: ProjectStorageReport[] =
     activeMonth === 'all'
-      ? storageForResource
+      ? hasAwards
+        ? awardStorageAll
+          ? [ProjectStorageReport.fromApiResponse(awardStorageAll)]
+          : []
+        : storageForResource
       : (storageByMonth[activeMonth] ?? []);
 
   const isLoading =
@@ -331,7 +350,7 @@ export const OpenPortalReportsTab: FC = () => {
     !isLoading && project
       ? getCacheAge(
           hasAwards
-            ? `project-award-usage-${project.uuid}`
+            ? `project-award-reports-${project.uuid}`
             : `project-usage-${project.uuid}`,
         )
       : null;
@@ -356,7 +375,7 @@ export const OpenPortalReportsTab: FC = () => {
                   clearCached(
                     `project-usage-${project.uuid}`,
                     `project-storage-${project.uuid}`,
-                    `project-award-usage-${project.uuid}`,
+                    `project-award-reports-${project.uuid}`,
                   );
                 }
                 refetchUsage();

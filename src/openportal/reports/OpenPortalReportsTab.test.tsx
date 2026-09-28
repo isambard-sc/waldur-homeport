@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   openportalOfferingMappingRetrieve,
   openportalRemoteProjectsList,
+  openportalRemoteProjectsStorageReportRetrieve,
   openportalRemoteProjectsUsageReportRetrieve,
   openportalUserMappingRetrieve,
 } from 'waldur-js-client';
@@ -147,7 +148,13 @@ describe('OpenPortalReportsTab for a project with awards', () => {
     localStorage.clear();
     vi.mocked(isFeatureVisible).mockReturnValue(true);
     vi.mocked(useProject).mockReturnValue({ uuid: 'proj-uuid' } as any);
-    vi.mocked(api.fetchStorageReports).mockResolvedValue([]);
+    vi.mocked(openportalRemoteProjectsStorageReportRetrieve).mockResolvedValue({
+      data: {
+        latest: storageItem.report.generated_at,
+        report: storageItem.report,
+        windows: [],
+      },
+    } as any);
     vi.mocked(openportalOfferingMappingRetrieve).mockResolvedValue({
       data: {},
     } as any);
@@ -188,7 +195,9 @@ describe('OpenPortalReportsTab for a project with awards', () => {
     renderWithProviders(<OpenPortalReportsTab />);
 
     await waitFor(() => expect(screen.getByText('Usage')).toBeInTheDocument());
+    expect(screen.getByText('Storage')).toBeInTheDocument();
     expect(api.fetchUsageReports).not.toHaveBeenCalled();
+    expect(api.fetchStorageReports).not.toHaveBeenCalled();
     expect(
       screen.getByText(/attached to more than one project/),
     ).toBeInTheDocument();
@@ -199,6 +208,9 @@ describe('OpenPortalReportsTab for a project with awards', () => {
   it('says there is no usage yet for a pending award', async () => {
     vi.mocked(openportalRemoteProjectsUsageReportRetrieve).mockResolvedValue({
       data: { total_hours: 0, report: null, windows: [] },
+    } as any);
+    vi.mocked(openportalRemoteProjectsStorageReportRetrieve).mockResolvedValue({
+      data: { latest: null, report: null, windows: [] },
     } as any);
 
     renderWithProviders(<OpenPortalReportsTab />);
