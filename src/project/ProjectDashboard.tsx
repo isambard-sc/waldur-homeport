@@ -451,13 +451,17 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       </Row>
       {/* Pace for each connected award, from what the remote portal reports.
           Not behind the billing flag: these are the award's own units, not
-          prices, and the connection cards above show the same figures. */}
-      {hasAnyRemoteProjects && remoteProjects && (
-        <RemoteProjectPaceBlock
-          remoteProjects={remoteProjects}
-          projectEndDate={project.end_date}
-        />
-      )}
+          prices, and the connection cards above show the same figures. Not in
+          the grace period either: the project has ended, so a verdict on
+          whether it will use its allocation in time has nothing to say. */}
+      {hasAnyRemoteProjects &&
+        remoteProjects &&
+        !project.is_in_grace_period && (
+          <RemoteProjectPaceBlock
+            remoteProjects={remoteProjects}
+            projectEndDate={project.end_date}
+          />
+        )}
       {/* The Health block is for projects with a credit allocation and gates
           itself on one — it renders nothing without. The usage views are about
           quota rather than credit, so they are not tied to an allocation; each
