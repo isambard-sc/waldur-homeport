@@ -9,8 +9,7 @@ import {
   reviewerSuggestionsDestroy,
 } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
-import { Badge } from 'waldur-ui';
+import { Badge, BaseButton, Tooltip } from 'waldur-ui';
 
 import { formatDate } from '@/core/dateUtils';
 import { lazyComponent } from '@/core/lazyComponent';
@@ -20,6 +19,7 @@ import { useBatchMutation } from '@/modal/useBatchMutation';
 import { Call } from '@/proposals/types';
 import { PoolSummaryButton } from '@/proposals/update/reviewer-pool/PoolSummaryButton';
 import { useReviewerPoolTabs } from '@/proposals/update/reviewer-pool/tabs';
+import { canManageCallReviews } from '@/proposals/utils';
 import { createFetcher } from '@/table/api';
 import {
   ReviewerSuggestionsFilter,
@@ -29,6 +29,7 @@ import {
 } from '@/table/generated/ReviewerSuggestionsFilter';
 import Table from '@/table/Table';
 import { useTable } from '@/table/useTable';
+import { useUser } from '@/workspace/hooks';
 
 import { ReviewerDiscoveryActions } from './ReviewerDiscoveryActions';
 import { SuggestionExpandableRow } from './SuggestionExpandableRow';
@@ -186,29 +187,32 @@ const BulkActions: FC<BulkActionsProps> = ({ rows, refetch }) => {
       </span>
       {pendingRows.length > 0 && (
         <>
-          <button
-            className="btn btn-sm btn-success"
+          <BaseButton
+            variant="success"
+            size="sm"
             onClick={() => handleBulkConfirm()}
             disabled={isLoading}
-          >
-            {translate('Confirm all')} ({pendingRows.length})
-          </button>
-          <button
-            className="btn btn-sm btn-danger"
+            disabledReason={translate('Action in progress')}
+            label={`${translate('Confirm all')} (${pendingRows.length})`}
+          />
+          <BaseButton
+            variant="danger"
+            size="sm"
             onClick={() => handleBulkReject()}
             disabled={isLoading}
-          >
-            {translate('Reject all')} ({pendingRows.length})
-          </button>
+            disabledReason={translate('Action in progress')}
+            label={`${translate('Reject all')} (${pendingRows.length})`}
+          />
         </>
       )}
-      <button
-        className="btn btn-sm btn-danger"
+      <BaseButton
+        variant="danger"
+        size="sm"
         onClick={() => handleBulkDelete()}
         disabled={isLoading}
-      >
-        {translate('Delete all')} ({rows.length})
-      </button>
+        disabledReason={translate('Action in progress')}
+        label={`${translate('Delete all')} (${rows.length})`}
+      />
     </div>
   );
 };
@@ -218,6 +222,9 @@ const ReviewerDiscoverySectionTable: FC<ReviewerDiscoverySectionProps> = ({
 }) => {
   const { openDialog } = useModal();
   const { values } = useFormState();
+  // Generating, confirming, rejecting and inviting all need
+  // MANAGE_PROPOSAL_REVIEW; everyone else gets the suggestions read-only.
+  const canManage = canManageCallReviews(useUser(), call);
 
   const formFilters = useMemo(
     () => selectReviewerSuggestionsFilter(values),
@@ -259,16 +266,16 @@ const ReviewerDiscoverySectionTable: FC<ReviewerDiscoverySectionProps> = ({
           <div>
             <div className="d-flex align-items-center gap-2">
               <span className="fw-bold">{row.reviewer_name}</span>
-              <button
-                className="btn btn-sm btn-icon btn-light-primary"
+              <BaseButton
+                variant="secondary"
+                size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleViewProfile(row);
                 }}
-                title={translate('View profile')}
-              >
-                <UserIcon size={14} weight="bold" />
-              </button>
+                tooltip={translate('View profile')}
+                iconNode={<UserIcon size={14} weight="bold" />}
+              />
             </div>
             {row.reviewer_biography && (
               <div
@@ -397,7 +404,7 @@ const ReviewerDiscoverySectionTable: FC<ReviewerDiscoverySectionProps> = ({
   const toolbarActions = (
     <>
       <PoolSummaryButton />
-      {call && (
+      {call && canManage && (
         <ReviewerDiscoveryActions call={call} refetch={tableProps.fetch} />
       )}
     </>
@@ -414,12 +421,12 @@ const ReviewerDiscoverySectionTable: FC<ReviewerDiscoverySectionProps> = ({
       showPageSizeSelector
       hasQuery
       filters={<ReviewerSuggestionsFilter />}
-      rowActions={SuggestionRowActions}
+      rowActions={canManage ? SuggestionRowActions : undefined}
       rowClass={({ row }) =>
         row.status === 'rejected' ? 'bg-light-danger' : ''
       }
-      enableMultiSelect
-      multiSelectActions={BulkActions}
+      enableMultiSelect={canManage}
+      multiSelectActions={canManage ? BulkActions : undefined}
       hasOptionalColumns
       expandableRow={SuggestionExpandableRow}
       formId={ReviewerSuggestionsFilterFormId}

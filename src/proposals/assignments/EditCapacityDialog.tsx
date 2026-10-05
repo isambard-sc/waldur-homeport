@@ -5,6 +5,7 @@ import {
   callReviewerPoolsPartialUpdate,
 } from 'waldur-js-client';
 
+import { required } from '@/core/validators';
 import { SubmitButton, NumberGroup } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
@@ -49,11 +50,11 @@ export const EditCapacityDialog: FC<EditCapacityDialogProps> = ({
             title={translate('Edit reviewer capacity')}
             footer={
               <>
+                <CloseDialogButton />
                 <SubmitButton
                   submitting={submitting}
                   label={translate('Save')}
                 />
-                <CloseDialogButton />
               </>
             }
           >
@@ -73,6 +74,8 @@ export const EditCapacityDialog: FC<EditCapacityDialogProps> = ({
 
               <NumberGroup
                 name="max_assignments"
+                required
+                validate={required}
                 min={1}
                 max={50}
                 label={translate('Maximum assignments')}

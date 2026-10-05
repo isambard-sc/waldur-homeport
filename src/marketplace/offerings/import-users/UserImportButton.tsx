@@ -7,7 +7,7 @@ import { translate } from '@/i18n/translate';
 import { useModal } from '@/modal/actions';
 import { PermissionEnum } from '@/permissions/enums';
 import { hasPermission } from '@/permissions/hasPermission';
-import { ActionButton } from '@/table/ActionButton';
+import { ActionItem } from '@/resource/actions/ActionItem';
 import { useUser } from '@/workspace/hooks';
 
 const UserImportDialog = lazyComponent(() =>
@@ -34,7 +34,7 @@ export const UserImportButton: FC<UserImportButtonProps> = ({
   });
 
   return (
-    <ActionButton
+    <ActionItem
       title={translate('Bulk import')}
       action={() =>
         openDialog(UserImportDialog, {
@@ -46,8 +46,9 @@ export const UserImportButton: FC<UserImportButtonProps> = ({
       iconNode={<UploadSimpleIcon weight="bold" />}
       disabled={!canCreateOfferingUser}
       tooltip={
-        !canCreateOfferingUser &&
-        translate('You do not have permission to perform this action.')
+        !canCreateOfferingUser
+          ? translate('You do not have permission to perform this action.')
+          : undefined
       }
     />
   );

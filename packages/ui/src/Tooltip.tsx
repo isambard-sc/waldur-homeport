@@ -44,6 +44,26 @@ export interface TooltipProps extends Omit<
    * - `'click'`: Opens on click and dismisses on outside click or Escape using Radix Popover.
    */
   trigger?: 'hover' | 'click';
+  /**
+   * Keeps the full Radix `Provider`/`Root`/`Trigger` structure mounted even
+   * on a render where `label` is currently falsy, instead of falling back
+   * to the bare `Slot` passthrough below. Only `hover` mode honors this
+   * (`click` always needs `label` to have anything to open).
+   *
+   * Use this when the SAME logical element's `label` toggles between empty
+   * and a real value across renders — e.g. a tooltip that only applies
+   * while its trigger is disabled. Without it, the element this wraps
+   * unmounts and remounts every time `label` flips from falsy to truthy
+   * (or back): `Slot` and the full Radix structure are different component
+   * trees at the same position, so React discards and recreates whatever
+   * `children` resolves to rather than reconciling it — losing focus and
+   * invalidating any ref/DOM-node identity held on it. Confirmed via an
+   * isolated RTL repro: capture the child via `getByRole`, toggle `label`
+   * from empty to set, and the captured node's `isConnected` goes false.
+   * Not needed when `label` is either always present or always absent for
+   * a given call site — only when it toggles.
+   */
+  alwaysMount?: boolean;
 }
 
 /**
@@ -68,15 +88,15 @@ const contentClassName = ({
     autoWidth ? 'max-w-none' : 'max-w-[200px]',
     hasBody ? 'p-[12px] text-left' : 'px-[12px] py-[8px] text-center',
     theme === 'dark'
-      ? 'bg-[var(--color-gray-900)] text-[#fff] dark:bg-[var(--color-gray-50)] dark:text-[var(--color-gray-900)]'
-      : 'bg-[var(--color-gray-900)] text-[#fff]',
+      ? 'bg-[var(--color-gray-900)] text-[#fff] dark:bg-[var(--color-gray-dark-50)] dark:text-[var(--color-gray-dark-900)]'
+      : 'bg-[var(--color-gray-900)] text-[#fff] dark:bg-[var(--color-gray-dark-900)]',
     className,
   );
 
 const arrowClassName = (theme: 'light' | 'dark') =>
   theme === 'dark'
-    ? 'fill-[var(--color-gray-900)] dark:fill-[var(--color-gray-50)]'
-    : 'fill-[var(--color-gray-900)]';
+    ? 'fill-[var(--color-gray-900)] dark:fill-[var(--color-gray-dark-50)]'
+    : 'fill-[var(--color-gray-900)] dark:fill-[var(--color-gray-dark-900)]';
 
 /**
  * Custom tooltip arrow.
@@ -100,7 +120,7 @@ const bubbleChildren = (label: ReactNode, body: ReactNode) => (
   <>
     <div className="font-medium">{label}</div>
     {body && (
-      <div className="mt-[4px] font-normal text-[var(--color-gray-300)]">
+      <div className="mt-[4px] font-normal text-[var(--color-gray-300)] dark:text-[var(--color-gray-dark-300)]">
         {body}
       </div>
     )}
@@ -131,11 +151,12 @@ export const Tooltip = forwardRef<HTMLButtonElement, TooltipProps>(
       zIndex = 1180,
       delayDuration = 200,
       trigger = 'hover',
+      alwaysMount,
       ...rest
     },
     ref,
   ) => {
-    if (!label)
+    if (!label && !(alwaysMount && trigger === 'hover'))
       return (
         <Slot ref={ref} className={className} {...rest}>
           {children}
@@ -189,20 +210,22 @@ export const Tooltip = forwardRef<HTMLButtonElement, TooltipProps>(
           >
             {children}
           </TooltipPrimitive.Trigger>
-          <TooltipPrimitive.Portal>
-            <TooltipPrimitive.Content
-              id={id}
-              side={side}
-              sideOffset={8}
-              style={{ zIndex }}
-              className={bubbleClassName}
-            >
-              {bubbleChildren(label, body)}
-              <TooltipPrimitive.Arrow asChild>
-                {bubbleArrow(theme)}
-              </TooltipPrimitive.Arrow>
-            </TooltipPrimitive.Content>
-          </TooltipPrimitive.Portal>
+          {label && (
+            <TooltipPrimitive.Portal>
+              <TooltipPrimitive.Content
+                id={id}
+                side={side}
+                sideOffset={8}
+                style={{ zIndex }}
+                className={bubbleClassName}
+              >
+                {bubbleChildren(label, body)}
+                <TooltipPrimitive.Arrow asChild>
+                  {bubbleArrow(theme)}
+                </TooltipPrimitive.Arrow>
+              </TooltipPrimitive.Content>
+            </TooltipPrimitive.Portal>
+          )}
         </TooltipPrimitive.Root>
       </TooltipPrimitive.Provider>
     );

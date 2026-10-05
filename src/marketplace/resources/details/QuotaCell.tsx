@@ -38,7 +38,7 @@ const CellDescription = ({
         <>
           {' '}
           <Tooltip label={description}>
-            <QuestionIcon weight="bold" className="aligned-tip" />
+            <QuestionIcon weight="bold" className="inline-flex items-center" />
           </Tooltip>
         </>
       )}
@@ -71,7 +71,12 @@ export const QuotaCell = ({
         units={units}
       />
 
-      <QuotaProgressBar percent={percent} height={4} className="mt-1" />
+      <QuotaProgressBar
+        percent={percent}
+        height={4}
+        className="mt-1"
+        label={typeof title === 'string' ? title : undefined}
+      />
     </div>
   );
 };

@@ -1,8 +1,7 @@
 import { FC, ReactNode } from 'react';
 
-import { Badge, BadgeVariant } from 'waldur-ui';
+import { AlertItem, Badge, BadgeVariant } from 'waldur-ui';
 
-import { AlertItem } from '@/core/AlertItem';
 import { translate } from '@/i18n';
 import { DASH_ESCAPE_CODE } from '@/table/constants';
 

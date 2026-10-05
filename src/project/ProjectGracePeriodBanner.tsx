@@ -3,8 +3,8 @@ import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Project, projectsPartialUpdate } from 'waldur-js-client';
 
-import { AlertItem } from '@/core/AlertItem';
-import { BaseButton } from '@/core/buttons/BaseButton';
+import { AlertItem, BaseButton } from 'waldur-ui';
+
 import { formatDate, formatISODate } from '@/core/dateUtils';
 import { formatJsxTemplate, translate } from '@/i18n';
 import { useModal } from '@/modal/actions';

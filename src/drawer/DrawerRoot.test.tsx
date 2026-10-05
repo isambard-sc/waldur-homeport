@@ -1,11 +1,12 @@
 import * as RadixPopover from '@radix-ui/react-popover';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useContext, useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import { DirtyFormContext } from '@/core/DirtyFormContext';
+import { Select } from '@/form/select';
 import {
   ActionsDropdownComponent,
   ActionsDropdownItem,
@@ -54,6 +55,16 @@ const OverlayDrawerContent = () => (
   </div>
 );
 
+const pickOption = vi.fn();
+
+const SelectDrawerContent = () => (
+  <Select
+    aria-label="Flavor"
+    options={[{ value: 'm1.small', label: 'm1.small' }]}
+    onChange={pickOption}
+  />
+);
+
 const OpenButton = ({
   onOpen,
 }: {
@@ -76,7 +87,37 @@ const renderDrawer = () => {
     open: () => openDrawer(DrawerContent, { title: 'Panel' }),
     openDirty: () => openDrawer(DirtyDrawerContent, { title: 'Panel' }),
     openOverlays: () => openDrawer(OverlayDrawerContent, { title: 'Panel' }),
+    openShelled: () =>
+      openDrawer(DrawerContent, {
+        title: 'Panel',
+        shellClass: 'ai-chat-drawer-active',
+      }),
+    openSelect: () => openDrawer(SelectDrawerContent, { title: 'Panel' }),
   };
+};
+
+/**
+ * jsdom applies no stylesheets, so Presence sees no exit animation and drops
+ * #kt_drawer the instant it closes. Report the slide-in/slide-out keyframes
+ * _shell.scss gives it, read live off the class list the way a browser's
+ * computed style is, so the drawer stays mounted through the slide-out.
+ */
+const simulateSlideAnimations = () => {
+  const getComputedStyle = window.getComputedStyle;
+  return vi
+    .spyOn(window, 'getComputedStyle')
+    .mockImplementation((element, pseudo) => {
+      const styles = getComputedStyle(element, pseudo);
+      if (element.id !== 'kt_drawer') return styles;
+      return new Proxy(styles, {
+        get: (target, key) =>
+          key === 'animationName'
+            ? element.classList.contains('drawer-on')
+              ? 'kt-drawer-slide-in'
+              : 'kt-drawer-slide-out'
+            : Reflect.get(target, key),
+      });
+    });
 };
 
 /**
@@ -153,6 +194,64 @@ describe('DrawerRoot', () => {
     });
     // eslint-disable-next-line no-restricted-syntax, testing-library/no-node-access
     expect(document.querySelector('.drawer-overlay')).not.toBeInTheDocument();
+  });
+
+  // The floating-card class is what keeps the drawer below the page header.
+  // Losing it mid slide-out snaps the card to full viewport height for the
+  // length of the animation, covering the header it had been sitting under.
+  it('keeps the shell class through the slide-out', async () => {
+    const user = userEvent.setup();
+    const computedStyle = simulateSlideAnimations();
+    const { openShelled } = renderDrawer();
+    openShelled();
+    await screen.findByTestId('drawer-content');
+    // eslint-disable-next-line no-restricted-syntax, testing-library/no-node-access
+    expect(document.getElementById('kt_drawer')).toHaveClass(
+      'ai-chat-drawer-active',
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+
+    // eslint-disable-next-line no-restricted-syntax, testing-library/no-node-access
+    const drawer = document.getElementById('kt_drawer');
+    expect(drawer).not.toHaveClass('drawer-on');
+    expect(drawer).toHaveClass('ai-chat-drawer-active');
+    computedStyle.mockRestore();
+  });
+
+  // A floating drawer leaves the header's drawer toggles clickable. Their own
+  // click has to decide: dismissing the drawer on the pointerdown would let
+  // that same click reopen it, or skip switching to another drawer.
+  it('leaves a floating drawer to its header toggle', async () => {
+    const user = userEvent.setup();
+    const onToggle = vi.fn();
+    let openDrawer!: ReturnType<typeof useDrawer>['openDrawer'];
+    render(
+      <DrawerProvider>
+        <OpenButton onOpen={(fn) => (openDrawer = fn)} />
+        {/* Inline stand-in for the _shell.scss rule jsdom doesn't load. */}
+        <button
+          type="button"
+          data-drawer-toggle
+          onClick={onToggle}
+          style={{ pointerEvents: 'auto' }}
+        >
+          Support
+        </button>
+        <DrawerRoot />
+      </DrawerProvider>,
+    );
+    openDrawer(DrawerContent, {
+      title: 'Panel',
+      shellClass: 'ai-chat-drawer-active',
+    });
+    await screen.findByTestId('drawer-content');
+
+    await user.click(screen.getByText('Support'));
+
+    expect(onToggle).toHaveBeenCalled();
+    // eslint-disable-next-line no-restricted-syntax, testing-library/no-node-access
+    expect(document.getElementById('kt_drawer')).toHaveClass('drawer-on');
   });
 
   it('closes when the content calls the injected close prop', async () => {
@@ -237,6 +336,28 @@ describe('DrawerRoot', () => {
     expect(await screen.findByText('Mart Tamm')).toBeInTheDocument();
   });
 
+  // react-select is not a Radix layer, so the nesting above doesn't cover it:
+  // its menu portals to <body>, which the modal dialog has set to
+  // `pointer-events: none`. The menu inherits that, every click on an option
+  // falls through to the drawer beneath, and react-select closes the menu as
+  // if the user had clicked away.
+  it('picks an option from a select inside the drawer', async () => {
+    const user = userEvent.setup();
+    pickOption.mockClear();
+    const { openSelect } = renderDrawer();
+    openSelect();
+
+    await user.click(await screen.findByRole('combobox', { name: 'Flavor' }));
+    await user.click(await screen.findByRole('option', { name: 'm1.small' }));
+
+    expect(pickOption).toHaveBeenCalledWith(
+      { value: 'm1.small', label: 'm1.small' },
+      expect.anything(),
+    );
+    // eslint-disable-next-line no-restricted-syntax, testing-library/no-node-access
+    expect(document.getElementById('kt_drawer')).toHaveClass('drawer-on');
+  });
+
   // Radix decides a pointerdown is "inside" via an onPointerDownCapture on the
   // layer, which travels the React tree rather than the DOM tree. Content
   // portalled in from a tree outside the dialog therefore reads as outside
@@ -252,5 +373,38 @@ describe('DrawerRoot', () => {
 
     // eslint-disable-next-line no-restricted-syntax, testing-library/no-node-access
     expect(document.getElementById('kt_drawer')).toHaveClass('drawer-on');
+  });
+
+  it('does not overwrite an active open drawer when renderDrawer is called with another component', async () => {
+    let drawerMethods!: ReturnType<typeof useDrawer>;
+    const CompA = () => <div data-testid="comp-a">Component A</div>;
+    const CompB = () => <div data-testid="comp-b">Component B</div>;
+
+    const TestButton = () => {
+      drawerMethods = useDrawer();
+      return null;
+    };
+
+    render(
+      <DrawerProvider>
+        <TestButton />
+        <DrawerRoot />
+      </DrawerProvider>,
+    );
+
+    act(() => {
+      drawerMethods.openDrawer(CompA, { title: 'Drawer A' });
+    });
+
+    expect(await screen.findByTestId('comp-a')).toBeInTheDocument();
+    expect(screen.getByText('Drawer A')).toBeInTheDocument();
+
+    act(() => {
+      drawerMethods.renderDrawer(CompB, { title: 'Drawer B' });
+    });
+
+    expect(screen.getByTestId('comp-a')).toBeInTheDocument();
+    expect(screen.getByText('Drawer A')).toBeInTheDocument();
+    expect(screen.queryByTestId('comp-b')).not.toBeInTheDocument();
   });
 });

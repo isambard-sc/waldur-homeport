@@ -1,58 +1,14 @@
-import {
-  CheckCircleIcon,
-  ClockCountdownIcon,
-  InfoIcon,
-  WarningCircleIcon,
-  WarningOctagonIcon,
-} from '@phosphor-icons/react';
-import { FunctionComponent, useEffect } from 'react';
-import NotificationsSystem, { useNotifications } from 'reapop';
+import { CSSProperties, FunctionComponent } from 'react';
 
-import { setGlobalNotify } from '@/store/notify';
-import { useTheme } from '@/theme/useTheme';
+import { NotificationProvider } from 'waldur-notifications';
 
-import { FeaturedIcon } from './core/FeaturedIcon';
-import { darkTheme, lightTheme } from './notification/theme';
+// See --z-index-toast in packages/design-tokens/src/zIndex.css for why the
+// z-index sits below tooltips — overriding waldur-ui's ToastViewport's own
+// generic z-50 default, which knows nothing of this app's legacy Bootstrap
+// z-index stack (Metronic's sidebar/drawer, Bootstrap modals, ...).
+const VIEWPORT_STYLE = { zIndex: 'var(--z-index-toast)' } as CSSProperties;
 
-export const NotificationContainer: FunctionComponent = () => {
-  const { notifications, dismissNotification, notify } = useNotifications();
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    setGlobalNotify(notify);
-    return () => setGlobalNotify(null);
-  }, [notify]);
-
-  return (
-    <NotificationsSystem
-      theme={theme === 'dark' ? darkTheme : lightTheme}
-      notifications={notifications}
-      dismissNotification={(id) => dismissNotification(id)}
-      components={{
-        NotificationIcon: (props) => (
-          <div style={props.theme.notificationIcon(props.notification)}>
-            {/* eslint-disable waldur-custom/enforce-phosphor-icon-weight */}
-            {props.notification.status === 'success' ? (
-              <FeaturedIcon IconComponent={CheckCircleIcon} variant="success" />
-            ) : props.notification.status === 'warning' ? (
-              <FeaturedIcon
-                IconComponent={WarningCircleIcon}
-                variant="warning"
-              />
-            ) : props.notification.status === 'error' ? (
-              <FeaturedIcon
-                IconComponent={WarningOctagonIcon}
-                variant="danger"
-              />
-            ) : props.notification.status === 'info' ? (
-              <FeaturedIcon IconComponent={InfoIcon} variant="dark" />
-            ) : props.notification.status === 'loading' ? (
-              <FeaturedIcon IconComponent={ClockCountdownIcon} variant="dark" />
-            ) : null}
-            {/* eslint-enable waldur-custom/enforce-phosphor-icon-weight */}
-          </div>
-        ),
-      }}
-    />
-  );
-};
+/** Mounts the toast stack; see waldur-notifications for the store it renders. */
+export const NotificationContainer: FunctionComponent = () => (
+  <NotificationProvider viewportStyle={VIEWPORT_STYLE} />
+);

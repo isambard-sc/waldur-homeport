@@ -537,6 +537,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       auth: true,
+      showGoBack: true,
       title: () => translate('Reviewer invitation'),
     },
   },

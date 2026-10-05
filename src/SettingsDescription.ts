@@ -142,12 +142,6 @@ export const SettingsDescription = [
         type: 'boolean',
       },
       {
-        key: 'ENABLE_MARKDOWN_IMAGE_UPLOAD',
-        description: translate('Allow uploading images for embedding in offering markdown descriptions.'),
-        default: false,
-        type: 'boolean',
-      },
-      {
         key: 'ENFORCE_USER_CONSENT_FOR_OFFERINGS',
         description: translate('If True, users must have active consent to access offerings that have active Terms of Service.'),
         default: false,
@@ -299,6 +293,12 @@ export const SettingsDescription = [
         description: translate('Telemetry service version.'),
         default: 1,
         type: 'integer',
+      },
+      {
+        key: 'TELEMETRY_DEPLOYMENT_ID',
+        description: translate('Random identifier sent with telemetry so reports from one deployment can be grouped. Generated on the first report; clear it to rotate.'),
+        default: '',
+        type: 'string',
       },
       {
         key: 'CHECK_FOR_UPDATES',
@@ -467,6 +467,23 @@ export const SettingsDescription = [
         description: translate('Toggler to disable dark theme.'),
         default: false,
         type: 'boolean',
+      },
+    ],
+  },
+  {
+    description: translate('About us page'),
+    items: [
+      {
+        key: 'ABOUT_US_PAGE_ENABLED',
+        description: translate('Show the About us page and its link in the footer.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'ABOUT_US_PAGE_CONTENT',
+        description: translate('Markdown content of the About us page.'),
+        default: '',
+        type: 'markdown_field',
       },
     ],
   },
@@ -1017,6 +1034,12 @@ export const SettingsDescription = [
         type: 'integer',
       },
       {
+        key: 'PROPOSAL_DASHBOARD_REVIEWS_DUE_WITHIN_DAYS',
+        description: translate('How many days ahead the call manager dashboard looks for review deadlines. Past-due reviews are always included.'),
+        default: 7,
+        type: 'integer',
+      },
+      {
         key: 'DEFAULT_PROPOSAL_REQUIRED_FIELDS',
         description: translate('Project details fields a new call requires by default. Applied when the call is created; changing this never alters an existing call.'),
         default: ['project_summary'],
@@ -1540,7 +1563,7 @@ export const SettingsDescription = [
         description: translate('List of automatic validation methods available for this portal.'),
         default: [],
         type: 'multiple_choice_field',
-        options: [{ value: 'ariregister', label: 'ariregister' }, { value: 'wirtschaftscompass', label: 'wirtschaftscompass' }, { value: 'bolagsverket', label: 'bolagsverket' }, { value: 'dnb_se', label: 'dnb_se' }, { value: 'dnb_no', label: 'dnb_no' }, { value: 'dnb_dk', label: 'dnb_dk' }, { value: 'dnb_fi', label: 'dnb_fi' }],
+        options: [{ value: 'ariregister', label: 'ariregister' }, { value: 'wirtschaftscompass', label: 'wirtschaftscompass' }, { value: 'bolagsverket', label: 'bolagsverket' }, { value: 'breg', label: 'breg' }, { value: 'dnb_se', label: 'dnb_se' }, { value: 'dnb_no', label: 'dnb_no' }, { value: 'dnb_dk', label: 'dnb_dk' }, { value: 'dnb_fi', label: 'dnb_fi' }],
       },
       {
         key: 'ONBOARDING_VERIFICATION_EXPIRY_HOURS',
@@ -2163,6 +2186,12 @@ export const SettingsDescription = [
       {
         key: 'MATRIX_ENABLED',
         description: translate('Enable Matrix chat integration.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'MATRIX_AUTO_CREATE_PROJECT_ROOMS',
+        description: translate('Automatically create a Matrix room for every newly created project. Off by default; existing projects are backfilled with the provision_matrix_rooms management command.'),
         default: false,
         type: 'boolean',
       },

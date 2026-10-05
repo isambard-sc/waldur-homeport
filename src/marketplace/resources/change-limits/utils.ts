@@ -27,6 +27,7 @@ import {
 } from '@/marketplace/details/plan/effectiveComponents';
 import { parseOfferingLimits } from '@/marketplace/offerings/store/limits';
 import { OfferingLimits } from '@/marketplace/offerings/store/types';
+import { TENANT_TYPE } from '@/openstack/constants';
 
 type PlanWithComponents = Pick<BasePublicPlan, 'components'>;
 
@@ -54,6 +55,8 @@ export interface ComponentRowType {
   subTotal: number;
   changedSubTotal: number;
   changedLimit: number;
+  /** The new limit itself, for display without recomputing it. */
+  newLimit: number;
   /** How the component is billed; drives the column suffix and the totals grouping. */
   chargeMode: ChargeMode;
   /** Localized suffix appended to the formatted price, e.g. "/mo", " /year", " one-time". */
@@ -110,14 +113,18 @@ export const hasEditableLimitComponents = (
     ).some((c) => c.billing_type === 'limit' || c.is_prepaid),
   );
 
-export const getRemainingMonths = (endDate: string): number => {
-  const now = DateTime.now();
+export const getRemainingMonths = (
+  endDate: string,
+  fromDate?: string,
+): number => {
+  const from = fromDate ? DateTime.fromISO(fromDate) : DateTime.now();
   const end = DateTime.fromISO(endDate);
-  return Math.max(0, Math.ceil(end.diff(now, 'months').months));
+  return Math.max(0, Math.ceil(end.diff(from, 'months').months));
 };
 
 export const getLimitChangeRequirements = (
-  resource: Pick<Resource, 'limits' | 'current_usages'>,
+  resource: Pick<Resource, 'limits' | 'current_usages'> &
+    Partial<Pick<Resource, 'limit_usage'>>,
   offering: PublicOfferingDetails | Offering,
   plan?: PlanWithComponents | null,
 ) => {
@@ -127,7 +134,17 @@ export const getLimitChangeRequirements = (
   const components = getEffectiveComponents(offering, plan).filter(
     (component) => component.billing_type === 'limit' || component.is_prepaid,
   );
-  const usages = limitParser(resource.current_usages || {});
+  const rawUsages = { ...(resource.current_usages || {}) };
+  // Match the overview: period usage for limits, except live OpenStack quotas.
+  if (offering.type !== TENANT_TYPE) {
+    for (const component of components) {
+      const limitUsage = resource.limit_usage?.[component.type];
+      if (component.billing_type === 'limit' && limitUsage != null) {
+        rawUsages[component.type] = limitUsage;
+      }
+    }
+  }
+  const usages = limitParser(rawUsages);
   const resourceLimits = limitParser(resource.limits);
   const limits: Record<string, number> = Object.fromEntries(
     components.map((component) => [
@@ -296,6 +313,11 @@ export const getLimitChangeData = (
   orderCanBeApproved,
   concealBillingInfo = false,
   resourceEndDate?: string,
+  // Anchor for "remaining months", instead of the moment this happens to
+  // render. Viewing an already-created order must show the same figure it
+  // showed on day one -- omit this only for a live preview of a request that
+  // doesn't exist yet, where "today" genuinely is the right anchor.
+  remainingMonthsFrom?: string,
 ): StateProps => {
   const { multipliers, periodKeys } = getBillingPeriods(plan.unit);
   const offeringComponents = getEffectiveComponents(offering, plan).filter(
@@ -303,7 +325,7 @@ export const getLimitChangeData = (
   );
 
   const remainingMonths = resourceEndDate
-    ? getRemainingMonths(resourceEndDate)
+    ? getRemainingMonths(resourceEndDate, remainingMonthsFrom)
     : undefined;
 
   const components: ComponentRowType[] = offeringComponents.map((component) => {
@@ -331,6 +353,7 @@ export const getLimitChangeData = (
       limit_decimal_places: component.limit_decimal_places,
       usage: usages[component.type] || 0,
       limit: currentLimits[component.type],
+      newLimit,
       subTotal,
       changedSubTotal,
       changedLimit,

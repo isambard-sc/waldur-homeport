@@ -2,14 +2,14 @@ import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
 import { FC, ReactNode } from 'react';
 import { Card } from 'react-bootstrap';
 
-import { Badge } from 'waldur-ui';
+import { Badge, BaseButton } from 'waldur-ui';
 
 import { formatDate } from '@/core/dateUtils';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { translate } from '@/i18n';
 import { Field } from '@/resource/summary';
-import { ActionButton } from '@/table/ActionButton';
 import { BooleanField } from '@/table/BooleanField';
+import { renderFieldOrDash } from '@/table/utils';
 import { useCustomer } from '@/workspace/hooks';
 
 import { useValidateHelpdesk } from '../api';
@@ -51,11 +51,13 @@ export const HelpdeskOverviewPage: FC = () => {
     ],
     [
       translate('API URL'),
-      url ? (
-        <a href={url} target="_blank" rel="noopener noreferrer">
-          {url}
-        </a>
-      ) : null,
+      renderFieldOrDash(
+        url && (
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {url}
+          </a>
+        ),
+      ),
     ],
     [
       translate('Health'),
@@ -65,11 +67,14 @@ export const HelpdeskOverviewPage: FC = () => {
     ],
     [
       translate('Last health check'),
-      helpdesk.last_health_check
-        ? formatDate(helpdesk.last_health_check)
-        : null,
+      renderFieldOrDash(
+        helpdesk.last_health_check && formatDate(helpdesk.last_health_check),
+      ),
     ],
-    [translate('Notification email'), helpdesk.notification_email || null],
+    [
+      translate('Notification email'),
+      renderFieldOrDash(helpdesk.notification_email),
+    ],
     [translate('Active'), <BooleanField value={Boolean(helpdesk.is_active)} />],
     [translate('Failed routings'), <>{helpdesk.failed_routing_count}</>],
     [translate('Created'), formatDate(helpdesk.created)],
@@ -79,26 +84,25 @@ export const HelpdeskOverviewPage: FC = () => {
     <Card className="card-bordered">
       <Card.Header className="d-flex justify-content-between align-items-center">
         <Card.Title>{translate('Helpdesk overview')}</Card.Title>
-        <ActionButton
-          title={translate('Validate')}
+        <BaseButton
+          label={translate('Validate')}
           iconNode={<ArrowsClockwiseIcon weight="bold" />}
           variant="tertiary"
-          action={() => validateMutation.mutate({ uuid: helpdesk.uuid })}
+          onClick={() => validateMutation.mutate({ uuid: helpdesk.uuid })}
+          size="lg"
         />
       </Card.Header>
       <Card.Body>
-        {rows
-          .filter(([, value]) => value != null)
-          .map(([label, value]) => (
-            <Field
-              key={label}
-              label={label}
-              value={value}
-              isStuck
-              labelClass="min-w-150px"
-              className="fs-6"
-            />
-          ))}
+        {rows.map(([label, value]) => (
+          <Field
+            key={label}
+            label={label}
+            value={value}
+            isStuck
+            labelClass="min-w-150px"
+            className="fs-6"
+          />
+        ))}
       </Card.Body>
     </Card>
   );

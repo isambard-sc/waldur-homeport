@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
 import { projectsListUsersList, projectsRetrieve } from 'waldur-js-client';
 
-import { AccordionCard } from '@/core/AccordionCard';
+import { AccordionCard } from 'waldur-ui';
+
 import { fetchResultCount } from '@/core/api';
 import { STALE_TIME } from '@/core/constants';
 import { Link } from '@/core/Link';
@@ -137,7 +138,9 @@ export const ResourceProjectGroup: FC<ResourceProjectGroupProps> = ({
                   <Link
                     state="project-team"
                     params={{ uuid: project.uuid }}
-                    className="btn btn-sm btn-link text-primary p-0"
+                    buttonVariant="text-primary"
+                    buttonSize="sm"
+                    className="p-0"
                   >
                     {translate('View team')}
                     <ArrowRightIcon size={14} weight="bold" className="ms-1" />

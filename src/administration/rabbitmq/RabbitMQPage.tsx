@@ -1,12 +1,15 @@
-import { WarningCircleIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { Alert } from 'react-bootstrap';
+import { FC } from 'react';
+
+import { AlertItem } from 'waldur-ui';
 
 import { LoadingSpinner } from '@/core/LoadingSpinner';
-import { Panel } from '@/core/Panel';
 import { translate } from '@/i18n';
 import { RefreshButton } from '@/marketplace/common/RefreshButton';
+import { TableWithPortal } from '@/table/types';
 import { useUser } from '@/workspace/hooks';
+
+import { TabToolbar } from '../TabToolbar';
 
 import { getRabbitMQStats } from './api';
 import { RabbitMQClusterOverview } from './RabbitMQClusterOverview';
@@ -15,7 +18,7 @@ import { RabbitMQOverviewCards } from './RabbitMQOverviewCards';
 import { RabbitMQPurgeAllButton } from './RabbitMQPurgeAllButton';
 import { RabbitMQVhostList } from './RabbitMQVhostList';
 
-export const RabbitMQPage = () => {
+export const RabbitMQPage: FC<Partial<TableWithPortal>> = ({ portal }) => {
   const user = useUser();
   const isStaff = user?.is_staff;
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
@@ -26,14 +29,14 @@ export const RabbitMQPage = () => {
 
   if (isLoading || !data) {
     return (
-      <Panel title={translate('RabbitMQ subscription queues')} cardBordered>
+      <div className="pt-5">
         <div className="text-center py-10">
           <LoadingSpinner />
           <p className="text-muted mt-4">
             {translate('Fetching RabbitMQ statistics, please standby...')}
           </p>
         </div>
-      </Panel>
+      </div>
     );
   }
 
@@ -42,25 +45,24 @@ export const RabbitMQPage = () => {
     const is503 = errorMessage.includes('503');
 
     return (
-      <Panel title={translate('RabbitMQ subscription queues')} cardBordered>
-        <Alert variant="danger" className="d-flex align-items-center mb-0">
-          <WarningCircleIcon size={24} weight="bold" className="me-3" />
-          <div>
-            <strong>
-              {is503
-                ? translate('RabbitMQ service unavailable')
-                : translate('Failed to load RabbitMQ statistics')}
-            </strong>
-            <p className="mb-0 mt-1">
-              {is503
-                ? translate(
-                    'The RabbitMQ management API is not responding. Please check that RabbitMQ is running.',
-                  )
-                : errorMessage}
-            </p>
-          </div>
-        </Alert>
-      </Panel>
+      <div className="pt-5">
+        <AlertItem
+          variant="error"
+          type="floating"
+          title={
+            is503
+              ? translate('RabbitMQ service unavailable')
+              : translate('Failed to load RabbitMQ statistics')
+          }
+          body={
+            is503
+              ? translate(
+                  'The RabbitMQ management API is not responding. Please check that RabbitMQ is running.',
+                )
+              : errorMessage
+          }
+        />
+      </div>
     );
   }
 
@@ -77,14 +79,11 @@ export const RabbitMQPage = () => {
   );
 
   return (
-    <Panel
-      title={translate('RabbitMQ subscription queues')}
-      actions={panelActions}
-      cardBordered
-    >
+    <div className="pt-5">
+      <TabToolbar portal={portal}>{panelActions}</TabToolbar>
       <RabbitMQOverviewCards data={data} />
       <RabbitMQClusterOverview />
       <RabbitMQVhostList data={data} />
-    </Panel>
+    </div>
   );
 };

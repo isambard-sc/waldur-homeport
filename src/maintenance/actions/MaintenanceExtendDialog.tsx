@@ -1,18 +1,16 @@
 import { ClockClockwiseIcon } from '@phosphor-icons/react';
 import { DateTime } from 'luxon';
 import { FC, useCallback, useMemo, useState } from 'react';
-import {
-  Form as BSForm,
-  ToggleButton,
-  ToggleButtonGroup,
-} from 'react-bootstrap';
+import { Form as BSForm } from 'react-bootstrap';
 import { Form as FinalForm, Field, useFormState } from 'react-final-form';
 import {
   MaintenanceAnnouncement,
   maintenanceAnnouncementsPartialUpdate,
 } from 'waldur-js-client';
 
-import { formatDateTime, parseDate } from '@/core/dateUtils';
+import { SegmentedControl } from 'waldur-ui';
+
+import { formatMediumDateTime, parseDate } from '@/core/dateUtils';
 import { DateTimeField } from '@/form/DateTimeField';
 import { FormFooter } from '@/form/FormFooter';
 import { translate } from '@/i18n';
@@ -130,7 +128,7 @@ const ExtendForm: FC<ExtendFormProps> = ({
   );
 
   const newEndPreview = values.scheduled_end
-    ? formatDateTime(values.scheduled_end)
+    ? formatMediumDateTime(values.scheduled_end)
     : null;
 
   return (
@@ -143,35 +141,27 @@ const ExtendForm: FC<ExtendFormProps> = ({
         <BSForm.Group className="mb-4">
           <BSForm.Label>{translate('Current end')}</BSForm.Label>
           <div className="form-control-plaintext">
-            {formatDateTime(currentEnd)}
+            {formatMediumDateTime(currentEnd)}
           </div>
         </BSForm.Group>
 
         <BSForm.Group className="mb-4">
           <BSForm.Label>{translate('Quick extend')}</BSForm.Label>
           <div>
-            <ToggleButtonGroup
-              type="radio"
-              name="quick-extend"
+            <SegmentedControl
+              aria-label={translate('Quick extend')}
+              size="sm"
+              options={QUICK_OFFSETS.map((offset) => ({
+                value: offset.key,
+                label: offset.label,
+                disabled: submitting,
+              }))}
               value={activeQuickKey || ''}
-              onChange={(value: string) => {
+              onValueChange={(value) => {
                 const offset = QUICK_OFFSETS.find((o) => o.key === value);
                 if (offset) applyQuickOffset(offset.key, offset.minutes);
               }}
-            >
-              {QUICK_OFFSETS.map((offset) => (
-                <ToggleButton
-                  key={offset.key}
-                  id={`quick-extend-${offset.key}`}
-                  value={offset.key}
-                  variant="tertiary"
-                  size="sm"
-                  disabled={submitting}
-                >
-                  {offset.label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+            />
           </div>
         </BSForm.Group>
 
@@ -188,7 +178,6 @@ const ExtendForm: FC<ExtendFormProps> = ({
                     setActiveQuickKey(null);
                   },
                 }}
-                dateFormat="Y-m-d H:i"
                 minDate={currentEnd.toJSDate()}
                 placeholder={translate('Pick a new end date and time')}
               />

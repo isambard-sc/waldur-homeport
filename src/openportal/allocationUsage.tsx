@@ -7,7 +7,7 @@
 import { ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { FC, ReactNode } from 'react';
 
-import { BaseButton } from '@/core/buttons/BaseButton';
+import { BaseButton } from 'waldur-ui';
 
 /** The unit part of an allocation string, e.g. "NHR" from "1000 NHR". */
 export const allocationUnit = (

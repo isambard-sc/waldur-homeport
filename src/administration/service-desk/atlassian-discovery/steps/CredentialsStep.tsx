@@ -1,11 +1,17 @@
 import { FC, useState } from 'react';
-import { Alert } from 'react-bootstrap';
 import { useForm, useFormState } from 'react-final-form';
 import { supportSettingsAtlassianValidateCredentials } from 'waldur-js-client';
 
+import { AlertItem } from 'waldur-ui';
+
 import { url } from '@/core/validators';
-import { StringGroup, RadioGroup, BooleanGroup, SecretGroup } from '@/form';
-import { SubmitButton } from '@/form/SubmitButton';
+import {
+  SubmitButton,
+  StringGroup,
+  RadioGroup,
+  BooleanGroup,
+  SecretGroup,
+} from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { WizardModal, WizardStepProps } from '@/wizard';
@@ -87,7 +93,6 @@ export const CredentialsStep: FC<WizardStepProps> = (props) => {
         disabled={!isFormValid()}
         label={translate('Validate & Continue')}
         onClick={validateAndContinue}
-        type="button"
       />
     </>
   );
@@ -201,17 +206,23 @@ export const CredentialsStep: FC<WizardStepProps> = (props) => {
         </div>
       )}
       {error && (
-        <Alert variant="danger" className="mb-4">
-          {error}
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="error"
+          title={error}
+          className="mb-4"
+        />
       )}
       {serverInfo && (
-        <Alert variant="success" className="mb-4">
-          {translate('Connected to Jira {version} ({type})', {
+        <AlertItem
+          type="floating"
+          variant="success"
+          title={translate('Connected to Jira {version} ({type})', {
             version: serverInfo.version,
             type: serverInfo.deployment_type,
           })}
-        </Alert>
+          className="mb-4"
+        />
       )}
     </WizardModal>
   );

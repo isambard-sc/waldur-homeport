@@ -20,219 +20,12 @@ $brands: (
 ) !default;
 
 $brands-rgb: (
-  '25': $brand-25-rgb,
   '50': $brand-50-rgb,
-  '100': $brand-100-rgb,
   '200': $brand-200-rgb,
-  '300': $brand-300-rgb,
   '400': $brand-400-rgb,
-  '500': $brand-500-rgb,
   '600': $brand-600-rgb,
-  '700': $brand-700-rgb,
-  '800': $brand-800-rgb,
   '900': $brand-900-rgb,
 ) !default;
-
-// Dark colors
-$theme-dark-colors: (
-  'secondary': $secondary-dark,
-) !default; // Custom variable
-
-// Dark inverse colors
-$theme-dark-inverse-colors: (
-  'secondary': $secondary-dark-inverse,
-) !default; // Custom variable
-
-// 50 colors
-$theme-50-colors: (
-  'brand': $brand-50,
-  'gray': $gray-50,
-  'primary': $primary-50,
-  'secondary': $secondary-light,
-  'light': $gray-50,
-  'success': $success-50,
-  'info': $info-50,
-  'warning': $warning-50,
-  'danger': $danger-50,
-  // custom colors
-  'pink': $pink-50,
-  'blue': $blue-50,
-  'teal': $teal-50,
-  'indigo': $indigo-50,
-  'purple': $purple-50,
-  'rose': $rose-50,
-  'moss': $moss-50,
-  'orange': $orange-50,
-) !default; // Custom variable
-
-// 200 colors
-$theme-200-colors: (
-  'brand': $brand-200,
-  'gray': $gray-200,
-  'primary': $primary-200,
-  'secondary': $secondary-active,
-  'light': $gray-200,
-  'success': $success-200,
-  'info': $info-200,
-  'warning': $warning-200,
-  'danger': $danger-200,
-  // custom colors
-  'pink': $pink-200,
-  'blue': $blue-200,
-  'teal': $teal-200,
-  'indigo': $indigo-200,
-  'purple': $purple-200,
-  'rose': $rose-200,
-  'moss': $moss-200,
-  'orange': $orange-200,
-) !default; // Custom variable
-
-// 500 colors
-$theme-500-colors: (
-  'brand': $brand-500,
-  'gray': $gray-500,
-  'primary': $primary-500,
-  'secondary': $secondary-dark,
-  'light': $gray-500,
-  'success': $success-500,
-  'info': $info-500,
-  'warning': $warning-500,
-  'danger': $danger-500,
-  // custom colors
-  'pink': $pink-500,
-  'blue': $blue-500,
-  'teal': $teal-500,
-  'indigo': $indigo-500,
-  'purple': $purple-500,
-  'rose': $rose-500,
-  'moss': $moss-500,
-  'orange': $orange-500,
-) !default; // Custom variable
-
-// 700 colors
-$theme-700-colors: (
-  'brand': $brand-700,
-  'gray': $gray-700,
-  'primary': $primary-700,
-  'secondary': $secondary-dark,
-  'light': $gray-700,
-  'success': $success-700,
-  'info': $info-700,
-  'warning': $warning-700,
-  'danger': $danger-700,
-  // custom colors
-  'pink': $pink-700,
-  'blue': $blue-700,
-  'teal': $teal-700,
-  'indigo': $indigo-700,
-  'purple': $purple-700,
-  'rose': $rose-700,
-  'moss': $moss-700,
-  'orange': $orange-700,
-) !default; // Custom variable
-
-// Button variants
-/* prettier-ignore */
-$button-variants: (
-  'primary': (
-    'contained': (
-      'enabled': (bg: $btn-primary-bg, text: $text-white),
-      'hovered': (bg: $btn-primary-bg_hover, text: $text-white),
-      'focused': (bg: $btn-primary-bg_hover, text: $text-white, ring: $focus-ring-primary),
-      'pressed': (bg: $btn-primary-bg_pressed, text: $text-white),
-      'disabled': (bg: $btn-bg-disable, text: $fg-disabled),
-    ),
-    'text': (
-      'enabled': (bg: transparent, text: $text-brand-secondary, icon: $fg-brand-secondary),
-      'hovered': (bg: $btn-secondary-bg, text: $text-brand-secondary, icon: $fg-brand-secondary),
-      'focused': (bg: $btn-secondary-bg_hover, text: $text-brand-secondary, icon: $fg-brand-secondary, ring: $focus-ring-primary),
-      'pressed': (bg: transparent, text: $text-brand-primary, icon: $fg-brand-secondary),
-      'disabled': (bg: transparent, text: $fg-disabled),
-    ),
-  ),
-  'secondary': (
-    'contained': (
-      'enabled': (bg: $btn-secondary-bg, text: $text-brand-primary, icon: $fg-brand-secondary, border: $border-brand),
-      'hovered': (bg: $btn-secondary-bg_hover, text: $text-brand-primary, icon: $fg-brand-secondary, border: $border-brand),
-      'focused': (bg: $btn-secondary-bg_hover, text: $text-brand-primary, icon: $fg-brand-secondary, border: $border-brand, ring: $focus-ring-primary),
-      'pressed': (bg: $btn-secondary-bg_pressed, text: $text-brand-primary, icon: $fg-brand-secondary),
-      'disabled': (bg: $btn-bg-disable, text: $fg-disabled),
-    ),
-    'text': (
-      'enabled': (bg: transparent, text: $text-secondary, icon: $fg-quaternary),
-      'hovered': (bg: $bg-tertiary, text: $text-secondary, icon: $fg-quinary),
-      'focused': (bg: $bg-tertiary, text: $text-secondary, icon: $fg-quinary, ring: $focus-ring-primary),
-      'pressed': (bg: transparent, text: $text-secondary, icon: $fg-tertiary),
-      'disabled': (bg: transparent, text: $fg-disabled),
-    ),
-  ),
-  'tertiary': (
-    'contained': (
-      'enabled': (bg: $btn-tertiary-bg, text: $text-secondary, icon: $fg-quaternary, border: $border-primary),
-      'hovered': (bg: $btn-tertiary-bg_hover, text: $text-secondary, icon: $fg-quaternary, border: $border-primary),
-      'focused': (bg: $btn-tertiary-bg_hover, text: $text-secondary, icon: $fg-quaternary, border: $border-primary, ring: $focus-ring-primary),
-      'pressed': (bg: $btn-tertiary-bg_pressed, text: $text-secondary, icon: $fg-quaternary, border: $btn-tertiary-border_pressed),
-      'disabled': (bg: $btn-bg-disable, text: $fg-disabled),
-    ),
-  ),
-  'tertiary-ghost': (
-    'contained': (
-      'enabled': (bg: transparent, text: $text-secondary, icon: $fg-quaternary, border: transparent),
-      'hovered': (bg: $btn-tertiary-bg_hover, text: $text-secondary, icon: $fg-quaternary, border: transparent),
-      'focused': (bg: $btn-tertiary-bg_hover, text: $text-secondary, icon: $fg-quaternary, border: transparent, ring: $focus-ring-primary),
-      'pressed': (bg: $btn-tertiary-bg_pressed, text: $text-secondary, icon: $fg-quaternary, border: transparent),
-      'disabled': (bg: transparent, text: $fg-disabled),
-    ),
-  ),
-  'danger': (
-    'contained': (
-      'enabled': (bg: $btn-error-bg, text: $text-error-primary, border: $border-error),
-      'hovered': (bg: $btn-error-bg_hover, text: $text-error-primary, icon: $fg-error-secondary, border: $border-error),
-      'focused': (bg: $btn-error-bg, text: $text-error-primary, icon: $fg-error-secondary, ring: $focus-ring-error),
-      'pressed': (bg: $btn-error-bg_pressed, text: $text-primary_on-brand, icon: $fg-white),
-      'disabled': (bg: $btn-bg-disable, text: $fg-disabled),
-    ),
-    'text': (
-      'enabled': (bg: transparent, text: $danger-700, icon: $fg-error-primary),
-      'hovered': (bg: $btn-error-bg_hover, text: $text-error-primary, icon: $fg-error-secondary),
-      'focused': (bg: $btn-error-bg, text: $text-error-primary, icon: $fg-error-secondary, ring: $focus-ring-error),
-      'pressed': (bg: transparent, text: $text-error-primary, icon: $fg-error-secondary),
-      'disabled': (bg: transparent, text: $fg-disabled),
-    ),
-  ),
-  'warning': (
-    'contained': (
-      'enabled': (bg: $btn-warning-bg, text: $text-warning-primary, border: $fg-warning-secondary),
-      'hovered': (bg: $btn-warning-bg_hover, text: $text-warning-primary, icon: $fg-warning-secondary),
-      'focused': (bg: $btn-warning-bg, text: $text-warning-primary, icon: $fg-warning-secondary, ring: $focus-ring-warning),
-      'pressed': (bg: $btn-warning-bg_pressed, text: $text-primary_on-brand, icon: $fg-white),
-      'disabled': (bg: $btn-bg-disable, text: $fg-disabled),
-    ),
-    'text': (
-      'enabled': (bg: transparent, text: $warning-600, icon: $fg-warning-secondary),
-      'hovered': (bg: $btn-warning-bg_hover, text: $text-warning-primary, icon: $fg-warning-secondary),
-      'focused': (bg: $btn-warning-bg, text: $text-warning-primary, icon: $fg-warning-secondary, ring: $focus-ring-warning),
-      'pressed': (bg: transparent, text: $text-warning-primary, icon: $fg-warning-secondary),
-      'disabled': (bg: transparent, text: $fg-disabled),
-    ),
-  ),
-  'success': (
-    'contained': (
-      'enabled': (bg: $btn-success-bg, text: $text-success-primary, border: $border-success),
-      'hovered': (bg: $btn-success-bg_hover, text: $text-success-primary, icon: $fg-success-secondary, border: $border-success),
-      'focused': (bg: $btn-success-bg, text: $text-success-primary, icon: $fg-success-secondary, ring: $focus-ring-success),
-      'pressed': (bg: $btn-success-bg_pressed, text: $text-primary_on-brand, icon: $fg-white),
-      'disabled': (bg: $btn-bg-disable, text: $fg-disabled),
-    ),
-    'text': (
-      'enabled': (bg: transparent, text: $success-700, icon: $fg-success-primary),
-      'hovered': (bg: $btn-success-bg_hover, text: $text-success-primary, icon: $fg-success-secondary),
-      'focused': (bg: $btn-success-bg, text: $text-success-primary, icon: $fg-success-secondary, ring: $focus-ring-success),
-      'pressed': (bg: transparent, text: $text-success-primary, icon: $fg-success-secondary),
-      'disabled': (bg: transparent, text: $fg-disabled),
-    ),
-  ),
-) !default; // Custom variable
 
 // Body
 //
@@ -336,6 +129,11 @@ $dropdown-box-shadow: if(
 ) !default;
 $dropdown-item-padding-x: 16px;
 $dropdown-item-padding-y: 10px;
+// Bootstrap defaults these to `$spacer * .5` margins and a raw
+// rgba($black, .15): the rows already carry their own padding, and every
+// other rule in the product resolves through $border-*.
+$dropdown-divider-margin-y: 0;
+$dropdown-divider-bg: $border-secondary;
 $dropdown-link-hover-color: $gray-700;
 $dropdown-link-hover-bg: $gray-50;
 $dropdown-link-active-color: $gray-700;
@@ -351,9 +149,6 @@ $modal-footer-margin-between: 0.923rem !default;
 
 $modal-content-border-radius: $border-radius-xl !default;
 
-$modal-content-box-shadow:
-  0 12px 14px -4px rgba(#101828, 0.05),
-  0 6px 6px -4px rgba(#101828, 0.03) !default;
 $modal-content-box-shadow-xs:
   0 12px 14px -4px rgba(#101828, 0.1),
   0 6px 6px -4px rgba(#101828, 0.04) !default;
@@ -364,15 +159,6 @@ $modal-content-box-shadow-sm-up:
 $modal-lg: 840px !default;
 $modal-md: 544px !default;
 $modal-sm: 400px !default;
-
-// Popovers
-$popover-bg: $body-bg !default;
-
-// Tooltips
-$tooltip-bg: $bg-primary-solid !default;
-$tooltip-color: $text-primary_on-brand !default;
-$tooltip-padding-y: 0.154rem * 4 !default;
-$tooltip-padding-x: 0.154rem * 6 !default;
 
 // Breadcrumbs
 $breadcrumb-divider: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="6.26358" y1="18.4759" x2="14.0116" y2="1.86025" stroke="#{$fg-quinary}" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></svg>') !default;

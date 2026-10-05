@@ -13,7 +13,6 @@ import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { SidebarLayout } from '@/form/SidebarLayout';
 import { translate } from '@/i18n';
-import { PageBarProvider } from '@/marketplace/context';
 import { useBreadcrumbs } from '@/navigation/context';
 import { useTitle } from '@/navigation/title';
 import { ArchivedProposalRedirect } from '@/proposals/archive/ArchivedProposalRedirect';
@@ -26,6 +25,7 @@ import { usesCallVocabulary } from '@/proposals/presentation';
 import { Proposal } from '@/proposals/types';
 import { useUser } from '@/workspace/hooks';
 
+import { DownloadProposalPdfAction } from '../DownloadProposalPdfAction';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 import { WorkflowTimeline } from '../WorkflowTimeline';
@@ -118,6 +118,8 @@ export const ProposalManagePage = () => {
             'compliance_checklist_name',
             // Drives which Project details fields the form asks for.
             'proposal_field_config',
+            // Tells the applicant when review of a submitted proposal starts.
+            'evaluation_start',
             // Cast: compliance_checklist* are protected-call fields, so the
             // list is not assignable to keyof PublicCall.
           ] as any,
@@ -193,7 +195,7 @@ export const ProposalManagePage = () => {
   }
 
   return (
-    <PageBarProvider scrollOffset={100}>
+    <>
       <SidebarLayout.Header className="pb-5">
         <div className="w-100">
           {isCallManagerView ? (
@@ -206,7 +208,16 @@ export const ProposalManagePage = () => {
             proposal={proposal}
             call={call}
           />
-          <ProposalHeader proposal={proposal} className="mb-7" />
+          <ProposalHeader
+            proposal={proposal}
+            className="mb-7"
+            // A utility, not a decision: beside the title, not in the sidebar.
+            actions={
+              isCallManagerView ? (
+                <DownloadProposalPdfAction proposal={proposal} />
+              ) : undefined
+            }
+          />
           {/* No stepper while the proposal is a draft: the applicant hasn't
               submitted yet, so no workflow has started — the page shows the
               editable submission form instead. The stepper only appears from
@@ -215,6 +226,7 @@ export const ProposalManagePage = () => {
             <WorkflowTimeline
               proposal={proposal}
               showDetails={isCallManagerView}
+              evaluationStart={call?.evaluation_start}
             />
           )}
         </div>
@@ -234,6 +246,6 @@ export const ProposalManagePage = () => {
           refetch={refetch}
         />
       )}
-    </PageBarProvider>
+    </>
   );
 };

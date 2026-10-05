@@ -280,6 +280,43 @@ overrides:
         'true': Active
         'false': Inactive
 
+  changelog_entries:
+    componentName: ChangelogEntriesFilter
+    operationId: changelog_entries_retrieve
+    filters:
+      - relevant_only
+      - type
+      - risk
+      - category
+    relevant_only:
+      label: Relevance
+      placeholder: All entries
+      enumOverrides:
+        'true': Applies to this deployment
+    type:
+      label: Type
+    risk:
+      label: Risk
+    category:
+      label: Category
+      # Lists every value: enumOverrides replaces the options rather than
+      # relabelling some of them.
+      enumOverrides:
+        marketplace: Marketplace
+        auth: Authentication
+        identity: Identity
+        openstack: OpenStack
+        slurm: SLURM
+        invoices: Invoices
+        ai_assistant: AI assistant
+        reporting: Reporting
+        policy: Policy
+        proposal: Proposals
+        support: Support
+        ui: UI
+        infrastructure: Infrastructure
+        notifications: Notifications
+
   admin_support_users:
     componentName: AdminSupportUsersFilter
     operationId: support_users_list
@@ -1325,3 +1362,30 @@ overrides:
     user_uuid:
       label: Person
       operationId: users_list
+
+  marketplace_offering_merges:
+    filters:
+      - state
+      - offering_uuid
+      - created_by_uuid
+    state:
+      isMulti: true
+      enumOverrides:
+        draft: Draft
+        previewed: Previewed
+        queued: Queued
+        running: Running
+        done: Done
+        failed: Failed
+        undoing: Undoing
+        undone: Undone
+    offering_uuid:
+      label: Offering
+      name: offering
+      operationId: marketplace_provider_offerings_list
+      searchParam: name
+    created_by_uuid:
+      label: Created by
+      name: created_by
+      operationId: users_list
+      searchParam: full_name

@@ -1,13 +1,9 @@
 import { ArrowsClockwiseIcon, CaretRightIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { FunctionComponent, PropsWithChildren, useContext } from 'react';
-import {
-  Accordion,
-  AccordionContext,
-  ListGroupItem,
-  Stack,
-  useAccordionButton,
-} from 'react-bootstrap';
+import { FunctionComponent, PropsWithChildren, useState } from 'react';
+import { ListGroupItem, Stack } from 'react-bootstrap';
+
+import { Collapsible, CollapsibleContent } from 'waldur-ui';
 
 import { ImagePlaceholder } from '@/core/ImagePlaceholder';
 import { truncate } from '@/core/utils';
@@ -15,6 +11,7 @@ import { translate } from '@/i18n';
 import { Category, CategoryGroup } from '@/marketplace/types';
 
 import { BaseList } from './BaseList';
+import { getSelectableRowProps } from './utils';
 
 const EmptyCategoryListPlaceholder: FunctionComponent = () => (
   <div className="message-wrapper ellipsis">
@@ -23,23 +20,34 @@ const EmptyCategoryListPlaceholder: FunctionComponent = () => (
 );
 
 interface CategoryListItemProps {
-  item: Category;
+  item: Category | CategoryGroup;
   onClick;
   selectedItem?: Category;
   active?: boolean;
+  /** Set on a group header row: whether its categories are shown. */
+  expanded?: boolean;
   className?: string;
 }
 
 const CategoryListItem: FunctionComponent<
   PropsWithChildren<CategoryListItemProps>
-> = ({ item, onClick, selectedItem, active, className, children }) => {
+> = ({
+  item,
+  onClick,
+  selectedItem,
+  active,
+  expanded,
+  className,
+  children,
+}) => {
   return (
     <ListGroupItem
       data-uuid={item.uuid}
       className={classNames(className, {
         active: (selectedItem && item.uuid === selectedItem.uuid) || active,
       })}
-      onClick={() => onClick(item)}
+      {...getSelectableRowProps(() => onClick(item))}
+      aria-expanded={expanded}
     >
       <Stack
         direction="horizontal"
@@ -69,45 +77,38 @@ const CategoryListItem: FunctionComponent<
   );
 };
 
-function CustomToggle({ item, eventKey }) {
-  const decoratedOnClick = useAccordionButton(eventKey);
-  const { activeEventKey } = useContext(AccordionContext);
-
-  return (
-    <CategoryListItem
-      item={item}
-      onClick={decoratedOnClick}
-      active={activeEventKey === eventKey}
-    >
-      <span className="svg-icon svg-icon-3 text-gray-700 rotate-90">
-        <CaretRightIcon weight="bold" />
-      </span>
-    </CategoryListItem>
-  );
-}
-
 const CategoryGroupListItem: FunctionComponent<{
   item: CategoryGroup;
   onClick;
   selectedItem: Category;
 }> = ({ item, onClick, selectedItem }) => {
+  const [open, setOpen] = useState(false);
+
   return item.categories ? (
-    <Accordion flush>
-      <CustomToggle item={item} eventKey="0" />
-      <Accordion.Collapse eventKey="0">
-        <>
-          {item.categories.map((category) => (
-            <CategoryListItem
-              key={category.uuid}
-              item={category}
-              onClick={onClick}
-              selectedItem={selectedItem}
-              className="ps-7 pe-14"
-            />
-          ))}
-        </>
-      </Accordion.Collapse>
-    </Accordion>
+    <Collapsible open={open} onOpenChange={setOpen} className="category-group">
+      <CategoryListItem
+        item={item}
+        onClick={() => setOpen(!open)}
+        active={open}
+        expanded={open}
+      >
+        <CaretRightIcon
+          weight="bold"
+          className="size-4 text-gray-700 rotate-90"
+        />
+      </CategoryListItem>
+      <CollapsibleContent>
+        {item.categories.map((category) => (
+          <CategoryListItem
+            key={category.uuid}
+            item={category}
+            onClick={onClick}
+            selectedItem={selectedItem}
+            className="ps-7 pe-14"
+          />
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
   ) : (
     <CategoryListItem
       item={item as Category}

@@ -1,10 +1,15 @@
 import { FingerprintIcon } from '@phosphor-icons/react';
+import * as Tabs from '@radix-ui/react-tabs';
 import { useEffect, useState } from 'react';
-import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
 
-import { AlertItem } from '@/core/AlertItem';
-import { BaseButton } from '@/core/buttons/BaseButton';
+import {
+  AlertItem,
+  BaseButton,
+  segmentedItemClassName,
+  segmentedListClassName,
+} from 'waldur-ui';
+
 import { ENV } from '@/core/config';
 import { format } from '@/core/ErrorMessageFormatter';
 import { SubmitButton, StringGroup } from '@/form';
@@ -120,17 +125,18 @@ const PasskeyStep = ({ ceremony, onCancel }) => {
           'Your password was accepted. Confirm with your passkey to finish signing in.',
         )}
       </p>
-      <SubmitButton
-        submitting={busy}
+      <BaseButton
+        pending={busy}
         onClick={verify}
-        invalid={!prepared}
+        disabled={!prepared}
         disabledReason={
           !prepared ? translate('Preparing the passkey challenge.') : undefined
         }
-        type="button"
         label={translate('Confirm with passkey')}
         className="w-100 mb-3"
         data-testid="passkey-mfa-confirm"
+        variant="primary"
+        size="lg"
       />
       <BaseButton
         label={translate('Cancel')}
@@ -199,76 +205,67 @@ export const SigninForm = () => {
     <Form
       onSubmit={signin}
       initialValues={initialValues}
-      render={({
-        handleSubmit,
-        submitting,
-        submitError,
-        submitErrors,
-        values,
-      }) => {
+      render={({ handleSubmit, submitting, submitError, submitErrors }) => {
         const formError = submitErrors?._error || submitError;
         return (
           <form className="mb-2" onSubmit={handleSubmit}>
             <Field
               name="signin_by"
               render={({ input }) => (
-                <ToggleButtonGroup
-                  {...input}
-                  type="radio"
+                <Tabs.Root
+                  value={input.value}
+                  onValueChange={input.onChange}
                   className="w-100 mb-5"
                 >
-                  <ToggleButton
-                    id="tbg-username"
-                    value="username"
-                    variant="tertiary"
-                    className="w-50"
+                  <Tabs.List
+                    className={segmentedListClassName({ fullWidth: true })}
+                    aria-label={translate('Sign in method')}
                   >
-                    {translate('Username')}
-                  </ToggleButton>
-                  <ToggleButton
-                    id="tbg-token"
-                    value="token"
-                    variant="tertiary"
-                    className="w-50"
-                  >
-                    {translate('Access token')}
-                  </ToggleButton>
-                </ToggleButtonGroup>
+                    <Tabs.Trigger
+                      value="username"
+                      className={segmentedItemClassName({ fullWidth: true })}
+                    >
+                      {translate('Username')}
+                    </Tabs.Trigger>
+                    <Tabs.Trigger
+                      value="token"
+                      className={segmentedItemClassName({ fullWidth: true })}
+                    >
+                      {translate('Access token')}
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Tabs.Content value="username">
+                    <StringGroup
+                      name="username"
+                      label={translate('Username')}
+                      placeholder={translate('Enter your username')}
+                      className="text-start"
+                      spaceless
+                    />
+                    <PasswordGroup
+                      name="password"
+                      label={translate('Password')}
+                      placeholder={translate('Enter your password')}
+                      className="text-start"
+                      space={8}
+                    />
+                  </Tabs.Content>
+                  <Tabs.Content value="token">
+                    <PasswordGroup
+                      name="token"
+                      label={translate('Access token')}
+                      description={translate(
+                        'Use a personal access token issued by {siteName}',
+                        { siteName: ENV.plugins.WALDUR_CORE.SITE_NAME },
+                      )}
+                      placeholder={translate('Paste here your token')}
+                      className="text-start"
+                      space={8}
+                    />
+                  </Tabs.Content>
+                </Tabs.Root>
               )}
             />
-
-            {values.signin_by === 'username' ? (
-              <>
-                <StringGroup
-                  name="username"
-                  label={translate('Username')}
-                  placeholder={translate('Enter your username')}
-                  className="text-start"
-                  spaceless
-                  autoFocus
-                />
-                <PasswordGroup
-                  name="password"
-                  label={translate('Password')}
-                  placeholder={translate('Enter your password')}
-                  className="text-start"
-                  space={8}
-                />
-              </>
-            ) : (
-              <PasswordGroup
-                name="token"
-                label={translate('Access token')}
-                description={translate(
-                  'Use a personal access token issued by {siteName}',
-                  { siteName: ENV.plugins.WALDUR_CORE.SITE_NAME },
-                )}
-                placeholder={translate('Paste here your token')}
-                className="text-start"
-                space={8}
-                autoFocus
-              />
-            )}
 
             <SubmitButton
               submitting={submitting}
@@ -278,13 +275,14 @@ export const SigninForm = () => {
             />
 
             {formError && (
-              <div
-                className="alert alert-danger mt-3 ellipsis-lines-1"
+              <AlertItem
+                type="floating"
+                variant="error"
+                title={formError}
                 role="alert"
+                className="mt-3 ellipsis-lines-1"
                 style={{ maxWidth: '100vh' }}
-              >
-                {formError}
-              </div>
+              />
             )}
           </form>
         );

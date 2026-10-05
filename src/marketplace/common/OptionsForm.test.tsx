@@ -118,6 +118,64 @@ describe('OptionsForm Integration', () => {
     });
   });
 
+  describe('pattern', () => {
+    const slugOptions = {
+      order: ['slug'],
+      options: {
+        slug: {
+          type: 'string',
+          label: 'Project slug',
+          pattern: '[a-z][a-z0-9-]{2,30}',
+          pattern_error: 'Lowercase letters, digits and dashes.',
+        },
+      },
+    };
+
+    const renderWithSubmit = () => {
+      const onSubmit = vi.fn();
+      render(
+        <QueryClientProvider client={queryClient}>
+          <Form
+            onSubmit={onSubmit}
+            render={({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                <OptionsForm options={slugOptions as any} />
+                <button type="submit">Submit</button>
+              </form>
+            )}
+          />
+        </QueryClientProvider>,
+      );
+      return onSubmit;
+    };
+
+    it('blocks a value that does not match and shows the provider message', async () => {
+      const onSubmit = renderWithSubmit();
+      await userEvent.type(screen.getByRole('textbox'), 'My Project');
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      expect(onSubmit).not.toHaveBeenCalled();
+      expect(
+        await screen.findByText('Lowercase letters, digits and dashes.'),
+      ).toBeInTheDocument();
+    });
+
+    it('submits a matching value', async () => {
+      const onSubmit = renderWithSubmit();
+      await userEvent.type(screen.getByRole('textbox'), 'my-project');
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+      expect(onSubmit.mock.calls[0][0].attributes).toEqual({
+        slug: 'my-project',
+      });
+    });
+
+    it('does not require an optional value', async () => {
+      const onSubmit = renderWithSubmit();
+      await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('Core rendering behaviors', () => {
     it('renders nothing if options or order is empty', () => {
       renderForm({ options: {}, order: [] });
@@ -424,6 +482,60 @@ describe('OptionsForm Integration', () => {
   });
 
   describe('Validation integration', () => {
+    describe('component formula', () => {
+      const formulaOptions = (required = false) => ({
+        order: ['storage'],
+        options: {
+          storage: {
+            type: 'component_formula',
+            label: 'Storage',
+            required,
+            component_formula_config: {
+              targets: [{ component_type: 'data', formula: 'input * 2' }],
+            },
+          },
+        },
+      });
+
+      const typeAndLeave = async (value?: string) => {
+        const input = screen.getByRole('spinbutton');
+        await userEvent.click(input);
+        if (value) await userEvent.type(input, value);
+        await userEvent.tab();
+      };
+
+      it('keeps Required with its own checks', async () => {
+        renderForm(formulaOptions(true));
+        await typeAndLeave();
+        expect(
+          await screen.findByText(/This field is required/i),
+        ).toBeInTheDocument();
+      });
+
+      it('refuses a decimal instead of truncating it', async () => {
+        renderForm(formulaOptions());
+        await typeAndLeave('2.5');
+        expect(
+          await screen.findByText('Enter a whole number.'),
+        ).toBeInTheDocument();
+      });
+
+      it('refuses a value whose calculated limit exceeds the component', async () => {
+        renderForm(formulaOptions(), {
+          offering: {
+            options: formulaOptions(),
+            components: [{ type: 'data', name: 'Data', max_value: 100 }],
+          },
+        });
+        await typeAndLeave('60');
+        expect(
+          await screen.findByText(
+            'Calculated Data (120) is above its maximum of 100.',
+          ),
+        ).toBeInTheDocument();
+      });
+    });
+
     it('applies required validation and shows error message on blur', async () => {
       renderForm({
         order: ['mandatory'],

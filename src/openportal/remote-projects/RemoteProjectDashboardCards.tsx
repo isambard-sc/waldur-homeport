@@ -4,7 +4,8 @@ import { FC, ReactNode } from 'react';
 import { Col } from 'react-bootstrap';
 import { type RemoteProject } from 'waldur-js-client';
 
-import { AlertItem } from '@/core/AlertItem';
+import { AlertItem } from 'waldur-ui';
+
 import { formatDate } from '@/core/dateUtils';
 import { Link } from '@/core/Link';
 import { Panel } from '@/core/Panel';

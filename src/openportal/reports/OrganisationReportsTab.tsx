@@ -2,23 +2,21 @@
  * Organisation-level OpenPortal reports tab.
  */
 
-/* eslint-disable waldur-custom/no-direct-bootstrap-button */
 /* eslint-disable no-console */
 import { useQuery } from '@tanstack/react-query';
 import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  Container,
-  Form,
-  Modal,
-  Row,
-} from 'react-bootstrap';
+import { Card, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import { projectsList } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import {
+  AlertItem,
+  Badge,
+  BaseButton,
+  DatePicker,
+  DateRangePicker,
+  parseDateValue,
+  toIsoDate,
+} from 'waldur-ui';
 
 import { getNextPageUrl } from '@/core/api';
 import { LoadingErred } from '@/core/LoadingErred';
@@ -140,24 +138,22 @@ const ProjectAutocompleteDialog: FC<ProjectAutocompleteDialogProps> = ({
             <Form.Label className="small mb-1" htmlFor="dlg-startAfter">
               {translate('Start date — after')}
             </Form.Label>
-            <Form.Control
+            <DatePicker
               id="dlg-startAfter"
-              type="date"
               size="sm"
-              value={startAfter}
-              onChange={(e) => setStartAfter(e.target.value)}
+              value={parseDateValue(startAfter)}
+              onChange={(date) => setStartAfter(toIsoDate(date))}
             />
           </Col>
           <Col xs={6} md={4}>
             <Form.Label className="small mb-1" htmlFor="dlg-endBefore">
               {translate('End date — before')}
             </Form.Label>
-            <Form.Control
+            <DatePicker
               id="dlg-endBefore"
-              type="date"
               size="sm"
-              value={endBefore}
-              onChange={(e) => setEndBefore(e.target.value)}
+              value={parseDateValue(endBefore)}
+              onChange={(date) => setEndBefore(toIsoDate(date))}
             />
           </Col>
         </Row>
@@ -255,16 +251,22 @@ const ProjectAutocompleteDialog: FC<ProjectAutocompleteDialogProps> = ({
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" size="sm" onClick={onClose}>
-          {translate('Cancel')}
-        </Button>
-        <Button variant="primary" size="sm" onClick={() => onConfirm(draft)}>
-          {translate('Apply ({count} {project})', {
+        <BaseButton
+          variant="secondary"
+          size="sm"
+          onClick={onClose}
+          label={translate('Cancel')}
+        />
+        <BaseButton
+          variant="primary"
+          size="sm"
+          onClick={() => onConfirm(draft)}
+          label={translate('Apply ({count} {project})', {
             count: draft.size,
             project:
               draft.size !== 1 ? translate('projects') : translate('project'),
           })}
-        </Button>
+        />
       </Modal.Footer>
     </Modal>
   );
@@ -782,13 +784,12 @@ export const OrganisationReportsTab: FC = () => {
                     : translate('project'),
               })}
             </span>
-            <Button
+            <BaseButton
               variant="primary"
               size="sm"
               onClick={() => setDialogOpen(true)}
-            >
-              {translate('Filter selected projects')}
-            </Button>
+              label={translate('Filter selected projects')}
+            />
           </div>
         )}
 
@@ -838,7 +839,7 @@ export const OrganisationReportsTab: FC = () => {
                 })}
               </span>
             )}
-            <Button
+            <BaseButton
               variant="secondary"
               size="sm"
               onClick={() => {
@@ -849,16 +850,14 @@ export const OrganisationReportsTab: FC = () => {
                 refetchProjects();
                 if (loadTriggered) refetchReports();
               }}
-            >
-              {translate('Refresh')}
-            </Button>
-            <Button
+              label={translate('Refresh')}
+            />
+            <BaseButton
               variant="secondary"
               size="sm"
               onClick={() => setShowLoadPrompt(true)}
-            >
-              {translate('Load new data…')}
-            </Button>
+              label={translate('Load new data…')}
+            />
           </div>
         )}
       </div>
@@ -880,34 +879,33 @@ export const OrganisationReportsTab: FC = () => {
                 <Form.Control
                   id="projectSearch"
                   type="text"
-                  size="sm"
                   placeholder={translate('Name search (applied at load time)…')}
                   value={projectSearch}
                   onChange={(e) => setProjectSearch(e.target.value)}
                 />
               </Col>
-              <Col xs={6} md={4}>
-                <Form.Label className="small mb-1" htmlFor="projectStartAfter">
-                  {translate('Started after')}
+              <Col xs={12} md={4}>
+                <Form.Label
+                  className="small mb-1"
+                  htmlFor="reportProjectPeriod"
+                >
+                  {translate('Project period')}
                 </Form.Label>
-                <Form.Control
-                  id="projectStartAfter"
-                  type="date"
-                  size="sm"
-                  value={projectStartAfter}
-                  onChange={(e) => setProjectStartAfter(e.target.value)}
-                />
-              </Col>
-              <Col xs={6} md={4}>
-                <Form.Label className="small mb-1" htmlFor="projectEndBefore">
-                  {translate('Ended before')}
-                </Form.Label>
-                <Form.Control
-                  id="projectEndBefore"
-                  type="date"
-                  size="sm"
-                  value={projectEndBefore}
-                  onChange={(e) => setProjectEndBefore(e.target.value)}
+                <DateRangePicker
+                  id="reportProjectPeriod"
+                  value={
+                    projectStartAfter && projectEndBefore
+                      ? [
+                          parseDateValue(projectStartAfter)!,
+                          parseDateValue(projectEndBefore)!,
+                        ]
+                      : undefined
+                  }
+                  onChange={(range) => {
+                    setProjectStartAfter(range ? toIsoDate(range[0]) : '');
+                    setProjectEndBefore(range ? toIsoDate(range[1]) : '');
+                  }}
+                  clearable
                 />
               </Col>
             </Row>
@@ -948,16 +946,15 @@ export const OrganisationReportsTab: FC = () => {
               )}
             </p>
 
-            <Button
+            <BaseButton
               variant="primary"
               size="sm"
               onClick={() => {
                 setLoadTriggered(true);
                 setShowLoadPrompt(false);
               }}
-            >
-              {translate('Load reports')}
-            </Button>
+              label={translate('Load reports')}
+            />
           </Card.Body>
         </Card>
       )}
@@ -995,27 +992,23 @@ export const OrganisationReportsTab: FC = () => {
 
       {/* ── Slow-load warning ────────────────────────────────────────── */}
       {showSlowWarning && (
-        <Alert
+        <AlertItem
+          type="floating"
           variant="warning"
-          className="d-flex align-items-start gap-3 mb-3"
-        >
-          <div className="flex-grow-1">
-            <strong>{translate('This is taking a while.')}</strong>
-            <div className="small mt-1">
-              {translate(
-                'To speed things up: use a specific year/month filter, or search for fewer projects when loading. Large datasets with many users and projects take longer to process.',
-              )}
-            </div>
-          </div>
-          <Button
-            variant="warning"
-            size="sm"
-            className="flex-shrink-0"
-            onClick={() => window.location.reload()}
-          >
-            {translate('Cancel & reload')}
-          </Button>
-        </Alert>
+          className="mb-3"
+          title={translate('This is taking a while.')}
+          body={translate(
+            'To speed things up: use a specific year/month filter, or search for fewer projects when loading. Large datasets with many users and projects take longer to process.',
+          )}
+          actions={
+            <BaseButton
+              variant="warning"
+              size="sm"
+              onClick={() => window.location.reload()}
+              label={translate('Cancel & reload')}
+            />
+          }
+        />
       )}
 
       {/* ── Errors ───────────────────────────────────────────────────── */}
@@ -1049,34 +1042,32 @@ export const OrganisationReportsTab: FC = () => {
 
       {/* ── Truncated user mapping notice ────────────────────────────── */}
       {usersTruncatedCount > 0 && nameMaps !== undefined && (
-        <Alert
+        <AlertItem
+          type="floating"
           variant="info"
-          className="d-flex align-items-center gap-2 mb-3 py-2"
-        >
-          <small>
-            {translate(
-              'User names shown for top {max} users by usage only. {count} more {user} not mapped.',
-              {
-                max: MAX_USER_MAPPINGS,
-                count: usersTruncatedCount,
-                user:
-                  usersTruncatedCount !== 1
-                    ? translate('users')
-                    : translate('user'),
-              },
-            )}
-          </small>
-          <Button
-            variant="tertiary"
-            size="sm"
-            className="ms-auto"
-            onClick={() => {
-              setLoadAllUserMappings(true);
-            }}
-          >
-            {translate('Load all user names')}
-          </Button>
-        </Alert>
+          className="mb-3"
+          title={translate(
+            'User names shown for top {max} users by usage only. {count} more {user} not mapped.',
+            {
+              max: MAX_USER_MAPPINGS,
+              count: usersTruncatedCount,
+              user:
+                usersTruncatedCount !== 1
+                  ? translate('users')
+                  : translate('user'),
+            },
+          )}
+          actions={
+            <BaseButton
+              variant="tertiary"
+              size="sm"
+              onClick={() => {
+                setLoadAllUserMappings(true);
+              }}
+              label={translate('Load all user names')}
+            />
+          }
+        />
       )}
 
       {/* ── Charts ───────────────────────────────────────────────────── */}

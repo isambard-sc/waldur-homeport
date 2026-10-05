@@ -5,9 +5,10 @@ import {
   DownloadSimpleIcon,
 } from '@phosphor-icons/react';
 import { FC, useCallback, useState } from 'react';
-import { Alert } from 'react-bootstrap';
 
-import { BaseButton } from '@/core/buttons/BaseButton';
+import { AlertItem } from 'waldur-ui';
+import { BaseButton } from 'waldur-ui';
+
 import { MonacoEditor } from '@/form/MonacoEditor';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
@@ -82,6 +83,7 @@ export const SiteAgentConfigPreview: FC<SiteAgentConfigPreviewProps> = ({
               }
               size="lg"
             />
+            <CloseDialogButton label={translate('Close')} onClick={onClose} />
             <BaseButton
               variant="primary"
               onClick={handleDownload}
@@ -89,31 +91,19 @@ export const SiteAgentConfigPreview: FC<SiteAgentConfigPreviewProps> = ({
               label={translate('Download YAML')}
               size="lg"
             />
-            <CloseDialogButton label={translate('Close')} onClick={onClose} />
           </div>
         </div>
       }
     >
       {hasPlaceholders && (
-        <Alert variant="warning" className="d-flex align-items-center">
-          <span className="svg-icon svg-icon-2 me-2 flex-shrink-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              fill="currentColor"
-              viewBox="0 0 256 256"
-            >
-              <path d="M236.8,188.09,149.35,36.22h0a24.76,24.76,0,0,0-42.7,0L19.2,188.09a23.51,23.51,0,0,0,0,23.72A24.35,24.35,0,0,0,40.55,224h174.9a24.35,24.35,0,0,0,21.33-12.19A23.51,23.51,0,0,0,236.8,188.09ZM120,104a8,8,0,0,1,16,0v40a8,8,0,0,1-16,0Zm8,88a12,12,0,1,1,12-12A12,12,0,0,1,128,192Z" />
-            </svg>
-          </span>
-          <div>
-            <strong>{translate('Action Required:')}</strong>{' '}
-            {translate(
-              'This configuration contains placeholder values (e.g., <YOUR_API_TOKEN_HERE>) that need to be replaced with actual values before use.',
-            )}
-          </div>
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="warning"
+          title={translate('Action Required:')}
+          body={translate(
+            'This configuration contains placeholder values (e.g., <YOUR_API_TOKEN_HERE>) that need to be replaced with actual values before use.',
+          )}
+        />
       )}
 
       <div className="border rounded overflow-hidden">

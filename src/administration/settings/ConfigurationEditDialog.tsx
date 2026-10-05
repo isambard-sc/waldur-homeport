@@ -3,6 +3,8 @@ import { FormControl } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
 import { overrideSettings } from 'waldur-js-client';
 
+import { DEFAULT_PRIMARY_COLORS } from 'waldur-design-tokens';
+
 import { VisualLayoutSelector } from '@/auth/VisualLayoutSelector';
 import { formDataOptions } from '@/core/api';
 import { ENV } from '@/core/config';
@@ -11,6 +13,7 @@ import { SelectField, SubmitButton, TextField } from '@/form';
 import { FormGroup } from '@/form';
 import { AwesomeCheckboxField } from '@/form/AwesomeCheckboxField';
 import { CommaSeparatedListField } from '@/form/CommaSeparatedListField';
+import MarkdownEditor from '@/form/MarkdownEditor';
 import { MonacoField } from '@/form/MonacoField';
 import { StringField } from '@/form/StringField';
 import { WideImageField } from '@/form/WideImageField';
@@ -27,7 +30,7 @@ import {
 } from './utils';
 
 const colorPalette = [
-  '#307300',
+  DEFAULT_PRIMARY_COLORS[600],
   '#4E5BA6',
   '#444CE7',
   '#6938EF',
@@ -135,7 +138,8 @@ export const ConfigurationEditDialog: FC<ConfigurationEditDialogProps> = ({
                   disabled={invalid || !dirty}
                   submitting={submitting}
                   label={translate('Confirm')}
-                  className="btn btn-primary flex-equal"
+                  variant="primary"
+                  className="flex-equal"
                 />
               </>
             }
@@ -170,6 +174,10 @@ export const ConfigurationEditDialog: FC<ConfigurationEditDialogProps> = ({
                   {({ input }) => (
                     <MonacoField input={input} language="json" height={100} />
                   )}
+                </Field>
+              ) : item.type === 'markdown_field' ? (
+                <Field name="value">
+                  {({ input }) => <MarkdownEditor input={input} showImages />}
                 </Field>
               ) : item.type === 'text_field' ? (
                 <Field name="value">

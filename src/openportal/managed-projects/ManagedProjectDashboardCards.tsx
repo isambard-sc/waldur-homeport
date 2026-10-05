@@ -3,7 +3,8 @@ import { FC } from 'react';
 import { Col } from 'react-bootstrap';
 import { type ManagedProject, type Project } from 'waldur-js-client';
 
-import { AlertItem } from '@/core/AlertItem';
+import { AlertItem } from 'waldur-ui';
+
 import { formatDate } from '@/core/dateUtils';
 import { defaultCurrency } from '@/core/formatCurrency';
 import { Panel } from '@/core/Panel';

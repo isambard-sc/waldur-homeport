@@ -23,7 +23,21 @@
    motion — this is for packages/ui's Radix Dialog/Sheet primitives.
    Keyframe names are namespaced, so nothing else picks them up. */
 @import 'waldur-design-tokens/animations.css';
-@import 'waldur-design-tokens/badgeColors.css';
+@import 'waldur-design-tokens/colors.css';
+@import 'waldur-design-tokens/focusRing.css';
+@import 'waldur-design-tokens/zIndex.css';
+
+/* The app's one focus ring, for everything that doesn't style its own —
+   links, breadcrumbs, sidebar rows, anything with tabindex. In `base`, so
+   Metronic's .btn ring (bootstrap layer) and the BaseButton variants
+   (utilities) still win where they apply, and an element that deliberately
+   suppresses its outline keeps doing so. */
+@layer base {
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
 
 /* Preflight's one rule that Bootstrap has no counterpart for, and so the
    only part of it that actually reaches the app:
@@ -57,6 +71,18 @@
    ICON_BUTTON_BASE_CLASSNAME respectively — so it is blockified by its
    parent and never depended on preflight's rule to begin with. Verify that
    still holds before moving one of them into an inline-flow context. */
+/* The ring's corner for controls that bring no radius of their own. It sits in
+   `bootstrap`, not `base`, only because Bootstrap's reboot forces
+   `button { border-radius: 0 }` there -- from `base` every plain <button> (the
+   column pin, the favourite star) would keep square corners while the padded
+   buttons beside them are rounded. A component that sets its own radius still
+   wins: same specificity, and its stylesheet loads after this one. */
+@layer bootstrap {
+  :focus-visible {
+    border-radius: var(--focus-ring-radius);
+  }
+}
+
 @layer bootstrap {
   img,
   svg,
@@ -122,33 +148,20 @@
      Tailwind scale step, hence the non-reserved name. */
   --radius-modal: 20px;
 
-  /* Named z-index scale for values chosen to match a still-present
-     Metronic layer's own z-index (so a still-partially-migrated page keeps
-     the exact stacking it always had) — not a general-purpose z-index
-     scale: components with no such parity requirement (Dialog, Popover,
-     DropdownMenu) keep using Tailwind's own built-in z-50/z-10 as before,
-     since that's already a shared, named value and there's nothing
-     Metronic-specific to anchor to. `--z-index-*` is one of Tailwind's own
-     theme namespaces, so each of these also becomes a real `z-<name>`
-     utility (verified: a throwaway `--z-index-scale-test: 4242` produced a
-     working `z-scale-test` class, computed z-index 4242) — no arbitrary
-     `z-[...]` needed at the call site. */
-  /* Metronic's own $aside-config z-index (layout/_variables.scss) — above
-     its header (100) and toolbar (99). Matched by Sidebar.tsx's desktop
-     panel. */
-  --z-index-sidebar-panel: 105;
-  /* Metronic's mobile drawer (.aside.drawer-mobile-on) — above its own
-     header (100), and deliberately not the same value as sidebar-panel above
-     (a different Metronic element, measured separately). Matched by Sheet.tsx's
-     overlay/panel when used as the sidebar's mobile drawer. */
-  --z-index-mobile-drawer: 110;
-  /* src/core/Tooltip.tsx's Tip default zIndex prop. Not consumed as a
-     `z-tooltip` class: Tooltip.tsx's zIndex prop is typed as a plain
-     number (its *override* case needs a value only known at runtime, which
-     no static Tailwind class can express — see that prop's own comment),
-     so its default is kept as the literal 1180 in Tooltip.tsx rather than
-     this variable, with each side commented to point at the other. */
-  --z-index-tooltip: 1180;
+  /* Same names, same values as Bootstrap's $grid-breakpoints
+     (metronic/sass/core/components/_variables.scss) and GRID_BREAKPOINTS in
+     src/core/constants.ts, so `lg:` means 992px whether it is written as a
+     Tailwind variant, a Bootstrap `.d-lg-*` class, an SCSS media query or a
+     useMediaQuery() call. Tailwind's own defaults (640/1024/1280/1536) would
+     make it a fourth, different `lg`. px, not rem: the root font-size is
+     forced to 13px/12px, and rem in a media query is the browser's initial
+     16px anyway, so rem values here would be a trap. `md` (768) already
+     matched. */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
 }
 
 /* Tailwind's `visibility` utility set includes a class literally named
@@ -202,24 +215,6 @@
 
 @theme {
   --font-sans: var(--waldur-font-family), Helvetica, sans-serif;
-
-  /* Token bridge, not new colors — points at CSS custom properties the app
-     already sets at runtime (afterBootstrap.tsx's initCssVariables) or
-     compiles per-theme (_root.scss), so BRAND_COLOR/theme changes re-theme
-     these with zero code here changing. */
-  --color-brand-25: var(--waldur-brand-25);
-  --color-brand-50: var(--waldur-brand-50);
-  --color-brand-100: var(--waldur-brand-100);
-  --color-brand-200: var(--waldur-brand-200);
-  --color-brand-300: var(--waldur-brand-300);
-  --color-brand-400: var(--waldur-brand-400);
-  --color-brand-500: var(--waldur-brand-500);
-  --color-brand-600: var(--waldur-brand-600);
-  --color-brand-700: var(--waldur-brand-700);
-  --color-brand-800: var(--waldur-brand-800);
-  --color-brand-900: var(--waldur-brand-900);
-  --color-brand-950: var(--waldur-brand-950);
-  --color-brand: var(--waldur-brand-color);
 
   --color-bg-primary: var(--waldur-bg-primary);
   --color-border-secondary: var(--waldur-border-secondary);

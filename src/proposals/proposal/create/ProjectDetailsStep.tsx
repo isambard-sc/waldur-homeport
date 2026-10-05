@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { Field } from 'react-final-form';
 
-import { AccordionCard } from '@/core/AccordionCard';
+import { AccordionCard } from 'waldur-ui';
+
 import { isEmpty } from '@/core/utils';
 import { StringGroup, TextGroup } from '@/form';
 import { FormGroup } from '@/form';
@@ -121,12 +122,6 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
           }
         />
       )}
-      {/* The project duration is stated on the overview card, not asked here;
-          comments left on the old duration field must survive that. */}
-      <FieldReviewComments
-        reviews={reviews}
-        fieldName="comment_project_duration"
-      />
       {isFieldVisible(fieldStates, 'supporting_documentation') && (
         <>
           <FormGroup

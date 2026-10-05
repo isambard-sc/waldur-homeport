@@ -1,11 +1,10 @@
-import { CalendarBlankIcon } from '@phosphor-icons/react';
 import { DateTime } from 'luxon';
 import { FunctionComponent, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import Flatpickr from 'react-flatpickr';
 import { VersionHistory } from 'waldur-js-client';
 
-import { useFlatpickrTheme } from '@/form/useFlatpickrTheme';
+import { BaseButton, DatePicker } from 'waldur-ui';
+
 import { translate } from '@/i18n';
 
 import { useVersionAtTimestamp } from './api';
@@ -22,8 +21,6 @@ export const VersionStateAtTimestamp: FunctionComponent<
 > = ({ entityType, entityUuid, onVersionLoaded }) => {
   const [timestamp, setTimestamp] = useState<Date | null>(null);
   const [queryTimestamp, setQueryTimestamp] = useState<string | null>(null);
-
-  useFlatpickrTheme();
 
   const { data, isLoading, error } = useVersionAtTimestamp(
     entityType,
@@ -49,44 +46,25 @@ export const VersionStateAtTimestamp: FunctionComponent<
       <Form.Label className="mb-0 text-nowrap text-muted fs-7">
         {translate('State at:')}
       </Form.Label>
-      <div style={{ position: 'relative' }}>
-        <Flatpickr
-          value={timestamp}
-          onChange={(dates) => setTimestamp(dates[0] || null)}
-          options={{
-            enableTime: true,
-            dateFormat: 'Y-m-d H:i',
-            maxDate: new Date(),
-            time_24hr: true,
-          }}
-          className="form-control form-control-sm"
-          placeholder={translate('Select date and time')}
-          style={{ width: '180px' }}
-        />
-        <span
-          className="svg-icon svg-icon-2 svg-icon-muted"
-          style={{
-            position: 'absolute',
-            right: 10,
-            top: 8,
-            pointerEvents: 'none',
-          }}
-        >
-          <CalendarBlankIcon weight="bold" />
-        </span>
-      </div>
-      <button
-        type="button"
-        className="btn btn-sm btn-light-primary"
+      <DatePicker
+        enableTime
+        value={timestamp}
+        onChange={setTimestamp}
+        maxDate="now"
+        clearable={false}
+        size="sm"
+        placeholder={translate('Select date and time')}
+        style={{ width: '180px' }}
+      />
+      <BaseButton
+        variant="secondary"
+        size="sm"
         onClick={handleQuery}
         disabled={!timestamp || isLoading}
-      >
-        {isLoading ? (
-          <span className="spinner-border spinner-border-sm" />
-        ) : (
-          translate('Load')
-        )}
-      </button>
+        disabledReason={translate('Select a date and time first')}
+        pending={isLoading}
+        label={translate('Load')}
+      />
       {error && (
         <span className="text-danger fs-7">
           {translate('No version found at this time')}

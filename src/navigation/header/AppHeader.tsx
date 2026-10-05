@@ -3,15 +3,17 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 import { FunctionComponent, useState } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
-import { useSidebar, Tooltip } from 'waldur-ui';
+import { useSidebar, BaseButton, Tooltip } from 'waldur-ui';
 
 import { isAssistantEnabled } from '@/ai-assistant/utils';
+import { DEFAULT_REDIRECT_STATE, isSignInStep } from '@/auth/authNavigation';
 import { getIconUrl } from '@/core/api';
 import { GRID_BREAKPOINTS } from '@/core/constants';
 import { Link } from '@/core/Link';
 import { translate } from '@/i18n';
 import { hasSupport as hasSupportSelector } from '@/issues/hooks';
 import { isMatrixChatEnabled } from '@/matrix/utils';
+import { router } from '@/router';
 import { useUser } from '@/workspace/hooks';
 
 import { BreadcrumbMain } from './breadcrumb/BreadcrumbMain';
@@ -48,9 +50,7 @@ interface AppHeaderProps {
 export const AppHeader: FunctionComponent<AppHeaderProps> = ({
   hasBreadcrumbs,
 }) => {
-  const {
-    state: { name: stateName },
-  } = useCurrentStateAndParams();
+  const { state } = useCurrentStateAndParams();
   const user = useUser();
   const imageUrl = getIconUrl('sidebar_logo_mobile');
   const [errorImg, setErrorImg] = useState(false);
@@ -60,10 +60,21 @@ export const AppHeader: FunctionComponent<AppHeaderProps> = ({
   const showSupportDrawer = hasSupportSelector() || isMatrixChatEnabled();
 
   const isSmallScr = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.lg });
-  const isResourceCreationView = stateName === 'marketplace-offering-public';
+  const showGoBack = Boolean(state.data?.showGoBack);
 
   const onGoBack = () => {
-    window.history.back();
+    // A page opened from an email link, or reached through a login redirect
+    // (the form, an SSO callback, or a profile gate on first sign-in), has
+    // no page in the app to go back to. A reload looks the same, so it also
+    // lands on the dashboard.
+    const previous = router.globals.successfulTransitions
+      .peekTail()
+      ?.from().name;
+    if (previous && !isSignInStep(previous)) {
+      window.history.back();
+    } else {
+      router.stateService.go(DEFAULT_REDIRECT_STATE);
+    }
   };
 
   return (
@@ -104,17 +115,16 @@ export const AppHeader: FunctionComponent<AppHeaderProps> = ({
             // overflow measurement (Breadcrumbs.tsx) can collapse the middle.
             style={{ minWidth: 0, flexBasis: 0, overflow: 'hidden' }}
           >
-            {Boolean(user) && isResourceCreationView && (
-              <button
-                className="btn me-3 py-0 d-inline-flex align-items-center justify-content-center align-self-center gap-1 text-primary fw-semibold fs-5 border-0 bg-transparent"
-                type="button"
+            {Boolean(user) && showGoBack && (
+              <BaseButton
+                variant="text-primary"
+                className="me-3 py-0 align-self-center fw-semibold fs-5"
                 onClick={onGoBack}
-                title={translate('Go back')}
+                tooltip={translate('Go back')}
                 style={{ width: '108px', height: '36px' }}
-              >
-                <CaretLeftIcon size={18} weight="bold" />
-                <span>{translate('Go back')}</span>
-              </button>
+                iconNode={<CaretLeftIcon size={18} weight="bold" />}
+                label={translate('Go back')}
+              />
             )}
             {hasBreadcrumbs && <BreadcrumbMain />}
           </div>

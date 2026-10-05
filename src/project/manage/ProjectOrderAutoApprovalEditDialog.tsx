@@ -1,6 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { FC } from 'react';
-import { Alert } from 'react-bootstrap';
 import { Form } from 'react-final-form';
 import {
   Project,
@@ -10,6 +9,8 @@ import {
   marketplaceProjectOrderAutoApprovalsPartialUpdate,
 } from 'waldur-js-client';
 
+import { AlertItem, BaseButton } from 'waldur-ui';
+
 import { ENV } from '@/core/config';
 import { SubmitButton, BooleanGroup, NumberGroup } from '@/form';
 import { translate } from '@/i18n';
@@ -17,7 +18,7 @@ import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 import { PermissionEnum } from '@/permissions/enums';
-import { hasPermission } from '@/permissions/hasPermission';
+import { hasConsumerPermission } from '@/permissions/hasPermission';
 import { useUser } from '@/workspace/hooks';
 
 interface EditDialogProps {
@@ -51,7 +52,7 @@ export const ProjectOrderAutoApprovalEditDialog: FC<EditDialogProps> = ({
   const user = useUser();
   const queryClient = useQueryClient();
 
-  const hasScopedPermission = hasPermission(user, {
+  const hasScopedPermission = hasConsumerPermission(user, {
     permission: PermissionEnum.APPROVE_ORDER,
     projectId: project.uuid,
     customerId: project.customer_uuid,
@@ -115,29 +116,33 @@ export const ProjectOrderAutoApprovalEditDialog: FC<EditDialogProps> = ({
             footer={
               <>
                 {rule ? (
-                  <SubmitButton
-                    submitting={destroyMutation.isPending}
-                    type="button"
+                  <BaseButton
+                    pending={destroyMutation.isPending}
                     onClick={() => destroyMutation.mutate()}
                     label={translate('Remove rule')}
-                    className="btn btn-danger me-auto"
+                    variant="danger"
+                    className="me-auto"
+                    size="lg"
                   />
                 ) : null}
                 <CloseDialogButton />
                 <SubmitButton
                   submitting={submitting || upsertMutation.isPending}
                   label={translate('Save')}
-                  className="btn btn-primary"
+                  variant="primary"
                 />
               </>
             }
           >
             {showStaffWarning && (
-              <Alert variant="warning">
-                {translate(
+              <AlertItem
+                type="floating"
+                variant="warning"
+                title={translate('Warning')}
+                body={translate(
                   "You don't hold order-approval permission on this scope. Saving this rule will let orders be auto-approved without further review.",
                 )}
-              </Alert>
+              />
             )}
 
             <BooleanGroup

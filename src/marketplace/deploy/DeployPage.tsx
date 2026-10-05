@@ -41,10 +41,9 @@ import { useCustomer, useProject, useUser } from '@/workspace/hooks';
 
 import { getOrderFormComponent } from '../common/registry';
 import { DeployFormData, Limits } from '../common/types';
-import { PageBarProvider } from '../context';
 import { formatOrderForCreate } from '../details/utils';
 import { getMarketplaceFilters } from '../landing/filter/store/selectors';
-import { getDefaultLimits, scrollToSectionById } from '../offerings/utils';
+import { scrollToSectionById } from '../offerings/utils';
 import { isExperimentalUiComponentsVisible } from '../utils';
 
 import { DeployPageActions } from './DeployPageActions';
@@ -54,7 +53,10 @@ import { NavigationBlocker } from './NavigationBlocker';
 import { useOrderFormData } from './selectors';
 import { isPartitionQosRequired } from './steps/FormQoSSelectionStep';
 import { OfferingConfigurationFormStep } from './types';
-import { hasStepWithField } from './utils';
+import { useDefaultLimits } from './useDefaultLimits';
+import { useDefaultPlan } from './useDefaultPlan';
+import { useDerivedLimits } from './useDerivedLimits';
+import { hasStepWithField, isMissingRequiredPlan } from './utils';
 
 import './DeployPage.scss';
 
@@ -103,11 +105,41 @@ export const BaseDeployPage = ({
     user,
     PermissionEnum.CREATE_ORDER,
   );
-
-  const plans = useMemo(
-    () => selectedOffering.plans.filter((plan) => plan.archived === false),
-    [selectedOffering],
+  // New orders only: an edit carries the plan the order was placed with, and an
+  // offering that has since lost its last orderable plan must not lock the form.
+  const hasNoOrderablePlan = useMemo(
+    () => !isEdit && isMissingRequiredPlan(selectedOffering),
+    [isEdit, selectedOffering],
   );
+
+  // Why every step but the first is closed, in reporting order. One answer for
+  // the three places that render a closed step: they were spelled out at each
+  // of them and had drifted -- the preview site had no tooltip at all.
+  const blockedReason = useMemo(() => {
+    if (noOrganizationOrProject) {
+      return translate('Select an organization and project to proceed.');
+    }
+    if (isProjectInactive) {
+      return translate('Project has reached its end date.');
+    }
+    if (!canCreateOrder) {
+      return translate('You are not allowed to create orders in this project.');
+    }
+    if (hasNoOrderablePlan) {
+      // Without it the form is a dead end: FormPlanStep renders nothing when
+      // there is no plan to show, nothing stops the submit, and the order comes
+      // back refused for a plan the user was never offered.
+      return translate(
+        'No plan of this offering is available to you, so it cannot be ordered.',
+      );
+    }
+    return null;
+  }, [
+    noOrganizationOrProject,
+    isProjectInactive,
+    canCreateOrder,
+    hasNoOrderablePlan,
+  ]);
 
   const formSteps = useMemo(
     () =>
@@ -150,18 +182,7 @@ export const BaseDeployPage = ({
     (_, i) => stepRefs.current[i] ?? createRef(),
   );
 
-  // Seed the offering's defaults, without overwriting what is already there.
-  //
-  // This effect is not the only writer of `values.limits`: a step can fill them
-  // in too -- the vSphere template step sets cpu, ram and disk from the chosen
-  // template -- and the two race. Which one wins used to depend on whether the
-  // template query was served from cache: a plain reassignment blanked the
-  // fields when this effect ran second, and a one-shot guard blanked them when
-  // it ran first, since React flushes a child's effects before its parent's.
-  // Merging the current values on top is invariant to that ordering. Nothing
-  // stale survives an offering switch either: a route-level change remounts the
-  // form (see the `key` on <Form> below), and an in-form change goes through
-  // FormCloudStep, which clears `limits` as it switches.
+  // Seed the offering's attribute defaults.
   useEffect(() => {
     if (isEdit) return;
     if (selectedOffering) {
@@ -180,26 +201,24 @@ export const BaseDeployPage = ({
           ),
         );
       }
-      form.change('limits', {
-        ...getDefaultLimits(selectedOffering),
-        ...props.limits,
-        ...form.getState().values.limits,
-      });
     }
   }, [selectedOffering]);
 
-  // The plan has its own trigger: it is assigned once the offering's plans are
-  // known, which is unrelated to seeding the defaults above.
-  useEffect(() => {
-    if (isEdit) return;
-    if (hasStepWithField(formSteps, 'plan') && plans) {
-      if (props.plan) {
-        form.change('plan', props.plan);
-      } else if (plans.length === 1) {
-        form.change('plan', plans[0]);
-      }
-    }
-  }, [plans, props.plan]);
+  useDefaultLimits({
+    offering: selectedOffering,
+    fallbackLimits: props.limits,
+    skip: isEdit,
+  });
+
+  useDerivedLimits(selectedOffering);
+
+  // Follows the offering: FormCloudStep can switch it without remounting the
+  // form, leaving behind a plan that belongs to the offering switched away from.
+  useDefaultPlan({
+    offering: selectedOffering,
+    plan: props.plan,
+    skip: isEdit || !hasStepWithField(formSteps, 'plan'),
+  });
 
   const [lastY, setLastY] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<boolean[]>(
@@ -209,11 +228,9 @@ export const BaseDeployPage = ({
   const disabledSteps = useMemo(
     () =>
       formSteps.map(
-        (step) =>
-          step.id !== 'step-general' &&
-          (isProjectInactive || noOrganizationOrProject || !canCreateOrder),
+        (step) => step.id !== 'step-general' && Boolean(blockedReason),
       ),
-    [formSteps, isProjectInactive, noOrganizationOrProject, canCreateOrder],
+    [formSteps, blockedReason],
   );
 
   const setScroll = useCallback(() => {
@@ -323,12 +340,8 @@ export const BaseDeployPage = ({
                 title={step.label}
                 offering={selectedOffering}
                 params={step.params}
-                disabled={
-                  step.id !== 'step-general' &&
-                  (isProjectInactive ||
-                    noOrganizationOrProject ||
-                    !canCreateOrder)
-                }
+                disabled={step.id !== 'step-general' && Boolean(blockedReason)}
+                disabledTooltip={blockedReason}
                 previewMode
               />
             </div>
@@ -339,7 +352,7 @@ export const BaseDeployPage = ({
   }
 
   return (
-    <PageBarProvider scrollOffset={100}>
+    <>
       <SidebarLayout.Header>
         <div className="d-flex justify-content-between align-items-center w-100">
           <h1 className="mb-0 flex-grow-1">
@@ -358,25 +371,8 @@ export const BaseDeployPage = ({
                 title={step.label}
                 offering={selectedOffering}
                 params={step.params}
-                disabled={
-                  step.id !== 'step-general' &&
-                  (isProjectInactive ||
-                    noOrganizationOrProject ||
-                    !canCreateOrder)
-                }
-                disabledTooltip={
-                  noOrganizationOrProject
-                    ? translate(
-                        'Select an organization and project to proceed.',
-                      )
-                    : isProjectInactive
-                      ? translate('Project has reached its end date.')
-                      : !canCreateOrder
-                        ? translate(
-                            'You are not allowed to create orders in this project.',
-                          )
-                        : null
-                }
+                disabled={step.id !== 'step-general' && Boolean(blockedReason)}
+                disabledTooltip={blockedReason}
               />
             </div>
           ))}
@@ -393,7 +389,7 @@ export const BaseDeployPage = ({
           />
         </SidebarLayout.Sidebar>
       </SidebarLayout.Container>
-    </PageBarProvider>
+    </>
   );
 };
 
@@ -525,6 +521,11 @@ export const DeployPage: FC<DeployPageProps> = (props) => {
       mutators={{ ...arrayMutators }}
       onSubmit={handleMutate}
       initialValues={initialValues}
+      // Choosing the project re-runs initializeFormValues (it depends on
+      // currentProject) and hands the form new initial values. Without this,
+      // the reinitialisation drops everything written since -- the plan, the
+      // limits, whatever the user typed.
+      keepDirtyOnReinitialize
       subscription={{ values: true }}
       render={({ values, handleSubmit }) => {
         const selectedOffering = values.offering || props.offering;

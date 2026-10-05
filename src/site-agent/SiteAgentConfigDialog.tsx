@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { FC, useMemo, useState } from 'react';
-import { Alert, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import {
   marketplaceServiceProvidersGenerateSiteAgentConfig,
   marketplaceServiceProvidersOfferingsList,
 } from 'waldur-js-client';
 
+import { AlertItem, BaseButton } from 'waldur-ui';
+
 import { LoadingSpinner } from '@/core/LoadingSpinner';
-import { SubmitButton } from '@/form';
 import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
@@ -141,12 +142,18 @@ export const SiteAgentConfigDialog: FC<SiteAgentConfigDialogProps> = ({
       footer={
         <>
           <CloseDialogButton />
-          <SubmitButton
-            submitting={isGenerating}
+          <BaseButton
+            pending={isGenerating}
             label={translate('Generate Configuration')}
             disabled={selectedOfferings.length === 0}
-            type="button"
+            disabledReason={
+              selectedOfferings.length === 0
+                ? translate('Please select at least one offering')
+                : undefined
+            }
             onClick={() => generateConfig()}
+            variant="primary"
+            size="lg"
           />
         </>
       }
@@ -164,11 +171,13 @@ export const SiteAgentConfigDialog: FC<SiteAgentConfigDialogProps> = ({
       ) : offeringsLoading ? (
         <LoadingSpinner />
       ) : !offerings || offerings.length === 0 ? (
-        <Alert variant="info">
-          {translate(
+        <AlertItem
+          type="floating"
+          variant="info"
+          title={translate(
             'No SLURM offerings found for this service provider. Create a SLURM offering first.',
           )}
-        </Alert>
+        />
       ) : (
         <Form.Group className="mb-4">
           <Form.Label className="fw-bold">

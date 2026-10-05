@@ -73,12 +73,7 @@ const PlanCard = ({
         <Field
           label={translate('Description')}
           labelWidth={200}
-          value={
-            <PlanDescriptionButton
-              className="btn btn-sm btn-secondary"
-              planDescription={planDescription}
-            />
-          }
+          value={<PlanDescriptionButton planDescription={planDescription} />}
         />
       )}
 
@@ -149,7 +144,10 @@ const PlanCard = ({
 };
 
 export const PlanSection = (props: PlanDetailsProps) => {
-  const shouldConcealPrices = useShouldConcealPrices(props.order.project_uuid);
+  const shouldConcealPrices = useShouldConcealPrices(
+    props.order.project_uuid,
+    props.order.customer_uuid,
+  );
   const { plan_name, plan_description, old_plan_name } = props.order;
 
   if (!plan_name) {

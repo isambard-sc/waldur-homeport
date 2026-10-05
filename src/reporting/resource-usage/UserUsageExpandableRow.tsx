@@ -1,14 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { uniqueId } from 'lodash-es';
 import { DateTime } from 'luxon';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Card,
-  Col,
-  Row,
-  ToggleButton,
-  ToggleButtonGroup,
-} from 'react-bootstrap';
+import { Card, Col, Row } from 'react-bootstrap';
 import { useMediaQuery } from 'react-responsive';
 import {
   ComponentUsage,
@@ -17,6 +10,8 @@ import {
   marketplaceComponentUserUsagesList,
   marketplaceResourcesRetrieve,
 } from 'waldur-js-client';
+
+import { SegmentedControl } from 'waldur-ui';
 
 import { getAllPages, MAX_PAGE_SIZE } from '@/core/api';
 import { GRID_BREAKPOINTS, UI_STALE_TIME } from '@/core/constants';
@@ -171,26 +166,14 @@ export const UsageExpandableRow = ({
               <div className="d-flex align-items-center justify-content-between gap-2 text-nowrap flex-wrap">
                 <div>
                   {periodOptions.length > 1 && (
-                    <ToggleButtonGroup
-                      type="radio"
-                      name={'period' + row.resource_uuid + componentType}
+                    <SegmentedControl<number>
+                      aria-label={translate('Time period')}
+                      size="sm"
+                      itemClassName="px-4"
+                      options={periodOptions}
                       value={period}
-                      defaultValue={period}
-                      onChange={setPeriod}
-                    >
-                      {periodOptions.map((option) => (
-                        <ToggleButton
-                          key={option.value}
-                          id={'tbg-' + option.value + uniqueId()}
-                          value={option.value}
-                          variant="outline-secondary"
-                          size="sm"
-                          className="px-4"
-                        >
-                          {option.label}
-                        </ToggleButton>
-                      ))}
-                    </ToggleButtonGroup>
+                      onValueChange={setPeriod}
+                    />
                   )}
                 </div>
                 {row.measured_unit && (

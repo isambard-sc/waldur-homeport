@@ -6,12 +6,20 @@ import React, {
   useCallback,
 } from 'react';
 
+import { DrawerShellClass } from './shellClasses';
+
 export interface DrawerProps {
   title?: React.ReactNode;
   subtitle?: string;
   footer?: ComponentType<any>;
   toolbar?: ComponentType<{ close: () => void }>;
   width?: string;
+  /**
+   * Rendered by DrawerRoot rather than added to #kt_drawer by hand: DrawerRoot
+   * owns the element's className, and every re-render that changes it
+   * (closing, for one) rewrites the whole attribute.
+   */
+  shellClass?: DrawerShellClass;
   [key: string]: any;
 }
 
@@ -59,15 +67,25 @@ export const DrawerProvider: React.FC<{ children: ReactNode }> = ({
   const closeDrawer = useCallback(() => {
     setIsOpen(false);
     setDrawerComponent(null);
-    setDrawerProps(DEFAULT_DRAWER_PROPS);
+    // The shell class has to outlast the slide-out, or the card drops to the
+    // default full-height panel over the page header while it leaves.
+    setDrawerProps((prev) => ({
+      ...DEFAULT_DRAWER_PROPS,
+      shellClass: prev.shellClass,
+    }));
   }, []);
 
   const renderDrawer = useCallback(
     <T,>(component: ComponentType<T>, props?: T & DrawerProps) => {
+      // Never overwrite an active open drawer with a background render call
+      // unless that drawer is already displaying this component.
+      if (isOpen && drawerComponent !== component) {
+        return;
+      }
       setDrawerComponent(() => component);
       setDrawerProps({ ...DEFAULT_DRAWER_PROPS, ...props });
     },
-    [],
+    [isOpen, drawerComponent],
   );
 
   // Update the global ref

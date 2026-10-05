@@ -1,14 +1,16 @@
 import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, Fragment, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MatrixRoom } from 'waldur-js-client';
 
-import { IconButton } from '@/core/buttons/IconButton';
+import { BaseButton } from 'waldur-ui';
+
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { StateIndicator } from '@/core/StateIndicator';
 import FormTable from '@/form/FormTable';
 import { translate } from '@/i18n';
+import { canCreateMatrixRoom } from '@/matrix/canCreateMatrixRoom';
 import { useProjectMatrixRooms } from '@/matrix/chat/useProjectMatrixRooms';
 import { CreateMatrixRoomDialog } from '@/matrix/CreateMatrixRoomDialog';
 import { MatrixExportsList } from '@/matrix/MatrixExportsList';
@@ -22,56 +24,86 @@ import {
   RetryRoomButton,
   SyncMembersButton,
 } from '@/matrix/MatrixRoomActions';
-import { ROOM_STATE_VARIANT } from '@/matrix/MatrixRoomStateBadge';
+import { ROOM_STATE_VARIANT, stateLabel } from '@/matrix/MatrixRoomStateBadge';
 import { useModal } from '@/modal/actions';
 import { NoResult } from '@/navigation/header/search/NoResult';
-import { ActionButton } from '@/table/ActionButton';
+import { ActionDropdownButton } from '@/table/ActionDropdownButton';
+import { ActionsDropdownSeparator } from '@/table/ActionsDropdown';
 import { renderFieldOrDash } from '@/table/utils';
 import {
   getProject,
+  getUser,
   isOwnerOrStaff as isOwnerOrStaffSelector,
   isStaff as isStaffSelector,
 } from '@/workspace/selectors';
 
-// Demo policy: owners may sync members and export history on an active room,
-// but room lifecycle (disable, retry, re-enable, delete) is staff-only.
+// Lifecycle after creation is staff-only here, deliberately stricter than the API.
+// Menu order is by cost: sync → connect (provisions, mints a token) →
+// disable → delete. One action is promoted beside it: the conversation while
+// healthy, otherwise whatever fixes the current state.
 const RoomActions: FC<{
   room: MatrixRoom;
   isOwnerOrStaff: boolean;
   staff: boolean;
   refetch(): void;
-}> = ({ room, isOwnerOrStaff, staff, refetch }) => (
-  <div className="d-flex gap-1 flex-wrap">
-    {room.state === 'active' && (
-      <OpenInTeamChatButton row={room} refetch={refetch} as={ActionButton} />
-    )}
-    {room.state === 'active' && (
-      <OpenInMatrixButton row={room} refetch={refetch} as={ActionButton} />
-    )}
-    {isOwnerOrStaff && room.state === 'active' && (
-      <SyncMembersButton row={room} refetch={refetch} as={ActionButton} />
-    )}
-    {staff && room.state === 'active' && (
-      <DisableChatButton row={room} refetch={refetch} as={ActionButton} />
-    )}
-    {staff && room.state === 'creating' && (
-      <RetryRoomButton row={room} refetch={refetch} as={ActionButton} />
-    )}
-    {staff && room.state === 'error' && (
-      <>
-        <RetryRoomButton row={room} refetch={refetch} as={ActionButton} />
-        <DisableChatButton row={room} refetch={refetch} as={ActionButton} />
-        <DeleteRoomButton row={room} refetch={refetch} as={ActionButton} />
-      </>
-    )}
-    {staff && room.state === 'archived' && (
-      <>
-        <ReactivateChatButton row={room} refetch={refetch} as={ActionButton} />
-        <DeleteRoomButton row={room} refetch={refetch} as={ActionButton} />
-      </>
-    )}
-  </div>
-);
+}> = ({ room, isOwnerOrStaff, staff, refetch }) => {
+  const isActive = room.state === 'active';
+  const canSync = isOwnerOrStaff && isActive;
+  const canRetry =
+    staff &&
+    (room.state === 'creating' ||
+      room.state === 'disabling' ||
+      room.state === 'error');
+  const canReactivate = staff && room.state === 'archived';
+  const canDisable = staff && (isActive || room.state === 'error');
+  const canDelete =
+    staff && (room.state === 'error' || room.state === 'archived');
+
+  // At most one is ever available: the three state tests are disjoint.
+  const PromotedAction = isActive
+    ? OpenInTeamChatButton
+    : canRetry
+      ? RetryRoomButton
+      : canReactivate
+        ? ReactivateChatButton
+        : null;
+
+  const groups = [
+    canSync && <SyncMembersButton key="sync" row={room} refetch={refetch} />,
+    isActive && (
+      <OpenInMatrixButton key="matrix" row={room} refetch={refetch} />
+    ),
+    canDisable && (
+      <DisableChatButton key="disable" row={room} refetch={refetch} />
+    ),
+    canDelete && <DeleteRoomButton key="delete" row={room} refetch={refetch} />,
+  ].filter(Boolean);
+
+  if (!PromotedAction && groups.length === 0) return null;
+
+  return (
+    <div className="d-flex align-items-center gap-2">
+      {PromotedAction && (
+        <PromotedAction
+          row={room}
+          refetch={refetch}
+          as={BaseButton}
+          variant="secondary"
+        />
+      )}
+      {groups.length > 0 && (
+        <ActionDropdownButton title={translate('All actions')} align="end">
+          {groups.map((item, index) => (
+            <Fragment key={index}>
+              {index > 0 && <ActionsDropdownSeparator />}
+              {item}
+            </Fragment>
+          ))}
+        </ActionDropdownButton>
+      )}
+    </div>
+  );
+};
 
 const HistoryExportsCard: FC<{
   room: MatrixRoom;
@@ -99,7 +131,7 @@ const HistoryExportsCard: FC<{
           {isActive ? (
             <div ref={setRefreshSlot} className="d-flex align-items-center" />
           ) : (
-            <IconButton
+            <BaseButton
               iconNode={<ArrowsClockwiseIcon weight="bold" />}
               tooltip={translate(
                 'Refresh is available when the room is active — no history exports can be produced in the current state.',
@@ -107,14 +139,11 @@ const HistoryExportsCard: FC<{
               onClick={() => undefined}
               variant="text-secondary"
               disabled
+              size="lg"
             />
           )}
           {isOwnerOrStaff && isActive && (
-            <ExportHistoryButton
-              row={room}
-              refetch={refetch}
-              as={ActionButton}
-            />
+            <ExportHistoryButton row={room} refetch={refetch} as={BaseButton} />
           )}
         </div>
       }
@@ -153,7 +182,7 @@ const RoomDetails: FC<{
           label={translate('State')}
           value={
             <StateIndicator
-              label={room.state}
+              label={stateLabel(room.state)}
               variant={ROOM_STATE_VARIANT[room.state] || 'neutral'}
               active={room.state === 'creating' || room.state === 'disabling'}
               shape="pill"
@@ -188,6 +217,7 @@ const RoomDetails: FC<{
 
 export const ProjectMatrixChat: FC = () => {
   const project = useSelector(getProject);
+  const user = useSelector(getUser);
   const isOwnerOrStaff = useSelector(isOwnerOrStaffSelector);
   const staff = useSelector(isStaffSelector);
   const { openDialog } = useModal();
@@ -225,18 +255,19 @@ export const ProjectMatrixChat: FC = () => {
     );
 
   if (!room) {
+    const canCreate = canCreateMatrixRoom(user, project);
     return (
       <NoResult
         title={translate('No chat room')}
         message={
-          staff
+          canCreate
             ? translate(
                 'No chat room has been created for this project yet. Create one to enable team communication via Matrix.',
               )
             : translate('No chat room has been created for this project.')
         }
-        callback={staff ? openCreateDialog : undefined}
-        buttonTitle={staff ? translate('Create chat room') : undefined}
+        callback={canCreate ? openCreateDialog : undefined}
+        buttonTitle={canCreate ? translate('Create chat room') : undefined}
       />
     );
   }

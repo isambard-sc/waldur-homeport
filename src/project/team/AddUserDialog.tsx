@@ -18,6 +18,8 @@ import { usersAutocomplete } from '@/customer/team/utils';
 import { isFeatureVisible } from '@/features/connect';
 import { UserFeatures } from '@/FeaturesEnums';
 import { AsyncSelectGroup, BooleanGroup, SubmitButton } from '@/form';
+import { FieldError } from '@/form/FieldError';
+import { FieldWarning } from '@/form/FieldWarning';
 import { createLoadOptions } from '@/form/select';
 import { translate } from '@/i18n';
 import { RestrictionsInfoCard } from '@/invitations/actions/RestrictionsInfoCard';
@@ -26,8 +28,10 @@ import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { isEmailAllowed } from '@/openportal/awardPolicy';
 import { PermissionEnum } from '@/permissions/enums';
+import { getExistingRoleFeedback } from '@/permissions/existingRoles';
 import { hasPermission } from '@/permissions/hasPermission';
 import { Role, RoleType } from '@/permissions/types';
+import { useExistingRoles } from '@/permissions/useExistingRoles';
 import { useNotify } from '@/store/notify';
 import { UserFormDialog } from '@/user/support/UserFormDialog';
 import { getCurrentUser } from '@/user/UsersService';
@@ -384,6 +388,25 @@ const AddUserDialogForm: FC<AddUserDialogFormProps> = ({
     isProjectManagerSelectionBlocked(targetProjectHasManager, values.role) ||
     (needsManagerCheck && isCheckingManager);
 
+  // The scope the role would be granted in, resolved the same way saveUser does.
+  const scopeUuidByContentType = {
+    project: targetProjectUuid,
+    customer: resolvedCustomerUuid,
+    call_organizer: resolvedCustomer?.call_managing_organization_uuid,
+    service_provider: resolvedCustomer?.service_provider_uuid,
+  };
+  const { hits: existingRoles, isChecking: isCheckingExistingRoles } =
+    useExistingRoles({
+      role: values.role,
+      userUuid: values.user?.uuid,
+      scopeUuid: scopeUuidByContentType[values.role?.content_type],
+    });
+  const existingRoleFeedback = getExistingRoleFeedback(existingRoles);
+  // Hold the button while the lookup is in flight, otherwise a quick submit
+  // slips through before the verdict arrives.
+  const isExistingRoleBlocked =
+    Boolean(existingRoleFeedback?.blocking) || isCheckingExistingRoles;
+
   return (
     <form onSubmit={handleSubmit}>
       <ModalDialog
@@ -393,11 +416,16 @@ const AddUserDialogForm: FC<AddUserDialogFormProps> = ({
             <CloseDialogButton />
             <SubmitButton
               submitting={submitting}
-              disabled={invalid || isProjectManagerBlocked}
+              disabled={
+                invalid || isProjectManagerBlocked || isExistingRoleBlocked
+              }
               disabledReason={
                 isProjectManagerBlocked
                   ? getOnlyOneProjectManagerTooltip()
-                  : undefined
+                  : isExistingRoleBlocked
+                    ? (existingRoleFeedback?.message ??
+                      translate('Checking the existing roles of this user...'))
+                    : undefined
               }
             >
               {translate('Add role')}
@@ -447,6 +475,13 @@ const AddUserDialogForm: FC<AddUserDialogFormProps> = ({
           }
           validate={validateUser}
         />
+
+        {existingRoleFeedback &&
+          (existingRoleFeedback.blocking ? (
+            <FieldError error={existingRoleFeedback.message} />
+          ) : (
+            <FieldWarning error={existingRoleFeedback.message} />
+          ))}
 
         {currentUser.is_staff && (
           <BooleanGroup

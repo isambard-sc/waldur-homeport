@@ -1,13 +1,13 @@
-import { PlusIcon } from '@phosphor-icons/react';
+import { PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { Card } from 'react-bootstrap';
 import { FieldArrayRenderProps } from 'react-final-form-arrays';
 
+import { BaseButton } from 'waldur-ui';
+
 import { required } from '@/core/validators';
 import { StringGroup, TextGroup, SelectGroup } from '@/form';
 import { translate } from '@/i18n';
-import { ActionButton } from '@/table/ActionButton';
-import { RemovalActionButton } from '@/table/RemovalActionButton';
 
 interface CascadeStep {
   name: string;
@@ -73,8 +73,12 @@ export const CascadeStepsGroup = ({
                 {translate('Step {index}', { index: index + 1 })}
               </h6>
               <div className="card-toolbar m-0">
-                <RemovalActionButton
-                  action={() => removeStep(index)}
+                <BaseButton
+                  size="sm"
+                  onClick={() => removeStep(index)}
+                  tooltip={translate('Remove')}
+                  iconNode={<TrashIcon weight="bold" />}
+                  variant="text-danger"
                   disabled={fields.length <= 1}
                   disabledReason={translate('At least one step is required')}
                 />
@@ -159,11 +163,12 @@ export const CascadeStepsGroup = ({
         );
       })}
       <div>
-        <ActionButton
+        <BaseButton
           variant="text-primary"
-          action={addStep}
+          onClick={addStep}
           iconNode={<PlusIcon weight="bold" />}
-          title={translate('Add step')}
+          label={translate('Add step')}
+          size="lg"
         />
       </div>
     </>

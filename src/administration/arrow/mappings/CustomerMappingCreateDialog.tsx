@@ -1,7 +1,5 @@
-import { CheckCircleIcon } from '@phosphor-icons/react';
 import createDecorator from 'final-form-calculate';
 import { useMemo, useState } from 'react';
-import { Alert } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
 import {
   adminArrowCustomerMappingsCreate,
@@ -9,6 +7,8 @@ import {
   CustomerMappingSuggestion,
   WaldurCustomerBrief,
 } from 'waldur-js-client';
+
+import { AlertItem, BaseButton } from 'waldur-ui';
 
 import { LoadingSpinnerSimple } from '@/core/LoadingSpinner';
 import { required } from '@/core/validators';
@@ -18,7 +18,6 @@ import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useManagedMutation } from '@/modal/useManagedMutation';
-import { ActionButton } from '@/table/ActionButton';
 
 import {
   arrowQueryKeys,
@@ -125,9 +124,11 @@ export const CustomerMappingCreateDialog = ({
   if (!settings) {
     return (
       <ModalDialog title={translate('Create Customer Mapping')}>
-        <Alert variant="warning">
-          {translate('Arrow settings not configured')}
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="warning"
+          title={translate('Arrow settings not configured')}
+        />
       </ModalDialog>
     );
   }
@@ -137,16 +138,19 @@ export const CustomerMappingCreateDialog = ({
       <ModalDialog
         title={translate('Create Customer Mapping')}
         footer={
-          <ActionButton
-            action={closeDialog}
+          <BaseButton
+            onClick={closeDialog}
             variant="secondary"
-            title={translate('Close')}
+            label={translate('Close')}
+            size="lg"
           />
         }
       >
-        <Alert variant="danger">
-          {translate('Failed to load Arrow customers. Please try again.')}
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="error"
+          title={translate('Failed to load Arrow customers. Please try again.')}
+        />
       </ModalDialog>
     );
   }
@@ -156,18 +160,21 @@ export const CustomerMappingCreateDialog = ({
       <ModalDialog
         title={translate('Create Customer Mapping')}
         footer={
-          <ActionButton
-            action={closeDialog}
+          <BaseButton
+            onClick={closeDialog}
             variant="secondary"
-            title={translate('Close')}
+            label={translate('Close')}
+            size="lg"
           />
         }
       >
-        <Alert variant="info">
-          {translate(
+        <AlertItem
+          type="floating"
+          variant="info"
+          title={translate(
             'All Arrow customers have already been mapped to Waldur organizations.',
           )}
-        </Alert>
+        />
       </ModalDialog>
     );
   }
@@ -182,10 +189,11 @@ export const CustomerMappingCreateDialog = ({
             title={translate('Create Customer Mapping')}
             footer={
               <>
-                <ActionButton
-                  action={closeDialog}
+                <BaseButton
+                  onClick={closeDialog}
                   variant="secondary"
-                  title={translate('Cancel')}
+                  label={translate('Cancel')}
+                  size="lg"
                 />
                 <SubmitButton
                   submitting={createMappingMutation.isPending}
@@ -286,12 +294,17 @@ export const CustomerMappingCreateDialog = ({
 
                 if (isSuggested && suggestion && suggestion.confidence > 0.6) {
                   return (
-                    <Alert variant="success" className="mb-4">
-                      <CheckCircleIcon className="me-2" weight="bold" />
-                      {translate('Auto-matched with {confidence}% confidence', {
-                        confidence: Math.round(suggestion.confidence * 100),
-                      })}
-                    </Alert>
+                    <AlertItem
+                      type="floating"
+                      variant="success"
+                      className="mb-4"
+                      title={translate(
+                        'Auto-matched with {confidence}% confidence',
+                        {
+                          confidence: Math.round(suggestion.confidence * 100),
+                        },
+                      )}
+                    />
                   );
                 }
                 return null;
@@ -299,9 +312,12 @@ export const CustomerMappingCreateDialog = ({
             />
 
             {error && (
-              <Alert variant="danger" className="mb-4">
-                {error}
-              </Alert>
+              <AlertItem
+                type="floating"
+                variant="error"
+                className="mb-4"
+                title={error}
+              />
             )}
           </ModalDialog>
         </form>

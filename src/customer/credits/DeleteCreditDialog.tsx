@@ -2,8 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
 import { projectCreditsList } from 'waldur-js-client';
 
-import { AlertItem } from '@/core/AlertItem';
-import { BaseButton } from '@/core/buttons/BaseButton';
+import { AlertItem, BaseButton } from 'waldur-ui';
+
 import { defaultCurrency } from '@/core/formatCurrency';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { translate } from '@/i18n';

@@ -1,7 +1,8 @@
 import { PhonePlusIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 
-import { FeaturedIcon } from '@/core/FeaturedIcon';
+import { BaseButton, FeaturedIcon } from 'waldur-ui';
+
 import { translate } from '@/i18n';
 
 import { useMatrixClient } from '../useMatrixClient';
@@ -27,23 +28,21 @@ export const CallInProgressBanner: FC = () => {
 
   return (
     <div className="call-in-progress-banner d-flex align-items-center">
-      {/* eslint-disable-next-line waldur-custom/enforce-phosphor-icon-weight */}
       <FeaturedIcon
-        IconComponent={WarningCircleIcon}
+        icon={<WarningCircleIcon weight="bold" />}
         variant="warning"
         size="sm"
       />
       <span className="call-in-progress-banner__label flex-grow-1 text-truncate">
         {translate('Call in progress')}
       </span>
-      <button
-        type="button"
-        className="btn btn-sm btn-tertiary d-inline-flex align-items-center gap-2"
+      <BaseButton
+        variant="tertiary"
+        size="sm"
         onClick={startCall}
-      >
-        <PhonePlusIcon size={16} weight="bold" />
-        {translate('Join call')}
-      </button>
+        iconNode={<PhonePlusIcon size={16} weight="bold" />}
+        label={translate('Join call')}
+      />
     </div>
   );
 };

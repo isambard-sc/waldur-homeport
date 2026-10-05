@@ -10,7 +10,7 @@ import * as RadixPopover from '@radix-ui/react-popover';
 import { FC, useEffect, useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Tooltip } from 'waldur-ui';
+import { BaseButton, Tooltip } from 'waldur-ui';
 
 import Avatar from '@/core/Avatar';
 import { Link } from '@/core/Link';
@@ -196,15 +196,16 @@ export const MatrixChatHeader: FC<MatrixChatHeaderProps> = ({
   return (
     <div className="tc-header">
       {onBack && (
-        <button
-          type="button"
-          className="position-relative btn btn-sm btn-icon btn-text-secondary"
-          onClick={onBack}
-          title={translate('Back to room list')}
-        >
-          <ArrowLeftIcon size={18} weight="bold" />
+        <div className="position-relative d-inline-flex">
+          <BaseButton
+            variant="text-secondary"
+            size="sm"
+            onClick={onBack}
+            tooltip={translate('Back to room list')}
+            iconNode={<ArrowLeftIcon size={18} weight="bold" />}
+          />
           {otherRoomsUnread > 0 && <HeaderButtonBullet />}
-        </button>
+        </div>
       )}
 
       <Avatar
@@ -241,15 +242,9 @@ export const MatrixChatHeader: FC<MatrixChatHeaderProps> = ({
                 side="bottom"
                 align="start"
                 sideOffset={2}
-                // position-static: Bootstrap's own .popover class hardcodes
-                // `position: absolute; left: 0`, fighting the Radix popper
-                // wrapper for control of this box's placement — see
-                // TableColumnsButton.tsx's own comment on this exact fix.
-                className="popover tc-members-popover position-static"
+                className="tc-members-popover rounded-md border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden"
               >
-                <div className="popover-body p-0">
-                  <MatrixMembersList />
-                </div>
+                <MatrixMembersList />
               </RadixPopover.Content>
             </RadixPopover.Portal>
           </RadixPopover.Root>

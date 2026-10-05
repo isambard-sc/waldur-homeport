@@ -1,18 +1,13 @@
-import {
-  InfoIcon,
-  MagnifyingGlassIcon,
-  WarningIcon,
-} from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent, useState } from 'react';
-import { Alert, Card } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import {
   AccessResponse,
   AccessProject,
   openportalAccessForEmailList,
 } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import { AlertItem, Badge, BaseButton } from 'waldur-ui';
 
 import { useDebouncedValue } from '@/core/useDebouncedValue';
 import { FilterBox } from '@/form/FilterBox';
@@ -247,13 +242,11 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
               style={{ flex: 1 }}
             />
             {searchValue && (
-              <button
-                type="button"
-                className="btn btn-secondary"
+              <BaseButton
+                variant="secondary"
                 onClick={handleClear}
-              >
-                {translate('Clear')}
-              </button>
+                label={translate('Clear')}
+              />
             )}
           </div>
         </div>
@@ -267,31 +260,29 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
         )}
 
         {error && (
-          <Alert variant="danger" className="d-flex align-items-center">
-            <WarningIcon weight="fill" className="me-2" size={20} />
-            <div>{error instanceof Error ? error.message : String(error)}</div>
-          </Alert>
+          <AlertItem
+            type="floating"
+            variant="error"
+            title={error instanceof Error ? error.message : String(error)}
+          />
         )}
 
         {debouncedQuery && data && data.length > 0 && (
           <>
             {data.length > 1 && (
               <div className="mb-3">
-                <Alert
+                <AlertItem
+                  type="floating"
                   variant="info"
-                  className="d-flex align-items-center mb-0"
-                >
-                  <InfoIcon weight="fill" className="me-2" size={20} />
-                  <div>
-                    {translate(
-                      'Found {count} users',
-                      {
-                        count: <strong>{data.length}</strong>,
-                      },
-                      formatJsxTemplate,
-                    )}
-                  </div>
-                </Alert>
+                  className="mb-0"
+                  title={translate(
+                    'Found {count} users',
+                    {
+                      count: <strong>{data.length}</strong>,
+                    },
+                    formatJsxTemplate,
+                  )}
+                />
               </div>
             )}
 
@@ -310,10 +301,11 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
         )}
 
         {debouncedQuery && data && data.length === 0 && !isFetching && (
-          <Alert variant="warning" className="text-center">
-            <MagnifyingGlassIcon className="me-2" size={20} weight="bold" />
-            {translate('No results found')}
-          </Alert>
+          <AlertItem
+            type="floating"
+            variant="warning"
+            title={translate('No results found')}
+          />
         )}
       </Card.Body>
     </Card>

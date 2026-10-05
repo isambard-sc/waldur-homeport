@@ -20,11 +20,10 @@ import {
 } from '@phosphor-icons/react';
 import * as RadixPopover from '@radix-ui/react-popover';
 import { FC, useMemo, useState } from 'react';
-import { Button, FormCheck } from 'react-bootstrap';
+import { FormCheck } from 'react-bootstrap';
 
-import { Tooltip } from 'waldur-ui';
+import { BaseButton } from 'waldur-ui';
 
-import { CompactIconButton } from '@/core/buttons/IconButton';
 import { FilterBox } from '@/form/FilterBox';
 import { translate } from '@/i18n';
 
@@ -112,18 +111,19 @@ const ColumnsPopover = ({
   );
 
   return (
-    <div className="border mw-400px">
+    <div className="mw-400px">
       <div className="p-5">
         <FilterBox
           type="search"
           placeholder={translate('Search...')}
           onChange={(e) => setQuery(e.target.value)}
           rightAction={
-            <CompactIconButton
+            <BaseButton
               iconNode={<ArrowCounterClockwiseIcon weight="bold" />}
               tooltip={translate('Reset settings to default')}
               onClick={resetColumns}
               variant="text-secondary"
+              size="sm"
             />
           }
         />
@@ -197,44 +197,24 @@ export const TableColumnButton: FC<TableProps> = ({
   };
   return (
     <RadixPopover.Root modal={false}>
-      <Tooltip label={translate('Toggle visible columns')}>
-        <span className="d-inline-flex">
-          {/* Trigger wraps the real <Button> (not an ancestor <span>): a
-                                      disabled HTML button never dispatches click events at all, so
-                                      unlike the old OverlayTrigger setup this needs no separate
-                                      trigger-suppression workaround for the grid-mode disabled
-                                      state. */}
-          <RadixPopover.Trigger asChild disabled={mode !== 'table'}>
-            <Button
-              disabled={mode !== 'table'}
-              variant="tertiary"
-              size="lg"
-              className="btn-icon"
-              aria-label={translate('Toggle visible columns')}
-            >
-              <span className="svg-icon svg-icon-2">
-                <GearIcon weight="bold" />
-              </span>
-            </Button>
-          </RadixPopover.Trigger>
-        </span>
-      </Tooltip>
+      {/* BaseButton's own `tooltip` prop wraps the button in its own
+          Tooltip internally — Radix's nested asChild composition delivers
+          Popover's props down to the underlying <button>. */}
+      <RadixPopover.Trigger asChild disabled={mode !== 'table'}>
+        <BaseButton
+          disabled={mode !== 'table'}
+          variant="tertiary"
+          size="lg"
+          tooltip={translate('Toggle visible columns')}
+          iconNode={<GearIcon weight="bold" />}
+        />
+      </RadixPopover.Trigger>
       <RadixPopover.Portal>
         <RadixPopover.Content
           side="bottom"
           align="end"
           sideOffset={2}
-          // position-static: Bootstrap's own .popover class hardcodes
-          // `position: absolute; left: 0`, which fights the Radix popper
-          // wrapper — the actual positioned element here — for control of
-          // this box's placement. Left in place, that `position: absolute`
-          // takes the panel out of the wrapper's normal flow, so instead of
-          // Radix's own align="end" transform positioning it, the panel
-          // just pins to the wrapper's local (0,0) and grows rightward,
-          // overflowing the viewport for a trigger anywhere near the right
-          // edge. Same fix, same reasoning, as ActionsDropdownComponent's
-          // own `position-static` on `.dropdown-menu` in ActionsDropdown.tsx.
-          className="popover bs-popover-bottom position-static"
+          className="table-columns-popover rounded-md border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden"
         >
           <ColumnsPopover
             columns={columns}

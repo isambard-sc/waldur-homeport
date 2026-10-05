@@ -1,20 +1,20 @@
-import { LightningIcon, WarningCircleIcon } from '@phosphor-icons/react';
+import { LightningIcon } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { Alert } from 'react-bootstrap';
+import { FC, useMemo } from 'react';
 import { overrideSettingsRetrieve, statsTableGrowth } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import { AlertItem, Badge, BaseButton } from 'waldur-ui';
 
 import { STALE_TIME } from '@/core/constants';
 import { Link } from '@/core/Link';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
-import { Panel } from '@/core/Panel';
-import { SubmitButton } from '@/form/SubmitButton';
 import { translate } from '@/i18n';
 import { RefreshButton } from '@/marketplace/common/RefreshButton';
 import { useNotify } from '@/store/notify';
+import { TableWithPortal } from '@/table/types';
 import { useUser } from '@/workspace/hooks';
+
+import { TabToolbar } from '../TabToolbar';
 
 import { getTableGrowth } from './api';
 import { TableGrowthAlerts } from './TableGrowthAlerts';
@@ -22,7 +22,7 @@ import { TableGrowthOverview } from './TableGrowthOverview';
 import { TableGrowthTable } from './TableGrowthTable';
 import { deriveAlerts } from './utils';
 
-export const TableGrowthPage = () => {
+export const TableGrowthPage: FC<Partial<TableWithPortal>> = ({ portal }) => {
   const user = useUser();
   const userIsStaff = user?.is_staff;
   const { showSuccess, showErrorResponse } = useNotify();
@@ -53,36 +53,35 @@ export const TableGrowthPage = () => {
     },
   });
 
-  const panelTitle = (
-    <>
-      {translate('Table growth monitoring')}{' '}
-      <Link
-        state="admin-table-growth-settings"
-        className="text-decoration-none"
+  // The monitoring switch lives on the Settings tab of the same page.
+  const monitoringBadge = (
+    <Link
+      state="admin-database"
+      params={{ tab: 'settings' }}
+      className="text-decoration-none align-self-center"
+    >
+      <Badge
+        variant={isEnabled ? 'success' : 'warning'}
+        shape="pill"
+        tone="outline"
       >
-        <Badge
-          variant={isEnabled ? 'success' : 'warning'}
-          shape="pill"
-          tone="outline"
-        >
-          {isEnabled
-            ? translate('Monitoring enabled')
-            : translate('Monitoring disabled')}
-        </Badge>
-      </Link>
-    </>
+        {isEnabled
+          ? translate('Monitoring enabled')
+          : translate('Monitoring disabled')}
+      </Badge>
+    </Link>
   );
 
   if (isLoading || !data) {
     return (
-      <Panel title={panelTitle} cardBordered>
+      <div className="pt-5">
         <div className="text-center py-10">
           <LoadingSpinner />
           <p className="text-muted mt-4">
             {translate('Fetching table growth statistics, please standby...')}
           </p>
         </div>
-      </Panel>
+      </div>
     );
   }
 
@@ -90,32 +89,28 @@ export const TableGrowthPage = () => {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     return (
-      <Panel title={panelTitle} cardBordered>
-        <Alert variant="danger" className="d-flex align-items-center mb-0">
-          <WarningCircleIcon size={24} weight="bold" className="me-3" />
-          <div>
-            <strong>
-              {translate('Failed to load table growth statistics')}
-            </strong>
-            <p className="mb-0 mt-1">{errorMessage}</p>
-          </div>
-        </Alert>
-      </Panel>
+      <div className="pt-5">
+        <AlertItem
+          variant="error"
+          title={translate('Failed to load table growth statistics')}
+          body={errorMessage}
+        />
+      </div>
     );
   }
 
   const panelActions = (
     <>
+      {monitoringBadge}
       {userIsStaff && (
-        <SubmitButton
-          submitting={isSampling}
-          type="button"
+        <BaseButton
+          pending={isSampling}
           variant="tertiary"
           className="min-w-100px"
           onClick={() => triggerSampling()}
           label={translate('Sample now')}
           iconNode={<LightningIcon weight="bold" />}
-          iconOnLeft
+          size="lg"
         />
       )}
       <RefreshButton refetch={refetch} isLoading={isRefetching} />
@@ -123,10 +118,11 @@ export const TableGrowthPage = () => {
   );
 
   return (
-    <Panel title={panelTitle} actions={panelActions} cardBordered>
+    <div className="pt-5">
+      <TabToolbar portal={portal}>{panelActions}</TabToolbar>
       <TableGrowthOverview data={data} alerts={alerts} />
       <TableGrowthAlerts alerts={alerts} />
       <TableGrowthTable data={data} alerts={alerts} />
-    </Panel>
+    </div>
   );
 };

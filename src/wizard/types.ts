@@ -2,6 +2,8 @@ import { FormApi } from 'final-form';
 import { FC, ReactNode } from 'react';
 import { FormRenderProps } from 'react-final-form';
 
+import { FeaturedIconVariant } from 'waldur-ui';
+
 import { ProgressStep } from '@/wizard';
 
 /**
@@ -44,7 +46,7 @@ export interface WizardStepProps extends FormRenderProps<any, any> {
   /** Optional props to pass to the modal */
   modalProps?: {
     iconNode?: ReactNode;
-    iconColor?: string;
+    iconColor?: FeaturedIconVariant;
     headerClassName?: string;
     bodyClassName?: string;
   };
@@ -110,8 +112,12 @@ export interface WizardProps<FormValues = any> {
   submitLabel?: string;
   /** Label for the next button on intermediate steps */
   nextLabel?: string;
-  /** Array of step definitions */
-  steps: WizardStep[];
+  /**
+   * Step definitions, or a function of the current values when a step only
+   * applies to some of them -- the last step decides whether the footer
+   * offers "Next" or the submit label.
+   */
+  steps: WizardStep[] | ((values: any) => WizardStep[]);
   /** Whether to hide the step indicator */
   hideStepper?: boolean;
   /** Array of step components, one for each step */

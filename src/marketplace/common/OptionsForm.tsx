@@ -32,12 +32,64 @@ import { useCustomer } from '@/workspace/hooks';
 
 import { ComponentMultiplierField } from './ComponentMultiplierField';
 import { ConditionalCascadeField } from './ConditionalCascadeField';
+import {
+  ComponentFormulaField,
+  componentFormulaParams,
+  ComponentSumField,
+} from './DerivedLimitFields';
+import {
+  getComponentsByType,
+  getDerivedLimitBoundsError,
+  getFormulaInputError,
+} from './derivedLimits';
 import { fetchOpenstackOptions } from './fetchOpenstackOptions';
 import { K8sClusterConfigurationForm } from './K8sClusterConfigurationForm';
 import { validateMultiDatacenterConfiguration } from './multi-datacenter-k8s-types';
+import { getOptionPatternValidator } from './optionPattern';
 import { getHiddenOptionKeys } from './optionVisibility';
 import { StorageFolderManagerField } from './StorageFolderManagerField';
 import { DeployFormData } from './types';
+
+// The server checks the same bounds and formulas; checking here says why
+// before the customer submits.
+const getFormulaValidator = (option, name) => (value, allValues?) => {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  // The server takes whole numbers; a decimal must not be truncated silently.
+  if (!Number.isInteger(value)) {
+    return translate('Enter a whole number.');
+  }
+  if (option.min != null && value < option.min) {
+    return translate('Ensure this value is greater than or equal to {min}.', {
+      min: option.min,
+    });
+  }
+  if (option.max != null && value > option.max) {
+    return translate('Ensure this value is less than or equal to {max}.', {
+      max: option.max,
+    });
+  }
+  const formulaError = getFormulaInputError(option, value);
+  if (formulaError) {
+    return formulaError;
+  }
+  // The limits it derives must fit their components, or the server refuses
+  // them on rows the customer cannot edit.
+  const offering = allValues?.offering;
+  if (!offering) {
+    return undefined;
+  }
+  // On an existing resource (the option dialog) the other inputs and the
+  // limits kept when underivable come with the form, as the server uses them.
+  return getDerivedLimitBoundsError(
+    offering.options?.options,
+    { ...allValues.derivedInputs, ...allValues.attributes, [name]: value },
+    allValues.limits,
+    getComponentsByType(offering.components),
+    allValues.derivedFallback,
+  );
+};
 
 // Validator for K8s configuration fields - returns array for proper tooltip formatting
 const validateK8sConfig = (value) => {
@@ -108,6 +160,11 @@ export const buildOptionValidator = (
   // `required` rejects, silently blocking submission.
   if (option.required && option.type !== 'boolean') {
     validators.push(required);
+  }
+
+  const patternValidator = getOptionPatternValidator(option);
+  if (patternValidator) {
+    validators.push(patternValidator);
   }
 
   // Add cross-field validators
@@ -243,6 +300,20 @@ export const getComponentAndParams = (option, key, customer, loaders?: any) => {
         field: option,
       };
       break;
+    case 'component_formula':
+      OptionField = ComponentFormulaField;
+      params = {
+        ...componentFormulaParams,
+        field: option,
+        validate: getFormulaValidator(option, key),
+      };
+      break;
+    case 'component_sum':
+      OptionField = ComponentSumField;
+      params = {
+        field: option,
+      };
+      break;
     case 'storage_folder_manager':
       OptionField = StorageFolderManagerField;
       params = {
@@ -351,6 +422,11 @@ export const OptionsForm = ({
             >
               {(() => {
                 const { key: remountKey, ...fieldParams } = params;
+                // The formula check is part of validateFn, with Required and
+                // the cross-field rules; passed on its own it would replace them.
+                if (option.type === 'component_formula') {
+                  delete fieldParams.validate;
+                }
                 return (
                   <Field
                     key={remountKey}

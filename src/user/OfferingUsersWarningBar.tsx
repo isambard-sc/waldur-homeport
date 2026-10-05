@@ -2,10 +2,10 @@ import { WarningCircleIcon } from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC } from 'react';
 
-import { FeaturedIcon } from '@/core/FeaturedIcon';
+import { FeaturedIcon, BaseButton } from 'waldur-ui';
+
 import { translate } from '@/i18n';
 import { router } from '@/router';
-import { CompactActionButton } from '@/table/CompactActionButton';
 
 import { usePendingOfferingUsers } from './hooks/usePendingOfferingUsers';
 
@@ -35,9 +35,8 @@ export const OfferingUsersWarningBar: FC = () => {
   return (
     <div className="layout-warning-bar bar-warning">
       <div className="container-fluid w-100 d-flex align-items-center gap-2">
-        {/* eslint-disable-next-line waldur-custom/enforce-phosphor-icon-weight */}
         <FeaturedIcon
-          IconComponent={WarningCircleIcon}
+          icon={<WarningCircleIcon weight="bold" />}
           variant="warning"
           size="sm"
         />
@@ -50,11 +49,12 @@ export const OfferingUsersWarningBar: FC = () => {
             { count },
           )}
         </p>
-        <CompactActionButton
+        <BaseButton
           variant="tertiary"
-          action={handleViewAccounts}
+          onClick={handleViewAccounts}
           className="ms-auto"
-          title={translate('View accounts')}
+          label={translate('View accounts')}
+          size="sm"
         />
       </div>
     </div>

@@ -10,22 +10,21 @@ import {
 import { Card } from 'react-bootstrap';
 import { Field } from 'react-final-form';
 import { type FieldArrayRenderProps } from 'react-final-form-arrays';
-import { type DateTimePickerProps } from 'react-flatpickr';
 import { usePrevious } from 'react-use';
+
+import { BaseButton } from 'waldur-ui';
 
 import { CustomRangeDatePicker } from '@/booking/deploy/CustomRangeDatePicker';
 import { BookingProps } from '@/booking/types';
 import { createBooking, getDurationOptions } from '@/booking/utils';
 import { parseDate } from '@/core/dateUtils';
 import { translate } from '@/i18n';
-import { ActionButton } from '@/table/ActionButton';
 
 import { BusinessHoursGroup } from './components/BusinessHoursGroup';
 import { SlotDurationGroup } from './components/SlotDurationGroup';
 import { TimeZoneGroup } from './components/TimeZoneGroup';
 import { WeekdaysGroup } from './components/WeekdaysGroup';
 import { WeekendsGroup } from './components/WeekendsGroup';
-
 import './OfferingScheduler.scss';
 
 const INITIAL_CONFIG = {
@@ -43,7 +42,7 @@ const INITIAL_CONFIG = {
 type OfferingSchedulerProps = FieldArrayRenderProps<BookingProps, any>;
 
 const getDisabledRangeOfDates = (weekends, daysOfWeek) => {
-  const disabledRanges: DateTimePickerProps['options']['disable'] = [];
+  const disabledRanges: Array<(date: Date) => boolean> = [];
   disabledRanges.push(function (date) {
     if (!weekends) {
       if (date.getDay() === 0 || date.getDay() === 6) {
@@ -181,10 +180,12 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = ({
                   </span>
                 )}
               </label>
-              <ActionButton
+              <BaseButton
                 variant="text-danger"
-                action={() => fields.remove(index)}
+                onClick={() => fields.remove(index)}
                 iconNode={<XIcon weight="bold" />}
+                tooltip={translate('Remove period')}
+                size="lg"
               />
             </div>
             <Field
@@ -202,12 +203,13 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = ({
             />
           </div>
         ))}
-        <ActionButton
+        <BaseButton
           variant="text-primary"
           className="text-nowrap"
-          action={addRow}
+          onClick={addRow}
           iconNode={<PlusCircleIcon weight="bold" />}
-          title={translate('Add time period')}
+          label={translate('Add time period')}
+          size="lg"
         />
       </>
     </>

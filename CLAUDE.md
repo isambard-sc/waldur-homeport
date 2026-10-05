@@ -38,6 +38,7 @@ For detailed guidance, see `docs/` — full index with one-line descriptions in 
 - `tables.md` - Modular index for useTable, columns, filters, row actions, export, and visual customizations
 - `table/filter-migration-guide.md` - Generated table filters from OpenAPI schema
 - `development-setup.md` - Build, environment, tooling
+- `design-tokens.md` - Colour ramps generated from `tokens/colors.json` (never edit `_color-ramps.scss` / `colorRamps.css`)
 - `ui-consistency-guidelines.md` - Empty states, buttons, loading, tooltips
 
 Subagents in `.claude/agents/` provide deep expertise for each area.
@@ -136,6 +137,8 @@ Subagents in `.claude/agents/` provide deep expertise for each area.
   Reference: `src/marketplace/resources/projects/ResourceUserInvitationsList.tsx`
 
 - Use design token button variants (`tertiary`, `danger`, `success`, `text-primary`) - linter enforces this
+
+- Use the `waldur-ui` pickers (`DatePicker`, `DateRangePicker`, `MonthPicker`; `DateField`/`DateGroup` in forms) — never a native `<input type="date">`, `datetime-local`, `time`, `month` or `week`. Linter enforces this; see `docs/forms.md` → "Date & Time Pickers"
 
 - Use **generated filters** for table filter components (see `docs/table/filter-migration-guide.md`):
   1. Add config to `generate-filters-config.yaml`

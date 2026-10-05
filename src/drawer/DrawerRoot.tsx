@@ -4,7 +4,8 @@ import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
 import React, { FunctionComponent, useContext } from 'react';
 
-import { CompactIconButton } from '@/core/buttons/IconButton';
+import { BaseButton } from 'waldur-ui';
+
 import { DirtyFormContext } from '@/core/DirtyFormContext';
 import { ErrorMessage } from '@/ErrorMessage';
 import { translate } from '@/i18n';
@@ -39,7 +40,13 @@ export const DrawerRoot: FunctionComponent = () => {
   React.useEffect(() => {
     const remember = (event: Event) => {
       const target = event.target as Node | null;
-      if (target && contentRef.current?.contains(target)) {
+      // `data-drawer-inside` opts in an overlay that such content portals to
+      // <body>, outside the drawer's DOM as well as its React tree.
+      if (
+        target &&
+        (contentRef.current?.contains(target) ||
+          (target instanceof Element && target.closest('[data-drawer-inside]')))
+      ) {
         insidePointerDownRef.current = event;
       }
     };
@@ -85,13 +92,25 @@ export const DrawerRoot: FunctionComponent = () => {
       <Dialog.Content
         ref={contentRef}
         id="kt_drawer"
-        className={classNames('bg-body drawer drawer-end', {
-          'drawer-on': isOpen,
-        })}
+        className={classNames(
+          'bg-body drawer drawer-end',
+          drawerProps.shellClass,
+          { 'drawer-on': isOpen },
+        )}
         style={{ '--drawer-width': drawerProps.width } as React.CSSProperties}
         aria-describedby={undefined}
         onPointerDownOutside={(event) => {
           if (event.detail.originalEvent === insidePointerDownRef.current) {
+            event.preventDefault();
+          }
+          // A floating drawer leaves the header's drawer toggles live (see
+          // _shell.scss). Their click closes or switches the drawer; dismissing
+          // it here first would have that same click open it again.
+          const target = event.detail.originalEvent.target as Element | null;
+          if (
+            drawerProps.shellClass &&
+            target?.closest('[data-drawer-toggle]')
+          ) {
             event.preventDefault();
           }
         }}
@@ -115,11 +134,13 @@ export const DrawerRoot: FunctionComponent = () => {
               {drawerProps.toolbar ? (
                 React.createElement(drawerProps.toolbar, { close: onHide })
               ) : (
-                <CompactIconButton
+                <BaseButton
                   iconNode={<XIcon weight="bold" />}
                   tooltip={translate('Close')}
                   onClick={onHide}
-                  tooltipPlacement="bottom"
+                  tooltipSide="bottom"
+                  size="sm"
+                  variant="tertiary"
                 />
               )}
             </div>

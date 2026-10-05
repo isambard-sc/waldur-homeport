@@ -1,8 +1,10 @@
 import { ChartBarIcon, TableIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Card, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { marketplaceResourcesTeamList, Resource } from 'waldur-js-client';
+
+import { BaseButton, SegmentedControl } from 'waldur-ui';
 
 import { UI_STALE_TIME } from '@/core/constants';
 import { LoadingErred } from '@/core/LoadingErred';
@@ -10,7 +12,6 @@ import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { Select } from '@/form/select';
 import { translate } from '@/i18n';
 import { NoResult } from '@/navigation/header/search/NoResult';
-import { ActionButton } from '@/table/ActionButton';
 
 import { ResourceUsageTabsContainer } from '../usage/ResourceUsageTabsContainer';
 import { UsageExportDropdown } from '../usage/UsageExportDropdown';
@@ -117,28 +118,22 @@ export const UsageCard = ({ resource }: { resource: Resource }) => {
               onChange={(value) => setUsers(value)}
               options={usersFilterOptions}
               isLoading={teamIsLoading}
-              className="min-w-150px min-w-lg-200px"
+              // Fixed, not content-sized: the `w-full` container would other-
+              // wise claim the whole toolbar row when empty and grow with each
+              // chip, shifting every control beside it on every selection.
+              className="w-250px"
             />
           ) : null}
           {periodOptions.length > 1 && (
-            <ToggleButtonGroup
-              type="radio"
-              name="period"
+            <SegmentedControl<number>
+              aria-label={translate('Time period')}
+              options={periodOptions}
               value={period}
-              defaultValue={period}
-              onChange={setPeriod}
-            >
-              {periodOptions.map((option) => (
-                <ToggleButton
-                  key={option.value}
-                  id={'tbg-' + option.value}
-                  value={option.value}
-                  variant="tertiary"
-                >
-                  {option.label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+              onValueChange={setPeriod}
+              // Matches the export dropdown and the chart/table toggle, which
+              // are both `lg`, so the toolbar row reads as one height.
+              size="lg"
+            />
           )}
           <UsageExportDropdown
             resource={resourceRef}
@@ -148,9 +143,9 @@ export const UsageCard = ({ resource }: { resource: Resource }) => {
             months={period}
           />
 
-          <ActionButton
+          <BaseButton
             variant="tertiary"
-            action={() =>
+            onClick={() =>
               setMode((prev) => (prev === 'chart' ? 'table' : 'chart'))
             }
             iconNode={
@@ -160,6 +155,7 @@ export const UsageCard = ({ resource }: { resource: Resource }) => {
                 <ChartBarIcon weight="bold" />
               )
             }
+            size="lg"
           />
         </div>
       </Card.Header>

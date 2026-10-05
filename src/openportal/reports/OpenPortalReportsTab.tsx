@@ -19,7 +19,8 @@ import {
   CachedProjectUsageReport as UsageReportApiItem,
 } from 'waldur-js-client';
 
-import { IconButton } from '@/core/buttons/IconButton';
+import { BaseButton } from 'waldur-ui';
+
 import { formatDate } from '@/core/dateUtils';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -356,7 +357,7 @@ export const OpenPortalReportsTab: FC = () => {
         <div className="d-flex align-items-center gap-3 flex-wrap w-100">
           <div className="d-flex align-items-center me-2">
             <span className="h3 mb-0">{translate('Usage Report')}</span>
-            <IconButton
+            <BaseButton
               iconNode={<ArrowsClockwiseIcon weight="bold" />}
               tooltip={translate('Refresh')}
               variant="text-secondary"
@@ -372,6 +373,7 @@ export const OpenPortalReportsTab: FC = () => {
                 refetchUsage();
                 refetchStorage();
               }}
+              size="lg"
             />
           </div>
 

@@ -17,9 +17,9 @@
  */
 
 import { FileArrowDownIcon, FileXlsIcon } from '@phosphor-icons/react';
-import { MouseEvent, FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Badge, Tooltip } from 'waldur-ui';
+import { Badge, SegmentedControl, Tooltip } from 'waldur-ui';
 
 import { EChart } from '@/core/EChart';
 import { translate } from '@/i18n';
@@ -60,17 +60,6 @@ interface Props {
   height?: string;
   nameMaps?: NameMaps;
 }
-
-/**
- * Drop focus after a mouse click on a toggle.
- *
- * Bootstrap keeps its focus ring on a clicked `.btn`, so an *unselected* toggle
- * that was just pressed goes on looking pressed while the real selection sits
- * elsewhere in the group. Blurring on mouse-up only leaves keyboard focus — and
- * its ring, which is doing its job there — alone.
- */
-const blurOnClick = (event: MouseEvent<HTMLButtonElement>) =>
-  event.currentTarget.blur();
 
 export const UsageReportVis: FC<Props> = ({
   reports,
@@ -297,104 +286,73 @@ export const UsageReportVis: FC<Props> = ({
       {/* ── Row 2: toggle controls ────────────────────────────────────── */}
       <div className="d-flex align-items-center gap-2 mb-3 flex-wrap">
         {/* Metric selector */}
-        <div className="btn-group btn-group-sm" role="group">
-          {(Object.keys(getMetricLabels()) as UsageMetric[]).map((m) => (
-            <button
-              key={m}
-              type="button"
-              className={`btn btn-${metric === m ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setMetric(m)}
-            >
-              {getMetricLabels()[m]}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl<UsageMetric>
+          aria-label={translate('Metric')}
+          size="sm"
+          variant="brand"
+          options={(Object.keys(getMetricLabels()) as UsageMetric[]).map(
+            (m) => ({ value: m, label: getMetricLabels()[m] }),
+          )}
+          value={metric}
+          onValueChange={setMetric}
+        />
 
         {/* Timeseries / Pie toggle */}
-        <div className="btn-group btn-group-sm" role="group">
-          <button
-            type="button"
-            className={`btn btn-${view === 'timeseries' ? 'primary' : 'secondary'}`}
-            onMouseUp={blurOnClick}
-            onClick={() => setView('timeseries')}
-          >
-            {translate('Timeline')}
-          </button>
-          <button
-            type="button"
-            className={`btn btn-${view === 'pie' ? 'primary' : 'secondary'}`}
-            onMouseUp={blurOnClick}
-            onClick={() => setView('pie')}
-          >
-            {translate('Pie')}
-          </button>
-        </div>
+        <SegmentedControl<ChartView>
+          aria-label={translate('Chart type')}
+          size="sm"
+          variant="brand"
+          options={[
+            { value: 'timeseries', label: translate('Timeline') },
+            { value: 'pie', label: translate('Pie') },
+          ]}
+          value={view}
+          onValueChange={setView}
+        />
 
         {/* Day / Month toggle — timeseries only */}
         {view === 'timeseries' && (
-          <div className="btn-group btn-group-sm" role="group">
-            <button
-              type="button"
-              className={`btn btn-${groupBy === 'day' ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setGroupBy('day')}
-            >
-              {translate('Day')}
-            </button>
-            <button
-              type="button"
-              className={`btn btn-${groupBy === 'month' ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setGroupBy('month')}
-            >
-              {translate('Month')}
-            </button>
-          </div>
+          <SegmentedControl<GroupBy>
+            aria-label={translate('Interval')}
+            size="sm"
+            variant="brand"
+            options={[
+              { value: 'day', label: translate('Day') },
+              { value: 'month', label: translate('Month') },
+            ]}
+            value={groupBy}
+            onValueChange={setGroupBy}
+          />
         )}
 
         {/* By user / By project toggle — only when multiple projects */}
         {multipleProjects && (
-          <div className="btn-group btn-group-sm" role="group">
-            <button
-              type="button"
-              className={`btn btn-${groupMode === 'user' ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setGroupMode('user')}
-            >
-              {translate('By user')}
-            </button>
-            <button
-              type="button"
-              className={`btn btn-${groupMode === 'project' ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setGroupMode('project')}
-            >
-              {translate('By project')}
-            </button>
-          </div>
+          <SegmentedControl<GroupMode>
+            aria-label={translate('Group by')}
+            size="sm"
+            variant="brand"
+            options={[
+              { value: 'user', label: translate('By user') },
+              { value: 'project', label: translate('By project') },
+            ]}
+            value={groupMode}
+            onValueChange={setGroupMode}
+          />
         )}
 
         {/* Mapped names toggle — only shown when mappings are available */}
         {nameMaps && (
-          <div className="btn-group btn-group-sm" role="group">
-            <button
-              type="button"
-              className={`btn btn-${showMapped ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setShowMapped(true)}
-            >
-              {translate('Names')}
-            </button>
-            <button
-              type="button"
-              className={`btn btn-${!showMapped ? 'primary' : 'secondary'}`}
-              onMouseUp={blurOnClick}
-              onClick={() => setShowMapped(false)}
-            >
-              {translate('IDs')}
-            </button>
-          </div>
+          <SegmentedControl<'names' | 'ids'>
+            aria-label={translate('Show as')}
+            size="sm"
+            variant="brand"
+            options={[
+              { value: 'names', label: translate('Names') },
+              { value: 'ids', label: translate('IDs') },
+            ]}
+            value={showMapped ? 'names' : 'ids'}
+            onValueChange={(next) => setShowMapped(next === 'names')}
+          />
         )}
 
         {/* Component filter — only relevant for usage metric, user mode */}

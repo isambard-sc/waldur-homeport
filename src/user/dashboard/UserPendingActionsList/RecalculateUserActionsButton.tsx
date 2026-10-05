@@ -2,6 +2,8 @@ import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 import { userActionsUpdateActions } from 'waldur-js-client';
 
+import { BaseButton } from 'waldur-ui';
+
 import { translate } from '@/i18n';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 import { ActionItem } from '@/resource/actions/ActionItem';
@@ -31,6 +33,7 @@ export const RecalculateUserActionsButton: FC<{ refetch?: () => void }> = ({
       action={() => recalculateMutation.mutate()}
       disabled={recalculateMutation.isPending}
       iconNode={<ArrowsClockwiseIcon weight="bold" />}
+      as={BaseButton}
     />
   );
 };
