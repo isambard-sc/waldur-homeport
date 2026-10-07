@@ -5,6 +5,9 @@ FROM ${DOCKER_REGISTRY}node:lts-alpine as build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
 COPY package.json yarn.lock /app/
+# vendor/ holds local file: dependencies (see package.json) that must be
+# present before `yarn install` runs, not just in the later `COPY . /app`.
+COPY vendor /app/vendor
 # Git is needed to refer with yarn to unrealised versions of libraries from github
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
 RUN apk add --no-cache git && yarn install
