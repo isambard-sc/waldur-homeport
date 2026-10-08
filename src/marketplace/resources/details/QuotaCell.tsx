@@ -1,6 +1,8 @@
 import { QuestionIcon } from '@phosphor-icons/react';
 
-import { Tip } from '@waldur/core/Tooltip';
+import { Tooltip } from 'waldur-ui';
+
+import { formatUsageValue } from '@/core/formatNumber';
 
 import { QuotaProgressBar } from './QuotaProgressBar';
 
@@ -29,21 +31,25 @@ const CellDescription = ({
   title,
   description,
 }: QuotaCellProps) => (
-  <span className="fw-bolder fs-7 text-dark text-nowrap ellipsis">
-    {description && (
-      <>
-        <Tip id="quota" label={description} className="aligned-tip">
-          <QuestionIcon />
-        </Tip>{' '}
-      </>
-    )}
-    {limit
-      ? `${usage.toLocaleString()}/${limit.toLocaleString()}`
-      : usage.toLocaleString()}
-    {units && ` ${units}`}
-
-    {title && ` ${title}`}
-  </span>
+  <>
+    <span className="fw-bolder fs-7 text-dark text-nowrap ellipsis">
+      {title}
+      {description && (
+        <>
+          {' '}
+          <Tooltip label={description}>
+            <QuestionIcon weight="bold" className="inline-flex items-center" />
+          </Tooltip>
+        </>
+      )}
+    </span>
+    <span className="fw-bolder fs-7 text-dark text-nowrap ellipsis">
+      {limit
+        ? `${formatUsageValue(usage)}/${formatUsageValue(limit)}`
+        : formatUsageValue(usage)}
+      {units && ` ${units}`}
+    </span>
+  </>
 );
 
 export const QuotaCell = ({
@@ -65,7 +71,12 @@ export const QuotaCell = ({
         units={units}
       />
 
-      <QuotaProgressBar percent={percent} className="mt-1" />
+      <QuotaProgressBar
+        percent={percent}
+        height={4}
+        className="mt-1"
+        label={typeof title === 'string' ? title : undefined}
+      />
     </div>
   );
 };

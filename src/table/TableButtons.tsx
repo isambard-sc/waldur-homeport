@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback } from 'react';
 import { useMediaQuery } from 'react-responsive';
 
-import { GRID_BREAKPOINTS } from '@waldur/core/constants';
+import { GRID_BREAKPOINTS } from '@/core/constants';
 
 import { TableColumnButton } from './TableColumnsButton';
 import { TableDisplayModeButton } from './TableDisplayModeButton';
@@ -11,8 +11,9 @@ import { TableMoreActions } from './TableMoreActions';
 import { TableProps } from './types';
 
 interface TableButtonsProps extends TableProps {
-  toggleFilterMenu?(): void;
+  toggleFilterMenu?(show?: boolean): void;
   showFilterMenuToggle?: boolean;
+  renderFilterButton?: boolean;
 }
 
 export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
@@ -25,17 +26,20 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
   const onClickFilterButton = useCallback(
     (event) => {
       if (props.filterPosition === 'sidebar') {
-        props.openFiltersDrawer(props.filters);
+        props.openFiltersDrawer(props.filters, props.formId);
       } else {
-        props.toggleFilterMenu();
+        // Force `true` — see the matching comment in TableToolbar.tsx's
+        // own onClickFilterButton: a bare toggle can hide the real
+        // Add-filter trigger's container in the same batch as the
+        // programmatic click below, mispositioning the popup.
+        props.toggleFilterMenu(true);
         const parent: HTMLElement = event.target.closest('.card-table');
         if (!parent) return;
-        const btns = parent.getElementsByClassName(
-          'btn-add-filter',
-        ) as HTMLCollectionOf<HTMLButtonElement>;
-        if (btns?.length) {
+        const addFilterButton =
+          parent.querySelector<HTMLButtonElement>('[data-add-filter]');
+        if (addFilterButton) {
           if (!props.showFilterMenuToggle || props.filtersStorage?.length) {
-            btns.item(0).click();
+            addFilterButton.click();
             event.stopPropagation();
           }
         }
@@ -59,13 +63,15 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
   return (
     <>
       {showDefaultActions && (
-        <div className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-3 flex-grow-1 flex-sm-grow-0">
+        <div className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-4 flex-grow-1 flex-sm-grow-0">
           {/* Filter */}
-          {['menu', 'sidebar'].includes(props.filterPosition) &&
+          {props.renderFilterButton !== false &&
+            ['menu', 'sidebar'].includes(props.filterPosition) &&
             props.filters && (
               <TableFilterButton
                 onClick={onClickFilterButton}
                 hasFilter={!!props.filtersStorage?.length}
+                filterCount={props.filtersStorage?.length || 0}
               />
             )}
           {/* Display mode */}
@@ -82,13 +88,18 @@ export const TableButtons: FunctionComponent<TableButtonsProps> = (props) => {
             <TableMoreActions
               {...props}
               actions={props.dropdownActions}
+              size={props.dropdownActionsSize}
               showExport
             />
           ) : (
             <>
               {props.enableExport && <TableExportButton {...props} />}
               {Boolean(props.dropdownActions) && (
-                <TableMoreActions {...props} actions={props.dropdownActions} />
+                <TableMoreActions
+                  {...props}
+                  actions={props.dropdownActions}
+                  size={props.dropdownActionsSize}
+                />
               )}
             </>
           )}

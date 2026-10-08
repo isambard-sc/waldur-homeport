@@ -1,22 +1,14 @@
-import { FunctionComponent } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import NotificationsSystem, {
-  atalhoTheme,
-  bootstrapTheme,
-  dismissNotification,
-} from 'reapop';
+import { CSSProperties, FunctionComponent } from 'react';
 
-import { useTheme } from '@waldur/theme/useTheme';
+import { NotificationProvider } from 'waldur-notifications';
 
-export const NotificationContainer: FunctionComponent = () => {
-  const dispatch = useDispatch();
-  const notifications = useSelector((state: any) => state.notifications);
-  const { theme } = useTheme();
-  return (
-    <NotificationsSystem
-      theme={theme === 'dark' ? atalhoTheme : bootstrapTheme}
-      notifications={notifications}
-      dismissNotification={(id) => dispatch(dismissNotification(id))}
-    />
-  );
-};
+// See --z-index-toast in packages/design-tokens/src/zIndex.css for why the
+// z-index sits below tooltips — overriding waldur-ui's ToastViewport's own
+// generic z-50 default, which knows nothing of this app's legacy Bootstrap
+// z-index stack (Metronic's sidebar/drawer, Bootstrap modals, ...).
+const VIEWPORT_STYLE = { zIndex: 'var(--z-index-toast)' } as CSSProperties;
+
+/** Mounts the toast stack; see waldur-notifications for the store it renders. */
+export const NotificationContainer: FunctionComponent = () => (
+  <NotificationProvider viewportStyle={VIEWPORT_STYLE} />
+);

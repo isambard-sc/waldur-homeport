@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { Card, Col, Nav, Row, Tab } from 'react-bootstrap';
 
-import { TableTabsContainer } from '@waldur/customer/list/TableTabsContainer';
+import { TableTabsContainer } from '@/customer/list/TableTabsContainer';
 
 import { TableProps } from './types';
 
@@ -25,6 +25,7 @@ export const TableWithTabs: FC<
     actions?:
       | ReactNode
       | Array<{ activeKeys: (string | number)[]; component: ReactNode }>;
+    headerActions?: ReactNode;
   }
 > = ({
   title,
@@ -35,6 +36,7 @@ export const TableWithTabs: FC<
   data = {},
   syncWithUrlKey,
   actions,
+  headerActions,
 }) => {
   const { state, params } = useCurrentStateAndParams();
   const router = useRouter();
@@ -70,6 +72,11 @@ export const TableWithTabs: FC<
   }, [params, syncWithUrlKey, tabs, defaultActiveKey]);
 
   const handleSelect = (key: string | null) => {
+    // Re-selecting the open tab mounts nothing new, so the portalled controls
+    // hidden below would never be restored.
+    if (key === (activeKey ?? defaultActiveKey)) {
+      return;
+    }
     // Remove all children that came through the portal from the toolbar and title,
     // to prevent previous children to be visible when the new tab is rendered
     const childrenToBeRemoved = [];
@@ -112,10 +119,14 @@ export const TableWithTabs: FC<
             </Card.Title>
             {/* Portal destination */}
           </Col>
-          <Col sm="auto" className="ms-auto">
+          <Col
+            sm="auto"
+            className="ms-auto mw-100 d-flex gap-4 flex-wrap flex-sm-nowrap text-nowrap"
+          >
+            {headerActions}
             <div
               ref={refToolbar}
-              className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-3"
+              className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-4"
             >
               {/* Portal destination */}
             </div>
@@ -127,6 +138,7 @@ export const TableWithTabs: FC<
           defaultActiveKey={defaultActiveKey}
           activeKey={activeKey ?? defaultActiveKey}
           onSelect={handleSelect}
+          unmountOnExit
           className="min-h-175px"
         >
           <div className="d-flex justify-content-between">
@@ -158,7 +170,7 @@ export const TableWithTabs: FC<
           {isRefsReady && (
             <Tab.Content className="overflow-auto">
               {tabs.map((tab) => (
-                <Tab.Pane key={tab.key} eventKey={tab.key} unmountOnExit={true}>
+                <Tab.Pane key={tab.key} eventKey={tab.key}>
                   <tab.component
                     {...data}
                     activeTab={activeKey}

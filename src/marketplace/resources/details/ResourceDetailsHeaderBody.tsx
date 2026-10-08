@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 import {
   PublicOfferingDetails,
   Resource,
@@ -8,7 +7,8 @@ import {
   projectsRetrieve,
 } from 'waldur-js-client';
 
-import { getUser } from '@waldur/workspace/selectors';
+import { STALE_TIME } from '@/core/constants';
+import { useUser } from '@/workspace/hooks';
 
 import { BackendIdField } from './BackendIdField';
 import { EndDateField } from './EndDateField';
@@ -18,12 +18,17 @@ import { OfferingUserDetailsField } from './OfferingUserDetailsField';
 interface ResourceDetailsHeaderBodyProps {
   resource: Resource;
   offering: PublicOfferingDetails;
+  /**
+   * The project and the viewer's own offering user are consumer data a
+   * provider-side user cannot read, so they are not requested.
+   */
+  providerView?: boolean;
 }
 
 export const ResourceDetailsHeaderBody: FunctionComponent<
   ResourceDetailsHeaderBodyProps
-> = ({ resource, offering }) => {
-  const user = useSelector(getUser);
+> = ({ resource, offering, providerView = false }) => {
+  const user = useUser();
 
   const { data: project } = useQuery({
     queryKey: ['display-project-billing', resource.project_uuid],
@@ -34,8 +39,9 @@ export const ResourceDetailsHeaderBody: FunctionComponent<
             query: { field: ['customer_display_billing_info_in_projects'] },
           }).then((response) => response.data)
         : null,
+    enabled: !providerView,
     refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STALE_TIME,
   });
   const { data: offeringUser } = useQuery({
     queryKey: ['fetchOfferingUser', user?.uuid, offering?.uuid],
@@ -49,8 +55,8 @@ export const ResourceDetailsHeaderBody: FunctionComponent<
             },
           }).then((response) => response.data[0] || null)
         : null,
-    enabled: !!(user?.uuid && offering?.uuid),
-    staleTime: 5 * 60 * 1000,
+    enabled: !providerView && !!(user?.uuid && offering?.uuid),
+    staleTime: STALE_TIME,
   });
 
   return (
@@ -64,7 +70,10 @@ export const ResourceDetailsHeaderBody: FunctionComponent<
       />
       <BackendIdField resource={resource} offering={offering} />
       <EndDateField resource={resource} />
-      <OfferingUserDetailsField offeringUser={offeringUser} />
+      <OfferingUserDetailsField
+        offeringUser={offeringUser}
+        resource={resource}
+      />
     </>
   );
 };

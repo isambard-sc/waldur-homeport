@@ -1,9 +1,9 @@
 import { padStart, uniqueId } from 'lodash-es';
 import { DateTime, Duration } from 'luxon';
 
-import { parseDate } from '@waldur/core/dateUtils';
-import { translate } from '@waldur/i18n';
-import { Option } from '@waldur/marketplace/common/registry';
+import { parseDate } from '@/core/dateUtils';
+import { translate } from '@/i18n';
+import { Option } from '@/marketplace/common/registry';
 
 import { BookedItem, BookingProps, EventInput } from './types';
 
@@ -110,7 +110,8 @@ export const getAvailableRangeOfDates = (
 
   return availableRanges.map((range) => {
     let start = range.start;
-    // if start time is 23:59, take it to the next day to render it currently in flatpickr
+    // if start time is 23:59, take it to the next day so the calendar doesn't
+    // enable a whole day for a one-minute slot
     if (start.hour === 23 && start.minute === 59) {
       start = start.plus({ hours: 1 }).startOf('day');
     }

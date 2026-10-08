@@ -1,6 +1,12 @@
-import { CascadeConfig, ComponentMultiplierConfig } from 'waldur-js-client';
+import {
+  CascadeConfig,
+  ComponentFormulaConfig,
+  ComponentMultiplierConfig,
+  ComponentSumConfig,
+} from 'waldur-js-client';
 
-import { Option } from '@waldur/marketplace/common/registry';
+import { K8sDefaultConfiguration } from '@/marketplace/common/multi-datacenter-k8s-types';
+import { Option } from '@/marketplace/common/registry';
 
 export interface PlanFormData {
   archived: boolean;
@@ -11,6 +17,7 @@ export interface PlanFormData {
   quotas: { [key: string]: number };
   description?: string;
   article_code?: string;
+  billing_mode?: Option;
   uuid?: string;
 }
 
@@ -21,6 +28,19 @@ export interface OptionFormData {
   choices: string;
   cascade_config?: CascadeConfig;
   component_multiplier_config?: ComponentMultiplierConfig;
+  component_formula_config?: ComponentFormulaConfig;
+  component_sum_config?: ComponentSumConfig;
+  default_configs?: K8sDefaultConfiguration;
+  validators?: Array<{
+    type: Option | string;
+    target_field: Option | string;
+  }>;
+  visible_if?: {
+    field?: string;
+    values?: Array<boolean | string>;
+  };
+  pattern?: string;
+  pattern_error?: string;
 }
 
 export type OfferingLimits = Record<string, { min: number; max: number }>;

@@ -2,22 +2,21 @@ import classNames from 'classnames';
 import { FC, ReactNode } from 'react';
 import { Modal } from 'react-bootstrap';
 
-import Bg from '@waldur/navigation/header/search/Background.svg';
+import { FeaturedIcon, FeaturedIconVariant } from 'waldur-ui';
+
+import { RadialBg } from '@/navigation/header/search/RadialBg';
 
 interface ModalDialogProps {
   title?: ReactNode;
   subtitle?: ReactNode;
   iconNode?: ReactNode;
-  iconColor?: string;
+  iconColor?: FeaturedIconVariant;
   footer?: ReactNode;
   closeButton?: boolean;
   className?: string;
   bodyClassName?: string;
   headerClassName?: string;
   footerClassName?: string;
-  hasHeaderPadding?: boolean;
-  hasFooterPadding?: boolean;
-  hasFooterBorder?: boolean;
   children?: ReactNode;
   headerLess?: boolean;
   actions?: ReactNode;
@@ -28,7 +27,7 @@ interface ModalDialogProps {
 }
 
 export const ModalDialog: FC<ModalDialogProps> = ({
-  closeButton = false,
+  closeButton = true,
   title,
   subtitle,
   iconNode,
@@ -39,9 +38,6 @@ export const ModalDialog: FC<ModalDialogProps> = ({
   bodyClassName,
   headerClassName,
   footerClassName,
-  hasHeaderPadding,
-  hasFooterPadding,
-  hasFooterBorder,
   headerLess,
   actions,
   extra,
@@ -56,7 +52,6 @@ export const ModalDialog: FC<ModalDialogProps> = ({
         className={classNames(
           headerClassName,
           'without-border',
-          !hasHeaderPadding && 'pb-0',
           !title && 'without-border',
           iconNode && 'has-icon',
         )}
@@ -64,26 +59,20 @@ export const ModalDialog: FC<ModalDialogProps> = ({
         <div className="flex-grow-1">
           {Boolean(iconNode) && (
             <>
-              <Bg className="icon-background" />
-              <div
-                className={classNames(
-                  'modal-icon mb-6',
-                  iconColor && `text-${iconColor}`,
-                  !iconColor
-                    ? 'bg-secondary'
-                    : iconColor === 'dark'
-                      ? `bg-gray-100`
-                      : `bg-light-${iconColor}`,
-                )}
-              >
-                {iconNode}
-              </div>
+              <RadialBg className="icon-background" />
+              <FeaturedIcon
+                icon={iconNode}
+                variant={iconColor}
+                tone="solid"
+                size="lg"
+                className="modal-icon mb-6"
+              />
             </>
           )}
-          <Modal.Title className="fw-bold">{title}</Modal.Title>
-          {subtitle && (
-            <h6 className="text-gray-500 fw-normal mt-2 lh-base">{subtitle}</h6>
-          )}
+          <Modal.Title className="fw-bold" as="h3">
+            {title}
+          </Modal.Title>
+          {subtitle && <h6 className="modal-subtitle">{subtitle}</h6>}
         </div>
         {actions}
       </Modal.Header>
@@ -98,12 +87,8 @@ export const ModalDialog: FC<ModalDialogProps> = ({
     </Modal.Body>
     {footer && (
       <Modal.Footer
-        className={classNames(
-          footerClassName,
-          !hasFooterPadding && !hasFooterBorder && 'pt-0',
-          !hasFooterBorder && 'border-0',
-          'gap-2',
-        )}
+        className={classNames(footerClassName, 'border-0')}
+        data-testid="modal-footer"
       >
         {footer}
       </Modal.Footer>

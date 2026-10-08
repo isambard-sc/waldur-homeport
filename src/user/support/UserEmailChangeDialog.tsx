@@ -2,10 +2,10 @@ import { FunctionComponent } from 'react';
 import { Form } from 'react-bootstrap';
 import { User } from 'waldur-js-client';
 
-import { SubmitButton } from '@waldur/form';
-import { translate } from '@waldur/i18n';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { SubmitButton } from '@/form';
+import { translate } from '@/i18n';
+import { CloseDialogButton } from '@/modal/CloseDialogButton';
+import { ModalDialog } from '@/modal/ModalDialog';
 
 import { useEmailChange } from './useEmailChange';
 
@@ -18,9 +18,7 @@ export const UserEmailChangeDialog: FunctionComponent<{
   return (
     <ModalDialog
       title={translate('Email')}
-      subtitle={translate(
-        'Provide an email address for communication and recovery',
-      )}
+      subtitle={translate('Provide an email address for notifications')}
       footer={
         <>
           <CloseDialogButton variant="tertiary" className="flex-equal" />
@@ -30,16 +28,18 @@ export const UserEmailChangeDialog: FunctionComponent<{
               disabled={email === user.email || !email || isProtected}
               submitting={submitting}
               label={translate('Request change')}
-              className="btn btn-primary flex-equal"
-              onClick={handleSubmit}
+              variant="primary"
+              className="flex-equal"
+              onClick={() => handleSubmit()}
             />
           ) : (
             <SubmitButton
               disabled={isProtected}
               submitting={submitting}
               label={translate('Cancel request')}
-              className="btn btn-danger flex-equal"
-              onClick={cancelRequest}
+              variant="danger"
+              className="flex-equal"
+              onClick={() => cancelRequest()}
             />
           )}
         </>

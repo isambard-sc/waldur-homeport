@@ -1,9 +1,9 @@
 import { ComponentType, FunctionComponent, ReactNode } from 'react';
 import { Nav, Tab } from 'react-bootstrap';
 
-import { translate } from '@waldur/i18n';
-import * as ResourceSummaryRegistry from '@waldur/resource/summary/registry';
-import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import { translate } from '@/i18n';
+import * as ResourceSummaryRegistry from '@/resource/summary/registry';
+import { ExpandableContainer } from '@/table/ExpandableContainer';
 
 import { ResourceSummaryBase } from './ResourceSummaryBase';
 
@@ -56,7 +56,7 @@ export const ResourceSummary: FunctionComponent<ResourceSummaryProps> = (
                 ))}
             </Nav>
             <Tab.Content className="overflow-auto">
-              <Tab.Pane eventKey="details" unmountOnExit={true}>
+              <Tab.Pane eventKey="details">
                 <ResourceSummaryBase resource={props.resource} />
                 {SummaryComponent && (
                   <SummaryComponent resource={props.resource} />
@@ -64,11 +64,7 @@ export const ResourceSummary: FunctionComponent<ResourceSummaryProps> = (
               </Tab.Pane>
               {props.extraTabs &&
                 props.extraTabs.map((tab) => (
-                  <Tab.Pane
-                    key={tab.eventKey}
-                    eventKey={tab.eventKey}
-                    unmountOnExit={true}
-                  >
+                  <Tab.Pane key={tab.eventKey} eventKey={tab.eventKey}>
                     <tab.component />
                   </Tab.Pane>
                 ))}

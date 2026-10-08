@@ -1,12 +1,12 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
 import { RancherCluster } from 'waldur-js-client';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 const HPACreateDialog = lazyComponent(() =>
   import('./HPACreateDialog').then((module) => ({
@@ -14,19 +14,18 @@ const HPACreateDialog = lazyComponent(() =>
   })),
 );
 
-const createHPADialog = (cluster) =>
-  openModalDialog(HPACreateDialog, { resolve: { cluster } });
-
 export const HPACreateButton: FunctionComponent<{
   cluster: RancherCluster;
 }> = ({ cluster }) => {
-  const dispatch = useDispatch();
-  const callback = () => dispatch(createHPADialog(cluster));
+  const { openDialog } = useModal();
+  const callback = () => openDialog(HPACreateDialog, { resolve: { cluster } });
   return (
-    <ActionButton
-      title={translate('Create')}
-      action={callback}
+    <BaseButton
+      label={translate('Create')}
+      onClick={callback}
       iconNode={<PlusCircleIcon weight="bold" />}
+      variant="tertiary"
+      size="lg"
     />
   );
 };

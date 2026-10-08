@@ -1,10 +1,13 @@
-import { PlusIcon } from '@phosphor-icons/react';
+import { LockIcon, PlusIcon, XIcon } from '@phosphor-icons/react';
+import classNames from 'classnames';
 import { groupBy, isEmpty } from 'lodash-es';
-import { Fragment, useCallback, useEffect, useRef } from 'react';
-import { Button, Col, Nav, Row, Tab } from 'react-bootstrap';
+import { Fragment, useCallback } from 'react';
+import { Col, Nav, Row, Tab } from 'react-bootstrap';
 
-import { Badge } from '@waldur/core/Badge';
-import { translate } from '@waldur/i18n';
+import { Badge, BaseButton } from 'waldur-ui';
+
+import { formatPhoneNumber } from '@/core/utils';
+import { translate } from '@/i18n';
 
 import { useFavoritePages } from '../favorite-pages/FavoritePageService';
 
@@ -13,18 +16,24 @@ import { RecentSearchItem } from './RecentSearchItem';
 import { useRecentSearch } from './RecentSearchService';
 import { SearchInput } from './SearchInput';
 import { SearchItem } from './SearchItem';
-import { SearchResult } from './useSearch';
+import { UserSearchImpersonateAction } from './UserSearchImpersonateAction';
+import { SearchResult, UsersSearchResult } from './useSearch';
 
 interface SearchPopoverProps {
   result: SearchResult;
+  usersResult: UsersSearchResult;
   query: string;
   show: boolean;
   setQuery;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  isStaffOrSupportUser: boolean;
   close(): void;
 }
 
 interface TabContentProps
-  extends Partial<ReturnType<typeof useFavoritePages>>,
+  extends
+    Partial<ReturnType<typeof useFavoritePages>>,
     Partial<ReturnType<typeof useRecentSearch>> {
   result: SearchResult;
   clearSearch(): void;
@@ -32,11 +41,7 @@ interface TabContentProps
 }
 
 const SectionTitle = ({ title, className = '' }) => (
-  <h6
-    className={
-      'text-gray-700 fw-bold mb-3 mx-5' + (className ? ` ${className}` : '')
-    }
-  >
+  <h6 className={classNames('text-gray-700 fw-bold mb-3 mx-5', className)}>
     {title}
   </h6>
 );
@@ -56,6 +61,7 @@ const AllResultsTabContent = ({
   isFavorite,
   recentSearchItems,
   addRecentSearch,
+  clearRecentSearches,
   close,
 }: TabContentProps) => {
   return (
@@ -63,7 +69,19 @@ const AllResultsTabContent = ({
       <Col md={12} lg={6} className="py-5 px-0">
         {Boolean(recentSearchItems?.length) && (
           <div className="mb-3">
-            <SectionTitle title={translate('Recent')} />
+            <div className="d-flex align-items-center justify-content-between mx-5 mb-3">
+              <h6 className="text-gray-700 fw-bold mb-0">
+                {translate('Recent')}
+              </h6>
+              <BaseButton
+                variant="text-secondary"
+                className="btn-no-focus"
+                onClick={clearRecentSearches}
+                iconNode={<XIcon weight="bold" />}
+                label={translate('Clear')}
+                size="sm"
+              />
+            </div>
             {recentSearchItems.map((item) => (
               <RecentSearchItem key={item.id} item={item} />
             ))}
@@ -89,16 +107,14 @@ const AllResultsTabContent = ({
             <SectionNoResult />
           )}
           {!isCurrentPageFavorite && (
-            <Button
-              variant="link"
-              className="ms-8"
+            <BaseButton
+              variant="text-primary"
+              className="ms-5"
               onClick={addCurrentPageFavorite}
-            >
-              <span className="svg-icon svg-icon-2">
-                <PlusIcon weight="bold" />
-              </span>
-              {translate('Add current page')}
-            </Button>
+              label={translate('Add current page')}
+              iconNode={<PlusIcon weight="bold" />}
+              size="lg"
+            />
           )}
         </div>
       </Col>
@@ -114,6 +130,7 @@ const AllResultsTabContent = ({
                     to="organization.dashboard"
                     params={{ uuid: item.uuid }}
                     title={item.name}
+                    subtitle={item.abbreviation}
                     image={item.image}
                     isFavorite={isFavorite}
                     addFavoritePage={addFavoritePage}
@@ -218,6 +235,7 @@ const OrganizationsTabContent = ({
               to="organization.dashboard"
               params={{ uuid: item.uuid }}
               title={item.name}
+              subtitle={item.abbreviation}
               image={item.image}
               isFavorite={isFavorite}
               addFavoritePage={addFavoritePage}
@@ -340,11 +358,90 @@ const ResourcesTabContent = ({
   );
 };
 
+const formatUserSubtitle = (user) => {
+  const parts: string[] = [];
+
+  // Status first
+  parts.push(
+    user.is_active ? `✓ ${translate('Active')}` : `✗ ${translate('Inactive')}`,
+  );
+
+  if (user.email) parts.push(user.email);
+  const formattedPhone = formatPhoneNumber(user.phone_number);
+  if (formattedPhone) parts.push(formattedPhone);
+  if (user.organization) parts.push(user.organization);
+
+  const orgRoles = user.permissions?.filter((p) => p.scope_type === 'customer');
+  const projectRoles = user.permissions?.filter(
+    (p) => p.scope_type === 'project',
+  );
+
+  if (orgRoles?.length > 0) {
+    parts.push(
+      translate('{count} org role(s)', { count: orgRoles.length.toString() }),
+    );
+  }
+  if (projectRoles?.length > 0) {
+    parts.push(
+      translate('{count} project role(s)', {
+        count: projectRoles.length.toString(),
+      }),
+    );
+  }
+
+  return parts.join(' • ');
+};
+
+const UsersTabContent = ({
+  usersResult,
+  clearSearch,
+  addRecentSearch,
+  close,
+}: {
+  usersResult: UsersSearchResult;
+  clearSearch(): void;
+  addRecentSearch(item, type): void;
+  close(): void;
+}) => {
+  return (
+    <>
+      {usersResult?.data?.usersCount ? (
+        <div className="py-5">
+          {usersResult.data.users.map((user) => (
+            <SearchItem
+              key={user.uuid}
+              to="support-user-manage"
+              params={{ user_uuid: user.uuid }}
+              title={user.full_name || user.email}
+              subtitle={formatUserSubtitle(user)}
+              actions={<UserSearchImpersonateAction row={user} close={close} />}
+              onClick={(item) => {
+                addRecentSearch(item, 'user');
+                close();
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
+      <NoResult
+        isVisible={
+          !usersResult?.data?.usersCount && usersResult?.status !== 'pending'
+        }
+        callback={clearSearch}
+      />
+    </>
+  );
+};
+
 export const SearchPopover = ({
   result,
+  usersResult,
   query,
   show,
   setQuery,
+  activeTab,
+  setActiveTab,
+  isStaffOrSupportUser,
   close,
 }: SearchPopoverProps) => {
   const {
@@ -355,18 +452,13 @@ export const SearchPopover = ({
     removeFavorite,
     isFavorite,
   } = useFavoritePages();
-  const refSearch = useRef<HTMLInputElement>();
-  useEffect(() => {
-    if (refSearch.current) {
-      refSearch.current.focus();
-    }
-  }, []);
 
   const clearSearch = useCallback(() => {
     setQuery('');
   }, [setQuery]);
 
-  const { recentSearchItems, addRecentSearch } = useRecentSearch();
+  const { recentSearchItems, addRecentSearch, clearRecentSearches } =
+    useRecentSearch();
 
   return (
     <div className="pt-5">
@@ -375,17 +467,33 @@ export const SearchPopover = ({
         query={query}
         show={show}
         setQuery={setQuery}
-        className="px-5 mb-6 d-lg-none"
+        className="px-5 mb-6"
       />
 
-      <Tab.Container defaultActiveKey="all">
-        <div className="overflow-auto">
+      <Tab.Container
+        activeKey={activeTab}
+        onSelect={(key) => setActiveTab(key)}
+      >
+        {/*
+          Firefox makes any scrollable box a Tab stop (Chrome only when it holds
+          nothing focusable), so without this the first Tab landed on the row
+          itself and the two browsers differed. Tab lands on the selected tab
+          and the arrows switch tabs; a tab scrolls into view as it takes focus.
+          py-1 leaves room for the line-tab focus ring, which is drawn outside
+          the tab and would otherwise be clipped by this scroll box.
+        */}
+        <div className="overflow-auto py-1" tabIndex={-1}>
           <Nav variant="tabs" className="nav-line-tabs flex-nowrap">
             <Nav.Item className="text-nowrap ms-5">
               <Nav.Link eventKey="all">
                 {translate('All results')}
                 {Boolean(result.data) && (
-                  <Badge variant="default" outline pill className="ms-2">
+                  <Badge
+                    variant="neutral"
+                    shape="pill"
+                    tone="outline"
+                    className="ms-2"
+                  >
                     {result.data.resultsCount}
                   </Badge>
                 )}
@@ -395,7 +503,12 @@ export const SearchPopover = ({
               <Nav.Link eventKey="organizations">
                 {translate('Organizations')}
                 {Boolean(result.data) && (
-                  <Badge variant="default" outline pill className="ms-2">
+                  <Badge
+                    variant="neutral"
+                    shape="pill"
+                    tone="outline"
+                    className="ms-2"
+                  >
                     {result.data.customersCount}
                   </Badge>
                 )}
@@ -405,22 +518,54 @@ export const SearchPopover = ({
               <Nav.Link eventKey="projects">
                 {translate('Projects')}
                 {Boolean(result.data) && (
-                  <Badge variant="default" outline pill className="ms-2">
+                  <Badge
+                    variant="neutral"
+                    shape="pill"
+                    tone="outline"
+                    className="ms-2"
+                  >
                     {result.data.projectsCount}
                   </Badge>
                 )}
               </Nav.Link>
             </Nav.Item>
-            <Nav.Item className="text-nowrap me-5">
+            <Nav.Item
+              className={
+                isStaffOrSupportUser ? 'text-nowrap' : 'text-nowrap me-5'
+              }
+            >
               <Nav.Link eventKey="resources">
                 {translate('Resources')}
                 {Boolean(result.data) && (
-                  <Badge variant="default" outline pill className="ms-2">
+                  <Badge
+                    variant="neutral"
+                    shape="pill"
+                    tone="outline"
+                    className="ms-2"
+                  >
                     {result.data.resourcesCount}
                   </Badge>
                 )}
               </Nav.Link>
             </Nav.Item>
+            {isStaffOrSupportUser && (
+              <Nav.Item className="text-nowrap me-5">
+                <Nav.Link eventKey="users">
+                  <LockIcon size={14} className="me-1" weight="bold" />
+                  {translate('Users')}
+                  {Boolean(usersResult?.data) && (
+                    <Badge
+                      variant="neutral"
+                      shape="pill"
+                      tone="outline"
+                      className="ms-2"
+                    >
+                      {usersResult.data.usersCount}
+                    </Badge>
+                  )}
+                </Nav.Link>
+              </Nav.Item>
+            )}
           </Nav>
         </div>
         <Tab.Content className="overflow-auto min-h-200px">
@@ -430,6 +575,7 @@ export const SearchPopover = ({
               clearSearch={clearSearch}
               recentSearchItems={recentSearchItems}
               addRecentSearch={addRecentSearch}
+              clearRecentSearches={clearRecentSearches}
               favPages={favPages}
               addCurrentPageFavorite={addCurrentPageFavorite}
               isCurrentPageFavorite={isCurrentPageFavorite}
@@ -472,6 +618,16 @@ export const SearchPopover = ({
               close={close}
             />
           </Tab.Pane>
+          {isStaffOrSupportUser && (
+            <Tab.Pane eventKey="users">
+              <UsersTabContent
+                usersResult={usersResult}
+                clearSearch={clearSearch}
+                addRecentSearch={addRecentSearch}
+                close={close}
+              />
+            </Tab.Pane>
+          )}
         </Tab.Content>
       </Tab.Container>
     </div>

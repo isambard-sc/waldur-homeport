@@ -1,14 +1,14 @@
 import { UserPlusIcon } from '@phosphor-icons/react';
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { UserFeatures } from '@waldur/FeaturesEnums';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { getUser } from '@waldur/workspace/selectors';
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
+import { PermissionEnum } from '@/permissions/enums';
+import { hasPermission } from '@/permissions/hasPermission';
+import { getPermissionDisabledTooltip } from '@/permissions/utils';
+import { ActionItem } from '@/resource/actions/ActionItem';
+import { useUser } from '@/workspace/hooks';
 
 import { AddUserDialogProps } from './types';
 
@@ -18,26 +18,46 @@ const AddUserDialog = lazyComponent(() =>
   })),
 );
 
+const ADD_USER_PERMISSIONS = [
+  PermissionEnum.CREATE_CALL_PERMISSION,
+  PermissionEnum.MANAGE_PROPOSAL,
+];
+
 export const AddUserButton: React.FC<AddUserDialogProps> = (props) => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUser);
+  const { openDialog } = useModal();
+  const user = useUser();
 
-  if (!user) {
-    console.log('Current user is not defined');
-    return null;
-  }
+  // Mirrors UserRoleCreateSerializer: the scope type's create permission --
+  // CALL.CREATE_PERMISSION for a call, PROPOSAL.MANAGE for a proposal -- held
+  // on the scope's organization or on the scope itself. The team panel renders
+  // for both, and checkScope inside hasPermission tells them apart by
+  // scope_type. Organization owners hold the call one on the organization.
+  const scopeUuid = props.scope?.uuid;
+  const canAddUser =
+    !!scopeUuid &&
+    ADD_USER_PERMISSIONS.some((permission) =>
+      hasPermission(user, {
+        permission,
+        scopeId: scopeUuid,
+        customerId: props.scope?.customer_uuid,
+      }),
+    );
 
-  console.log('Current user:', user);
-
-  if (user.is_staff || user.is_support || isFeatureVisible(UserFeatures.allow_user_creation)) {
-    return (
-      <ActionItem
-        title={translate('Member')}
-        action={() => dispatch(openModalDialog(AddUserDialog, props))}
-        iconNode={<UserPlusIcon weight="bold" />}
-      />
-    )
-  } else {
-    return null;
-  }
+  return (
+    <ActionItem
+      title={translate('Member')}
+      action={() => openDialog(AddUserDialog, props)}
+      iconNode={<UserPlusIcon weight="bold" />}
+      disabled={!canAddUser}
+      tooltip={
+        !canAddUser
+          ? getPermissionDisabledTooltip(ADD_USER_PERMISSIONS, [
+              'customer',
+              'call',
+              'proposal',
+            ])
+          : null
+      }
+    />
+  );
 };

@@ -1,44 +1,59 @@
+import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
-import { openportalManagedProjectsList, openportalRemoteProjectsList, projectsListUsersList, projectsStatsRetrieve } from 'waldur-js-client';
-import type { ManagedProject, RemoteProject } from 'waldur-js-client';
+import {
+  openportalManagedProjectsList,
+  openportalRemoteProjectsList,
+  projectsListUsersList,
+  projectsStatsRetrieve,
+} from 'waldur-js-client';
 
-import { count, parseSelectData } from '@waldur/core/api';
-import { Badge } from '@waldur/core/Badge';
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { Panel } from '@waldur/core/Panel';
-import { TruncatedMarkdown } from '@waldur/core/TruncatedMarkdown';
-import { filterComponentsWithUsage } from '@waldur/customer/dashboard/utils';
-import { COMMON_WIDGET_HEIGHT } from '@waldur/dashboard/constants';
-import { TeamWidget } from '@waldur/dashboard/TeamWidget';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { CustomerFeatures, MarketplaceFeatures } from '@waldur/FeaturesEnums';
-import { EditButton } from '@waldur/form/EditButton';
-import { translate } from '@waldur/i18n';
-import { useCreateInvitation } from '@waldur/invitations/actions/useCreateInvitation';
-import { AggregateLimitWidget } from '@waldur/marketplace/aggregate-limits/AggregateLimitWidget';
-import { NON_TERMINATED_STATES } from '@waldur/marketplace/resources/list/constants';
-import { openModalDialog } from '@waldur/modal/actions';
-import { PermissionEnum } from '@waldur/permissions/enums';
-import { hasPermission } from '@waldur/permissions/hasPermission';
-import { useUser } from '@waldur/workspace/hooks';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
-import { useThemeFeatures } from '@waldur/theme/useThemeFeatures';
+import { Badge, BaseButton } from 'waldur-ui';
 
-import { canChangeMembership } from '@waldur/openportal/bindings/helpers';
-import { ManagedProjectDashboardCards } from '@waldur/openportal/managed-projects/ManagedProjectDashboardCards';
-import { RemoteProjectDashboardCards } from '@waldur/openportal/remote-projects/RemoteProjectDashboardCards';
+import { getResourcesCount } from '@/administration/api';
+import { parseSelectData } from '@/core/api';
+import { SHORT_STALE_TIME, STALE_TIME, UI_STALE_TIME } from '@/core/constants';
+import { lazyComponent } from '@/core/lazyComponent';
+import { Panel } from '@/core/Panel';
+import { TruncatedMarkdown } from '@/core/TruncatedMarkdown';
+import { filterComponentsWithUsage } from '@/customer/dashboard/utils';
+import { COMMON_WIDGET_HEIGHT } from '@/dashboard/constants';
+import { TeamWidget } from '@/dashboard/TeamWidget';
+import { isFeatureVisible } from '@/features/connect';
+import { CustomerFeatures, MarketplaceFeatures } from '@/FeaturesEnums';
+import { translate } from '@/i18n';
+import { useCreateInvitation } from '@/invitations/actions/useCreateInvitation';
+import { AggregateLimitWidget } from '@/marketplace/aggregate-limits/AggregateLimitWidget';
+import { UsageViewsSection } from '@/marketplace/aggregate-limits/usage-views/UsageViewsSection';
+import { NON_TERMINATED_STATES } from '@/marketplace/resources/list/constants';
+import { useModal } from '@/modal/actions';
+import { useAwardPace } from '@/openportal/award-pace/useAwardPace';
+import { canChangeMembership } from '@/openportal/awardPolicy';
+import { MonthlyUsageChart } from '@/openportal/consumption/MonthlyUsageChart';
+import { ManagedProjectDashboardCards } from '@/openportal/managed-projects/ManagedProjectDashboardCards';
+import { getAccountingMode } from '@/openportal/project-accounting/accountingMode';
+import { ProjectSpendCard } from '@/openportal/project-accounting/ProjectSpendCard';
+import { useProjectSpend } from '@/openportal/project-accounting/useProjectSpend';
+import { RemoteProjectDashboardCards } from '@/openportal/remote-projects/RemoteProjectDashboardCards';
+import { RemoteProjectPaceBlock } from '@/openportal/remote-projects/RemoteProjectPaceBlock';
+import { useProjectAccountingSummary } from '@/openportal/useProjectAccountingSummary';
+import { PermissionEnum } from '@/permissions/enums';
+import { hasPermission } from '@/permissions/hasPermission';
+import { canViewTeam } from '@/permissions/teamVisibility';
+import { useThemeFeatures } from '@/theme/useThemeFeatures';
+import { useCustomer, useUser, useProject } from '@/workspace/hooks';
 
+import { AwardLockedDialog } from './AwardLockedDialog';
 import { ProjectLimitUsageBasedResources } from './dashboard/ProjectLimitUsageBasedResources';
+import { membershipLockedDialogProps } from './MembershipLockedDialog';
+import { ProjectCreditHealthBlock } from './policy-watch/ProjectCreditHealthBlock';
+import { ProjectDashboardBalance } from './ProjectDashboardBalance';
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { ProjectDashboardCredit } from './ProjectDashboardCredit';
-import { ProjectDashboardBalance } from './ProjectDashboardBalance';
-import { getProjectTeamChart } from './utils';
-import { membershipLockedDialog } from './MembershipLockedDialog';
 import { useProjectAwardDetails } from './useProjectAwardDetails';
+import { getProjectTeamChart } from './utils';
 
 const EditFieldDialog = lazyComponent(() =>
   import('./manage/EditFieldDialog').then((module) => ({
@@ -46,22 +61,41 @@ const EditFieldDialog = lazyComponent(() =>
   })),
 );
 
+/**
+ * The monthly usage chart spans the row when it ends up on one by itself.
+ *
+ * How many half-width cards come before it is not fixed — one per connected
+ * remote project, plus whichever accounting card this mode shows — so the
+ * chart can land beside a card or alone on the next line. Rather than counting
+ * those cards, which would repeat every one of their visibility conditions and
+ * silently go wrong the day one changes, the column is allowed to grow:
+ * `col-md-6` still gives it a half-width basis, so it wraps exactly as before,
+ * and `flex-md-grow-1` lets it take up whatever the line leaves. Beside another
+ * card that is nothing; alone, it is the whole row. Below `md` every card is
+ * full width already.
+ */
+const MONTHLY_USAGE_COL_CLASS = 'mb-5 flex-md-grow-1';
+
 export const ProjectDashboard: FunctionComponent<{}> = () => {
   const shouldConcealPrices = isFeatureVisible(
     MarketplaceFeatures.conceal_prices,
   );
 
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
+
+  // Limits are aggregated across all resources, which reads as though the
+  // budget were N * remaining_credits. Hidden for this deployment.
+  const { ShowResourceLimits } = useThemeFeatures();
   const user = useUser();
-  const userFromSelector = useSelector(getUser);
-  const project = useSelector(getProject);
-  const customer = useSelector(getCustomer);
-  const showRemoteProjects = isFeatureVisible(
-    CustomerFeatures.show_openportal_remote_projects,
-  );
+  const userFromSelector = useUser();
+  const project = useProject();
 
   const router = useRouter();
   const goToUsers = () => router.stateService.go('project-users');
+  const showTeam = canViewTeam(user, {
+    customerId: project?.customer_uuid,
+    projectId: project?.uuid,
+  });
 
   const canEditProject =
     userFromSelector &&
@@ -76,63 +110,23 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       }));
 
   const handleEditStaffNotes = () => {
-    dispatch(
-      openModalDialog(EditFieldDialog, {
-        resolve: { project, name: 'staff_notes' },
-        size: 'lg',
-      }),
-    );
+    openDialog(EditFieldDialog, {
+      resolve: { project, name: 'staff_notes' },
+      size: 'lg',
+    });
   };
 
   const handleEditDescription = () => {
-    dispatch(
-      openModalDialog(EditFieldDialog, {
-        resolve: { project, name: 'description' },
-        size: 'lg',
-      }),
-    );
+    openDialog(EditFieldDialog, {
+      resolve: { project, name: 'description' },
+      size: 'lg',
+    });
   };
-
-  const { data: remoteProjects } = useQuery({
-    queryKey: ['remote-projects-for-project', project?.uuid],
-    queryFn: () =>
-      openportalRemoteProjectsList({ query: { project_uuid: project.uuid } }).then(
-        (r) => r.data,
-      ),
-    enabled: showRemoteProjects && Boolean(project?.uuid),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const remoteCount =
-    remoteProjects?.filter((rp: RemoteProject) => rp.state !== 'deleted')
-      .length ?? 0;
-  const hasAnyRemoteProjects = showRemoteProjects && remoteCount > 0;
-  const hasManyRemoteProjects = showRemoteProjects && remoteCount > 1;
-
-  const showManagedProjects = isFeatureVisible(
-    MarketplaceFeatures.show_managed_projects,
-  );
-
-  const { data: managedProjects } = useQuery({
-    queryKey: ['managed-projects-for-project', project?.uuid],
-    queryFn: () =>
-      openportalManagedProjectsList({
-        query: { project_uuid: project.uuid },
-      }).then((r) => r.data),
-    enabled: showManagedProjects && Boolean(project?.uuid),
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const hasAnyManagedProjects =
-    showManagedProjects &&
-    (managedProjects?.filter(
-      (mp: ManagedProject) => mp.state === 'approved' || mp.state === 'pending',
-    ).length ?? 0) > 0;
 
   const { data: teamData } = useQuery({
     queryKey: ['projectTeamData', project?.uuid],
     queryFn: () => getProjectTeamChart(project),
-    staleTime: 5 * 60 * 1000,
+    staleTime: STALE_TIME,
   });
 
   const { callback, canInvite, loadingProjects } = useCreateInvitation({
@@ -141,13 +135,6 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   });
 
   const isProjectRemoved = Boolean(project?.is_removed);
-
-  const { data: awardDetails } = useProjectAwardDetails(project?.uuid);
-  const membershipLocked = !canChangeMembership(awardDetails?.membership_control);
-
-  const handleAddClick = membershipLocked && awardDetails
-    ? () => dispatch(membershipLockedDialog(awardDetails))
-    : callback;
 
   const {
     data: aggregateLimitData,
@@ -163,7 +150,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       ),
 
     refetchOnWindowFocus: false,
-    staleTime: 60 * 1000,
+    staleTime: SHORT_STALE_TIME,
   });
 
   const {
@@ -181,37 +168,46 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
       }).then((r) => r.data),
 
     refetchOnWindowFocus: false,
-    staleTime: 60 * 1000,
+    staleTime: SHORT_STALE_TIME,
   });
-
-  const theme_features = useThemeFeatures();
-
-  const show_resource_limits = theme_features.ShowResourceLimits;
 
   const currentMonthFilteredData = filterComponentsWithUsage(
     aggregateLimitDataForCurrentMonth,
   );
 
+  // The organisation has said its accounting is OpenPortal's absolute model,
+  // so the marketplace widgets — a balance, aggregate limits, a credit
+  // consumption chart — describe a different one and contradict the figures
+  // beside them. The same feature already does this on the organisation
+  // dashboard; a project belongs to exactly one organisation, so it follows.
+  const openPortalAccountingOnly = isFeatureVisible(
+    CustomerFeatures.show_openportal_accounting_only,
+  );
+
   const shouldShowAggregateLimitWidget =
-    aggregateLimitData?.components?.length > 0 && show_resource_limits;
+    aggregateLimitData?.components?.length > 0 &&
+    ShowResourceLimits &&
+    !openPortalAccountingOnly;
 
   const shouldShowCurrentMonthWidget =
-    currentMonthFilteredData?.components?.length > 0 && show_resource_limits;
+    currentMonthFilteredData?.components?.length > 0 &&
+    ShowResourceLimits &&
+    !openPortalAccountingOnly;
 
   // Check if there are limit-based resources to show
   const { data: limitBasedResourcesCount } = useQuery({
     queryKey: ['limit-based-resources-count', project?.uuid],
     queryFn: () =>
       project?.uuid
-        ? count('/api/marketplace-resources/', {
-          project_uuid: project.uuid,
-          state: NON_TERMINATED_STATES,
-          only_limit_based: true,
-          component_count: 1,
-        })
+        ? getResourcesCount({
+            project_uuid: project.uuid,
+            state: NON_TERMINATED_STATES,
+            only_limit_based: true,
+            component_count: 1,
+          })
         : 0,
     refetchOnWindowFocus: false,
-    staleTime: 3 * 60 * 1000,
+    staleTime: UI_STALE_TIME,
     enabled: Boolean(project?.uuid),
   });
 
@@ -219,18 +215,111 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
 
   const showBillingInfo = project.customer_display_billing_info_in_projects;
 
+  // ── OpenPortal remote and managed projects ──────────────────────────────
+  // A project backed by an external award shows that award's allocation and
+  // usage in place of the local credit widgets, which say nothing useful when
+  // the budget lives on the awarding portal.
+  const customer = useCustomer();
+
+  const showRemoteProjects = isFeatureVisible(
+    CustomerFeatures.show_openportal_remote_projects,
+  );
+
+  const { data: remoteProjects } = useQuery({
+    queryKey: ['remote-projects-for-project', project?.uuid],
+    queryFn: () =>
+      openportalRemoteProjectsList({
+        query: { project_uuid: project.uuid },
+      }).then((r) => r.data),
+    enabled: showRemoteProjects && Boolean(project?.uuid),
+    staleTime: STALE_TIME,
+  });
+
+  const remoteCount =
+    remoteProjects?.filter((rp) => rp.state !== 'deleted').length ?? 0;
+  const hasAnyRemoteProjects = showRemoteProjects && remoteCount > 0;
+  const hasManyRemoteProjects = showRemoteProjects && remoteCount > 1;
+
+  const showManagedProjects = isFeatureVisible(
+    MarketplaceFeatures.show_managed_projects,
+  );
+
+  const { data: managedProjects } = useQuery({
+    queryKey: ['managed-projects-for-project', project?.uuid],
+    queryFn: () =>
+      openportalManagedProjectsList({
+        query: { project_uuid: project.uuid },
+      }).then((r) => r.data),
+    enabled: showManagedProjects && Boolean(project?.uuid),
+    staleTime: STALE_TIME,
+  });
+
+  const activeManagedProjects =
+    managedProjects?.filter(
+      (mp) => mp.state === 'approved' || mp.state === 'pending',
+    ) ?? [];
+  const hasAnyManagedProjects =
+    showManagedProjects && activeManagedProjects.length > 0;
+  // A project holds at most one award at a time — the backend looks it up with
+  // a plain get() — so the first is the one attached now.
+  const currentAward = hasAnyManagedProjects ? activeManagedProjects[0] : null;
+
+  // Shares the award card's request: same query key, so no extra call.
+  const { data: awardAccounting } = useProjectAccountingSummary(
+    project?.uuid,
+    hasAnyManagedProjects,
+  );
+  const accountingMode = getAccountingMode({
+    hasAward: hasAnyManagedProjects,
+    openPortalAccountingOnly,
+  });
+  const showProjectSpend = accountingMode === 'project';
+  const { data: projectSpend } = useProjectSpend(
+    project?.uuid,
+    showProjectSpend,
+  );
+
+  const awardPace = useAwardPace(
+    currentAward,
+    awardAccounting,
+    project?.uuid,
+    project?.end_date,
+  );
+
+  // When the award controls membership, the team widget's Add button explains
+  // that rather than opening the invitation flow.
+  const { data: awardDetails } = useProjectAwardDetails(project?.uuid);
+  const membershipLocked = !canChangeMembership(
+    awardDetails?.membership_control,
+  );
+  const handleAddClick =
+    membershipLocked && awardDetails
+      ? () =>
+          openDialog(
+            AwardLockedDialog,
+            membershipLockedDialogProps(awardDetails),
+          )
+      : callback;
+
   if (!project || !user) {
     return null;
   }
   return (
     <>
-      {shouldShowLimitBasedResources && <ProjectLimitUsageBasedResources />}
+      {shouldShowLimitBasedResources && (
+        <ProjectLimitUsageBasedResources
+          showCost={!shouldConcealPrices && showBillingInfo}
+        />
+      )}
       <Row>
-        {!shouldConcealPrices && showBillingInfo && show_resource_limits && !hasManyRemoteProjects && (
-          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-            <ProjectDashboardCostLimits project={project} />
-          </Col>
-        )}
+        {!shouldConcealPrices &&
+          showBillingInfo &&
+          ShowResourceLimits &&
+          !hasManyRemoteProjects && (
+            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+              <ProjectDashboardCostLimits project={project} />
+            </Col>
+          )}
         {hasAnyRemoteProjects && remoteProjects && (
           <RemoteProjectDashboardCards
             remoteProjects={remoteProjects}
@@ -243,43 +332,73 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             project={project}
           />
         )}
-        {!hasManyRemoteProjects && !hasAnyManagedProjects && (
+        {/* The award card's counterpart for a project with no award: the same
+            absolute figures, minus everything that needs an allocation. Paired
+            with the monthly usage beside it, the way the award card and its
+            chart pair up. */}
+        {showProjectSpend && projectSpend && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-            <ProjectDashboardBalance project={project} className="mb-5" />
+            <ProjectSpendCard spend={projectSpend} className="h-100" />
           </Col>
         )}
-        {!hasAnyRemoteProjects && (
-          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
-            <TeamWidget
-              api={() =>
-                projectsListUsersList({
-                  path: { uuid: project.uuid },
-                  query: {
-                    field: [
-                      'user_uuid',
-                      'user_full_name',
-                      'user_email',
-                      'user_image',
-                      'role_name',
-                    ],
-                    page_size: 5,
-                  },
-                }).then(parseSelectData)
-              }
-              scope={project}
-              chartData={teamData}
-              showChart
-              onBadgeClick={isProjectRemoved ? undefined : goToUsers}
-              onAddClick={isProjectRemoved ? undefined : handleAddClick}
-              showAdd={(canInvite || membershipLocked) && !isProjectRemoved}
-              loadingAdd={loadingProjects}
+        {showBillingInfo && showProjectSpend && projectSpend?.endDate && (
+          <Col
+            md={6}
+            sm={12}
+            className={MONTHLY_USAGE_COL_CLASS}
+            style={COMMON_WIDGET_HEIGHT}
+          >
+            <MonthlyUsageChart
+              projectUuid={project.uuid}
+              startDate={projectSpend.startDate}
+              endDate={projectSpend.endDate}
               className="h-100"
-              nameKey="user_full_name"
-              emailKey="user_email"
-              imageKey="user_image"
             />
           </Col>
         )}
+        {!hasManyRemoteProjects &&
+          !hasAnyManagedProjects &&
+          !openPortalAccountingOnly && (
+            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+              <ProjectDashboardBalance project={project} />
+            </Col>
+          )}
+        {showTeam &&
+          !hasAnyRemoteProjects &&
+          !hasAnyManagedProjects &&
+          !showProjectSpend && (
+            <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+              <TeamWidget
+                api={() =>
+                  projectsListUsersList({
+                    path: { uuid: project.uuid },
+                    query: {
+                      field: [
+                        'user_uuid',
+                        'user_full_name',
+                        'user_email',
+                        'user_image',
+                        'role_name',
+                      ],
+
+                      page_size: 5,
+                    },
+                  }).then(parseSelectData)
+                }
+                scope={project}
+                chartData={teamData}
+                showChart
+                onBadgeClick={isProjectRemoved ? undefined : goToUsers}
+                onAddClick={isProjectRemoved ? undefined : handleAddClick}
+                showAdd={(canInvite || membershipLocked) && !isProjectRemoved}
+                loadingAdd={loadingProjects}
+                className="h-100"
+                nameKey="user_full_name"
+                emailKey="user_email"
+                imageKey="user_image"
+              />
+            </Col>
+          )}
         {shouldShowCurrentMonthWidget && (
           <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
             <AggregateLimitWidget
@@ -303,10 +422,65 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             />
           </Col>
         )}
-        {showBillingInfo && !hasManyRemoteProjects && (
-          <ProjectDashboardCredit project={project} className="mb-5" />
+        {/* Award-backed projects get the monthly usage chart in the health
+            slot instead: this one plots credit compensation, which OpenPortal
+            never writes, so it is flat zero for every one of them. */}
+        {showBillingInfo &&
+          !hasManyRemoteProjects &&
+          !hasAnyManagedProjects &&
+          !openPortalAccountingOnly && (
+            <ProjectDashboardCredit project={project} className="mb-5" />
+          )}
+        {showBillingInfo && hasAnyManagedProjects && awardPace && (
+          <Col
+            md={6}
+            sm={12}
+            className={MONTHLY_USAGE_COL_CLASS}
+            style={COMMON_WIDGET_HEIGHT}
+          >
+            <MonthlyUsageChart
+              projectUuid={project.uuid}
+              startDate={awardPace.startDate}
+              endDate={awardPace.endDate}
+              className="h-100"
+            />
+          </Col>
         )}
       </Row>
+      {/* Pace for each connected award, from what the remote portal reports.
+          Not behind the billing flag: these are the award's own units, not
+          prices, and the connection cards above show the same figures. Not in
+          the grace period either: the project has ended, so a verdict on
+          whether it will use its allocation in time has nothing to say. */}
+      {hasAnyRemoteProjects &&
+        remoteProjects &&
+        !project.is_in_grace_period && (
+          <RemoteProjectPaceBlock
+            remoteProjects={remoteProjects}
+            projectEndDate={project.end_date}
+          />
+        )}
+      {/* The Health block is for projects with a credit allocation and gates
+          itself on one — it renders nothing without. The usage views are about
+          quota rather than credit, so they are not tied to an allocation; each
+          view ships behind its own dashboard.usage_* feature flag and the
+          section renders nothing until an operator enables one. */}
+      {/* The credit health block is the relative model throughout — this
+          month's drawdown, its pacing, the credit lifecycle. With an award it
+          shows the award pace instead, so it stays; without one, under
+          OpenPortal-only accounting, it is exactly what the feature is meant
+          to suppress. */}
+      {showBillingInfo && !showProjectSpend && (
+        <ProjectCreditHealthBlock
+          project={project}
+          hasAward={hasAnyManagedProjects}
+          award={currentAward}
+        />
+      )}
+      <UsageViewsSection project={project} />
+      {/* Description and staff notes last: they are static prose the project
+          team already knows, and at the top they pushed the figures that do
+          change — credit, usage, what happens next — below the fold. */}
       {(project.description || project.staff_notes) && (
         <Row>
           {project.description && (
@@ -319,10 +493,14 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
                 title={translate('Description')}
                 actions={
                   canEditProject && (
-                    <EditButton
+                    <BaseButton
+                      label={translate('Edit')}
+                      iconNode={<PencilSimpleIcon weight="bold" />}
+                      iconRight
                       onClick={handleEditDescription}
-                      size="sm"
                       tooltip={translate('Edit description')}
+                      variant="tertiary"
+                      size="lg"
                     />
                   )
                 }
@@ -347,17 +525,21 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
                 title={
                   <>
                     {translate('Staff Notes')}{' '}
-                    <Badge variant="warning" light={true} outline={true}>
+                    <Badge variant="warning" shape="pill" tone="outline">
                       {translate('Internal')}
                     </Badge>
                   </>
                 }
                 actions={
                   user.is_staff && (
-                    <EditButton
+                    <BaseButton
                       onClick={handleEditStaffNotes}
-                      size="sm"
                       tooltip={translate('Edit staff notes')}
+                      iconNode={<PencilSimpleIcon weight="bold" />}
+                      label={translate('Edit')}
+                      iconRight
+                      variant="tertiary"
+                      size="sm"
                     />
                   )
                 }

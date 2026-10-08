@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { FC, PropsWithChildren, useCallback, useMemo } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { BaseButton } from 'waldur-ui';
+
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 import { loadData } from './loadData';
 import { ModalActionsDialog } from './ModalActionsDialog';
@@ -48,17 +48,15 @@ export const ActionsPopover = ({
     () => Promise.all([refetchParent(), refetchChild()]),
     [refetchParent, refetchChild],
   );
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const callback = () => {
-    dispatch(
-      openModalDialog(ModalActionsDialog, {
-        name,
-        refetch,
-        ActionsList,
-        className: 'resource-actions-modal',
-        ...value,
-      }),
-    );
+    openDialog(ModalActionsDialog, {
+      name,
+      refetch,
+      ActionsList,
+      className: 'resource-actions-modal',
+      ...value,
+    });
   };
 
   return loading ? (
@@ -76,15 +74,13 @@ export const ActionsPopover = ({
         <ActionsList {...value} refetch={refetch} />
       </ResourceActionMenuContext.Provider>
       <div className="d-flex flex-column justify-content-center flex-grow-1">
-        <Button
-          variant="link"
-          size="sm"
+        <BaseButton
+          variant="text-primary"
           className="text-decoration-underline my-1"
-          role="button"
           onClick={callback}
-        >
-          {translate('Show all')}
-        </Button>
+          label={translate('Show all')}
+          size="sm"
+        />
       </div>
     </>
   ) : null;

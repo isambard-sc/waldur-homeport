@@ -1,16 +1,15 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FC, ReactNode } from 'react';
-import { ButtonVariant } from 'react-bootstrap/esm/types';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n/translate';
-import { openModalDialog } from '@waldur/modal/actions';
-import { PermissionEnum } from '@waldur/permissions/enums';
-import { hasPermission } from '@waldur/permissions/hasPermission';
-import { ActionButton } from '@waldur/table/ActionButton';
-import { getCustomer, getUser } from '@waldur/workspace/selectors';
-import { Customer } from '@waldur/workspace/types';
+import { ButtonVariant, BaseButton, ButtonSize } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n/translate';
+import { useModal } from '@/modal/actions';
+import { PermissionEnum } from '@/permissions/enums';
+import { hasPermission } from '@/permissions/hasPermission';
+import { useUser, useCustomer } from '@/workspace/hooks';
+import { Customer } from '@/workspace/types';
 
 const ProjectCreateDialog = lazyComponent(() =>
   import('./ProjectCreateDialog').then((module) => ({
@@ -21,10 +20,10 @@ const ProjectCreateDialog = lazyComponent(() =>
 interface ProjectCreateButtonProps {
   customer: Customer;
   variant?: ButtonVariant;
-  size?: 'sm' | 'lg';
+  size?: ButtonSize;
   title?: string;
   iconNode?: ReactNode;
-  refetch?;
+  refetch?: () => void;
   className?: string;
 }
 
@@ -32,37 +31,34 @@ export const ProjectCreateButton: FC<ProjectCreateButtonProps> = ({
   customer: _customer,
   title = translate('Add'),
   variant = 'primary',
+  size = 'lg',
   iconNode,
-  size,
   refetch,
   className,
 }) => {
-  const currentCustomer = useSelector(getCustomer);
+  const currentCustomer = useCustomer();
   const customer = _customer || currentCustomer;
-  const user = useSelector(getUser);
+  const user = useUser();
   const disabled =
     !customer ||
     !hasPermission(user, {
       permission: PermissionEnum.CREATE_PROJECT,
       customerId: customer.uuid,
     });
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
 
   return (
-    <ActionButton
-      title={title}
-      size={size}
+    <BaseButton
+      label={title}
       variant={variant}
       className={className}
-      action={() =>
-        dispatch(
-          openModalDialog(ProjectCreateDialog, {
-            size: 'lg',
-            formId: 'projectCreate',
-            customer,
-            refetch,
-          }),
-        )
+      onClick={() =>
+        openDialog(ProjectCreateDialog, {
+          size: 'lg',
+          formId: 'projectCreate',
+          customer,
+          refetch,
+        })
       }
       tooltip={
         !customer
@@ -75,6 +71,7 @@ export const ProjectCreateButton: FC<ProjectCreateButtonProps> = ({
       }
       iconNode={iconNode || <PlusCircleIcon weight="bold" />}
       disabled={disabled}
+      size={size}
     />
   );
 };

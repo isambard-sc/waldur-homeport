@@ -1,9 +1,9 @@
 import { FC } from 'react';
 
-import { Link } from '@waldur/core/Link';
-import { ModelCard1 } from '@waldur/core/ModelCard1';
-import { translate } from '@waldur/i18n';
-import { OfferingDetailsLink } from '@waldur/marketplace/links/OfferingDetailsLink';
+import { Link } from '@/core/Link';
+import { ModelCard1 } from '@/core/ModelCard1';
+import { translate } from '@/i18n';
+import { OfferingDetailsLink } from '@/marketplace/links/OfferingDetailsLink';
 
 export const AvailableOfferingCard: FC<{ availableOffering }> = ({
   availableOffering,
@@ -20,14 +20,14 @@ export const AvailableOfferingCard: FC<{ availableOffering }> = ({
             state="calls-for-proposals-all-calls"
             params={{ offering_uuid: availableOffering.uuid }}
             buttonVariant="text-primary"
-            className="btn-sm"
-            label={translate('Apply')}
+            buttonSize="sm"
+            label={translate('Apply to call')}
           />
 
           <OfferingDetailsLink
             offering_uuid={availableOffering.uuid}
             buttonVariant="text-primary"
-            className="btn-sm"
+            buttonSize="sm"
           >
             {translate('View offering')}
           </OfferingDetailsLink>

@@ -1,16 +1,15 @@
 import { PencilSimpleIcon } from '@phosphor-icons/react';
 import { useMemo } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import { Resource } from 'waldur-js-client';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { EditAction } from '@waldur/form/EditAction';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { PermissionEnum } from '@waldur/permissions/enums';
-import { hasPermission } from '@waldur/permissions/hasPermission';
-import { useUser } from '@waldur/workspace/hooks';
+import { BaseButton } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { EditAction } from '@/form/EditAction';
+import { translate } from '@/i18n';
+import { canUpdateResourceOptions } from '@/marketplace/resources/options/permissions';
+import { useModal } from '@/modal/actions';
+import { useUser } from '@/workspace/hooks';
 
 const MultiEditOptionsDialog = lazyComponent(() =>
   import('./MultiEditOptionsDialog').then((module) => ({
@@ -27,7 +26,7 @@ export const MultiEditOptionsAction = ({
   refetch;
   asButton?: boolean;
 }) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
 
   const user = useUser();
   const canShow = useMemo(() => {
@@ -36,32 +35,27 @@ export const MultiEditOptionsAction = ({
     return rows.every(
       (resource) =>
         resource.offering_uuid === offeringUuid &&
-        hasPermission(user, {
-          permission: PermissionEnum.UPDATE_RESOURCE_OPTIONS,
-          projectId: resource.project_uuid,
-          customerId: resource.customer_uuid,
-        }),
+        canUpdateResourceOptions(user, resource),
     );
   }, [rows, user]);
 
   const callback = () =>
-    dispatch(
-      openModalDialog(MultiEditOptionsDialog, {
-        resolve: {
-          rows,
-          refetch,
-        },
-      }),
-    );
+    openDialog(MultiEditOptionsDialog, {
+      resolve: {
+        rows,
+        refetch,
+      },
+    });
 
   return canShow ? (
     asButton ? (
-      <Button variant="tertiary" onClick={callback}>
-        <span className="svg-icon svg-icon-2">
-          <PencilSimpleIcon weight="bold" />
-        </span>
-        {translate('Edit all')}
-      </Button>
+      <BaseButton
+        variant="tertiary"
+        onClick={callback}
+        iconNode={<PencilSimpleIcon weight="bold" />}
+        label={translate('Edit all')}
+        size="lg"
+      />
     ) : (
       <EditAction
         title={translate('Edit resource options')}

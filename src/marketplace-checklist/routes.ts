@@ -1,23 +1,21 @@
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { StateDeclaration } from '@waldur/core/types';
-import { translate } from '@waldur/i18n';
-import { isStaff } from '@waldur/workspace/selectors';
+import { UIView } from '@uirouter/react';
+
+import { StateDeclaration } from '@/core/types';
 
 export const states: StateDeclaration[] = [
+  // Now the Checklists tab of the Compliance page; kept as a redirect so
+  // bookmarks and the chaos route sweep keep resolving. The staff gate moved
+  // onto the tab.
   {
     name: 'admin-organization-checklist-management',
     url: 'organization-checklist-management/',
-    parent: 'admin-organizations',
-    component: lazyComponent(() =>
-      import('@waldur/marketplace-checklist/ChecklistManagementTable').then(
-        (module) => ({
-          default: module.ChecklistManagementTable,
-        }),
-      ),
-    ),
+    parent: 'admin-organizations-compliance',
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: { state: 'admin-compliance', params: { tab: 'checklists' } },
     data: {
-      breadcrumb: () => translate('Checklist management'),
-      permissions: [isStaff],
+      skipBreadcrumb: true,
     },
   },
 ];

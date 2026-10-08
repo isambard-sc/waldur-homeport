@@ -1,11 +1,11 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 import { ENDPOINT_FORM_ID } from './constants';
 
@@ -19,20 +19,20 @@ export const AddEndpointButton: FunctionComponent<{
   offering;
   refetch;
 }> = ({ offering, refetch }) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const callback = () => {
-    dispatch(
-      openModalDialog(AddEndpointDialog, {
-        resolve: { offering, refetch },
-        formId: ENDPOINT_FORM_ID,
-      }),
-    );
+    openDialog(AddEndpointDialog, {
+      resolve: { offering, refetch },
+      formId: ENDPOINT_FORM_ID,
+    });
   };
   return (
-    <ActionButton
+    <BaseButton
       iconNode={<PlusCircleIcon weight="bold" />}
-      title={translate('Add endpoint')}
-      action={callback}
+      label={translate('Add endpoint')}
+      onClick={callback}
+      variant="tertiary"
+      size="lg"
     />
   );
 };

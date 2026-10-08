@@ -1,18 +1,23 @@
+import classNames from 'classnames';
 import { ProgressBar } from 'react-bootstrap';
 
 export const QuotaProgressBar = ({
   percent,
-  height = 4,
+  height = undefined,
   className = undefined,
+  label,
+}: {
+  percent: number;
+  height?: number;
+  className?: string;
+  label?: string;
 }) => {
   return (
     <ProgressBar
       variant={percent < 33 ? 'primary' : percent < 66 ? 'warning' : 'danger'}
       now={percent}
-      className={
-        `h-${height}px resource-progress shadow-none w-100` +
-        (className ? ' ' + className : '')
-      }
+      aria-label={label}
+      className={classNames('w-100', height && `h-${height}px`, className)}
     />
   );
 };

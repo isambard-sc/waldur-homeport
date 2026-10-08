@@ -77,7 +77,7 @@
     tr {
       border-bottom-width: 1px;
       border-bottom-style: solid;
-      border-bottom-color: $border-color;
+      border-bottom-color: $border-secondary;
     }
 
     tfoot {
@@ -93,7 +93,7 @@
     tr {
       border-bottom-width: 1px;
       border-bottom-style: dashed;
-      border-bottom-color: $border-color;
+      border-bottom-color: $border-secondary;
     }
 
     tfoot {
@@ -161,7 +161,7 @@
   left: 50%;
   @include border-radius($border-radius);
   box-shadow: $dropdown-box-shadow;
-  background-color: $tooltip-bg;
+  background-color: $bg-primary-solid;
   color: if(isDarkMode(), $gray-700, $gray-600);
   font-weight: $font-weight-bold;
   margin: 0 !important;

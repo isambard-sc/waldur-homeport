@@ -1,14 +1,14 @@
 import { PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
-import { Alert, Button, Form, Stack } from 'react-bootstrap';
-import { Field } from 'react-final-form';
+import { Form, Stack } from 'react-bootstrap';
 import { FieldArray, FieldArrayRenderProps } from 'react-final-form-arrays';
 
-import { required } from '@waldur/core/validators';
-import { SelectField, TextField } from '@waldur/form';
-import { translate } from '@waldur/i18n';
-import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
-import { ChecklistQuestionForm } from '@waldur/marketplace-checklist/types';
+import { AlertItem, BaseButton } from 'waldur-ui';
+
+import { required } from '@/core/validators';
+import { SelectGroup, TextGroup } from '@/form';
+import { translate } from '@/i18n';
+import { ChecklistQuestionForm } from '@/marketplace-checklist/types';
 
 interface FieldValue {
   answer?;
@@ -33,11 +33,13 @@ const FieldsListGroup = ({
 
   if (!['multi_select', 'single_select'].includes(values.question_type)) {
     return (
-      <Alert variant="warning">
-        {translate(
+      <AlertItem
+        type="floating"
+        variant="warning"
+        title={translate(
           'This section is only for single select and multi select questions.',
         )}
-      </Alert>
+      />
     );
   }
 
@@ -66,50 +68,45 @@ const FieldsListGroup = ({
             className={i + 1 < fields.length ? 'border-bottom mb-3' : undefined}
           >
             <Stack direction="horizontal" gap={3}>
-              <FormGroup label={translate('Answer')} className="flex-grow-1">
-                <Field
-                  component={SelectField}
-                  name={`${name}.answer`}
-                  options={getOptions(i)}
-                  simpleValue
-                  validate={required}
-                />
-              </FormGroup>
+              <SelectGroup
+                name={`${name}.answer`}
+                options={getOptions(i)}
+                simpleValue
+                validate={required}
+                label={translate('Answer')}
+                className="flex-grow-1"
+              />
 
-              <Button
-                variant="text-danger"
-                className="btn-icon mt-1"
-                size="lg"
+              <BaseButton
                 onClick={() => removeRow(i)}
-              >
-                <span className="svg-icon svg-icon-1">
-                  <TrashIcon weight="bold" />
-                </span>
-              </Button>
+                iconNode={<TrashIcon weight="bold" />}
+                variant="text-danger"
+                className="mt-1"
+                size="lg"
+              />
             </Stack>
-            <FormGroup
+            <TextGroup
+              name={`${name}.solution`}
+              placeholder={translate(
+                'Add helpful guidance when users select specific answers that need correction or clarification...',
+              )}
+              validate={required}
               label={translate('Solution / Guidance')}
               spaceless={i === fields.length - 1}
-            >
-              <Field
-                component={TextField as any}
-                name={`${name}.solution`}
-                placeholder={translate(
-                  'Add helpful guidance when users select specific answers that need correction or clarification...',
-                )}
-                validate={required}
-              />
-            </FormGroup>
+            />
           </div>
         ))}
       </Form.Group>
       <div className="mt-3">
-        <Button variant="text-primary" onClick={addRow} disabled={addDisabled}>
-          <span className="svg-icon svg-icon-2">
-            <PlusIcon weight="bold" />
-          </span>
-          {translate('Add guidance')}
-        </Button>
+        <BaseButton
+          onClick={addRow}
+          label={translate('Add guidance')}
+          iconNode={<PlusIcon weight="bold" />}
+          variant="text-primary"
+          disabled={addDisabled}
+          disabledReason={translate('Complete all fields before adding more')}
+          size="lg"
+        />
       </div>
     </>
   );

@@ -1,12 +1,12 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { ENV } from '@waldur/core/config';
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { ENV } from '@/core/config';
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 const CatalogCreateDialog = lazyComponent(() =>
   import('./CatalogCreateDialog').then((module) => ({
@@ -14,19 +14,18 @@ const CatalogCreateDialog = lazyComponent(() =>
   })),
 );
 
-const createCatalogDialog = (cluster) =>
-  openModalDialog(CatalogCreateDialog, { resolve: { cluster } });
-
 export const CatalogCreateButton: FC<{ cluster }> = ({ cluster }) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   if (ENV.plugins.WALDUR_RANCHER.READ_ONLY_MODE) {
     return null;
   }
   return (
-    <ActionButton
-      title={translate('Create')}
-      action={() => dispatch(createCatalogDialog(cluster))}
+    <BaseButton
+      label={translate('Create')}
+      onClick={() => openDialog(CatalogCreateDialog, { resolve: { cluster } })}
       iconNode={<PlusCircleIcon weight="bold" />}
+      variant="tertiary"
+      size="lg"
     />
   );
 };

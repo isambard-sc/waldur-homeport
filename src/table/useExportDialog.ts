@@ -1,30 +1,26 @@
-import { useDispatch } from 'react-redux';
-
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { openModalDialog } from '@waldur/modal/actions';
+import { lazyComponent } from '@/core/lazyComponent';
+import { useModal } from '@/modal/actions';
 
 import { ExportFormat } from './exporters/types';
-import { TableState } from './types';
+import { TableProps } from './types';
 
 const ExportDialog = lazyComponent(() =>
   import('./ExportDialog').then((module) => ({ default: module.ExportDialog })),
 );
 
 export const useExportDialog = () => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   return (
     table: string,
     format: ExportFormat,
-    ownProps?: Partial<TableState>,
+    ownProps?: Partial<TableProps>,
   ) => {
-    dispatch(
-      openModalDialog(ExportDialog, {
-        resolve: {
-          table,
-          format,
-          ownProps,
-        },
-      }),
-    );
+    openDialog(ExportDialog, {
+      resolve: {
+        table,
+        format,
+        ownProps,
+      },
+    });
   };
 };

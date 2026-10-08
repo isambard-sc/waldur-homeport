@@ -3,8 +3,8 @@ import { UIView } from '@uirouter/react';
 import { ComponentType, LazyExoticComponent } from 'react';
 import { RoleDetails } from 'waldur-js-client';
 
-import { PluginConfiguration } from '@waldur/auth/types';
-import { FeaturesEnum } from '@waldur/FeaturesEnums';
+import { PluginConfiguration } from '@/auth/types';
+import { FeaturesEnum } from '@/FeaturesEnums';
 
 interface DataDeclaration {
   /** State is disabled as long as its feature is disabled */
@@ -21,6 +21,8 @@ interface DataDeclaration {
   /** Page header component is concealed as long as this parameter is set to true. */
   hideHeader: boolean;
   hideHeaderMenu: boolean;
+  /** Header shows a Go back button in place of the breadcrumbs. */
+  showGoBack?: boolean;
   skipAuth: boolean;
   title?(): string;
   breadcrumb?(): string;
@@ -49,7 +51,7 @@ export interface ApplicationConfigurationOptions {
   /** Language choices and default language are fetched from MasterMind */
   languageChoices?: LanguageOption[];
   defaultLanguage?: string;
-  FEATURES?: Record<string, boolean>;
+  FEATURES?: Record<string, Record<string, boolean>>;
   pageSize: number;
   buildId: string;
   accountingMode: 'billing' | 'accounting';

@@ -1,4 +1,5 @@
-import { CaretDownIcon, CaretRightIcon, XIcon } from '@phosphor-icons/react';
+import { CaretRightIcon } from '@phosphor-icons/react';
+import * as RadixPopover from '@radix-ui/react-popover';
 import classNames from 'classnames';
 import { isEqual } from 'lodash-es';
 import React, {
@@ -9,19 +10,28 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Accordion, Badge, Button } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { useDebounce } from 'react-use';
-import { Field, change, formValueSelector } from 'redux-form';
 
-import { translate } from '@waldur/i18n';
-import { MenuComponent } from '@waldur/metronic/components';
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Badge,
+  BaseButton,
+  RemoveFilterBadgeButton,
+} from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { PopoverMenuContent } from '@/navigation/NavMenu';
 
 import { TableFilterContext } from './FilterContextProvider';
+import { closeFlyoutOnTabOut } from './filterMenuFocus';
+import { selectFilterValues } from './selectors';
 
 const DELAY_WAITING_FOR_FILTER = 50; // ms
 
-interface TableFilterItem {
+export interface TableFilterItemProps {
   title: string;
   name?: string;
   badgeValue?(value: any): string | number;
@@ -34,75 +44,14 @@ interface TableFilterItem {
   instantApply?: boolean;
 }
 
-const TableHeaderFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
-  badgeValue = (value) => {
-    if (value) {
-      if (value instanceof Array) {
-        return value.length;
-      } else {
-        return 1;
-      }
-    } else return null;
-  },
-  ...props
-}) => {
-  const [open, setOpen] = React.useState(false);
-  const toggleClick = React.useCallback(
-    (value, e) => {
-      // prevent filter to toggle when clicking on inner clickable elements
-      const el = e.target as HTMLElement;
-      const isFieldClicked = el.closest('.filter-field');
+export { RemoveFilterBadgeButton };
 
-      if (isFieldClicked) return;
-      setOpen(value);
-    },
-    [setOpen],
-  );
-
-  return (
-    <button
-      type="button"
-      className={classNames('filter-toggle btn btn-sm fw-bold bg-hover-light', {
-        active: open,
-      })}
-      onClick={(event) => toggleClick(!open, event)}
-    >
-      {props.title}
-      {open && <div className="filter-field">{props.children}</div>}
-      <Field
-        name={props.name}
-        component={({ input: { value } }) =>
-          !['', undefined].includes(value) ? (
-            <div
-              className="filter-value"
-              style={!props.ellipsis ? { maxWidth: 'unset' } : undefined}
-            >
-              {badgeValue(value) ? (
-                <Badge bg="secondary" className="text-dark">
-                  {badgeValue(value)}
-                </Badge>
-              ) : null}
-            </div>
-          ) : null
-        }
-      />
-
-      <span className="svg-icon svg-icon-3 rotate-90 ms-2 lh-base">
-        <CaretDownIcon size={20} />
-      </span>
-    </button>
-  );
-};
-
-export const RemoveFilterBadgeButton = ({ onClick, size = 20 }) => (
-  <button
-    type="button"
-    className="text-btn text-gray-400 text-hover-gray-500 lh-0 ps-2"
-    onClick={onClick}
-  >
-    <XIcon weight="bold" size={size} />
-  </button>
-);
+// Value labels can be elements (badgeValue/getValueLabel may render
+// markup), which can't go into aria-label — fall back to a generic name.
+const removeValueLabel = (label) =>
+  typeof label === 'string' || typeof label === 'number'
+    ? translate('Remove {value}', { value: label })
+    : translate('Remove filter value');
 
 export const TableSidebarFilterValues = ({
   value,
@@ -120,16 +69,20 @@ export const TableSidebarFilterValues = ({
           style={!ellipsis ? { maxWidth: 'unset' } : undefined}
         >
           <Badge
-            bg=""
-            className="badge-outline-default badge-lg fw-bold fs-7 py-2"
+            variant="neutral"
+            size="lg"
+            rightIcon={
+              !hideRemoveButton && (
+                <RemoveFilterBadgeButton
+                  onClick={() => remove(value, value)}
+                  label={removeValueLabel(badgeValue(value))}
+                />
+              )
+            }
+            tone="outline"
+            className="fs-7"
           >
             {badgeValue(value)}
-            {!hideRemoveButton && (
-              <RemoveFilterBadgeButton
-                size={12}
-                onClick={() => remove(value, value)}
-              />
-            )}
           </Badge>
         </div>
       ) : null
@@ -138,39 +91,47 @@ export const TableSidebarFilterValues = ({
         {value.map((v, i) => (
           <Badge
             key={i}
-            bg=""
-            className="filter-value badge-outline-default badge-lg fw-bold fs-7 px-2"
+            variant="neutral"
+            size="lg"
+            rightIcon={
+              !hideRemoveButton && (
+                <RemoveFilterBadgeButton
+                  onClick={() => remove(value, v)}
+                  label={removeValueLabel(getValueLabel(v))}
+                />
+              )
+            }
+            tone="outline"
+            className="filter-value fs-7"
             style={!ellipsis ? { maxWidth: 'unset' } : undefined}
           >
             {getValueLabel(v)}
-            {!hideRemoveButton && (
-              <RemoveFilterBadgeButton
-                size={12}
-                onClick={() => remove(value, v)}
-              />
-            )}
           </Badge>
         ))}
       </>
     ) : (
       <Badge
-        bg=""
-        className="filter-value badge-outline-default badge-lg fw-bold fs-7 py-2"
+        variant="neutral"
+        size="lg"
+        rightIcon={
+          !hideRemoveButton && (
+            <RemoveFilterBadgeButton
+              onClick={() => remove(value, value)}
+              label={removeValueLabel(getValueLabel(value))}
+            />
+          )
+        }
+        tone="outline"
+        className="filter-value fs-7"
         style={!ellipsis ? { maxWidth: 'unset' } : undefined}
       >
         {getValueLabel(value)}
-        {!hideRemoveButton && (
-          <RemoveFilterBadgeButton
-            size={12}
-            onClick={() => remove(value, value)}
-          />
-        )}
       </Badge>
     )
   ) : null;
 };
 
-const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
+const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItemProps>> = ({
   getValueLabel = (value) => {
     if (value) {
       if (Array.isArray(value)) {
@@ -182,7 +143,29 @@ const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   },
   ...props
 }) => {
-  const { setFilter, form } = React.useContext(TableFilterContext);
+  const { table, setFilter, changeFilterValue } =
+    React.useContext(TableFilterContext);
+  const values = useSelector(selectFilterValues(table));
+
+  const _setFilterRef = useRef<any>();
+
+  const removeValue = useCallback(
+    (prevValue, value) => {
+      let newValue;
+      if (Array.isArray(prevValue) && prevValue.length > 1) {
+        newValue = prevValue.filter((v) => !isEqual(v, value));
+      } else {
+        newValue = null;
+      }
+      if (changeFilterValue) {
+        changeFilterValue(props.name, newValue);
+      }
+      if (_setFilterRef.current) {
+        _setFilterRef.current(newValue);
+      }
+    },
+    [changeFilterValue, props.name],
+  );
 
   const _setFilter = useCallback(
     (value) => {
@@ -202,65 +185,66 @@ const TableSidebarFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
         ),
       });
     },
-    [props, setFilter],
+    [
+      props.title,
+      props.name,
+      getValueLabel,
+      props.badgeValue,
+      props.ellipsis,
+      removeValue,
+      props.hideRemoveButton,
+      setFilter,
+    ],
   );
+  _setFilterRef.current = _setFilter;
 
-  const dispatch = useDispatch();
-  const removeValue = useCallback(
-    (prevValue, value) => {
-      let newValue;
-      if (Array.isArray(prevValue) && prevValue.length > 1) {
-        newValue = prevValue.filter((v) => !isEqual(v, value));
-      } else {
-        newValue = null;
-      }
-      dispatch(change(form, props.name, newValue, true));
-      _setFilter(newValue);
+  const itemValue = values?.[props.name];
+  useDebounce(
+    () => {
+      _setFilter(itemValue);
+      if (props.onApply)
+        props.onApply({
+          title: props.title,
+          name: props.name,
+          value: itemValue,
+        });
     },
-    [dispatch, form, props.name, _setFilter],
+    DELAY_WAITING_FOR_FILTER,
+    [itemValue],
   );
 
-  const itemValue = useSelector((state) =>
-    form ? formValueSelector(form)(state, props.name) : null,
-  );
-  useEffect(() => {
-    _setFilter(itemValue);
-    if (props.onApply)
-      props.onApply({ title: props.title, name: props.name, value: itemValue });
-  }, [itemValue, _setFilter]);
-
+  // Radix unmounts a closed panel's children, so a row's field only mounts
+  // once its section is expanded. That matters: every sidebar row mounting
+  // at once used to fire each AsyncSelectFilter's forced `autoFocus: true`
+  // (useSelect.ts's `tableFilterProps`) simultaneously, starving the main
+  // thread for over a second — reported live as the mobile filter drawer's
+  // rows rendering empty and disappearing. react-bootstrap's Accordion.Body
+  // mounted everything, so this used to need a manual `isExpanded` gate.
   return (
-    <Accordion.Item eventKey={props.name}>
-      <Accordion.Header className="filter-toggle">
-        {props.title}
-      </Accordion.Header>
-      <Accordion.Body>
+    <AccordionItem value={props.name}>
+      <AccordionTrigger>{props.title}</AccordionTrigger>
+      <AccordionContent>
         <div
           className={classNames('filter-field', props.showValueBadge && 'mb-2')}
         >
           {props.children}
         </div>
         {props.showValueBadge && (
-          <Field
-            name={props.name}
-            component={({ input: { value } }) => (
-              <TableSidebarFilterValues
-                value={value}
-                getValueLabel={getValueLabel}
-                badgeValue={props.badgeValue}
-                ellipsis={props.ellipsis}
-                remove={removeValue}
-                hideRemoveButton={props.hideRemoveButton}
-              />
-            )}
+          <TableSidebarFilterValues
+            value={itemValue}
+            getValueLabel={getValueLabel}
+            badgeValue={props.badgeValue}
+            ellipsis={props.ellipsis}
+            remove={removeValue}
+            hideRemoveButton={props.hideRemoveButton}
           />
         )}
-      </Accordion.Body>
-    </Accordion.Item>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 
-const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
+const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItemProps>> = ({
   getValueLabel = (value) => {
     if (value) {
       if (Array.isArray(value)) {
@@ -274,13 +258,41 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
   ...props
 }) => {
   const {
+    table,
     setFilter,
-    form,
+    changeFilterValue,
     apply,
-    columnFilter,
     selectedSavedFilter,
     registerFilterComponent,
+    openMenuName,
+    menuIsOpen,
+    closeMenu,
+    activeItemName,
+    setActiveItemName,
   } = React.useContext(TableFilterContext);
+  const values = useSelector(selectFilterValues(table));
+
+  const _setFilterRef = useRef<any>();
+
+  const removeValue = useCallback(
+    (prevValue, value) => {
+      let newValue;
+      if (Array.isArray(prevValue) && prevValue.length > 1) {
+        newValue = prevValue.filter((v) => !isEqual(v, value));
+      } else {
+        newValue = null;
+      }
+      apply(false);
+      if (changeFilterValue) {
+        changeFilterValue(props.name, newValue);
+      }
+      if (_setFilterRef.current) {
+        _setFilterRef.current(newValue);
+      }
+      apply(true);
+    },
+    [changeFilterValue, props.name, apply],
+  );
 
   const _setFilter = useCallback(
     (value) => {
@@ -300,8 +312,18 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
         ),
       });
     },
-    [props, setFilter],
+    [
+      props.title,
+      props.name,
+      getValueLabel,
+      props.badgeValue,
+      props.ellipsis,
+      removeValue,
+      props.hideRemoveButton,
+      setFilter,
+    ],
   );
+  _setFilterRef.current = _setFilter;
 
   // Register the filter renderer to access it from outside (from table cells)
   useEffect(() => {
@@ -311,38 +333,20 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     });
   }, [props.name, _setFilter]);
 
-  const dispatch = useDispatch();
-  const removeValue = useCallback(
-    (prevValue, value) => {
-      let newValue;
-      if (Array.isArray(prevValue) && prevValue.length > 1) {
-        newValue = prevValue.filter((v) => !isEqual(v, value));
-      } else {
-        newValue = null;
-      }
-      apply(false);
-      dispatch(change(form, props.name, newValue, true));
-      _setFilter(newValue);
-      apply(true);
-    },
-    [dispatch, form, props.name, _setFilter],
-  );
-
-  const itemValue = useSelector((state) =>
-    form ? formValueSelector(form)(state, props.name) : null,
-  );
+  const itemValue = values?.[props.name];
 
   // The filter field must have an initial value (at least null) so that the filter menu popup does not close when setting this filter for the first time.
   // Wait a moment for the filters to set to the form. Then use them in the table state.
+  // Include itemValue in dependencies so filters loaded from URL are reflected in filtersStorage.
   useDebounce(
     () => {
       _setFilter(itemValue);
-      if (itemValue === null) {
-        dispatch(change(form, props.name, null));
+      if (itemValue === null && changeFilterValue) {
+        changeFilterValue(props.name, null);
       }
     },
     DELAY_WAITING_FOR_FILTER,
-    [],
+    [itemValue],
   );
 
   // Update filter when selecting a saved filter
@@ -356,93 +360,221 @@ const TableMenuFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
     }
   }, [selectedSavedFilter]);
 
-  const onApply = () => {
+  const onApply = (hideMenu = true) => {
     _setFilter(itemValue);
     if (props.onApply)
       props.onApply({ title: props.title, name: props.name, value: itemValue });
-    apply();
+    apply(hideMenu);
   };
 
-  const [shown, setShown] = useState(false);
-  const menuEl = useRef<HTMLDivElement>(null);
+  // Fully independent fallback for standalone usage (no TableFiltersMenu
+  // parent providing `setActiveItemName` — e.g. this component rendered
+  // in isolation in a test), where there are no siblings to coordinate
+  // with.
+  const [localOpen, setLocalOpen] = useState(false);
+  // Sibling-coordinated when a TableFiltersMenu "Add filter" list parent
+  // is present: only one row across the whole list can be `open` at a
+  // time, so opening this one implicitly closes any previously open
+  // sibling — see FilterContextProvider.tsx's own comment on
+  // `activeItemName` for why this exists (Radix's own default
+  // outside-click dismissal alone needs a second click to actually open
+  // a new row once another is already open).
+  const open = setActiveItemName ? activeItemName === props.name : localOpen;
+  const setOpen = useCallback(
+    (next: boolean) => {
+      if (setActiveItemName) {
+        // The `next === false` (dismiss) branch only clears the shared
+        // name if *this* row is still the one recorded active — guards
+        // against a stale dismiss-outside callback (fired because a
+        // sibling's trigger click looks like an "outside click" to
+        // Radix) racing with that sibling's own open call and
+        // clobbering it back to undefined.
+        setActiveItemName((prev) =>
+          next ? props.name : prev === props.name ? undefined : prev,
+        );
+      } else {
+        setLocalOpen(next);
+      }
+    },
+    [setActiveItemName, props.name],
+  );
 
-  let isShown = false;
-  if (menuEl?.current) {
-    isShown = menuEl.current.classList.contains('show');
-  }
-  useEffect(() => {
-    setShown(isShown);
-  }, [isShown]);
+  // The column-header funnel icon (TableFiltersMenu.tsx's `openName`
+  // branch) targets exactly one filter — its whole point is "this
+  // column's own control," not the full filter list — so that one row
+  // renders its field directly below, with no collapsed menu-link/nested
+  // Popover of its own, and every *other* row renders nothing at all
+  // rather than showing a redundant full list alongside it (reported
+  // live: the column icon opened the entire "Add filter"-style list,
+  // with the target's own flyout then overlapping it — "dropdown menu is
+  // not needed in this case").
+  const isColumnMode = Boolean(openMenuName);
+  const isColumnTarget = isColumnMode && openMenuName === props.name;
 
+  // `skipFirstRun` guards against the column-target row: unlike the "Add
+  // filter" list's own row (starts `open === false`, inert until a real
+  // click), a column-target row is "open" from its very first render —
+  // without this guard, instantApply's onApply() (a real
+  // applyFiltersFn()/setFilter() dispatch) would fire during the initial
+  // mount of *every* filterable column at once. That flood of
+  // simultaneous cross-component dispatches, mid-mount for sibling
+  // columns, reproduced a live "Should not already be working" React
+  // invariant violation in Storybook — not caught by the jsdom suite,
+  // which never mounts more than one filterable column at once. Real,
+  // later value changes are unaffected.
+  const skipFirstRun = useRef(true);
   useEffect(() => {
-    if (isShown && instantApply) {
-      onApply();
+    if (skipFirstRun.current) {
+      skipFirstRun.current = false;
+      return;
+    }
+    if ((open || (isColumnTarget && menuIsOpen)) && instantApply) {
+      // Don't hide menu when value changes (e.g., during typing)
+      onApply(false);
     }
   }, [itemValue]);
 
-  return (
-    <div
-      id={`filter-item-${props.name}`}
-      className="menu-item"
-      data-kt-menu-trigger="click"
-      data-kt-menu-placement={columnFilter ? 'bottom' : 'right-start'}
-    >
-      <span className="menu-link" aria-hidden="true">
-        <span className="menu-title">{props.title}</span>
-        <CaretRightIcon size={20} className="ms-auto" weight="bold" />
-      </span>
+  if (isColumnMode && !isColumnTarget) {
+    return null;
+  }
 
-      <div
-        ref={menuEl}
-        className="menu-sub menu-sub-dropdown w-375px py-3 shadow-sm"
-      >
-        <div className="menu-item">
-          <div
-            className="menu-content filter-field"
-            onClick={(e) => e.stopPropagation()}
-            aria-hidden="true"
-          >
-            {shown && props.children}
-          </div>
+  if (isColumnTarget) {
+    return (
+      <div id={`filter-item-${props.name}`} className="menu-item">
+        {/* `role="presentation"`, not `aria-hidden`: aria-hidden would
+            hide the filter field inside from screen readers too. */}
+        <div
+          className="menu-content filter-field"
+          onClick={(e) => e.stopPropagation()}
+          role="presentation"
+        >
+          {/* Deferred until the popup itself is open, not mounted the
+              moment this force-mounted row exists — see menuIsOpen's own
+              comment in FilterContextProvider.tsx: mounting react-select
+              (or similar) immediately, for every filterable column at
+              once on page load, let its own auto-focus-on-mount behavior
+              fire simultaneously across all of them. */}
+          {menuIsOpen && props.children}
         </div>
-        {!instantApply && (
+        {!instantApply && menuIsOpen && (
           <>
             <div className="separator" />
             <div className="menu-item">
-              {shown && (
-                <div className="menu-content filter-footer pb-0">
-                  <div className="d-flex gap-4">
-                    <Button
-                      variant="tertiary"
-                      className="flex-grow-1 w-50"
-                      onClick={() => MenuComponent.hideDropdowns(null)}
-                    >
-                      {translate('Cancel')}
-                    </Button>
-                    <Button className="flex-grow-1 w-50" onClick={onApply}>
-                      {translate('Apply')}
-                    </Button>
-                  </div>
+              <div className="menu-content filter-footer pb-0">
+                <div className="d-flex gap-4">
+                  <BaseButton
+                    variant="tertiary"
+                    className="flex-grow-1 w-50"
+                    onClick={closeMenu}
+                    label={translate('Cancel')}
+                    size="lg"
+                  />
+                  <BaseButton
+                    className="flex-grow-1 w-50"
+                    onClick={() => onApply()}
+                    label={translate('Apply')}
+                    variant="primary"
+                    size="lg"
+                  />
                 </div>
-              )}
+              </div>
             </div>
           </>
         )}
       </div>
+    );
+  }
+
+  // The "Add filter" list (openMenuName undefined): unchanged
+  // accordion-row shape — click to expand this one row's own nested
+  // Popover, coexisting with every other row in the same list.
+  return (
+    <div id={`filter-item-${props.name}`} className="menu-item">
+      <RadixPopover.Root open={open} onOpenChange={setOpen} modal={false}>
+        <RadixPopover.Trigger asChild>
+          {/* A real <button> so Tab reaches the row and Enter/Space open
+              it; `button.menu-link` in the menu base keeps the row look. */}
+          <button type="button" className="menu-link">
+            <span className="menu-title">{props.title}</span>
+            <CaretRightIcon size={20} className="ms-auto" weight="bold" />
+          </button>
+        </RadixPopover.Trigger>
+        <PopoverMenuContent
+          placement="right-start"
+          className="w-375px py-3 shadow-sm"
+          // Radix returns focus to this row on close, so the keyboard
+          // stays in the list. Two exceptions skip that:
+          // - a sibling row has taken over (`activeItemName` is set): the
+          //   sibling would read the delayed focus return as an outside
+          //   interaction and dismiss itself (see `activeItemName` in
+          //   FilterContextProvider.tsx);
+          // - the whole menu has closed: this row is hidden with it, and
+          //   TableFiltersMenu moves focus to its trigger instead.
+          onCloseAutoFocus={(e) =>
+            (activeItemName || !menuIsOpen) && e.preventDefault()
+          }
+          onEscapeKeyDown={() => closeMenu?.()}
+          onKeyDown={(e) => closeFlyoutOnTabOut(e, () => setOpen(false))}
+        >
+          <div className="menu-item">
+            {/* `role="presentation"` — see the column branch above. */}
+            <div
+              className="menu-content filter-field"
+              onClick={(e) => e.stopPropagation()}
+              role="presentation"
+            >
+              {open && props.children}
+            </div>
+          </div>
+          {!instantApply && (
+            <>
+              <div className="separator" />
+              <div className="menu-item">
+                {open && (
+                  <div className="menu-content filter-footer pb-0">
+                    <div className="d-flex gap-4">
+                      <BaseButton
+                        variant="tertiary"
+                        className="flex-grow-1 w-50"
+                        onClick={() => setOpen(false)}
+                        label={translate('Cancel')}
+                        size="lg"
+                      />
+                      <BaseButton
+                        className="flex-grow-1 w-50"
+                        onClick={() => onApply()}
+                        label={translate('Apply')}
+                        variant="primary"
+                        size="lg"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </PopoverMenuContent>
+      </RadixPopover.Root>
     </div>
   );
 };
 
-/** Please put only one child in each table filter item. */
-export const TableFilterItem: FC<PropsWithChildren<TableFilterItem>> = ({
+/** Please put only one child in each table filter item.
+ *
+ * `filterPosition` is only ever `'menu'` (`TableFiltersMenu`) or
+ * `'sidebar'` (`TableFilterContainer`, the mobile drawer) by the time a
+ * `TableFilterItem` actually renders — those are the only two components
+ * that ever mount `props.filters` as real children. A third `'header'`
+ * branch (`<Table filterPosition="header">`'s always-visible inline row)
+ * used to live here too, but no real caller ever paired `filterPosition=
+ * "header"` with `filters`, so it was unreachable and has been removed. */
+export const TableFilterItem: FC<PropsWithChildren<TableFilterItemProps>> = ({
   ellipsis = true,
   ...props
 }) => {
   const { filterPosition } = React.useContext(TableFilterContext);
   if (filterPosition === 'menu') {
     return <TableMenuFilterItem ellipsis={ellipsis} {...props} />;
-  } else if (filterPosition === 'sidebar') {
-    return <TableSidebarFilterItem ellipsis={ellipsis} {...props} />;
   }
-  return <TableHeaderFilterItem ellipsis={ellipsis} {...props} />;
+  return <TableSidebarFilterItem ellipsis={ellipsis} {...props} />;
 };

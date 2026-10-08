@@ -7,23 +7,24 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { Button, Card } from 'react-bootstrap';
-import { type DateTimePickerProps } from 'react-flatpickr';
+import { Card } from 'react-bootstrap';
+import { Field } from 'react-final-form';
+import { type FieldArrayRenderProps } from 'react-final-form-arrays';
 import { usePrevious } from 'react-use';
-import { Field, WrappedFieldArrayProps } from 'redux-form';
 
-import { CustomRangeDatePicker } from '@waldur/booking/deploy/CustomRangeDatePicker';
-import { BookingProps } from '@waldur/booking/types';
-import { createBooking, getDurationOptions } from '@waldur/booking/utils';
-import { parseDate } from '@waldur/core/dateUtils';
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { CustomRangeDatePicker } from '@/booking/deploy/CustomRangeDatePicker';
+import { BookingProps } from '@/booking/types';
+import { createBooking, getDurationOptions } from '@/booking/utils';
+import { parseDate } from '@/core/dateUtils';
+import { translate } from '@/i18n';
 
 import { BusinessHoursGroup } from './components/BusinessHoursGroup';
 import { SlotDurationGroup } from './components/SlotDurationGroup';
 import { TimeZoneGroup } from './components/TimeZoneGroup';
 import { WeekdaysGroup } from './components/WeekdaysGroup';
 import { WeekendsGroup } from './components/WeekendsGroup';
-
 import './OfferingScheduler.scss';
 
 const INITIAL_CONFIG = {
@@ -38,10 +39,10 @@ const INITIAL_CONFIG = {
   },
 };
 
-type OfferingSchedulerProps = WrappedFieldArrayProps<BookingProps>;
+type OfferingSchedulerProps = FieldArrayRenderProps<BookingProps, any>;
 
 const getDisabledRangeOfDates = (weekends, daysOfWeek) => {
-  const disabledRanges: DateTimePickerProps['options']['disable'] = [];
+  const disabledRanges: Array<(date: Date) => boolean> = [];
   disabledRanges.push(function (date) {
     if (!weekends) {
       if (date.getDay() === 0 || date.getDay() === 6) {
@@ -53,9 +54,9 @@ const getDisabledRangeOfDates = (weekends, daysOfWeek) => {
   return disabledRanges;
 };
 
-export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
-  props,
-) => {
+export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = ({
+  fields,
+}) => {
   const [weekends, setWeekends] = useState<boolean>(INITIAL_CONFIG.weekends);
   const [slotDuration, setSlotDuration] = useState<any>(
     INITIAL_CONFIG.slotDuration,
@@ -93,8 +94,8 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
   }, [updateWeekends, weekends]);
 
   const addRow = useCallback(() => {
-    props.fields.push({} as any);
-  }, [props.fields]);
+    fields.push({} as any);
+  }, [fields]);
 
   const durationSlot = useMemo(
     () =>
@@ -103,10 +104,10 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
   );
 
   useEffect(() => {
-    if (props.fields?.length === 0) {
+    if (fields?.length === 0) {
       addRow();
     }
-  }, [addRow]);
+  }, [addRow, fields]);
 
   const parseField = useCallback(
     (v: [Date, Date]) => {
@@ -162,33 +163,30 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
         </Card.Body>
       </Card>
       <>
-        {props.fields.map((schedule, index) => (
+        {fields.map((schedule, index) => (
           <div key={index} className="mb-6">
             <div className="d-flex justify-content-between align-items-center mb-2">
               <label>
                 <b>{translate('Period {i}', { i: index + 1 })}:</b>&nbsp;
-                {props.fields.get(index).start &&
-                  props.fields.get(index).end && (
-                    <span>
-                      {parseDate(props.fields.get(index).start).toFormat(
-                        'dd LLLL yyyy HH:mm',
-                      )}
-                      &nbsp;{translate('To')}&nbsp;
-                      {parseDate(props.fields.get(index).end).toFormat(
-                        'dd LLLL yyyy HH:mm',
-                      )}
-                    </span>
-                  )}
+                {fields.value[index]?.start && fields.value[index]?.end && (
+                  <span>
+                    {parseDate(fields.value[index].start).toFormat(
+                      'dd LLLL yyyy HH:mm',
+                    )}
+                    &nbsp;{translate('To')}&nbsp;
+                    {parseDate(fields.value[index].end).toFormat(
+                      'dd LLLL yyyy HH:mm',
+                    )}
+                  </span>
+                )}
               </label>
-              <Button
+              <BaseButton
                 variant="text-danger"
-                className="btn-icon"
-                onClick={() => props.fields.remove(index)}
-              >
-                <span className="svg-icon svg-icon-2">
-                  <XIcon weight="bold" />
-                </span>
-              </Button>
+                onClick={() => fields.remove(index)}
+                iconNode={<XIcon weight="bold" />}
+                tooltip={translate('Remove period')}
+                size="lg"
+              />
             </div>
             <Field
               name={schedule}
@@ -200,17 +198,19 @@ export const OfferingScheduler: FunctionComponent<OfferingSchedulerProps> = (
               }}
               parse={parseField}
               format={(schedule) =>
-                schedule.start ? [schedule.start, schedule.end] : []
+                schedule['start'] ? [schedule['start'], schedule['end']] : []
               }
             />
           </div>
         ))}
-        <Button variant="text-primary" className="text-nowrap" onClick={addRow}>
-          <span className="svg-icon svg-icon-2">
-            <PlusCircleIcon weight="bold" />
-          </span>
-          {translate('Add time period')}
-        </Button>
+        <BaseButton
+          variant="text-primary"
+          className="text-nowrap"
+          onClick={addRow}
+          iconNode={<PlusCircleIcon weight="bold" />}
+          label={translate('Add time period')}
+          size="lg"
+        />
       </>
     </>
   );

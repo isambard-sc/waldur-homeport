@@ -1,11 +1,11 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 const OfferingPartitionFormDialog = lazyComponent(() =>
   import('./OfferingPartitionFormDialog').then((module) => ({
@@ -17,19 +17,19 @@ export const AddOfferingPartitionButton: FunctionComponent<{
   offering;
   refetch;
 }> = ({ offering, refetch }) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const callback = () => {
-    dispatch(
-      openModalDialog(OfferingPartitionFormDialog, {
-        resolve: { offering, refetch },
-      }),
-    );
+    openDialog(OfferingPartitionFormDialog, {
+      resolve: { offering, refetch },
+    });
   };
   return (
-    <ActionButton
+    <BaseButton
       iconNode={<PlusCircleIcon weight="bold" />}
-      title={translate('Add offering partition')}
-      action={callback}
+      label={translate('Add offering partition')}
+      onClick={callback}
+      variant="tertiary"
+      size="lg"
     />
   );
 };

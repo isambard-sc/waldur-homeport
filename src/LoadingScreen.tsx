@@ -1,8 +1,10 @@
 import { ArrowClockwiseIcon, EyeIcon } from '@phosphor-icons/react';
 import { FunctionComponent, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 
-import Illustration from '@waldur/images/table-placeholders/undraw_fixing_bugs_w7gi.svg';
+import { BaseButton } from 'waldur-ui';
+
+import Illustration from '@/images/table-placeholders/undraw_fixing_bugs_w7gi.svg';
 
 import { lazyComponent } from './core/lazyComponent';
 import { translate } from './i18n';
@@ -10,7 +12,7 @@ import './LoadingScreen.css';
 import { ThemeProvider } from './theme/ThemeProvider';
 
 const ErrorTraceDialog = lazyComponent(() =>
-  import('@waldur/ErrorTraceDialog').then((module) => ({
+  import('@/ErrorTraceDialog').then((module) => ({
     default: module.ErrorTraceDialog,
   })),
 );
@@ -42,20 +44,25 @@ export const LoadingScreen: FunctionComponent<{
                   </Modal>
                 )}
                 <div className="d-flex gap-4 mt-2">
-                  {error.stack && (
-                    <Button variant="tertiary" onClick={() => setShow(true)}>
-                      <span className="svg-icon svg-icon-2">
-                        <EyeIcon weight="bold" />
-                      </span>
-                      {translate('Show error trace')}
-                    </Button>
-                  )}
-                  <Button variant="success" onClick={() => location.reload()}>
-                    <span className="svg-icon svg-icon-2">
-                      <ArrowClockwiseIcon weight="bold" />
-                    </span>
-                    {translate('Reload')}
-                  </Button>
+                  {/* Not gated on error.stack: the actionable detail lives on
+                      error.cause, which is often not an Error and so has no
+                      stack of its own. Gating on it hid the trace in exactly
+                      the cases where the message alone was not enough to act
+                      on. */}
+                  <BaseButton
+                    size="lg"
+                    variant="tertiary"
+                    onClick={() => setShow(true)}
+                    label={translate('Show error trace')}
+                    iconNode={<EyeIcon weight="bold" />}
+                  />
+                  <BaseButton
+                    size="lg"
+                    variant="success"
+                    onClick={() => location.reload()}
+                    label={translate('Reload')}
+                    iconNode={<ArrowClockwiseIcon weight="bold" />}
+                  />
                 </div>
               </div>
             </>

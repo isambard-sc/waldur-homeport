@@ -1,9 +1,12 @@
 import { FileTextIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { DropdownButton, Dropdown } from 'react-bootstrap';
 import { Invoice } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
+import { ButtonVariant } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { ActionDropdownButton } from '@/table/ActionDropdownButton';
+import { ActionsDropdownItem } from '@/table/ActionsDropdown';
 
 interface ResourceActionComponentProps {
   onToggle: (isOpen: boolean) => void;
@@ -12,24 +15,24 @@ interface ResourceActionComponentProps {
   open?: boolean;
   loading?: boolean;
   error?: object;
-  variant?: string;
+  variant?: ButtonVariant;
   invoices: Invoice[];
 }
 
-const ActionItem = ({ invoice, invoiceKey, onSelect }) => (
-  <Dropdown.Item eventKey={invoiceKey} onSelect={() => onSelect(invoice)}>
+const ActionItem = ({ invoice, onSelect }) => (
+  <ActionsDropdownItem onSelect={() => onSelect(invoice)}>
     {invoice.month} - {invoice.year} ({invoice.state})
-  </Dropdown.Item>
+  </ActionsDropdownItem>
 );
 
 export const InvoicesDropdown: FunctionComponent<
   ResourceActionComponentProps
 > = (props) => (
-  <DropdownButton
+  <ActionDropdownButton
     title={
       <>
         <span className="svg-icon svg-icon-2">
-          <FileTextIcon />
+          <FileTextIcon weight="bold" />
         </span>{' '}
         {translate('Link invoice')}
       </>
@@ -42,29 +45,28 @@ export const InvoicesDropdown: FunctionComponent<
   >
     {props.open ? (
       props.loading ? (
-        <Dropdown.Item eventKey="1">
+        <ActionsDropdownItem disabled>
           {translate('Loading invoices')}
-        </Dropdown.Item>
+        </ActionsDropdownItem>
       ) : props.error ? (
-        <Dropdown.Item eventKey="1">
+        <ActionsDropdownItem disabled>
           {translate('Unable to load invoices')}
-        </Dropdown.Item>
+        </ActionsDropdownItem>
       ) : props.invoices ? (
         Object.keys(props.invoices).length === 0 ? (
-          <Dropdown.Item eventKey="2">
+          <ActionsDropdownItem disabled>
             {translate('There are no invoices.')}
-          </Dropdown.Item>
+          </ActionsDropdownItem>
         ) : (
           Object.keys(props.invoices).map((invoice) => (
             <ActionItem
               key={invoice}
               invoice={props.invoices[invoice]}
-              invoiceKey={invoice}
               onSelect={props.onSelect}
             />
           ))
         )
       ) : null
     ) : null}
-  </DropdownButton>
+  </ActionDropdownButton>
 );

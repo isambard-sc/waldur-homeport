@@ -1,25 +1,26 @@
 import { useCallback, FunctionComponent } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 import { MarketplaceKeyValueDialog } from './MarketplaceKeyValueDialog';
 
 export const KeyValueButton: FunctionComponent<{ items; title }> = (props) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
 
   const showDetails = useCallback(() => {
     const resolve = { items: props.items, title: props.title };
-    dispatch(
-      openModalDialog(MarketplaceKeyValueDialog, { resolve, size: 'lg' }),
-    );
-  }, [dispatch, props.items, props.title]);
+    openDialog(MarketplaceKeyValueDialog, { resolve, size: 'lg' });
+  }, [props.items, props.title]);
 
   return (
-    <Button variant="link" className="btn-flush" onClick={showDetails}>
-      {translate('Show details')}
-    </Button>
+    <BaseButton
+      variant="tertiary"
+      onClick={showDetails}
+      label={translate('Show details')}
+      size="sm"
+    />
   );
 };

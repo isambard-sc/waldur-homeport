@@ -1,19 +1,19 @@
 import { FunctionComponent, useMemo } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
 import {
   OpenStackServerGroup,
   openstackServerGroupsList,
   OpenstackServerGroupsListData,
 } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { CreateServerGroupAction } from '@waldur/openstack/openstack-tenant/actions/CreateServerGroupAction';
-import { PullServerGroupsAction } from '@waldur/openstack/openstack-tenant/actions/PullServerGroupsAction';
-import { ResourceRowActions } from '@waldur/resource/actions/ResourceRowActions';
-import { ResourceState } from '@waldur/resource/state/ResourceState';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { useTable } from '@waldur/table/useTable';
+import { translate } from '@/i18n';
+import { ServerGroupExpandableRow } from '@/openstack/openstack-server-groups/ServerGroupExpandableRow';
+import { CreateServerGroupAction } from '@/openstack/openstack-tenant/actions/CreateServerGroupAction';
+import { PullServerGroupsAction } from '@/openstack/openstack-tenant/actions/PullServerGroupsAction';
+import { ResourceRowActions } from '@/resource/actions/ResourceRowActions';
+import { ResourceState } from '@/resource/state/ResourceState';
+import { createFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { useTable } from '@/table/useTable';
 
 export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
   resourceScope,
@@ -50,21 +50,17 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
           render: ({ row }) => <ResourceState resource={row} />,
           className: 'col-sm-2',
         },
-        {
-          title: translate('Actions'),
-          render: ({ row }) => (
-            <ResourceRowActions resource={row} refetch={props.fetch} />
-          ),
-
-          className: 'col-sm-2',
-        },
       ]}
+      rowActions={({ row }) => (
+        <ResourceRowActions resource={row} refetch={props.fetch} />
+      )}
+      expandableRow={ServerGroupExpandableRow}
       title={translate('Server groups')}
       verboseName={translate('server groups')}
       initialSorting={{ field: 'name', mode: 'asc' }}
       showPageSizeSelector={true}
       tableActions={
-        <ButtonGroup>
+        <div className="d-flex gap-2">
           <PullServerGroupsAction
             resource={resourceScope}
             refetch={props.fetch}
@@ -74,7 +70,7 @@ export const ServerGroupsList: FunctionComponent<{ resourceScope }> = ({
             resource={resourceScope}
             refetch={props.fetch}
           />
-        </ButtonGroup>
+        </div>
       }
     />
   );

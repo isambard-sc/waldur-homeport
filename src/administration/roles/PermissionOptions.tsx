@@ -1,6 +1,6 @@
 // WARNING: This file is auto-generated from src/waldur_core/core/management/commands/print_permissions_description.py
 // Do not edit it manually. All manual changes would be overridden.
-import { translate } from '@waldur/i18n';
+import { translate } from '@/i18n';
 
 export const PermissionOptions = [
   {
@@ -68,12 +68,20 @@ export const PermissionOptions = [
     label: translate('Customer'),
     options: [
       {
+        label: translate('Contact update'),
+        value: 'CUSTOMER.CONTACT_UPDATE',
+      },
+      {
         label: translate('List users'),
         value: 'CUSTOMER.LIST_USERS',
       },
       {
         label: translate('Update customer'),
         value: 'CUSTOMER.UPDATE',
+      },
+      {
+        label: translate('View team'),
+        value: 'CUSTOMER.VIEW_TEAM',
       },
     ],
   },
@@ -95,6 +103,10 @@ export const PermissionOptions = [
       {
         label: translate('List resource'),
         value: 'RESOURCE.LIST',
+      },
+      {
+        label: translate('Manage api key for resource'),
+        value: 'RESOURCE.MANAGE_API_KEY',
       },
       {
         label: translate('Reject booking request for resource'),
@@ -123,6 +135,15 @@ export const PermissionOptions = [
     ],
   },
   {
+    label: translate('Matrix_room'),
+    options: [
+      {
+        label: translate('Create matrix room'),
+        value: 'MATRIX_ROOM.CREATE',
+      },
+    ],
+  },
+  {
     label: translate('Offering'),
     options: [
       {
@@ -144,6 +165,10 @@ export const PermissionOptions = [
       {
         label: translate('Create offering'),
         value: 'OFFERING.CREATE',
+      },
+      {
+        label: translate('Create offering access subnet'),
+        value: 'OFFERING_ACCESS_SUBNET.CREATE',
       },
       {
         label: translate('Create permission'),
@@ -168,6 +193,10 @@ export const PermissionOptions = [
       {
         label: translate('Delete offering'),
         value: 'OFFERING.DELETE',
+      },
+      {
+        label: translate('Delete offering access subnet'),
+        value: 'OFFERING_ACCESS_SUBNET.DELETE',
       },
       {
         label: translate('Delete permission'),
@@ -234,6 +263,10 @@ export const PermissionOptions = [
         value: 'OFFERING.UPDATE',
       },
       {
+        label: translate('Update offering access subnet'),
+        value: 'OFFERING_ACCESS_SUBNET.UPDATE',
+      },
+      {
         label: translate('Update options'),
         value: 'OFFERING.UPDATE_OPTIONS',
       },
@@ -264,11 +297,15 @@ export const PermissionOptions = [
     ],
   },
   {
-    label: translate('Openstack_instance'),
+    label: translate('Openstack'),
     options: [
       {
         label: translate('Console access'),
         value: 'OPENSTACK_INSTANCE.CONSOLE_ACCESS',
+      },
+      {
+        label: translate('Manage gateway for openstack router'),
+        value: 'OPENSTACK_ROUTER.MANAGE_GATEWAY',
       },
       {
         label: translate('Manage openstack instance'),
@@ -296,6 +333,10 @@ export const PermissionOptions = [
         value: 'ORDER.CANCEL',
       },
       {
+        label: translate('Create order'),
+        value: 'ORDER.CREATE',
+      },
+      {
         label: translate('Destroy order'),
         value: 'ORDER.DESTROY',
       },
@@ -306,6 +347,10 @@ export const PermissionOptions = [
       {
         label: translate('Reject order'),
         value: 'ORDER.REJECT',
+      },
+      {
+        label: translate('Set consumer info for order'),
+        value: 'ORDER.SET_CONSUMER_INFO',
       },
     ],
   },
@@ -331,6 +376,15 @@ export const PermissionOptions = [
       {
         label: translate('Update access subnet'),
         value: 'ACCESS_SUBNET.UPDATE',
+      },
+    ],
+  },
+  {
+    label: translate('Posix_id_pool'),
+    options: [
+      {
+        label: translate('Manage posix id pool'),
+        value: 'POSIX_ID_POOL.MANAGE',
       },
     ],
   },
@@ -364,6 +418,10 @@ export const PermissionOptions = [
       {
         label: translate('Update project'),
         value: 'PROJECT.UPDATE',
+      },
+      {
+        label: translate('View team'),
+        value: 'PROJECT.VIEW_TEAM',
       },
     ],
   },
@@ -417,6 +475,10 @@ export const PermissionOptions = [
       {
         label: translate('List users'),
         value: 'SERVICE_PROVIDER.LIST_USERS',
+      },
+      {
+        label: translate('Manage maintenance announcement for service provider'),
+        value: 'SERVICE_PROVIDER.MANAGE_MAINTENANCE_ANNOUNCEMENT',
       },
       {
         label: translate('Manage offerings username'),
@@ -489,11 +551,37 @@ export const PermissionOptions = [
     ],
   },
   {
+    label: translate('Staff'),
+    options: [
+      {
+        label: translate('Access staff'),
+        value: 'STAFF.ACCESS',
+      },
+    ],
+  },
+  {
+    label: translate('Support'),
+    options: [
+      {
+        label: translate('Access support'),
+        value: 'SUPPORT.ACCESS',
+      },
+    ],
+  },
+  {
     label: translate('Team members'),
     options: [
       {
         label: translate('Create permission customer'),
         value: 'CUSTOMER.CREATE_PERMISSION',
+      },
+      {
+        label: translate('Create permission for resource'),
+        value: 'RESOURCE.CREATE_PERMISSION',
+      },
+      {
+        label: translate('Create permission for resource project'),
+        value: 'RESOURCE_PROJECT.CREATE_PERMISSION',
       },
       {
         label: translate('Create permission project'),
@@ -502,6 +590,14 @@ export const PermissionOptions = [
       {
         label: translate('Delete permission customer'),
         value: 'CUSTOMER.DELETE_PERMISSION',
+      },
+      {
+        label: translate('Delete permission for resource'),
+        value: 'RESOURCE.DELETE_PERMISSION',
+      },
+      {
+        label: translate('Delete permission for resource project'),
+        value: 'RESOURCE_PROJECT.DELETE_PERMISSION',
       },
       {
         label: translate('Delete permission project'),
@@ -518,6 +614,14 @@ export const PermissionOptions = [
       {
         label: translate('Update permission customer'),
         value: 'CUSTOMER.UPDATE_PERMISSION',
+      },
+      {
+        label: translate('Update permission for resource'),
+        value: 'RESOURCE.UPDATE_PERMISSION',
+      },
+      {
+        label: translate('Update permission for resource project'),
+        value: 'RESOURCE_PROJECT.UPDATE_PERMISSION',
       },
       {
         label: translate('Update permission project'),

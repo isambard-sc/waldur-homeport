@@ -1,94 +1,292 @@
-import { Form } from 'react-final-form';
+import { FingerprintIcon } from '@phosphor-icons/react';
+import * as Tabs from '@radix-ui/react-tabs';
+import { useEffect, useState } from 'react';
+import { Field, Form } from 'react-final-form';
 
-import { format } from '@waldur/core/ErrorMessageFormatter';
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
+import {
+  AlertItem,
+  BaseButton,
+  segmentedItemClassName,
+  segmentedListClassName,
+} from 'waldur-ui';
 
+import { ENV } from '@/core/config';
+import { format } from '@/core/ErrorMessageFormatter';
+import { SubmitButton, StringGroup } from '@/form';
+import { translate } from '@/i18n';
+import {
+  completeMfa,
+  describePasskeyError,
+  prepareMfa,
+  PreparedCeremony,
+} from '@/user/passkeys/api';
+
+import { redirectOnSuccess } from './authNavigation';
 import * as AuthService from './AuthService';
-import { InputGroup } from './InputGroup';
+import { PasswordGroup } from './PasswordGroup';
 
 interface FormData {
+  signin_by: 'username' | 'token';
   username: string;
   password: string;
+  token: string;
 }
 
-const signin = async (values: FormData) => {
-  // See also: https://github.com/facebook/react/issues/1159#issuecomment-506584346
-  if (!values.password || !values.username) {
-    return translate('Please enter username and password.');
-  }
+const renderError = (error) => {
+  let renderedError;
   try {
-    await AuthService.signin(values.username, values.password);
-    await AuthService.redirectOnSuccess();
-  } catch (error) {
-    let renderedError;
-    try {
-      // Check multiple possible error structures
-      if (error?.response?.data?.detail) {
-        renderedError = error.response.data.detail;
-      } else if (error?.data?.detail) {
-        renderedError = error.data.detail;
-      } else if (error?.detail) {
-        renderedError = error.detail;
-      } else if (error?.message) {
-        renderedError = error.message;
-      } else {
-        const formatted = format(error);
-        renderedError =
-          typeof formatted === 'string'
-            ? formatted
-            : formatted?.message || translate('Unknown error');
-      }
-    } catch {
-      renderedError = translate('Unknown error');
+    // Check multiple possible error structures
+    if (error?.response?.data?.detail) {
+      renderedError = error.response.data.detail;
+    } else if (error?.data?.detail) {
+      renderedError = error.data.detail;
+    } else if (error?.detail) {
+      renderedError = error.detail;
+    } else if (error?.message) {
+      renderedError = error.message;
+    } else {
+      const formatted = format(error);
+      renderedError =
+        typeof formatted === 'string'
+          ? formatted
+          : formatted?.message || translate('Unknown error');
     }
-    return { _error: renderedError };
+  } catch {
+    renderedError = translate('Unknown error');
   }
+  return renderedError;
 };
 
-export const SigninForm = () => (
-  <Form
-    onSubmit={signin}
-    render={({ handleSubmit, submitting, submitError, submitErrors }) => {
-      const formError = submitErrors?._error || submitError;
-      return (
-        <form className="mb-2" onSubmit={handleSubmit}>
-          <InputGroup
-            fieldName="username"
-            placeholder={translate('Username')}
-            type="text"
-          />
+const initialValues = { signin_by: 'username' };
 
-          <InputGroup
-            fieldName="password"
-            placeholder={translate('Password')}
-            type="password"
-          />
+/**
+ * The second-factor step.
+ *
+ * Rendered in place of the credentials form once a password has been
+ * accepted. `ceremony` is the pending handle: it is not a token and grants
+ * nothing on its own, so holding it in component state is not holding a
+ * session.
+ */
+const PasskeyStep = ({ ceremony, onCancel }) => {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const [prepared, setPrepared] = useState<PreparedCeremony | null>(null);
 
-          <button
-            type="submit"
-            className="login-submit-button"
-            disabled={submitting}
-          >
-            {submitting && (
-              <>
-                <LoadingSpinnerIcon className="me-1" />{' '}
-              </>
+  // Fetched as the step renders, so the confirm click calls WebAuthn with
+  // nothing awaited in between. Awaiting a request first consumes the user
+  // activation and the browser refuses the call outright — see
+  // @/user/passkeys/api.
+  useEffect(() => {
+    let cancelled = false;
+    prepareMfa(ceremony)
+      .then((value) => {
+        if (!cancelled) setPrepared(value);
+      })
+      .catch((e) => {
+        if (!cancelled) setError(renderError(e));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [ceremony]);
+
+  const verify = async () => {
+    if (!prepared) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const token = await completeMfa(prepared);
+      await AuthService.loginUser(token, 'passkey');
+      await redirectOnSuccess();
+    } catch (e: any) {
+      if (e?.name === 'AbortError') {
+        return;
+      }
+      setError(describePasskeyError(e) ?? renderError(e));
+      // The challenge is spent; get a fresh one so retrying is not futile.
+      setPrepared(null);
+      prepareMfa(ceremony)
+        .then(setPrepared)
+        .catch(() => undefined);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mb-2 text-center">
+      <div className="mb-5">
+        <span className="svg-icon svg-icon-2x text-primary">
+          <FingerprintIcon weight="bold" />
+        </span>
+      </div>
+      <p className="text-muted mb-5">
+        {translate(
+          'Your password was accepted. Confirm with your passkey to finish signing in.',
+        )}
+      </p>
+      <BaseButton
+        pending={busy}
+        onClick={verify}
+        disabled={!prepared}
+        disabledReason={
+          !prepared ? translate('Preparing the passkey challenge.') : undefined
+        }
+        label={translate('Confirm with passkey')}
+        className="w-100 mb-3"
+        data-testid="passkey-mfa-confirm"
+        variant="primary"
+        size="lg"
+      />
+      <BaseButton
+        label={translate('Cancel')}
+        onClick={onCancel}
+        disabled={busy}
+        disabledReason={translate('Waiting for your device to respond.')}
+        variant="text-primary"
+        size="lg"
+        type="button"
+      />
+      {error && (
+        <AlertItem
+          variant="error"
+          title={translate('Passkey verification failed')}
+          body={error}
+          className="mt-3"
+        />
+      )}
+    </div>
+  );
+};
+
+export const SigninForm = () => {
+  const [pendingCeremony, setPendingCeremony] = useState<string | null>(null);
+
+  const signin = async (values: FormData) => {
+    // See also: https://github.com/facebook/react/issues/1159#issuecomment-506584346
+    if (
+      values.signin_by === 'username' &&
+      (!values.password || !values.username)
+    ) {
+      return translate('Please enter username and password.');
+    }
+    if (values.signin_by === 'token' && !values.token) {
+      return translate('Please enter access token.');
+    }
+    try {
+      if (values.signin_by === 'username') {
+        const result = await AuthService.signin(
+          values.username,
+          values.password,
+        );
+        if (result.status === 'passkey-required') {
+          setPendingCeremony(result.ceremony);
+          return;
+        }
+      } else {
+        await AuthService.signinByToken(values.token);
+      }
+      await redirectOnSuccess();
+    } catch (error) {
+      return { _error: renderError(error) };
+    }
+  };
+
+  if (pendingCeremony) {
+    return (
+      <PasskeyStep
+        ceremony={pendingCeremony}
+        onCancel={() => setPendingCeremony(null)}
+      />
+    );
+  }
+
+  return (
+    <Form
+      onSubmit={signin}
+      initialValues={initialValues}
+      render={({ handleSubmit, submitting, submitError, submitErrors }) => {
+        const formError = submitErrors?._error || submitError;
+        return (
+          <form className="mb-2" onSubmit={handleSubmit}>
+            <Field
+              name="signin_by"
+              render={({ input }) => (
+                <Tabs.Root
+                  value={input.value}
+                  onValueChange={input.onChange}
+                  className="w-100 mb-5"
+                >
+                  <Tabs.List
+                    className={segmentedListClassName({ fullWidth: true })}
+                    aria-label={translate('Sign in method')}
+                  >
+                    <Tabs.Trigger
+                      value="username"
+                      className={segmentedItemClassName({ fullWidth: true })}
+                    >
+                      {translate('Username')}
+                    </Tabs.Trigger>
+                    <Tabs.Trigger
+                      value="token"
+                      className={segmentedItemClassName({ fullWidth: true })}
+                    >
+                      {translate('Access token')}
+                    </Tabs.Trigger>
+                  </Tabs.List>
+                  <Tabs.Content value="username">
+                    <StringGroup
+                      name="username"
+                      label={translate('Username')}
+                      placeholder={translate('Enter your username')}
+                      className="text-start"
+                      spaceless
+                    />
+                    <PasswordGroup
+                      name="password"
+                      label={translate('Password')}
+                      placeholder={translate('Enter your password')}
+                      className="text-start"
+                      space={8}
+                    />
+                  </Tabs.Content>
+                  <Tabs.Content value="token">
+                    <PasswordGroup
+                      name="token"
+                      label={translate('Access token')}
+                      description={translate(
+                        'Use a personal access token issued by {siteName}',
+                        { siteName: ENV.plugins.WALDUR_CORE.SITE_NAME },
+                      )}
+                      placeholder={translate('Paste here your token')}
+                      className="text-start"
+                      space={8}
+                    />
+                  </Tabs.Content>
+                </Tabs.Root>
+              )}
+            />
+
+            <SubmitButton
+              submitting={submitting}
+              label={translate('Login')}
+              className="login-submit-button"
+              data-testid="login-submit"
+            />
+
+            {formError && (
+              <AlertItem
+                type="floating"
+                variant="error"
+                title={formError}
+                role="alert"
+                className="mt-3 ellipsis-lines-1"
+                style={{ maxWidth: '100vh' }}
+              />
             )}
-            {translate('Login')}
-          </button>
-
-          {formError && (
-            <div
-              className="alert alert-danger mt-3 ellipsis-lines-1"
-              role="alert"
-              style={{ maxWidth: '100vh' }}
-            >
-              {formError}
-            </div>
-          )}
-        </form>
-      );
-    }}
-  />
-);
+          </form>
+        );
+      }}
+    />
+  );
+};
