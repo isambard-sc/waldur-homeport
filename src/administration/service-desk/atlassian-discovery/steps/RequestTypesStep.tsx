@@ -1,10 +1,12 @@
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
 import { FC, useState, useEffect } from 'react';
-import { Alert, FormCheck, Spinner, Table } from 'react-bootstrap';
+import { FormCheck, Spinner, Table } from 'react-bootstrap';
 import { useForm, useFormState } from 'react-final-form';
 import { supportSettingsAtlassianDiscoverRequestTypes } from 'waldur-js-client';
 
-import { SubmitButton } from '@/form/SubmitButton';
+import { AlertItem, BaseButton } from 'waldur-ui';
+
+import { SubmitButton } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { renderFieldOrDash } from '@/table/utils';
@@ -84,29 +86,23 @@ export const RequestTypesStep: FC<WizardStepProps> = (props) => {
   // Custom footer for this step
   const renderFooter = () => (
     <>
-      <SubmitButton
-        submitting={false}
+      <BaseButton
         variant="tertiary"
         className="min-w-125px me-auto"
         onClick={() => props.onPrev(values)}
-        type="button"
         label={translate('Back')}
         iconNode={<CaretLeftIcon weight="bold" />}
-        iconOnLeft
+        size="lg"
       />
       <CloseDialogButton className="min-w-125px" />
       <SubmitButton
-        submitting={false}
+        submitting={loading}
         disabled={selectedCount === 0 || loading}
         label={translate('Continue')}
         onClick={handleContinue}
-        type="button"
-        className="btn-icon-right min-w-125px"
-      >
-        <span className="svg-icon svg-icon-2">
-          <CaretRightIcon weight="bold" />
-        </span>
-      </SubmitButton>
+        className="min-w-125px"
+        iconNode={<CaretRightIcon weight="bold" />}
+      />
     </>
   );
 
@@ -124,7 +120,7 @@ export const RequestTypesStep: FC<WizardStepProps> = (props) => {
   if (error) {
     return (
       <WizardModal {...props} renderFooter={renderFooter}>
-        <Alert variant="danger">{error}</Alert>
+        <AlertItem type="floating" variant="error" title={error} />
       </WizardModal>
     );
   }
@@ -132,11 +128,13 @@ export const RequestTypesStep: FC<WizardStepProps> = (props) => {
   if (values.requestTypes.length === 0) {
     return (
       <WizardModal {...props} renderFooter={renderFooter}>
-        <Alert variant="warning">
-          {translate(
+        <AlertItem
+          type="floating"
+          variant="warning"
+          title={translate(
             'No request types found for this project. Please configure request types in Jira Service Desk.',
           )}
-        </Alert>
+        />
       </WizardModal>
     );
   }

@@ -9,9 +9,8 @@ import {
   ProviderOfferingDetails as Offering,
 } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
+import { AccordionCard, BaseButton, Tooltip } from 'waldur-ui';
 
-import { AccordionCard } from '@/core/AccordionCard';
 import { wait } from '@/core/utils';
 import { required } from '@/core/validators';
 import { SubmitButton } from '@/form';
@@ -20,7 +19,6 @@ import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useNotify } from '@/store/notify';
-import { ActionButton } from '@/table/ActionButton';
 
 import { ScriptEditorHeader } from './ScriptEditorHeader';
 import { ScriptEditorProps } from './types';
@@ -253,12 +251,13 @@ export const EditScriptDialog = ({
                       'Please select a script language to use dry-run',
                     )}
                   >
-                    <ActionButton
+                    <BaseButton
                       variant="secondary"
                       disabled
                       disabledReason={translate('Read-only mode')}
-                      action={() => {}}
-                      title={translate('Save & dry run script')}
+                      onClick={() => {}}
+                      label={translate('Save & dry run script')}
+                      size="lg"
                     />
                   </Tooltip>
                 ) : (
@@ -294,12 +293,13 @@ export const EditScriptDialog = ({
                     )}
                   </AccordionCard>
                   <div className="d-flex justify-content-end gap-4">
-                    <ActionButton
+                    <BaseButton
                       variant="tertiary"
-                      action={closeDialog}
+                      onClick={closeDialog}
                       disabled={submitting}
                       disabledReason={translate('Submission in progress')}
-                      title={translate('Cancel')}
+                      label={translate('Cancel')}
+                      size="lg"
                     />
                     <SubmitButton
                       disabled={invalid || !isDirty}

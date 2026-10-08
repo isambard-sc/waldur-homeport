@@ -60,11 +60,6 @@
   padding: 0.5rem;
 }
 
-.layout-weather-header .theme-switcher-btn {
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
 .layout-weather-content {
   position: relative;
   z-index: 1;
@@ -98,11 +93,13 @@
   flex-wrap: wrap;
 }
 
-.layout-weather-footer .menu-link {
+.layout-weather-footer .menu-link,
+.layout-weather-footer .menu-link .menu-title {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
-.layout-weather-footer .menu-link:hover {
+.layout-weather-footer .menu-link:hover,
+.layout-weather-footer .menu-link:hover .menu-title {
   color: #fff !important;
 }
 

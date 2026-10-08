@@ -10,7 +10,7 @@ import {
   projectsStatsRetrieve,
 } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import { Badge, BaseButton } from 'waldur-ui';
 
 import { getResourcesCount } from '@/administration/api';
 import { parseSelectData } from '@/core/api';
@@ -23,7 +23,6 @@ import { COMMON_WIDGET_HEIGHT } from '@/dashboard/constants';
 import { TeamWidget } from '@/dashboard/TeamWidget';
 import { isFeatureVisible } from '@/features/connect';
 import { CustomerFeatures, MarketplaceFeatures } from '@/FeaturesEnums';
-import { EditButton } from '@/form/EditButton';
 import { translate } from '@/i18n';
 import { useCreateInvitation } from '@/invitations/actions/useCreateInvitation';
 import { AggregateLimitWidget } from '@/marketplace/aggregate-limits/AggregateLimitWidget';
@@ -38,11 +37,11 @@ import { getAccountingMode } from '@/openportal/project-accounting/accountingMod
 import { ProjectSpendCard } from '@/openportal/project-accounting/ProjectSpendCard';
 import { useProjectSpend } from '@/openportal/project-accounting/useProjectSpend';
 import { RemoteProjectDashboardCards } from '@/openportal/remote-projects/RemoteProjectDashboardCards';
+import { RemoteProjectPaceBlock } from '@/openportal/remote-projects/RemoteProjectPaceBlock';
 import { useProjectAccountingSummary } from '@/openportal/useProjectAccountingSummary';
 import { PermissionEnum } from '@/permissions/enums';
 import { hasPermission } from '@/permissions/hasPermission';
 import { canViewTeam } from '@/permissions/teamVisibility';
-import { ActionButton } from '@/table/ActionButton';
 import { useThemeFeatures } from '@/theme/useThemeFeatures';
 import { useCustomer, useUser, useProject } from '@/workspace/hooks';
 
@@ -61,6 +60,21 @@ const EditFieldDialog = lazyComponent(() =>
     default: module.EditFieldDialog,
   })),
 );
+
+/**
+ * The monthly usage chart spans the row when it ends up on one by itself.
+ *
+ * How many half-width cards come before it is not fixed — one per connected
+ * remote project, plus whichever accounting card this mode shows — so the
+ * chart can land beside a card or alone on the next line. Rather than counting
+ * those cards, which would repeat every one of their visibility conditions and
+ * silently go wrong the day one changes, the column is allowed to grow:
+ * `col-md-6` still gives it a half-width basis, so it wraps exactly as before,
+ * and `flex-md-grow-1` lets it take up whatever the line leaves. Beside another
+ * card that is nothing; alone, it is the whole row. Below `md` every card is
+ * full width already.
+ */
+const MONTHLY_USAGE_COL_CLASS = 'mb-5 flex-md-grow-1';
 
 export const ProjectDashboard: FunctionComponent<{}> = () => {
   const shouldConcealPrices = isFeatureVisible(
@@ -328,7 +342,12 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
           </Col>
         )}
         {showBillingInfo && showProjectSpend && projectSpend?.endDate && (
-          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+          <Col
+            md={6}
+            sm={12}
+            className={MONTHLY_USAGE_COL_CLASS}
+            style={COMMON_WIDGET_HEIGHT}
+          >
             <MonthlyUsageChart
               projectUuid={project.uuid}
               startDate={projectSpend.startDate}
@@ -413,7 +432,12 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
             <ProjectDashboardCredit project={project} className="mb-5" />
           )}
         {showBillingInfo && hasAnyManagedProjects && awardPace && (
-          <Col md={6} sm={12} className="mb-5" style={COMMON_WIDGET_HEIGHT}>
+          <Col
+            md={6}
+            sm={12}
+            className={MONTHLY_USAGE_COL_CLASS}
+            style={COMMON_WIDGET_HEIGHT}
+          >
             <MonthlyUsageChart
               projectUuid={project.uuid}
               startDate={awardPace.startDate}
@@ -423,6 +447,19 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
           </Col>
         )}
       </Row>
+      {/* Pace for each connected award, from what the remote portal reports.
+          Not behind the billing flag: these are the award's own units, not
+          prices, and the connection cards above show the same figures. Not in
+          the grace period either: the project has ended, so a verdict on
+          whether it will use its allocation in time has nothing to say. */}
+      {hasAnyRemoteProjects &&
+        remoteProjects &&
+        !project.is_in_grace_period && (
+          <RemoteProjectPaceBlock
+            remoteProjects={remoteProjects}
+            projectEndDate={project.end_date}
+          />
+        )}
       {/* The Health block is for projects with a credit allocation and gates
           itself on one — it renders nothing without. The usage views are about
           quota rather than credit, so they are not tied to an allocation; each
@@ -456,12 +493,14 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
                 title={translate('Description')}
                 actions={
                   canEditProject && (
-                    <ActionButton
-                      title={translate('Edit')}
+                    <BaseButton
+                      label={translate('Edit')}
                       iconNode={<PencilSimpleIcon weight="bold" />}
                       iconRight
-                      action={handleEditDescription}
+                      onClick={handleEditDescription}
                       tooltip={translate('Edit description')}
+                      variant="tertiary"
+                      size="lg"
                     />
                   )
                 }
@@ -493,9 +532,14 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
                 }
                 actions={
                   user.is_staff && (
-                    <EditButton
+                    <BaseButton
                       onClick={handleEditStaffNotes}
                       tooltip={translate('Edit staff notes')}
+                      iconNode={<PencilSimpleIcon weight="bold" />}
+                      label={translate('Edit')}
+                      iconRight
+                      variant="tertiary"
+                      size="sm"
                     />
                   )
                 }

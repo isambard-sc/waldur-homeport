@@ -2,10 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { FC, useMemo, useState } from 'react';
 import { EventConsumer, eventConsumersList } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
+import { AccordionCard, Tooltip } from 'waldur-ui';
 import { Badge } from 'waldur-ui';
 
-import { AccordionCard } from '@/core/AccordionCard';
 import { FAST_STALE_TIME } from '@/core/constants';
 import { formatDateTime } from '@/core/dateUtils';
 import { Link } from '@/core/Link';
@@ -229,9 +228,12 @@ export const EventConsumersCard: FC = () => {
         'Unified pub/sub consumers registered through /api/event-consumers/. Site-agent consumers are managed on the Site agents page.',
       )}
       actions={
-        <Link state="admin-site-agents" className="btn btn-sm btn-light">
-          {translate('Site agents')}
-        </Link>
+        <Link
+          state="admin-site-agents"
+          buttonVariant="tertiary"
+          buttonSize="sm"
+          label={translate('Site agents')}
+        />
       }
       isOpen={open}
       onToggle={setOpen}

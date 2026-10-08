@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC, useState } from 'react';
 import { Card } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import {
   marketplaceOfferingProfilesAddRole,
   marketplaceOfferingProfilesRetrieve,
@@ -10,11 +11,13 @@ import {
   rolesList,
 } from 'waldur-js-client';
 
+import { BaseButton } from 'waldur-ui';
+
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { translate } from '@/i18n';
 import { useManagedMutation } from '@/modal/useManagedMutation';
-import { ActionButton } from '@/table/ActionButton';
 import { renderFieldOrDash } from '@/table/utils';
+import { isStaff as isStaffSelector } from '@/workspace/selectors';
 
 import { OfferingProfileRoleRemoveButton } from './OfferingProfileRoleRemoveButton';
 import { PROFILE_KEY } from './queryKeys';
@@ -32,6 +35,8 @@ export const OfferingProfileDetail: FC = () => {
   });
 
   const [showAdd, setShowAdd] = useState(false);
+  // The profile API is read-open; changing the role catalog is staff-only.
+  const isStaff = useSelector(isStaffSelector);
 
   if (isLoading || !profile) {
     return <LoadingSpinner />;
@@ -56,18 +61,25 @@ export const OfferingProfileDetail: FC = () => {
       <Card>
         <Card.Header className="d-flex align-items-center justify-content-between">
           <h5 className="mb-0">{translate('Role catalog')}</h5>
-          <ActionButton
-            title={translate('Add role')}
-            iconNode={<PlusCircleIcon weight="bold" />}
-            action={() => setShowAdd(true)}
-          />
+          {isStaff && (
+            <BaseButton
+              label={translate('Add role')}
+              iconNode={<PlusCircleIcon weight="bold" />}
+              onClick={() => setShowAdd(true)}
+              variant="tertiary"
+              size="lg"
+            />
+          )}
         </Card.Header>
         <Card.Body>
+          <p className="text-muted">
+            {translate(
+              'These roles can be assigned on every offering bound to this profile, at the scope shown. Adding or removing a role updates the bound offerings in the background.',
+            )}
+          </p>
           {(profile.roles || []).length === 0 ? (
             <p className="text-muted mb-0">
-              {translate(
-                'No roles in this catalog yet. Add roles below — they become assignable on every offering bound to this profile.',
-              )}
+              {translate('No roles in this catalog yet.')}
             </p>
           ) : (
             <table className="table align-middle mb-0">
@@ -92,10 +104,12 @@ export const OfferingProfileDetail: FC = () => {
                     </td>
                     <td>{renderFieldOrDash(r.description)}</td>
                     <td className="text-end">
-                      <OfferingProfileRoleRemoveButton
-                        profileUuid={uuid}
-                        role={r}
-                      />
+                      {isStaff && (
+                        <OfferingProfileRoleRemoveButton
+                          profileUuid={uuid}
+                          role={r}
+                        />
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -196,23 +210,25 @@ const AddRoleToProfileDialog: FC<{
                         ({r.content_type})
                       </span>
                     </span>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-primary"
+                    <BaseButton
+                      variant="primary"
+                      size="sm"
                       onClick={() => submit(r.uuid)}
                       disabled={submitting}
-                    >
-                      {translate('Add')}
-                    </button>
+                      disabledReason={translate('Adding role...')}
+                      label={translate('Add')}
+                    />
                   </li>
                 ))}
               </ul>
             )}
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-light" onClick={onClose}>
-              {translate('Close')}
-            </button>
+            <BaseButton
+              variant="tertiary"
+              onClick={onClose}
+              label={translate('Close')}
+            />
           </div>
         </div>
       </div>

@@ -3,6 +3,11 @@
  *
  * Fetches usage and storage reports for the current project and renders them
  * using UsageReportVis / StorageReportVis.
+ *
+ * A project backed by awards (remote projects) takes its usage from each
+ * award's own stitched report instead of the raw monthly rows, which are keyed
+ * by project and so split — and can double-count — an award that has moved.
+ * Storage is the same, from each award's storage-report. See awardUsage.ts.
  */
 
 import { ArrowsClockwiseIcon } from '@phosphor-icons/react';
@@ -14,9 +19,13 @@ import {
   CachedProjectUsageReport as UsageReportApiItem,
 } from 'waldur-js-client';
 
-import { IconButton } from '@/core/buttons/IconButton';
+import { BaseButton } from 'waldur-ui';
+
+import { formatDate } from '@/core/dateUtils';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { isFeatureVisible } from '@/features/connect';
+import { CustomerFeatures } from '@/FeaturesEnums';
 import { translate } from '@/i18n';
 import { NoResult } from '@/navigation/header/search/NoResult';
 import { useProject } from '@/workspace/hooks';
@@ -28,6 +37,13 @@ import {
   fetchUserMapping,
   selectUserMappingIds,
 } from './api';
+import {
+  AwardUsage,
+  awardStorageReports,
+  awardUsageReports,
+  fetchAllAwardUsage,
+  fetchProjectAwards,
+} from './awardUsage';
 import {
   getCached,
   setCached,
@@ -61,14 +77,56 @@ const groupByMonth = <T extends { year: number; month: number }>(
   return groups;
 };
 
+interface AwardUsageResult {
+  /** True when the project has awards at all, visible or not. */
+  hasAwards: boolean;
+  awards: AwardUsage[];
+}
+
+const NO_AWARDS: AwardUsageResult = { hasAwards: false, awards: [] };
+
 export const OpenPortalReportsTab: FC = () => {
   const project = useProject();
 
+  const awardsEnabled = isFeatureVisible(
+    CustomerFeatures.show_openportal_remote_projects,
+  );
+
   const {
-    data: usageReports,
-    isLoading: usageLoading,
-    error: usageError,
-    refetch: refetchUsage,
+    data: awardUsage,
+    isLoading: awardLoading,
+    error: awardError,
+    refetch: refetchAwards,
+  } = useQuery<AwardUsageResult>({
+    queryKey: ['openportal-award-usage', project?.uuid],
+    queryFn: async () => {
+      const cacheKey = `project-award-reports-${project!.uuid}`;
+      const cached = getCached<AwardUsageResult>(cacheKey, TTL.REPORTS);
+      if (cached) return cached;
+      const remoteProjects = await fetchProjectAwards(project!.uuid);
+      const result = {
+        hasAwards: remoteProjects.length > 0,
+        awards: await fetchAllAwardUsage(remoteProjects),
+      };
+      setCached(cacheKey, result);
+      return result;
+    },
+    enabled: !!project && awardsEnabled,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
+  });
+
+  // Settled once the award lookup has answered, or straight away where the
+  // deployment has no awards. Until then neither source is fetched, so an
+  // award-backed project never flashes the project rows it must not use.
+  const awardsSettled = !awardsEnabled || awardUsage !== undefined;
+  const { hasAwards, awards } = (awardsEnabled && awardUsage) || NO_AWARDS;
+
+  const {
+    data: projectUsageReports,
+    isLoading: projectUsageLoading,
+    error: projectUsageError,
+    refetch: refetchProjectUsage,
   } = useQuery({
     queryKey: ['openportal-usage-reports', project?.uuid],
     queryFn: async () => {
@@ -82,16 +140,25 @@ export const OpenPortalReportsTab: FC = () => {
       );
       return reports;
     },
-    enabled: !!project,
+    enabled: !!project && awardsSettled && !hasAwards,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
 
+  const awardReports = useMemo(() => awardUsageReports(awards), [awards]);
+  const usageReports = hasAwards ? awardReports : projectUsageReports;
+  const usageLoading = awardLoading || (!hasAwards && projectUsageLoading);
+  const usageError = awardError || (!hasAwards && projectUsageError);
+  const refetchUsage = () => {
+    if (awardsEnabled) refetchAwards();
+    refetchProjectUsage();
+  };
+
   const {
-    data: storageReports,
-    isLoading: storageLoading,
-    error: storageError,
-    refetch: refetchStorage,
+    data: projectStorageReports,
+    isLoading: projectStorageLoading,
+    error: projectStorageError,
+    refetch: refetchProjectStorage,
   } = useQuery({
     queryKey: ['openportal-storage-reports', project?.uuid],
     queryFn: async () => {
@@ -107,10 +174,19 @@ export const OpenPortalReportsTab: FC = () => {
       );
       return reports;
     },
-    enabled: !!project,
+    enabled: !!project && awardsSettled && !hasAwards,
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
+
+  // Storage for an award comes with its usage, from the same award lookup.
+  const awardStorage = useMemo(() => awardStorageReports(awards), [awards]);
+  const storageReports = hasAwards ? awardStorage : projectStorageReports;
+  const storageLoading = !hasAwards && projectStorageLoading;
+  const storageError = !hasAwards && projectStorageError;
+  const refetchStorage = () => {
+    if (!hasAwards) refetchProjectStorage();
+  };
 
   const hasReports = !!(usageReports || storageReports);
 
@@ -120,7 +196,7 @@ export const OpenPortalReportsTab: FC = () => {
     isPending: mappingsPending,
     error: mappingsError,
   } = useQuery<NameMaps>({
-    queryKey: ['openportal-project-mappings', project?.uuid],
+    queryKey: ['openportal-project-mappings', project?.uuid, hasAwards],
     refetchOnWindowFocus: false,
     staleTime: Infinity,
     queryFn: async () => {
@@ -183,9 +259,29 @@ export const OpenPortalReportsTab: FC = () => {
   // identifiers. So a failed lookup falls back to empty maps instead of
   // withholding the report, while a lookup still in flight keeps the charts
   // back for the moment it takes, to avoid a flash of raw identifiers.
-  const effectiveNameMaps: NameMaps | undefined = mappingsError
+  const baseNameMaps: NameMaps | undefined = mappingsError
     ? EMPTY_NAME_MAPS
     : nameMaps;
+  // An award's report is filed under its destination, which the offering
+  // mapping does not know; it goes by the name its connection card uses.
+  const effectiveNameMaps: NameMaps | undefined = useMemo(
+    () =>
+      baseNameMaps && awards.length > 0
+        ? {
+            ...baseNameMaps,
+            offering: {
+              ...baseNameMaps.offering,
+              ...Object.fromEntries(
+                awards.map(({ remoteProject: rp }) => [
+                  rp.destination,
+                  rp.resource_name || rp.destination,
+                ]),
+              ),
+            },
+          }
+        : baseNameMaps,
+    [baseNameMaps, awards],
+  );
 
   // Collect distinct resources across both report types, busiest first, so the
   // tab that opens is the one the project actually uses.
@@ -239,10 +335,21 @@ export const OpenPortalReportsTab: FC = () => {
   const isLoading =
     usageLoading ||
     storageLoading ||
+    !awardsSettled ||
     (hasReports && mappingsPending && !mappingsError);
 
   const reportsCacheAge =
-    !isLoading && project ? getCacheAge(`project-usage-${project.uuid}`) : null;
+    !isLoading && project
+      ? getCacheAge(
+          hasAwards
+            ? `project-award-reports-${project.uuid}`
+            : `project-usage-${project.uuid}`,
+        )
+      : null;
+
+  const activeAward = awards.find(
+    (award) => award.remoteProject.destination === activeResource,
+  );
 
   return (
     <Card className="card-bordered">
@@ -250,7 +357,7 @@ export const OpenPortalReportsTab: FC = () => {
         <div className="d-flex align-items-center gap-3 flex-wrap w-100">
           <div className="d-flex align-items-center me-2">
             <span className="h3 mb-0">{translate('Usage Report')}</span>
-            <IconButton
+            <BaseButton
               iconNode={<ArrowsClockwiseIcon weight="bold" />}
               tooltip={translate('Refresh')}
               variant="text-secondary"
@@ -260,11 +367,13 @@ export const OpenPortalReportsTab: FC = () => {
                   clearCached(
                     `project-usage-${project.uuid}`,
                     `project-storage-${project.uuid}`,
+                    `project-award-reports-${project.uuid}`,
                   );
                 }
                 refetchUsage();
                 refetchStorage();
               }}
+              size="lg"
             />
           </div>
 
@@ -281,7 +390,7 @@ export const OpenPortalReportsTab: FC = () => {
             >
               {allResources.map((r) => (
                 <option key={r} value={r}>
-                  {nameMaps?.offering?.[r] ?? r}
+                  {effectiveNameMaps?.offering?.[r] ?? r}
                 </option>
               ))}
             </Form.Select>
@@ -336,9 +445,15 @@ export const OpenPortalReportsTab: FC = () => {
           allMonths.length === 0 && (
             <NoResult
               title={translate('No usage reports yet')}
-              message={translate(
-                'No OpenPortal reports have been generated for this project.',
-              )}
+              message={
+                hasAwards
+                  ? translate(
+                      'No usage has been reported for the awards on this project yet.',
+                    )
+                  : translate(
+                      'No OpenPortal reports have been generated for this project.',
+                    )
+              }
               noAction
             />
           )}
@@ -351,6 +466,10 @@ export const OpenPortalReportsTab: FC = () => {
               'Could not load offering and user names; showing identifiers instead.',
             )}
           </p>
+        )}
+
+        {activeAward && (
+          <AwardWindows award={activeAward} projectUuid={project?.uuid} />
         )}
 
         {/* Usage chart */}
@@ -378,5 +497,48 @@ export const OpenPortalReportsTab: FC = () => {
         )}
       </Card.Body>
     </Card>
+  );
+};
+
+const sameProject = (a: string | null, b: string | undefined): boolean =>
+  Boolean(a && b) && a.replace(/-/g, '') === b.replace(/-/g, '');
+
+/**
+ * Which project held the award, when — the award's usage covers all of them.
+ *
+ * Names are the recorded ones and are not linked: the project may be gone, or
+ * be one this user cannot open.
+ */
+const AwardWindows: FC<{ award: AwardUsage; projectUuid?: string }> = ({
+  award,
+  projectUuid,
+}) => {
+  if (award.windows.length === 0) return null;
+  const movedBetweenProjects = award.windows.some(
+    (w) => !sameProject(w.project_uuid, projectUuid),
+  );
+  return (
+    <div className="text-muted mb-5">
+      {movedBetweenProjects && (
+        <p className="mb-2">
+          {translate(
+            'This award has been attached to more than one project. Its usage below covers all of them.',
+          )}
+        </p>
+      )}
+      <ul className="mb-0 ps-5">
+        {award.windows.map((w) => (
+          <li key={`${w.start}-${w.project_identifier}`}>
+            {translate('{project}: {start} to {end}', {
+              project: sameProject(w.project_uuid, projectUuid)
+                ? translate('This project')
+                : w.project_name || translate('A project no longer available'),
+              start: formatDate(w.start),
+              end: w.end ? formatDate(w.end) : translate('now'),
+            })}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };

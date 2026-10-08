@@ -97,8 +97,15 @@ export const DefaultUserManagementSection: FC<OfferingEditPanelProps> = (
   const context = useOfferingAccountContext(props.offering);
 
   const pluginOptions = props.offering.plugin_options;
+  const usesRobotAccounts = pluginOptions?.uses_robot_accounts === true;
   const canCreateUser =
     pluginOptions?.service_provider_can_create_offering_user;
+  const offeringUsersRobotAccountsConflict = translate(
+    'Cannot be combined with automatic creation of offering users. Disable that option first.',
+  );
+  const robotAccountsOfferingUsersConflict = translate(
+    'Cannot be combined with per-resource robot accounts as the identity model. Disable that option first.',
+  );
   // enable_posix_account defaults to true; only an explicit false disables it.
   const posixEnabled = pluginOptions?.enable_posix_account !== false;
 
@@ -169,11 +176,28 @@ export const DefaultUserManagementSection: FC<OfferingEditPanelProps> = (
             }
           />
           <BooleanEditField
+            name="plugin_options.uses_robot_accounts"
+            label={translate(
+              'Use per-resource robot accounts as identity model',
+            )}
+            description={translate(
+              'Signals that integrators should provision per-resource robot accounts instead of offering users. Does not block creating robot accounts on offerings that use offering users (for example LEXIS links). Unset means off.',
+            )}
+            disabled={canCreateUser}
+            tooltip={
+              canCreateUser ? offeringUsersRobotAccountsConflict : undefined
+            }
+          />
+          <BooleanEditField
             name="plugin_options.service_provider_can_create_offering_user"
             label={translate('Enable automatic creation of offering users')}
             description={translate(
               'If true, offering users are created automatically when a user is added to the project with active offering resources or when a new offering resource is created.',
             )}
+            disabled={usesRobotAccounts}
+            tooltip={
+              usesRobotAccounts ? robotAccountsOfferingUsersConflict : undefined
+            }
           />
           {canCreateUser && (
             <BooleanEditField
@@ -184,6 +208,13 @@ export const DefaultUserManagementSection: FC<OfferingEditPanelProps> = (
               )}
             />
           )}
+          <BooleanEditField
+            name="plugin_options.enable_scim_entitlements"
+            label={translate('Enable SCIM entitlements')}
+            description={translate(
+              'Include this offering in outbound SCIM entitlement sync for SSH login-node access. An SSH access endpoint alone is not enough; this option must be enabled. Also requires SCIM_MEMBERSHIP_SYNC_ENABLED on the deployment.',
+            )}
+          />
           {props.offering.type === SITE_AGENT_PLUGIN && (
             <SelectEditField
               name="plugin_options.account_name_generation_policy"

@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
-import { DateTime, Settings } from 'luxon';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useProject } from '@/workspace/hooks';
@@ -9,8 +8,9 @@ import { GracePeriodWarningBar } from './GracePeriodWarningBar';
 
 describe('GracePeriodWarningBar', () => {
   beforeEach(() => {
-    const fixedNow = DateTime.fromISO('2026-09-16T09:00:00').toMillis();
-    Settings.now = () => fixedNow;
+    vi.useFakeTimers({ toFake: ['Date'] });
+    // Both clocks: the bar checks expiry with Date and counts days with luxon.
+    vi.setSystemTime(new Date('2026-09-16T09:00:00'));
     // The bar only renders on a project page.
     vi.mocked(useCurrentStateAndParams).mockReturnValue({
       state: { name: 'project.dashboard' },
@@ -23,7 +23,7 @@ describe('GracePeriodWarningBar', () => {
   });
 
   afterEach(() => {
-    Settings.now = () => Date.now();
+    vi.useRealTimers();
   });
 
   // Resources are deleted at the start of effective_end_date, so 30 Sep is
@@ -41,8 +41,7 @@ describe('GracePeriodWarningBar', () => {
   });
 
   it('says so plainly on the last usable day', () => {
-    const fixedNow = DateTime.fromISO('2026-09-29T09:00:00').toMillis();
-    Settings.now = () => fixedNow;
+    vi.setSystemTime(new Date('2026-09-29T09:00:00'));
 
     render(<GracePeriodWarningBar />);
 

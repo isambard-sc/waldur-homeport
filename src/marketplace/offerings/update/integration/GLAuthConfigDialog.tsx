@@ -37,7 +37,7 @@ export const GLAuthConfigDialog: FC<OwnProps> = (props) => {
           <CopyToClipboard
             value={props.resolve.config}
             label={translate('Copy')}
-            className="btn-tertiary w-150px"
+            className="w-150px"
           />
         )
       }
@@ -45,7 +45,11 @@ export const GLAuthConfigDialog: FC<OwnProps> = (props) => {
         <CloseDialogButton label={translate('Close')} className="w-150px" />
       }
     >
-      <Tab.Container activeKey={view} onSelect={(k) => k && setView(k as View)}>
+      <Tab.Container
+        activeKey={view}
+        onSelect={(k) => k && setView(k as View)}
+        mountOnEnter
+      >
         <Nav variant="tabs" className="nav-line-tabs mb-5">
           <Nav.Item>
             <Nav.Link eventKey="toml">{translate('TOML config')}</Nav.Link>
@@ -73,7 +77,7 @@ export const GLAuthConfigDialog: FC<OwnProps> = (props) => {
               </p>
             )}
           </Tab.Pane>
-          <Tab.Pane eventKey="tree" mountOnEnter unmountOnExit={false}>
+          <Tab.Pane eventKey="tree" unmountOnExit={false}>
             {hasTree ? (
               <GLAuthTreeView tree={props.resolve.tree as GlauthTree} />
             ) : (

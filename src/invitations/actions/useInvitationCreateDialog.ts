@@ -7,6 +7,10 @@ import { getAllPages } from '@/core/api';
 import { ENV } from '@/core/config';
 import { translate } from '@/i18n';
 import { useManagedMutation } from '@/modal/useManagedMutation';
+import {
+  ExistingRoleHit,
+  mapExistingRoleResponse,
+} from '@/permissions/existingRoles';
 import { Role } from '@/permissions/types';
 import {
   getOnlyOneProjectManagerTooltip,
@@ -15,7 +19,15 @@ import {
 import { useProjectHasActiveManager } from '@/project/team/useProjectHasActiveManager';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
+import { RowVerdict } from './rowVerdicts';
 import { GroupInvitationFormData, InvitationContext } from './types';
+
+export interface DuplicateCheckResult {
+  /** (email, role) pairs that already have a pending invitation in the scope. */
+  duplicatePairs: RowVerdict[];
+  /** Roles the invitees already hold in the scope. */
+  existingRoleHits: ExistingRoleHit[];
+}
 
 export const useInvitationCreateDialog = (context: InvitationContext) => {
   const defaultProject = useMemo(
@@ -110,42 +122,68 @@ export const useInvitationCreateDialog = (context: InvitationContext) => {
   const checkDuplicates = useCallback(
     async (
       formData: GroupInvitationFormData,
-    ): Promise<Array<{ email: string; roleUuid: string }>> => {
+    ): Promise<DuplicateCheckResult> => {
       const validRows = (formData.rows ?? []).filter(
         (row) => row?.email && row?.role_project?.role,
       );
-      if (validRows.length === 0) return [];
+      if (validRows.length === 0)
+        return { duplicatePairs: [], existingRoleHits: [] };
 
-      const byScope = new Map<string, { email: string; role: string }[]>();
+      // The project travels with each scope's answers so a verdict can be
+      // matched back to rows still in that project, and dropped from a row
+      // that has since moved to another one.
+      const byScope = new Map<
+        string,
+        {
+          projectUuid?: string;
+          invitations: { email: string; role: string }[];
+        }
+      >();
       for (const row of validRows) {
         const scope = getScopeForRow(row);
         if (!scope) continue;
-        const list = byScope.get(scope) ?? [];
-        list.push({
+        const entry = byScope.get(scope) ?? {
+          projectUuid:
+            row.role_project.role.content_type === 'project'
+              ? row.role_project.project?.uuid
+              : undefined,
+          invitations: [],
+        };
+        entry.invitations.push({
           email: row.email,
           role: row.role_project.role.uuid,
         });
-        byScope.set(scope, list);
+        byScope.set(scope, entry);
       }
 
-      const duplicatePairs: Array<{ email: string; roleUuid: string }> = [];
+      const duplicatePairs: RowVerdict[] = [];
+      const existingRoleHits: ExistingRoleHit[] = [];
       await Promise.all(
-        Array.from(byScope.entries()).map(async ([scope, invitations]) => {
-          const response = await userInvitationsCheckDuplicates({
-            body: { scope, invitations },
-          });
-          const data = response.data;
-          if (data?.duplicates?.length) {
-            duplicatePairs.push(
-              ...data.duplicates.map((d) => ({
-                email: d.email,
-                roleUuid: d.role,
+        Array.from(byScope.entries()).map(
+          async ([scope, { projectUuid, invitations }]) => {
+            const response = await userInvitationsCheckDuplicates({
+              body: { scope, invitations },
+            });
+            const data = response.data;
+            if (data?.duplicates?.length) {
+              duplicatePairs.push(
+                ...data.duplicates.map((d) => ({
+                  email: d.email,
+                  roleUuid: d.role,
+                  projectUuid,
+                })),
+              );
+            }
+            existingRoleHits.push(
+              ...mapExistingRoleResponse(data?.existing_roles).map((hit) => ({
+                ...hit,
+                projectUuid,
               })),
             );
-          }
-        }),
+          },
+        ),
       );
-      return duplicatePairs;
+      return { duplicatePairs, existingRoleHits };
     },
     [getScopeForRow],
   );

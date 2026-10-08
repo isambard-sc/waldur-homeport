@@ -4,7 +4,6 @@ import { lazyComponent } from '@/core/lazyComponent';
 import { StateDeclaration } from '@/core/types';
 import { isFeatureVisible } from '@/features/connect';
 import {
-  CustomerFeatures,
   InvitationsFeatures,
   MarketplaceFeatures,
   ProjectFeatures,
@@ -53,6 +52,7 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     url: '',
+    redirectTo: 'admin-workers',
     data: {
       breadcrumb: () => translate('System management'),
     },
@@ -64,6 +64,7 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     url: '',
+    redirectTo: 'admin-branding',
     data: {
       breadcrumb: () => translate('User interface'),
     },
@@ -75,6 +76,7 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     url: '',
+    redirectTo: 'admin-ai-assistant-settings',
     data: {
       breadcrumb: () => translate('Configuration'),
     },
@@ -86,6 +88,7 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     url: '',
+    redirectTo: 'admin-classifiers',
     data: {
       breadcrumb: () => translate('Organizations & compliance'),
     },
@@ -97,58 +100,68 @@ export const states: StateDeclaration[] = [
     abstract: true,
     component: UIView,
     url: '',
+    redirectTo: 'admin-marketplace-offerings',
     data: {
       breadcrumb: () => getMarketplaceTitle(),
     },
   },
 
   {
-    name: 'admin-table-growth',
-    url: 'table-growth/',
+    name: 'admin-changelog',
+    url: 'changelog/',
     parent: 'admin-system-management',
     component: lazyComponent(() =>
-      import('./table-growth/TableGrowthPage').then((module) => ({
-        default: module.TableGrowthPage,
+      import('./changelog/ChangelogPage').then((module) => ({
+        default: module.ChangelogPage,
       })),
     ),
     data: {
-      breadcrumb: () => translate('Table growth'),
+      breadcrumb: () => translate('Changelog'),
+      permissions: [isStaffOrSupport],
     },
   },
 
+  // Now the Service profiles tab of the roles page; kept as a redirect so
+  // bookmarks, the chaos route sweep and external links keep resolving. See
+  // admin-role-availabilities for why `skipBreadcrumb` is needed.
   {
     name: 'admin-marketplace-offering-profiles',
     url: 'offering-profiles/',
-    parent: 'admin-marketplace',
-    component: lazyComponent(() =>
-      import('@/marketplace/offerings/profiles/OfferingProfilesList').then(
-        (module) => ({
-          default: module.OfferingProfilesList,
-        }),
-      ),
-    ),
+    parent: 'admin-configuration',
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: {
+      state: 'admin-roles',
+      params: { tab: 'profiles' },
+    },
     data: {
-      breadcrumb: () => translate('Service profiles'),
-      priority: 30,
+      skipBreadcrumb: true,
     },
   },
+  // Folded into the roles page as a tab; kept as a redirect so bookmarks, the
+  // chaos route sweep and external links keep resolving. ui-router inherits
+  // `data` from the parent, so without `skipBreadcrumb` this state picks up
+  // admin-configuration's "Configuration" breadcrumb and `filterState` in
+  // src/navigation/useTabs.tsx lists it in the header menu under that name.
   {
     name: 'admin-role-availabilities',
     url: 'role-availabilities/',
     parent: 'admin-configuration',
-    component: lazyComponent(() =>
-      import('./role-availabilities/RoleAvailabilitiesList').then((module) => ({
-        default: module.RoleAvailabilitiesList,
-      })),
-    ),
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: { state: 'admin-roles', params: { tab: 'availability' } },
     data: {
-      breadcrumb: () => translate('Role availabilities'),
+      skipBreadcrumb: true,
     },
   },
   {
     name: 'admin-marketplace-offering-profile-detail',
     url: 'offering-profiles/:uuid/',
-    parent: 'admin-marketplace',
+    // Service profiles are a tab of the roles page, so their detail page sits in
+    // the same menu; the URL is unchanged because both parents are url-less.
+    parent: 'admin-configuration',
     component: lazyComponent(() =>
       import('@/marketplace/offerings/profiles/OfferingProfileDetail').then(
         (module) => ({
@@ -163,46 +176,58 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'admin-table-growth-settings',
-    url: 'table-growth-settings/',
+    name: 'admin-workers',
+    url: 'workers/?tab',
     parent: 'admin-system-management',
     component: lazyComponent(() =>
-      import('./table-growth/AdministrationTableGrowthSettings').then(
-        (module) => ({
-          default: module.AdministrationTableGrowthSettings,
-        }),
-      ),
+      import('./system-management/WorkersPage').then((module) => ({
+        default: module.WorkersPage,
+      })),
     ),
     data: {
-      breadcrumb: () => translate('Table growth settings'),
+      breadcrumb: () => translate('Workers & messaging'),
     },
   },
 
   {
-    name: 'admin-system-info',
-    url: 'system-info/',
+    name: 'admin-database',
+    url: 'database/?tab',
     parent: 'admin-system-management',
     component: lazyComponent(() =>
-      import('./database-stats/DatabaseStatsPage').then((module) => ({
-        default: module.DatabaseStatsPage,
+      import('./system-management/DatabasePage').then((module) => ({
+        default: module.DatabasePage,
       })),
     ),
     data: {
-      breadcrumb: () => translate('Database statistics'),
+      breadcrumb: () => translate('Database'),
     },
   },
 
+  {
+    name: 'admin-logging-telemetry',
+    url: 'logging-telemetry/?tab',
+    parent: 'admin-system-management',
+    component: lazyComponent(() =>
+      import('./system-management/LoggingTelemetryPage').then((module) => ({
+        default: module.LoggingTelemetryPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Logging & telemetry'),
+    },
+  },
+
+  // Folded into a tabbed System management page; kept as a redirect so
+  // bookmarks, the chaos route sweep and external links keep resolving. See
+  // admin-role-availabilities for why `skipBreadcrumb` is needed.
   {
     name: 'admin-celery-info',
     url: 'celery-info/',
     parent: 'admin-system-management',
-    component: lazyComponent(() =>
-      import('./CeleryInfoPage').then((module) => ({
-        default: module.CeleryInfoPage,
-      })),
-    ),
+    component: UIView,
+    redirectTo: { state: 'admin-workers', params: { tab: 'celery' } },
     data: {
-      breadcrumb: () => translate('Celery info'),
+      skipBreadcrumb: true,
     },
   },
 
@@ -210,14 +235,96 @@ export const states: StateDeclaration[] = [
     name: 'admin-rabbitmq',
     url: 'rabbitmq/',
     parent: 'admin-system-management',
-    component: lazyComponent(() =>
-      import('./rabbitmq/RabbitMQPage').then((module) => ({
-        default: module.RabbitMQPage,
-      })),
-    ),
+    component: UIView,
+    redirectTo: { state: 'admin-workers', params: { tab: 'rabbitmq' } },
     data: {
-      breadcrumb: () => translate('RabbitMQ'),
-      permissions: [isStaffOrSupport],
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-pubsub-health',
+    url: 'pubsub-health/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: { state: 'admin-workers', params: { tab: 'pubsub' } },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-event-subscriptions',
+    url: 'event-subscriptions/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-workers',
+      params: { tab: 'event-subscriptions' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-system-info',
+    url: 'system-info/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: { state: 'admin-database', params: { tab: 'statistics' } },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-table-growth',
+    url: 'table-growth/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: { state: 'admin-database', params: { tab: 'table-growth' } },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-table-growth-settings',
+    url: 'table-growth-settings/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: { state: 'admin-database', params: { tab: 'settings' } },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-system-logging-settings',
+    url: 'system-logging/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-logging-telemetry',
+      params: { tab: 'system-logging' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-telemetry-settings',
+    url: 'telemetry/',
+    parent: 'admin-system-management',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-logging-telemetry',
+      params: { tab: 'telemetry' },
+    },
+    data: {
+      skipBreadcrumb: true,
     },
   },
 
@@ -237,21 +344,6 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'admin-pubsub-health',
-    url: 'pubsub-health/',
-    parent: 'admin-system-management',
-    component: lazyComponent(() =>
-      import('./pubsub/PubSubHealthPage').then((module) => ({
-        default: module.PubSubHealthPage,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('PubSub health'),
-      permissions: [isStaff],
-    },
-  },
-
-  {
     name: 'admin-site-agents',
     url: 'site-agents/?tab',
     parent: 'admin-system-management',
@@ -262,21 +354,6 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Site agents'),
-      permissions: [isStaffOrSupport],
-    },
-  },
-
-  {
-    name: 'admin-event-subscriptions',
-    url: 'event-subscriptions/',
-    parent: 'admin-system-management',
-    component: lazyComponent(() =>
-      import('./event-subscriptions/EventSubscriptionsList').then((module) => ({
-        default: module.EventSubscriptionsList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Event subscriptions (legacy)'),
       permissions: [isStaffOrSupport],
     },
   },
@@ -387,33 +464,6 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'admin-system-logging-settings',
-    url: 'system-logging/',
-    parent: 'admin-system-management',
-    component: lazyComponent(() =>
-      import('./system-logging/AdministrationSystemLogging').then((module) => ({
-        default: module.AdministrationSystemLogging,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('System logging'),
-    },
-  },
-
-  {
-    name: 'admin-telemetry-settings',
-    url: 'telemetry/',
-    parent: 'admin-system-management',
-    component: lazyComponent(() =>
-      import('./telemetry/AdministrationTelemetry').then((module) => ({
-        default: module.AdministrationTelemetry,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Telemetry'),
-    },
-  },
-  {
     name: 'admin-custom-scripts-settings',
     url: 'custom-scripts/',
     parent: 'admin-configuration',
@@ -442,19 +492,180 @@ export const states: StateDeclaration[] = [
   },
 
   {
-    name: 'admin-user-agreements',
-    url: 'user-agreements/',
+    name: 'admin-organization-credits-cost-policies',
+    url: 'credits-cost-policies/?tab',
     parent: 'admin-organizations-compliance',
     component: lazyComponent(() =>
-      import('./agreements/UserAgreementsList').then((module) => ({
-        default: module.UserAgreementsList,
-      })),
+      import('./organizations-compliance/CreditsCostPoliciesPage').then(
+        (module) => ({
+          default: module.CreditsCostPoliciesPage,
+        }),
+      ),
     ),
     data: {
-      breadcrumb: () => translate('User agreements'),
+      breadcrumb: () => translate('Credits & cost policies'),
+      permissions: [isStaff],
     },
   },
 
+  {
+    name: 'admin-organization-project-settings',
+    url: 'organization-project-settings/?tab',
+    parent: 'admin-organizations-compliance',
+    component: lazyComponent(() =>
+      import('./organizations-compliance/OrganizationProjectSettingsPage').then(
+        (module) => ({
+          default: module.OrganizationProjectSettingsPage,
+        }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Organization & project settings'),
+    },
+  },
+
+  {
+    name: 'admin-classifiers',
+    url: 'classifiers/?tab',
+    parent: 'admin-organizations-compliance',
+    component: lazyComponent(() =>
+      import('./organizations-compliance/ClassifiersPage').then((module) => ({
+        default: module.ClassifiersPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Classifiers'),
+    },
+  },
+
+  {
+    name: 'admin-compliance',
+    url: 'compliance/?tab',
+    parent: 'admin-organizations-compliance',
+    component: lazyComponent(() =>
+      import('./organizations-compliance/CompliancePage').then((module) => ({
+        default: module.CompliancePage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Compliance'),
+    },
+  },
+
+  // Folded into a tabbed Organizations & compliance page; kept as a redirect
+  // so bookmarks, the chaos route sweep and external links keep resolving. See
+  // admin-role-availabilities for why `skipBreadcrumb` is needed.
+  {
+    name: 'admin-organization-credit-management',
+    url: 'organization-credits/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-organization-credits-cost-policies',
+      params: { tab: 'credits' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-organization-cost-policies',
+    url: 'organization-cost-policies/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-organization-credits-cost-policies',
+      params: { tab: 'cost-policies' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-onboarding-settings',
+    url: 'onboarding-settings/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-organization-project-settings',
+      params: { tab: 'onboarding' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-project-settings',
+    url: 'project-settings/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-organization-project-settings',
+      params: { tab: 'project' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-organizations-group-list',
+    url: 'organization-groups/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-classifiers',
+      params: { tab: 'organization-groups' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-affiliated-organizations',
+    url: 'affiliated-organizations/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: { state: 'admin-classifiers', params: { tab: 'affiliations' } },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-science-domains',
+    url: 'science-domains/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-classifiers',
+      params: { tab: 'science-domains' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  {
+    name: 'admin-user-agreements',
+    url: 'user-agreements/',
+    parent: 'admin-organizations-compliance',
+    component: UIView,
+    redirectTo: {
+      state: 'admin-compliance',
+      params: { tab: 'user-agreements' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+
+  // A marketplace-resource feature, so it sits in the Marketplace menu; the
+  // URL is unchanged because both menu parents are url-less.
   {
     name: 'admin-user-lexis-links-list',
     url: 'lexis-links/',
@@ -463,9 +674,10 @@ export const states: StateDeclaration[] = [
         (module) => ({ default: module.BasicLexisLinkList }),
       ),
     ),
-    parent: 'admin-organizations-compliance',
+    parent: 'admin-marketplace',
     data: {
       breadcrumb: () => translate('LEXIS links'),
+      priority: 95,
       permissions: [
         () => {
           if (isFeatureVisible(MarketplaceFeatures.lexis_links)) {
@@ -491,47 +703,51 @@ export const states: StateDeclaration[] = [
     },
   },
 
+  // Moved to Support › User management, next to robot accounts and offering
+  // users; kept as a redirect so bookmarks and external links keep resolving.
   {
     name: 'admin-course-accounts',
     url: 'course-accounts/?tab',
     parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./CourseAccountsTable').then((module) => ({
-        default: module.CourseAccountsTable,
-      })),
-    ),
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: 'support-course-accounts',
     data: {
-      breadcrumb: () => translate('Course accounts'),
-      feature: InvitationsFeatures.show_course_accounts,
+      skipBreadcrumb: true,
     },
   },
 
+  // Folded into a tabbed Marketplace page; kept as a redirect so bookmarks,
+  // the chaos route sweep and external links keep resolving. See
+  // admin-role-availabilities for why `skipBreadcrumb` is needed.
   {
     name: 'admin-marketplace-category-groups',
     url: 'category-groups',
     parent: 'admin-marketplace',
-    component: lazyComponent(() =>
-      import('@/marketplace/category/admin/CategoryGroupsList').then(
-        (module) => ({ default: module.CategoryGroupsList }),
-      ),
-    ),
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: {
+      state: 'admin-marketplace-categories',
+      params: { tab: 'category-groups' },
+    },
     data: {
-      breadcrumb: () => translate('Category groups'),
-      priority: 50,
+      skipBreadcrumb: true,
     },
   },
 
   {
     name: 'admin-marketplace-categories',
-    url: 'categories/',
+    url: 'categories/?tab',
     parent: 'admin-marketplace',
     component: lazyComponent(() =>
-      import('@/marketplace/category/admin/AdminCategoriesPage').then(
-        (module) => ({ default: module.AdminCategoriesPage }),
-      ),
+      import('./marketplace/CatalogueStructurePage').then((module) => ({
+        default: module.CatalogueStructurePage,
+      })),
     ),
     data: {
-      breadcrumb: () => translate('Categories'),
+      breadcrumb: () => translate('Catalogue structure'),
       priority: 40,
     },
   },
@@ -540,14 +756,15 @@ export const states: StateDeclaration[] = [
     name: 'admin-marketplace-tags',
     url: 'tags/',
     parent: 'admin-marketplace',
-    component: lazyComponent(() =>
-      import('@/marketplace/tags/admin/TagsList').then((module) => ({
-        default: module.TagsList,
-      })),
-    ),
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: {
+      state: 'admin-marketplace-categories',
+      params: { tab: 'tags' },
+    },
     data: {
-      breadcrumb: () => translate('Tags'),
-      priority: 60,
+      skipBreadcrumb: true,
     },
   },
 
@@ -555,16 +772,15 @@ export const states: StateDeclaration[] = [
     name: 'admin-marketplace-offering-groups',
     url: 'offering-groups/',
     parent: 'admin-marketplace',
-    component: lazyComponent(() =>
-      import('@/marketplace/service-providers/offering-groups/ProviderOfferingGroupsList').then(
-        (module) => ({
-          default: module.AdminOfferingGroupsList,
-        }),
-      ),
-    ),
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: {
+      state: 'admin-marketplace-offerings',
+      params: { tab: 'groups' },
+    },
     data: {
-      breadcrumb: () => translate('Offering groups'),
-      priority: 20,
+      skipBreadcrumb: true,
     },
   },
 
@@ -621,70 +837,15 @@ export const states: StateDeclaration[] = [
     name: 'admin-slurm-policy-settings',
     url: 'slurm-policy/',
     parent: 'admin-marketplace',
-    component: lazyComponent(() =>
-      import('./marketplace/AdministrationSlurmPolicy').then((module) => ({
-        default: module.AdministrationSlurmPolicy,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('SLURM policy'),
-      priority: 100,
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: {
+      state: 'admin-marketplace-settings',
+      params: { tab: 'slurm-policy' },
     },
-  },
-
-  {
-    name: 'admin-organizations-group-list',
-    url: 'organization-groups/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./organizations/OrganizationGroupsList').then((module) => ({
-        default: module.OrganizationGroupsList,
-      })),
-    ),
     data: {
-      breadcrumb: () => translate('Organization groups'),
-    },
-  },
-  {
-    name: 'admin-affiliated-organizations',
-    url: 'affiliated-organizations/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./affiliated-organizations/AffiliatedOrganizationsList').then(
-        (module) => ({
-          default: module.AffiliatedOrganizationsList,
-        }),
-      ),
-    ),
-    data: {
-      breadcrumb: () => translate('Affiliations'),
-    },
-  },
-  {
-    name: 'admin-science-domains',
-    url: 'science-domains/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./science-domains/ScienceDomainsList').then((module) => ({
-        default: module.ScienceDomainsList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Science domains'),
-    },
-  },
-  {
-    name: 'admin-organization-cost-policies',
-    url: 'organization-cost-policies/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./organizations/OrganizationCostPoliciesList').then((module) => ({
-        default: module.OrganizationCostPoliciesList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Cost policies'),
-      permissions: [isStaff],
+      skipBreadcrumb: true,
     },
   },
 
@@ -704,30 +865,30 @@ export const states: StateDeclaration[] = [
 
   {
     name: 'admin-roles',
-    url: 'roles/',
+    url: 'roles/?tab',
     parent: 'admin-configuration',
     component: lazyComponent(() =>
-      import('./roles/RolesList').then((module) => ({
-        default: module.RolesList,
+      import('./roles/RolesPage').then((module) => ({
+        default: module.RolesPage,
       })),
     ),
     data: {
-      breadcrumb: () => translate('User roles'),
+      breadcrumb: () => translate('Roles'),
     },
   },
 
+  // See admin-role-availabilities above: a tab of the roles page now, kept as a
+  // redirect only. The staff gate moved onto the tab itself.
   {
     name: 'admin-role-hygiene',
     url: 'role-hygiene/',
     parent: 'admin-configuration',
-    component: lazyComponent(() =>
-      import('./roles/hygiene/RoleHygienePage').then((module) => ({
-        default: module.RoleHygienePage,
-      })),
-    ),
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: { state: 'admin-roles', params: { tab: 'hygiene' } },
     data: {
-      breadcrumb: () => translate('Role hygiene'),
-      permissions: [isStaff],
+      skipBreadcrumb: true,
     },
   },
 
@@ -884,50 +1045,6 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Arrow Integration'),
       permissions: [isStaff],
       feature: ResellerFeatures.arrow,
-    },
-  },
-
-  {
-    name: 'admin-onboarding-settings',
-    url: 'onboarding-settings/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./organizations/OnboardingSettings').then((module) => ({
-        default: module.OnboardingSettings,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Onboarding settings'),
-      feature: CustomerFeatures.show_onboarding,
-    },
-  },
-
-  {
-    name: 'admin-project-settings',
-    url: 'project-settings/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./organizations/AdministrationProject').then((module) => ({
-        default: module.AdministrationProject,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Project settings'),
-    },
-  },
-
-  {
-    name: 'admin-organization-credit-management',
-    url: 'organization-credits/',
-    parent: 'admin-organizations-compliance',
-    component: lazyComponent(() =>
-      import('./organizations/OrganizationCreditsList').then((module) => ({
-        default: module.OrganizationCreditsList,
-      })),
-    ),
-    data: {
-      breadcrumb: () => translate('Credit management'),
-      permissions: [isStaff],
     },
   },
 

@@ -68,8 +68,10 @@ const CreditHealth: FC<Props> = ({ project, hasAward, award }) => {
     project,
     awardAccounting?.has_award ? awardAccounting : null,
   );
+  // Hidden in the grace period: the project has ended, and the card's
+  // verdict — whether the allocation will be used in time — no longer applies.
   const awardPace = useAwardPace(
-    award,
+    project?.is_in_grace_period ? null : award,
     awardAccounting,
     project?.uuid,
     project?.end_date,

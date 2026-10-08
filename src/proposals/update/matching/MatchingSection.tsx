@@ -5,7 +5,7 @@ import { FC, useCallback, useMemo } from 'react';
 import { Card, Nav, Tab } from 'react-bootstrap';
 import { proposalProtectedCallsMatchingConfigurationRetrieve } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
+import { AlertItem, Tooltip } from 'waldur-ui';
 
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -224,7 +224,11 @@ export const MatchingSection: FC<MatchingSectionProps> = ({
         </div>
       </Card.Header>
       <Card.Body>
-        <Tab.Container activeKey={activeTab} onSelect={handleTabSelect}>
+        <Tab.Container
+          activeKey={activeTab}
+          onSelect={handleTabSelect}
+          unmountOnExit
+        >
           <Nav variant="tabs" className="nav-line-tabs mb-5">
             {tabs.map((tab) => (
               <Nav.Item key={tab.key}>
@@ -234,7 +238,7 @@ export const MatchingSection: FC<MatchingSectionProps> = ({
           </Nav>
           <Tab.Content>
             {/* Affinity calculation tab */}
-            <Tab.Pane eventKey="affinity" unmountOnExit>
+            <Tab.Pane eventKey="affinity">
               <FormTable>
                 {affinityRows.map((row) => (
                   <FormTable.Item
@@ -254,24 +258,24 @@ export const MatchingSection: FC<MatchingSectionProps> = ({
                   />
                 ))}
               </FormTable>
-              <div className="alert alert-info mt-4 d-flex align-items-center gap-2">
-                <InfoIcon size={20} weight="bold" />
-                <span>
-                  {translate(
-                    'Weights should sum to 1.0 for optimal results. Current sum: {sum}',
-                    {
-                      sum: (
-                        (config?.keyword_weight ?? 0.4) +
-                        (config?.text_weight ?? 0.6)
-                      ).toFixed(2),
-                    },
-                  )}
-                </span>
-              </div>
+              <AlertItem
+                type="floating"
+                variant="info"
+                className="mt-4"
+                title={translate(
+                  'Weights should sum to 1.0 for optimal results. Current sum: {sum}',
+                  {
+                    sum: (
+                      (config?.keyword_weight ?? 0.4) +
+                      (config?.text_weight ?? 0.6)
+                    ).toFixed(2),
+                  },
+                )}
+              />
             </Tab.Pane>
 
             {/* Constraints tab */}
-            <Tab.Pane eventKey="constraints" unmountOnExit>
+            <Tab.Pane eventKey="constraints">
               <FormTable>
                 {constraintRows.map((row) => (
                   <FormTable.Item

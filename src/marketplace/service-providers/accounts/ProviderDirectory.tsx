@@ -7,7 +7,8 @@ import {
   ServiceProvider,
 } from 'waldur-js-client';
 
-import { AlertItem } from '@/core/AlertItem';
+import { AlertItem } from 'waldur-ui';
+
 import { CopyToClipboard } from '@/core/CopyToClipboard';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -73,7 +74,7 @@ export const ProviderDirectory: FC<ProviderDirectoryProps> = ({ provider }) => {
             <CopyToClipboard
               value={config}
               label={translate('Copy')}
-              className="btn-tertiary w-150px"
+              className="w-150px"
             />
           </div>
         )}

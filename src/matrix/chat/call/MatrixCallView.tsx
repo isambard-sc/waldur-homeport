@@ -34,7 +34,7 @@ import {
   useState,
 } from 'react';
 
-import { Tooltip } from 'waldur-ui';
+import { BaseButton, Tooltip } from 'waldur-ui';
 
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinnerSimple } from '@/core/LoadingSpinner';
@@ -348,7 +348,9 @@ const CallStage: FC<{
             primary controls. Hidden in the cramped floating widget. */}
         {!compact && (
           <>
-            <CallSettingsMenu />
+            <CallSettingsMenu
+              container={isFullscreen ? containerRef.current : null}
+            />
             {fullscreenSupported && (
               <Tooltip
                 label={
@@ -428,9 +430,12 @@ const CallErrorPanel: FC<{
       loadData={onRetry}
       message={message || translate('Could not connect to the call.')}
     />
-    <button type="button" className="btn btn-sm btn-light" onClick={onClose}>
-      {translate('Close')}
-    </button>
+    <BaseButton
+      variant="tertiary"
+      size="sm"
+      onClick={onClose}
+      label={translate('Close')}
+    />
   </div>
 );
 

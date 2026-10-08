@@ -43,16 +43,12 @@ export const UserEditTab: React.FC<UserEditTabProps> = ({ user }) => {
           </Card.Body>
         </Card>
       )}
-      <Card className="card-bordered mb-7">
-        <Card.Header>
-          <Card.Title>
-            <h3 className="mb-0">
-              {isSelf
-                ? translate('Personal information')
-                : translate('Profile settings')}
-            </h3>
-          </Card.Title>
-          <div className="card-toolbar gap-4">
+      <UserProfileTabs
+        user={user}
+        disabled={isDisabled}
+        disabledReason={translate('Terms of service not accepted')}
+        actions={
+          <>
             {/* Users signed in against the local database have no external
                 identity provider to point at, so the logo and backend name
                 are noise on their own profile. */}
@@ -68,19 +64,12 @@ export const UserEditTab: React.FC<UserEditTabProps> = ({ user }) => {
               <ExternalLink
                 label={translate('Manage profile')}
                 url={user.identity_provider_management_url}
-                className="btn btn-light-primary"
+                buttonVariant="secondary"
               />
             )}
-          </div>
-        </Card.Header>
-        <Card.Body>
-          <UserProfileTabs
-            user={user}
-            disabled={isDisabled}
-            disabledReason={translate('Terms of service not accepted')}
-          />
-        </Card.Body>
-      </Card>
+          </>
+        }
+      />
     </>
   );
 };

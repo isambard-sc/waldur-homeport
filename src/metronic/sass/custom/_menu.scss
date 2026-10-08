@@ -43,27 +43,19 @@
     @include menu-link-arrow-rotate(270deg, -270deg);
   }
 
-  // Radix bridge for the same three rules above. TabsList.tsx's
-  // TabWithChildren (src/navigation/TabsList.tsx) is `.header-menu`'s only
-  // Radix-driven trigger with a `.menu-arrow` — Metronic's own JS used to
-  // add `.show`/`.here`/`.hover` classes to this exact `.menu-item` on
-  // open/active/hover (MenuComponent.ts's `_showDropdown`:
-  // `item.classList.add('show')`), which nothing does anymore now that
-  // Radix owns open/close. `RadixDropdownMenu.Trigger asChild` sets
-  // `data-state="open"|"closed"` on this same element automatically (no
-  // wiring needed, unlike `[data-highlighted]`/`[data-side]` elsewhere in
-  // this file), so `[data-state='open']` is the direct, real-time-accurate
-  // equivalent of `.show` — including the entrance/rotation transition,
-  // since the attribute (like the class before it) is simply present or
-  // absent, not toggled via a one-shot animation class.
-  &[data-state='open'] > .menu-link .menu-arrow:after {
+  // Radix bridge for the same three rules above. TabWithChildren
+  // (src/navigation/TabsList.tsx) is `.header-menu`'s only Radix-driven
+  // trigger with a `.menu-arrow`. Metronic's JS used to add `.show` to the
+  // `.menu-item`; Radix instead sets `data-state="open"|"closed"` on the
+  // trigger itself, the `.menu-link` button.
+  & > .menu-link[data-state='open'] .menu-arrow:after {
     @include svg-bg-icon(arrow-start, $fg-brand-primary);
     /*rtl:begin:remove*/
     @include svg-bg-icon(arrow-end, $fg-brand-primary);
     /*rtl:end:remove*/
   }
 
-  &[data-state='open'] > .menu-link .menu-arrow:after {
+  & > .menu-link[data-state='open'] .menu-arrow:after {
     @include menu-link-arrow-rotate(270deg, -270deg);
   }
 }
@@ -92,6 +84,20 @@
 // `:focus-visible` rule on specificity alone, so this wins regardless of
 // source order relative to core/.
 .menu-link:hover:focus-visible {
+  outline: none;
+}
+
+// Dashboard tab row (TabsList). The row scrolls in overflow-auto, which clips
+// an outline drawn outside the link, so the ring is inset. The hover rule
+// must win: Radix focuses the row on pointer hover and some browsers treat
+// that as :focus-visible. Keyboard focus (no hover) still shows the ring.
+.toolbar .header-menu .menu-link:focus-visible {
+  outline: $focus-ring-width solid $focus-ring-primary;
+  outline-offset: -$focus-ring-width;
+  border-radius: $border-radius;
+}
+
+.toolbar .header-menu .menu-link:hover:focus-visible {
   outline: none;
 }
 
@@ -143,24 +149,11 @@ $menu-link-highlight-exclude: ':not(.disabled):not(.active):not(.here)';
   );
 }
 
-// RoleAndProjectSelectField.tsx's popup combines this with
-// menu-state-bg-light (source order below wins the title colour on
-// :hover the same way — primary-700 over the bg-light block's own
-// gray-700 — so [data-highlighted] keeps that same layering: no
-// background of its own here, since menu-state-bg-light's rule above
-// already supplies it).
-.menu-state-primary
-  .menu-link[data-highlighted]#{$menu-link-highlight-exclude} {
-  transition: $transition-link;
-  @include menu-link-theme(
-    $primary-700,
-    $primary-700,
-    $primary-700,
-    $primary-700,
-    null
-  );
-}
-
+// RoleAndProjectSelectField.tsx's popup combines menu-state-title-primary
+// with menu-state-bg-light: source order below wins the title colour over
+// the bg-light block's gray-700, while the background comes from
+// menu-state-bg-light's rule above.
+//
 // menu-hover-title-primary (BoxRadioField.tsx's version-options menu) is a
 // different Metronic class family — menu/_theme.scss's own generated
 // .menu-hover-title-#{$name} rather than this file's custom

@@ -4,6 +4,8 @@ import { useMemo } from 'react';
 import { Card, Col, Nav, Row, Tab } from 'react-bootstrap';
 import { overrideSettingsRetrieve } from 'waldur-js-client';
 
+import { ButtonVariant } from 'waldur-ui';
+
 import { ServiceDeskProviderLogo } from '@/administration/service-desk/ServiceDeskProviderLogo';
 import { lazyComponent } from '@/core/lazyComponent';
 import { LoadingErred } from '@/core/LoadingErred';
@@ -99,8 +101,8 @@ const ServiceDeskProviderCard = ({ serviceDeskProvider, initialValues }) => {
   // Same states, colours and wording as the identity provider cards. An
   // unconfigured desk is never shown as enabled, even when it is the default
   // active backend.
-  const state = !isConfigured
-    ? { variant: 'dark', title: translate('Not configured') }
+  const state: { variant: ButtonVariant; title: string } = !isConfigured
+    ? { variant: 'tertiary', title: translate('Not configured') }
     : isActive
       ? { variant: 'primary', title: translate('Enabled') }
       : { variant: 'warning', title: translate('Disabled') };
@@ -230,7 +232,11 @@ export const AdministrationServiceDesk = () => {
         </Card.Title>
       </Card.Header>
       <Card.Body>
-        <Tab.Container activeKey={activeKey} onSelect={handleSelect}>
+        <Tab.Container
+          activeKey={activeKey}
+          onSelect={handleSelect}
+          unmountOnExit
+        >
           <Nav variant="tabs" className="nav-line-tabs mb-5">
             {tabs.map((tab) => (
               <Nav.Item key={tab.key}>
@@ -241,19 +247,22 @@ export const AdministrationServiceDesk = () => {
             ))}
           </Nav>
           <Tab.Content>
-            <Tab.Pane eventKey="configuration">
+            {/* These two stay mounted across tab switches (unlike the rest of
+                this container) so in-progress edits aren't lost when the user
+                tabs away — hence the explicit override back to false. */}
+            <Tab.Pane eventKey="configuration" unmountOnExit={false}>
               <ConfigurationTab data={data} />
             </Tab.Pane>
-            <Tab.Pane eventKey="credentials">
+            <Tab.Pane eventKey="credentials" unmountOnExit={false}>
               <CredentialsTab data={data} />
             </Tab.Pane>
             {supportEnabled && (
-              <Tab.Pane eventKey="issue-statuses" unmountOnExit={true}>
+              <Tab.Pane eventKey="issue-statuses">
                 <IssueStatusList />
               </Tab.Pane>
             )}
             {supportEnabled && (
-              <Tab.Pane eventKey="support-users" unmountOnExit={true}>
+              <Tab.Pane eventKey="support-users">
                 <SupportUsersList />
               </Tab.Pane>
             )}

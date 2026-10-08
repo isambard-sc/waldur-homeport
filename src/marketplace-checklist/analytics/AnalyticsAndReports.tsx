@@ -1,15 +1,10 @@
 import { ExportIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
-import {
-  Card,
-  ToggleButton,
-  ToggleButtonGroup,
-  Row,
-  Col,
-} from 'react-bootstrap';
+import { Card, Row, Col } from 'react-bootstrap';
+
+import { BaseButton, SegmentedControl } from 'waldur-ui';
 
 import { translate } from '@/i18n';
-import { ActionButton } from '@/table/ActionButton';
 
 import { ChecklistUsageAnalyticsTable } from './ChecklistUsageAnalyticsTable';
 import { OrgPerformanceTable } from './OrgPerformanceTable';
@@ -57,30 +52,19 @@ export const AnalyticsAndReports = () => {
       <Card.Header className="mx-0 border-0">
         <div className="card-toolbar gap-4">
           {periodOptions.length > 1 && (
-            <ToggleButtonGroup
-              type="radio"
-              name="period"
+            <SegmentedControl<number>
+              aria-label={translate('Time period')}
+              options={periodOptions}
               value={period}
-              defaultValue={period}
-              onChange={setPeriod}
-            >
-              {periodOptions.map((option) => (
-                <ToggleButton
-                  key={option.value}
-                  id={'tbg-' + option.value}
-                  value={option.value}
-                  variant="tertiary"
-                >
-                  {option.label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+              onValueChange={setPeriod}
+            />
           )}
-          <ActionButton
-            action={() => {}}
-            title={translate('Export report')}
+          <BaseButton
+            onClick={() => {}}
+            label={translate('Export report')}
             iconNode={<ExportIcon weight="bold" />}
             variant="tertiary"
+            size="lg"
           />
         </div>
       </Card.Header>

@@ -1,12 +1,17 @@
 import type { Preview } from '@storybook/react-vite';
 import { useEffect } from 'react';
+import { sb } from 'storybook/test';
 
 import { generateBrandColors, hexToRgb } from 'waldur-design-tokens';
 
+import { ENV } from '@/core/config';
 import { getBrandColor } from '@/core/utils';
 import { loadTheme } from '@/theme/utils';
 
 import '../src/tailwind.css';
+
+// Redirects @/core/api to src/core/__mocks__/api.ts: same API, fixture icons.
+sb.mock(import('../src/core/api.ts'));
 
 /**
  * Seeds --waldur-brand-* the same way afterBootstrap.tsx's
@@ -15,6 +20,16 @@ import '../src/tailwind.css';
  * docs/tailwind-shadcn-migration-notes.md.
  */
 function seedBrandVars() {
+  if (!ENV.plugins?.WALDUR_CORE) {
+    ENV.plugins = {
+      ...ENV.plugins,
+      WALDUR_CORE: {
+        SHORT_PAGE_TITLE: 'Waldur',
+        FULL_PAGE_TITLE: 'Waldur | Cloud Management Platform',
+        ...(ENV.plugins?.WALDUR_CORE || {}),
+      },
+    } as any;
+  }
   const hex = getBrandColor();
   document.documentElement.style.setProperty('--waldur-brand-color', hex);
   document.documentElement.style.setProperty(
@@ -57,22 +72,37 @@ const preview: Preview = {
         order: [
           'Foundations',
           ['Colors', 'Typography', 'Elevation'],
-          'Primitives',
+          'Actions',
+          ['BaseButton', 'CopyButton'],
+          'Forms',
           [
-            'BaseButton',
+            'Select',
+            'Switch',
+            'Date & time',
+            [
+              'Calendar',
+              'DatePicker',
+              'DateRangePicker',
+              'MonthPicker',
+              'Form fields',
+            ],
+          ],
+          'Feedback',
+          ['AlertItem', 'LoadingSpinner'],
+          'Data Display',
+          [
             'Badge',
             'StatusPill',
             'Avatar',
-            'Tooltip',
-            'Switch',
-            'LoadingSpinner',
-            'CopyButton',
+            'FeaturedIcon',
             'Card',
+            'StatCard',
+            'Table',
+            'DataTable',
+            'MermaidChart',
           ],
           'Overlays',
-          ['Popover', 'DropdownMenu', 'Dialog', 'Sheet'],
-          'Data Display',
-          ['Table', 'DataTable', 'StatCard'],
+          ['Tooltip', 'Popover', 'DropdownMenu', 'Dialog', 'Sheet'],
           'Navigation',
           [
             'TopBar',
@@ -82,12 +112,7 @@ const preview: Preview = {
             'ActionsDropdown',
           ],
           'Migration',
-          [
-            'BaseButton (Legacy)',
-            'BaseButton Parity',
-            'Badge Parity',
-            'StatCard Parity',
-          ],
+          ['BaseButton (Legacy)', 'BaseButton Parity', 'StatCard Parity'],
         ],
       },
     },

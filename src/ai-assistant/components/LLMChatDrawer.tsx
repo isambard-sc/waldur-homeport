@@ -5,6 +5,8 @@ import {
 } from '@phosphor-icons/react';
 import { FC, useCallback, useEffect, useRef, useState } from 'react';
 
+import { BaseButton } from 'waldur-ui';
+
 import { AIDisclosureBanner } from '@/ai-assistant/components/AIDisclosureDialog';
 import { ChatHistorySidebar } from '@/ai-assistant/components/ChatHistorySidebar';
 import { LLMErrorBoundary } from '@/ai-assistant/components/LLMErrorBoundary';
@@ -17,11 +19,10 @@ import {
   isDisclosureAcknowledged,
 } from '@/ai-assistant/utils';
 import { useChatDrawerPreference } from '@/chat/chatDrawerPreferences';
-import { IconButton, MediumIconButton } from '@/core/buttons/IconButton';
 import { useDrawer } from '@/drawer/actions';
 import { DrawerCloseButton } from '@/drawer/DrawerCloseButton';
-import { DRAWER_SHELL_CLASS } from '@/drawer/shellClasses';
 import { useDrawerExpand } from '@/drawer/useDrawerExpand';
+import { isDrawerOpen } from '@/drawer/utils';
 import { translate } from '@/i18n';
 import { useLayout } from '@/metronic/layout/core';
 import { HeaderButtonBullet } from '@/navigation/header/HeaderButtonBullet';
@@ -40,13 +41,10 @@ const setDrawerWidth = (width: string) => {
   }
 };
 
-const AI_DRAWER_CLASS = DRAWER_SHELL_CLASS.ai;
-
 /** Reset all AI drawer DOM state to defaults. */
 export const resetDrawerDOM = () => {
   const drawer = document.getElementById('kt_drawer');
   if (!drawer) return;
-  drawer.classList.remove(AI_DRAWER_CLASS);
   drawer.removeAttribute('data-expanded');
   drawer.removeAttribute('data-history-open');
   drawer.style.removeProperty('--drawer-width');
@@ -117,7 +115,7 @@ export const LLMChatDrawerToolbar: FC<{ close: () => void }> = ({ close }) => {
   useEffect(() => {
     return () => {
       // History sidebar is the toolbar's own state; width + data-expanded are
-      // owned by useDrawerExpand, and the drawer class by LLMChatDrawer.
+      // owned by useDrawerExpand, and the drawer class by DrawerRoot.
       document
         .getElementById('kt_drawer')
         ?.removeAttribute('data-history-open');
@@ -130,7 +128,7 @@ export const LLMChatDrawerToolbar: FC<{ close: () => void }> = ({ close }) => {
           full-screen layout) */}
       {!isAnonymous && (
         <span className="d-none d-lg-inline-flex position-relative">
-          <MediumIconButton
+          <BaseButton
             iconNode={
               expanded ? (
                 <ArrowsInSimpleIcon weight="bold" />
@@ -145,7 +143,8 @@ export const LLMChatDrawerToolbar: FC<{ close: () => void }> = ({ close }) => {
             }
             onClick={toggleExpand}
             variant="tertiary-ghost"
-            tooltipPlacement="bottom"
+            tooltipSide="bottom"
+            size="md"
           />
           {hasNewMessages && !expanded && (
             <HeaderButtonBullet className="pe-none" />
@@ -156,22 +155,24 @@ export const LLMChatDrawerToolbar: FC<{ close: () => void }> = ({ close }) => {
         <>
           {/* Tablet: compact history toggle */}
           <span className="d-none d-md-inline-flex d-lg-none">
-            <MediumIconButton
+            <BaseButton
               iconNode={<ListIcon weight="bold" />}
               tooltip={translate('History')}
               onClick={toggleHistory}
               variant="tertiary-ghost"
-              tooltipPlacement="bottom"
+              tooltipSide="bottom"
+              size="md"
             />
           </span>
           {/* Mobile: large history toggle */}
           <span className="d-inline-flex d-md-none">
-            <IconButton
+            <BaseButton
               iconNode={<ListIcon weight="bold" />}
               tooltip={translate('History')}
               onClick={toggleHistory}
               variant="tertiary-ghost"
-              tooltipPlacement="bottom"
+              tooltipSide="bottom"
+              size="lg"
             />
           </span>
         </>
@@ -194,35 +195,23 @@ export const LLMChatDrawer: React.FC<LLMChatDrawerProps> = ({ close }) => {
       cleanupTimeout = null;
     }
 
-    // Ensure clean state on mount (e.g. after impersonation change). Re-assert
-    // the shared drawer class too: swapping straight from the Support drawer
-    // runs its unmount cleanup (which strips the class) after this body mounts.
+    // Ensure clean state on mount (e.g. after impersonation change).
     setDrawerWidth(DRAWER_WIDTH_DEFAULT);
-    const drawer = document.getElementById('kt_drawer');
-    drawer?.removeAttribute('data-expanded');
-    drawer?.classList.add(AI_DRAWER_CLASS);
+    document.getElementById('kt_drawer')?.removeAttribute('data-expanded');
 
     return () => {
-      const drawer = document.getElementById('kt_drawer');
-      if (drawer?.classList.contains('drawer-on')) {
+      if (isDrawerOpen()) {
         resetDrawerDOM();
       } else {
-        // Drawer already sliding out — delay class removal so CSS transition
-        // finishes. But another drawer (Support, Pending confirmations) may open
-        // — and expand — within that window; `resetDrawerDOM` mutates shared
-        // #kt_drawer state (width, data-expanded, data-history-open), so running
-        // it wholesale would clobber the new drawer. Always drop our own shell
-        // class, but only reset the shared state when the drawer is still idle.
+        // Drawer already sliding out — delay the reset so the card keeps its
+        // width while it leaves. But another drawer (Support, Pending
+        // confirmations) may open — and expand — within that window;
+        // `resetDrawerDOM` mutates shared #kt_drawer state (width,
+        // data-expanded, data-history-open), so only run it while the drawer is
+        // still idle.
         cleanupTimeout = setTimeout(() => {
           cleanupTimeout = null;
-          const el = document.getElementById('kt_drawer');
-          if (!el) return;
-          el.classList.remove(AI_DRAWER_CLASS);
-          if (!el.classList.contains('drawer-on')) {
-            el.removeAttribute('data-expanded');
-            el.removeAttribute('data-history-open');
-            el.style.removeProperty('--drawer-width');
-          }
+          if (!isDrawerOpen()) resetDrawerDOM();
         }, 350);
       }
     };

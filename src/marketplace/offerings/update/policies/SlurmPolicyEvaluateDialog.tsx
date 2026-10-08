@@ -8,10 +8,9 @@ import {
   SlurmPolicyEvaluateResponse,
 } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import { AlertItem, Badge, BaseButton } from 'waldur-ui';
 
 import { LoadingSpinner } from '@/core/LoadingSpinner';
-import { SubmitButton } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
@@ -74,24 +73,28 @@ export const SlurmPolicyEvaluateDialog: FC<SlurmPolicyEvaluateDialogProps> = ({
       footer={
         <div className="d-flex gap-2">
           <CloseDialogButton />
-          <SubmitButton
-            variant="outline-primary"
+          <BaseButton
+            variant="secondary"
             onClick={handleDryRun}
             disabled={isLoading}
-            submitting={dryRunMutation.isPending}
-            type="button"
-          >
-            {translate('Dry run')}
-          </SubmitButton>
-          <SubmitButton
+            disabledReason={
+              isLoading ? translate('Evaluation is in progress') : undefined
+            }
+            pending={dryRunMutation.isPending}
+            label={translate('Dry run')}
+            size="lg"
+          />
+          <BaseButton
             variant="primary"
             onClick={handleEvaluate}
             disabled={isLoading}
-            submitting={evaluateMutation.isPending}
-            type="button"
-          >
-            {translate('Evaluate now')}
-          </SubmitButton>
+            disabledReason={
+              isLoading ? translate('Evaluation is in progress') : undefined
+            }
+            pending={evaluateMutation.isPending}
+            label={translate('Evaluate now')}
+            size="lg"
+          />
         </div>
       }
     >
@@ -104,17 +107,23 @@ export const SlurmPolicyEvaluateDialog: FC<SlurmPolicyEvaluateDialogProps> = ({
       {isLoading && <LoadingSpinner />}
 
       {dryRunMutation.isError && (
-        <div className="alert alert-danger">
-          {translate('Dry run failed.')}{' '}
-          {String((dryRunMutation.error as Error)?.message || '')}
-        </div>
+        <AlertItem
+          variant="error"
+          type="floating"
+          className="mb-4"
+          title={translate('Dry run failed.')}
+          body={String((dryRunMutation.error as Error)?.message || '')}
+        />
       )}
 
       {evaluateMutation.isError && (
-        <div className="alert alert-danger">
-          {translate('Evaluation failed.')}{' '}
-          {String((evaluateMutation.error as Error)?.message || '')}
-        </div>
+        <AlertItem
+          variant="error"
+          type="floating"
+          className="mb-4"
+          title={translate('Evaluation failed.')}
+          body={String((evaluateMutation.error as Error)?.message || '')}
+        />
       )}
 
       {dryRunResult && <DryRunResults data={dryRunResult} />}

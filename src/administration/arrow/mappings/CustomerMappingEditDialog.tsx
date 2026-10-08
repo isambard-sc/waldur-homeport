@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { Alert } from 'react-bootstrap';
 import { Form } from 'react-final-form';
 import {
   type ArrowCustomerMapping,
   adminArrowCustomerMappingsPartialUpdate,
 } from 'waldur-js-client';
+
+import { AlertItem, BaseButton } from 'waldur-ui';
 
 import { required } from '@/core/validators';
 import { AsyncSelectGroup, BooleanGroup, StringGroup } from '@/form';
@@ -14,7 +15,6 @@ import { organizationAutocomplete } from '@/marketplace/common/autocompletes';
 import { useModal } from '@/modal/actions';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useManagedMutation } from '@/modal/useManagedMutation';
-import { ActionButton } from '@/table/ActionButton';
 
 import { arrowQueryKeys } from '../api';
 
@@ -97,10 +97,11 @@ export const CustomerMappingEditDialog = ({
             title={translate('Edit Customer Mapping')}
             footer={
               <>
-                <ActionButton
-                  action={closeDialog}
+                <BaseButton
+                  onClick={closeDialog}
                   variant="secondary"
-                  title={translate('Cancel')}
+                  label={translate('Cancel')}
+                  size="lg"
                 />
                 <SubmitButton
                   submitting={submitMutation.isPending}
@@ -144,9 +145,12 @@ export const CustomerMappingEditDialog = ({
             <BooleanGroup name="is_active" label={translate('Active')} />
 
             {mutationError && (
-              <Alert variant="danger" className="mb-4">
-                {mutationError}
-              </Alert>
+              <AlertItem
+                type="floating"
+                variant="error"
+                className="mb-4"
+                title={mutationError}
+              />
             )}
           </ModalDialog>
         </form>

@@ -5,6 +5,8 @@ import {
   EventSubscriptionRequest,
 } from 'waldur-js-client';
 
+import { AlertItem } from 'waldur-ui';
+
 import { SubmitButton, TextGroup } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
@@ -80,7 +82,8 @@ export const EventSubscriptionForm = ({
                   submitting={submitting}
                   invalid={invalid}
                   label={isEdit ? translate('Update') : translate('Create')}
-                  className="btn btn-primary flex-equal"
+                  variant="primary"
+                  className="flex-equal"
                 />
               </>
             }
@@ -94,11 +97,14 @@ export const EventSubscriptionForm = ({
               label={translate('Description')}
             />
 
-            <div className="alert alert-info">
-              {translate(
+            <AlertItem
+              variant="info"
+              type="floating"
+              title={translate('Note')}
+              body={translate(
                 'Event subscriptions allow external systems to receive notifications about changes in Waldur. After creating a subscription, configure observable objects via the API.',
               )}
-            </div>
+            />
           </ModalDialog>
         </form>
       )}

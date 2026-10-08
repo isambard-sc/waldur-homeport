@@ -7,12 +7,13 @@ import {
   PublicOfferingDetails,
 } from 'waldur-js-client';
 
+import { BaseButton } from 'waldur-ui';
+
 import { parseNextPage } from '@/core/api';
 import { UI_STALE_TIME } from '@/core/constants';
 import { required } from '@/core/validators';
 import { translate } from '@/i18n';
 import { isExperimentalUiComponentsVisible } from '@/marketplace/utils';
-import { CompactActionButton } from '@/table/CompactActionButton';
 import { VStepperFormStepCard } from '@/wizard';
 import { useProject } from '@/workspace/hooks';
 
@@ -129,6 +130,12 @@ export const FormCloudStep = (props: FormStepProps) => {
         // run -- lets BaseDeployPage seed the new defaults into an empty object
         // while a step that owns limits still writes after it.
         form.change('limits', undefined);
+        // The plan belongs to it too, and for the same reason it goes here
+        // rather than in an effect: useOrderPrices reads the held plan's own
+        // prices and components, so a plan left in place for one commit prices
+        // the offering switched away from against the one switched to.
+        // useDefaultPlan refills the default, or leaves the choice to the user.
+        form.change('plan', undefined);
       }
     },
     [form.change],
@@ -163,12 +170,13 @@ export const FormCloudStep = (props: FormStepProps) => {
               <StepCardTabs tabs={tabs} tab={tab} setTab={setTab} />
             </div>
             <div className="d-flex gap-10 justify-content-end">
-              <CompactActionButton
+              <BaseButton
                 variant="tertiary"
                 className="text-nowrap"
-                action={() => {}}
+                onClick={() => {}}
                 iconNode={<PlusIcon weight="bold" />}
-                title={translate('New cloud')}
+                label={translate('New cloud')}
+                size="sm"
               />
             </div>
           </div>
@@ -203,16 +211,21 @@ export const FormCloudStep = (props: FormStepProps) => {
           <div className="text-center">
             {context.hasNextPage && (
               <div>
-                <button
-                  type="button"
+                <BaseButton
                   onClick={() => context.fetchNextPage()}
                   disabled={context.isFetchingNextPage}
-                  className="btn btn-link"
-                >
-                  {context.isFetchingNextPage
-                    ? translate('Loading more...')
-                    : translate('Load more')}
-                </button>
+                  disabledReason={
+                    context.isFetchingNextPage
+                      ? translate('Loading more...')
+                      : undefined
+                  }
+                  variant="text-primary"
+                  label={
+                    context.isFetchingNextPage
+                      ? translate('Loading more...')
+                      : translate('Load more')
+                  }
+                />
               </div>
             )}
             <div>

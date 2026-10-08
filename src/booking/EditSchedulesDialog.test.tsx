@@ -8,7 +8,7 @@ import { openAndSelectOption } from '@/test/select';
 
 import { EditSchedulesDialog } from './EditSchedulesDialog';
 
-// Mock CustomRangeDatePicker to avoid Flatpickr issues in tests
+// Replace CustomRangeDatePicker with an input so tests set the range directly
 vi.mock('@/booking/deploy/CustomRangeDatePicker', () => ({
   CustomRangeDatePicker: ({ input }) => (
     <input
@@ -120,10 +120,7 @@ describe('EditSchedulesDialog', () => {
 
     expect(screen.getByText(/27 October 2023/i)).toBeInTheDocument();
 
-    const removeButton = screen
-      .getAllByRole('button')
-      .find((btn) => btn.classList.contains('btn-text-danger'));
-    await user.click(removeButton);
+    await user.click(screen.getByRole('button', { name: /Remove period/i }));
 
     expect(screen.queryByText(/27 October 2023/i)).not.toBeInTheDocument();
   });

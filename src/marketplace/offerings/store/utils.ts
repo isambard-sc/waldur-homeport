@@ -5,6 +5,7 @@ import {
   ProviderPlanDetailsRequest,
 } from 'waldur-js-client';
 
+import { isPatternFieldType } from '@/marketplace/common/optionPattern';
 import { getFormLimitSerializer } from '@/marketplace/common/registry';
 
 import { PlanFormData, OptionFormData } from './types';
@@ -29,8 +30,12 @@ export const formatOption = (option: OptionFormData) => {
     choices,
     cascade_config,
     component_multiplier_config,
+    component_formula_config,
+    component_sum_config,
     default_configs,
     visible_if,
+    pattern,
+    pattern_error,
     ...rest
   } = option;
   const item: any = {
@@ -55,6 +60,20 @@ export const formatOption = (option: OptionFormData) => {
   // Handle component_multiplier_config for component_multiplier type
   if (component_multiplier_config && item.type === 'component_multiplier') {
     item.component_multiplier_config = component_multiplier_config;
+  }
+
+  if (component_formula_config && item.type === 'component_formula') {
+    item.component_formula_config = component_formula_config;
+  }
+
+  if (component_sum_config && item.type === 'component_sum') {
+    item.component_sum_config = component_sum_config;
+  }
+
+  // A sum has nothing to fill in; a Required ticked under another type would
+  // make the order form impossible to submit.
+  if (item.type === 'component_sum') {
+    item.required = false;
   }
 
   // Handle default_configs for K8s config types
@@ -87,6 +106,16 @@ export const formatOption = (option: OptionFormData) => {
   // A rule without a referenced option is an unfinished one; drop it.
   if (visible_if?.field && visible_if.values?.length) {
     item.visible_if = { field: visible_if.field, values: visible_if.values };
+  }
+
+  // Mastermind rejects a pattern on other types, and pattern_error without a
+  // pattern, so a pattern left behind by a type change or a cleared field
+  // must not be sent.
+  if (pattern && isPatternFieldType(item.type)) {
+    item.pattern = pattern;
+    if (pattern_error) {
+      item.pattern_error = pattern_error;
+    }
   }
 
   return item;

@@ -1,17 +1,18 @@
 import { FC } from 'react';
 import { proposalReviewsReject } from 'waldur-js-client';
 
+import { BaseButton } from 'waldur-ui';
+
 import { Panel } from '@/core/Panel';
 import { formatJsxTemplate, translate } from '@/i18n';
-import { PageBarTabs } from '@/marketplace/common/PageBarTabs';
 import { useModal } from '@/modal/actions';
 import { useManagedMutation } from '@/modal/useManagedMutation';
+import { ScrollSpyNav } from '@/navigation/ScrollSpyNav';
 import { useCallFixedDuration } from '@/proposals/callQueries';
 import { ProposalCostTotal } from '@/proposals/ProposalCostTotal';
 import { Proposal, ProposalReview } from '@/proposals/types';
 import { useProposalResourceRows } from '@/proposals/useProposalResourceRows';
 import { isReviewInFinalState } from '@/proposals/utils';
-import { ActionButton } from '@/table/ActionButton';
 
 import { createReviewSteps } from './steps/steps';
 import { SubmitReviewDialog } from './SubmitReviewDialog';
@@ -61,7 +62,7 @@ export const CreatePageSidebar: FC<CreatePageSidebarProps> = ({
   return (
     <>
       <Panel title={translate('Progress')} cardBordered className="mb-5">
-        <PageBarTabs tabs={tabs} mode="tabs-left" />
+        <ScrollSpyNav items={tabs} />
       </Panel>
       <ProposalCostTotal
         rows={resourceRows || []}
@@ -70,20 +71,22 @@ export const CreatePageSidebar: FC<CreatePageSidebarProps> = ({
       />
       {review && !isReviewInFinalState(review.state) && (
         <>
-          <ActionButton
-            action={() =>
+          <BaseButton
+            onClick={() =>
               openDialog(SubmitReviewDialog, { resolve: { review, refetch } })
             }
-            title={translate('Submit review')}
+            label={translate('Submit review')}
             variant="primary"
             className="w-100 mt-2"
+            size="lg"
           />
-          <ActionButton
-            action={() => rejectMutation.mutate()}
-            title={translate('Send back')}
+          <BaseButton
+            onClick={() => rejectMutation.mutate()}
+            label={translate('Send back')}
             variant="danger"
             className="w-100 mt-2"
             pending={rejectMutation.isPending}
+            size="lg"
           />
         </>
       )}

@@ -2,7 +2,8 @@ import { FunctionComponent } from 'react';
 import { Modal } from 'react-bootstrap';
 import type { AwardDetails } from 'waldur-js-client';
 
-import { BaseButton } from '@/core/buttons/BaseButton';
+import { BaseButton } from 'waldur-ui';
+
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 

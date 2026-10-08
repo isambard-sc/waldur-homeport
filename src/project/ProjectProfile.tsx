@@ -11,7 +11,7 @@ import { Project } from 'waldur-js-client';
 import { Badge } from 'waldur-ui';
 
 import { CopyToClipboardButton } from '@/core/CopyToClipboardButton';
-import { daysUntilAccessEnds, formatDate } from '@/core/dateUtils';
+import { formatDate } from '@/core/dateUtils';
 import { Link } from '@/core/Link';
 import { PublicDashboardHero } from '@/dashboard/hero/PublicDashboardHero';
 import { isFeatureVisible } from '@/features/connect';
@@ -22,7 +22,9 @@ import { useUser, useCustomer } from '@/workspace/hooks';
 import { checkIsOwnerOrStaff } from '@/workspace/selectors';
 
 import { ProjectActions } from './dashboard/ProjectActions';
+import { getEndDateStatus } from './gracePeriodNotice';
 import { useProjectAwardDetails } from './useProjectAwardDetails';
+import { useProjectProposals } from './useProjectProposals';
 
 /** An award or call reference: a link when it carries a URL, plain text otherwise. */
 const AwardReference = ({
@@ -137,45 +139,38 @@ const ProjectKindCard = ({ project }: ProjectProfileProps) => {
 const APPROACHING_DAYS = 30;
 
 const ProjectEndDate = ({ project }: ProjectProfileProps) => {
-  const today = new Date();
-  const endDateObj = new Date(project.end_date);
-  const effectiveEndDateObj = project.effective_end_date
-    ? new Date(project.effective_end_date)
-    : endDateObj;
-  // Counts run to the last day of access, which is the day before the end
-  // date — see the end-dates-are-exclusive note in @/core/dateUtils. The
-  // "expired N days ago" count below is unaffected: it measures from the day
-  // access was actually lost, which is the effective end date itself.
-  const daysToEnd = daysUntilAccessEnds(project.end_date);
-  const daysSinceEffectiveEnd = Math.floor(
-    (today.getTime() - effectiveEndDateObj.getTime()) / 86400000,
-  );
+  const status = getEndDateStatus(project, APPROACHING_DAYS);
 
   let className = '';
   let suffix: string | null = null;
-  if (project.is_in_grace_period) {
+  if (status?.kind === 'grace') {
     className = 'text-warning fw-semibold';
-    const daysLeft = Math.max(
-      0,
-      daysUntilAccessEnds(project.effective_end_date),
-    );
     suffix =
-      daysLeft === 0
+      status.daysLeft === 0
         ? translate('(in grace period, last day)')
-        : translate('(in grace period, {n} days left)', {
-            n: String(daysLeft),
-          });
-  } else if (daysSinceEffectiveEnd > 0) {
+        : status.daysLeft === 1
+          ? translate('(in grace period, 1 day left)')
+          : translate('(in grace period, {n} days left)', {
+              n: String(status.daysLeft),
+            });
+  } else if (status?.kind === 'expired') {
     className = 'text-danger fw-semibold';
-    suffix = translate('(expired {n} days ago)', {
-      n: String(daysSinceEffectiveEnd),
-    });
-  } else if (daysToEnd >= 0 && daysToEnd <= APPROACHING_DAYS) {
+    suffix =
+      status.daysAgo === 0
+        ? translate('(expired today)')
+        : status.daysAgo === 1
+          ? translate('(expired 1 day ago)')
+          : translate('(expired {n} days ago)', {
+              n: String(status.daysAgo),
+            });
+  } else if (status?.kind === 'approaching') {
     className = 'text-warning fw-semibold';
     suffix =
-      daysToEnd === 0
+      status.daysLeft === 0
         ? translate('(last day)')
-        : translate('(in {n} days)', { n: String(daysToEnd) });
+        : status.daysLeft === 1
+          ? translate('(in 1 day)')
+          : translate('(in {n} days)', { n: String(status.daysLeft) });
   }
 
   return (
@@ -192,6 +187,7 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
   // The OpenPortal award backing this project, giving the user a way back to
   // where it was granted.
   const { data: awardDetails } = useProjectAwardDetails(project.uuid);
+  const proposals = useProjectProposals(project);
 
   return (
     <PublicDashboardHero
@@ -230,6 +226,39 @@ export const ProjectProfile = ({ project }: ProjectProfileProps) => {
         )}
         {project.end_date && <ProjectEndDate project={project} />}
       </Stack>
+      {proposals.length > 0 && (
+        <Stack direction="horizontal" className="gap-3 mt-2">
+          <span className="fw-semibold text-dark">
+            {proposals.length === 1
+              ? translate('Proposal:')
+              : translate('Proposals:')}
+          </span>
+          {proposals.map((proposal, index) => (
+            <span key={proposal.uuid}>
+              {/* Archived proposals go straight to the archive rather than
+                  through /proposals/{uuid}, which would reach it too but only
+                  after a failed live lookup. Live ones use the applicant
+                  route: the call-management view this used to link to sits
+                  under the managing organisation, which an award holder may
+                  have no access to. */}
+              <Link
+                state={
+                  proposal.archived
+                    ? 'proposal-archive-proposal'
+                    : 'proposals.manage-proposal'
+                }
+                params={
+                  proposal.archived
+                    ? { uuid: proposal.uuid }
+                    : { proposal_uuid: proposal.uuid }
+                }
+                label={proposal.slug}
+              />
+              {index < proposals.length - 1 && ', '}
+            </span>
+          ))}
+        </Stack>
+      )}
       {awardDetails && (awardDetails.award || awardDetails.call) && (
         <Stack direction="horizontal" className="gap-6 mt-2">
           {awardDetails.award && (

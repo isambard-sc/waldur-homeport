@@ -3,10 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { FC, ReactNode } from 'react';
 import { overrideSettingsRetrieve } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import { AlertItem, Badge } from 'waldur-ui';
 
 import { getKeyTitle } from '@/administration/settings/utils';
-import { AlertItem } from '@/core/AlertItem';
 import { ENV } from '@/core/config';
 import { Link } from '@/core/Link';
 import { LoadingErred } from '@/core/LoadingErred';
@@ -107,7 +106,8 @@ export const SramSettingsTab: FC = () => {
           <Link
             state="admin-identity"
             params={{ tab: 'scim' }}
-            className="btn btn-tertiary btn-sm"
+            buttonVariant="tertiary"
+            buttonSize="sm"
           >
             <GearSixIcon weight="bold" className="me-2" />
             {translate('Edit in SCIM settings')}

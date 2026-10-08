@@ -47,4 +47,34 @@ describe('ProjectProfile end date', () => {
     ).toBeInTheDocument();
     expect(screen.queryByText('(in grace period, 14 days left)')).toBeNull();
   });
+
+  // On the effective end date access has already been lost, although the API
+  // still reports is_in_grace_period: the label must agree with the bar above
+  // it, which says the project has expired.
+  it('says expired, not "last day", on the effective end date', () => {
+    renderWithProviders(
+      <ProjectProfile
+        project={{
+          ...project,
+          end_date: '2026-08-17',
+          effective_end_date: '2026-09-16',
+        }}
+      />,
+    );
+
+    expect(screen.getByText('(expired today)')).toBeInTheDocument();
+    expect(screen.queryByText(/in grace period/)).toBeNull();
+  });
+
+  it('uses the singular for one day left', () => {
+    renderWithProviders(
+      <ProjectProfile
+        project={{ ...project, effective_end_date: '2026-09-18' }}
+      />,
+    );
+
+    expect(
+      screen.getByText('(in grace period, 1 day left)'),
+    ).toBeInTheDocument();
+  });
 });

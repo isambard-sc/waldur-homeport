@@ -1,10 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Alert, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import {
   adminArrowBillingSyncsSyncResourceHistoricalConsumption,
   Resource,
 } from 'waldur-js-client';
+
+import { AlertItem, MonthPicker, parseDateValue, toIsoMonth } from 'waldur-ui';
 
 import { SubmitButton } from '@/form';
 import { translate } from '@/i18n';
@@ -96,6 +98,7 @@ export const SyncConsumptionHistoryDialog = ({
           <CloseDialogButton label={translate('Cancel')} />
           <SubmitButton
             submitting={mutation.isPending}
+            disabled={!periodFrom || !periodTo || periodFrom > periodTo}
             label={translate('Sync')}
             onClick={() => mutation.mutate()}
           />
@@ -109,11 +112,16 @@ export const SyncConsumptionHistoryDialog = ({
       </p>
 
       <Form.Group className="mb-3">
-        <Form.Label>{translate('From period')}</Form.Label>
-        <Form.Control
-          type="month"
-          value={periodFrom}
-          onChange={(e) => setPeriodFrom(e.target.value)}
+        <Form.Label htmlFor="sync-history-period-from">
+          {translate('From period')}
+        </Form.Label>
+        <MonthPicker
+          id="sync-history-period-from"
+          value={parseDateValue(periodFrom)}
+          onChange={(month) => setPeriodFrom(toIsoMonth(month))}
+          maxDate={periodTo}
+          // Required: the dialog seeds a range and the API needs both ends.
+          clearable={false}
           disabled={mutation.isPending}
         />
         <Form.Text className="text-muted">
@@ -122,11 +130,16 @@ export const SyncConsumptionHistoryDialog = ({
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>{translate('To period')}</Form.Label>
-        <Form.Control
-          type="month"
-          value={periodTo}
-          onChange={(e) => setPeriodTo(e.target.value)}
+        <Form.Label htmlFor="sync-history-period-to">
+          {translate('To period')}
+        </Form.Label>
+        <MonthPicker
+          id="sync-history-period-to"
+          value={parseDateValue(periodTo)}
+          onChange={(month) => setPeriodTo(toIsoMonth(month))}
+          minDate={periodFrom}
+          // Required: the dialog seeds a range and the API needs both ends.
+          clearable={false}
           disabled={mutation.isPending}
         />
         <Form.Text className="text-muted">
@@ -135,36 +148,45 @@ export const SyncConsumptionHistoryDialog = ({
       </Form.Group>
 
       {mutation.isSuccess && mutation.data && (
-        <Alert variant="success">
-          <strong>{translate('Sync completed')}</strong>
-          <ul className="mb-0 mt-2">
-            <li>
-              {translate('Periods synced')}: {mutation.data.periods_synced}
-            </li>
-            <li>
-              {translate('Periods skipped (finalized)')}:{' '}
-              {mutation.data.periods_skipped}
-            </li>
-            {mutation.data.errors?.length > 0 && (
-              <li className="text-danger">
-                {translate('Errors')}: {mutation.data.errors.length}
+        <AlertItem
+          type="floating"
+          variant="success"
+          title={translate('Sync completed')}
+          body={
+            <ul className="mb-0 mt-2">
+              <li>
+                {translate('Periods synced')}: {mutation.data.periods_synced}
               </li>
-            )}
-          </ul>
-        </Alert>
+              <li>
+                {translate('Periods skipped (finalized)')}:{' '}
+                {mutation.data.periods_skipped}
+              </li>
+              {mutation.data.errors?.length > 0 && (
+                <li className="text-danger">
+                  {translate('Errors')}: {mutation.data.errors.length}
+                </li>
+              )}
+            </ul>
+          }
+        />
       )}
 
       {mutation.data?.errors?.length > 0 && (
-        <Alert variant="warning" className="mt-3">
-          <strong>{translate('Some periods had errors:')}</strong>
-          <ul className="mb-0 mt-2">
-            {mutation.data.errors.map((err: any, idx: number) => (
-              <li key={idx}>
-                {err.period}: {err.error}
-              </li>
-            ))}
-          </ul>
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="warning"
+          className="mt-3"
+          title={translate('Some periods had errors:')}
+          body={
+            <ul className="mb-0 mt-2">
+              {mutation.data.errors.map((err: any, idx: number) => (
+                <li key={idx}>
+                  {err.period}: {err.error}
+                </li>
+              ))}
+            </ul>
+          }
+        />
       )}
     </ModalDialog>
   );

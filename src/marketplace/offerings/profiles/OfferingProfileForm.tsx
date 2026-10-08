@@ -78,11 +78,16 @@ export const OfferingProfileForm: FC<{ resolve: FormResolve }> = ({
                   disabled={invalid}
                   submitting={submitting}
                   label={isEdit ? translate('Save') : translate('Create')}
-                  className="btn btn-primary"
+                  variant="primary"
                 />
               </>
             }
           >
+            <p className="text-muted mb-5">
+              {translate(
+                'Name the set of roles this profile provides. After saving, add roles to it on the profile page; they become assignable on every offering bound to the profile.',
+              )}
+            </p>
             <StringGroup
               name="name"
               validate={required}

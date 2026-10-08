@@ -7,7 +7,7 @@ import {
 
 import { translate } from '@/i18n';
 import { formatRole } from '@/permissions/utils';
-import { callLockedTooltip } from '@/proposals/workflow/constants';
+import { getCallReadOnlyReason } from '@/proposals/utils';
 import { ActionsDropdown } from '@/table/ActionsDropdown';
 import { createFetcher } from '@/table/api';
 import Table from '@/table/Table';
@@ -15,6 +15,7 @@ import { Column } from '@/table/types';
 import { useTable } from '@/table/useTable';
 import { renderFieldOrDash } from '@/table/utils';
 
+import { NoRoleMappingsWarning } from './NoRoleMappingsWarning';
 import { RoleMappingCreateButton } from './RoleMappingCreateButton';
 import { RoleMappingDeleteAction } from './RoleMappingDeleteAction';
 import { RoleMappingEditAction } from './RoleMappingEditAction';
@@ -63,17 +64,23 @@ export const CallRoleMappingsList = (props) => {
           refetch={tableProps.fetch}
           call={props.call}
           disabled={props.isReadOnly}
-          tooltip={props.isReadOnly ? callLockedTooltip() : undefined}
+          tooltip={
+            props.isReadOnly ? getCallReadOnlyReason(props.call) : undefined
+          }
         />
       }
       title={translate('Proposal project role mappings')}
       rowActions={({ row }) =>
         props.isReadOnly ? (
-          <ActionsDropdown disabled tooltip={callLockedTooltip()} />
+          <ActionsDropdown
+            disabled
+            tooltip={getCallReadOnlyReason(props.call)}
+          />
         ) : (
           <CallRoleMappingsRowActions row={row} refetch={tableProps.fetch} />
         )
       }
+      placeholderComponent={<NoRoleMappingsWarning className="m-6" />}
       showPageSizeSelector
     />
   );

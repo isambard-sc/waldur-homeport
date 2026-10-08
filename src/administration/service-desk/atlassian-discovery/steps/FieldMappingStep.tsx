@@ -1,14 +1,15 @@
 import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
 import { FC, useState, useEffect } from 'react';
-import { Alert, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import { useForm, useFormState } from 'react-final-form';
 import {
   supportSettingsAtlassianDiscoverCustomFields,
   supportSettingsAtlassianDiscoverPriorities,
 } from 'waldur-js-client';
 
-import { SelectGroup } from '@/form';
-import { SubmitButton } from '@/form/SubmitButton';
+import { AlertItem, BaseButton } from 'waldur-ui';
+
+import { SelectGroup, SubmitButton } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { WizardModal, WizardStepProps } from '@/wizard';
@@ -102,29 +103,23 @@ export const FieldMappingStep: FC<WizardStepProps> = (props) => {
   // Custom footer for this step
   const renderFooter = () => (
     <>
-      <SubmitButton
-        submitting={false}
+      <BaseButton
         variant="tertiary"
         className="min-w-125px me-auto"
         onClick={() => props.onPrev(values)}
-        type="button"
         label={translate('Back')}
         iconNode={<CaretLeftIcon weight="bold" />}
-        iconOnLeft
+        size="lg"
       />
       <CloseDialogButton className="min-w-125px" />
       <SubmitButton
-        submitting={false}
+        submitting={loading}
         disabled={loading}
         label={translate('Continue')}
         onClick={handleContinue}
-        type="button"
-        className="btn-icon-right min-w-125px"
-      >
-        <span className="svg-icon svg-icon-2">
-          <CaretRightIcon weight="bold" />
-        </span>
-      </SubmitButton>
+        className="min-w-125px"
+        iconNode={<CaretRightIcon weight="bold" />}
+      />
     </>
   );
 
@@ -144,7 +139,7 @@ export const FieldMappingStep: FC<WizardStepProps> = (props) => {
   if (error) {
     return (
       <WizardModal {...props} renderFooter={renderFooter}>
-        <Alert variant="danger">{error}</Alert>
+        <AlertItem type="floating" variant="error" title={error} />
       </WizardModal>
     );
   }
@@ -273,11 +268,14 @@ export const FieldMappingStep: FC<WizardStepProps> = (props) => {
         </div>
       </div>
       {(values.customFields || []).length === 0 && (
-        <Alert variant="info" className="mt-4">
-          {translate(
+        <AlertItem
+          type="floating"
+          variant="info"
+          title={translate(
             'No custom fields found. You can skip this step and configure field mappings later.',
           )}
-        </Alert>
+          className="mt-4"
+        />
       )}
     </WizardModal>
   );

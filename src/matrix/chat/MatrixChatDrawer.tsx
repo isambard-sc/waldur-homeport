@@ -14,7 +14,7 @@ import {
 } from 'react';
 import Dropzone from 'react-dropzone';
 
-import { Tooltip } from 'waldur-ui';
+import { BaseButton, Tooltip } from 'waldur-ui';
 
 import { LoadingErred } from '@/core/LoadingErred';
 import { translate } from '@/i18n';
@@ -27,14 +27,12 @@ import { useMatrixCall } from './call/useMatrixCall';
 import { MatrixChatHeader } from './MatrixChatHeader';
 import { MatrixMessageInput } from './MatrixMessageInput';
 import { MatrixMessageList } from './MatrixMessageList';
-import { MatrixRoomSelector } from './MatrixRoomSelector';
 import { MatrixSyncStatus } from './MatrixSyncStatus';
 import { MatrixTypingIndicator } from './MatrixTypingIndicator';
 import { useAllMatrixRooms } from './useAllMatrixRooms';
 import { useMatrixClient } from './useMatrixClient';
 import { useMatrixFileUpload } from './useMatrixFileUpload';
 import { useMatrixRoom } from './useMatrixRoom';
-import { useMatrixRooms } from './useMatrixRooms';
 import { useRoomMemberImages, useRoomMemberNames } from './useRoomMemberNames';
 import { buildVoiceContent } from './voice/buildVoiceContent';
 import { generateWaveform } from './voice/generateWaveform';
@@ -60,11 +58,9 @@ export const MatrixChatDrawer: FC<MatrixChatDrawerProps> = ({
     useMatrixClient();
   const { callState, callRoomId, callRoomUuid } = useMatrixCall();
   const { requestReturnToCall } = useContext(MatrixCallPortalContext);
-  const [activeRoomUuid, setActiveRoomUuid] = useState(roomUuid);
-  const { data: rooms } = useMatrixRooms(projectUuid);
   const { rooms: allRooms } = useAllMatrixRooms();
-  const memberNames = useRoomMemberNames(activeRoomUuid);
-  const memberImages = useRoomMemberImages(activeRoomUuid);
+  const memberNames = useRoomMemberNames(roomUuid);
+  const memberImages = useRoomMemberImages(roomUuid);
   const currentUser = useUser();
   const {
     uploadFile,
@@ -129,24 +125,8 @@ export const MatrixChatDrawer: FC<MatrixChatDrawerProps> = ({
 
   // Connect on mount
   useEffect(() => {
-    connect(activeRoomUuid);
-  }, [activeRoomUuid]);
-
-  const handleRoomSelect = useCallback(
-    (uuid: string) => {
-      // Discard any in-progress recording before switching — the clip belongs to
-      // the room being left, not the one being opened (otherwise Send would post
-      // it to the newly-selected room).
-      recorder.cancel();
-      setSendingVoice(false);
-      setActiveRoomUuid(uuid);
-      connect(uuid);
-    },
-    [connect, recorder],
-  );
-
-  const activeRooms =
-    rooms?.filter((r) => r.state === 'active' && r.room_alias) || [];
+    connect(roomUuid);
+  }, [roomUuid]);
 
   // 'discovering' is included so the drawer reserves the call pane the moment
   // a room is claimed — otherwise MatrixCallHost falls back to the floating
@@ -202,10 +182,10 @@ export const MatrixChatDrawer: FC<MatrixChatDrawerProps> = ({
             </div>
           )}
           <MatrixChatHeader
-            roomUuid={activeRoomUuid}
+            roomUuid={roomUuid}
             roomName={
               roomName ||
-              activeRooms.find((r) => r.uuid === activeRoomUuid)?.room_name ||
+              allRooms.find((r) => r.uuid === roomUuid)?.room_name ||
               translate('Chat')
             }
             roomAlias={roomAlias}
@@ -228,29 +208,20 @@ export const MatrixChatDrawer: FC<MatrixChatDrawerProps> = ({
                     (callRoom as any)?.room_name ?? translate('another room'),
                 })}
               </span>
-              <button
-                type="button"
-                className="btn btn-sm btn-success"
+              <BaseButton
+                variant="success"
+                size="sm"
                 onClick={requestReturnToCall}
-              >
-                {translate('Return to call')}
-              </button>
+                label={translate('Return to call')}
+              />
             </div>
-          )}
-
-          {activeRooms.length > 1 && !onBack && (
-            <MatrixRoomSelector
-              rooms={activeRooms}
-              activeRoomUuid={activeRoomUuid}
-              onSelect={handleRoomSelect}
-            />
           )}
 
           <div className="flex-grow-1 overflow-hidden d-flex flex-column">
             {showConnectionError && (
               <div className="flex-grow-1 d-flex align-items-center justify-content-center p-4">
                 <LoadingErred
-                  loadData={() => connect(activeRoomUuid)}
+                  loadData={() => connect(roomUuid)}
                   message={
                     error || translate('Could not connect to the chat server.')
                   }
@@ -279,22 +250,23 @@ export const MatrixChatDrawer: FC<MatrixChatDrawerProps> = ({
                       }
                       side="left"
                     >
-                      <button
-                        type="button"
+                      <BaseButton
                         onClick={() => setChatVisible((v) => !v)}
                         aria-label={
                           chatVisible
                             ? translate('Hide chat')
                             : translate('Show chat')
                         }
-                        className="btn btn-icon btn-sm btn-light"
-                      >
-                        {chatVisible ? (
-                          <ArrowsOutSimpleIcon weight="bold" />
-                        ) : (
-                          <ArrowsInSimpleIcon weight="bold" />
-                        )}
-                      </button>
+                        variant="tertiary"
+                        size="sm"
+                        iconNode={
+                          chatVisible ? (
+                            <ArrowsOutSimpleIcon weight="bold" />
+                          ) : (
+                            <ArrowsInSimpleIcon weight="bold" />
+                          )
+                        }
+                      />
                     </Tooltip>
                   </div>
                 )}

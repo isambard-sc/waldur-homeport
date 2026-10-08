@@ -7,12 +7,15 @@
   "main": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
+    "./contrast": "./src/contrast.ts",
+    "./react": "./src/react.ts",
     "./colors.css": "./src/colors.css",
     "./buttonColors.css": "./src/buttonColors.css",
     "./surfaceColors.css": "./src/surfaceColors.css",
     "./sidebarColors.css": "./src/sidebarColors.css",
-    "./badgeColors.css": "./src/badgeColors.css",
+    "./focusRing.css": "./src/focusRing.css",
     "./animations.css": "./src/animations.css",
+    "./zIndex.css": "./src/zIndex.css",
     "./fonts.css": "./src/fonts.css"
   },
   "dependencies": {

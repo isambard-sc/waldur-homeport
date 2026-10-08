@@ -1,10 +1,17 @@
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import * as RadixPopover from '@radix-ui/react-popover';
 import classNames from 'classnames';
-import { ComponentPropsWithoutRef, forwardRef, useRef, useState } from 'react';
+import {
+  ComponentPropsWithoutRef,
+  forwardRef,
+  PointerEvent,
+  useRef,
+  useState,
+} from 'react';
 import { useMediaQuery } from 'react-responsive';
 
 import { GRID_BREAKPOINTS } from '@/core/constants';
+import { radixDropdownMenuScrollContentStyle } from '@/core/radixScrollContentStyles';
 
 /**
  * Radix-driven replacement for the header/footer/sidebar-popup menus built
@@ -86,7 +93,8 @@ const PLACEMENT_TO_SIDE_ALIGN = (
  * Root/Trigger, and Radix's DropdownMenuTrigger only ever opens on
  * click/keyboard, with no built-in hover mode. Reproduced by hand
  * instead: `open` is lifted and controlled, and the returned
- * `hoverHandlers` need spreading onto *both* the trigger and the content
+ * handlers need spreading onto *both* the trigger (`triggerHandlers`)
+ * and the content (`hoverHandlers`)
  * (leaving off either one closes the menu the instant the pointer
  * crosses the small visual gap between the button and its panel while
  * moving toward it), gated to `lg`+ only. The 200ms close-on-leave delay
@@ -102,7 +110,7 @@ const PLACEMENT_TO_SIDE_ALIGN = (
  * matching that click-below/hover-at-`lg`+ config. Pass `false` for a
  * trigger whose original config was unconditionally hover, no
  * responsive variant at all — hover is then unconditional, at every
- * viewport width (PageBarTabs.tsx's in-page section tabs).
+ * viewport width (ScrollSpyNav.tsx's in-page section tabs).
  */
 export function useHoverMenu(requireDesktop = true) {
   const isDesktopQuery = useMediaQuery({ minWidth: GRID_BREAKPOINTS.lg });
@@ -114,7 +122,7 @@ export function useHoverMenu(requireDesktop = true) {
     if (closeTimeout.current) clearTimeout(closeTimeout.current);
   };
 
-  const hoverHandlers = {
+  const mouseHandlers = {
     onMouseEnter: () => {
       if (!isDesktop) return;
       cancelClose();
@@ -127,7 +135,34 @@ export function useHoverMenu(requireDesktop = true) {
     },
   };
 
-  return { isDesktop, open, setOpen, hoverHandlers };
+  // Hover has already opened the menu by the time a mouse clicks the
+  // trigger, and Radix closes it on that pointer-down twice over: the
+  // trigger toggles it, and the content dismisses it because the trigger
+  // lies outside the content. The trigger cancels its own toggle and
+  // leaves this flag for the content to cancel the dismissal.
+  const keepOpenOnPointerDown = useRef(false);
+
+  const triggerHandlers = {
+    ...mouseHandlers,
+    onPointerDown: (event: PointerEvent<HTMLElement>) => {
+      if (isDesktop && open && event.pointerType === 'mouse') {
+        event.preventDefault();
+        keepOpenOnPointerDown.current = true;
+      }
+    },
+  };
+
+  const hoverHandlers = {
+    ...mouseHandlers,
+    onPointerDownOutside: (event: Event) => {
+      if (keepOpenOnPointerDown.current) {
+        keepOpenOnPointerDown.current = false;
+        event.preventDefault();
+      }
+    },
+  };
+
+  return { isDesktop, open, setOpen, hoverHandlers, triggerHandlers };
 }
 
 export const NavMenu = RadixDropdownMenu.Root;
@@ -165,6 +200,7 @@ export function NavMenuContent({
   className,
   placement = 'bottom-start',
   sideOffset = 2,
+  style,
   ...props
 }: ComponentPropsWithoutRef<typeof RadixDropdownMenu.Content> & {
   /** Same placement strings Metronic's own placement config used, e.g.
@@ -180,6 +216,7 @@ export function NavMenuContent({
         sideOffset={sideOffset}
         data-popper-placement={placement}
         className={classNames(NAV_MENU_CONTENT_CLASSNAME, className)}
+        style={{ ...radixDropdownMenuScrollContentStyle, ...style }}
         {...props}
       />
     </RadixDropdownMenu.Portal>
@@ -206,6 +243,7 @@ export function PopoverMenuContent({
   className,
   placement = 'bottom-start',
   sideOffset = 2,
+  style,
   ...props
 }: ComponentPropsWithoutRef<typeof RadixPopover.Content> & {
   /** Same placement strings NavMenuContent's own `placement` takes, e.g.
@@ -221,6 +259,7 @@ export function PopoverMenuContent({
         sideOffset={sideOffset}
         data-popper-placement={placement}
         className={classNames(NAV_MENU_CONTENT_CLASSNAME, className)}
+        style={style}
         {...props}
       />
     </RadixPopover.Portal>
@@ -281,6 +320,7 @@ const NAV_MENU_SUB_CONTENT_CLASSNAME = classNames(
 export function NavMenuSubContent({
   className,
   placement = 'right-start',
+  style,
   ...props
 }: ComponentPropsWithoutRef<typeof RadixDropdownMenu.SubContent> & {
   placement?: string;
@@ -296,6 +336,7 @@ export function NavMenuSubContent({
         align={align}
         data-popper-placement={placement}
         className={classNames(NAV_MENU_SUB_CONTENT_CLASSNAME, className)}
+        style={{ ...radixDropdownMenuScrollContentStyle, ...style }}
         {...props}
       />
     </RadixDropdownMenu.Portal>

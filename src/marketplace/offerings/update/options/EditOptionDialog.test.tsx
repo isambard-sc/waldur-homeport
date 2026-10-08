@@ -9,8 +9,9 @@ import { EditOptionDialog } from './EditOptionDialog';
 const offering: any = {
   uuid: 'off-1',
   options: {
-    order: ['tier', 'size'],
+    order: ['tier', 'size', 'backups'],
     options: {
+      backups: { type: 'boolean', label: 'Backups' },
       tier: {
         type: 'select_string',
         label: 'Tier',
@@ -25,7 +26,35 @@ const offering: any = {
   },
 };
 
+const renderDialog = (optionKey: string) =>
+  renderWithProviders(
+    <EditOptionDialog
+      resolve={{
+        offering,
+        type: 'options',
+        refetch: vi.fn(),
+        option: { ...offering.options.options[optionKey], name: optionKey },
+      }}
+    />,
+  );
+
 describe('EditOptionDialog', () => {
+  it('shows the steps when the type has settings of its own', () => {
+    renderDialog('tier');
+    expect(
+      screen.getByRole('group', { name: 'Form progress' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Settings')).toBeInTheDocument();
+  });
+
+  it('hides the steps for a type without settings', () => {
+    renderDialog('backups');
+    expect(
+      screen.queryByRole('group', { name: 'Form progress' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+  });
+
   it('blocks removing a choice that another rule refers to', async () => {
     renderWithProviders(
       <EditOptionDialog
@@ -37,6 +66,8 @@ describe('EditOptionDialog', () => {
         }}
       />,
     );
+    // The type-specific settings live on the second step.
+    await userEvent.click(screen.getByTestId('wizard-submit-btn'));
     const save = screen.getByRole('button', { name: 'Save' });
     expect(save).toBeEnabled();
 
@@ -48,5 +79,29 @@ describe('EditOptionDialog', () => {
       screen.getByText('Remove the "Show only when" rule from: Size first.'),
     ).toBeInTheDocument();
     expect(save).toBeDisabled();
+  });
+
+  it('puts the pattern of a text option on its settings step', async () => {
+    renderWithProviders(
+      <EditOptionDialog
+        resolve={{
+          offering,
+          type: 'options',
+          refetch: vi.fn(),
+          option: {
+            type: 'text',
+            label: 'Notes',
+            name: 'notes',
+            pattern: '[^<>]*',
+          },
+        }}
+      />,
+    );
+    expect(
+      screen.getByRole('group', { name: 'Form progress' }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId('wizard-submit-btn'));
+    expect(screen.getByDisplayValue('[^<>]*')).toBeInTheDocument();
+    expect(screen.getByText('Validation error message')).toBeInTheDocument();
   });
 });

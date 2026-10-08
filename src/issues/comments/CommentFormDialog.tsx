@@ -2,7 +2,7 @@ import { FC, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import {
   Issue,
-  supportCommentsUpdate,
+  supportCommentsPartialUpdate,
   supportIssuesComment,
 } from 'waldur-js-client';
 
@@ -33,12 +33,11 @@ export const CommentFormDialog: FC<CommentFormDialogProps> = (props) => {
   const commentMutation = useManagedMutation<any, any, CommentFormData>({
     mutationFn: (data) => {
       if (isEdit) {
-        return supportCommentsUpdate({
+        // Only the text changes: sending is_public would turn an internal
+        // comment public whenever staff edited it.
+        return supportCommentsPartialUpdate({
           path: { uuid: props.resolve.comment.uuid },
-          body: {
-            is_public: true,
-            description: data.description,
-          },
+          body: { description: data.description },
         });
       } else {
         return supportIssuesComment({
@@ -99,7 +98,8 @@ export const CommentFormDialog: FC<CommentFormDialogProps> = (props) => {
                   submitting={submitting}
                   disabled={invalid || submitting || pristine}
                   label={translate('Confirm')}
-                  className="btn btn-primary flex-equal"
+                  variant="primary"
+                  className="flex-equal"
                 />
               </>
             }

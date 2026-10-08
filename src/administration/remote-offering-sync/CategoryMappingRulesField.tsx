@@ -4,13 +4,14 @@ import { Form } from 'react-bootstrap';
 import { Field } from 'react-final-form';
 import { FieldArray, FieldArrayRenderProps } from 'react-final-form-arrays';
 
+import { BaseButton } from 'waldur-ui';
+
 import { usePagination } from '@/core/usePagination';
 import { required, requiredArray } from '@/core/validators';
 import { SelectField } from '@/form';
 import { AsyncSelect } from '@/form/select';
 import { translate } from '@/i18n';
 import { categoryAutocomplete } from '@/marketplace/common/autocompletes';
-import { ActionButton } from '@/table/ActionButton';
 import { TablePagination } from '@/table/TablePagination';
 
 interface FieldValue {
@@ -29,7 +30,6 @@ const FieldsListGroup = ({
     changePageSize,
     visibleItems,
     refreshPageOnAdd,
-    refreshPageOnRemove,
     hasPages,
   } = usePagination(fields);
 
@@ -46,24 +46,10 @@ const FieldsListGroup = ({
 
   const removeRow = (index: number) => {
     if (fields.length > 1) {
-      const currentPageItems = fields.value.slice(
-        (page - 1) * pageSize,
-        page * pageSize,
-      );
       fields.remove(index);
-
-      const newLength = fields.length - 1;
-
-      const lastPage = Math.ceil(newLength / pageSize);
-      const isLastItemOnPage = currentPageItems.length === 1;
-
-      if (isLastItemOnPage && page > 1 && page === lastPage) {
-        setPage(page - 1);
-      }
-
-      const actualIndex = (page - 1) * pageSize + index;
-      if (actualIndex < fields.value.length) {
-        refreshPageOnRemove();
+      const lastPage = Math.ceil((fields.length - 1) / pageSize);
+      if (page > lastPage) {
+        setPage(lastPage);
       }
     }
   };
@@ -82,14 +68,13 @@ const FieldsListGroup = ({
             </tr>
           </thead>
           <tbody>
-            {visibleItems.map((component, i) => {
-              const actualIndex = (page - 1) * pageSize + i;
-              return component ? (
+            {visibleItems.map((name, i) =>
+              name ? (
                 <Fragment key={`${page}-${i}-${fields.length}`}>
                   <tr>
                     <td data-testid="remote-category-col">
                       <Field
-                        name={`${fields.name}[${actualIndex}].remote_category`}
+                        name={`${name}.remote_category`}
                         validate={required}
                       >
                         {({ input, meta }) => (
@@ -105,7 +90,7 @@ const FieldsListGroup = ({
                     </td>
                     <td data-testid="local-category-col">
                       <Field
-                        name={`${fields.name}[${actualIndex}].local_category`}
+                        name={`${name}.local_category`}
                         validate={required}
                       >
                         {(fieldProps) => (
@@ -125,31 +110,33 @@ const FieldsListGroup = ({
                       </Field>
                     </td>
                     <td>
-                      <ActionButton
+                      <BaseButton
                         variant="text-danger"
-                        action={() => removeRow(actualIndex)}
+                        onClick={() => removeRow(i)}
                         disabled={fields.length < 2}
                         disabledReason={translate(
                           'At least one mapping is required',
                         )}
                         iconNode={<TrashIcon weight="bold" />}
+                        size="lg"
                       />
                     </td>
                   </tr>
                 </Fragment>
-              ) : null;
-            })}
+              ) : null,
+            )}
           </tbody>
         </table>
       </Form.Group>
       <div>
-        <ActionButton
+        <BaseButton
           variant="text-primary"
-          action={addRow}
+          onClick={addRow}
           disabled={addDisabled}
           disabledReason={translate('Complete existing mappings first')}
           iconNode={<PlusCircleIcon weight="bold" />}
-          title={translate('Add new')}
+          label={translate('Add new')}
+          size="lg"
         />
       </div>
 

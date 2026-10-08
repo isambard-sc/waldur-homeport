@@ -44,11 +44,6 @@
   padding: 1rem;
 }
 
-.layout-animated-gradient-header .theme-switcher-btn {
-  color: white;
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
 .layout-animated-gradient-content {
   position: relative;
   z-index: 1;
@@ -80,7 +75,8 @@
   color: white;
 }
 
-.layout-animated-gradient-footer .menu-link {
+.layout-animated-gradient-footer .menu-link,
+.layout-animated-gradient-footer .menu-link .menu-title {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 

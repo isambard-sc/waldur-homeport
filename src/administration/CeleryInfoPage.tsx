@@ -1,7 +1,7 @@
-import { WarningCircleIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
-import { Alert } from 'react-bootstrap';
 import { celeryStatsRetrieve } from 'waldur-js-client';
+
+import { AlertItem } from 'waldur-ui';
 
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { translate } from '@/i18n';
@@ -45,19 +45,17 @@ export const CeleryInfoPage = () => {
   const hasWorkers = workers.length > 0;
 
   return (
-    <div className="celery-info-page">
+    <div className="celery-info-page pt-5">
       {!hasWorkers && (
-        <Alert variant="warning" className="mb-6 d-flex align-items-center">
-          <WarningCircleIcon size={24} weight="bold" className="me-3" />
-          <div>
-            <strong>{translate('No Celery workers detected')}</strong>
-            <p className="mb-0 mt-1">
-              {translate(
-                'Celery may be down or not responding. Task queues and statistics are unavailable.',
-              )}
-            </p>
-          </div>
-        </Alert>
+        <AlertItem
+          variant="warning"
+          type="floating"
+          className="mb-6"
+          title={translate('No Celery workers detected')}
+          body={translate(
+            'Celery may be down or not responding. Task queues and statistics are unavailable.',
+          )}
+        />
       )}
 
       <CeleryOverviewCards data={data} />

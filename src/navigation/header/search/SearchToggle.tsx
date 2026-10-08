@@ -1,10 +1,11 @@
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import * as RadixPopover from '@radix-ui/react-popover';
-import { useEffect } from 'react';
+import { KeyboardEvent as ReactKeyboardEvent, useEffect, useRef } from 'react';
 
 import { Tooltip } from 'waldur-ui';
 
 import { translate } from '@/i18n';
+import { getTabbableAfter, getTabbables } from '@/navigation/tabbables';
 
 import { SearchInput } from './SearchInput';
 import { SearchPopover } from './SearchPopover';
@@ -29,6 +30,12 @@ export const SearchToggle = ({ compact }: SearchToggleProps) => {
     isStaffOrSupportUser,
   } = useSearch();
 
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  // A pointer press outside the panel already decided where focus goes, so
+  // the close handler must leave it alone.
+  const pointerDownOutsideRef = useRef(false);
+
   // Keyboard shortcuts: Cmd/Ctrl+K to open, Escape to close
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -48,16 +55,68 @@ export const SearchToggle = ({ compact }: SearchToggleProps) => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [show, setShow]);
 
+  // What the user acted on to open the panel: the header field on desktop,
+  // the search button in compact and mobile layouts.
+  const getOpener = () => {
+    const tabbables = anchorRef.current ? getTabbables(anchorRef.current) : [];
+    return tabbables[tabbables.length - 1] ?? null;
+  };
+
+  const handleOpenAutoFocus = (event: Event) => {
+    // Radix would focus the panel's field and select its whole value; the
+    // value mirrors what was just typed in the header field, so the next
+    // keystroke would replace it. Put the caret after the text instead.
+    event.preventDefault();
+    const input = contentRef.current?.querySelector('input');
+    if (!input) return;
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  };
+
+  const handleCloseAutoFocus = (event: Event) => {
+    // Radix only hands focus back to a Trigger and there is none here (see
+    // the Anchor comment below), so without this Escape drops focus to body.
+    event.preventDefault();
+    const pointerDownOutside = pointerDownOutsideRef.current;
+    pointerDownOutsideRef.current = false;
+    if (pointerDownOutside || document.activeElement !== document.body) return;
+    getOpener()?.focus();
+  };
+
+  const handleContentKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    const tabbables = getTabbables(event.currentTarget);
+    const edge = event.shiftKey
+      ? tabbables[0]
+      : tabbables[tabbables.length - 1];
+    if (!edge || document.activeElement !== edge) return;
+    // The panel is portaled to the end of <body>, and Radix loops Tab back to
+    // its first control. Hand focus over as if the panel sat right after the
+    // header field in the document: back to the opener, or on to whatever
+    // follows the search in the header.
+    event.preventDefault();
+    const target = event.shiftKey
+      ? getOpener()
+      : anchorRef.current &&
+        getTabbableAfter(anchorRef.current, event.currentTarget);
+    setShow(false);
+    target?.focus();
+  };
+
   return (
     <RadixPopover.Root open={show} onOpenChange={setShow} modal={false}>
       {/*
         Anchor, not Trigger: opening isn't one clickable element here — it's
-        the compact button, the mobile button, or focusing the inline
+        the compact button, the mobile button, or acting on the inline
         desktop SearchInput, each already calling setShow(true) directly.
         Anchor only gives Content something to position against.
       */}
       <RadixPopover.Anchor asChild>
-        <div className="d-flex align-items-center" id="searchContainer">
+        <div
+          className="d-flex align-items-center"
+          id="searchContainer"
+          ref={anchorRef}
+        >
           {compact ? (
             <Tooltip label={translate('Search')} side="bottom">
               <button
@@ -80,7 +139,7 @@ export const SearchToggle = ({ compact }: SearchToggleProps) => {
                 show={show}
                 className="d-none d-lg-block"
                 showShortcut={!show}
-                onFocus={() => setShow(true)}
+                onOpen={() => setShow(true)}
               />
               <Tooltip label={translate('Search')} side="bottom">
                 <button
@@ -100,19 +159,18 @@ export const SearchToggle = ({ compact }: SearchToggleProps) => {
       </RadixPopover.Anchor>
       <RadixPopover.Portal>
         <RadixPopover.Content
+          ref={contentRef}
           id="GlobalSearch"
           side="bottom"
           align="start"
           sideOffset={2}
-          // position-static: Bootstrap's own .popover class hardcodes
-          // `position: absolute; left: 0`, fighting the Radix popper
-          // wrapper for control of this box's placement — see
-          // TableColumnsButton.tsx's own comment on this exact fix. Also
-          // the direct cause of "search panel too narrow": with the panel
-          // taken out of the wrapper's flow, Radix never got a real width
-          // to measure, so #GlobalSearch's own width/max-width rules
-          // (SearchToggle.scss) had nothing correctly-flowing to apply to.
-          className="popover position-static"
+          className="z-header-popover rounded-md border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden"
+          onOpenAutoFocus={handleOpenAutoFocus}
+          onCloseAutoFocus={handleCloseAutoFocus}
+          onPointerDownOutside={() => {
+            pointerDownOutsideRef.current = true;
+          }}
+          onKeyDown={handleContentKeyDown}
         >
           <SearchPopover
             result={result}

@@ -1,6 +1,12 @@
 import { OfferingOptions } from 'waldur-js-client';
 
 import { translate } from '@/i18n';
+import {
+  getOptionPatternValidator,
+  isPatternFieldType,
+  isValidOptionPattern,
+  MAX_PATTERN_LENGTH,
+} from '@/marketplace/common/optionPattern';
 import { isVisibleIfFieldType } from '@/marketplace/common/optionVisibility';
 
 export interface OptionFormContext {
@@ -122,6 +128,45 @@ const validateVisibleIf = (
   return undefined;
 };
 
+/**
+ * Mirrors `OptionFieldSerializer._validate_pattern` in mastermind. Patterns
+ * that only Python can compile are rejected too, so that the order form can
+ * repeat the check.
+ */
+const validatePattern = (values) => {
+  if (!isPatternFieldType(values.type?.value)) {
+    return {};
+  }
+  const { pattern, pattern_error } = values;
+  if (!pattern) {
+    return pattern_error
+      ? { pattern_error: translate('Set a validation pattern first.') }
+      : {};
+  }
+  if (pattern.length > MAX_PATTERN_LENGTH) {
+    return {
+      pattern: translate('Pattern must be at most {max} characters long.', {
+        max: MAX_PATTERN_LENGTH,
+      }),
+    };
+  }
+  if (!isValidOptionPattern(pattern)) {
+    return { pattern: translate('Invalid regular expression.') };
+  }
+  if (values.default) {
+    const error = getOptionPatternValidator({
+      type: values.type.value,
+      pattern,
+    })(values.default);
+    if (error) {
+      return {
+        default: translate('The default value does not match the pattern.'),
+      };
+    }
+  }
+  return {};
+};
+
 export const validateOptionForm = (values, context: OptionFormContext = {}) => {
   const errors: any = {};
   if (values.type?.value === 'storage_folder_manager') {
@@ -136,6 +181,16 @@ export const validateOptionForm = (values, context: OptionFormContext = {}) => {
       );
     }
   }
+  // Options are keyed by internal name: a second one would replace the first.
+  if (
+    values.name &&
+    values.name !== context.optionKey &&
+    context.options?.options?.[values.name]
+  ) {
+    errors.name = translate(
+      'An option with this internal name already exists.',
+    );
+  }
   const brokenDependents = getBrokenDependents(values, context);
   if (brokenDependents.length > 0) {
     // Not a registered field: OptionForm shows it above the submit button.
@@ -145,5 +200,6 @@ export const validateOptionForm = (values, context: OptionFormContext = {}) => {
   if (visibleIfErrors) {
     errors.visible_if = visibleIfErrors;
   }
+  Object.assign(errors, validatePattern(values));
   return errors;
 };

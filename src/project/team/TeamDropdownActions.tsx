@@ -3,7 +3,8 @@ import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useSelector } from 'react-redux';
 import { Project } from 'waldur-js-client';
 
-import { BaseButton } from '@/core/buttons/BaseButton';
+import { BaseButton } from 'waldur-ui';
+
 import { ServiceAccountCreateButton } from '@/customer/service-accounts/ServiceAccountCreateAction';
 import { translate } from '@/i18n';
 import { InvitationCreateButton } from '@/invitations/actions/create/InvitationCreateButton';

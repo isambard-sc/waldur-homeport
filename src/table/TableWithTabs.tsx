@@ -72,6 +72,11 @@ export const TableWithTabs: FC<
   }, [params, syncWithUrlKey, tabs, defaultActiveKey]);
 
   const handleSelect = (key: string | null) => {
+    // Re-selecting the open tab mounts nothing new, so the portalled controls
+    // hidden below would never be restored.
+    if (key === (activeKey ?? defaultActiveKey)) {
+      return;
+    }
     // Remove all children that came through the portal from the toolbar and title,
     // to prevent previous children to be visible when the new tab is rendered
     const childrenToBeRemoved = [];
@@ -133,6 +138,7 @@ export const TableWithTabs: FC<
           defaultActiveKey={defaultActiveKey}
           activeKey={activeKey ?? defaultActiveKey}
           onSelect={handleSelect}
+          unmountOnExit
           className="min-h-175px"
         >
           <div className="d-flex justify-content-between">
@@ -164,7 +170,7 @@ export const TableWithTabs: FC<
           {isRefsReady && (
             <Tab.Content className="overflow-auto">
               {tabs.map((tab) => (
-                <Tab.Pane key={tab.key} eventKey={tab.key} unmountOnExit={true}>
+                <Tab.Pane key={tab.key} eventKey={tab.key}>
                   <tab.component
                     {...data}
                     activeTab={activeKey}

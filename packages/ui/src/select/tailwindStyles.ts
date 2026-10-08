@@ -61,7 +61,10 @@ export const getSelectTailwindClassNames = <
       );
       return cn(
         stateClasses,
-        'flex items-center justify-between w-full transition-colors',
+        // `font-normal`: a control must not inherit an ambient weight from its
+        // host — `.card-header` sets `font-weight: 700`, which rendered the
+        // value and placeholder bold in every card-toolbar select.
+        'flex items-center justify-between w-full transition-colors font-normal',
         // Gotcha #2: bare `border`/`rounded-md` would collide with
         // Bootstrap. 8px radius matches the old control's $border-radius
         // (Tailwind's `rounded-md` step is 6px).
@@ -95,10 +98,19 @@ export const getSelectTailwindClassNames = <
     },
 
     valueContainer: ({ isMulti }) =>
-      cn('flex flex-1 items-center flex-wrap gap-[6px]', isMulti && 'py-[2px]'),
+      cn(
+        'flex flex-1 items-center gap-[6px]',
+        // A multi-select collapses everything past the second value into a
+        // `+N` tag, so wrapping only ever bought a second line that made the
+        // control change height as values came and went. Without wrapping the
+        // 2px band that separated those lines has nothing to space, and it
+        // pushed a 24px tag past the 26px the control holds inside its own
+        // padding — growing the control by 2px the moment a value was picked.
+        isMulti ? 'flex-nowrap' : 'flex-wrap',
+      ),
 
     multiValue: () =>
-      'bg-[var(--color-gray-200)] dark:bg-[var(--color-gray-700)] rounded-md px-[4px] py-[2px] flex items-center gap-[4px] m-[2px]',
+      'bg-[var(--color-gray-200)] dark:bg-[var(--color-gray-dark-700)] rounded-md px-[4px] py-[2px] flex items-center gap-[4px] m-[2px]',
 
     multiValueLabel: () => 'text-[11px] text-[var(--surface-text-primary)]',
 
@@ -200,7 +212,7 @@ export const getSelectTailwindClassNames = <
 
       const colorClasses = cn(
         isSelected
-          ? 'bg-[var(--surface-hover-bg)] font-medium text-[var(--surface-text-primary)]'
+          ? 'bg-[var(--surface-hover-bg)] text-[var(--surface-text-primary)]'
           : isFocused
             ? 'bg-[var(--surface-hover-bg)] text-[var(--surface-text-primary)]'
             : 'text-[var(--surface-text-primary)]',
@@ -217,11 +229,15 @@ export const getSelectTailwindClassNames = <
       // between` would shove apart instead of keeping together — the
       // old SCSS scoped this the same way, to
       // `:not(.metronic-select__menu-list--is-multi)` only.
+      // `[&>*]:grow` (also single-select only, as in the old SCSS) lets a
+      // custom Option's content fill the row, so anything it right-aligns
+      // (RoleOption's type badge, UserListOptionInline's icons) stays at the
+      // far edge instead of collapsing onto the label.
       if (isTableFilter) {
         return cn(
           stateClasses,
           'flex! items-center gap-[8px] h-[40px] px-[12px] py-[2px]',
-          !isMulti && 'justify-between',
+          !isMulti && 'justify-between [&>*]:grow',
           'cursor-pointer select-none transition-colors text-[14px]!',
           '[&>*]:line-clamp-2',
           checkmarkClasses,
@@ -232,7 +248,8 @@ export const getSelectTailwindClassNames = <
       return cn(
         stateClasses,
         'flex! items-center px-[16px] py-[10px] cursor-pointer select-none transition-colors text-[14.3px]!',
-        !isMulti && 'justify-between',
+        // `gap-[8px]` keeps the content clear of the selected row's checkmark.
+        !isMulti && 'justify-between gap-[8px] [&>*]:grow',
         checkmarkClasses,
         colorClasses,
       );

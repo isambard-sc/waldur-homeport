@@ -1,5 +1,6 @@
-import { FC, useState } from 'react';
-import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { FC, useCallback, useRef, useState } from 'react';
+
+import { SegmentedControl, SegmentedControlOption } from 'waldur-ui';
 
 import { translate } from '@/i18n';
 import { useTitle } from '@/navigation/title';
@@ -29,40 +30,56 @@ type View = 'requests' | 'resources';
  */
 export const ProfileRequests: FC = () => {
   const [view, setView] = useState<View>('requests');
+  // The switcher is `actions` on whichever list is mounted. Changing the lens
+  // unmounts that table, so the focused segment is destroyed. This flag is
+  // consumed once by the new switcher's ref, which puts focus back on the
+  // selected segment as it mounts.
+  const restoreFocusRef = useRef(false);
   useTitle(requestListTitle());
+
+  const options: SegmentedControlOption<View>[] = [
+    { value: 'requests', label: requestViewLabel() },
+    { value: 'resources', label: translate('By resource') },
+  ];
+
+  const restoreFocus = useCallback((node: HTMLDivElement | null) => {
+    if (node && restoreFocusRef.current) {
+      restoreFocusRef.current = false;
+      node
+        .querySelector<HTMLElement>('[role="radio"][aria-checked="true"]')
+        ?.focus();
+    }
+  }, []);
+
+  const handleValueChange = (next: View) => {
+    restoreFocusRef.current = true;
+    setView(next);
+  };
+
+  const switcher = (
+    <SegmentedControl
+      ref={restoreFocus}
+      aria-label={translate('Group by')}
+      options={options}
+      value={view}
+      onValueChange={handleValueChange}
+      // lg to match the search box and toolbar buttons it sits beside. Both
+      // hosts must agree: the requests view mounts it in the card toolbar, the
+      // resources view in the page header, and an unset size would render 36px
+      // in one and (before the control stopped stretching) 44px in the other.
+      size="lg"
+      itemClassName="px-6"
+    />
+  );
 
   // In the card toolbar beside search, not above the panel: this is a tab
   // inside the profile, and the standalone heading treatment is for a table
-  // that owns its page (compare UserOfferingList on Remote accounts).
-  const switcher = (
-    <ToggleButtonGroup
-      type="radio"
-      name="requestsView"
-      value={view}
-      onChange={(value: View) => setView(value)}
-    >
-      <ToggleButton
-        id="requests-view-requests"
-        value="requests"
-        variant="tertiary"
-        className="px-6"
-      >
-        {requestViewLabel()}
-      </ToggleButton>
-      <ToggleButton
-        id="requests-view-resources"
-        value="resources"
-        variant="tertiary"
-        className="px-6"
-      >
-        {translate('By resource')}
-      </ToggleButton>
-    </ToggleButtonGroup>
-  );
-
+  // that owns its page (compare UserOfferingList on Remote accounts). Both
+  // lenses, or the switcher resizes as you toggle: that header sizes up every
+  // button in it.
   return view === 'requests' ? (
     <UserProposalsList actions={switcher} standalone={false} />
   ) : (
-    <ResourceRequestsList actions={switcher} />
+    <ResourceRequestsList actions={switcher} standalone={false} />
   );
 };

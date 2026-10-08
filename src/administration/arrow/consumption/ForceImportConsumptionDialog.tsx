@@ -1,12 +1,19 @@
 import { useMutation } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Alert, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import {
   adminArrowBillingSyncsSyncResourceHistoricalConsumption,
   Resource,
 } from 'waldur-js-client';
 
-import { Badge } from 'waldur-ui';
+import {
+  AlertItem,
+  Badge,
+  BaseButton,
+  MonthPicker,
+  parseDateValue,
+  toIsoMonth,
+} from 'waldur-ui';
 
 import { defaultCurrency } from '@/core/formatCurrency';
 import { SubmitButton } from '@/form';
@@ -166,20 +173,30 @@ export const ForceImportConsumptionDialog = ({
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>{translate('From period')}</Form.Label>
-        <Form.Control
-          type="month"
-          value={periodFrom}
-          onChange={(e) => setPeriodFrom(e.target.value)}
+        <Form.Label htmlFor="force-import-period-from">
+          {translate('From period')}
+        </Form.Label>
+        <MonthPicker
+          id="force-import-period-from"
+          value={parseDateValue(periodFrom)}
+          onChange={(month) => setPeriodFrom(toIsoMonth(month))}
+          maxDate={periodTo}
+          // Required: the dialog seeds a range and the API needs both ends.
+          clearable={false}
         />
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>{translate('To period')}</Form.Label>
-        <Form.Control
-          type="month"
-          value={periodTo}
-          onChange={(e) => setPeriodTo(e.target.value)}
+        <Form.Label htmlFor="force-import-period-to">
+          {translate('To period')}
+        </Form.Label>
+        <MonthPicker
+          id="force-import-period-to"
+          value={parseDateValue(periodTo)}
+          onChange={(month) => setPeriodTo(toIsoMonth(month))}
+          minDate={periodFrom}
+          // Required: the dialog seeds a range and the API needs both ends.
+          clearable={false}
         />
       </Form.Group>
     </>
@@ -194,11 +211,13 @@ export const ForceImportConsumptionDialog = ({
       </p>
 
       {previewData.length === 0 ? (
-        <Alert variant="info">
-          {translate(
+        <AlertItem
+          type="floating"
+          variant="info"
+          title={translate(
             'No consumption data found for the selected period range.',
           )}
-        </Alert>
+        />
       ) : (
         <div className="table-responsive">
           <table className="table table-striped table-hover">
@@ -252,16 +271,21 @@ export const ForceImportConsumptionDialog = ({
       )}
 
       {previewMutation.data?.errors?.length > 0 && (
-        <Alert variant="warning" className="mt-3">
-          <strong>{translate('Some periods had errors:')}</strong>
-          <ul className="mb-0 mt-2">
-            {previewMutation.data.errors.map((err: any, idx: number) => (
-              <li key={idx}>
-                {err.period}: {err.error}
-              </li>
-            ))}
-          </ul>
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="warning"
+          className="mt-3"
+          title={translate('Some periods had errors:')}
+          body={
+            <ul className="mb-0 mt-2">
+              {previewMutation.data.errors.map((err: any, idx: number) => (
+                <li key={idx}>
+                  {err.period}: {err.error}
+                </li>
+              ))}
+            </ul>
+          }
+        />
       )}
     </>
   );
@@ -269,47 +293,54 @@ export const ForceImportConsumptionDialog = ({
   const renderResultPhase = () => (
     <>
       {importMutation.isSuccess && importMutation.data && (
-        <Alert
+        <AlertItem
+          type="floating"
           variant={
             importMutation.data.periods_synced > 0 ? 'success' : 'warning'
           }
-        >
-          <strong>{translate('Force import completed')}</strong>
-          <ul className="mb-0 mt-2">
-            <li>
-              {translate('Periods synced')}:{' '}
-              {importMutation.data.periods_synced}
-            </li>
-            <li>
-              {translate('Periods skipped')}:{' '}
-              {importMutation.data.periods_skipped}
-            </li>
-            {importMutation.data.periods_no_data > 0 && (
-              <li className="text-muted">
-                {translate('Periods with no data')}:{' '}
-                {importMutation.data.periods_no_data}
+          title={translate('Force import completed')}
+          body={
+            <ul className="mb-0 mt-2">
+              <li>
+                {translate('Periods synced')}:{' '}
+                {importMutation.data.periods_synced}
               </li>
-            )}
-            {importMutation.data.errors?.length > 0 && (
-              <li className="text-danger">
-                {translate('Errors')}: {importMutation.data.errors.length}
+              <li>
+                {translate('Periods skipped')}:{' '}
+                {importMutation.data.periods_skipped}
               </li>
-            )}
-          </ul>
-        </Alert>
+              {importMutation.data.periods_no_data > 0 && (
+                <li className="text-muted">
+                  {translate('Periods with no data')}:{' '}
+                  {importMutation.data.periods_no_data}
+                </li>
+              )}
+              {importMutation.data.errors?.length > 0 && (
+                <li className="text-danger">
+                  {translate('Errors')}: {importMutation.data.errors.length}
+                </li>
+              )}
+            </ul>
+          }
+        />
       )}
 
       {importMutation.data?.errors?.length > 0 && (
-        <Alert variant="warning" className="mt-3">
-          <strong>{translate('Some periods had errors:')}</strong>
-          <ul className="mb-0 mt-2">
-            {importMutation.data.errors.map((err: any, idx: number) => (
-              <li key={idx}>
-                {err.period}: {err.error}
-              </li>
-            ))}
-          </ul>
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="warning"
+          className="mt-3"
+          title={translate('Some periods had errors:')}
+          body={
+            <ul className="mb-0 mt-2">
+              {importMutation.data.errors.map((err: any, idx: number) => (
+                <li key={idx}>
+                  {err.period}: {err.error}
+                </li>
+              ))}
+            </ul>
+          }
+        />
       )}
     </>
   );
@@ -321,7 +352,12 @@ export const ForceImportConsumptionDialog = ({
           <CloseDialogButton label={translate('Cancel')} />
           <SubmitButton
             submitting={previewMutation.isPending}
-            disabled={!selectedResource}
+            disabled={
+              !selectedResource ||
+              !periodFrom ||
+              !periodTo ||
+              periodFrom > periodTo
+            }
             label={translate('Preview')}
             onClick={() => previewMutation.mutate()}
           />
@@ -331,14 +367,13 @@ export const ForceImportConsumptionDialog = ({
     if (phase === 'preview') {
       return (
         <>
-          <button
-            type="button"
-            className="btn btn-secondary"
+          <BaseButton
+            variant="secondary"
             onClick={() => setPhase('form')}
             disabled={importMutation.isPending}
-          >
-            {translate('Back')}
-          </button>
+            disabledReason={translate('Import is already in progress')}
+            label={translate('Back')}
+          />
           <CloseDialogButton label={translate('Cancel')} />
           <SubmitButton
             submitting={importMutation.isPending}

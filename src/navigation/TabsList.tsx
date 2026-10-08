@@ -8,7 +8,15 @@ import {
 } from '@uirouter/react';
 import classNames from 'classnames';
 import { isMatch } from 'lodash-es';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  FC,
+  KeyboardEvent as ReactKeyboardEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { Tooltip } from 'waldur-ui';
 
@@ -19,6 +27,7 @@ import {
   NavMenuItem,
   useHoverMenu,
 } from '@/navigation/NavMenu';
+import { getTabbableAfter } from '@/navigation/tabbables';
 
 import { isDescendantOf, useTabs } from './useTabs';
 
@@ -39,6 +48,11 @@ const MenuLink: FC<
     </a>
   );
 
+const tabTestId = (tab) => {
+  const id = tab.params?.tab ?? tab.to;
+  return id ? `tab-${id}` : undefined;
+};
+
 const findActiveTab = (tabs, router) => {
   const exactMatch = tabs.find(
     (parent) =>
@@ -49,6 +63,21 @@ const findActiveTab = (tabs, router) => {
   );
   if (exactMatch) {
     return exactMatch;
+  }
+  // No page tab matches ?tab= — it is absent (routes declare `tab` with no
+  // default) or names no tab — so the page renders its first shown tab
+  // (usePageTabsTransmitter). Highlight that same tab rather than none, by the
+  // same rule: skip hidden tabs and hidden children. Route tabs always match
+  // exactly above, and tabs on other states are left to the descendant match.
+  const onThisState = (to) => to && router.stateService.is(to);
+  const fallbackTab = tabs.find(
+    (tab) =>
+      tab.visible !== false &&
+      (onThisState(tab.to) ||
+        tab.children?.some((c) => c.visible !== false && onThisState(c.to))),
+  );
+  if (fallbackTab) {
+    return fallbackTab;
   }
   return tabs.find((parent) => {
     if (!isDescendantOf(parent.to, router.globals.current)) {
@@ -69,54 +98,65 @@ const findActiveTab = (tabs, router) => {
  * responsive CSS (`.menu-lg-down-accordion`,
  * `.menu-sub-down-accordion.menu-sub-dropdown`).
  *
- * Both modes collapse to the same Radix dropdown here — a deliberate
- * simplification, not an overlooked one. Metronic's own imperative menu
- * JS never called `preventDefault()` on this trigger (confirmed in its
- * `_click` handler before that file was deleted — the line was
- * commented out, not missing), and Link's own onClick always fires its
- * state transition regardless, so clicking this row today already
- * navigates away immediately in the common case (parentTab always
- * carries its own `to`/`redirectTo`) — remounting the whole tree and
- * making whatever the accordion was doing under it invisible in
- * practice. Reproducing a true
- * inline-accordion mode here would faithfully replicate a mode nothing
- * can actually observe; a single hover-capable Radix dropdown (matching
- * FooterDropdown.tsx's own identical original attribute value) is both
- * simpler and already what `lg`+ users see today.
+ * Both modes collapse to the same Radix dropdown here. The trigger is a
+ * plain button that only opens the menu (click, Enter, Space, ArrowDown,
+ * or hover at `lg`+); it does not navigate, so every destination,
+ * including the first, is a menu item (WCAG 2.1.1, no link nested in a
+ * button).
  */
 const TabWithChildren: FC<{ parentTab; active: boolean }> = ({
   parentTab,
   active,
 }) => {
-  const { open, setOpen, hoverHandlers } = useHoverMenu();
+  const { open, setOpen, hoverHandlers, triggerHandlers } = useHoverMenu();
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const tabTargetRef = useRef<HTMLElement | null>(null);
+
+  // Radix menus swallow Tab. Treat the portaled menu as if it sat right
+  // after its trigger: Tab closes it and moves on to the next header item,
+  // Shift+Tab closes it and returns to the trigger.
+  const handleContentKeyDown = (event: ReactKeyboardEvent) => {
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
+    tabTargetRef.current =
+      !event.shiftKey && triggerRef.current
+        ? getTabbableAfter(triggerRef.current, event.currentTarget)
+        : null;
+    setOpen(false);
+  };
+
+  const handleCloseAutoFocus = (event: Event) => {
+    const target = tabTargetRef.current;
+    tabTargetRef.current = null;
+    if (target) {
+      event.preventDefault();
+      target.focus();
+    }
+  };
 
   return (
     <NavMenu open={open} onOpenChange={setOpen} modal={false}>
-      <RadixDropdownMenu.Trigger asChild>
-        <span
-          className={classNames('menu-item me-0 me-lg-2', { here: active })}
-          {...hoverHandlers}
-        >
-          <MenuLink
-            to={
-              (typeof parentTab.redirectTo === 'string'
-                ? parentTab.redirectTo
-                : parentTab.redirectTo?.state) || parentTab.to
-            }
-            params={
-              typeof parentTab.redirectTo === 'object'
-                ? parentTab.redirectTo.params
-                : undefined
-            }
+      <span
+        data-testid={tabTestId(parentTab)}
+        className={classNames('menu-item me-0 me-lg-2', { here: active })}
+      >
+        <RadixDropdownMenu.Trigger asChild>
+          <button
+            ref={triggerRef}
+            type="button"
+            className="menu-link"
+            {...triggerHandlers}
           >
             <span className="menu-title">{parentTab.title}</span>
             <span className="menu-arrow" />
-          </MenuLink>
-        </span>
-      </RadixDropdownMenu.Trigger>
+          </button>
+        </RadixDropdownMenu.Trigger>
+      </span>
       <NavMenuContent
         placement="bottom-start"
         className="menu-gray-600 menu-state-bg-gray menu-rounded-0 menu-dropdown-default fw-bolder fs-6 py-2 w-200px"
+        onKeyDown={handleContentKeyDown}
+        onCloseAutoFocus={handleCloseAutoFocus}
         {...hoverHandlers}
       >
         {parentTab.children.map((childTab, childIndex) => (
@@ -168,6 +208,7 @@ export const TabsList: FC = () => {
         ) : parentTab.to || parentTab.redirectTo ? (
           <span
             key={parentIndex}
+            data-testid={tabTestId(parentTab)}
             className={classNames('menu-item text-nowrap', {
               here: isMatch(activeTab, parentTab),
             })}

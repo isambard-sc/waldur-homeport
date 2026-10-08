@@ -5,10 +5,10 @@ import {
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC } from 'react';
 
-import { FeaturedIcon } from '@/core/FeaturedIcon';
+import { FeaturedIcon, BaseButton } from 'waldur-ui';
+
 import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
-import { CompactActionButton } from '@/table/CompactActionButton';
 import { useProject } from '@/workspace/hooks';
 
 import { ProjectRecoveryModal } from './ProjectRecoveryModal';
@@ -36,9 +36,8 @@ export const RemovedProjectWarningBar: FC = () => {
   return (
     <div className="layout-warning-bar bar-warning">
       <div className="container-fluid w-100 d-flex align-items-center gap-2">
-        {/* eslint-disable-next-line waldur-custom/enforce-phosphor-icon-weight */}
         <FeaturedIcon
-          IconComponent={WarningCircleIcon}
+          icon={<WarningCircleIcon weight="bold" />}
           variant="warning"
           size="sm"
         />
@@ -48,12 +47,13 @@ export const RemovedProjectWarningBar: FC = () => {
             'This project has been removed. All resources have been terminated and user roles have been revoked.',
           )}
         </p>
-        <CompactActionButton
-          action={openRecoveryModal}
-          title={translate('Recover Project')}
+        <BaseButton
+          onClick={openRecoveryModal}
+          label={translate('Recover Project')}
           iconNode={<ArrowCounterClockwiseIcon weight="bold" />}
           variant="warning"
           className="ms-auto"
+          size="sm"
         />
       </div>
     </div>

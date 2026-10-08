@@ -4,13 +4,11 @@ import {
   WarningCircleIcon,
 } from '@phosphor-icons/react';
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
-import SelectableContext from '@restart/ui/SelectableContext';
 import { useQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash-es';
 import {
   FunctionComponent,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -26,7 +24,7 @@ import {
   OfferingComponent,
 } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
+import { BaseButton, Tooltip } from 'waldur-ui';
 
 import { AwesomeRadioButton } from '@/core/AwesomeRadioButton';
 import { UI_STALE_TIME } from '@/core/constants';
@@ -91,10 +89,9 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
   const form = useForm();
   const formState = form.getState();
   const errors = formState.errors || {};
-  // Tab.Container below is uncontrolled (defaultActiveKey only), so switching
-  // tabs from this overflow dropdown has to go through the same internal
-  // SelectableContext that Nav.Link's own eventKey taps into.
-  const selectTab = useContext(SelectableContext);
+  // Controlled so the overflow menu, which sits outside the tab Nav, can
+  // switch tabs too.
+  const [activeTab, setActiveTab] = useState(props.components[0]?.uuid);
 
   const handleWindowResize = useCallback(
     debounce(() => {
@@ -304,7 +301,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
         )}
       </div>
       {props.components.length > 0 && (
-        <Tab.Container defaultActiveKey={props.components[0].uuid}>
+        <Tab.Container activeKey={activeTab} onSelect={setActiveTab}>
           <div className="d-flex">
             <Nav
               ref={refNav}
@@ -359,24 +356,25 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
               <Nav variant="tabs" className="nav-line-tabs mb-4">
                 <Nav.Item>
                   <RadixDropdownMenu.Root>
-                    <RadixDropdownMenu.Trigger asChild>
-                      <button
-                        type="button"
-                        className="btn dropdown-toggle btn-text-secondary btn-icon no-arrow w-35px h-35px position-relative"
-                      >
-                        <DotsThreeIcon size={22} weight="bold" />
-                        {wrappedComponents.some((comp) =>
-                          Boolean(errors.components?.[comp.type]),
-                        ) && (
-                          <HeaderButtonBullet
-                            size={10}
-                            blink={false}
-                            variant="danger"
-                            className="me-n2"
-                          />
-                        )}
-                      </button>
-                    </RadixDropdownMenu.Trigger>
+                    <div className="position-relative d-inline-flex">
+                      <RadixDropdownMenu.Trigger asChild>
+                        <BaseButton
+                          variant="text-secondary"
+                          size="md"
+                          iconNode={<DotsThreeIcon size={22} weight="bold" />}
+                        />
+                      </RadixDropdownMenu.Trigger>
+                      {wrappedComponents.some((comp) =>
+                        Boolean(errors.components?.[comp.type]),
+                      ) && (
+                        <HeaderButtonBullet
+                          size={10}
+                          blink={false}
+                          variant="danger"
+                          className="me-n2"
+                        />
+                      )}
+                    </div>
                     <RadixDropdownMenu.Portal>
                       <RadixDropdownMenu.Content
                         sideOffset={2}
@@ -387,9 +385,7 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                             <ActionsDropdownItem
                               key={component.uuid}
                               className="d-flex justify-content-between"
-                              onClick={(event) =>
-                                selectTab?.(component.uuid, event)
-                              }
+                              onClick={() => setActiveTab(component.uuid)}
                             >
                               {Boolean(errors.components?.[component.type]) && (
                                 <Tooltip

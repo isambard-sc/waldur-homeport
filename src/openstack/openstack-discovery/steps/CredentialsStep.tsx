@@ -1,16 +1,17 @@
 import { FC, useState } from 'react';
-import { Alert } from 'react-bootstrap';
 import { useForm, useFormState } from 'react-final-form';
 import { openstackDiscoveryValidateCredentials } from 'waldur-js-client';
 
+import { AlertItem } from 'waldur-ui';
+
 import {
+  SubmitButton,
   StringGroup,
   SelectGroup,
   SecretGroup,
   BooleanGroup,
   TextGroup,
 } from '@/form';
-import { SubmitButton } from '@/form/SubmitButton';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { WizardModal, WizardStepProps } from '@/wizard';
@@ -71,7 +72,6 @@ export const CredentialsStep: FC<WizardStepProps> = (props) => {
         disabled={!isFormValid()}
         label={translate('Validate & Continue')}
         onClick={validateAndContinue}
-        type="button"
         data-testid="discovery-validate-btn"
       />
     </>
@@ -160,16 +160,22 @@ export const CredentialsStep: FC<WizardStepProps> = (props) => {
         />
       </div>
       {error && (
-        <Alert variant="danger" className="mb-4">
-          {error}
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="error"
+          className="mb-4"
+          title={error}
+        />
       )}
       {values.serverInfo && (
-        <Alert variant="success" className="mb-4">
-          {translate('Connected to OpenStack (project: {project})', {
+        <AlertItem
+          type="floating"
+          variant="success"
+          className="mb-4"
+          title={translate('Connected to OpenStack (project: {project})', {
             project: values.serverInfo.project_name,
           })}
-        </Alert>
+        />
       )}
     </WizardModal>
   );

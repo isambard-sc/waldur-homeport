@@ -1,13 +1,12 @@
 import { CaretLeftIcon } from '@phosphor-icons/react';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Table as BTable } from 'react-bootstrap';
+import { Table as BTable } from 'react-bootstrap';
 import { useForm, useFormState } from 'react-final-form';
 
-import { Badge } from 'waldur-ui';
+import { AlertItem, Badge, BaseButton } from 'waldur-ui';
 
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { Select } from '@/form/select';
-import { SubmitButton } from '@/form/SubmitButton';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { WizardModal, WizardStepProps } from '@/wizard';
@@ -97,22 +96,20 @@ export const Step2CustomerDiscovery: FC<WizardStepProps> = (props) => {
 
   const renderFooter = () => (
     <>
-      <SubmitButton
-        submitting={false}
+      <BaseButton
         variant="tertiary"
         className="min-w-125px me-auto"
         onClick={() => props.onPrev(values)}
-        type="button"
         label={translate('Back')}
         iconNode={<CaretLeftIcon weight="bold" />}
-        iconOnLeft
+        size="lg"
       />
       <CloseDialogButton className="min-w-125px" />
-      <SubmitButton
-        submitting={false}
+      <BaseButton
         label={translate('Continue')}
         onClick={() => props.handleSubmit()}
-        type="button"
+        variant="primary"
+        size="lg"
       />
     </>
   );
@@ -133,9 +130,12 @@ export const Step2CustomerDiscovery: FC<WizardStepProps> = (props) => {
   if (error) {
     return (
       <WizardModal {...props} renderFooter={renderFooter}>
-        <Alert variant="danger" className="mb-4">
-          {error}
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="error"
+          className="mb-4"
+          title={error}
+        />
       </WizardModal>
     );
   }
@@ -150,11 +150,13 @@ export const Step2CustomerDiscovery: FC<WizardStepProps> = (props) => {
       </p>
 
       {values.customers.length === 0 ? (
-        <Alert variant="info">
-          {translate(
+        <AlertItem
+          type="floating"
+          variant="info"
+          title={translate(
             'No Arrow customers found. You can continue without mappings.',
           )}
-        </Alert>
+        />
       ) : (
         <div className="table-responsive mb-4" style={{ maxHeight: '400px' }}>
           <BTable striped bordered hover size="sm">

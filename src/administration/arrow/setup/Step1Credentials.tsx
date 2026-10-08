@@ -1,10 +1,10 @@
 import { FC, useState } from 'react';
-import { Alert } from 'react-bootstrap';
 import { useForm, useFormState } from 'react-final-form';
 
+import { AlertItem } from 'waldur-ui';
+
 import { url, required } from '@/core/validators';
-import { StringGroup, SecretGroup } from '@/form';
-import { SubmitButton } from '@/form/SubmitButton';
+import { SubmitButton, StringGroup, SecretGroup } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { WizardModal, WizardStepProps } from '@/wizard';
@@ -60,7 +60,6 @@ export const Step1Credentials: FC<WizardStepProps> = (props) => {
         disabled={!isFormValid}
         label={translate('Validate & Continue')}
         onClick={validateAndContinue}
-        type="button"
       />
     </>
   );
@@ -94,9 +93,12 @@ export const Step1Credentials: FC<WizardStepProps> = (props) => {
         />
       </div>
       {error && (
-        <Alert variant="danger" className="mb-4">
-          {error}
-        </Alert>
+        <AlertItem
+          type="floating"
+          variant="error"
+          className="mb-4"
+          title={error}
+        />
       )}
     </WizardModal>
   );

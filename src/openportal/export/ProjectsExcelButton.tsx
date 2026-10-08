@@ -2,10 +2,11 @@ import { MicrosoftExcelLogoIcon } from '@phosphor-icons/react';
 import { FC, useCallback } from 'react';
 import { projectsList } from 'waldur-js-client';
 
+import { BaseButton } from 'waldur-ui';
+
 import { getAllPages } from '@/core/api';
 import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
-import { ActionButton } from '@/table/ActionButton';
 
 import { projectExportFilter } from './projectExportFilter';
 import { ProjectsExcelDialog } from './ProjectsExcelDialog';
@@ -43,11 +44,12 @@ export const ProjectsExcelButton: FC<Props> = ({
   );
 
   return (
-    <ActionButton
-      title={translate('Excel')}
+    <BaseButton
+      label={translate('Excel')}
       iconNode={<MicrosoftExcelLogoIcon weight="bold" />}
       variant="secondary"
-      action={() =>
+      size="lg"
+      onClick={() =>
         openDialog(ProjectsExcelDialog, {
           resolve: {
             fetchProjects,
