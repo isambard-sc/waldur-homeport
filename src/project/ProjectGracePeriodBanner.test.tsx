@@ -33,6 +33,10 @@ describe('ProjectGracePeriodBanner', () => {
     expect(
       screen.getByText(/contact the allocator of your project no later than/),
     ).toHaveTextContent('20 Jan 2027');
+    expect(
+      screen.getByText(/the earlier you ask, the more likely/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/will need evidence/)).toBeInTheDocument();
     expect(screen.queryByText(/Today is the last day/)).toBeNull();
   });
 
@@ -40,42 +44,58 @@ describe('ProjectGracePeriodBanner', () => {
     renderOn('2027-01-20');
 
     expect(
-      screen.getByText(/contact the allocator of your project no later than/),
+      screen.getByText(/you must contact the allocator of your project TODAY/),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Today is the last day to ask the allocator for an extension.',
+        /Today is the last day that a change to the grace period can be requested/,
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/After today, an extension is unlikely/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/will need evidence/)).toBeInTheDocument();
   });
 
-  // One rule, as in the emails: there is no second, 5-day deadline.
-  it('names no rejection deadline', () => {
-    renderOn('2027-01-05');
-
-    expect(screen.queryByText(/will be rejected/)).toBeNull();
+  // Soft, as the emails are: a late request is unlikely to succeed, never
+  // ruled out.
+  it('uses no absolute wording', () => {
+    for (const day of ['2027-01-05', '2027-01-20', '2027-01-25']) {
+      const { unmount } = renderOn(day);
+      expect(screen.queryByText(/will be rejected/)).toBeNull();
+      expect(screen.queryByText(/cannot be extended/)).toBeNull();
+      unmount();
+    }
   });
 
-  it('says the grace period cannot be extended once the deadline has passed', () => {
+  it('says a late extension is unlikely once the deadline has passed', () => {
     renderOn('2027-01-21');
 
-    expect(screen.getByText(/cannot be extended/)).toHaveTextContent(
-      '29 Jan 2027',
-    );
+    expect(screen.getByText(/that date has now passed/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/unlikely unless there are exceptional circumstances/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/explain what has happened/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/copied back all of your data by the end of/),
+    ).toHaveTextContent('29 Jan 2027');
+    // "Explain what has happened" takes the place of the evidence sentence.
+    expect(screen.queryByText(/will need evidence/)).toBeNull();
     expect(screen.queryByText(/no later than/)).toBeNull();
   });
 
   // A 5-day grace period never had a deadline in its future; the banner must
   // not name one that has already gone.
-  it('shows a short grace period as not extendable, with no past date', () => {
+  it('shows a short grace period as past its deadline, with no past date', () => {
     renderOn('2027-01-02', {
       effective_end_date: '2027-01-05',
       grace_period_days: 5,
     });
 
-    expect(screen.getByText(/cannot be extended/)).toHaveTextContent(
-      '4 Jan 2027',
-    );
+    expect(screen.getByText(/that date has now passed/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/copied back all of your data by the end of/),
+    ).toHaveTextContent('4 Jan 2027');
     expect(screen.queryByText(/26 Dec 2026|31 Dec 2026/)).toBeNull();
   });
 
