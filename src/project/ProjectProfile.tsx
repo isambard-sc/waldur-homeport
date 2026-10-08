@@ -11,7 +11,7 @@ import { Project } from 'waldur-js-client';
 import { Badge } from 'waldur-ui';
 
 import { CopyToClipboardButton } from '@/core/CopyToClipboardButton';
-import { daysUntilAccessEnds, formatDate } from '@/core/dateUtils';
+import { formatDate } from '@/core/dateUtils';
 import { Link } from '@/core/Link';
 import { PublicDashboardHero } from '@/dashboard/hero/PublicDashboardHero';
 import { isFeatureVisible } from '@/features/connect';
@@ -22,6 +22,7 @@ import { useUser, useCustomer } from '@/workspace/hooks';
 import { checkIsOwnerOrStaff } from '@/workspace/selectors';
 
 import { ProjectActions } from './dashboard/ProjectActions';
+import { getEndDateStatus } from './gracePeriodNotice';
 import { useProjectAwardDetails } from './useProjectAwardDetails';
 import { useProjectProposals } from './useProjectProposals';
 
@@ -138,45 +139,38 @@ const ProjectKindCard = ({ project }: ProjectProfileProps) => {
 const APPROACHING_DAYS = 30;
 
 const ProjectEndDate = ({ project }: ProjectProfileProps) => {
-  const today = new Date();
-  const endDateObj = new Date(project.end_date);
-  const effectiveEndDateObj = project.effective_end_date
-    ? new Date(project.effective_end_date)
-    : endDateObj;
-  // Counts run to the last day of access, which is the day before the end
-  // date — see the end-dates-are-exclusive note in @/core/dateUtils. The
-  // "expired N days ago" count below is unaffected: it measures from the day
-  // access was actually lost, which is the effective end date itself.
-  const daysToEnd = daysUntilAccessEnds(project.end_date);
-  const daysSinceEffectiveEnd = Math.floor(
-    (today.getTime() - effectiveEndDateObj.getTime()) / 86400000,
-  );
+  const status = getEndDateStatus(project, APPROACHING_DAYS);
 
   let className = '';
   let suffix: string | null = null;
-  if (project.is_in_grace_period) {
+  if (status?.kind === 'grace') {
     className = 'text-warning fw-semibold';
-    const daysLeft = Math.max(
-      0,
-      daysUntilAccessEnds(project.effective_end_date),
-    );
     suffix =
-      daysLeft === 0
+      status.daysLeft === 0
         ? translate('(in grace period, last day)')
-        : translate('(in grace period, {n} days left)', {
-            n: String(daysLeft),
-          });
-  } else if (daysSinceEffectiveEnd > 0) {
+        : status.daysLeft === 1
+          ? translate('(in grace period, 1 day left)')
+          : translate('(in grace period, {n} days left)', {
+              n: String(status.daysLeft),
+            });
+  } else if (status?.kind === 'expired') {
     className = 'text-danger fw-semibold';
-    suffix = translate('(expired {n} days ago)', {
-      n: String(daysSinceEffectiveEnd),
-    });
-  } else if (daysToEnd >= 0 && daysToEnd <= APPROACHING_DAYS) {
+    suffix =
+      status.daysAgo === 0
+        ? translate('(expired today)')
+        : status.daysAgo === 1
+          ? translate('(expired 1 day ago)')
+          : translate('(expired {n} days ago)', {
+              n: String(status.daysAgo),
+            });
+  } else if (status?.kind === 'approaching') {
     className = 'text-warning fw-semibold';
     suffix =
-      daysToEnd === 0
+      status.daysLeft === 0
         ? translate('(last day)')
-        : translate('(in {n} days)', { n: String(daysToEnd) });
+        : status.daysLeft === 1
+          ? translate('(in 1 day)')
+          : translate('(in {n} days)', { n: String(status.daysLeft) });
   }
 
   return (

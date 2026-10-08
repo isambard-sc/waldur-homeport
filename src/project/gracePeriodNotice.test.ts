@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { describe, expect, it } from 'vitest';
 
-import { getGracePeriodNotice } from './gracePeriodNotice';
+import { getEndDateStatus, getGracePeriodNotice } from './gracePeriodNotice';
 
 // Ends 31 Dec 2026 with a 30-day grace period: the example the emails use.
 const PROJECT = { end_date: '2026-12-31', effective_end_date: '2027-01-30' };
@@ -57,5 +57,66 @@ describe('getGracePeriodNotice', () => {
     expect(
       getGracePeriodNotice({ end_date: null, effective_end_date: null }),
     ).toBeNull();
+  });
+});
+
+// The three projects from 8 Oct 2026, each with a 30-day grace period.
+describe('getEndDateStatus', () => {
+  const TODAY = on('2026-10-08');
+  const ended = (end: string, effective: string) =>
+    getEndDateStatus(
+      { end_date: end, effective_end_date: effective },
+      30,
+      TODAY,
+    );
+
+  it('counts to the last day of access in the grace period', () => {
+    // Loses access 10 Oct, so 9 Oct is the last day: one day left.
+    expect(ended('2026-09-10', '2026-10-10')).toEqual({
+      kind: 'grace',
+      daysLeft: 1,
+    });
+    // Loses access 9 Oct: today is the last day.
+    expect(ended('2026-09-09', '2026-10-09')).toEqual({
+      kind: 'grace',
+      daysLeft: 0,
+    });
+  });
+
+  // Access was lost at the start of 8 Oct, although the API still reports
+  // is_in_grace_period that day: the label must not say "last day".
+  it('is expired on the effective end date itself', () => {
+    expect(ended('2026-09-08', '2026-10-08')).toEqual({
+      kind: 'expired',
+      daysAgo: 0,
+    });
+    expect(ended('2026-09-07', '2026-10-07')).toEqual({
+      kind: 'expired',
+      daysAgo: 1,
+    });
+  });
+
+  it('is in the grace period from the end date itself', () => {
+    expect(ended('2026-10-08', '2026-11-07')).toEqual({
+      kind: 'grace',
+      daysLeft: 29,
+    });
+  });
+
+  it('counts down to an approaching end date', () => {
+    // Ends 10 Oct, so 9 Oct is the last day.
+    expect(ended('2026-10-10', '2026-11-09')).toEqual({
+      kind: 'approaching',
+      daysLeft: 1,
+    });
+    expect(ended('2027-01-01', '2027-01-31')).toBeNull();
+  });
+
+  // Without a grace period, access ends with the end date.
+  it('expires on the end date when there is no grace period', () => {
+    expect(ended('2026-10-08', '2026-10-08')).toEqual({
+      kind: 'expired',
+      daysAgo: 0,
+    });
   });
 });

@@ -73,3 +73,48 @@ export const getGracePeriodNotice = (
     window,
   };
 };
+
+/** Where a project stands against its end dates, for the end-date label. */
+export type EndDateStatus =
+  | { kind: 'approaching'; daysLeft: number }
+  | { kind: 'grace'; daysLeft: number }
+  | { kind: 'expired'; daysAgo: number };
+
+/**
+ * The end-date label's state, decided from the dates on the same rule as the
+ * banner rather than from `is_in_grace_period`.
+ *
+ * The backend still reports a project as in its grace period on the effective
+ * end date itself, although access was lost at the start of that day, so the
+ * label read "in grace period, last day" while the bar above it said the
+ * project had expired. Day counts run to the last day of access, the day
+ * before each (exclusive) end date.
+ */
+export const getEndDateStatus = (
+  project: Pick<Project, 'end_date' | 'effective_end_date'>,
+  approachingDays: number,
+  now: DateTime = DateTime.now(),
+): EndDateStatus | null => {
+  if (!project.end_date) {
+    return null;
+  }
+  const today = now.startOf('day');
+  const end = DateTime.fromISO(project.end_date).startOf('day');
+  const accessEnds = project.effective_end_date
+    ? DateTime.fromISO(project.effective_end_date).startOf('day')
+    : end;
+  const daysUntil = (date: DateTime) =>
+    Math.round(date.minus({ days: 1 }).diff(today, 'days').days);
+
+  if (today >= accessEnds) {
+    return {
+      kind: 'expired',
+      daysAgo: Math.round(today.diff(accessEnds, 'days').days),
+    };
+  }
+  if (today >= end) {
+    return { kind: 'grace', daysLeft: daysUntil(accessEnds) };
+  }
+  const daysLeft = daysUntil(end);
+  return daysLeft <= approachingDays ? { kind: 'approaching', daysLeft } : null;
+};
