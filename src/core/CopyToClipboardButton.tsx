@@ -1,17 +1,24 @@
 import { CopyIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { useCallback, FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
-import { showSuccess } from '@waldur/store/notify';
+import { buttonVariants, ButtonVariant, Tooltip } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { useNotify } from '@/store/notify';
 
 interface OwnProps {
   value;
   size?: number;
   className?: string;
   buttonClassName?: string;
+  /**
+   * Renders as a real design-token icon button (`buttonVariants()`,
+   * icon-only) instead of the default bare `text-btn` reset — for contexts
+   * where the copy affordance needs its own hit target and hover fill
+   * rather than sitting inline with surrounding text/other icons.
+   */
+  buttonVariant?: ButtonVariant;
   onlyButton?: boolean;
   verbose?: string;
 }
@@ -20,37 +27,39 @@ export const CopyToClipboardButton: FunctionComponent<OwnProps> = ({
   value,
   className,
   buttonClassName,
+  buttonVariant,
   size,
   onlyButton,
   verbose = translate('Text'),
 }) => {
-  const dispatch = useDispatch();
+  const { showSuccess } = useNotify();
 
   const onClick = useCallback(
     (event) => {
       event.stopPropagation();
       event.preventDefault();
       navigator.clipboard.writeText(value).then(() => {
-        dispatch(
-          showSuccess(translate('{name} has been copied', { name: verbose })),
-        );
+        showSuccess(translate('{name} has been copied', { name: verbose }));
       });
     },
-    [dispatch, value, verbose],
+    [value, verbose],
   );
 
   const CopyButton = () => (
     <button
-      className={classNames('text-btn', buttonClassName)}
+      className={classNames(
+        buttonVariant
+          ? buttonVariants({ variant: buttonVariant, iconOnly: true })
+          : 'text-btn',
+        buttonClassName,
+      )}
       type="button"
+      aria-label={translate('Copy to clipboard')}
       onClick={(e) => onClick(e)}
     >
-      <Tip
-        label={translate('Copy to clipboard')}
-        id={'copyToClipboard-' + value}
-      >
+      <Tooltip label={translate('Copy to clipboard')}>
         <CopyIcon weight="bold" size={size} />
-      </Tip>
+      </Tooltip>
     </button>
   );
 

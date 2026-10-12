@@ -1,8 +1,9 @@
 import { ArrowClockwiseIcon } from '@phosphor-icons/react';
-import { Button } from 'react-bootstrap';
+import classNames from 'classnames';
 
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 interface RefreshButtonProps {
   size?: 'sm' | 'lg';
@@ -12,26 +13,18 @@ interface RefreshButtonProps {
 }
 
 export const RefreshButton = ({
-  size,
+  size = 'lg',
   refetch,
   isLoading,
   className,
-}: RefreshButtonProps) => {
-  return (
-    <Button
-      variant="tertiary"
-      className={'min-w-100px' + (className ? ` ${className}` : '')}
-      size={size}
-      onClick={!isLoading ? refetch : undefined}
-    >
-      {isLoading ? (
-        <LoadingSpinnerIcon />
-      ) : (
-        <span className={'svg-icon' + (size !== 'sm' ? ' svg-icon-2' : '')}>
-          <ArrowClockwiseIcon />
-        </span>
-      )}
-      {translate('Refresh')}
-    </Button>
-  );
-};
+}: RefreshButtonProps) => (
+  <BaseButton
+    pending={isLoading}
+    size={size}
+    variant="tertiary"
+    className={classNames('min-w-100px', className)}
+    onClick={!isLoading ? refetch : undefined}
+    label={translate('Refresh')}
+    iconNode={<ArrowClockwiseIcon weight="bold" />}
+  />
+);

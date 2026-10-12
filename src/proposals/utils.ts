@@ -8,58 +8,38 @@ import {
 } from 'waldur-js-client';
 import { User } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
-import { IBreadcrumbItem } from '@waldur/navigation/types';
-import { RoleEnum } from '@waldur/permissions/enums';
+import { BadgeVariant } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { usePresetBreadcrumbItems } from '@/navigation/header/breadcrumb/utils';
+import { IBreadcrumbItem } from '@/navigation/types';
+import { PermissionEnum, RoleEnum } from '@/permissions/enums';
+import { hasPermission } from '@/permissions/hasPermission';
 import {
+  AllocationTime,
   Call,
   CallOfferingState,
   CallState,
   ProposalState,
-  RoundAllocationStrategy,
-  RoundAllocationTime,
-  RoundReviewStrategy,
-} from '@waldur/proposals/types';
+} from '@/proposals/types';
+import {
+  checkIsOwnerOrStaff,
+  checkIsStaffOrSupport,
+} from '@/workspace/selectors';
 
-export const getRoundReviewStrategyOptions = () =>
-  [
-    { value: 'after_round', label: translate('After round is closed') },
-    { value: 'after_proposal', label: translate('After proposal submission') },
-  ] as { value: RoundReviewStrategy; label: string }[];
-
-export const formatRoundReviewStrategy = (value: RoundReviewStrategy) =>
-  getRoundReviewStrategyOptions().find((option) => option.value === value)
-    ?.label || value;
-
-export const getRoundAllocationStrategyOptions = () =>
-  [
-    { value: 'by_call_manager', label: translate('By call manager') },
-    {
-      value: 'automatic',
-      label: translate('Automatic based on review scoring'),
-    },
-  ] as { value: RoundAllocationStrategy; label: string }[];
-
-export const formatRoundAllocationStrategy = (value: RoundAllocationStrategy) =>
-  getRoundAllocationStrategyOptions().find((option) => option.value === value)
-    ?.label || value;
-
-export const getRoundAllocationTimeOptions = () =>
+// Allocation timing is a call-level policy on the allocation_decision workflow
+// step (not per-round): 'on_decision' provisions immediately, 'fixed_date' uses
+// the round's allocation date.
+export const getAllocationTimeOptions = () =>
   [
     { value: 'on_decision', label: translate('On decision') },
     { value: 'fixed_date', label: translate('Fixed date') },
-  ] as { value: RoundAllocationTime; label: string }[];
+  ] as { value: AllocationTime; label: string }[];
 
-export const formatRoundAllocationTime = (value: RoundAllocationTime) =>
-  getRoundAllocationTimeOptions().find((option) => option.value === value)
-    ?.label || value;
-
-export const getCallStateActions = () =>
-  [
-    { label: translate('Activate'), value: 'active', action: 'activate' },
-    { label: translate('Archive'), value: 'archived', action: 'archive' },
-  ] as { value: CallState; label: string; action: string }[];
+export const formatAllocationTime = (value: AllocationTime) =>
+  getAllocationTimeOptions().find(
+    (option) => option.value === value?.toLowerCase(),
+  )?.label || value;
 
 export const getCallStateOptions = () =>
   [
@@ -72,7 +52,7 @@ export const formatCallState = (value: CallState) =>
   getCallStateOptions().find((option) => option.value === value)?.label ||
   value;
 
-export const getCallOfferingStateOptions = () =>
+const getCallOfferingStateOptions = () =>
   [
     { value: 'requested', label: translate('Requested') },
     { value: 'accepted', label: translate('Accepted') },
@@ -124,29 +104,52 @@ export const formatProposalState = (value: ProposalState) =>
 
 export const getReviewStateOptions = () =>
   [
-    { value: 'created', label: translate('Created') },
     { value: 'in_review', label: translate('In review') },
     { value: 'submitted', label: translate('Submitted') },
-    { value: 'rejected', label: translate('Declined') },
+    { value: 'rejected', label: translate('Rejected') },
   ] as { value: ProposalReviewStateEnum; label: string }[];
 
 export const formatReviewState = (value: ProposalReviewStateEnum) =>
   getReviewStateOptions().find((option) => option.value === value)?.label ||
   value;
 
-export const getReviewStateBadgeVariant = (value: ProposalReviewStateEnum) =>
-  value === 'created'
-    ? 'default'
-    : value === 'in_review' || value === 'submitted'
-      ? 'warning'
-      : value === 'rejected'
-        ? 'danger'
-        : 'secondary';
+/**
+ * The same states, named from the reviewer's own side.
+ *
+ * `in_review` describes the proposal — it is under review — which in a
+ * reviewer's own list reads as "someone is handling this" when it means "you
+ * have not done this yet". `rejected` is likewise the system's word for the
+ * reviewer having declined the assignment.
+ *
+ * Only for a reviewer looking at their own work; a manager reading someone
+ * else's review wants the neutral wording.
+ */
+export const getOwnReviewStateOptions = () =>
+  [
+    { value: 'in_review', label: translate('To do') },
+    { value: 'submitted', label: translate('Submitted') },
+    { value: 'rejected', label: translate('Declined') },
+  ] as { value: ProposalReviewStateEnum; label: string }[];
+
+export const formatOwnReviewState = (value: ProposalReviewStateEnum) =>
+  getOwnReviewStateOptions().find((option) => option.value === value)?.label ||
+  value;
+
+export const getReviewStateBadgeVariant = (
+  value: ProposalReviewStateEnum,
+): BadgeVariant =>
+  value === 'in_review' || value === 'submitted'
+    ? 'warning'
+    : value === 'rejected'
+      ? 'danger'
+      : 'secondary';
 
 export const isReviewInFinalState = (state: ProposalReviewStateEnum) =>
-  !['in_review', 'created'].includes(state);
+  !['in_review'].includes(state);
 
-export const getRoundStatus = (round: NestedRound) => {
+export const getRoundStatus = (
+  round: NestedRound,
+): { label: string; value: string; color: BadgeVariant } | null | undefined => {
   if (!round) {
     return null;
   } else if (round.status === 'scheduled') {
@@ -168,13 +171,15 @@ export const getRoundsWithStatus = (rounds: NestedRound[]) =>
     status: getRoundStatus(round),
   }));
 
-export const getCallStatus = (call: Call) => {
+export const getCallStatus = (
+  call: Call,
+): { label: string; color: BadgeVariant } => {
   if (call.state == 'active')
     return { label: translate('Active'), color: 'success' };
   else if (call.state == 'draft')
     return { label: translate('Draft'), color: 'danger' };
   else if (call.state == 'archived')
-    return { label: translate('Archived'), color: 'secondary' };
+    return { label: translate('Archived'), color: 'neutral' };
   else {
     return { label: call.state, color: 'secondary' };
   }
@@ -189,6 +194,71 @@ export const getRoundInitialValues = (
   timezone: DateTime.local().zoneName,
 });
 
+/**
+ * Whether the user may write to this call.
+ *
+ * The single frontend statement of the backend's gate on ProtectedCallViewSet:
+ * `permission_factory(UPDATE_CALL, CALL_PERMISSION_SOURCES)` with sources
+ * `["*", "manager"]` — the permission held either on the call itself, where a
+ * CALL.MANAGER role sits, or on its managing organisation, where a
+ * CUSTOMER.CALL_ORGANIZER role is bound. Both roles ship carrying CALL.UPDATE.
+ *
+ * Every surface that asks "may this user edit the call?" goes through here, so
+ * the answer cannot drift between the page body, the action menu and the
+ * navigation that leads to them.
+ */
+export const canUpdateCall = (user: User, call: Call): boolean =>
+  Boolean(
+    hasPermission(user, {
+      permission: PermissionEnum.UPDATE_CALL,
+      scopeId: call?.uuid,
+      callOrganizerId: call?.manager_uuid,
+    }),
+  );
+
+/** Mirrors the backend gate on the export endpoints. Narrower than
+ * `canAccessCallManagement`, which also admits organization owners. */
+export const canExportCall = (user: User, call: Call): boolean =>
+  canUpdateCall(user, call) || Boolean(checkIsStaffOrSupport(user));
+
+/**
+ * Whether the user may open the call's management surfaces at all — the Edit
+ * and Manage pages and the tab strip that leads to them.
+ *
+ * Broader than `canUpdateCall` on purpose, and the distinction matters: an
+ * organization owner holds no CALL.UPDATE (so every field stays read-only) but
+ * does hold the call team-management permissions, exercised from the Team tab
+ * inside the Edit page. Gating page access on `canUpdateCall` alone would
+ * strand them.
+ *
+ * Support users are admitted too, read-only: the backend lets them read every
+ * call and its management data but grants them no write, so every control on
+ * these pages stays disabled or hidden for them.
+ *
+ * Reviewers and panel members satisfy none of these, which is the point: they
+ * can read a call through the API to do their reviewing, but these pages are
+ * not theirs, whether they arrive by link or by typed URL.
+ */
+export const canAccessCallManagement = (user: User, call: Call): boolean =>
+  canUpdateCall(user, call) ||
+  checkIsOwnerOrStaff({ uuid: call?.customer_uuid } as any, user) ||
+  Boolean(checkIsStaffOrSupport(user));
+
+/**
+ * Whether the user may manage the call's reviewers — invite to the pool,
+ * generate and confirm matches, create and send assignment batches, resolve
+ * conflicts of interest. Mirrors the backend's MANAGE_PROPOSAL_REVIEW gate,
+ * held on the call or on its managing organisation.
+ */
+export const canManageCallReviews = (user: User, call: Call): boolean =>
+  Boolean(
+    hasPermission(user, {
+      permission: PermissionEnum.MANAGE_PROPOSAL_REVIEW,
+      scopeId: call?.uuid,
+      callOrganizerId: call?.manager_uuid,
+    }),
+  );
+
 export const checkIsCallManager = (call: Call, user: User): boolean =>
   !!user?.permissions?.find(
     (permission) =>
@@ -200,15 +270,12 @@ export const checkIsCallManager = (call: Call, user: User): boolean =>
 export const useCallBreadcrumbItems = (
   call: Pick<Call, 'customer_uuid' | 'customer_name' | 'name'>,
 ): IBreadcrumbItem[] => {
-  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
+  const { getOrganizationsBreadcrumbItem, getOrganizationBreadcrumbItem } =
+    usePresetBreadcrumbItems();
 
   return useMemo(
     () => [
-      {
-        key: 'organizations',
-        text: translate('Organizations'),
-        to: 'organizations',
-      },
+      getOrganizationsBreadcrumbItem(),
       call?.customer_uuid
         ? getOrganizationBreadcrumbItem({
             uuid: call.customer_uuid,
@@ -235,3 +302,37 @@ export const useCallBreadcrumbItems = (
     [call],
   );
 };
+
+/**
+ * Simplified breadcrumb for public call pages.
+ * Uses public routes that don't require organization access.
+ */
+export const usePublicCallBreadcrumbItems = (
+  call: Pick<Call, 'name'>,
+): IBreadcrumbItem[] => {
+  return useMemo(
+    () => [
+      {
+        key: 'calls-list',
+        text: translate('Calls for proposals'),
+        to: 'public-calls.list-public',
+      },
+      {
+        key: 'call',
+        text: call?.name || '...',
+        truncate: true,
+        active: true,
+      },
+    ],
+    [call],
+  );
+};
+
+// Tooltip explaining why a call's fields are read-only, for the disabled edit
+// controls on the call-edit tabs. Only ever called when the call is read-only,
+// and state is the archived case, so anything else is a permission block:
+// draft and active calls are editable by whoever holds UPDATE_CALL.
+export const getCallReadOnlyReason = (call?: { state?: string }): string =>
+  call?.state === 'archived'
+    ? translate('This call is archived and cannot be edited.')
+    : translate('You do not have permission to edit this call.');

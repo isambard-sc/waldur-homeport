@@ -1,0 +1,26 @@
+{
+  "name": "waldur-design-tokens",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared brand color-ramp generation and CSS custom-property bootstrap for Waldur frontend apps",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./contrast": "./src/contrast.ts",
+    "./react": "./src/react.ts",
+    "./colors.css": "./src/colors.css",
+    "./buttonColors.css": "./src/buttonColors.css",
+    "./surfaceColors.css": "./src/surfaceColors.css",
+    "./sidebarColors.css": "./src/sidebarColors.css",
+    "./focusRing.css": "./src/focusRing.css",
+    "./animations.css": "./src/animations.css",
+    "./zIndex.css": "./src/zIndex.css",
+    "./fonts.css": "./src/fonts.css"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/maven-pro": "^5.2.10"
+  },
+  "license": "MIT"
+}

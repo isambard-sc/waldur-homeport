@@ -6,7 +6,7 @@
       border-color: $gray-200;
       color: $gray-700;
     }
-    &:hover .nav-link .badge,
+    &:hover .nav-link:not(.disabled) .badge,
     .nav-link.active .badge {
       background-color: $brand-50;
       border-color: $brand-200;
@@ -14,7 +14,71 @@
     }
 
     .nav-link.disabled {
-      color: $gray-400 !important;
+      color: $text-disabled !important;
+
+      .badge {
+        background-color: $gray-100;
+        border-color: $gray-200;
+        color: $gray-400;
+      }
+    }
+  }
+
+  // Line tabs
+  &.nav-line-tabs {
+    row-gap: 1rem;
+
+    .nav-item {
+      position: relative;
+
+      // Active & Hover States
+      .nav-link.active,
+      &.show .nav-link,
+      .nav-link:hover:not(.disabled) {
+        border-bottom-color: $fg-brand-secondary;
+        color: $text-brand-primary;
+      }
+
+      // Pointer focus only; keyboard focus keeps a ring (WCAG 2.4.7).
+      // The ring itself is the ::before below, not an outline on the link.
+      .nav-link {
+        position: relative;
+        z-index: 1;
+        outline: none;
+
+        &:focus-visible {
+          color: $text-brand-primary;
+        }
+      }
+
+      // Focus ring around the tab (not on the link outline — that merges with
+      // the active underline). Underline stays on .nav-link; ring wraps outside.
+      // Horizontal inset follows the link margin so the ring matches the
+      // underline, not the wider .nav-item.
+      &:has(> .nav-link:focus-visible)::before,
+      &:has(> * > .nav-link:focus-visible)::before {
+        content: '';
+        position: absolute;
+        top: -$focus-ring-width;
+        bottom: -$focus-ring-width;
+        left: calc(#{$nav-line-tabs-link-margin} - #{$focus-ring-width});
+        right: calc(#{$nav-line-tabs-link-margin} - #{$focus-ring-width});
+        border-radius: $border-radius;
+        outline: $focus-ring-width solid $focus-ring-primary;
+        outline-offset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      &:first-child:has(> .nav-link:focus-visible)::before,
+      &:first-child:has(> * > .nav-link:focus-visible)::before {
+        left: -$focus-ring-width;
+      }
+
+      &:last-child:has(> .nav-link:focus-visible)::before,
+      &:last-child:has(> * > .nav-link:focus-visible)::before {
+        right: -$focus-ring-width;
+      }
     }
   }
 }
@@ -35,13 +99,63 @@
     @include svg-icon-color($gray-400);
   }
 
-  &:hover {
-    background-color: $brand-50;
+  // `aria-expanded`: the drawer this button opens is showing. The drawer takes
+  // focus (and, being modal, hover), so without it the button looks idle and
+  // nothing says a second click closes the drawer.
+  &:focus,
+  &:active,
+  &:hover,
+  &[aria-expanded='true'] {
+    background-color: $btn-secondary-bg;
+
+    i {
+      color: $text-brand-secondary;
+    }
+    .svg-icon {
+      @include svg-icon-color($text-brand-secondary);
+    }
   }
 
   &:focus,
   &:active {
-    background-color: $bg-primary;
-    box-shadow: $ring-gray-100;
+    box-shadow: $ring-primary-100;
+  }
+}
+
+// Occupied space when tabs inside the table expandable container. Includes 300px of aside
+$tableSidesSpace: 495px;
+
+.tabs-container.tabs-scrollable {
+  width: 100%;
+
+  .expandable-container & {
+    width: calc(100vw - $tableSidesSpace);
+  }
+  [data-kt-aside-minimize='on'] .expandable-container & {
+    width: calc(
+      100vw - $tableSidesSpace + 226px
+    ); // 226px free on aside minimized
+  }
+
+  .nav-line-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: ($focus-ring-width * 2);
+
+    .nav-item {
+      white-space: nowrap;
+    }
+  }
+}
+
+// Mobile screens
+@media (max-width: 992px) {
+  .tabs-container.tabs-scrollable {
+    .expandable-container & {
+      width: calc(
+        100vw - $tableSidesSpace + 300px + 30px
+      ); // 300px from aside hidden + 30px from container, space released
+    }
   }
 }

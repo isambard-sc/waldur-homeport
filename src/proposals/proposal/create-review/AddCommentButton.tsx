@@ -1,9 +1,9 @@
 import { ChatDotsIcon } from '@phosphor-icons/react';
-import { Button } from 'react-bootstrap';
 
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
-import { isReviewInFinalState } from '@waldur/proposals/utils';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { isReviewInFinalState } from '@/proposals/utils';
 
 export const AddCommentButton = ({
   review,
@@ -13,21 +13,14 @@ export const AddCommentButton = ({
   const disabled = isReviewInFinalState(review?.state);
 
   return (
-    <Tip
-      id="form-add-comment-tooltip"
-      label={translate('Add comment')}
+    <BaseButton
+      onClick={onClick}
+      iconNode={<ChatDotsIcon weight="bold" />}
+      variant="text-primary"
+      disabled={disabled}
+      tooltip={translate('Add comment')}
       className={className}
-    >
-      <Button
-        variant="text-primary"
-        className="btn-icon"
-        onClick={onClick}
-        disabled={disabled}
-      >
-        <span className="svg-icon svg-icon-1x me-0">
-          <ChatDotsIcon weight="bold" />
-        </span>
-      </Button>
-    </Tip>
+      size="lg"
+    />
   );
 };

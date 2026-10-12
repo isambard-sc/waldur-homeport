@@ -1,16 +1,18 @@
 import { QuestionIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { uniqueId } from 'lodash';
 import { FC, ReactNode, useContext } from 'react';
-import { Button, Dropdown } from 'react-bootstrap';
 import { Variant } from 'react-bootstrap/esm/types';
 
-import { Tip } from '@waldur/core/Tooltip';
-import { StaffOnlyIndicator } from '@waldur/customer/details/StaffOnlyIndicator';
-import { ResourceActionMenuContext } from '@waldur/marketplace/resources/actions/ResourceActionMenuContext';
+import { ButtonVariant, Tooltip, BaseButton } from 'waldur-ui';
+
+import { StaffOnlyIndicator } from '@/customer/details/StaffOnlyIndicator';
+import { ResourceAction } from '@/marketplace/resources/actions/constants';
+import { ResourceActionMenuContext } from '@/marketplace/resources/actions/ResourceActionMenuContext';
+import { ActionsDropdownItem, PlainActionItem } from '@/table/ActionsDropdown';
 
 export interface ActionItemProps {
   title: string;
+  label?: string;
   action: () => void;
   iconNode?: ReactNode;
   iconColor?: Variant;
@@ -21,14 +23,35 @@ export interface ActionItemProps {
   tooltip?: string;
   as?;
   size?: 'sm' | 'lg';
+  actionId?: ResourceAction;
+  resource?: any;
+  variant?: ButtonVariant;
 }
 
 export const ActionItem: FC<ActionItemProps> = (props) => {
-  const Component = props.as || Dropdown.Item;
   const actionMenuContext = useContext(ResourceActionMenuContext);
+  const label = props.label ?? props.title ?? '';
+  // Default to ActionsDropdownItem (a real RadixDropdownMenu.Item, needing
+  // a Menu Root/Content ancestor); ModalActionsDialog's "show all actions"
+  // search results render outside one entirely (a plain react-bootstrap
+  // Modal, not a Radix panel), so notInMenu switches every row in that
+  // tree to PlainActionItem — same appearance, zero Radix dependency.
+  const Component =
+    props.as ||
+    (actionMenuContext?.notInMenu ? PlainActionItem : ActionsDropdownItem);
+  const isMenuRow =
+    Component === ActionsDropdownItem || Component === PlainActionItem;
+  if (
+    props.actionId &&
+    props.resource?.offering_plugin_options?.disabled_resource_actions?.includes(
+      props.actionId,
+    )
+  ) {
+    return null;
+  }
   if (
     actionMenuContext?.query &&
-    !props.title
+    !label
       .toLocaleLowerCase()
       .includes(actionMenuContext.query.toLocaleLowerCase())
   ) {
@@ -40,7 +63,27 @@ export const ActionItem: FC<ActionItemProps> = (props) => {
   if (actionMenuContext?.hideNonImportant && !props.important) {
     return null;
   }
-  return Component === Dropdown.Item || Component === Button ? (
+
+  // When rendering as a Button (or any non-menu-item), use BaseButton
+  if (props.as && !isMenuRow) {
+    return (
+      <div className="d-flex align-items-center">
+        <BaseButton
+          className={props.className}
+          onClick={props.action}
+          disabled={props.disabled}
+          iconNode={props.iconNode}
+          label={label}
+          tooltip={props.tooltip}
+          variant={props.variant ?? 'tertiary'}
+          size={props.size ?? 'lg'}
+        />
+        {props.staff && <StaffOnlyIndicator className="text-dark ms-1 me-3" />}
+      </div>
+    );
+  }
+
+  return isMenuRow ? (
     <div className="d-flex align-items-center">
       <Component
         className={classNames(
@@ -48,40 +91,45 @@ export const ActionItem: FC<ActionItemProps> = (props) => {
           props.className,
           props.disabled && 'bg-hover-lighten',
         )}
-        // Workaround for rendering tooltips for disabled dropdown menu items.
-        // See also: https://stackoverflow.com/questions/57349166/
-        onClick={() => !props.disabled && props.action()}
-        variant={Component === Button ? '' : undefined}
-        size={Component === Button ? props.size : undefined}
+        // onSelect, not onClick: both Component variants accept it —
+        // ActionsDropdownItem is Radix's own prop, closing the menu and
+        // returning focus to the trigger on its own; PlainActionItem
+        // (notInMenu) has no menu to close, so it just forwards onSelect
+        // as a plain click handler. Either way it covers keyboard
+        // activation (Enter/Space) as well as pointer. `disabled` blocks
+        // selection while leaving the row hoverable so its explanatory
+        // tooltip still shows.
+        onSelect={() => props.action()}
         disabled={props.disabled}
       >
-        <div className={props.disabled ? 'opacity-50' : undefined}>
+        <div
+          className={props.disabled ? 'opacity-50' : undefined}
+          data-testid="action-item-content"
+        >
           {props.iconNode && (
             <span
               className={classNames(
                 'svg-icon svg-icon-2',
-                Component !== Button &&
-                  `svg-icon-${props.iconColor || 'gray-400'}`,
+                `svg-icon-${props.iconColor || 'gray-400'}`,
               )}
             >
               {props.iconNode}
             </span>
           )}
-          {props.title}
+          {label}
         </div>
       </Component>
       {props.tooltip && (
-        <Tip
-          label={props.tooltip}
-          id={`action-reason-${uniqueId()}`}
-          className="ms-1 me-3"
-        >
+        <Tooltip label={props.tooltip}>
           <QuestionIcon
             size={20}
             weight="bold"
-            className={classNames('text-muted', props.disabled && 'opacity-50')}
+            className={classNames(
+              'ms-1 me-3 text-muted',
+              props.disabled && 'opacity-50',
+            )}
           />
-        </Tip>
+        </Tooltip>
       )}
       {props.staff && <StaffOnlyIndicator className="text-dark ms-1 me-3" />}
     </div>

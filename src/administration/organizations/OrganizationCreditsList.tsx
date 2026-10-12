@@ -1,16 +1,19 @@
 import { FC } from 'react';
 import { CustomerCredit, customerCreditsList } from 'waldur-js-client';
 
-import { Link } from '@waldur/core/Link';
-import { COMMON_CREDIT_COLUMNS } from '@waldur/customer/credits/constants';
-import { CreateCreditButton } from '@waldur/customer/credits/CreateCreditButton';
-import { CreditActions } from '@waldur/customer/credits/CreditActions';
-import { CreditExpandableRow } from '@waldur/customer/credits/CreditExpandableRow';
-import { FilteredEventsButton } from '@waldur/events/FilteredEventsButton';
-import { translate } from '@waldur/i18n';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { useTable } from '@waldur/table/useTable';
+import { Link } from '@/core/Link';
+import { COMMON_CREDIT_COLUMNS } from '@/customer/credits/constants';
+import { CreateCreditButton } from '@/customer/credits/CreateCreditButton';
+import { CreditExpandableRow } from '@/customer/credits/CreditExpandableRow';
+import { CustomerCreditActions } from '@/customer/credits/CustomerCreditActions';
+import { FilteredEventsButton } from '@/events/FilteredEventsButton';
+import { translate } from '@/i18n';
+import { createFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { TableWithPortal } from '@/table/types';
+import { useTable } from '@/table/useTable';
+
+import { tabTableProps } from '../tabTableProps';
 
 const OrganizationField = ({ row }) => (
   <Link
@@ -20,7 +23,9 @@ const OrganizationField = ({ row }) => (
   />
 );
 
-export const OrganizationCreditsList: FC<{}> = () => {
+export const OrganizationCreditsList: FC<Partial<TableWithPortal>> = ({
+  portal,
+}) => {
   const tableProps = useTable({
     table: 'OrganizationCreditsList',
     fetchData: createFetcher(customerCreditsList),
@@ -30,6 +35,7 @@ export const OrganizationCreditsList: FC<{}> = () => {
   return (
     <Table<CustomerCredit>
       {...tableProps}
+      {...tabTableProps(portal)}
       columns={[
         {
           title: translate('Organization name'),
@@ -42,7 +48,7 @@ export const OrganizationCreditsList: FC<{}> = () => {
       verboseName={translate('Credits')}
       hasQuery
       enableExport
-      rowActions={CreditActions}
+      rowActions={CustomerCreditActions}
       expandableRow={CreditExpandableRow}
       tableActions={
         <>

@@ -1,13 +1,14 @@
+import { KeyboardEvent } from 'react';
 import {
   marketplaceCategoriesList,
   marketplaceProviderOfferingsList,
   marketplacePublicOfferingsList,
+  Project,
 } from 'waldur-js-client';
-import { Project } from 'waldur-js-client';
 
-import { getAllPages, parseSelectData } from '@waldur/core/api';
-import { Category, Offering } from '@waldur/marketplace/types';
-import { Customer } from '@waldur/workspace/types';
+import { fetchResultCount, getAllPages, MAX_PAGE_SIZE } from '@/core/api';
+import { Category } from '@/marketplace/types';
+import { Customer } from '@/workspace/types';
 
 export const fetchCategories = (
   customer: Customer,
@@ -18,15 +19,20 @@ export const fetchCategories = (
     marketplaceCategoriesList({
       query: {
         page,
+        page_size: MAX_PAGE_SIZE,
         ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
         ...(project ? { project_uuid: project.uuid } : {}),
+        // accessible: keep the quick-add category list (and its offering_count)
+        // in sync with the catalog by hiding offerings the current user cannot
+        // order (e.g. restricted to roles they do not hold).
+        accessible: true,
         field: ['uuid', 'title', 'offering_count', 'icon', 'group'],
         offering_name,
       },
     }),
   );
 
-export const fetchOfferingsByPage = (
+export const fetchOfferingsByPage = async (
   customer: Customer,
   project: Project,
   category: Category,
@@ -38,11 +44,15 @@ export const fetchOfferingsByPage = (
   const api = importable
     ? marketplaceProviderOfferingsList
     : marketplacePublicOfferingsList;
-  return api({
+  const response = await api({
     query: {
       ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
       ...(project ? { project_uuid: project.uuid } : {}),
-      ...(importable ? { importable: true } : {}),
+      ...(importable ? { importable: 'true' } : {}),
+      // accessible: hide offerings the current user cannot order (matches the
+      // catalog); skipped for the provider "importable" flow which lists the
+      // provider's own offerings.
+      ...(importable ? {} : { accessible: true }),
       category_uuid: category.uuid,
       name: search,
       field: [
@@ -62,12 +72,24 @@ export const fetchOfferingsByPage = (
       page,
       page_size: pageSize,
     },
-  })
-    .then(parseSelectData)
-    .then((res) => ({
-      pageElements: res.options,
-      itemCount: res.totalItems,
-    }));
+  });
+  if (Array.isArray(response.data)) {
+    // itemCount must be the TOTAL number of matching offerings (from the
+    // 'x-result-count' header), not the length of this page. It seeds
+    // InfiniteLoader's item count; using the page length made it believe
+    // every item was already loaded, so categories with more than one page
+    // of offerings never fetched pages 2+ and silently capped at page_size.
+    const total = fetchResultCount(response);
+    return {
+      pageElements: response.data,
+      itemCount: Number.isNaN(total) ? response.data.length : total,
+    };
+  } else {
+    return {
+      pageElements: [],
+      itemCount: 0,
+    };
+  }
 };
 
 export const fetchLastNOfferings = async (
@@ -82,21 +104,48 @@ export const fetchLastNOfferings = async (
         page_size,
         ...(customer ? { allowed_customer_uuid: customer.uuid } : {}),
         ...(project ? { project_uuid: project.uuid } : {}),
+        // accessible: hide offerings the current user cannot order (matches the
+        // catalog) from the "Recently added offerings" quick-add shortcut.
+        accessible: true,
         field: [
           'uuid',
           'category_uuid',
-          'customer_uuid',
           'category_title',
+          'customer_uuid',
+          'customer_name',
           'name',
           'description',
           'image',
           'state',
           'paused_reason',
+          'plans',
         ],
         state: ['Active', 'Paused'],
         o: ['-created'],
       },
     })
-  ).data as any as Offering[];
+  ).data;
   return offerings;
 };
+
+/** A react-bootstrap ListGroupItem with only an onClick renders a plain <li>:
+ * clickable, but the keyboard can neither reach nor activate it. These props
+ * make the row a control without changing a class, so the list looks the same.
+ * `disabled` rows stay out of the tab order -- there is nothing to activate. */
+export const getSelectableRowProps = (
+  onSelect: () => void,
+  disabled?: boolean,
+) =>
+  disabled
+    ? { onClick: undefined }
+    : {
+        role: 'button',
+        tabIndex: 0,
+        onClick: onSelect,
+        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            onSelect();
+          }
+        },
+      };

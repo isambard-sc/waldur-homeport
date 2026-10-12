@@ -1,6 +1,10 @@
 import { MinusIcon, PlusIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
+
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 import { FormField } from './types';
 
@@ -33,19 +37,17 @@ export const BoxNumberField: FunctionComponent<BoxNumberFieldProps> = (
   return (
     <div className="box-number-input">
       <div className="box-number-input-control">
-        <Button
-          size="sm"
-          variant="active-icon-primary"
-          className="minus-btn btn-icon btn-no-focus"
+        <BaseButton
+          iconNode={<MinusIcon weight="bold" />}
+          tooltip={translate('Decrease')}
           onClick={() =>
             change(Number(input.value) - 1 * Number(props.step || 1))
           }
           disabled={props.disabled}
-        >
-          <span className="svg-icon svg-icon-2">
-            <MinusIcon weight="bold" />
-          </span>
-        </Button>
+          variant="tertiary-ghost"
+          className="minus-btn btn-no-focus"
+          size="sm"
+        />
         <Form.Control
           {...props.input}
           type="number"
@@ -55,19 +57,17 @@ export const BoxNumberField: FunctionComponent<BoxNumberFieldProps> = (
           onBlur={() => change(input.value)}
         />
 
-        <Button
-          size="sm"
-          variant="active-icon-primary"
-          className="plus-btn btn-icon btn-no-focus"
+        <BaseButton
+          iconNode={<PlusIcon weight="bold" />}
+          tooltip={translate('Increase')}
           onClick={() =>
             change(Number(input.value) + 1 * Number(props.step || 1))
           }
           disabled={props.disabled}
-        >
-          <span className="svg-icon svg-icon-2">
-            <PlusIcon weight="bold" />
-          </span>
-        </Button>
+          variant="tertiary-ghost"
+          className="plus-btn btn-no-focus"
+          size="sm"
+        />
       </div>
     </div>
   );

@@ -1,12 +1,14 @@
 import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import { FC, useMemo } from 'react';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 import { User } from 'waldur-js-client';
 
-import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { isDescendantOf } from '@waldur/navigation/useTabs';
+import { Tooltip } from 'waldur-ui';
+
+import { LoadingErred } from '@/core/LoadingErred';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+import { isDescendantOf } from '@/navigation/useTabs';
 
 import { UsersService } from '../UsersService';
 
@@ -27,7 +29,7 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
 }) => {
   const { state } = useCurrentStateAndParams();
   const router = useRouter();
-  const goTo = (stateName) => router.stateService.go(stateName);
+  const goTo = (stateName: string) => router.stateService.go(stateName);
 
   const isValidUser = useMemo(
     () =>
@@ -39,6 +41,11 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
   );
 
   const showViewTab = isDescendantOf('profile', state);
+  const editActive = state.name === 'profile-manage' || !showViewTab;
+
+  const disabledReason = !user?.agreement_date
+    ? translate('Terms of service not accepted')
+    : translate('Profile is incomplete');
 
   return isLoading ? (
     <LoadingSpinner />
@@ -46,31 +53,46 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
     <LoadingErred loadData={refetch} />
   ) : (
     <div className="container-fluid my-5">
-      <Tabs
-        defaultActiveKey={
-          state.name === 'profile-manage' || !showViewTab
-            ? 'profile-manage'
-            : 'profile.details'
-        }
-        className="nav-line-tabs mb-4"
-        onSelect={showViewTab ? goTo : null}
-      >
+      <Nav variant="tabs" className="nav-line-tabs mb-4">
         {showViewTab && (
-          <Tab
-            eventKey="profile.details"
-            title={translate('View')}
-            disabled={!isValidUser}
-            tabClassName={
-              'text-center min-w-60px' + (isValidUser ? '' : ' opacity-50')
-            }
-          />
+          <Nav.Item>
+            {isValidUser ? (
+              <Nav.Link
+                as="button"
+                type="button"
+                className="text-center min-w-60px"
+                active={!editActive}
+                onClick={() => goTo('profile.details')}
+              >
+                {translate('View')}
+              </Nav.Link>
+            ) : (
+              // The tooltip has to wrap the link from the outside: a
+              // disabled nav link stops receiving hover, so a tooltip
+              // nested inside it would never open. Same arrangement as the
+              // draft-offering tab in OfferingViewHero.
+              <Tooltip label={disabledReason}>
+                <span>
+                  <Nav.Link disabled className="text-center min-w-60px">
+                    {translate('View')}
+                  </Nav.Link>
+                </span>
+              </Tooltip>
+            )}
+          </Nav.Item>
         )}
-        <Tab
-          eventKey="profile-manage"
-          title={translate('Edit')}
-          tabClassName="text-center min-w-60px"
-        />
-      </Tabs>
+        <Nav.Item>
+          <Nav.Link
+            as="button"
+            type="button"
+            className="text-center min-w-60px"
+            active={editActive}
+            onClick={() => goTo('profile-manage')}
+          >
+            {translate('Edit')}
+          </Nav.Link>
+        </Nav.Item>
+      </Nav>
       <UserProfile user={user} />
     </div>
   );

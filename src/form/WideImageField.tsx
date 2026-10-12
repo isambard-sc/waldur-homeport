@@ -8,13 +8,15 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { Button } from 'react-bootstrap';
 
-import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
-import { formatFilesize } from '@waldur/core/utils';
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { ImagePlaceholder } from '@/core/ImagePlaceholder';
+import { formatFilesize } from '@/core/utils';
+import { translate } from '@/i18n';
 
 import { FormField } from './types';
+
 import './ImageField.scss';
 
 type ImageType = File | string;
@@ -26,6 +28,8 @@ interface WideImageFieldProps extends FormField {
   extraActions?: ComponentType<{ value; isChanged; isTooLarge }>;
   /** max size in byte */
   max?: number;
+  /** Explains why the image actions are unavailable when `disabled` is set. */
+  disabledReason?: string;
 }
 
 const previewImage = (imageFile: ImageType, element: HTMLDivElement) => {
@@ -70,7 +74,7 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
 
   const isChanged = Boolean(
     input.value instanceof File ||
-      Boolean(input.value) !== Boolean(initialValue),
+    Boolean(input.value) !== Boolean(initialValue),
   );
 
   const isTooLarge = isChanged && input.value?.size > props.max;
@@ -107,53 +111,47 @@ export const WideImageField: FunctionComponent<WideImageFieldProps> = (
             : translate('Upload an image JPG or PNG')}
         </p>
         <div className="d-flex gap-2 mb-4">
-          <label
-            className={classNames(
-              'btn btn-tertiary btn-sm btn-icon-right',
-              props.disabled && 'disabled',
-            )}
-            data-image-input-action="change"
-          >
-            {translate('Change')}
-            <span className="svg-icon svg-icon-5">
-              <PencilSimpleIcon weight="bold" />
-            </span>
-            <input
-              ref={inputRef}
-              type="file"
-              name={input.name}
-              accept=".png, .jpg, .jpeg"
-              onChange={(event) => changeImage(event.target.files[0])}
-              className="d-none"
-              disabled={props.disabled}
-            />
-          </label>
-          <Button
+          <BaseButton
             variant="tertiary"
             size="sm"
-            className="btn-icon-right"
+            data-image-input-action="change"
+            onClick={() => inputRef.current?.click()}
+            disabled={props.disabled}
+            disabledReason={props.disabledReason}
+            iconNode={<PencilSimpleIcon weight="bold" />}
+            label={translate('Change')}
+          />
+          <input
+            ref={inputRef}
+            type="file"
+            name={input.name}
+            accept=".png, .jpg, .jpeg"
+            onChange={(event) => changeImage(event.target.files[0])}
+            className="d-none"
+            disabled={props.disabled}
+          />
+          <BaseButton
+            size="sm"
+            variant="tertiary"
             onClick={() => changeImage(initialValue)}
             disabled={props.disabled}
+            disabledReason={props.disabledReason}
+            label={translate('Cancel')}
+            iconNode={<XIcon weight="bold" />}
+            iconRight
             data-image-input-action="cancel"
-          >
-            {translate('Cancel')}
-            <span className="svg-icon svg-icon-5">
-              <XIcon weight="bold" />
-            </span>
-          </Button>
-          <Button
-            variant="tertiary"
+          />
+          <BaseButton
             size="sm"
-            className="btn-icon-right"
+            variant="tertiary"
             onClick={() => changeImage(null)}
             disabled={props.disabled}
+            disabledReason={props.disabledReason}
+            label={translate('Remove')}
+            iconNode={<TrashIcon weight="bold" />}
+            iconRight
             data-image-input-action="remove"
-          >
-            {translate('Remove')}
-            <span className="svg-icon svg-icon-5">
-              <TrashIcon />
-            </span>
-          </Button>
+          />
           {props.extraActions
             ? createElement(props.extraActions, {
                 value: input.value,

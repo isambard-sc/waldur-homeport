@@ -1,8 +1,8 @@
-import { useDispatch } from 'react-redux';
+import { BaseButton } from 'waldur-ui';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 const ProviderProjectResourcesDialog = lazyComponent(() =>
   import('./ProviderProjectResourcesDialog').then((module) => ({
@@ -11,26 +11,23 @@ const ProviderProjectResourcesDialog = lazyComponent(() =>
 );
 
 export const ResourcesColumn = ({ row, provider_customer_uuid }) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
 
   return (
-    <button
-      className="btn btn-link"
+    <BaseButton
+      variant="text-primary"
       onClick={() =>
-        dispatch(
-          openModalDialog(ProviderProjectResourcesDialog, {
-            resolve: {
-              project_uuid: row.uuid,
-              provider_customer_uuid,
-            },
-            size: 'lg',
-          }),
-        )
+        openDialog(ProviderProjectResourcesDialog, {
+          resolve: {
+            project_uuid: row.uuid,
+            provider_customer_uuid,
+          },
+          size: 'lg',
+        })
       }
-    >
-      {translate('{count} resources', {
+      label={translate('{count} resources', {
         count: row.resources_count || 0,
       })}
-    </button>
+    />
   );
 };

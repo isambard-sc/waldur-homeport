@@ -2,6 +2,9 @@
 // Nav
 //
 
+// Shared with custom/_nav.scss so the focus ring tracks this margin.
+$nav-line-tabs-link-margin: 0.615rem !default;
+
 // Line tabs
 .nav-line-tabs {
   border-bottom-width: 1px;
@@ -13,14 +16,15 @@
 
     // Base link
     .nav-link {
-      color: $gray-500;
+      color: $text-quaternary;
       font-weight: 600;
-      font-size: 14px;
+      font-size: $font-size-lg;
+      line-height: 20px;
       border: 0;
       border-bottom: 2px solid transparent;
       transition: $transition-link;
-      padding: 0 4px 12px;
-      margin: 0 0.615rem;
+      padding: 4px 4px 10px;
+      margin: 0 $nav-line-tabs-link-margin;
     }
 
     // First Item
@@ -116,8 +120,7 @@
   &.nav-group-fluid {
     display: flex;
 
-    > label,
-    > .btn {
+    > label {
       position: relative;
       flex-shrink: 0;
       flex-grow: 1;
@@ -126,10 +129,6 @@
 
     > label {
       margin-right: 0.1rem;
-
-      > .btn {
-        width: 100%;
-      }
 
       &:last-child {
         margin-right: 0;

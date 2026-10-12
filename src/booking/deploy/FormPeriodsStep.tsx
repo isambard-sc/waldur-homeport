@@ -3,13 +3,16 @@ import { useQuery } from '@tanstack/react-query';
 import { uniqueId } from 'lodash-es';
 import { DateTime, Duration } from 'luxon';
 import { useCallback, useEffect, useMemo } from 'react';
-import { Button } from 'react-bootstrap';
-import { Field, FieldArray } from 'redux-form';
+import { Field } from 'react-final-form';
+import { FieldArray } from 'react-final-form-arrays';
 import { marketplaceBookingsList } from 'waldur-js-client';
 
-import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
-import { translate } from '@waldur/i18n';
-import { FormStepProps } from '@waldur/marketplace/deploy/types';
+import { BaseButton } from 'waldur-ui';
+
+import { UI_STALE_TIME } from '@/core/constants';
+import { translate } from '@/i18n';
+import { FormStepProps } from '@/marketplace/deploy/types';
+import { VStepperFormStepCard } from '@/wizard';
 
 import { BookingProps } from '../types';
 import {
@@ -59,46 +62,27 @@ const renderScheduleRows = ({
           <div className="d-flex justify-content-between align-items-center mb-2">
             <label>
               <b>{translate('Period {i}', { i: index + 1 })}:</b>&nbsp;
-              {fields.get(index).start && fields.get(index).end && (
+              {fields.value[index]?.start && fields.value[index]?.end && (
                 <span>
-                  {DateTime.fromJSDate(fields.get(index).start).toFormat(
+                  {DateTime.fromJSDate(fields.value[index].start).toFormat(
                     'dd LLLL yyyy HH:mm',
                   )}
                   &nbsp;{translate('To')}&nbsp;
-                  {DateTime.fromJSDate(fields.get(index).end).toFormat(
+                  {DateTime.fromJSDate(fields.value[index].end).toFormat(
                     'dd LLLL yyyy HH:mm',
                   )}
                 </span>
               )}
             </label>
-            <Button
+            <BaseButton
               variant="text-danger"
-              className="btn-icon"
               onClick={() => fields.remove(index)}
-            >
-              <span className="svg-icon svg-icon-2">
-                <XIcon weight="bold" />
-              </span>
-            </Button>
+              iconNode={<XIcon weight="bold" />}
+              size="lg"
+            />
           </div>
           <Field
             name={schedule}
-            component={CustomRangeDatePicker}
-            options={{
-              minDate: 'today',
-              enable: getAvailableRangeOfDates(availableSchedules, [
-                ...fields.reduce(
-                  (acc, _, i) =>
-                    fields.get(i) === fields.get(index)
-                      ? acc
-                      : acc.concat(fields.get(i)),
-                  [],
-                ),
-                ...getBookedSlots(bookedItems),
-              ]),
-              timeStep: durationSlot ? durationSlot.as('minutes') : 60,
-              hasTimePicker: true,
-            }}
             parse={(v: [Date, Date]) =>
               v
                 ? {
@@ -108,18 +92,36 @@ const renderScheduleRows = ({
                   }
                 : {}
             }
-            format={(schedule) =>
-              schedule.start ? [schedule.start, schedule.end] : []
-            }
-          />
+            format={(val) => (val?.start ? [val.start, val.end] : [])}
+          >
+            {(fieldProps) => (
+              <CustomRangeDatePicker
+                {...fieldProps}
+                options={{
+                  minDate: 'today',
+                  enable: getAvailableRangeOfDates(availableSchedules, [
+                    ...(fields.value || []).reduce(
+                      (acc, val, i) => (i === index ? acc : acc.concat(val)),
+                      [],
+                    ),
+                    ...getBookedSlots(bookedItems),
+                  ]),
+                  timeStep: durationSlot ? durationSlot.as('minutes') : 60,
+                  hasTimePicker: true,
+                }}
+              />
+            )}
+          </Field>
         </div>
       ))}
-      <Button variant="text-primary" className="text-nowrap" onClick={addRow}>
-        <span className="svg-icon svg-icon-2">
-          <PlusIcon weight="bold" />
-        </span>
-        {translate('Add time period')}
-      </Button>
+      <BaseButton
+        variant="text-primary"
+        className="text-nowrap"
+        onClick={addRow}
+        iconNode={<PlusIcon weight="bold" />}
+        label={translate('Add time period')}
+        size="lg"
+      />
     </>
   );
 };
@@ -133,7 +135,7 @@ export const FormPeriodsStep = (props: FormStepProps) => {
         (r) => r.data,
       ),
 
-    staleTime: 3 * 60 * 1000,
+    staleTime: UI_STALE_TIME,
   });
 
   return (

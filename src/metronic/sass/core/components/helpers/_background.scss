@@ -31,12 +31,6 @@
   @if (theme-light-color($color)) {
     .bg-light-#{$color} {
       background-color: theme-light-color($color) !important;
-
-      @if ($isNotBrand) {
-        &.hoverable:hover {
-          background-color: darken(theme-light-color($color), 6%) !important;
-        }
-      }
     }
   }
 
@@ -46,10 +40,6 @@
     } @else if ($altColorRgb) {
       background-color: rgb($altColorRgb) !important;
       --bg-color: #{$altColorRgb} !important;
-    }
-
-    &.hoverable:hover {
-      background-color: theme-active-color($color) !important;
     }
   }
 
@@ -61,27 +51,12 @@
         background-color: theme-light-color($color) !important;
       }
     }
-
-    .bg-state-light-#{$color} {
-      cursor: pointer;
-
-      &.active,
-      &:hover {
-        background-color: theme-light-color($color) !important;
-      }
-    }
   }
 
   .bg-hover-#{$color} {
     cursor: pointer;
 
     &:hover {
-      @include setBgColor($isNotBrand, $value, $altColorRgb);
-    }
-  }
-
-  .bg-active-#{$color} {
-    &.active {
       @include setBgColor($isNotBrand, $value, $altColorRgb);
     }
   }
@@ -110,10 +85,6 @@
   }
 
   .bg-hover-opacity-#{$name}:hover {
-    background-color: rgba(var(--bg-color), #{$value}) !important;
-  }
-
-  .bg-active-opacity-#{$name}.active {
     background-color: rgba(var(--bg-color), #{$value}) !important;
   }
 
@@ -146,102 +117,5 @@
 
   &:hover {
     background-color: $lighten;
-  }
-}
-
-.bg-active-lighten {
-  &.active {
-    background-color: $lighten;
-  }
-}
-
-.bg-state-lighten {
-  cursor: pointer;
-
-  &.active,
-  &:hover {
-    background-color: $lighten;
-  }
-}
-
-// Hoverable
-.hoverable {
-  cursor: pointer;
-  transition: $transition-base;
-
-  &:hover {
-    transition: $transition-base;
-  }
-}
-
-// Background image helpers
-// Background repeat
-.bgi-no-repeat {
-  background-repeat: no-repeat;
-}
-
-// Background positions
-.bgi-position-y-top {
-  background-position-y: top;
-}
-
-.bgi-position-y-bottom {
-  background-position-y: bottom;
-}
-
-.bgi-position-y-center {
-  background-position-y: center;
-}
-
-.bgi-position-x-start {
-  background-position-x: left;
-}
-
-.bgi-position-x-end {
-  background-position-x: right;
-}
-
-.bgi-position-x-center {
-  background-position-x: center;
-}
-
-.bgi-position-top {
-  background-position: 0 top;
-}
-
-.bgi-position-bottom {
-  background-position: 0 bottom;
-}
-
-.bgi-position-center {
-  background-position: center;
-}
-
-// Responsive helpers
-@each $breakpoint in map-keys($grid-breakpoints) {
-  @include media-breakpoint-up($breakpoint) {
-    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
-
-    // Background sizes
-    .bgi-size#{$infix}-auto {
-      background-size: auto;
-    }
-
-    .bgi-size#{$infix}-cover {
-      background-size: cover;
-    }
-
-    .bgi-size#{$infix}-contain {
-      background-size: contain;
-    }
-
-    // Background attachment
-    .bgi-attachment#{$infix}-fixed {
-      background-attachment: fixed;
-    }
-
-    .bgi-attachment#{$infix}-scroll {
-      background-attachment: scroll;
-    }
   }
 }

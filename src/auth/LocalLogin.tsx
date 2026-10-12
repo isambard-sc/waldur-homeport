@@ -1,51 +1,42 @@
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { ArrowLeftIcon } from '@phosphor-icons/react';
+import { FC } from 'react';
 
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 import './LocalLogin.css';
 
 import { SigninForm } from './SigninForm';
 
-interface LocalLoginProps {
-  enableSeperator: boolean;
+interface LocalLoginButtonProps {
+  onClick: () => void;
 }
 
-interface SigninWithLocalAccountProps {
-  setShowForm: Dispatch<SetStateAction<boolean>>;
+interface LocalLoginFormProps {
+  onBack?: () => void;
 }
 
-const Border = () => <div className="login-separator-border" />;
-
-const SignInWithLocalAccount: FC<SigninWithLocalAccountProps> = ({
-  setShowForm,
-}) => (
-  <button
-    type="button"
+export const LocalLoginButton: FC<LocalLoginButtonProps> = ({ onClick }) => (
+  <BaseButton
+    variant="text-primary"
     className="login-with-local-account-button"
-    onClick={() => setShowForm(true)}
-  >
-    {translate('Sign in with local account')}
-  </button>
+    onClick={onClick}
+    label={translate('Sign in with local account')}
+  />
 );
 
-export const LocalLogin: FC<LocalLoginProps> = ({
-  enableSeperator = false,
-}) => {
-  const [showSigninForm, setShowSigninForm] = useState(false);
-  return (
-    <>
-      {enableSeperator && (
-        <div className="login-separator">
-          <Border />
-          <div className="login-separator-text">{translate('OR')}</div>
-          <Border />
-        </div>
-      )}
-      {!showSigninForm ? (
-        <SignInWithLocalAccount setShowForm={setShowSigninForm} />
-      ) : (
-        <SigninForm />
-      )}
-    </>
-  );
-};
+export const LocalLoginForm: FC<LocalLoginFormProps> = ({ onBack }) => (
+  <div className="local-login-form">
+    <SigninForm />
+    {onBack && (
+      <BaseButton
+        variant="text-secondary"
+        className="mt-2"
+        onClick={onBack}
+        iconNode={<ArrowLeftIcon weight="bold" />}
+        label={translate('Back to all sign-in options')}
+      />
+    )}
+  </div>
+);

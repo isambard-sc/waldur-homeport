@@ -1,12 +1,10 @@
-import {
-  CaretDownIcon,
-  MagnifyingGlassIcon,
-  XIcon,
-} from '@phosphor-icons/react';
-import classNames from 'classnames';
-import { Button } from 'react-bootstrap';
+import { MagnifyingGlassIcon, XIcon } from '@phosphor-icons/react';
+import { KeyboardEvent, useMemo } from 'react';
 
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { BaseStringField } from '@/form';
+import { translate } from '@/i18n';
 
 import { SearchResult } from './useSearch';
 
@@ -15,12 +13,21 @@ interface SearchProps {
   query: string;
   show: boolean;
   setQuery;
-  hasFilters?: boolean;
   className?: string;
+  showShortcut?: boolean;
+  /**
+   * Fired when the user acts on the field: click, typing, Enter or ArrowDown.
+   * Deliberately not on bare focus, so a keyboard user can Tab past the field
+   * without being pulled into the panel.
+   */
+  onOpen?: () => void;
 }
 
-const hiddenStyle = {
-  display: 'none',
+const getShortcutHint = () => {
+  const isMac =
+    typeof navigator !== 'undefined' &&
+    /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  return isMac ? '⌘K' : 'Ctrl+K';
 };
 
 export const SearchInput = ({
@@ -28,74 +35,65 @@ export const SearchInput = ({
   query,
   show,
   setQuery,
-  hasFilters,
   className,
+  showShortcut,
+  onOpen,
 }: SearchProps) => {
   const isLoading = result.isLoading || result.isRefetching;
+  const shortcutHint = useMemo(() => getShortcutHint(), []);
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (onOpen && (event.key === 'Enter' || event.key === 'ArrowDown')) {
+      event.preventDefault();
+      onOpen();
+    }
+  };
 
   return (
     <div className={className}>
-      <form className="w-100 position-relative" autoComplete="off">
-        <input style={hiddenStyle} type="text" name="fakeusernameremembered" />
-        <input
-          style={hiddenStyle}
-          type="password"
-          name="fakepasswordremembered"
-        />
-
-        <span className="position-absolute top-50 translate-middle-y ms-4">
-          <MagnifyingGlassIcon
-            weight="bold"
-            size={20}
-            className="text-gray-500"
-          />
-        </span>
-        <input
-          type="text"
-          className="search-input form-control placeholder-gray-400 ps-13 fs-4 h-40px"
-          name="search"
+      {/* A lone text field submits its form on Enter, which would reload the page. */}
+      <form
+        className="w-100 position-relative"
+        autoComplete="off"
+        onSubmit={(event) => event.preventDefault()}
+      >
+        <BaseStringField
+          className="search-input w-lg-325px"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            onOpen?.();
+          }}
+          onClick={onOpen}
+          onKeyDown={handleKeyDown}
           placeholder={translate('Search...')}
+          icon={<MagnifyingGlassIcon weight="bold" />}
         />
 
+        {/* Keyboard shortcut hint */}
+        {showShortcut && !query && (
+          <span className="position-absolute top-50 end-0 translate-middle-y me-4 z-index-5 text-gray-700 fs-8 bg-gray-200 px-2 py-1 rounded">
+            {shortcutHint}
+          </span>
+        )}
+
+        {/* Loading */}
         {show && isLoading ? (
-          <span className="position-absolute top-50 end-0 translate-middle-y lh-0 me-4">
+          <span className="position-absolute top-50 end-0 translate-middle-y lh-0 me-4 z-index-5">
             <span className="spinner-border h-15px w-15px align-middle text-gray-400" />
           </span>
         ) : null}
-        <button
-          type="button"
-          className={classNames(
-            'btn btn-flush btn-active-color-primary position-absolute top-50 end-0 translate-middle-y lh-0 me-4',
-            !isLoading && query ? '' : 'd-none',
-          )}
-          onClick={() => setQuery('')}
-        >
-          <XIcon weight="bold" size={16} className="text-gray-400" />
-        </button>
-
-        {/* Filters toggle */}
-        {hasFilters && (
-          <div
-            className={classNames(
-              'position-absolute top-50 end-0 translate-middle-y',
-              !isLoading && !query ? '' : 'd-none',
-            )}
-            data-kt-search-element="toolbar"
-          >
-            <Button
-              variant="text-primary"
-              data-kt-search-element="advanced-options-form-show"
-              size="sm"
-              className="btn-icon w-20px"
-              data-bs-toggle="tooltip"
-              title="Show more search options"
-            >
-              <CaretDownIcon size={30} />
-            </Button>
-          </div>
-        )}
+        {/* Clear button */}
+        {!isLoading && query ? (
+          <BaseButton
+            size="sm"
+            variant="text-secondary"
+            className="position-absolute top-50 end-0 translate-middle-y me-4 z-index-5"
+            onClick={() => setQuery('')}
+            iconNode={<XIcon weight="bold" />}
+            tooltip={translate('Clear')}
+          />
+        ) : null}
       </form>
     </div>
   );

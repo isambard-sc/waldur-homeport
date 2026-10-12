@@ -1,9 +1,11 @@
-import { Badge } from '@waldur/core/Badge';
+import { ProposalStates } from 'waldur-js-client';
+
+import { Badge, BadgeVariant } from 'waldur-ui';
 
 import { formatProposalState } from '../utils';
 
-const stateColorMapping = {
-  draft: 'default',
+const stateColorMapping: Record<ProposalStates, BadgeVariant> = {
+  draft: 'neutral',
   submitted: 'warning',
   in_review: 'warning',
   accepted: 'primary',
@@ -11,10 +13,10 @@ const stateColorMapping = {
   canceled: 'danger',
 };
 
-export const ProposalBadge = ({ state }) => {
-  const variant = stateColorMapping[state] || 'default';
+export const ProposalBadge = ({ state }: { state: ProposalStates }) => {
+  const variant = stateColorMapping[state] || 'neutral';
   return (
-    <Badge variant={variant} outline pill>
+    <Badge variant={variant} shape="pill" tone="outline">
       {formatProposalState(state)}
     </Badge>
   );

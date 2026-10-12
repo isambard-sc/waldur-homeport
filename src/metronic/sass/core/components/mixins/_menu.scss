@@ -14,30 +14,6 @@
   }
 }
 
-// Set menu link padding x
-@mixin menu-link-padding-x($value) {
-  // Menu item
-  .menu-item {
-    .menu-link,
-    .menu-content {
-      padding-left: $value;
-      padding-right: $value;
-    }
-  }
-}
-
-// Set menu link padding y
-@mixin menu-link-padding-y($value) {
-  // Menu item
-  .menu-item {
-    .menu-link,
-    .menu-content {
-      padding-top: $value;
-      padding-bottom: $value;
-    }
-  }
-}
-
 // Set menu indention
 @mixin menu-link-indention($value, $offset) {
   // Accordion mode
@@ -67,46 +43,6 @@
                   > .menu-content,
                   > .menu-link {
                     padding-left: calc(#{4 * $value} + #{$offset});
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    .menu-fit & {
-      > .menu-item {
-        > .menu-content,
-        > .menu-link {
-          padding-left: #{$value};
-          padding-right: 0;
-        }
-
-        > .menu-sub:not([data-popper-placement]) {
-          > .menu-item {
-            > .menu-content,
-            > .menu-link {
-              padding-left: calc(#{2 * $value});
-              padding-right: 0;
-            }
-
-            > .menu-sub:not([data-popper-placement]) {
-              > .menu-item {
-                > .menu-content,
-                > .menu-link {
-                  padding-left: calc(#{3 * $value});
-                  padding-right: 0;
-                }
-
-                > .menu-sub:not([data-popper-placement]) {
-                  > .menu-item {
-                    > .menu-content,
-                    > .menu-link {
-                      padding-left: calc(#{4 * $value});
-                      padding-right: 0;
-                    }
                   }
                 }
               }
@@ -148,14 +84,6 @@
       // Svg icon
       .svg-icon {
         @include svg-icon-color($icon-color);
-      }
-    }
-  }
-
-  @if ($bullet-color != null) {
-    .menu-bullet {
-      .bullet {
-        background-color: $bullet-color;
       }
     }
   }
@@ -263,7 +191,6 @@
   $bg-color: null,
   $all-links: true
 ) {
-  //&.here > .menu-link,
   &.show > .menu-link {
     transition: $transition-link;
 

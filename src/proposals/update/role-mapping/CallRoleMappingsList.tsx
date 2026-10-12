@@ -5,14 +5,17 @@ import {
   ProposalProjectRoleMapping,
 } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { formatRole } from '@waldur/permissions/utils';
-import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/useTable';
+import { translate } from '@/i18n';
+import { formatRole } from '@/permissions/utils';
+import { getCallReadOnlyReason } from '@/proposals/utils';
+import { ActionsDropdown } from '@/table/ActionsDropdown';
+import { createFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { Column } from '@/table/types';
+import { useTable } from '@/table/useTable';
+import { renderFieldOrDash } from '@/table/utils';
 
+import { NoRoleMappingsWarning } from './NoRoleMappingsWarning';
 import { RoleMappingCreateButton } from './RoleMappingCreateButton';
 import { RoleMappingDeleteAction } from './RoleMappingDeleteAction';
 import { RoleMappingEditAction } from './RoleMappingEditAction';
@@ -48,7 +51,7 @@ export const CallRoleMappingsList = (props) => {
     },
     {
       title: translate('Project role'),
-      render: ({ row }) => formatRole(row.project_role) || 'N/A',
+      render: ({ row }) => renderFieldOrDash(formatRole(row.project_role)),
     },
   ];
 
@@ -57,12 +60,28 @@ export const CallRoleMappingsList = (props) => {
       {...tableProps}
       columns={columns}
       tableActions={
-        <RoleMappingCreateButton refetch={tableProps.fetch} call={props.call} />
+        <RoleMappingCreateButton
+          refetch={tableProps.fetch}
+          call={props.call}
+          disabled={props.isReadOnly}
+          tooltip={
+            props.isReadOnly ? getCallReadOnlyReason(props.call) : undefined
+          }
+        />
       }
       title={translate('Proposal project role mappings')}
-      rowActions={({ row }) => (
-        <CallRoleMappingsRowActions row={row} refetch={tableProps.fetch} />
-      )}
+      rowActions={({ row }) =>
+        props.isReadOnly ? (
+          <ActionsDropdown
+            disabled
+            tooltip={getCallReadOnlyReason(props.call)}
+          />
+        ) : (
+          <CallRoleMappingsRowActions row={row} refetch={tableProps.fetch} />
+        )
+      }
+      placeholderComponent={<NoRoleMappingsWarning className="m-6" />}
+      showPageSizeSelector
     />
   );
 };

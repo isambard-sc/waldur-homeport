@@ -1,27 +1,32 @@
 import { ChartBarIcon, TableIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Button, Card, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import { useAsync } from 'react-use';
-import { marketplaceResourcesTeamList } from 'waldur-js-client';
+import { Card } from 'react-bootstrap';
+import { marketplaceResourcesTeamList, Resource } from 'waldur-js-client';
 
-import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { Select } from '@waldur/form/themed-select';
-import { translate } from '@waldur/i18n';
+import { BaseButton, SegmentedControl } from 'waldur-ui';
+
+import { UI_STALE_TIME } from '@/core/constants';
+import { LoadingErred } from '@/core/LoadingErred';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { Select } from '@/form/select';
+import { translate } from '@/i18n';
+import { NoResult } from '@/navigation/header/search/NoResult';
 
 import { ResourceUsageTabsContainer } from '../usage/ResourceUsageTabsContainer';
 import { UsageExportDropdown } from '../usage/UsageExportDropdown';
 import { getComponentsAndUsages } from '../usage/utils';
 import { getUsageHistoryPeriodOptions } from '../usage/utils';
 
-export const UsageCard = ({ resource }) => {
+export const UsageCard = ({ resource }: { resource: Resource }) => {
   const [mode, setMode] = useState<'chart' | 'table'>('chart');
   const resourceRef = useMemo(
     () => ({
       name: resource.name,
-      offering_uuid: resource.offering_uuid,
-      resource_uuid: resource.uuid,
+      uuid: resource.uuid,
+      customer_name: resource.customer_name,
+      project_name: resource.project_name,
+      backend_id: resource.backend_id,
     }),
     [resource],
   );
@@ -49,13 +54,17 @@ export const UsageCard = ({ resource }) => {
         (r) => r.data,
       ),
 
-    staleTime: 3 * 60 * 1000,
+    staleTime: UI_STALE_TIME,
   });
 
-  const { loading, error, value } = useAsync(
-    () => getComponentsAndUsages(resourceRef.resource_uuid, period),
-    [resourceRef, period],
-  );
+  const {
+    isLoading: loading,
+    error,
+    data: value,
+  } = useQuery({
+    queryKey: ['UsageCard', resourceRef, period],
+    queryFn: () => getComponentsAndUsages(resourceRef.uuid, period),
+  });
 
   const usersFilterOptions = useMemo(() => {
     if (!team?.length || !value?.userUsages?.length) return [];
@@ -67,7 +76,30 @@ export const UsageCard = ({ resource }) => {
     );
   }, [team, value]);
 
-  return resource.is_usage_based || resource.is_limit_based ? (
+  // The tab is offered whenever the resource bills on usage or limits, so this
+  // component must render something for every state it can be opened in.
+  // Returning null left the panel entirely blank while a resource was still
+  // being created -- which is exactly when a customer goes looking for it.
+  if (!resource.is_usage_based && !resource.is_limit_based) {
+    return null;
+  }
+  if (resource.state === 'Creating') {
+    return (
+      <Card className="card-bordered">
+        <Card.Body>
+          <NoResult
+            title={translate('No usage yet')}
+            message={translate(
+              'Usage is recorded once the resource has been created. Come back after provisioning finishes.',
+            )}
+            noAction
+          />
+        </Card.Body>
+      </Card>
+    );
+  }
+
+  return (
     <Card className="card-bordered">
       <Card.Header>
         <Card.Title>
@@ -86,48 +118,45 @@ export const UsageCard = ({ resource }) => {
               onChange={(value) => setUsers(value)}
               options={usersFilterOptions}
               isLoading={teamIsLoading}
-              className="metronic-select-container min-w-150px min-w-lg-200px"
-              classNamePrefix="metronic-select"
+              // Fixed, not content-sized: the `w-full` container would other-
+              // wise claim the whole toolbar row when empty and grow with each
+              // chip, shifting every control beside it on every selection.
+              className="w-250px"
             />
           ) : null}
           {periodOptions.length > 1 && (
-            <ToggleButtonGroup
-              type="radio"
-              name="period"
+            <SegmentedControl<number>
+              aria-label={translate('Time period')}
+              options={periodOptions}
               value={period}
-              defaultValue={period}
-              onChange={setPeriod}
-            >
-              {periodOptions.map((option) => (
-                <ToggleButton
-                  key={option.value}
-                  id={'tbg-' + option.value}
-                  value={option.value}
-                  variant="tertiary"
-                >
-                  {option.label}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+              onValueChange={setPeriod}
+              // Matches the export dropdown and the chart/table toggle, which
+              // are both `lg`, so the toolbar row reads as one height.
+              size="lg"
+            />
           )}
           <UsageExportDropdown
             resource={resourceRef}
             data={value}
-            users={team}
+            // Mirror the chart's user filter; empty selection exports all usernames, incl. robot accounts
+            users={users}
             months={period}
           />
 
-          <Button
+          <BaseButton
             variant="tertiary"
-            className="btn-icon"
             onClick={() =>
               setMode((prev) => (prev === 'chart' ? 'table' : 'chart'))
             }
-          >
-            <span className="svg-icon svg-icon-2">
-              {mode === 'chart' ? <TableIcon /> : <ChartBarIcon />}
-            </span>
-          </Button>
+            iconNode={
+              mode === 'chart' ? (
+                <TableIcon weight="bold" />
+              ) : (
+                <ChartBarIcon weight="bold" />
+              )
+            }
+            size="lg"
+          />
         </div>
       </Card.Header>
       <Card.Body>
@@ -155,5 +184,5 @@ export const UsageCard = ({ resource }) => {
         )}
       </Card.Body>
     </Card>
-  ) : null;
+  );
 };

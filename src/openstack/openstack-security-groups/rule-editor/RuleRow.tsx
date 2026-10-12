@@ -1,8 +1,12 @@
+import { TrashIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { useSelector } from 'react-redux';
+import { useField } from 'react-final-form';
 import { OpenStackSecurityGroup } from 'waldur-js-client';
 
-import { ActionsField } from './ActionsField';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+
 import { CIDRField } from './CIDRField';
 import { DescriptionField } from './DescriptionField';
 import { DirectionField } from './DirectionField';
@@ -10,32 +14,46 @@ import { EtherTypeField } from './EtherTypeField';
 import { PortRangeField } from './PortRangeField';
 import { ProtocolField } from './ProtocolField';
 import { RemoteGroupField } from './RemoteGroupField';
-import { getRuleSelector } from './utils';
 
 interface RuleRowProps {
-  formName: string;
-  ruleName: string;
-  onRemove(): void;
-  remoteSecurityGroups: OpenStackSecurityGroup[];
+  name: string;
+  onRemove: () => void;
+  remoteSecurityGroups: Pick<OpenStackSecurityGroup, 'name' | 'url'>[];
 }
 
 export const RuleRow: FC<RuleRowProps> = ({
-  formName,
-  ruleName,
+  name,
   onRemove,
   remoteSecurityGroups,
 }) => {
-  const rule = useSelector(getRuleSelector(formName, ruleName));
+  const {
+    input: { value: ethertype },
+  } = useField(`${name}.ethertype`);
+  const {
+    input: { value: protocol },
+  } = useField(`${name}.protocol`);
+
   return (
     <tr>
-      <EtherTypeField />
-      <DirectionField />
-      <ProtocolField />
-      <PortRangeField rule={rule} />
-      <CIDRField ethertype={rule.ethertype} />
-      <RemoteGroupField choices={remoteSecurityGroups} />
-      <DescriptionField />
-      <ActionsField onRemove={onRemove} />
+      <EtherTypeField name={`${name}.ethertype`} />
+      <DirectionField name={`${name}.direction`} />
+      <ProtocolField name={`${name}.protocol`} />
+      <PortRangeField name={`${name}.port_range`} protocol={protocol} />
+      <CIDRField name={`${name}.cidr`} ethertype={ethertype} />
+      <RemoteGroupField
+        name={`${name}.remote_group`}
+        choices={remoteSecurityGroups}
+      />
+      <DescriptionField name={`${name}.description`} />
+      <td>
+        <BaseButton
+          onClick={onRemove}
+          iconNode={<TrashIcon weight="bold" />}
+          variant="text-secondary"
+          label={translate('Remove')}
+          size="lg"
+        />
+      </td>
     </tr>
   );
 };

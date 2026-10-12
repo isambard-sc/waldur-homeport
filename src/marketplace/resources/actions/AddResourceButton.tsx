@@ -1,12 +1,12 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
-import { Button } from 'react-bootstrap';
-import { useAsync } from 'react-use';
-import { marketplaceProviderResourcesOfferingForSubresourcesList } from 'waldur-js-client';
+import { useQuery } from '@tanstack/react-query';
+import { marketplaceResourcesOfferingForSubresourcesList } from 'waldur-js-client';
 
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n/translate';
-import { OfferingLink } from '@waldur/marketplace/links/OfferingLink';
-import { Resource } from '@waldur/resource/types';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n/translate';
+import { OfferingLink } from '@/marketplace/links/OfferingLink';
+import { Resource } from '@/resource/types';
 
 interface AddResourceButtonProps {
   resource: Resource;
@@ -14,31 +14,25 @@ interface AddResourceButtonProps {
 }
 
 export const AddResourceButton = (props: AddResourceButtonProps) => {
-  const { value, loading } = useAsync(
-    () =>
-      marketplaceProviderResourcesOfferingForSubresourcesList({
+  const { data: value, isLoading: loading } = useQuery({
+    queryKey: ['AddResourceButton', props.resource],
+
+    queryFn: () =>
+      marketplaceResourcesOfferingForSubresourcesList({
         path: { uuid: props.resource.marketplace_resource_uuid },
       }).then((r) => r.data),
-    [props.resource],
-  );
+  });
 
-  const relatedOfferingUuid = value?.length
-    ? value.find((offering) => offering.type === props.offeringType).uuid
-    : null;
+  const relatedOfferingUuid =
+    value?.find((offering) => offering.type === props.offeringType)?.uuid ??
+    null;
 
   return loading ? (
-    <Button variant="primary">
-      <LoadingSpinnerIcon className="p-2" />
-    </Button>
+    <BaseButton variant="primary" pending onClick={() => {}} size="lg" />
   ) : (
     relatedOfferingUuid && (
-      <OfferingLink
-        offering_uuid={relatedOfferingUuid}
-        className="btn btn-primary"
-      >
-        <span className="svg-icon svg-icon-2">
-          <PlusCircleIcon weight="bold" />
-        </span>
+      <OfferingLink offering_uuid={relatedOfferingUuid} buttonVariant="primary">
+        <PlusCircleIcon size={20} weight="bold" />
         {translate('Add resource')}
       </OfferingLink>
     )

@@ -1,0 +1,95 @@
+import { useMediaDeviceSelect } from '@livekit/components-react';
+import { GearSixIcon } from '@phosphor-icons/react';
+import * as RadixPopover from '@radix-ui/react-popover';
+import { FC } from 'react';
+
+import { Select } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+
+interface CallSettingsMenuProps {
+  /**
+   * Render the popover inside this element. Needed when the call is
+   * fullscreened — the Fullscreen API only paints the fullscreened subtree, so
+   * anything portaled to <body> would be invisible. Everywhere else it stays
+   * in <body>: Safari mis-paints the drawer's content while a fixed layer sits
+   * inside the drawer.
+   */
+  container?: HTMLElement | null;
+}
+
+interface DeviceSelectProps {
+  kind: MediaDeviceKind;
+  label: string;
+}
+
+const DeviceSelect: FC<DeviceSelectProps> = ({ kind, label }) => {
+  const { devices, activeDeviceId, setActiveMediaDevice } =
+    useMediaDeviceSelect({ kind });
+  const options = devices.map((d) => ({
+    value: d.deviceId,
+    label: d.label || translate('Unknown device'),
+  }));
+  const value = options.find((o) => o.value === activeDeviceId) ?? null;
+
+  return (
+    <div className="call-device-settings__group">
+      <div className="call-device-settings__label">{label}</div>
+      <Select
+        options={options}
+        value={value}
+        onChange={(option: any) => option && setActiveMediaDevice(option.value)}
+        isSearchable={false}
+        menuPlacement="auto"
+        // Inline in the popover rather than a fixed menu portalled elsewhere,
+        // so it moves with the popover wherever that portals and adds no
+        // second fixed layer for Safari to mis-composite.
+        menuPortalTarget={null}
+        menuPosition="absolute"
+      />
+    </div>
+  );
+};
+
+/**
+ * In-call device picker: a control-bar button that opens a popover letting the
+ * user switch microphone, speaker and camera mid-call. Rendered inside
+ * <LiveKitRoom> (the control bar) so the device hooks reach the active room.
+ */
+export const CallSettingsMenu: FC<CallSettingsMenuProps> = ({ container }) => {
+  const kinds: { kind: MediaDeviceKind; label: string }[] = [
+    { kind: 'audioinput', label: translate('Microphone') },
+    { kind: 'audiooutput', label: translate('Speaker') },
+    { kind: 'videoinput', label: translate('Camera') },
+  ];
+
+  return (
+    <RadixPopover.Root modal={false}>
+      <RadixPopover.Trigger asChild>
+        <button
+          type="button"
+          className="lk-button"
+          title={translate('Audio & video settings')}
+        >
+          <GearSixIcon size={20} weight="bold" />
+        </button>
+      </RadixPopover.Trigger>
+      <RadixPopover.Portal container={container ?? undefined}>
+        <RadixPopover.Content
+          side="top"
+          sideOffset={2}
+          // The docked call belongs to MatrixCallHost's React tree, not the
+          // drawer's, so the drawer would read clicks here as a click away.
+          data-drawer-inside=""
+          className="call-device-settings-popover rounded-md border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden p-4"
+        >
+          <div className="call-device-settings">
+            {kinds.map(({ kind, label }) => (
+              <DeviceSelect key={kind} kind={kind} label={label} />
+            ))}
+          </div>
+        </RadixPopover.Content>
+      </RadixPopover.Portal>
+    </RadixPopover.Root>
+  );
+};

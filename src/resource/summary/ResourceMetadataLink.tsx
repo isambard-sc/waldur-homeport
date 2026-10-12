@@ -1,8 +1,8 @@
-import { Button } from 'react-bootstrap';
+import { BaseButton } from 'waldur-ui';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { useModal } from '@waldur/modal/hooks';
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 import { Resource } from '../types';
 
@@ -19,17 +19,16 @@ export const ResourceMetadataLink = <T extends Resource = any>(
 ) => {
   const { openDialog } = useModal();
   return (
-    <Button
-      variant="link"
-      className="btn-flush"
+    <BaseButton
+      variant="tertiary"
       onClick={() =>
         openDialog(ResourceMetadataDialog, {
           resolve: props,
           size: 'lg',
         })
       }
-    >
-      {translate('Show')}
-    </Button>
+      label={translate('Show')}
+      size="sm"
+    />
   );
 };

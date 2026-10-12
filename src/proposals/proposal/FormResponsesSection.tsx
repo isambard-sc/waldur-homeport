@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
-import FormTable from '@waldur/form/FormTable';
-import { translate } from '@waldur/i18n';
+import FormTable from '@/form/FormTable';
+import { translate } from '@/i18n';
 
 // The generated SDK types `Proposal.form_responses`/`ProposalReview.form_responses`
 // as `Array<{[key: string]: unknown}> | null` - drf-spectacular can't infer

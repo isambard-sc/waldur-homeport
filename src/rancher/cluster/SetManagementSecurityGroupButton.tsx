@@ -1,9 +1,10 @@
 import { BookOpenTextIcon } from '@phosphor-icons/react';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { useModal } from '@waldur/modal/hooks';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 const SetManagementSecurityGroupDialog = lazyComponent(() =>
   import('./SetManagementSecurityGroupDialog').then((module) => ({
@@ -14,15 +15,17 @@ const SetManagementSecurityGroupDialog = lazyComponent(() =>
 export const SetManagementSecurityGroupButton = ({ clusterId }) => {
   const { openDialog } = useModal();
   return (
-    <ActionButton
-      title={translate('Set management security group')}
-      action={() =>
+    <BaseButton
+      label={translate('Set management security group')}
+      onClick={() =>
         openDialog(SetManagementSecurityGroupDialog, {
           size: 'lg',
           clusterId,
         })
       }
-      iconNode={<BookOpenTextIcon />}
+      iconNode={<BookOpenTextIcon weight="bold" />}
+      variant="tertiary"
+      size="lg"
     />
   );
 };

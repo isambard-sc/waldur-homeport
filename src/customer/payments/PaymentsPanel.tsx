@@ -1,26 +1,23 @@
-import { useEffect, useState, FunctionComponent } from 'react';
-import { Alert } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { FunctionComponent, useEffect, useState } from 'react';
 
-import { Link } from '@waldur/core/Link';
-import { PaymentsList } from '@waldur/customer/payments/PaymentsList';
-import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { getActivePaymentProfile } from '@waldur/invoices/details/utils';
-import {
-  getCustomer,
-  isStaff as isStaffSelector,
-  isSupport as isSupportSelector,
-  isOwner as isOwnerSelector,
-} from '@waldur/workspace/selectors';
+import { AlertItem } from 'waldur-ui';
+
+import { Link } from '@/core/Link';
+import { PaymentsList } from '@/customer/payments/PaymentsList';
+import { formatJsxTemplate, translate } from '@/i18n';
+import { getActivePaymentProfile } from '@/invoices/details/utils';
+import { useCustomer, useUser } from '@/workspace/hooks';
+import { checkIsOwner } from '@/workspace/selectors';
 
 export const PaymentsPanel: FunctionComponent = () => {
-  const customer = useSelector(getCustomer);
+  const customer = useCustomer();
   const [activePaymentProfile, setActivePaymentProfile] = useState(
     getActivePaymentProfile(customer.payment_profiles),
   );
-  const isStaff = useSelector(isStaffSelector);
-  const isSupport = useSelector(isSupportSelector);
-  const isOwner = useSelector(isOwnerSelector);
+  const user = useUser();
+  const isStaff = user?.is_staff;
+  const isSupport = user?.is_support;
+  const isOwner = checkIsOwner(customer, user);
 
   useEffect(() => {
     setActivePaymentProfile(getActivePaymentProfile(customer.payment_profiles));
@@ -33,8 +30,10 @@ export const PaymentsPanel: FunctionComponent = () => {
     return isStaff || isSupport ? <PaymentsList /> : null;
   } else if (!activePaymentProfile) {
     return (
-      <Alert variant="light">
-        {translate(
+      <AlertItem
+        type="floating"
+        variant="info"
+        title={translate(
           'You do not have an active payment profile, visit {link} to create a payment profile.',
           {
             link: (
@@ -46,7 +45,7 @@ export const PaymentsPanel: FunctionComponent = () => {
           },
           formatJsxTemplate,
         )}
-      </Alert>
+      />
     );
   } else {
     return null;

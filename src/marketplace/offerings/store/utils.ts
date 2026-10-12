@@ -1,18 +1,28 @@
+import { isNil, omitBy } from 'lodash-es';
 import {
   BillingUnit,
-  OptionField,
-  OptionFieldTypeEnum,
+  PlanBillingMode,
+  ProviderPlanDetailsRequest,
 } from 'waldur-js-client';
+
+import { isPatternFieldType } from '@/marketplace/common/optionPattern';
+import { getFormLimitSerializer } from '@/marketplace/common/registry';
 
 import { PlanFormData, OptionFormData } from './types';
 
-export const formatPlan = (plan: PlanFormData) => ({
-  name: plan.name,
-  unit: plan.unit.value as BillingUnit,
-  unit_price: plan.unit_price ? String(plan.unit_price) : undefined,
-  article_code: plan.article_code,
-  description: plan.description,
-});
+export const formatPlan = (plan: PlanFormData) =>
+  ({
+    name: plan.name,
+    unit: plan.unit.value as BillingUnit,
+    unit_price: plan.unit_price ? String(plan.unit_price) : undefined,
+    article_code: plan.article_code,
+    description: plan.description,
+    // Only offerings with builtin components show the selector; leave the
+    // field out otherwise so the backend keeps its default.
+    ...(plan.billing_mode?.value
+      ? { billing_mode: plan.billing_mode.value as PlanBillingMode }
+      : {}),
+  }) as ProviderPlanDetailsRequest;
 
 export const formatOption = (option: OptionFormData) => {
   const {
@@ -20,10 +30,16 @@ export const formatOption = (option: OptionFormData) => {
     choices,
     cascade_config,
     component_multiplier_config,
+    component_formula_config,
+    component_sum_config,
+    default_configs,
+    visible_if,
+    pattern,
+    pattern_error,
     ...rest
   } = option;
-  const item: OptionField = {
-    type: type.value as OptionFieldTypeEnum,
+  const item: any = {
+    type: type.value,
     ...rest,
   };
 
@@ -46,32 +62,85 @@ export const formatOption = (option: OptionFormData) => {
     item.component_multiplier_config = component_multiplier_config;
   }
 
-  return item;
-};
+  if (component_formula_config && item.type === 'component_formula') {
+    item.component_formula_config = component_formula_config;
+  }
 
-export const formatAttribute = (attribute, value) => {
-  if (attribute.type === 'list' && Array.isArray(value)) {
-    if (value.length === 0) {
-      return undefined;
-    } else {
-      return value.map((item) => item.key);
-    }
-  } else if (attribute.type === 'choice' && typeof value !== 'undefined') {
-    if (value === '') {
-      return undefined;
-    } else {
-      return value.key;
+  if (component_sum_config && item.type === 'component_sum') {
+    item.component_sum_config = component_sum_config;
+  }
+
+  // A sum has nothing to fill in; a Required ticked under another type would
+  // make the order form impossible to submit.
+  if (item.type === 'component_sum') {
+    item.required = false;
+  }
+
+  // Handle default_configs for K8s config types
+  if (
+    default_configs &&
+    (item.type === 'single_datacenter_k8s_config' ||
+      item.type === 'multi_datacenter_k8s_config')
+  ) {
+    // A cleared setting (for example topology_mode set back to "the type
+    // decides") must disappear rather than reach the backend as null.
+    item.default_configs = omitBy(default_configs, isNil);
+  }
+
+  // Handle validators for cross-field validation
+  if (rest.validators && Array.isArray(rest.validators)) {
+    const validValidators = rest.validators.filter(
+      (v) => v.type && v.target_field,
+    );
+    if (validValidators.length > 0) {
+      item.validators = validValidators.map((v) => ({
+        type: typeof v.type === 'object' ? v.type.value : v.type,
+        target_field:
+          typeof v.target_field === 'object'
+            ? v.target_field.value
+            : v.target_field,
+      }));
     }
   }
-  return value;
+
+  // A rule without a referenced option is an unfinished one; drop it.
+  if (visible_if?.field && visible_if.values?.length) {
+    item.visible_if = { field: visible_if.field, values: visible_if.values };
+  }
+
+  // Mastermind rejects a pattern on other types, and pattern_error without a
+  // pattern, so a pattern left behind by a type change or a cleared field
+  // must not be sent.
+  if (pattern && isPatternFieldType(item.type)) {
+    item.pattern = pattern;
+    if (pattern_error) {
+      item.pattern_error = pattern_error;
+    }
+  }
+
+  return item;
 };
 
 const getBillingTypeValue = (option) =>
   typeof option === 'object' ? option.value : option;
 
-export const formatComponent = (component) => ({
-  ...component,
-  billing_type: getBillingTypeValue(component.billing_type),
-  limit_period: component.limit_period ? component.limit_period.value : null,
-  uuid: component.uuid,
-});
+export const formatComponent = (component, offering?) => {
+  const limitSerializer = offering
+    ? getFormLimitSerializer(offering.type)
+    : (x) => x;
+  return {
+    ...component,
+    billing_type: getBillingTypeValue(component.billing_type),
+    limit_period: component.limit_period ? component.limit_period.value : null,
+    min_value: limitSerializer({ [component.type]: component.min_value })[
+      component.type
+    ],
+    max_value: limitSerializer({ [component.type]: component.max_value })[
+      component.type
+    ],
+    limit_amount: limitSerializer({ [component.type]: component.limit_amount })[
+      component.type
+    ],
+    uuid: component.uuid,
+  };
+};

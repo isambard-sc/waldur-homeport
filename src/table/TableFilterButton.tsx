@@ -1,26 +1,46 @@
 import { FunnelSimpleIcon } from '@phosphor-icons/react';
-import { Button } from 'react-bootstrap';
 
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
-import { HeaderButtonBullet } from '@waldur/navigation/header/HeaderButtonBullet';
+import { Badge, BaseButton } from 'waldur-ui';
 
-export const TableFilterButton = ({ onClick, hasFilter = false }) => {
+import { translate } from '@/i18n';
+
+interface TableFilterButtonProps {
+  onClick: (event: React.MouseEvent) => void;
+  hasFilter?: boolean;
+  filterCount?: number;
+}
+
+export const TableFilterButton = ({
+  onClick,
+  hasFilter = false,
+  filterCount = 0,
+}: TableFilterButtonProps) => {
+  const count = hasFilter ? filterCount : 0;
   return (
-    <Tip id="table-filter-toggle-tip" label={translate('Set filters')}>
-      <Button
+    // The wrapper is always mounted, only the badge comes and goes: wrapping
+    // the button only while there is a count changed the tree shape at this
+    // position, so React remounted the button (losing focus and tooltip state)
+    // whenever the count crossed zero.
+    <div className="d-inline-flex position-relative">
+      <BaseButton
         variant="tertiary"
-        className="btn-icon btn-toggle-filters position-relative"
         size="lg"
+        tooltip={translate('Set filters')}
+        iconNode={<FunnelSimpleIcon weight="bold" />}
         onClick={onClick}
-      >
-        <span className="svg-icon svg-icon-2">
-          <FunnelSimpleIcon weight="bold" />
-        </span>
-        {hasFilter && (
-          <HeaderButtonBullet size={8} blink={false} className="me-n2" />
-        )}
-      </Button>
-    </Tip>
+        className="btn-toggle-filters"
+      />
+      {count > 0 && (
+        <Badge
+          variant="primary"
+          size="sm"
+          shape="pill"
+          tone="outline"
+          className="position-absolute top-0 start-100 translate-middle fs-7"
+        >
+          {count > 9 ? '9+' : count}
+        </Badge>
+      )}
+    </div>
   );
 };

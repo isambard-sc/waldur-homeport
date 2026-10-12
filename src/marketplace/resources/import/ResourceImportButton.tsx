@@ -1,11 +1,11 @@
 import { DownloadSimpleIcon } from '@phosphor-icons/react';
-import React from 'react';
-import { useDispatch } from 'react-redux';
+import { FC } from 'react';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 import { ImportDialogProps } from './types';
 
@@ -15,25 +15,23 @@ const ResourceImportDialog = lazyComponent(() =>
   })),
 );
 
-export const ResourceImportButton: React.FC<ImportDialogProps['resolve']> = (
+export const ResourceImportButton: FC<ImportDialogProps['resolve']> = (
   props,
 ) => {
-  const dispatch = useDispatch();
-
-  const openDialog = () => {
-    dispatch(
-      openModalDialog(ResourceImportDialog, {
-        resolve: props,
-        size: 'lg',
-      }),
-    );
-  };
+  const { openDialog } = useModal();
 
   return (
-    <ActionButton
-      title={translate('Import')}
-      action={openDialog}
+    <BaseButton
+      label={translate('Import')}
+      onClick={() => {
+        openDialog(ResourceImportDialog, {
+          resolve: props,
+          size: 'lg',
+        });
+      }}
       iconNode={<DownloadSimpleIcon weight="bold" />}
+      variant="tertiary"
+      size="lg"
     />
   );
 };

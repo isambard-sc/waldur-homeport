@@ -16,10 +16,12 @@ import * as Popover from '@radix-ui/react-popover';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import classNames from 'classnames';
 import { useState, FC, useEffect, forwardRef } from 'react';
-import { Modal, Button, FormLabel } from 'react-bootstrap';
+import { Modal, FormLabel } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
 
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 import { StringField } from './StringField';
 
@@ -32,6 +34,7 @@ const LinkEditForm = ({ initialUrl, onCancel }) => {
         updateLink({
           title: '',
           url: values.url,
+          text: '',
         });
       }}
       initialValues={{ url: initialUrl || '' }}
@@ -48,22 +51,36 @@ const LinkEditForm = ({ initialUrl, onCancel }) => {
           }}
         >
           <FormLabel>URL</FormLabel>
-          <Field
-            component={StringField as any}
-            name="url"
-            id="url"
-            placeholder="https://..."
-            autoFocus
-            className="mb-5"
-          />
+          <Field name="url">
+            {({ input, meta }) => (
+              <StringField
+                input={input}
+                meta={meta}
+                id="url"
+                placeholder="https://..."
+                autoFocus
+                className="mb-5"
+              />
+            )}
+          </Field>
 
           <div>
-            <Button variant="tertiary" type="reset" size="sm">
-              {translate('Cancel')}
-            </Button>
-            <Button type="submit" size="sm" className="ms-2">
-              {translate('Save')}
-            </Button>
+            <BaseButton
+              size="sm"
+              variant="tertiary"
+              onClick={(e) => {
+                e.preventDefault();
+                onCancel();
+              }}
+              label={translate('Cancel')}
+            />
+            <BaseButton
+              size="sm"
+              variant="primary"
+              type="submit"
+              className="ms-2"
+              label={translate('Save')}
+            />
           </div>
         </form>
       )}

@@ -1,0 +1,32 @@
+import { Project } from 'waldur-js-client';
+
+import { ButtonSize } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { ActionDropdownButton } from '@/table/ActionDropdownButton';
+import { ActionsDropdownSeparator } from '@/table/ActionsDropdown';
+
+import { BatchDeleteProjectAction } from './BatchDeleteProjectAction';
+import { BatchMoveProjectAction } from './BatchMoveProjectAction';
+import { BatchSetEndDateAction } from './BatchSetEndDateAction';
+
+export const BatchProjectActions = ({
+  rows,
+  refetch,
+  size,
+}: {
+  rows: Project[];
+  refetch;
+  size?: ButtonSize;
+}) => (
+  <ActionDropdownButton
+    variant="primary"
+    title={translate('All actions')}
+    size={size}
+  >
+    <BatchMoveProjectAction rows={rows} refetch={refetch} />
+    <BatchSetEndDateAction rows={rows} refetch={refetch} />
+    <ActionsDropdownSeparator className="border-top m-0" />
+    <BatchDeleteProjectAction rows={rows} refetch={refetch} />
+  </ActionDropdownButton>
+);

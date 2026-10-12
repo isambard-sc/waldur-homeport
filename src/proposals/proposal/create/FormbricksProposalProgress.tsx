@@ -1,24 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import {
   proposalProposalsFormbricksEditLinkRetrieve,
   proposalProposalsFormbricksProgressRetrieve,
   proposalProposalsSubmit,
 } from 'waldur-js-client';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { Panel } from '@waldur/core/Panel';
-import { SidebarLayout } from '@waldur/form/SidebarLayout';
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
+
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { Panel } from '@/core/Panel';
+import { SidebarLayout } from '@/form/SidebarLayout';
+import { translate } from '@/i18n';
 import {
   FormResponsesSection,
   STEP_LABELS,
-} from '@waldur/proposals/proposal/FormResponsesSection';
-import { TeamSection } from '@waldur/proposals/team/TeamSection';
-import { Proposal } from '@waldur/proposals/types';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+} from '@/proposals/proposal/FormResponsesSection';
+import { TeamSection } from '@/proposals/team/TeamSection';
+import { Proposal } from '@/proposals/types';
+import { useNotify } from '@/store/notify';
 
 import { ResourceRequestsSummary } from './ResourceRequestsSummary';
 
@@ -51,7 +51,7 @@ interface FormbricksEditLinkResponse {
 export const FormbricksProposalProgress: FC<
   FormbricksProposalProgressProps
 > = ({ proposal, refetch }) => {
-  const dispatch = useDispatch();
+  const { showSuccess, showErrorResponse } = useNotify();
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,7 +60,9 @@ export const FormbricksProposalProgress: FC<
     queryFn: () =>
       proposalProposalsFormbricksProgressRetrieve({
         path: { uuid: proposal.uuid },
-      }).then((response) => response.data as unknown as FormbricksProgressResponse),
+      }).then(
+        (response) => response.data as unknown as FormbricksProgressResponse,
+      ),
     // The Lead can finish a step in another tab/window (or come back
     // later) without this page knowing - refetch on focus so "Continue
     // application" always points at the real next step.
@@ -74,9 +76,11 @@ export const FormbricksProposalProgress: FC<
         path: { uuid: proposal.uuid },
         query: { step: stepKey },
       });
-      window.location.assign((data as unknown as FormbricksEditLinkResponse).redirect_url);
+      window.location.assign(
+        (data as unknown as FormbricksEditLinkResponse).redirect_url,
+      );
     } catch (error) {
-      dispatch(showErrorResponse(error, translate('Unable to open edit link.')));
+      showErrorResponse(error, translate('Unable to open edit link.'));
       setEditingStep(null);
     }
   };
@@ -92,9 +96,9 @@ export const FormbricksProposalProgress: FC<
     try {
       await proposalProposalsSubmit({ path: { uuid: proposal.uuid } });
       refetch?.();
-      dispatch(showSuccess(translate('Proposal submitted successfully')));
+      showSuccess(translate('Proposal submitted successfully'));
     } catch (error) {
-      dispatch(showErrorResponse(error, translate('Unable to submit proposal.')));
+      showErrorResponse(error, translate('Unable to submit proposal.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -138,26 +142,25 @@ export const FormbricksProposalProgress: FC<
                   className="d-flex justify-content-between align-items-center mb-2"
                 >
                   <span>{STEP_LABELS[stepKey] ?? stepKey}</span>
-                  <Button
-                    variant="link"
+                  <BaseButton
+                    variant="text-primary"
                     size="sm"
                     disabled={editingStep === stepKey}
+                    disabledReason={translate('Opening edit link…')}
                     onClick={() => handleEdit(stepKey)}
-                  >
-                    {translate('Edit Form')}
-                  </Button>
+                    label={translate('Edit Form')}
+                  />
                 </li>
               ))}
             </ul>
           )}
           {progress?.next_step ? (
-            <Button
+            <BaseButton
               variant="primary"
               className="w-100"
               onClick={handleContinue}
-            >
-              {translate('Continue application')}
-            </Button>
+              label={translate('Continue application')}
+            />
           ) : (
             <>
               <p className="text-muted">
@@ -165,14 +168,13 @@ export const FormbricksProposalProgress: FC<
                   'All steps are complete. Add team members in the Project team section if needed, then submit your application.',
                 )}
               </p>
-              <Button
+              <BaseButton
                 variant="primary"
                 className="w-100"
-                disabled={isSubmitting}
+                pending={isSubmitting}
                 onClick={handleSubmit}
-              >
-                {translate('Submit')}
-              </Button>
+                label={translate('Submit')}
+              />
             </>
           )}
         </Panel>

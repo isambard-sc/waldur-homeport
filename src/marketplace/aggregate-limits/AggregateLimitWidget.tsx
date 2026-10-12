@@ -1,19 +1,18 @@
 import { EyeIcon, QuestionIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import { ComponentsUsageStats } from 'waldur-js-client';
 import { Project } from 'waldur-js-client';
 
-import { EChart } from '@waldur/core/EChart';
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { Tip } from '@waldur/core/Tooltip';
-import { WidgetCard } from '@waldur/dashboard/WidgetCard';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { Customer } from '@waldur/workspace/types';
+import { Tooltip, BaseButton } from 'waldur-ui';
+
+import { EChart } from '@/core/EChart';
+import { lazyComponent } from '@/core/lazyComponent';
+import { LoadingErred } from '@/core/LoadingErred';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { WidgetCard } from '@/dashboard/WidgetCard';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
+import { Customer } from '@/workspace/types';
 
 import { useAggregateLimitChart } from './utils';
 
@@ -48,7 +47,7 @@ export const AggregateLimitWidget = ({
   refetch,
   type = 'all',
 }: AggregateLimitWidgetProps) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const isProject = !!project;
   const isMonthly = type === 'monthly';
 
@@ -62,43 +61,37 @@ export const AggregateLimitWidget = ({
   const viewDetails = useCallback(
     () =>
       isProject
-        ? dispatch(
-            openModalDialog(AggregateLimitDetailsDialog, {
-              resolve: {
-                project,
-                components: data?.components,
-              },
-              size: 'lg',
-            }),
-          )
-        : dispatch(
-            openModalDialog(AggregateLimitDetailsDialog, {
-              resolve: {
-                customer,
-                components: data?.components,
-              },
-              size: 'lg',
-            }),
-          ),
-    [dispatch, project, customer, data, isProject],
+        ? openDialog(AggregateLimitDetailsDialog, {
+            resolve: {
+              project,
+              components: data?.components,
+            },
+            size: 'lg',
+          })
+        : openDialog(AggregateLimitDetailsDialog, {
+            resolve: {
+              customer,
+              components: data?.components,
+            },
+            size: 'lg',
+          }),
+    [project, customer, data, isProject],
   );
 
   const viewAllComponents = useCallback(
     () =>
-      dispatch(
-        openModalDialog(AggregateLimitChartModal, {
-          resolve: {
-            data,
-            isMonthly,
-            title:
-              type === 'monthly'
-                ? translate("Current month's usage")
-                : translate('Aggregate usage and limits'),
-          },
-          size: 'xl',
-        }),
-      ),
-    [dispatch, data, isMonthly, type],
+      openDialog(AggregateLimitChartModal, {
+        resolve: {
+          data,
+          isMonthly,
+          title:
+            type === 'monthly'
+              ? translate("Current month's usage")
+              : translate('Aggregate usage and limits'),
+        },
+        size: 'xl',
+      }),
+    [data, isMonthly, type],
   );
 
   if (isLoading) {
@@ -125,12 +118,11 @@ export const AggregateLimitWidget = ({
   const TitleWithTip = () => (
     <>
       {title}{' '}
-      <Tip
-        id="aggregate-limit-tooltip"
+      <Tooltip
         label={translate('You are viewing the chart in log scale mode.')}
       >
-        <QuestionIcon />
-      </Tip>
+        <QuestionIcon weight="bold" />
+      </Tooltip>
     </>
   );
 
@@ -142,7 +134,7 @@ export const AggregateLimitWidget = ({
   const actions = [
     {
       label: translate('Details'),
-      icon: <EyeIcon />,
+      icon: <EyeIcon weight="bold" />,
       callback: viewDetails,
     },
   ];
@@ -150,14 +142,13 @@ export const AggregateLimitWidget = ({
   const cardAction = () => {
     if (showViewAllButton) {
       return (
-        <Button
+        <BaseButton
           onClick={viewAllComponents}
-          variant="link"
-          size="sm"
+          label={translate('View all')}
+          variant="text-primary"
           className="py-0"
-        >
-          {translate('View all')}
-        </Button>
+          size="sm"
+        />
       );
     }
     return null;

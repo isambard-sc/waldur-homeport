@@ -1,0 +1,223 @@
+/**
+ * Tailwind entry point for both the real app (imported by src/index.tsx)
+ * and Storybook (.storybook/preview.tsx). One file, so a story and the
+ * running app cannot drift on layer order, the px `@theme` overrides or
+ * the brand-token bridge. Full reasoning for every choice below:
+ * docs/tailwind-shadcn-migration-notes.md.
+ */
+
+/* Layer order theme < base (preflight) < bootstrap < utilities — NOT
+   bootstrap ranked below everything, which broke the real BaseButton
+   outright (Tailwind's preflight reset wiped Bootstrap's own styling). Does
+   NOT fix Bootstrap's !important utility classes (.border, .bg-transparent)
+   colliding with same-named Tailwind utilities — those still need
+   differently-named classes at the call site. See migration notes. */
+@layer theme, base, bootstrap, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'waldur-design-tokens/buttonColors.css';
+@import 'waldur-design-tokens/surfaceColors.css';
+@import 'waldur-design-tokens/sidebarColors.css';
+/* Not used by the app's own Bootstrap modals, which bring their own
+   motion — this is for packages/ui's Radix Dialog/Sheet primitives.
+   Keyframe names are namespaced, so nothing else picks them up. */
+@import 'waldur-design-tokens/animations.css';
+@import 'waldur-design-tokens/colors.css';
+@import 'waldur-design-tokens/focusRing.css';
+@import 'waldur-design-tokens/zIndex.css';
+
+/* The app's one focus ring, for everything that doesn't style its own —
+   links, breadcrumbs, sidebar rows, anything with tabindex. In `base`, so
+   Metronic's .btn ring (bootstrap layer) and the BaseButton variants
+   (utilities) still win where they apply, and an element that deliberately
+   suppresses its outline keeps doing so. */
+@layer base {
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+/* Preflight's one rule that Bootstrap has no counterpart for, and so the
+   only part of it that actually reaches the app:
+
+     img, svg, video, canvas, audio, iframe, embed, object { display: block }
+     img, video { max-width: 100%; height: auto }
+
+   Bootstrap's reboot only sets `vertical-align: middle` on img/svg, so
+   nothing in the `bootstrap` layer outranks the display change — every one
+   of the app's ~61 <img> tags and every inline Phosphor <svg> silently went
+   from inline to block the moment Tailwind shipped in the app bundle, which
+   drops them out of the text baseline they were laid out against (e.g.
+   QuotaBadge's 15px icon sitting inline beside its label).
+
+   `revert`, not explicit values: it rolls the cascade back to the UA origin,
+   which restores each element's real initial display without this rule
+   having to hardcode one per tag — notably Chrome's own
+   `audio:not([controls]) { display: none }`, which a blanket
+   `display: inline` here would override and make hidden audio elements
+   visible.
+
+   Placed in `bootstrap` deliberately, so the precedence is:
+     preflight (base)  <  this  <  Tailwind utilities  <  component .scss
+   New Tailwind-styled markup that wants block media asks for it explicitly
+   with `block`/`max-w-full`, and unlayered component stylesheets keep
+   winning as they always did.
+
+   packages/ui needed no such opt-in: every <img>/<svg> it renders
+   (AvatarImage, WaldurLogo's wordmark, SidebarToggleGraphic) is a flex item
+   of its own wrapper — AvatarRoot, WaldurLogo's span, and
+   ICON_BUTTON_BASE_CLASSNAME respectively — so it is blockified by its
+   parent and never depended on preflight's rule to begin with. Verify that
+   still holds before moving one of them into an inline-flow context. */
+/* The ring's corner for controls that bring no radius of their own. It sits in
+   `bootstrap`, not `base`, only because Bootstrap's reboot forces
+   `button { border-radius: 0 }` there -- from `base` every plain <button> (the
+   column pin, the favourite star) would keep square corners while the padded
+   buttons beside them are rounded. A component that sets its own radius still
+   wins: same specificity, and its stylesheet loads after this one. */
+@layer bootstrap {
+  :focus-visible {
+    border-radius: var(--focus-ring-radius);
+  }
+}
+
+@layer bootstrap {
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: revert;
+  }
+
+  img,
+  video {
+    max-width: revert;
+    height: revert;
+  }
+
+  /* The other preflight rule Bootstrap only half-covers:
+
+       ol, ul, menu { list-style: none; margin: 0; padding: 0 }
+
+     Reboot has its own `margin`/`padding-left` for lists, so those two win
+     on layer order and are already unaffected — `list-style` is the single
+     property with no Bootstrap counterpart, which is why only it is
+     reverted here rather than the whole rule. Without this, every bare
+     <ul>/<ol> loses its bullets: ~30 in .tsx directly, plus every list in
+     Markdown the app renders as user content (SafeMarkdown /
+     TruncatedMarkdown — offering descriptions, announcements, terms of
+     service, user agreements), none of which carry a class to style back.
+
+     Metronic's own list-based components (.menu, .nav, .pagination) set
+     `list-style: none` themselves at class specificity, so they are
+     untouched by this and stay bulletless. */
+  ol,
+  ul,
+  menu {
+    list-style: revert;
+  }
+}
+
+/* Metronic forces a 13px root font-size !important; Tailwind's rem-based
+   scale silently resizes against that instead of the assumed 16px. Cascade
+   layering doesn't fix this (it decides which declaration wins, not what a
+   rem-relative value computes to) — these are explicit px overrides instead. */
+@theme {
+  --spacing: 4px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  /* Not --radius-xl/2xl/3xl: those are Tailwind's own reserved keys (own
+     defaults ~12/16/24px depending on root font-size), and giving one of
+     them this value would silently change what "rounded-2xl" means for any
+     future non-packages/ui caller expecting Tailwind's real default. This
+     is Dialog's modal content and Sidebar's mode-switcher card specifically
+     (both visibly rounder than rounded-lg's 8px, both pair with
+     bg-[var(--surface-card-bg)]) — a genuinely new, one-off value, not a
+     Tailwind scale step, hence the non-reserved name. */
+  --radius-modal: 20px;
+
+  /* Same names, same values as Bootstrap's $grid-breakpoints
+     (metronic/sass/core/components/_variables.scss) and GRID_BREAKPOINTS in
+     src/core/constants.ts, so `lg:` means 992px whether it is written as a
+     Tailwind variant, a Bootstrap `.d-lg-*` class, an SCSS media query or a
+     useMediaQuery() call. Tailwind's own defaults (640/1024/1280/1536) would
+     make it a fourth, different `lg`. px, not rem: the root font-size is
+     forced to 13px/12px, and rem in a media query is the browser's initial
+     16px anyway, so rem values here would be a trap. `md` (768) already
+     matched. */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+}
+
+/* Tailwind's `visibility` utility set includes a class literally named
+   `.collapse` (`{ visibility: collapse }` — the third state alongside
+   `visible`/`invisible`, meant for hiding table rows/columns without
+   reflowing the table). React-bootstrap's `Collapse`/`Accordion.Collapse`/
+   `Navbar.Collapse` independently use the exact same bare class name
+   `collapse` as their own component marker (Bootstrap predates this
+   Tailwind utility by years) — an unrelated meaning that happens to share
+   a name. With this file's own deliberate `utilities` > `bootstrap` layer
+   order, Tailwind's rule silently wins on every one of those elements:
+   `visibility: collapse` on a non-table element computes exactly like
+   `visibility: hidden` per spec, so the collapse/accordion body still
+   occupies its normal layout box (`.show`, correct `scrollHeight`, real
+   children mounted and even auto-focused) but paints nothing — "expands
+   but shows empty" with no console error, evidenced live via
+   `getComputedStyle` on both the real app and this file's own Storybook
+   preview (both import this same file, so both had it). At least seven
+   components hit this (`AccordionCard`, `TableFilterItem`'s sidebar
+   drawer, `TableHeader`, `ChatHistorySidebar`, `CategoriesPanel`,
+   `InferenceServiceView`, `TwoStageWorkflowCard`), so this is fixed once
+   here rather than per call site. No genuine Tailwind `.collapse`
+   (table-visibility) usage exists anywhere in the app (checked), so
+   reclaiming the name outright is safe.
+
+   Layer order alone can't win this back — `bootstrap` is ranked *below*
+   `utilities` on purpose (see this file's very first comment), so a
+   normal-priority rule here would still lose. Cascade Layers order
+   `!important` declarations in *reverse*, and rank any `!important`
+   above any normal-priority rule regardless of layer, so `!important`
+   here reliably beats Tailwind's non-important utility without touching
+   that deliberate ordering. */
+@layer bootstrap {
+  .collapse {
+    visibility: visible !important;
+  }
+}
+
+/* Same clash: src/ uses `bg-gray-50` as Metronic's theme-aware panel
+   background; Tailwind's version stays light in dark mode. */
+@layer bootstrap {
+  .bg-gray-50 {
+    background-color: var(--bs-gray-50) !important;
+  }
+}
+
+/* No `.dark` class in this app — dark mode swaps compiled stylesheets
+   (src/theme/utils.ts). data-theme on <html> gives Tailwind's dark:
+   variant a real signal to key off instead of introducing a second toggle. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  --font-sans: var(--waldur-font-family), Helvetica, sans-serif;
+
+  --color-bg-primary: var(--waldur-bg-primary);
+  --color-border-secondary: var(--waldur-border-secondary);
+  --color-border-brand-solid: var(--waldur-border-brand-solid);
+  --color-border-danger: var(--waldur-border-danger);
+}
