@@ -76,10 +76,19 @@ export const ProposalManagePage = () => {
   } = useQuery({
     queryKey: ['Proposal', proposal_uuid],
 
+    // A 404 is answered here rather than thrown: the global query error
+    // handler would otherwise send the whole app to the Not Found page before
+    // this page could look in the archive (see below). Anything else is still
+    // thrown, so a 403 or a 500 reaches the global handler as before.
     queryFn: () =>
       proposalProposalsRetrieve({
         path: { uuid: proposal_uuid },
-      }).then((response) => response.data),
+      })
+        .then((response) => response.data)
+        .catch((e) => {
+          if (isNotFound(e)) return null;
+          throw e;
+        }),
 
     refetchOnWindowFocus: false,
   });
@@ -184,14 +193,13 @@ export const ProposalManagePage = () => {
   if (isLoading || isLoadingReviews) {
     return <LoadingSpinner />;
   } else if (error) {
+    return <LoadingErred loadData={refetch} />;
+  } else if (proposal === null) {
     // A proposal that is not here may still be in the archive: the upgrade
     // archived the old proposals rather than migrating them, keeping their
     // UUIDs, so an old link identifies a real record that is no longer live.
-    // Only a 404 is worth following up — a 403 or a 500 must surface as itself.
-    if (isNotFound(error)) {
-      return <ArchivedProposalRedirect uuid={proposal_uuid} />;
-    }
-    return <LoadingErred loadData={refetch} />;
+    // Only a 404 comes here -- a 403 or a 500 surfaces as itself.
+    return <ArchivedProposalRedirect uuid={proposal_uuid} />;
   }
 
   return (
