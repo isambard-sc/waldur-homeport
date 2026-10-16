@@ -1,7 +1,10 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
-import { proposalProtectedCallsPartialUpdate } from 'waldur-js-client';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  proposalProtectedCallsFormbricksFlowKeysList,
+  proposalProtectedCallsPartialUpdate,
+} from 'waldur-js-client';
 
 import { EditFieldDialog } from '@/form/EditFieldDialog';
 import { useModal } from '@/modal/actions';
@@ -121,5 +124,121 @@ describe('GeneralConfigurationSection evaluation start', () => {
       });
       expect(refetch).toHaveBeenCalled();
     });
+  });
+});
+
+describe('GeneralConfigurationSection formbricks_flow_key', () => {
+  const call = {
+    uuid: 'call-uuid',
+    customer_uuid: 'customer-uuid',
+    evaluation_start: 'on_submission',
+    order_author: 'applicant',
+    formbricks_flow_key: null,
+    has_proposals: false,
+  } as any;
+
+  beforeEach(() => {
+    vi.mocked(proposalProtectedCallsFormbricksFlowKeysList).mockResolvedValue({
+      data: [{ key: 'AIRR-GW' }, { key: 'AIRR-RA' }],
+    } as any);
+  });
+
+  it('shows the native-form option when no flow is set', async () => {
+    renderWithProviders(
+      <GeneralConfigurationSection call={call} refetch={vi.fn()} />,
+    );
+    expect(screen.getByText('Applicant intake form')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Not using Formbricks (native form)'),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the configured flow key when one is set', async () => {
+    renderWithProviders(
+      <GeneralConfigurationSection
+        call={{ ...call, formbricks_flow_key: 'AIRR-GW' }}
+        refetch={vi.fn()}
+      />,
+    );
+    expect(await screen.findByText('AIRR-GW')).toBeInTheDocument();
+  });
+
+  it('saves a chosen flow key on the call', async () => {
+    const user = userEvent.setup();
+    const refetch = vi.fn();
+    vi.mocked(proposalProtectedCallsPartialUpdate).mockResolvedValue({
+      data: {},
+    } as any);
+    renderWithProviders(
+      <GeneralConfigurationSection call={call} refetch={refetch} />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('edit-formbricks_flow_key')).not.toBeDisabled(),
+    );
+    await user.click(screen.getByTestId('edit-formbricks_flow_key'));
+    const { openDialog } = useModal();
+    const [, dialogProps] = vi.mocked(openDialog).mock.lastCall as any;
+    renderWithProviders(<EditFieldDialog {...dialogProps} />);
+
+    await openAndSelectOption(user, /^Applicant intake form/, 'AIRR-GW');
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    await waitFor(() => {
+      expect(proposalProtectedCallsPartialUpdate).toHaveBeenCalledWith({
+        path: { uuid: 'call-uuid' },
+        body: { formbricks_flow_key: 'AIRR-GW' },
+      });
+      expect(refetch).toHaveBeenCalled();
+    });
+  });
+
+  it('saves clearing the flow key back to the native form', async () => {
+    const user = userEvent.setup();
+    const refetch = vi.fn();
+    vi.mocked(proposalProtectedCallsPartialUpdate).mockResolvedValue({
+      data: {},
+    } as any);
+    renderWithProviders(
+      <GeneralConfigurationSection
+        call={{ ...call, formbricks_flow_key: 'AIRR-GW' }}
+        refetch={refetch}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('edit-formbricks_flow_key')).not.toBeDisabled(),
+    );
+    await user.click(screen.getByTestId('edit-formbricks_flow_key'));
+    const { openDialog } = useModal();
+    const [, dialogProps] = vi.mocked(openDialog).mock.lastCall as any;
+    renderWithProviders(<EditFieldDialog {...dialogProps} />);
+
+    await openAndSelectOption(
+      user,
+      /^Applicant intake form/,
+      'Not using Formbricks (native form)',
+    );
+    await user.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    await waitFor(() => {
+      expect(proposalProtectedCallsPartialUpdate).toHaveBeenCalledWith({
+        path: { uuid: 'call-uuid' },
+        body: { formbricks_flow_key: null },
+      });
+      expect(refetch).toHaveBeenCalled();
+    });
+  });
+
+  it('is disabled once the call has proposals', async () => {
+    renderWithProviders(
+      <GeneralConfigurationSection
+        call={{ ...call, has_proposals: true }}
+        refetch={vi.fn()}
+      />,
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId('edit-formbricks_flow_key')).toBeDisabled(),
+    );
   });
 });
