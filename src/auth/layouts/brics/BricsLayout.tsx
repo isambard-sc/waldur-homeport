@@ -11,9 +11,10 @@ import { IdentityProvider } from 'waldur-js-client';
 import { getIdentityProviders } from '@/administration/api';
 import { getIconUrl } from '@/core/api';
 import { ENV } from '@/core/config';
+import { Link } from '@/core/Link';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
-import { translate } from '@/i18n';
+import { formatJsx, translate } from '@/i18n';
 import { useThemeFeatures } from '@/theme/useThemeFeatures';
 
 import { getHeroBackgroundImage } from '../../heroImage';
@@ -22,7 +23,6 @@ import { LocalLoginButton, LocalLoginForm } from '../../LocalLogin';
 import { OauthLoginButton } from '../../OauthLoginButton';
 import { PoweredBy } from '../../PoweredBy';
 import { useAuthFeatures } from '../../useAuthFeatures';
-import { UserAuthWarning } from '../../UserAuthWarning';
 import { getOauthURL } from '../../utils';
 
 import { LoginNotices } from './LoginNotices';
@@ -116,6 +116,25 @@ const LoginOptions = () => {
   );
 };
 
+/**
+ * The terms notice, broken after "agreeing to the" so the two links sit
+ * together on a line of their own rather than wherever the text wraps.
+ */
+const BricsTerms = () => (
+  <p className="brics-terms">
+    {translate('By authenticating you are agreeing to the')}
+    <br />
+    {translate(
+      '<tos>Terms of Service</tos> and <pp>Privacy policy</pp>.',
+      {
+        tos: (s: string) => <Link state="about.tos" label={s} />,
+        pp: (s: string) => <Link state="about.privacy" label={s} />,
+      },
+      formatJsx,
+    )}
+  </p>
+);
+
 const QuickLink = ({
   href,
   icon,
@@ -187,9 +206,7 @@ export const BricsLayout = () => {
             src={getIconUrl('login_logo')}
           />
           <LoginOptions />
-          <div className="brics-terms">
-            <UserAuthWarning />
-          </div>
+          <BricsTerms />
           <PoweredBy />
         </div>
 

@@ -211,6 +211,26 @@ describe('BricsLayout', () => {
     ).toBeInTheDocument();
   });
 
+  it('puts the terms links on a line of their own', async () => {
+    renderLayout();
+    await screen.findByRole('button', { name: 'Log in' });
+
+    const terms = screen.getByText(
+      (_, element) =>
+        element?.tagName === 'P' &&
+        element.textContent.startsWith('By authenticating'),
+    );
+    expect(terms).toContainHTML(
+      'By authenticating you are agreeing to the<br>',
+    );
+    expect(
+      screen.getByRole('link', { name: 'Terms of Service' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Privacy policy' }),
+    ).toBeInTheDocument();
+  });
+
   it('says so when there is no way to log in', async () => {
     vi.mocked(getIdentityProviders).mockResolvedValue([]);
     renderLayout();
