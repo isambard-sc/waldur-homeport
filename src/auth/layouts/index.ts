@@ -29,6 +29,9 @@ export { DiagonalLayout } from './DiagonalLayout';
 export { DuotoneLayout } from './DuotoneLayout';
 export { LogoWatermarkLayout } from './LogoWatermarkLayout';
 
+// This deployment's own
+export { BricsLayout } from './brics/BricsLayout';
+
 // Dynamic layouts
 export { SeasonalLayout } from './SeasonalLayout';
 export { TimeBasedLayout } from './TimeBasedLayout';

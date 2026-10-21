@@ -1,0 +1,330 @@
+/*
+ * BriCS login page. The palette is fixed rather than taken from the light or
+ * dark theme: the page sits on its own artwork, and the colours are the
+ * logo's own.
+ */
+.layout-brics {
+  --brics-navy: #22305c;
+  --brics-navy-deep: #121a36;
+  --brics-blue: #6a98d8;
+  --brics-blue-soft: #a9c4ea;
+  --brics-warning: #f5b544;
+  --brics-danger: #f07070;
+
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--brics-navy-deep);
+  background-size: cover;
+  background-position: right center;
+  color: #fff;
+  isolation: isolate;
+}
+
+/* Navy wash: deep behind the text on the left, thinning out over the brain. */
+.layout-brics::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(
+      ellipse at 85% 50%,
+      rgba(106, 152, 216, 0.18),
+      transparent 60%
+    ),
+    linear-gradient(
+      100deg,
+      rgba(18, 26, 54, 0.94) 0%,
+      rgba(34, 48, 92, 0.82) 45%,
+      rgba(34, 48, 92, 0.45) 100%
+    );
+}
+
+.brics-grid {
+  flex: 1;
+  display: grid;
+  grid-template-areas:
+    'card'
+    'hero';
+  gap: 2.5rem;
+  align-content: center;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2.5rem 1rem;
+}
+
+@media (width >= 992px) {
+  .brics-grid {
+    grid-template-areas: 'hero card';
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 440px);
+    gap: clamp(3rem, 6vw, 6rem);
+    align-items: center;
+    padding: 3rem clamp(2rem, 5vw, 5rem);
+  }
+}
+
+/* --- Login card --------------------------------------------------------- */
+
+.brics-card {
+  grid-area: card;
+  width: 100%;
+  max-width: 440px;
+  justify-self: center;
+  padding: 2.5rem 2rem 2rem;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 24px 64px rgba(10, 16, 40, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #3b4256;
+  text-align: center;
+}
+
+.brics-logo {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  max-height: 200px;
+  margin: 0 auto 2rem;
+  object-fit: contain;
+}
+
+.brics-login-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.brics-login-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--brics-navy), #2f4380);
+  box-shadow: 0 8px 20px rgba(34, 48, 92, 0.35);
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.brics-login-button svg {
+  transition: transform 0.15s ease;
+}
+
+.brics-login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(34, 48, 92, 0.45);
+}
+
+.brics-login-button:hover svg {
+  transform: translateX(3px);
+}
+
+.brics-login-button:focus-visible {
+  outline: 3px solid var(--brics-blue);
+  outline-offset: 3px;
+}
+
+.brics-terms p {
+  margin: 1.25rem 0 0;
+  font-size: 0.85rem;
+  color: #5b6378;
+}
+
+.brics-terms a {
+  color: var(--brics-navy);
+  font-weight: 500;
+}
+
+.brics-card .powered-by {
+  margin-top: 1.5rem;
+}
+
+/* --- Hero side --------------------------------------------------------- */
+
+.brics-hero {
+  grid-area: hero;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.brics-hero h1 {
+  margin: 0;
+  max-width: 18ch;
+  color: #fff;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.brics-hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  background: var(--brics-blue);
+  color: var(--brics-navy-deep);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.brics-hero-link:hover,
+.brics-hero-link:focus-visible {
+  background: var(--brics-blue-soft);
+  color: var(--brics-navy-deep);
+}
+
+.brics-quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.brics-quick-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.brics-quick-link:hover,
+.brics-quick-link:focus-visible {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+/* --- Notices ----------------------------------------------------------- */
+
+.brics-notices {
+  width: 100%;
+  max-width: 560px;
+}
+
+.brics-section-title {
+  margin: 0 0 0.75rem;
+  color: var(--brics-blue-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brics-notices ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brics-notice {
+  --brics-notice-accent: var(--brics-blue);
+
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 4px solid var(--brics-notice-accent);
+  background: rgba(18, 26, 54, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.brics-notice-warning {
+  --brics-notice-accent: var(--brics-warning);
+}
+
+.brics-notice-danger {
+  --brics-notice-accent: var(--brics-danger);
+}
+
+.brics-notice-icon {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  font-size: 1.15rem;
+  color: var(--brics-notice-accent);
+}
+
+.brics-notice-body {
+  min-width: 0;
+}
+
+.brics-notice-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.brics-notice-text p {
+  margin: 0;
+}
+
+.brics-notice-text a {
+  color: var(--brics-blue-soft);
+}
+
+.brics-notice-more {
+  margin-top: 0.25rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brics-blue-soft);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.brics-notice-more:hover,
+.brics-notice-more:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brics-login-button,
+  .brics-login-button svg {
+    transition: none;
+  }
+
+  .brics-login-button:hover,
+  .brics-login-button:hover svg {
+    transform: none;
+  }
+}
