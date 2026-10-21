@@ -331,6 +331,33 @@
   }
 }
 
+/* --- Stacked, below 992px -------------------------------------------- */
+
+/* One centred column: the message, links and notices take the card's width
+   and alignment, so the page reads as a single stack rather than a centred
+   card over a left-aligned block. */
+@media (width < 992px) {
+  .brics-hero {
+    width: 100%;
+    max-width: 440px;
+    justify-self: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .brics-hero h1 {
+    max-width: none;
+  }
+
+  .brics-quick-links {
+    justify-content: center;
+  }
+
+  .brics-notice {
+    text-align: left;
+  }
+}
+
 /* --- Local login and fallbacks, inside the card ------------------------ */
 
 .brics-card .login-with-local-account-button {
