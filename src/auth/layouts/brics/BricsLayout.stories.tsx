@@ -47,9 +47,12 @@ const NOTICES = [
  */
 const BricsStory = ({
   notices,
+  localOnly = false,
   children,
 }: {
   notices: AdminAnnouncement[];
+  /** A local development site: no Keycloak, local accounts only. */
+  localOnly?: boolean;
   children: ReactNode;
 }) => {
   const queryClient = useQueryClient();
@@ -62,12 +65,12 @@ const BricsStory = ({
     SUPPORT_PORTAL_URL: 'https://support.example.org',
     SITE_EMAIL: 'support@example.ac.uk',
     POWERED_BY_LOGO: '',
-    // Keycloak is the only way in.
-    AUTHENTICATION_METHODS: [],
+    // Keycloak is the only way in, except on a local development site.
+    AUTHENTICATION_METHODS: localOnly ? ['LOCAL_SIGNIN'] : [],
   });
   queryClient.setQueryData(
     ['IdentityProvidersConfigurations'],
-    [{ provider: 'keycloak', label: 'Keycloak' }],
+    localOnly ? [] : [{ provider: 'keycloak', label: 'Keycloak' }],
   );
   queryClient.setQueryData(['LoginNotices'], notices);
   return <>{children}</>;
@@ -106,6 +109,14 @@ export const WithNotices: StoryObj = {
 export const Quiet: StoryObj = {
   render: () => (
     <BricsStory notices={[]}>
+      <BricsLayout />
+    </BricsStory>
+  ),
+};
+
+export const LocalDevelopment: StoryObj = {
+  render: () => (
+    <BricsStory notices={[]} localOnly>
       <BricsLayout />
     </BricsStory>
   ),

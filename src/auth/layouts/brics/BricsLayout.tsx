@@ -53,7 +53,9 @@ const BricsLoginButton = ({
 /**
  * Login methods: the first identity provider gets the BriCS button. Should
  * more ever be configured, the rest are offered underneath in the usual way,
- * so none goes missing.
+ * so none goes missing. With no identity provider at all, as on a local
+ * development site, the local login form is the only way in, so it is shown
+ * straight away rather than behind a link.
  */
 const LoginOptions = () => {
   const features = useAuthFeatures();
@@ -64,9 +66,6 @@ const LoginOptions = () => {
     queryFn: () => getIdentityProviders(),
   });
 
-  if (localLogin) {
-    return <LocalLoginForm onBack={() => setLocalLogin(false)} />;
-  }
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -80,6 +79,29 @@ const LoginOptions = () => {
   }
 
   const [primary, ...others] = data ?? [];
+  const offerLocalLogin =
+    features.SigninForm && themeFeatures.ShowLocalSigninForm;
+  const offerOtherMethods =
+    features.saml2 ||
+    features.saml2providers ||
+    features.saml2discovery ||
+    features.valimo ||
+    features.passkey;
+
+  if (offerLocalLogin && !primary && !offerOtherMethods) {
+    return <LocalLoginForm />;
+  }
+  if (localLogin) {
+    return <LocalLoginForm onBack={() => setLocalLogin(false)} />;
+  }
+  if (!primary && !offerOtherMethods) {
+    return (
+      <p className="brics-no-login">
+        {translate('Logging in is not available at the moment.')}
+      </p>
+    );
+  }
+
   return (
     <div className="brics-login-options">
       {primary && <BricsLoginButton provider={primary} />}
@@ -87,7 +109,7 @@ const LoginOptions = () => {
         <OauthLoginButton key={provider.provider} provider={provider} />
       ))}
       <IdentityProviderSelector features={features} providers={[]} />
-      {features.SigninForm && themeFeatures.ShowLocalSigninForm && (
+      {offerLocalLogin && (
         <LocalLoginButton onClick={() => setLocalLogin(true)} />
       )}
     </div>

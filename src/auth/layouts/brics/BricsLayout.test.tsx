@@ -177,4 +177,46 @@ describe('BricsLayout', () => {
     ).not.toBeInTheDocument();
     expect(goToNotFound).not.toHaveBeenCalled();
   });
+
+  it('shows the local login form straight away when it is the only way in', async () => {
+    ENV.apiEndpoint = 'http://localhost:8080/';
+    ENV.plugins.WALDUR_CORE.AUTHENTICATION_METHODS = ['LOCAL_SIGNIN'];
+    vi.mocked(getIdentityProviders).mockResolvedValue([]);
+    renderLayout();
+
+    expect(
+      await screen.findByRole('button', { name: 'Login' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Sign in with local account' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Back to all sign-in options/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the local login behind a link when Keycloak is there too', async () => {
+    ENV.apiEndpoint = 'http://localhost:8080/';
+    ENV.plugins.WALDUR_CORE.AUTHENTICATION_METHODS = ['LOCAL_SIGNIN'];
+    renderLayout();
+
+    expect(
+      await screen.findByRole('button', { name: 'Log in' }),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Sign in with local account' }),
+    );
+    expect(
+      await screen.findByRole('button', { name: 'Login' }),
+    ).toBeInTheDocument();
+  });
+
+  it('says so when there is no way to log in', async () => {
+    vi.mocked(getIdentityProviders).mockResolvedValue([]);
+    renderLayout();
+
+    expect(
+      await screen.findByText('Logging in is not available at the moment.'),
+    ).toBeInTheDocument();
+  });
 });

@@ -329,3 +329,47 @@
     transform: none;
   }
 }
+
+/* --- Local login and fallbacks, inside the card ------------------------ */
+
+.brics-card .login-with-local-account-button {
+  align-self: center;
+  margin: 0.25rem 0 0;
+  color: var(--brics-navy);
+  font-size: 0.85rem;
+}
+
+.brics-card .local-login-form {
+  text-align: left;
+}
+
+.brics-card .local-login-form .form-control {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.brics-card .local-login-form .form-control:focus {
+  border-color: var(--brics-blue);
+  box-shadow: 0 0 0 3px rgba(106, 152, 216, 0.35);
+}
+
+.brics-card .login-submit-button {
+  height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--brics-navy), #2f4380);
+  box-shadow: 0 8px 20px rgba(34, 48, 92, 0.35);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.brics-card .login-submit-button:hover {
+  box-shadow: 0 12px 28px rgba(34, 48, 92, 0.45);
+  color: #fff;
+}
+
+.brics-no-login {
+  margin: 0;
+  color: #5b6378;
+}
