@@ -148,6 +148,7 @@
 
 .brics-terms a {
   color: var(--brics-navy);
+  font-size: inherit;
   font-weight: 500;
 }
 

@@ -62,6 +62,8 @@ const BricsStory = ({
     SUPPORT_PORTAL_URL: 'https://support.example.org',
     SITE_EMAIL: 'support@example.ac.uk',
     POWERED_BY_LOGO: '',
+    // Keycloak is the only way in.
+    AUTHENTICATION_METHODS: [],
   });
   queryClient.setQueryData(
     ['IdentityProvidersConfigurations'],
