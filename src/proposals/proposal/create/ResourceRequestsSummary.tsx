@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { proposalProposalsResourcesList } from 'waldur-js-client';
 
 import { AccordionCard } from 'waldur-ui';
@@ -24,11 +25,16 @@ const columns = resourceRequestColumns();
 interface ResourceRequestsSummaryProps {
   proposal: Proposal;
   reviews?: ProposalReview[];
+  /** Call-manager affordance (e.g. "Modify allocation"), rendered alongside
+   * the chosen-offerings summary. Left undefined by the applicant-facing
+   * FormbricksProposalProgress call site. */
+  actions?: ReactNode;
 }
 
 export const ResourceRequestsSummary = ({
   proposal,
   reviews,
+  actions,
 }: ResourceRequestsSummaryProps) => {
   const tableProps = useTable({
     // Its own key: the applicant's editable table keeps separate state.
@@ -60,9 +66,12 @@ export const ResourceRequestsSummary = ({
       id="step-resource-requests"
       title={translate('Resource requests')}
       actions={
-        chosen ? (
-          <span className="text-muted fw-semibold fs-7">{chosen}</span>
-        ) : undefined
+        <>
+          {chosen && (
+            <span className="text-muted fw-semibold fs-7">{chosen}</span>
+          )}
+          {actions}
+        </>
       }
       subtitle={
         usesCallVocabulary()
