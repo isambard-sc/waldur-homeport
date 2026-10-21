@@ -9,10 +9,12 @@ import {
 
 import { AlertItem, Badge, BaseButton } from 'waldur-ui';
 
+import { getErrorBody } from '@/core/ErrorMessageFormatter';
 import { useDebouncedValue } from '@/core/useDebouncedValue';
 import { FilterBox } from '@/form/FilterBox';
 import { formatJsxTemplate, translate } from '@/i18n';
 import { useTitle } from '@/navigation/title';
+import { isNotFound } from '@/proposals/archive/resolveArchived';
 import { Field } from '@/resource/summary/Field';
 
 // Type definitions
@@ -189,6 +191,36 @@ const ProjectsCard: FunctionComponent<ProjectsCardProps> = ({ projects }) => {
     </Card>
   );
 };
+/**
+ * Look up who matches a free-text query, always as a list.
+ *
+ * The endpoint answers a single object for an email or short-name match and a
+ * list for a project match, though the schema declares only the list -- so a
+ * single match used to render nothing. And "nothing matched" is a 404 with a
+ * JSON reason rather than an empty list; it is an answer, not an error.
+ */
+export const fetchAccess = async (query: string): Promise<AccessResponse[]> => {
+  try {
+    const response = await openportalAccessForEmailList({
+      query: { q: query },
+    });
+    const body: AccessResponse | AccessResponse[] = response.data;
+    return Array.isArray(body) ? body : [body];
+  } catch (error) {
+    if (isNotFound(error)) {
+      return [];
+    }
+    throw error;
+  }
+};
+
+/** The reason the endpoint gave, e.g. that non-staff may only search for
+ * themselves; it answers with `{error: "..."}` rather than DRF's `detail`. */
+const accessErrorMessage = (error: unknown): string => {
+  const body = getErrorBody(error);
+  return body?.error ?? body?.detail ?? translate('Unable to check access.');
+};
+
 export const AccessForEmail: FunctionComponent<{}> = () => {
   useTitle(translate('Check user access'), '', 'browser');
 
@@ -198,14 +230,12 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
   // React Query implementation
   const { data, isFetching, error } = useQuery<AccessResponse[], Error>({
     queryKey: ['accessForEmail', debouncedQuery],
-    queryFn: async () => {
-      const response = await openportalAccessForEmailList({
-        query: { q: debouncedQuery },
-      });
-      return response.data;
-    },
+    queryFn: () => fetchAccess(debouncedQuery),
     // Only execute the query if there is a query string
     enabled: Boolean(debouncedQuery),
+    // A refusal (403) belongs on this page, not on the app-wide error page
+    // the global handler would otherwise navigate to.
+    meta: { skipGlobalErrorRedirect: true },
   });
 
   const handleClear = () => {
@@ -263,7 +293,7 @@ export const AccessForEmail: FunctionComponent<{}> = () => {
           <AlertItem
             type="floating"
             variant="error"
-            title={error instanceof Error ? error.message : String(error)}
+            title={accessErrorMessage(error)}
           />
         )}
 
