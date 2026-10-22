@@ -1,7 +1,9 @@
 import { useQueries } from '@tanstack/react-query';
 import { FC, useMemo, useState } from 'react';
-import { Col, Nav, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { type RemoteProject } from 'waldur-js-client';
+
+import { Tabs, TabsList, TabsTrigger } from 'waldur-ui';
 
 import { translate } from '@/i18n';
 import { AwardPaceCard } from '@/openportal/award-pace/AwardPaceCard';
@@ -76,21 +78,21 @@ export const RemoteProjectPaceBlock: FC<Props> = ({
 
   const toolbar =
     paces.length > 1 ? (
-      <Nav
-        variant="tabs"
-        role="tablist"
-        className="nav-line-tabs mb-5"
-        activeKey={current.remoteProject.uuid}
-        onSelect={(key) => setSelected(key)}
+      // The tabs only pick which connection the one card below shows, so
+      // there are no panels: the card is the content for every tab.
+      <Tabs
+        value={current.remoteProject.uuid}
+        onValueChange={(key) => setSelected(key)}
+        className="mb-5"
       >
-        {paces.map(({ remoteProject }) => (
-          <Nav.Item key={remoteProject.uuid}>
-            <Nav.Link as="button" eventKey={remoteProject.uuid}>
+        <TabsList>
+          {paces.map(({ remoteProject }) => (
+            <TabsTrigger key={remoteProject.uuid} value={remoteProject.uuid}>
               <ConnectionLabel remoteProject={remoteProject} />
-            </Nav.Link>
-          </Nav.Item>
-        ))}
-      </Nav>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     ) : (
       <div className="fw-semibold mb-4">
         <ConnectionLabel remoteProject={current.remoteProject} />

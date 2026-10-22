@@ -1,9 +1,10 @@
 import { FC } from 'react';
 import { ServiceProvider } from 'waldur-js-client';
 
-import { BaseButton } from 'waldur-ui';
+import { Badge, BaseButton } from 'waldur-ui';
 
 import { lazyComponent } from '@/core/lazyComponent';
+import { CompactEditButton } from '@/form/CompactEditButton';
 import {
   EditFieldProvider,
   SelectEditField,
@@ -15,6 +16,7 @@ import { useModal } from '@/modal/actions';
 import { useCustomer, useUser } from '@/workspace/hooks';
 import { checkIsOwnerOrStaff } from '@/workspace/selectors';
 
+import { useGuardedProviderUpdate } from './accounts/useConflictResolution';
 import {
   ACCOUNT_SCOPE_OPTIONS,
   DEFAULT_ACCOUNT_SCOPE,
@@ -25,7 +27,7 @@ import {
   getOptionLabel,
   USERNAME_GENERATION_POLICY_OPTIONS,
 } from './accountSettings';
-import { useServiceProviderUpdate } from './useServiceProviderUpdate';
+import { ProjectGroupsRolloutOrder } from './project-groups/ProjectGroupsRolloutOrder';
 
 const AccountOptionsPreviewDialog = lazyComponent(() =>
   import('./accounts/AccountOptionsPreviewDialog').then((module) => ({
@@ -91,11 +93,17 @@ export const ProviderAccountSettings: FC<ProviderAccountSettingsProps> = ({
 }) => {
   const user = useUser();
   const customer = useCustomer();
-  const update = useServiceProviderUpdate(serviceProvider, setServiceProvider);
+  const update = useGuardedProviderUpdate(serviceProvider, setServiceProvider);
   // The backend lets organization owners and staff update the provider.
   const canUpdate = checkIsOwnerOrStaff(customer, user);
   const { openDialog } = useModal();
   const options = serviceProvider.account_options ?? {};
+  // The switch goes through the preview, which warns about a missing range.
+  const openPreview = () =>
+    openDialog(AccountOptionsPreviewDialog, {
+      resolve: { serviceProvider, setServiceProvider },
+      size: 'xl',
+    });
 
   return (
     <FormTable.Card
@@ -105,12 +113,7 @@ export const ProviderAccountSettings: FC<ProviderAccountSettingsProps> = ({
         canUpdate && (
           <BaseButton
             label={translate('Preview changes')}
-            onClick={() =>
-              openDialog(AccountOptionsPreviewDialog, {
-                resolve: { serviceProvider, setServiceProvider },
-                size: 'xl',
-              })
-            }
+            onClick={openPreview}
             variant="tertiary"
             size="lg"
           />
@@ -189,6 +192,39 @@ export const ProviderAccountSettings: FC<ProviderAccountSettingsProps> = ({
             )}
             placeholder={DEFAULT_LOGIN_SHELL}
             renderValue={renderOrFallback(DEFAULT_LOGIN_SHELL)}
+          />
+          <FormTable.Item
+            label={translate('Create project groups')}
+            data-testid="project-groups-enabled"
+            description={
+              <>
+                {translate(
+                  'One POSIX group per project that uses your offerings, with a GID from the service provider’s POSIX ID pool. To keep the GIDs of groups your directory already holds:',
+                )}
+                <ProjectGroupsRolloutOrder />
+              </>
+            }
+            value={
+              options.project_groups_enabled ? (
+                <Badge variant="success" tone="light">
+                  {translate('Enabled')}
+                </Badge>
+              ) : (
+                <Badge variant="neutral" tone="light">
+                  {translate('Disabled')}
+                </Badge>
+              )
+            }
+            actions={
+              canUpdate && (
+                <CompactEditButton
+                  onClick={openPreview}
+                  variant="secondary"
+                  tooltip={translate('Change in the preview')}
+                  data-testid="edit-project-groups-enabled"
+                />
+              )
+            }
           />
         </FormTable>
       </EditFieldProvider>

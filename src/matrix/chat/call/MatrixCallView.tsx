@@ -9,7 +9,6 @@ import {
   LiveKitRoom,
   ParticipantTile,
   RoomAudioRenderer,
-  TrackToggle,
   useLayoutContext,
   useLocalParticipant,
   usePinnedTracks,
@@ -20,6 +19,7 @@ import '@livekit/components-styles';
 import {
   CornersInIcon,
   CornersOutIcon,
+  LockSimpleIcon,
   PhoneSlashIcon,
   PictureInPictureIcon,
 } from '@phosphor-icons/react';
@@ -44,35 +44,20 @@ import { useUser } from '@/workspace/hooks';
 import { useMatrixClient } from '../useMatrixClient';
 import { formatDisplayName } from '../utils';
 
+import { CallEncryptionNotice } from './CallEncryptionNotice';
+import { getCallDeviceId } from './callMembership';
 import { CallSettingsMenu } from './CallSettingsMenu';
+import { CallTrackToggle } from './CallTrackToggle';
+import { computeLiveKitIdentities } from './liveKitIdentity';
 import { MatrixCallPortalContext } from './MatrixCallPortalContext';
 import { CallMemberInfo } from './types';
+import { useEncryptedRoom } from './useEncryptedRoom';
 import { useFullscreen } from './useFullscreen';
 import { useMatrixCall } from './useMatrixCall';
-
-const DEVICE_ID_KEY = 'waldur_matrix_device_id';
 
 // LiveKit log level is set inside MatrixCallView's mount effect so the
 // module-level side effect can't clobber another consumer of livekit-client
 // loaded later in the bundle.
-
-// Mirrors element-hq/lk-jwt-service processSFURequest in main.go:
-//   lkIdentity = unpaddedBase64(sha256(JSON.stringify([userId, claimedDeviceId, memberId])))
-// We send member.id === claimed_device_id === deviceId in useLiveKitToken.ts,
-// so all three slots collapse to (userId, deviceId, deviceId).
-async function computeLiveKitIdentity(
-  userId: string,
-  deviceId: string,
-): Promise<string | null> {
-  if (!userId || !deviceId) return null;
-  const raw = JSON.stringify([userId, deviceId, deviceId]);
-  const buffer = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(raw),
-  );
-  const padded = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-  return padded.replace(/=+$/, '');
-}
 
 interface IdentityEntry {
   userId: string;
@@ -89,8 +74,12 @@ function useIdentityNameMap(entries: IdentityEntry[]): Map<string, string> {
     async function build() {
       const next = new Map<string, string>();
       for (const e of entries) {
-        const identity = await computeLiveKitIdentity(e.userId, e.deviceId);
-        if (identity) next.set(identity, e.displayName);
+        for (const identity of await computeLiveKitIdentities(
+          e.userId,
+          e.deviceId,
+        )) {
+          next.set(identity, e.displayName);
+        }
       }
       if (!cancelled) {
         setMap(next);
@@ -183,9 +172,15 @@ const COMPACT_SPEAKER_DEBOUNCE_MS = 2000;
 
 const CallStage: FC<{
   compact?: boolean;
+  encrypted?: boolean;
   containerRef: RefObject<HTMLElement>;
   fullscreenTarget?: HTMLElement | null;
-}> = ({ compact = false, containerRef, fullscreenTarget }) => {
+}> = ({
+  compact = false,
+  encrypted = false,
+  containerRef,
+  fullscreenTarget,
+}) => {
   // Fullscreen the host's relocation container (the unit that travels between
   // dock / floating widget / PiP), not the inner view — otherwise the host
   // moves the element out from under fullscreen. Falls back to the view itself
@@ -329,21 +324,18 @@ const CallStage: FC<{
           internally, so the .lk-* styling is unchanged. The four primary
           controls (mic, camera, screen-share, end-call) match the mockup. */}
       <div className="lk-control-bar">
-        <Tooltip label={translate('Toggle microphone')} side="top">
-          <span>
-            <TrackToggle source={Track.Source.Microphone} />
-          </span>
-        </Tooltip>
-        <Tooltip label={translate('Toggle camera')} side="top">
-          <span>
-            <TrackToggle source={Track.Source.Camera} />
-          </span>
-        </Tooltip>
-        <Tooltip label={translate('Share your screen')} side="top">
-          <span>
-            <TrackToggle source={Track.Source.ScreenShare} />
-          </span>
-        </Tooltip>
+        <CallTrackToggle
+          source={Track.Source.Microphone}
+          label={translate('Toggle microphone')}
+        />
+        <CallTrackToggle
+          source={Track.Source.Camera}
+          label={translate('Toggle camera')}
+        />
+        <CallTrackToggle
+          source={Track.Source.ScreenShare}
+          label={translate('Share your screen')}
+        />
         {/* Settings / fullscreen / PiP live on the control bar alongside the
             primary controls. Hidden in the cramped floating widget. */}
         {!compact && (
@@ -403,6 +395,17 @@ const CallStage: FC<{
             )}
           </>
         )}
+        {encrypted && !compact && (
+          <Tooltip label={translate('End-to-end encrypted')} side="top">
+            <span
+              className="lk-button"
+              aria-label={translate('End-to-end encrypted')}
+              role="img"
+            >
+              <LockSimpleIcon size={20} weight="bold" />
+            </span>
+          </Tooltip>
+        )}
         <Tooltip label={translate('Leave call')} side="top">
           <DisconnectButton>
             <PhoneSlashIcon size={20} weight="bold" />
@@ -451,8 +454,10 @@ const MatrixCallView: FC<{
     endCall,
     markConnected,
     callMembers,
+    encrypted,
+    callSession,
   } = useMatrixCall();
-  const { userId } = useMatrixClient();
+  const { client, userId } = useMatrixClient();
   const currentUser = useUser();
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -465,7 +470,7 @@ const MatrixCallView: FC<{
     currentUser?.full_name || (userId ? formatDisplayName(userId) : '');
 
   const identityEntries = useMemo<IdentityEntry[]>(() => {
-    const myDeviceId = sessionStorage.getItem(DEVICE_ID_KEY) || '';
+    const myDeviceId = getCallDeviceId(client);
     const entries: IdentityEntry[] = callMembers.map((m: CallMemberInfo) => ({
       userId: m.userId,
       deviceId: m.deviceId,
@@ -479,9 +484,18 @@ const MatrixCallView: FC<{
       });
     }
     return entries;
-  }, [callMembers, userId, displayName]);
+  }, [callMembers, client, userId, displayName]);
 
   const identityMap = useIdentityNameMap(identityEntries);
+
+  const encryptedRoom = useEncryptedRoom(
+    encrypted,
+    callSession,
+    `${userId}:${getCallDeviceId(client)}`,
+    () => endCall(translate('Could not connect to the call.')),
+  );
+  // An encrypted call connects only once its room encrypts what it publishes.
+  const roomReady = !encrypted || !!encryptedRoom;
 
   // Cover the LiveKit handshake so the bare ParticipantTile placeholder doesn't
   // flash into the dock between discovering and connected. The error state is
@@ -495,8 +509,9 @@ const MatrixCallView: FC<{
       className={`matrix-call-view flex-grow-1 overflow-hidden${compact ? ' matrix-call-view--compact' : ''}`}
       data-lk-theme="default"
     >
-      {credentials && (
+      {credentials && roomReady && (
         <LiveKitRoom
+          room={encryptedRoom}
           serverUrl={credentials.url}
           token={credentials.jwt}
           connect
@@ -517,10 +532,12 @@ const MatrixCallView: FC<{
           <LayoutContextProvider>
             <CallStage
               compact={compact}
+              encrypted={encrypted}
               containerRef={containerRef}
               fullscreenTarget={fullscreenTarget}
             />
           </LayoutContextProvider>
+          {encrypted && <CallEncryptionNotice identityMap={identityMap} />}
           <RoomAudioRenderer />
           <NameOverrider
             containerRef={containerRef}

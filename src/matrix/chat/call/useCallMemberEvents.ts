@@ -5,20 +5,13 @@ import { useMatrixClient } from '../useMatrixClient';
 import { useRoomMemberNames } from '../useRoomMemberNames';
 import { resolveMemberName } from '../utils';
 
+import {
+  CALL_MEMBER_EVENT,
+  getCallDeviceId,
+  timerDelay,
+} from './callMembership';
 import { parseCallMembers } from './parseCallMembers';
 import { CallMemberInfo } from './types';
-
-const CALL_MEMBER_EVENT = 'org.matrix.msc3401.call.member';
-// Short expiry + periodic refresh (see CALL_MEMBER_REFRESH_MS) so a crashed
-// or closed tab stops showing as "in call" within ~30s instead of an hour.
-const MEMBERSHIP_EXPIRY_MS = 30 * 1000;
-export const CALL_MEMBER_REFRESH_MS = 10 * 1000;
-
-const DEVICE_ID_KEY = 'waldur_matrix_device_id';
-
-function getDeviceId(): string {
-  return sessionStorage.getItem(DEVICE_ID_KEY) || '';
-}
 
 export const useCallMemberEvents = (
   roomId: string | null,
@@ -27,18 +20,22 @@ export const useCallMemberEvents = (
   const { client } = useMatrixClient();
   const memberNames = useRoomMemberNames(roomUuid);
   const [callMembers, setCallMembers] = useState<CallMemberInfo[]>([]);
+  const [nextExpiry, setNextExpiry] = useState<number | null>(null);
 
   const refresh = useCallback(() => {
     if (!client || !roomId) {
       setCallMembers([]);
+      setNextExpiry(null);
       return;
     }
     const room = client.getRoom(roomId);
     if (!room) {
       setCallMembers([]);
+      setNextExpiry(null);
       return;
     }
     const raw = parseCallMembers(room, Date.now());
+    setNextExpiry(raw.length ? Math.min(...raw.map((r) => r.expiresAt)) : null);
     setCallMembers(
       raw.map((r) => ({
         ...r,
@@ -75,9 +72,20 @@ export const useCallMemberEvents = (
     };
   }, [client, roomId, refresh]);
 
+  // A device that crashed never sends its leave, so its membership only ends
+  // by expiring. Nothing arrives at that moment; re-read the state then.
+  useEffect(() => {
+    if (nextExpiry === null) return;
+    const timer = setTimeout(
+      refresh,
+      timerDelay(nextExpiry - Date.now() + 100),
+    );
+    return () => clearTimeout(timer);
+  }, [nextExpiry, refresh]);
+
   const isOtherMemberInCall = useCallback(() => {
     const myUserId = client?.getUserId();
-    const myDeviceId = getDeviceId();
+    const myDeviceId = getCallDeviceId(client);
     return callMembers.some(
       (m) => m.userId !== myUserId || m.deviceId !== myDeviceId,
     );
@@ -85,48 +93,3 @@ export const useCallMemberEvents = (
 
   return { callMembers, isOtherMemberInCall };
 };
-
-// The call lives in a specific room; tying the announce target to whatever
-// room the user is currently viewing breaks as soon as they switch rooms
-// mid-call. These helpers take the target room explicitly.
-export async function announceCallJoin(
-  client: any,
-  roomId: string,
-  deviceId: string,
-): Promise<void> {
-  if (!client || !roomId) return;
-  await client.sendStateEvent(
-    roomId,
-    CALL_MEMBER_EVENT,
-    {
-      memberships: [
-        {
-          application: 'org.matrix.msc3401.call',
-          call_id: '',
-          device_id: deviceId,
-          expires: MEMBERSHIP_EXPIRY_MS,
-          created_ts: Date.now(),
-          foci_active: [{ type: 'livekit' }],
-        },
-      ],
-    },
-    client.getUserId() || undefined,
-  );
-}
-
-export async function announceCallLeave(
-  client: any,
-  roomId: string,
-): Promise<void> {
-  if (!client || !roomId) return;
-  try {
-    await client.sendStateEvent(
-      roomId,
-      CALL_MEMBER_EVENT,
-      { memberships: [] },
-      client.getUserId() || undefined,
-    );
-  } catch {
-    // Best effort — tab may be closing
-  }
-}

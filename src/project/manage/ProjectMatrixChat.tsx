@@ -3,7 +3,7 @@ import { FC, Fragment, useCallback, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { MatrixRoom } from 'waldur-js-client';
 
-import { BaseButton } from 'waldur-ui';
+import { BaseButton, Menu } from 'waldur-ui';
 
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -11,6 +11,7 @@ import { StateIndicator } from '@/core/StateIndicator';
 import FormTable from '@/form/FormTable';
 import { translate } from '@/i18n';
 import { canCreateMatrixRoom } from '@/matrix/canCreateMatrixRoom';
+import { canManageMatrixRoom } from '@/matrix/canManageMatrixRoom';
 import { useProjectMatrixRooms } from '@/matrix/chat/useProjectMatrixRooms';
 import { CreateMatrixRoomDialog } from '@/matrix/CreateMatrixRoomDialog';
 import { MatrixExportsList } from '@/matrix/MatrixExportsList';
@@ -25,30 +26,28 @@ import {
   SyncMembersButton,
 } from '@/matrix/MatrixRoomActions';
 import { ROOM_STATE_VARIANT, stateLabel } from '@/matrix/MatrixRoomStateBadge';
+import { canOpenInExternalClient } from '@/matrix/utils';
 import { useModal } from '@/modal/actions';
 import { NoResult } from '@/navigation/header/search/NoResult';
-import { ActionDropdownButton } from '@/table/ActionDropdownButton';
-import { ActionsDropdownSeparator } from '@/table/ActionsDropdown';
 import { renderFieldOrDash } from '@/table/utils';
 import {
   getProject,
   getUser,
-  isOwnerOrStaff as isOwnerOrStaffSelector,
   isStaff as isStaffSelector,
 } from '@/workspace/selectors';
 
 // Lifecycle after creation is staff-only here, deliberately stricter than the API.
-// Menu order is by cost: sync → connect (provisions, mints a token) →
-// disable → delete. One action is promoted beside it: the conversation while
+// Menu order is by cost: sync → connect (hands the room to an external
+// client) → disable → delete. One action is promoted beside it: the conversation while
 // healthy, otherwise whatever fixes the current state.
 const RoomActions: FC<{
   room: MatrixRoom;
-  isOwnerOrStaff: boolean;
+  canManage: boolean;
   staff: boolean;
   refetch(): void;
-}> = ({ room, isOwnerOrStaff, staff, refetch }) => {
+}> = ({ room, canManage, staff, refetch }) => {
   const isActive = room.state === 'active';
-  const canSync = isOwnerOrStaff && isActive;
+  const canSync = canManage && isActive;
   const canRetry =
     staff &&
     (room.state === 'creating' ||
@@ -70,7 +69,9 @@ const RoomActions: FC<{
 
   const groups = [
     canSync && <SyncMembersButton key="sync" row={room} refetch={refetch} />,
-    isActive && (
+    // Gated here as well as in the button: a null item would still count
+    // towards the menu and its separators.
+    isActive && canOpenInExternalClient() && (
       <OpenInMatrixButton key="matrix" row={room} refetch={refetch} />
     ),
     canDisable && (
@@ -92,14 +93,19 @@ const RoomActions: FC<{
         />
       )}
       {groups.length > 0 && (
-        <ActionDropdownButton title={translate('All actions')} align="end">
-          {groups.map((item, index) => (
-            <Fragment key={index}>
-              {index > 0 && <ActionsDropdownSeparator />}
-              {item}
-            </Fragment>
-          ))}
-        </ActionDropdownButton>
+        <Menu>
+          <Menu.TriggerButton size="lg">
+            {translate('All actions')}
+          </Menu.TriggerButton>
+          <Menu.Content look="actions" side="bottom" align="end">
+            {groups.map((item, index) => (
+              <Fragment key={index}>
+                {index > 0 && <Menu.Separator />}
+                {item}
+              </Fragment>
+            ))}
+          </Menu.Content>
+        </Menu>
       )}
     </div>
   );
@@ -107,9 +113,8 @@ const RoomActions: FC<{
 
 const HistoryExportsCard: FC<{
   room: MatrixRoom;
-  isOwnerOrStaff: boolean;
   refetch(): void;
-}> = ({ room, isOwnerOrStaff, refetch }) => {
+}> = ({ room, refetch }) => {
   const [refreshSlot, setRefreshSlot] = useState<HTMLDivElement | null>(null);
   // No exports are ever produced on a non-active room, so refetching is a
   // no-op. The room can transition back to active, so disable with an
@@ -142,7 +147,7 @@ const HistoryExportsCard: FC<{
               size="lg"
             />
           )}
-          {isOwnerOrStaff && isActive && (
+          {isActive && (
             <ExportHistoryButton row={room} refetch={refetch} as={BaseButton} />
           )}
         </div>
@@ -159,10 +164,10 @@ const HistoryExportsCard: FC<{
 
 const RoomDetails: FC<{
   room: MatrixRoom;
-  isOwnerOrStaff: boolean;
+  canManage: boolean;
   staff: boolean;
   refetch(): void;
-}> = ({ room, isOwnerOrStaff, staff, refetch }) => (
+}> = ({ room, canManage, staff, refetch }) => (
   <>
     <FormTable.Card
       title={translate('Chat room')}
@@ -170,7 +175,7 @@ const RoomDetails: FC<{
       actions={
         <RoomActions
           room={room}
-          isOwnerOrStaff={isOwnerOrStaff}
+          canManage={canManage}
           staff={staff}
           refetch={refetch}
         />
@@ -207,18 +212,14 @@ const RoomDetails: FC<{
       </FormTable>
     </FormTable.Card>
 
-    <HistoryExportsCard
-      room={room}
-      isOwnerOrStaff={isOwnerOrStaff}
-      refetch={refetch}
-    />
+    {/* The API lists exports only for those who manage the room. */}
+    {canManage && <HistoryExportsCard room={room} refetch={refetch} />}
   </>
 );
 
 export const ProjectMatrixChat: FC = () => {
   const project = useSelector(getProject);
   const user = useSelector(getUser);
-  const isOwnerOrStaff = useSelector(isOwnerOrStaffSelector);
   const staff = useSelector(isStaffSelector);
   const { openDialog } = useModal();
 
@@ -275,7 +276,7 @@ export const ProjectMatrixChat: FC = () => {
   return (
     <RoomDetails
       room={room}
-      isOwnerOrStaff={isOwnerOrStaff}
+      canManage={canManageMatrixRoom(user, project)}
       staff={staff}
       refetch={refetch}
     />

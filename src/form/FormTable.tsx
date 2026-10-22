@@ -1,9 +1,8 @@
-import { QuestionIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC, PropsWithChildren, ReactNode } from 'react';
 import { Card, Table } from 'react-bootstrap';
 
-import { Tooltip } from 'waldur-ui';
+import { HelpIcon, Tooltip, WarningTip } from 'waldur-ui';
 
 import { RefreshButton } from '@/marketplace/offerings/update/components/RefreshButton';
 
@@ -28,19 +27,6 @@ export interface FormTableItemProps {
   htmlFor?: string;
 }
 
-const IconTooltip = ({
-  tooltip,
-  icon,
-}: {
-  tooltip: ReactNode;
-  icon: ReactNode;
-}) =>
-  tooltip ? (
-    <Tooltip label={tooltip}>
-      <span>{icon}</span>
-    </Tooltip>
-  ) : null;
-
 const FormTableItem: FC<PropsWithChildren<FormTableItemProps>> = ({
   actions,
   ...props
@@ -52,34 +38,23 @@ const FormTableItem: FC<PropsWithChildren<FormTableItemProps>> = ({
     <tr key={i} className={props.className} data-testid={props['data-testid']}>
       {i === 0 && props.description ? (
         <th className={row ? 'col-md-4' : 'col-md-auto'} rowSpan={titleRowSpan}>
-          <label
-            htmlFor={props.htmlFor}
-            className="title fw-medium mb-0 d-block"
-          >
-            {props.label}
-            {props.required && <span className="text-danger ms-1">*</span>}
-            <IconTooltip
-              tooltip={props.tooltip}
-              icon={
-                <QuestionIcon
-                  size={20}
-                  weight="bold"
-                  className="ms-2 text-muted mb-1"
-                />
-              }
-            />
-            <IconTooltip
-              tooltip={props.warnTooltip}
-              icon={
-                <WarningCircleIcon
-                  size={20}
-                  weight="bold"
-                  className="ms-2 text-warning mb-1"
-                />
-              }
-            />
-            {props.colon && ':'}
-          </label>
+          <div className="d-flex align-items-center">
+            <label htmlFor={props.htmlFor} className="title fw-medium mb-0">
+              {props.label}
+              {props.required && <span className="text-danger ms-1">*</span>}
+              {props.colon && ':'}
+            </label>
+            {props.tooltip && (
+              <HelpIcon label={props.tooltip} size={20} className="ms-2" />
+            )}
+            {props.warnTooltip && (
+              <WarningTip
+                label={props.warnTooltip}
+                size={20}
+                className="ms-2"
+              />
+            )}
+          </div>
           {props.description ? (
             <Tooltip label={props.description}>
               <div
@@ -104,31 +79,23 @@ const FormTableItem: FC<PropsWithChildren<FormTableItemProps>> = ({
         </th>
       ) : i === 0 && props.label ? (
         <th className="title col-md-3" rowSpan={titleRowSpan}>
-          <label htmlFor={props.htmlFor} className="mb-0 d-block">
-            {props.label}
-            {props.required && <span className="text-danger ms-1">*</span>}
-            <IconTooltip
-              tooltip={props.tooltip}
-              icon={
-                <QuestionIcon
-                  size={20}
-                  weight="bold"
-                  className="ms-2 text-muted mb-1"
-                />
-              }
-            />
-            <IconTooltip
-              tooltip={props.warnTooltip}
-              icon={
-                <WarningCircleIcon
-                  size={20}
-                  weight="bold"
-                  className="ms-2 text-warning mb-1"
-                />
-              }
-            />
-            {props.colon && ':'}
-          </label>
+          <div className="d-flex align-items-center">
+            <label htmlFor={props.htmlFor} className="mb-0">
+              {props.label}
+              {props.required && <span className="text-danger ms-1">*</span>}
+              {props.colon && ':'}
+            </label>
+            {props.tooltip && (
+              <HelpIcon label={props.tooltip} size={20} className="ms-2" />
+            )}
+            {props.warnTooltip && (
+              <WarningTip
+                label={props.warnTooltip}
+                size={20}
+                className="ms-2"
+              />
+            )}
+          </div>
         </th>
       ) : null}
       {row || [false, 0].includes(row) ? (
@@ -193,8 +160,6 @@ interface FormTableProps {
   detailsMode?: boolean;
   alignTop?: boolean;
   className?: string;
-  /** Show the outer table cell borders. Default true. Set false when nesting inside an already-bordered container. */
-  bordered?: boolean;
 }
 
 const TABLE_GY_SPACE_REGEX = /(?<=\s|^)(g[y]?-([1-9]\d*))( ?)(?=\s|$)/;
@@ -206,7 +171,6 @@ const FormTable: FC<PropsWithChildren<FormTableProps>> & {
 } = (props) => {
   return (
     <Table
-      bordered={props.bordered ?? true}
       responsive={true}
       className={classNames(
         'form-table',

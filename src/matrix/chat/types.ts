@@ -1,5 +1,8 @@
 import type { MatrixClient } from 'matrix-js-sdk';
 
+import type { EncryptedFile } from './attachmentCrypto';
+import type { CryptoState } from './crypto';
+
 export interface ReactionAggregate {
   /** The reaction key — typically a unicode emoji, e.g. "👍". */
   key: string;
@@ -8,6 +11,9 @@ export interface ReactionAggregate {
   /** The current user's reaction event_id — needed to redact (unreact). */
   myEventId?: string;
 }
+
+/** Where an uploaded attachment is: a plain `url`, or an encrypted `file`. */
+export type UploadedMedia = { url: string } | { file: EncryptedFile };
 
 export interface MatrixChatMessage {
   eventId: string;
@@ -24,6 +30,10 @@ export interface MatrixChatMessage {
   type: string;
   /** mxc:// or https:// URL for media messages */
   url?: string;
+  /** Encrypted media: where the ciphertext is and how to decrypt it. */
+  file?: EncryptedFile;
+  /** The event carried an encrypted `file` that failed validation. */
+  fileInvalid?: boolean;
   /** Media metadata (mimetype, width, height, size) */
   info?: { mimetype?: string; w?: number; h?: number; size?: number };
   reactions?: ReactionAggregate[];
@@ -41,10 +51,29 @@ export interface MatrixChatMessage {
   waveform?: number[];
   /** Clip length in ms (from `org.matrix.msc1767.audio.duration` or info.duration). */
   durationMs?: number;
+  /**
+   * Sent in clear into an encrypted room: whoever wrote it bypassed
+   * encryption (or the homeserver injected it), so it is shown as such.
+   */
+  unencrypted?: boolean;
+  /** The message this one replies to (`m.in_reply_to`). */
+  replyToEventId?: string;
+  /** Shown as replaced by a valid edit from its sender. */
+  edited?: boolean;
+  /** Deleted (redacted): shown as a placeholder, without its content. */
+  redacted?: boolean;
+  /** On the row where the room's call started: who has been on it. */
+  callParticipants?: Array<{ userId: string; displayName: string }>;
 }
 
 export type MatrixConnectionState =
-  'idle' | 'connecting' | 'connected' | 'error' | 'disconnected';
+  | 'idle'
+  | 'connecting'
+  | 'connected'
+  | 'error'
+  | 'disconnected'
+  // Waldur refused a new session, or the homeserver kept signing it out.
+  | 'ended';
 
 export interface MatrixChatContextValue {
   client: MatrixClient | null;
@@ -65,11 +94,23 @@ export interface MatrixChatContextValue {
   disconnect: () => void;
   error: string | null;
   /**
-   * True when the most recently requested room was resolved but the backend
-   * withheld conversation access (no room_id/access_token) — i.e. the user can
-   * see/manage the room but is not a member of the conversation (e.g. staff or
-   * a non-member owner). Lets the UI show a clear "not a member" state instead
-   * of an empty placeholder.
+   * True when the open endpoint refused the most recently requested room
+   * (403/404): the user can see or manage the room but is not a member of the
+   * conversation (e.g. staff or a non-member owner). Lets the UI show a clear
+   * "not a member" state instead of an empty placeholder.
    */
   roomAccessDenied: boolean;
+  /** End-to-end encryption of the current client; see `./crypto`. */
+  cryptoState: CryptoState;
+  /**
+   * Replace an encryption identity Waldur can't unlock. Only on the user's
+   * explicit request: the keys only the old backup held are lost.
+   */
+  resetCryptoIdentity: () => Promise<void>;
+  /**
+   * Unlock an identity Waldur can't unlock with the recovery key the user
+   * holds from another client, and escrow it. Rejects with WrongRecoveryKey
+   * when the key does not open the user's secret storage.
+   */
+  importCryptoRecoveryKey: (recoveryKey: string) => Promise<void>;
 }

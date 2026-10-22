@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ComponentProps, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { BaseButton } from '../BaseButton';
+import { BaseButton } from '../Button';
 
 import {
   DateRangePicker,
@@ -169,7 +169,7 @@ export const ReplaceRange: Story = {
     const field = fieldContainer(canvasElement);
     await expect(displayValue(field)).toBe('2026-06-10 to 2026-06-18');
     await expect(
-      within(field).queryByRole('button', { name: 'Remove' }),
+      within(field).queryByRole('button', { name: 'Clear' }),
     ).toBeNull();
     await openPicker(field);
     await expect(selectedDays()).toEqual(
@@ -207,9 +207,7 @@ export const Clearable: Story = {
   render: () => <Harness initial={[june(10), june(12)]} clearable />,
   play: async ({ canvasElement }) => {
     const field = fieldContainer(canvasElement);
-    await userEvent.click(
-      within(field).getByRole('button', { name: 'Remove' }),
-    );
+    await userEvent.click(within(field).getByRole('button', { name: 'Clear' }));
     await waitFor(() => expect(readFormValue(canvasElement)).toBeNull());
     await expect(displayValue(field)).toBe('');
   },

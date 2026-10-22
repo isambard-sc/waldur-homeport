@@ -11,7 +11,7 @@ import {
   WorkflowCriterionRequest,
 } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
+import { HelpIcon, Tooltip } from 'waldur-ui';
 
 import { required } from '@/core/validators';
 import {
@@ -304,7 +304,6 @@ export const AddWorkflowStepDialog: FC<Props> = ({ resolve }) => {
                 label={translate('Transition mode options')}
                 required={true}
                 choices={transitionModeChoices}
-                gap={3}
                 validate={required}
               />
 
@@ -335,17 +334,11 @@ export const AddWorkflowStepDialog: FC<Props> = ({ resolve }) => {
                     label={
                       <span className="d-inline-flex align-items-center gap-2">
                         {translate('Include Award response')}
-                        <Tooltip
+                        <HelpIcon
                           label={translate(
                             'Activate this step if applicants must explicitly accept or reject the awarded resources after the allocation decision.',
                           )}
-                        >
-                          <QuestionIcon
-                            weight="regular"
-                            size={16}
-                            className="text-muted"
-                          />
-                        </Tooltip>
+                        />
                       </span>
                     }
                   />

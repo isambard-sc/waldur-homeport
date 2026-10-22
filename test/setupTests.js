@@ -1,7 +1,25 @@
 import '@testing-library/jest-dom/vitest';
 import { configure } from '@testing-library/dom';
 import 'vitest-location-mock';
-import { afterAll } from 'vitest';
+import { afterAll, afterEach } from 'vitest';
+
+import './mocks/router';
+import './mocks/icons';
+import './mocks/modal';
+import './mocks/notify';
+import './mocks/workspace';
+import './mocks/i18n';
+import './mocks/monaco';
+import './mocks/config';
+import './mocks/echarts';
+import './mocks/markdown';
+import './mocks/date';
+import './mocks/svg';
+
+import {
+  resetViewport,
+  setupVirtualViewport,
+} from '../packages/ui/src/testing/viewport';
 
 configure({ asyncUtilTimeout: 5000 });
 
@@ -12,6 +30,15 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
     disconnect() {}
   };
 }
+
+// jsdom does not implement matchMedia. The virtual viewport controller simulates
+// realistic width, height, and hover queries (defaulting to 1440px desktop)
+// and dispatches change events on setViewport(...).
+setupVirtualViewport();
+
+afterEach(() => {
+  resetViewport();
+});
 
 // jsdom does not implement IntersectionObserver. This mock stores the latest
 // observer instance and its callback so tests can simulate intersections via
@@ -54,16 +81,3 @@ if (typeof globalThis.IntersectionObserver === 'undefined') {
 // stall the hook.
 const realSetTimeout = globalThis.setTimeout;
 afterAll(() => new Promise((resolve) => realSetTimeout(resolve, 20)));
-
-import './mocks/router';
-import './mocks/icons';
-import './mocks/modal';
-import './mocks/notify';
-import './mocks/workspace';
-import './mocks/i18n';
-import './mocks/monaco';
-import './mocks/config';
-import './mocks/echarts';
-import './mocks/markdown';
-import './mocks/date';
-import './mocks/svg';

@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { FunctionComponent } from 'react';
 import { useField } from 'react-final-form';
-import { OptionProps, components } from 'react-select';
+import { OptionProps } from 'react-select';
 import { User, rolesList } from 'waldur-js-client';
+
+import { SelectOption } from 'waldur-ui';
 
 import { getAllPages } from '@/core/api';
 import { ENV } from '@/core/config';
@@ -19,13 +21,14 @@ import {
 } from '@/permissions/utils';
 import { SramRoleBadge } from '@/sram/SramBadge';
 
-const renderRoleType = (roleType: RoleType) =>
+export const renderRoleType = (roleType: RoleType) =>
   ({
     customer: 'O',
     project: 'P',
     service_provider: 'SP',
     call: 'C',
     call_organizer: 'CO',
+    proposal: 'PR',
   })[roleType] || '';
 
 // Every option of one open dropdown shares the same options array, so the
@@ -51,7 +54,7 @@ const RoleOption: FunctionComponent<OptionProps<Role>> = (props) => {
     getOptionQualifiers(props.options ?? []),
   );
   return (
-    <components.Option {...props}>
+    <SelectOption {...props}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <span>
           {label}
@@ -69,7 +72,7 @@ const RoleOption: FunctionComponent<OptionProps<Role>> = (props) => {
           {renderRoleType(props.data.content_type)}
         </span>
       </div>
-    </components.Option>
+    </SelectOption>
   );
 };
 

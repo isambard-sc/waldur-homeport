@@ -1,10 +1,16 @@
-import * as Tabs from '@radix-ui/react-tabs';
 import classNames from 'classnames';
 import { FC, useEffect, useMemo, useState } from 'react';
 
-import { Badge, BadgeVariant } from 'waldur-ui';
+import {
+  Badge,
+  BadgeVariant,
+  Checkbox,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from 'waldur-ui';
 
-import { AwesomeCheckbox } from '@/core/AwesomeCheckbox';
 import { FilterBox } from '@/form/FilterBox';
 import { translate } from '@/i18n';
 import { NoResult } from '@/navigation/header/search/NoResult';
@@ -118,7 +124,7 @@ const PermissionGroupTab: FC<PermissionGroupTabProps> = ({
   const coverage = getCoverage(entity.selectedCount, entity.options.length);
 
   return (
-    <Tabs.Trigger
+    <TabsTrigger
       key={entity.label}
       value={entity.label}
       disabled={entity.matches.length === 0}
@@ -139,7 +145,7 @@ const PermissionGroupTab: FC<PermissionGroupTabProps> = ({
       >
         {coverage.label}
       </Badge>
-    </Tabs.Trigger>
+    </TabsTrigger>
   );
 };
 
@@ -161,36 +167,36 @@ const PermissionOptionsPanel: FC<PermissionOptionsPanelProps> = ({
     shown.length > 0 && shown.every((option) => selectedSet.has(option.value));
 
   return (
-    <Tabs.Content
+    <TabsContent
       value={activeGroup.label}
       className="border-t md:border-t-0 md:border-l border-[var(--waldur-border-secondary)] pt-4 md:ps-4 outline-none"
     >
       <p className="text-muted text-sm font-medium leading-5 mb-4">
         {activeGroup.label}
       </p>
-      <AwesomeCheckbox
+      <Checkbox
         id="permission-select-all"
         className="min-h-[22px] mb-2"
-        type="checkbox"
         size="sm"
         label={translate('Select all')}
-        value={allShownSelected}
-        onChange={onToggleShown}
+        checked={allShownSelected}
+        onCheckedChange={onToggleShown}
       />
       <hr className="mt-0 mb-2" />
       {shown.map((option: PermissionOption) => (
-        <AwesomeCheckbox
+        <Checkbox
           className="min-h-[22px] mb-2"
           key={option.value}
           id={`permission-${option.value}`}
-          type="checkbox"
           size="sm"
           label={option.label}
-          value={selectedSet.has(option.value)}
-          onChange={(checked: boolean) => onToggleOption(option.value, checked)}
+          checked={selectedSet.has(option.value)}
+          onCheckedChange={(checked: boolean) =>
+            onToggleOption(option.value, checked)
+          }
         />
       ))}
-    </Tabs.Content>
+    </TabsContent>
   );
 };
 
@@ -254,7 +260,7 @@ export const PermissionField = (props: PermissionFieldProps) => {
           callback={() => setQuery('')}
         />
       ) : (
-        <Tabs.Root
+        <Tabs
           value={activeKey}
           onValueChange={setActiveKey}
           orientation="vertical"
@@ -264,9 +270,10 @@ export const PermissionField = (props: PermissionFieldProps) => {
             <p className="text-muted text-sm font-medium leading-5 mb-4">
               {translate('Permissions')}
             </p>
-            <Tabs.List
+            <TabsList
               aria-label={translate('Permissions')}
-              className="flex flex-col m-0 p-0"
+              bordered={false}
+              className="flex-col"
             >
               {groups.map((entity) => (
                 <PermissionGroupTab
@@ -275,7 +282,7 @@ export const PermissionField = (props: PermissionFieldProps) => {
                   isActive={activeKey === entity.label}
                 />
               ))}
-            </Tabs.List>
+            </TabsList>
           </div>
 
           <PermissionOptionsPanel
@@ -284,7 +291,7 @@ export const PermissionField = (props: PermissionFieldProps) => {
             onToggleOption={toggleOption}
             onToggleShown={toggleShown}
           />
-        </Tabs.Root>
+        </Tabs>
       )}
     </div>
   );

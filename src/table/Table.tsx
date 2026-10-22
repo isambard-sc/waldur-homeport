@@ -9,9 +9,8 @@ import React, {
 } from 'react';
 import { Card, Stack } from 'react-bootstrap';
 import { createPortal } from 'react-dom';
-import { useMediaQuery } from 'react-responsive';
 
-import { GRID_BREAKPOINTS } from '@/core/constants';
+import { TablePagination, useBreakpointDown } from 'waldur-ui';
 
 import { TableContent } from './components/content';
 import { TableToolbar, TableToolbarActions } from './components/toolbar';
@@ -20,9 +19,8 @@ import { TableProvider } from './context';
 import { FilterContextProvider } from './FilterContextProvider';
 import { HiddenActionsMessage } from './HiddenActionsMessage';
 import { TableFilters } from './TableFilters';
-import { TablePagination } from './TablePagination';
+import { TableNav } from './TableNav';
 import { TableRefreshButton } from './TableRefreshButton';
-import { TableTabs } from './TableTabs';
 import { Column, PinnedColumns, PinnedOffsets, TableProps } from './types';
 import { computePinnedOffsets, computePinnedShadows } from './utils';
 
@@ -412,7 +410,7 @@ function TableInternal<RowType = any>(inputProps: TableInternalProps<RowType>) {
           {/* Tabs */}
           {props.tabs?.length ? (
             <Card.Header className="table-tabs border-bottom align-items-stretch py-0 min-h-auto">
-              <TableTabs tabs={props.tabs} />
+              <TableNav tabs={props.tabs} />
             </Card.Header>
           ) : null}
 
@@ -497,7 +495,7 @@ function Table<RowType = any>(props: TableProps<RowType>) {
     initColumnPositions,
   } = props;
 
-  const isSm = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.sm });
+  const isSm = useBreakpointDown('sm');
 
   const filterPosition =
     isSm && originalFilterPosition === 'menu'

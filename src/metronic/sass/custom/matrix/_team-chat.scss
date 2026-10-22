@@ -19,48 +19,6 @@
     padding: 1.23rem $card-px 0.923rem;
   }
 
-  // All / Unread / Mentions room filter: a button group whose neighbours
-  // collapse their borders into single dividers so it reads as one pill.
-  .tc-segment {
-    align-self: flex-start;
-    display: inline-flex;
-    // Figma Shadow/xs - $box-shadow-xs is too diffuse and reads as a glitch.
-    filter: drop-shadow(0 1px 2px rgba($gray-900, 0.05));
-  }
-
-  .tc-segment-item {
-    padding: 0.769rem 1.23rem;
-    border: 1px solid $border-primary;
-    background: $bg-primary;
-    color: $text-secondary;
-    font-size: $font-size-lg;
-    font-weight: 500;
-    line-height: 1.4;
-    cursor: pointer;
-
-    & + & {
-      margin-left: -1px;
-    }
-
-    &:first-child {
-      border-radius: $border-radius 0 0 $border-radius;
-    }
-
-    &:last-child {
-      border-radius: 0 $border-radius $border-radius 0;
-    }
-
-    &:hover:not(.active) {
-      background: $bg-secondary;
-    }
-
-    &.active {
-      position: relative;
-      z-index: 1;
-      background: $bg-tertiary;
-    }
-  }
-
   .tc-list {
     flex: 1;
     min-height: 0;
@@ -370,6 +328,17 @@
     }
   }
 
+  // Where the room's call started or ended: one quiet centred line, without
+  // the day separator's rules so the two don't read alike.
+  .tc-call-event {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.462rem;
+    font-size: $font-size-sm;
+    color: $fg-tertiary;
+  }
+
   .tc-msg {
     display: grid;
     grid-template-columns: 40px 1fr;
@@ -486,6 +455,95 @@
 
   .tc-msg.mentions-me .tc-bubble {
     background: rgba($warning-500, 0.12);
+  }
+
+  // A reply's parent was jumped to.
+  .tc-msg.is-highlighted .tc-bubble {
+    box-shadow: 0 0 0 2px $border-brand;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .tc-bubble--editing {
+    width: 90%;
+  }
+
+  // Quote of the replied-to message at the top of a reply's bubble.
+  .tc-reply-quote {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 0.462rem;
+    padding: 0.308rem 0.615rem;
+    border: 0;
+    border-inline-start: 3px solid $border-brand;
+    border-radius: $border-radius-sm;
+    background: $bg-tertiary;
+    color: $text-secondary;
+    font-size: $font-size-base;
+    line-height: 1.4;
+    text-align: start;
+    white-space: normal;
+
+    &:is(button) {
+      cursor: pointer;
+
+      &:hover {
+        background: $bg-quaternary;
+      }
+    }
+
+    &.is-unavailable {
+      border-inline-start-color: $border-primary;
+      font-style: italic;
+    }
+  }
+
+  .tc-reply-quote__sender {
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .tc-reply-quote__text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tc-msg-edited {
+    display: inline-block;
+    margin-inline-start: 0.308rem;
+    font-size: $font-size-sm;
+    color: $text-tertiary;
+  }
+
+  .tc-msg-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.462rem;
+  }
+
+  .tc-msg-editor__input {
+    width: 100%;
+    padding: 0.308rem 0.462rem;
+    border: 1px solid $border-primary;
+    border-radius: $border-radius;
+    background: $bg-primary;
+    color: $text-primary;
+    font-size: $font-size-lg;
+    line-height: 1.5;
+    resize: vertical;
+
+    &:focus {
+      outline: 0;
+      border-color: $border-brand;
+    }
+  }
+
+  .tc-msg-editor__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.462rem;
   }
 
   .tc-file-card {
@@ -752,7 +810,10 @@
   }
 
   .tc-msg:hover .tc-msg-reactions-toolbar,
-  .tc-msg:focus-within .tc-msg-reactions-toolbar {
+  .tc-msg:focus-within .tc-msg-reactions-toolbar,
+  // An open actions menu is portaled out of the message, so neither hover nor
+  // focus-within holds the toolbar while it is open.
+  .tc-msg-reactions-toolbar:has([aria-expanded='true']) {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -822,8 +883,9 @@
     top: calc(100% + 6px);
     left: 0;
     z-index: 10;
-    width: 240px;
-    max-width: 240px;
+    // emoji-mart sizes itself from perLine and emojiButtonSize; a fixed width
+    // here leaves an empty strip beside it, so right-anchoring misses the edge.
+    width: max-content;
     max-height: 220px;
     overflow: hidden;
     box-shadow:
@@ -833,15 +895,23 @@
 
     //noinspection CssInvalidHtmlTagReference
     em-emoji-picker {
-      width: 240px;
-      max-width: 240px;
       max-height: 220px;
+      // emoji-mart's :host sets min-height: 230px, which beats max-height and
+      // pushes the picker's bottom edge past the clipping wrapper.
+      min-height: 0;
     }
   }
 
   .tc-msg-reactions-toolbar .tc-msg-emoji-popover {
     top: auto;
     bottom: calc(100% + 6px);
+  }
+
+  // Own messages anchor the toolbar to the bubble's right edge; the picker
+  // has to follow or it runs past .tc-stream, which clips horizontally.
+  .tc-msg.mine .tc-msg-reactions-toolbar .tc-msg-emoji-popover {
+    left: auto;
+    right: 0;
   }
 
   .tc-msg-reactions-toolbar.is-below .tc-msg-emoji-popover,
@@ -869,6 +939,38 @@
     background: $bg-primary;
     box-shadow: $box-shadow-xs;
     overflow: hidden;
+  }
+
+  .tc-composer-reply {
+    display: flex;
+    align-items: center;
+    gap: 0.615rem;
+    padding: 0.462rem 0.923rem;
+    border-bottom: 1px solid $border-primary;
+    background: $bg-secondary;
+  }
+
+  .tc-composer-reply__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    padding-inline-start: 0.615rem;
+    border-inline-start: 3px solid $border-brand;
+    font-size: $font-size-base;
+    line-height: 1.4;
+  }
+
+  .tc-composer-reply__title {
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .tc-composer-reply__text {
+    overflow: hidden;
+    color: $text-secondary;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .tc-composer-input-row {
@@ -1101,11 +1203,9 @@
   }
 }
 
-// The popover portals to <body>, beside the chat drawer (z-index 100), so it
-// needs the popover tier to show above it; Radix copies this onto its
-// positioned wrapper. A plain `z-50` left it open but hidden behind the drawer.
+// The popover portals to <body>, beside the chat drawer (z-index 100), which
+// PopoverContent's popover layer (z-popover) clears.
 .tc-members-popover {
-  z-index: $zindex-popover;
   width: 260px;
   // Bootstrap popovers default to a smaller font; pin the members list to the
   // chat's body size so names are readable.

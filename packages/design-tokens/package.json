@@ -12,11 +12,15 @@
     "./colors.css": "./src/colors.css",
     "./buttonColors.css": "./src/buttonColors.css",
     "./surfaceColors.css": "./src/surfaceColors.css",
+    "./checkColors.css": "./src/checkColors.css",
+    "./progressColors.css": "./src/progressColors.css",
     "./sidebarColors.css": "./src/sidebarColors.css",
     "./focusRing.css": "./src/focusRing.css",
     "./animations.css": "./src/animations.css",
     "./zIndex.css": "./src/zIndex.css",
-    "./fonts.css": "./src/fonts.css"
+    "./variants.css": "./src/variants.css",
+    "./fonts.css": "./src/fonts.css",
+    "./tabColors.css": "./src/tabColors.css"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",

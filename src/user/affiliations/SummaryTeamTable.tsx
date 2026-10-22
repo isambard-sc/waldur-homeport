@@ -14,7 +14,7 @@ import {
   getDisplayUsername,
   usesOpenPortalUsername,
 } from '@/openportal/user-identifier/displayUsername';
-import { ActionsDropdownComponent } from '@/table/ActionsDropdown';
+import { ActionsMenu } from '@/table/ActionsDropdown';
 import { createFetcher } from '@/table/api';
 import { DASH_ESCAPE_CODE } from '@/table/constants';
 import Table from '@/table/Table';
@@ -51,9 +51,9 @@ const projectUserMandatoryFields = [
 
 const RowActions = ({ row }) => {
   return (
-    <ActionsDropdownComponent>
+    <ActionsMenu>
       <UserDetailsButton userId={row.user_uuid || row.uuid} />
-    </ActionsDropdownComponent>
+    </ActionsMenu>
   );
 };
 

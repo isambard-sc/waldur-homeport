@@ -6,6 +6,7 @@ import { CompactEditButton } from '@/form/CompactEditButton';
 import FormTable from '@/form/FormTable';
 import { translate } from '@/i18n';
 import { SecretField } from '@/marketplace/common/SecretField';
+import { useUser } from '@/workspace/hooks';
 
 import { ConfigurationEditButton } from './ConfigurationEditButton';
 import { CountryListField } from './CountryListField';
@@ -105,9 +106,32 @@ interface FieldRowProps {
   value: any;
   onEdit?: any;
   isLoading?: boolean;
+  // Set when the value cannot be edited here; shown as the edit button's tooltip.
+  editDisabledReason?: string;
 }
 
-export const FieldRow = ({ item, value, onEdit, isLoading }: FieldRowProps) => {
+export const FieldRow = ({
+  item,
+  value,
+  onEdit,
+  isLoading,
+  editDisabledReason,
+}: FieldRowProps) => {
+  const canEdit = Boolean(useUser()?.is_staff);
+  const actions = !canEdit ? undefined : item.type === 'country_list_field' ? (
+    <CountryListEditButton onEdit={onEdit} />
+  ) : item.type === 'multilingual_image_field' ? (
+    <MultilingualImageEditButton item={item} value={value} />
+  ) : item.type === 'json_list_field' ? (
+    <CompactEditButton onClick={onEdit} />
+  ) : (
+    <ConfigurationEditButton
+      item={item}
+      value={value}
+      disabledReason={editDisabledReason}
+    />
+  );
+
   return (
     <FormTable.Item
       key={item.key}
@@ -172,17 +196,7 @@ export const FieldRow = ({ item, value, onEdit, isLoading }: FieldRowProps) => {
           value
         )
       }
-      actions={
-        item.type === 'country_list_field' ? (
-          <CountryListEditButton onEdit={onEdit} />
-        ) : item.type === 'multilingual_image_field' ? (
-          <MultilingualImageEditButton item={item} value={value} />
-        ) : item.type === 'json_list_field' ? (
-          <CompactEditButton onClick={onEdit} />
-        ) : (
-          <ConfigurationEditButton item={item} value={value} />
-        )
-      }
+      actions={actions}
     />
   );
 };

@@ -7,7 +7,7 @@
 import { ArrowSquareOutIcon } from '@phosphor-icons/react';
 import { FC, ReactNode } from 'react';
 
-import { BaseButton } from 'waldur-ui';
+import { BaseButton, Progress } from 'waldur-ui';
 
 /** The unit part of an allocation string, e.g. "NHR" from "1000 NHR". */
 export const allocationUnit = (
@@ -79,22 +79,20 @@ export const usageTextClass = (percent: number): string | undefined => {
  * A thin progress bar that turns amber past the warning threshold and red past
  * the danger one.
  */
-export const UsageProgressBar: FC<{ percent: number }> = ({ percent }) => {
-  const variant =
-    percent >= USAGE_DANGER_PERCENT
-      ? 'bg-danger'
-      : percent >= USAGE_WARNING_PERCENT
-        ? 'bg-warning'
-        : 'bg-primary';
-  return (
-    <div className="progress mt-2" style={{ height: 6 }}>
-      <div
-        className={`progress-bar ${variant}`}
-        style={{ width: `${percent}%` }}
-      />
-    </div>
-  );
-};
+export const UsageProgressBar: FC<{ percent: number }> = ({ percent }) => (
+  <Progress
+    value={percent}
+    variant={
+      percent >= USAGE_DANGER_PERCENT
+        ? 'danger'
+        : percent >= USAGE_WARNING_PERCENT
+          ? 'warning'
+          : 'primary'
+    }
+    size="xs"
+    className="mt-2"
+  />
+);
 
 /**
  * The "Go to award" / "Go to project" button that sits beside a card. Opens

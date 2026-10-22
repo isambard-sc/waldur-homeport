@@ -1,17 +1,16 @@
-import {
-  QuestionIcon,
-  ThumbsDownIcon,
-  ThumbsUpIcon,
-} from '@phosphor-icons/react';
+import { ThumbsDownIcon, ThumbsUpIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FunctionComponent, PropsWithChildren, ReactNode } from 'react';
-import { useMediaQuery } from 'react-responsive';
 import { ActionTakenEnum, InjectionSeverityEnum } from 'waldur-js-client';
 
-import { BadgeVariant, Tooltip } from 'waldur-ui';
-import { Badge } from 'waldur-ui';
+import {
+  Badge,
+  BadgeVariant,
+  HelpIcon,
+  Tooltip,
+  useBreakpointUp,
+} from 'waldur-ui';
 
-import { GRID_BREAKPOINTS } from '@/core/constants';
 import { formatDateTime, formatShortDateTime } from '@/core/dateUtils';
 import { formatUsageValue } from '@/core/formatNumber';
 import { translate } from '@/i18n';
@@ -155,7 +154,7 @@ export const MessageGutter: FunctionComponent<
   outputTokens,
   children,
 }) => {
-  const isDesktop = useMediaQuery({ minWidth: GRID_BREAKPOINTS.sm });
+  const isDesktop = useBreakpointUp('sm');
   const formatDate = isDesktop ? formatDateTime : formatShortDateTime;
 
   return (
@@ -186,13 +185,11 @@ export const asPercent = (value?: number | null) =>
 export const SatisfactionLabel: FunctionComponent<{ id?: string }> = () => (
   <>
     {translate('Satisfaction')}{' '}
-    <Tooltip
+    <HelpIcon
       label={translate(
         'Share of rated replies marked helpful: positive ÷ (positive + negative). Counts every rating ever submitted, not a recent window, and ignores replies nobody rated.',
       )}
-    >
-      <QuestionIcon weight="bold" />
-    </Tooltip>
+    />
   </>
 );
 

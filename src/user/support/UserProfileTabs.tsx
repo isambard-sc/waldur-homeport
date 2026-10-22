@@ -422,6 +422,8 @@ const buildPersonalFields = ({
               : translate("The user's date of birth")
           }
           renderValue={(val) => (val ? formatDate(val) : '')}
+          captionLayout="dropdown"
+          maxDate="today"
           {...birthDateProps}
         />
       ),

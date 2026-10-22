@@ -8,6 +8,8 @@ import {
   QuestionWithAnswer,
 } from 'waldur-js-client';
 
+import { Badge } from 'waldur-ui';
+
 import { ENV } from '@/core/config';
 import { formatDateTime } from '@/core/dateUtils';
 import { Link } from '@/core/Link';
@@ -17,6 +19,10 @@ import { isFeatureVisible } from '@/features/connect';
 import { MarketplaceFeatures } from '@/FeaturesEnums';
 import { translate } from '@/i18n';
 import { FIELD_MAPPING } from '@/marketplace/offerings/details/OfferingUserDetailsDialog';
+import {
+  isProviderBacked,
+  ProviderAccountButton,
+} from '@/marketplace/service-providers/accounts/ProviderAccountLink';
 import { isExperimentalUiComponentsVisible } from '@/marketplace/utils';
 import { BooleanIconBadge } from '@/project/metadata/BooleanIconBadge';
 import { ParsedAnswer } from '@/project/metadata/ParsedAnswer';
@@ -29,7 +35,11 @@ import { renderFieldOrDash } from '@/table/utils';
 
 import { AnswerRowActions } from './AnswerRowActions';
 
-const PosixGroupsTable = ({ offeringUser }: { offeringUser: OfferingUser }) => {
+export const PosixGroupsTable = ({
+  offeringUser,
+}: {
+  offeringUser: OfferingUser;
+}) => {
   const tableProps = useTable({
     table: 'offeringUserPosixGroups-' + offeringUser.uuid,
     fetchData: createFetcher(marketplaceOfferingUsersPosixGroupsList, {
@@ -44,6 +54,24 @@ const PosixGroupsTable = ({ offeringUser }: { offeringUser: OfferingUser }) => {
           title: translate('GID'),
           render: ({ row }) => row.gid,
           copyField: (row) => String(row.gid),
+        },
+        {
+          // A provider project group is shared by all offerings of the
+          // provider; the others belong to this offering.
+          title: translate('Group'),
+          render: ({ row }) =>
+            row.kind === 'provider_project_group' ? (
+              <span className="d-inline-flex align-items-center gap-2">
+                {row.group_name ? <code>{row.group_name}</code> : null}
+                <Badge variant="primary" tone="light">
+                  {translate('Service provider group')}
+                </Badge>
+              </span>
+            ) : (
+              <Badge variant="neutral" tone="light">
+                {translate('Offering group')}
+              </Badge>
+            ),
         },
         {
           title: translate('Organization'),
@@ -192,6 +220,20 @@ export const OfferingUsersExpandableRow = ({
 
   return (
     <ExpandableContainer>
+      {isProviderBacked(offeringUser) && (
+        <Field
+          label={translate('Provider account')}
+          value={
+            <>
+              {renderFieldOrDash(
+                offeringUser.service_provider_account_username,
+              )}{' '}
+              <ProviderAccountButton row={offeringUser} />
+            </>
+          }
+          labelClass="mw-175px"
+        />
+      )}
       {showPosix && <PosixIdentifiersTable offeringUser={offeringUser} />}
       {showPosix && <PosixGroupsTable offeringUser={offeringUser} />}
       {showTosFields && (

@@ -1,11 +1,18 @@
 import { useMediaDeviceSelect } from '@livekit/components-react';
 import { GearSixIcon } from '@phosphor-icons/react';
-import * as RadixPopover from '@radix-ui/react-popover';
+import { Track } from 'livekit-client';
 import { FC } from 'react';
 
-import { Select } from 'waldur-ui';
+import { Popover, PopoverContent, PopoverTrigger, Select } from 'waldur-ui';
 
 import { translate } from '@/i18n';
+import { useNotify } from '@/store/notify';
+
+import {
+  CallDeviceSource,
+  classifyCallDeviceError,
+  getCallDeviceErrorMessage,
+} from './callDeviceErrors';
 
 interface CallSettingsMenuProps {
   /**
@@ -23,9 +30,45 @@ interface DeviceSelectProps {
   label: string;
 }
 
+const DEVICE_SOURCES: Partial<Record<MediaDeviceKind, CallDeviceSource>> = {
+  audioinput: Track.Source.Microphone,
+  videoinput: Track.Source.Camera,
+};
+
+const getGenericSwitchError = (kind: MediaDeviceKind): string => {
+  switch (kind) {
+    case 'videoinput':
+      return translate('Could not switch the camera.');
+    case 'audioinput':
+      return translate('Could not switch the microphone.');
+    default:
+      return translate('Could not switch the speaker.');
+  }
+};
+
+const getSwitchErrorMessage = (error: Error, kind: MediaDeviceKind): string => {
+  const source = DEVICE_SOURCES[kind];
+  if (!source || classifyCallDeviceError(error, source) === 'other') {
+    return getGenericSwitchError(kind);
+  }
+  return (
+    getCallDeviceErrorMessage(error, source) ?? getGenericSwitchError(kind)
+  );
+};
+
 const DeviceSelect: FC<DeviceSelectProps> = ({ kind, label }) => {
+  const { showError } = useNotify();
   const { devices, activeDeviceId, setActiveMediaDevice } =
     useMediaDeviceSelect({ kind });
+  // LiveKit only moves activeDeviceId once the switch has succeeded, so after
+  // a failure the select falls back to the device that is still in use.
+  const switchDevice = async (deviceId: string) => {
+    try {
+      await setActiveMediaDevice(deviceId);
+    } catch (error) {
+      showError(getSwitchErrorMessage(error as Error, kind));
+    }
+  };
   const options = devices.map((d) => ({
     value: d.deviceId,
     label: d.label || translate('Unknown device'),
@@ -38,7 +81,7 @@ const DeviceSelect: FC<DeviceSelectProps> = ({ kind, label }) => {
       <Select
         options={options}
         value={value}
-        onChange={(option: any) => option && setActiveMediaDevice(option.value)}
+        onChange={(option: any) => option && switchDevice(option.value)}
         isSearchable={false}
         menuPlacement="auto"
         // Inline in the popover rather than a fixed menu portalled elsewhere,
@@ -64,8 +107,8 @@ export const CallSettingsMenu: FC<CallSettingsMenuProps> = ({ container }) => {
   ];
 
   return (
-    <RadixPopover.Root modal={false}>
-      <RadixPopover.Trigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <button
           type="button"
           className="lk-button"
@@ -73,23 +116,22 @@ export const CallSettingsMenu: FC<CallSettingsMenuProps> = ({ container }) => {
         >
           <GearSixIcon size={20} weight="bold" />
         </button>
-      </RadixPopover.Trigger>
-      <RadixPopover.Portal container={container ?? undefined}>
-        <RadixPopover.Content
-          side="top"
-          sideOffset={2}
-          // The docked call belongs to MatrixCallHost's React tree, not the
-          // drawer's, so the drawer would read clicks here as a click away.
-          data-drawer-inside=""
-          className="call-device-settings-popover rounded-md border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden p-4"
-        >
-          <div className="call-device-settings">
-            {kinds.map(({ kind, label }) => (
-              <DeviceSelect key={kind} kind={kind} label={label} />
-            ))}
-          </div>
-        </RadixPopover.Content>
-      </RadixPopover.Portal>
-    </RadixPopover.Root>
+      </PopoverTrigger>
+      <PopoverContent
+        container={container ?? undefined}
+        side="top"
+        sideOffset={2}
+        // The docked call belongs to MatrixCallHost's React tree, not the
+        // drawer's, so the drawer would read clicks here as a click away.
+        data-dialog-inside=""
+        className="call-device-settings-popover p-4"
+      >
+        <div className="call-device-settings">
+          {kinds.map(({ kind, label }) => (
+            <DeviceSelect key={kind} kind={kind} label={label} />
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };

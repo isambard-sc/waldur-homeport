@@ -9,20 +9,21 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useMediaQuery } from 'react-responsive';
+
+import { useBreakpointUp } from 'waldur-ui';
 
 import {
   getChatDrawerPreference,
   setChatDrawerPreference,
   useChatDrawerPreference,
 } from '@/chat/chatDrawerPreferences';
-import { GRID_BREAKPOINTS } from '@/core/constants';
 import { useDrawerExpanded } from '@/drawer/useDrawerExpanded';
 import { translate } from '@/i18n';
 
 import { MatrixCallPortalContext } from './call/MatrixCallPortalContext';
 import { useMatrixCall } from './call/useMatrixCall';
 import { MatrixChatDrawer } from './MatrixChatDrawer';
+import { MatrixEncryptionNotice } from './MatrixEncryptionNotice';
 import { MatrixRoomList } from './MatrixRoomList';
 import { useAllMatrixRooms } from './useAllMatrixRooms';
 import { useMatrixClient } from './useMatrixClient';
@@ -54,7 +55,7 @@ export const MatrixChatPanel: FC<MatrixChatPanelProps> = ({
   // drawer or the standalone Communication page — matching the AI history
   // sidebar. Otherwise the panel is just the open conversation.
   const drawerExpanded = useDrawerExpanded();
-  const isAtLeastMd = useMediaQuery({ minWidth: GRID_BREAKPOINTS.md });
+  const isAtLeastMd = useBreakpointUp('md');
   const showDock = (drawerExpanded || Boolean(forceDock)) && isAtLeastMd;
 
   const [selectedRoomUuid, setSelectedRoomUuid] = useState<string | null>(
@@ -215,16 +216,21 @@ export const MatrixChatPanel: FC<MatrixChatPanelProps> = ({
       return hideRoomList ? accessDeniedContent : noRoomSelectedContent;
     if (roomAccessDenied) return accessDeniedContent;
     return (
-      <MatrixChatDrawer
-        key={detailRoomUuid}
-        roomUuid={detailRoomUuid}
-        roomAlias={detailRoomAlias}
-        roomName={(detailRoom as any)?.room_name}
-        projectUuid={(detailRoom as any)?.scope_uuid}
-        onBack={
-          showDock || hideRoomList ? undefined : () => changeCompactView('list')
-        }
-      />
+      <>
+        <MatrixEncryptionNotice />
+        <MatrixChatDrawer
+          key={detailRoomUuid}
+          roomUuid={detailRoomUuid}
+          roomAlias={detailRoomAlias}
+          roomName={(detailRoom as any)?.room_name}
+          projectUuid={(detailRoom as any)?.scope_uuid}
+          onBack={
+            showDock || hideRoomList
+              ? undefined
+              : () => changeCompactView('list')
+          }
+        />
+      </>
     );
   };
 

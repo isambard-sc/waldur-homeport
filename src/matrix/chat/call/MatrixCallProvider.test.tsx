@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { FC, PropsWithChildren, useContext } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const h = vi.hoisted(() => ({
   client: null as any,
@@ -12,6 +12,8 @@ const h = vi.hoisted(() => ({
   tokenError: null as string | null,
   rtcAvailable: true,
   callMembers: [],
+  joinCallSession: vi.fn(),
+  handles: [] as any[],
 }));
 
 vi.mock('../useMatrixClient', () => ({
@@ -27,6 +29,12 @@ vi.mock('./useLiveKitToken', () => ({
   useLiveKitToken: () => ({
     rtcAvailable: h.rtcAvailable,
     discover: h.discover,
+    getFocus: (roomId: string) =>
+      Promise.resolve({
+        type: 'livekit',
+        livekit_service_url: 'https://lk.test',
+        livekit_alias: roomId,
+      }),
     acquireToken: h.acquireToken,
     error: h.tokenError,
   }),
@@ -34,29 +42,45 @@ vi.mock('./useLiveKitToken', () => ({
 
 vi.mock('./useCallMemberEvents', () => ({
   useCallMemberEvents: () => ({ callMembers: h.callMembers }),
-  announceCallJoin: vi.fn().mockResolvedValue(undefined),
-  announceCallLeave: vi.fn().mockResolvedValue(undefined),
-  CALL_MEMBER_REFRESH_MS: 10_000,
 }));
+
+vi.mock('./rtcSession', () => ({ joinCallSession: h.joinCallSession }));
 
 import { MatrixCallContext } from './MatrixCallContext';
 import {
   CALL_CONNECT_TIMEOUT_MS,
   MatrixCallProvider,
 } from './MatrixCallProvider';
-import { announceCallJoin, announceCallLeave } from './useCallMemberEvents';
+
+// A call session whose membership lands at once, unless `joined` is given.
+const fakeHandle = (joined: Promise<void> = Promise.resolve()) => {
+  let lose!: () => void;
+  const handle = {
+    session: { id: h.handles.length },
+    joined,
+    lost: new Promise<void>((r) => (lose = r)),
+    lose: () => lose(),
+    leave: vi.fn(() => Promise.resolve()),
+  };
+  h.handles.push(handle);
+  return handle;
+};
 
 beforeEach(() => {
-  h.client = { getUserId: () => '@me:s' };
+  h.client = {
+    getUserId: () => '@me:s',
+    getDeviceId: () => 'dev-1',
+    getRoom: (roomId: string) => ({ roomId }),
+  };
   h.activeRoomId = '!abc:s';
   h.activeRoomUuid = 'uuid-1';
   h.connectionState = 'connected';
   h.tokenError = null;
   h.acquireToken.mockReset();
   h.acquireToken.mockResolvedValue({ url: 'wss://lk', jwt: 'tok' });
-  vi.mocked(announceCallJoin).mockClear();
-  vi.mocked(announceCallLeave).mockClear();
-  sessionStorage.setItem('waldur_matrix_device_id', 'dev-1');
+  h.handles = [];
+  h.joinCallSession.mockReset();
+  h.joinCallSession.mockImplementation(() => Promise.resolve(fakeHandle()));
 });
 
 const wrapper: FC<PropsWithChildren> = ({ children }) => (
@@ -75,6 +99,24 @@ describe('MatrixCallProvider', () => {
     expect(result.current.callRoomUuid).toBe('uuid-1');
   });
 
+  it('ends the call when the chat session ends', async () => {
+    // An ended session takes the client away: no heartbeat and no way to
+    // announce the leave, so media must not keep flowing on its own.
+    const { result, rerender } = renderHook(useCtx, { wrapper });
+    await act(async () => {
+      await result.current.startCall();
+    });
+    act(() => result.current.markConnected());
+
+    h.client = null;
+    h.activeRoomId = null;
+    h.connectionState = 'ended';
+    rerender();
+
+    expect(result.current.callState).toBe('idle');
+    expect(result.current.credentials).toBeNull();
+  });
+
   it('clears callRoomUuid on endCall', async () => {
     const { result } = renderHook(useCtx, { wrapper });
     await act(async () => {
@@ -84,62 +126,84 @@ describe('MatrixCallProvider', () => {
     expect(result.current.callRoomUuid).toBeNull();
   });
 
-  it('re-announces call membership periodically while connected', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    try {
-      const { result } = renderHook(useCtx, { wrapper });
-      await act(async () => {
-        await result.current.startCall();
-      });
-      act(() => result.current.markConnected());
+  it('joins the room call with its own focus and leaves on hang-up', async () => {
+    const { result } = renderHook(useCtx, { wrapper });
+    await act(async () => {
+      await result.current.startCall();
+    });
+    expect(h.joinCallSession).toHaveBeenCalledWith(
+      h.client,
+      { roomId: '!abc:s' },
+      [
+        {
+          type: 'livekit',
+          livekit_service_url: 'https://lk.test',
+          livekit_alias: '!abc:s',
+        },
+      ],
+      { encrypt: false },
+    );
+    expect(result.current.encrypted).toBe(false);
 
-      expect(vi.mocked(announceCallJoin)).toHaveBeenCalledTimes(1);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(11_000);
-      });
-      expect(vi.mocked(announceCallJoin)).toHaveBeenCalledTimes(2);
-
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(10_000);
-      });
-      expect(vi.mocked(announceCallJoin)).toHaveBeenCalledTimes(3);
-
-      act(() => result.current.endCall());
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(10_000);
-      });
-      expect(vi.mocked(announceCallJoin)).toHaveBeenCalledTimes(3);
-    } finally {
-      vi.useRealTimers();
-    }
+    act(() => result.current.endCall());
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
   });
 
-  it('heartbeat ticks while still connecting', async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    try {
-      vi.mocked(announceCallJoin).mockClear();
+  describe('in an encrypted room', () => {
+    beforeEach(() => {
+      h.client.getRoom = (roomId: string) => ({
+        roomId,
+        hasEncryptionStateEvent: () => true,
+      });
+    });
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('encrypts the call and joins under the keyed identity', async () => {
+      vi.stubGlobal('RTCRtpScriptTransform', class {});
       const { result } = renderHook(useCtx, { wrapper });
       await act(async () => {
         await result.current.startCall();
       });
-      expect(result.current.callState).toBe('connecting');
-      // startCall itself triggers an initial announceCallJoin
-      const callsAfterStart = vi.mocked(announceCallJoin).mock.calls.length;
 
-      // Advance past CALL_MEMBER_REFRESH_MS (10_000ms) — heartbeat should tick
+      expect(h.joinCallSession.mock.calls[0][3]).toEqual({ encrypt: true });
+      expect(h.acquireToken.mock.calls[0][2]).toEqual({ encrypted: true });
+      expect(result.current.encrypted).toBe(true);
+      expect(result.current.callSession).toBe(h.handles[0].session);
+    });
+
+    it('stays encrypted when the room state no longer says so', async () => {
+      vi.stubGlobal('RTCRtpScriptTransform', class {});
+      h.client.getRoom = (roomId: string) => ({
+        roomId,
+        hasEncryptionStateEvent: () => false,
+      });
+      h.client.getCrypto = () => ({
+        isEncryptionEnabledInRoom: () => Promise.resolve(true),
+      });
+      const { result } = renderHook(useCtx, { wrapper });
       await act(async () => {
-        await vi.advanceTimersByTimeAsync(11_000);
+        await result.current.startCall();
       });
 
-      expect(vi.mocked(announceCallJoin).mock.calls.length).toBeGreaterThan(
-        callsAfterStart,
+      expect(h.joinCallSession.mock.calls[0][3]).toEqual({ encrypt: true });
+      expect(result.current.encrypted).toBe(true);
+    });
+
+    it('refuses to join from a browser that cannot encrypt media', async () => {
+      vi.stubGlobal('RTCRtpScriptTransform', undefined);
+      vi.stubGlobal('RTCRtpSender', class {});
+      const { result } = renderHook(useCtx, { wrapper });
+      await act(async () => {
+        await result.current.startCall();
+      });
+
+      expect(h.joinCallSession).not.toHaveBeenCalled();
+      expect(h.acquireToken).not.toHaveBeenCalled();
+      expect(result.current.callState).toBe('error');
+      expect(result.current.error).toBe(
+        "This browser can't take part in encrypted calls.",
       );
-    } finally {
-      vi.useRealTimers();
-      vi.mocked(announceCallJoin).mockClear();
-      vi.mocked(announceCallLeave).mockClear();
-    }
+    });
   });
 
   it('endCall(message) surfaces the message via context error', async () => {
@@ -206,6 +270,65 @@ describe('MatrixCallProvider', () => {
     // The raw SFU/token error must never reach the user.
     expect(result.current.error).toBeTruthy();
     expect(result.current.error).not.toContain('errcode');
+    // The membership published before the token request is withdrawn.
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+  });
+
+  it('publishes the membership before requesting the call token', async () => {
+    let land!: () => void;
+    h.joinCallSession.mockImplementationOnce(() =>
+      Promise.resolve(fakeHandle(new Promise<void>((r) => (land = r)))),
+    );
+    const { result } = renderHook(useCtx, { wrapper });
+    let started!: Promise<void>;
+    await act(async () => {
+      started = result.current.startCall();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(h.acquireToken).not.toHaveBeenCalled();
+
+    await act(async () => {
+      land();
+      await started;
+    });
+    expect(h.acquireToken).toHaveBeenCalledTimes(1);
+    expect(result.current.callState).toBe('connecting');
+  });
+
+  it('fails the call without a token request when publishing fails', async () => {
+    h.joinCallSession.mockImplementationOnce(() =>
+      Promise.resolve(fakeHandle(Promise.reject(new Error('forbidden')))),
+    );
+    const { result } = renderHook(useCtx, { wrapper });
+    await act(async () => {
+      await result.current.startCall();
+    });
+    expect(h.acquireToken).not.toHaveBeenCalled();
+    expect(result.current.callState).toBe('error');
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+  });
+
+  it('fails the call when the membership never lands', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      h.joinCallSession.mockImplementationOnce(() =>
+        Promise.resolve(fakeHandle(new Promise<void>(() => undefined))),
+      );
+      const { result } = renderHook(useCtx, { wrapper });
+      let started!: Promise<void>;
+      act(() => {
+        started = result.current.startCall();
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(CALL_CONNECT_TIMEOUT_MS + 100);
+        await started;
+      });
+      expect(h.acquireToken).not.toHaveBeenCalled();
+      expect(result.current.callState).toBe('error');
+      expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('keeps the room anchored on endCall(message) so the error can dock', async () => {
@@ -230,49 +353,107 @@ describe('MatrixCallProvider', () => {
     expect(result.current.callRoomId).toBeNull();
   });
 
-  it('endCall waits for an in-flight announceCallJoin before announceCallLeave', async () => {
-    const order: string[] = [];
-    let resolveJoin!: () => void;
-    vi.mocked(announceCallJoin).mockImplementation(
-      () =>
-        new Promise<void>((resolve) => {
-          order.push('join-start');
-          resolveJoin = () => {
-            order.push('join-resolved');
-            resolve();
-          };
-        }),
+  it('leaves a session that was still loading when the call ended', async () => {
+    let load!: (handle: any) => void;
+    h.joinCallSession.mockImplementationOnce(
+      () => new Promise((r) => (load = r)),
     );
-    vi.mocked(announceCallLeave).mockImplementation(() => {
-      order.push('leave');
-      return Promise.resolve();
-    });
-
     const { result } = renderHook(useCtx, { wrapper });
-
-    // Start the call without awaiting — we need to interrupt mid-flight.
-    // Flush microtasks until announceCallJoin starts (resolveJoin is assigned).
-    let startDone = false;
-    result.current.startCall().then(() => {
-      startDone = true;
-    });
-    // Drain microtasks: acquireToken resolves, then queueAnnounce runs the
-    // join mock (assigning resolveJoin) before we proceed.
+    let started!: Promise<void>;
     await act(async () => {
-      await new Promise<void>((r) => setTimeout(r, 0));
+      started = result.current.startCall();
+      await new Promise((r) => setTimeout(r, 0));
     });
 
-    // join is in-flight; endCall should queue behind it.
+    act(() => result.current.endCall());
+    await act(async () => {
+      load(fakeHandle());
+      await started;
+    });
+
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+    expect(h.acquireToken).not.toHaveBeenCalled();
+    expect(result.current.callState).toBe('idle');
+  });
+
+  it('leaves a running call before starting another one', async () => {
+    const { result } = renderHook(useCtx, { wrapper });
+    await act(async () => {
+      await result.current.startCall();
+    });
+    await act(async () => {
+      await result.current.startCall();
+    });
+
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+    expect(h.handles[1].leave).not.toHaveBeenCalled();
+  });
+
+  it('ends the call when the session loses the membership', async () => {
+    const { result } = renderHook(useCtx, { wrapper });
+    await act(async () => {
+      await result.current.startCall();
+    });
+    act(() => result.current.markConnected());
+
+    await act(async () => {
+      h.handles[0].lose();
+      await Promise.resolve();
+    });
+
+    expect(result.current.callState).toBe('error');
+    expect(result.current.error).toBe('The call was disconnected.');
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancels a call still being set up when the chat session ends', async () => {
+    let load!: (handle: any) => void;
+    h.joinCallSession.mockImplementationOnce(
+      () => new Promise((r) => (load = r)),
+    );
+    const { result, rerender } = renderHook(useCtx, { wrapper });
+    let started!: Promise<void>;
+    await act(async () => {
+      started = result.current.startCall();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+
+    h.connectionState = 'ended';
+    rerender();
+    await act(async () => {
+      load(fakeHandle());
+      await started;
+    });
+
+    expect(h.handles[0].leave).toHaveBeenCalledTimes(1);
+    expect(h.acquireToken).not.toHaveBeenCalled();
+    expect(result.current.callState).toBe('idle');
+  });
+
+  it('joins a new call only once the previous leave has landed', async () => {
+    let landLeave!: () => void;
+    const first = fakeHandle();
+    first.leave.mockImplementation(
+      () => new Promise<void>((r) => (landLeave = r)),
+    );
+    h.joinCallSession.mockImplementationOnce(() => Promise.resolve(first));
+    const { result } = renderHook(useCtx, { wrapper });
+    await act(async () => {
+      await result.current.startCall();
+    });
     act(() => result.current.endCall());
 
-    // Now unblock the join.
-    resolveJoin();
+    let started!: Promise<void>;
+    await act(async () => {
+      started = result.current.startCall();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    expect(h.joinCallSession).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      await new Promise<void>((r) => setTimeout(r, 0));
+      landLeave();
+      await started;
     });
-
-    expect(startDone).toBe(true);
-    expect(order).toEqual(['join-start', 'join-resolved', 'leave']);
+    expect(h.joinCallSession).toHaveBeenCalledTimes(2);
   });
 });
