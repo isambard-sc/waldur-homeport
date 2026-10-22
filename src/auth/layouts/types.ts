@@ -27,6 +27,8 @@ export type LandingPageLayout =
   | 'brand-pattern'
   | 'duotone'
   | 'diagonal'
+  // This deployment's own
+  | 'brics'
   // Dynamic layouts
   | 'time-based'
   | 'seasonal'
@@ -107,6 +109,7 @@ export const LAYOUT_OPTIONS: Array<{
   },
   { value: 'duotone', label: translate('Duotone'), category: 'Brand' },
   { value: 'diagonal', label: translate('Diagonal Split'), category: 'Brand' },
+  { value: 'brics', label: 'BriCS', category: 'Brand' },
 
   // Dynamic
   { value: 'time-based', label: translate('Time Based'), category: 'Dynamic' },
