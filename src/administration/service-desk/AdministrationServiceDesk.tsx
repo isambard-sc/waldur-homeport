@@ -1,10 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
 import { capitalize } from 'lodash-es';
 import { useMemo } from 'react';
-import { Card, Col, Nav, Row, Tab } from 'react-bootstrap';
+import { Card, Col, Row } from 'react-bootstrap';
 import { overrideSettingsRetrieve } from 'waldur-js-client';
 
-import { ButtonVariant } from 'waldur-ui';
+import {
+  Badge,
+  ButtonVariant,
+  Menu,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from 'waldur-ui';
 
 import { ServiceDeskProviderLogo } from '@/administration/service-desk/ServiceDeskProviderLogo';
 import { lazyComponent } from '@/core/lazyComponent';
@@ -14,12 +22,11 @@ import FormTable from '@/form/FormTable';
 import { formatJsxTemplate, translate } from '@/i18n';
 import { hasSupport } from '@/issues/hooks';
 import { useModal } from '@/modal/actions';
+import { useUrlTab } from '@/navigation/useUrlTab';
 import { SettingsDescription } from '@/SettingsDescription';
-import { ActionDropdownButton } from '@/table/ActionDropdownButton';
-import { ActionsDropdownItem } from '@/table/ActionsDropdown';
+import { useUser } from '@/workspace/hooks';
 
 import { FieldRow } from '../settings/FieldRow';
-import { useSettingsUrlSync } from '../settings/useSettingsUrlSync';
 import { SupportUsersList } from '../support-users/SupportUsersList';
 
 import {
@@ -74,6 +81,7 @@ const AtlassianSummary = ({ settings }) => {
 };
 
 const ServiceDeskProviderCard = ({ serviceDeskProvider, initialValues }) => {
+  const canEdit = Boolean(useUser()?.is_staff);
   const { openDialog } = useModal();
   const isAtlassian = serviceDeskProvider === 'atlassian';
   const isConfigured = isProviderConfigured(serviceDeskProvider, initialValues);
@@ -140,24 +148,41 @@ const ServiceDeskProviderCard = ({ serviceDeskProvider, initialValues }) => {
                 </p>
               )}
               <div className="mt-auto">
-                <ActionDropdownButton
-                  variant={state.variant}
-                  title={state.title}
-                >
-                  {isAtlassian && !isConfigured && (
-                    <ActionsDropdownItem onSelect={openDiscovery}>
-                      {translate('Discovery wizard')}
-                    </ActionsDropdownItem>
-                  )}
-                  <ActionsDropdownItem onSelect={openConfigure}>
-                    {translate('Edit')}
-                  </ActionsDropdownItem>
-                  {isAtlassian && isConfigured && (
-                    <ActionsDropdownItem onSelect={openDiscovery}>
-                      {translate('Re-discover')}
-                    </ActionsDropdownItem>
-                  )}
-                </ActionDropdownButton>
+                {canEdit ? (
+                  <Menu>
+                    <Menu.TriggerButton variant={state.variant} size="lg">
+                      {state.title}
+                    </Menu.TriggerButton>
+                    <Menu.Content look="actions" side="bottom">
+                      {isAtlassian && !isConfigured && (
+                        <Menu.Item onSelect={openDiscovery}>
+                          {translate('Discovery wizard')}
+                        </Menu.Item>
+                      )}
+                      <Menu.Item onSelect={openConfigure}>
+                        {translate('Edit')}
+                      </Menu.Item>
+                      {isAtlassian && isConfigured && (
+                        <Menu.Item onSelect={openDiscovery}>
+                          {translate('Re-discover')}
+                        </Menu.Item>
+                      )}
+                    </Menu.Content>
+                  </Menu>
+                ) : (
+                  <Badge
+                    variant={
+                      state.variant === 'primary'
+                        ? 'primary'
+                        : state.variant === 'warning'
+                          ? 'warning'
+                          : 'neutral'
+                    }
+                    tone="light"
+                  >
+                    {state.title}
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -215,7 +240,7 @@ export const AdministrationServiceDesk = () => {
     ],
     [supportEnabled],
   );
-  const { activeKey, handleSelect } = useSettingsUrlSync(tabs);
+  const { activeKey, handleSelect } = useUrlTab(tabs, 'tab');
 
   return isLoading ? (
     <LoadingSpinner />
@@ -232,42 +257,37 @@ export const AdministrationServiceDesk = () => {
         </Card.Title>
       </Card.Header>
       <Card.Body>
-        <Tab.Container
-          activeKey={activeKey}
-          onSelect={handleSelect}
-          unmountOnExit
-        >
-          <Nav variant="tabs" className="nav-line-tabs mb-5">
+        <Tabs mount="active" value={activeKey} onValueChange={handleSelect}>
+          <TabsList className="mb-5">
             {tabs.map((tab) => (
-              <Nav.Item key={tab.key}>
-                <Nav.Link eventKey={tab.key} className="cursor-pointer">
-                  {tab.title}
-                </Nav.Link>
-              </Nav.Item>
+              <TabsTrigger
+                key={tab.key}
+                value={tab.key}
+                className="cursor-pointer"
+              >
+                {tab.title}
+              </TabsTrigger>
             ))}
-          </Nav>
-          <Tab.Content>
-            {/* These two stay mounted across tab switches (unlike the rest of
-                this container) so in-progress edits aren't lost when the user
-                tabs away — hence the explicit override back to false. */}
-            <Tab.Pane eventKey="configuration" unmountOnExit={false}>
+          </TabsList>
+          <>
+            <TabsContent value="configuration">
               <ConfigurationTab data={data} />
-            </Tab.Pane>
-            <Tab.Pane eventKey="credentials" unmountOnExit={false}>
+            </TabsContent>
+            <TabsContent value="credentials">
               <CredentialsTab data={data} />
-            </Tab.Pane>
+            </TabsContent>
             {supportEnabled && (
-              <Tab.Pane eventKey="issue-statuses">
+              <TabsContent value="issue-statuses">
                 <IssueStatusList />
-              </Tab.Pane>
+              </TabsContent>
             )}
             {supportEnabled && (
-              <Tab.Pane eventKey="support-users">
+              <TabsContent value="support-users">
                 <SupportUsersList />
-              </Tab.Pane>
+              </TabsContent>
             )}
-          </Tab.Content>
-        </Tab.Container>
+          </>
+        </Tabs>
       </Card.Body>
     </Card>
   ) : null;

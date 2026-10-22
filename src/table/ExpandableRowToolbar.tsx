@@ -1,11 +1,18 @@
 import { FunnelSimpleIcon, GearSixIcon, XIcon } from '@phosphor-icons/react';
-import * as RadixPopover from '@radix-ui/react-popover';
 import { useQueryClient } from '@tanstack/react-query';
 import { ComponentType, FC, createElement, useCallback } from 'react';
-import { FormCheck, Stack } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { BaseButton, ButtonSize } from 'waldur-ui';
+import {
+  BaseButton,
+  ButtonSize,
+  Checkbox,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  cn,
+  menuItem,
+} from 'waldur-ui';
 
 import { translate } from '@/i18n';
 import { resetSelection, setFilterQuery, toggleColumn } from '@/table/actions';
@@ -49,13 +56,22 @@ const ColumnsPopover: FC<{
       <button
         key={column.id}
         type="button"
-        className="dropdown-item d-flex align-items-center gap-2"
+        className={cn(
+          menuItem({ look: 'actions' }),
+          'd-flex align-items-center gap-2',
+        )}
+        aria-pressed={Boolean(activeColumns[column.id])}
         onClick={() => onToggle(column)}
       >
-        <FormCheck
-          className="form-check form-check-custom form-check-sm min-h-auto"
+        {/* A visual only: the button is the control, and an input inside a
+            button would be a second, nested one. */}
+        <Checkbox
+          size="sm"
           checked={Boolean(activeColumns[column.id])}
-          onChange={(e) => e.preventDefault()}
+          readOnly
+          tabIndex={-1}
+          aria-hidden="true"
+          className="pointer-events-none"
         />
         {column.title}
       </button>
@@ -117,10 +133,7 @@ export const ExpandableRowToolbar: FC<ExpandableRowToolbarProps> = ({
       )}
       <div className="ms-sm-auto d-flex align-items-center gap-3">
         {hasSelection && (
-          <Stack
-            direction="horizontal"
-            className="fw-normal text-dark gap-2 align-items-center"
-          >
+          <div className="d-flex align-items-center fw-normal text-dark gap-2">
             <BaseButton
               iconNode={<XIcon weight="bold" />}
               tooltip={translate('Clear selection')}
@@ -131,7 +144,7 @@ export const ExpandableRowToolbar: FC<ExpandableRowToolbarProps> = ({
             <span className="fs-7">
               ({selectedRows.length}) {translate('Selected')}
             </span>
-          </Stack>
+          </div>
         )}
         {hasSelection &&
           multiSelectActions &&
@@ -148,31 +161,29 @@ export const ExpandableRowToolbar: FC<ExpandableRowToolbarProps> = ({
           variant="tertiary"
         />
         {hasSettings ? (
-          <RadixPopover.Root modal={false}>
+          <Popover>
             {/* size="md" matches the disabled fallback branch below so the two
                 stay visually consistent. */}
-            <RadixPopover.Trigger asChild>
+            <PopoverTrigger asChild>
               <BaseButton
                 variant="tertiary"
                 size="md"
                 tooltip={translate('Toggle visible columns')}
                 iconNode={<GearSixIcon weight="bold" />}
               />
-            </RadixPopover.Trigger>
-            <RadixPopover.Portal>
-              <RadixPopover.Content
-                align="end"
-                sideOffset={2}
-                className="table-columns-popover rounded-md border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden"
-              >
-                <ColumnsPopover
-                  columns={optionalColumns}
-                  activeColumns={activeColumns}
-                  onToggle={handleToggleColumn}
-                />
-              </RadixPopover.Content>
-            </RadixPopover.Portal>
-          </RadixPopover.Root>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              sideOffset={2}
+              className="table-columns-popover"
+            >
+              <ColumnsPopover
+                columns={optionalColumns}
+                activeColumns={activeColumns}
+                onToggle={handleToggleColumn}
+              />
+            </PopoverContent>
+          </Popover>
         ) : (
           <BaseButton
             iconNode={<GearSixIcon weight="bold" />}

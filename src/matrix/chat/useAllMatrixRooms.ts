@@ -1,18 +1,21 @@
-import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { matrixRoomsList } from 'waldur-js-client';
 
 import { translate } from '@/i18n';
-import { isMatrixChatEnabled } from '@/matrix/utils';
 import { useUser } from '@/workspace/hooks';
 
 import {
   RoomCallState,
   useAllRoomCallStates,
 } from './call/useAllRoomCallStates';
+import { getDisplayedContent, getReplacedEventId } from './messageRelations';
 import { isRoomMuted } from './mute';
-import { classifyPreviewEvent, PreviewKind } from './previewClassifier';
+import {
+  classifyPreviewEvent,
+  PreviewKind,
+  undecryptablePreview,
+} from './previewClassifier';
 import { useMatrixClient } from './useMatrixClient';
+import { useMemberMatrixRooms } from './useMemberMatrixRooms';
 import { useAllRoomMemberNames } from './useRoomMemberNames';
 import { resolveMemberName } from './utils';
 
@@ -40,14 +43,18 @@ interface RoomLiveState {
 // Event types that can surface as a conversation-list preview. Anything else
 // (topic/name/avatar churn, redactions) is skipped so the row keeps showing the
 // last meaningful line.
-const PREVIEWABLE_EVENT_TYPES = new Set(['m.room.message', 'm.room.member']);
+const PREVIEWABLE_EVENT_TYPES = new Set([
+  'm.room.message',
+  'm.room.member',
+  'm.room.encrypted',
+]);
 
 interface RoomLiveMap {
   [roomId: string]: RoomLiveState;
 }
 
 /** Pull unread counts and the last message straight from the Matrix client. */
-function readRoomLiveState(
+export function readRoomLiveState(
   client: any,
   room: any,
   ownUserId: string | null,
@@ -75,7 +82,9 @@ function readRoomLiveState(
     const event = events[i];
     const type = event.getType?.();
     if (!PREVIEWABLE_EVENT_TYPES.has(type)) continue;
-    const content = event.getContent?.() ?? {};
+    // An edit is previewed through the message it edits, not as "* text",
+    // and only a valid edit is: getContent() would take any from the sender.
+    if (getReplacedEventId(event)) continue;
 
     // Member events are state events: the affected user is the state key, and
     // the prior membership lives in prev_content. Resolve the target to the
@@ -89,10 +98,20 @@ function readRoomLiveState(
           room.getMember?.(targetId)?.name,
         )
       : undefined;
-    const info = classifyPreviewEvent(type, content, {
-      prevMembership: event.getPrevContent?.()?.membership,
-      targetName,
-    });
+    // A failed decryption reads as an m.room.message whose body is
+    // matrix-js-sdk's raw error text, so it is caught before classifying.
+    const info = event.isDecryptionFailure?.()
+      ? undecryptablePreview()
+      : classifyPreviewEvent(
+          type,
+          type === 'm.room.message'
+            ? getDisplayedContent(event, room).content
+            : (event.getContent?.() ?? {}),
+          {
+            prevMembership: event.getPrevContent?.()?.membership,
+            targetName,
+          },
+        );
     if (info.kind === 'none') continue;
 
     preview = info.text;
@@ -134,21 +153,7 @@ export function useAllMatrixRooms() {
   const currentUser = useUser();
   const [liveMap, setLiveMap] = useState<RoomLiveMap>({});
 
-  const query = useQuery({
-    queryKey: ['matrixRoomsAll'],
-    // Restrict to rooms the current user belongs to. Unlike the admin rooms
-    // view, the chat list is personal — staff/support must not see rooms they
-    // are not a member of.
-    queryFn: () =>
-      matrixRoomsList({ query: { member: true } as any }).then((r) => r.data),
-    // Gate on an authenticated user, mirroring useMatrixAutoConnect's observer
-    // of this same shared query key. Without it this observer keeps the query
-    // enabled during the OIDC login transition, so an anonymous /matrix/rooms/
-    // request fires; its 401 lands after the exchanged token is stored and the
-    // global interceptor mistakes it for an expired session and logs the user
-    // straight back out.
-    enabled: isMatrixChatEnabled() && Boolean(currentUser?.uuid),
-  });
+  const query = useMemberMatrixRooms();
 
   // Preview sender names: small rooms are covered by the members embedded in
   // the room list response (no extra request). Rooms larger than the embedded
@@ -232,13 +237,20 @@ export function useAllMatrixRooms() {
     };
     // accountData (e.g. push-rule/mute changes) is global — full refresh.
     const onAccountData = () => refreshLiveState();
+    // The preview of an encrypted room changes once its last event decrypts.
+    const onDecrypted = (event: any) => {
+      const room = client.getRoom(event?.getRoomId?.());
+      if (room) onRoomEvent(event, room);
+    };
 
     client.on('Room.timeline' as any, onRoomEvent);
+    client.on('Event.decrypted' as any, onDecrypted);
     client.on('Room.receipt' as any, onRoomEvent);
     client.on('accountData' as any, onAccountData);
 
     return () => {
       client.removeListener('Room.timeline' as any, onRoomEvent);
+      client.removeListener('Event.decrypted' as any, onDecrypted);
       client.removeListener('Room.receipt' as any, onRoomEvent);
       client.removeListener('accountData' as any, onAccountData);
     };

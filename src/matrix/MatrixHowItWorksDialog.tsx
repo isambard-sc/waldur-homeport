@@ -3,9 +3,11 @@ import { FC } from 'react';
 import { AlertItem } from 'waldur-ui';
 
 import { MermaidChart } from '@/core/MermaidChart';
-import { translate } from '@/i18n';
+import { formatJsxTemplate, translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
+
+import { REGISTER_APPSERVICE_COMMAND } from './utils';
 
 const SETUP_FLOW_DIAGRAM = `
 flowchart TB
@@ -15,23 +17,25 @@ flowchart TB
         C --> D["Registration YAML is displayed"]
     end
 
-    subgraph homeserver["Homeserver Configuration"]
-        D --> E["Admin copies YAML to homeserver config"]
-        E --> F["Restart homeserver"]
-        F --> G{Homeserver connects to webhook?}
-        G -->|Yes| H["Appservice is active"]
-        G -->|No| I["Check URL reachability and tokens"]
-        I --> E
+    subgraph homeserver["Homeserver Registration"]
+        D --> E{Homeserver?}
+        E -->|Tuwunel| F["register_matrix_appservice, or !admin appservices register in the admin room"]
+        E -->|Synapse| G["Add YAML to app_service_config_files and restart"]
+        F & G --> H{Homeserver connects to webhook?}
+        H -->|Yes| I["Appservice is active"]
+        H -->|No| J["Check URL reachability and tokens"]
+        J --> E
     end
 
-    style G fill:#fff3e0,color:#000
-    style H fill:#e8f5e9,color:#000
+    style E fill:#fff3e0,color:#000
+    style H fill:#fff3e0,color:#000
+    style I fill:#e8f5e9,color:#000
 `;
 
 const ROOM_LIFECYCLE_DIAGRAM = `
 flowchart TB
     subgraph creation["Room Creation"]
-        A["Owner clicks 'Create chat room'"] --> B["Waldur calls homeserver API"]
+        A["Owner, staff or support clicks 'Create chat room'"] --> B["Waldur calls homeserver API"]
         B --> C["Room created with alias #waldur-{uuid}"]
         C --> D["Auto-sync: invite project members"]
     end
@@ -39,18 +43,18 @@ flowchart TB
     subgraph membership["Member Management"]
         D --> E["Each project member gets invited"]
         E --> F["Power levels set based on role"]
-        F --> G["Owner/Admin = power 50+, Member = 0"]
+        F --> G["Owner/Admin = power 50, Member = 0"]
     end
 
     subgraph lifecycle["Room Lifecycle"]
         G --> H["Room is ACTIVE"]
         H --> I["Members join via Matrix client"]
-        H --> J["Owner can re-sync members anytime"]
-        H --> K["Owner can export chat history"]
-        H --> L["Owner clicks 'Disable chat'"]
+        H --> J["Owner, staff or support can re-sync members anytime"]
+        H --> K["Owner, staff or support can export chat history"]
+        H --> L["Staff clicks 'Disable chat'"]
         L --> M["DISABLING: members kicked, history exported"]
         M --> N["Room is ARCHIVED"]
-        N --> O["Owner can re-enable or delete room"]
+        N --> O["Staff can re-enable or delete room"]
         O -->|Re-enable| H
         H --> P["Room archived on project deletion"]
     end
@@ -65,22 +69,22 @@ const WEBHOOK_FLOW_DIAGRAM = `
 flowchart LR
     subgraph homeserver["Matrix Homeserver"]
         A["Room event occurs"]
-        A --> B["PUT /api/matrix-appservice/transactions/{txnId}/"]
+        A --> B["PUT /_matrix/app/v1/transactions/{txnId}"]
     end
 
-    subgraph waldur["Waldur Appservice"]
+    subgraph waldur["Waldur Appservice webhook"]
         B --> C{Valid HS token?}
-        C -->|No| D["401 Unauthorized"]
-        C -->|Yes| E{Already processed?}
+        C -->|No| D["403 Forbidden"]
+        C -->|Yes| E{Already received?}
         E -->|Yes| F["200 OK (idempotent)"]
-        E -->|No| G["Queue event processing"]
+        E -->|No| G["Record transaction ID, 200 OK"]
     end
 
-    subgraph processing["Event Processing"]
-        G --> H{Bot command?}
-        H -->|Yes| I["Execute command"]
-        I --> J["Send reply to room"]
-        H -->|No| K["Ignore event"]
+    subgraph matrixbot["Matrix bot (waldur matrix_bot)"]
+        A -->|Sync| H["Decrypt room event"]
+        H --> I{Bot command?}
+        I -->|Yes| J["Send reply to room"]
+        I -->|No| K["Ignore event"]
     end
 
     style C fill:#fff3e0,color:#000
@@ -91,7 +95,7 @@ flowchart LR
 const EXPORT_FLOW_DIAGRAM = `
 flowchart TB
     subgraph trigger["Export Triggers"]
-        A["Manual: owner clicks 'Export history'"]
+        A["Manual: owner, staff or support clicks 'Export history'"]
         B["Periodic: daily at 2 AM"]
         C["On disable: before archiving room"]
         D2["On project deletion: before archiving"]
@@ -141,31 +145,37 @@ const KEY_CONCEPTS = [
   {
     term: translate('Appservice'),
     description: translate(
-      'A Matrix protocol mechanism that allows Waldur to register as a service on the homeserver. The homeserver pushes events to Waldur via a webhook, and Waldur can create rooms, invite users, and send messages on behalf of a bot user.',
+      'A Matrix protocol mechanism that allows Waldur to register as a service on the homeserver. The homeserver pushes events to Waldur via a webhook, and Waldur can create rooms and invite users on behalf of a bot user. Messages are sent by the Matrix bot.',
+    ),
+  },
+  {
+    term: translate('Matrix bot'),
+    description: translate(
+      'A separate, long-running process (waldur matrix_bot) that signs in as the bot user and is the encrypted member of every Waldur room. It answers commands, posts every message Waldur sends to a room, and exports history with the room keys it holds. Run exactly one: a second process refuses to start.',
     ),
   },
   {
     term: translate('AS token / HS token'),
     description: translate(
-      'Two shared secrets generated during setup. The AS token authenticates Waldur when calling the homeserver API. The HS token authenticates the homeserver when sending events to Waldur via webhook.',
+      'Two shared secrets, generated by Setup or supplied by the deployment. The AS token authenticates Waldur when calling the homeserver API. The HS token authenticates the homeserver when sending events to Waldur via webhook.',
     ),
   },
   {
     term: translate('Registration YAML'),
     description: translate(
-      'A configuration file that must be added to the Matrix homeserver to register Waldur as an appservice. Contains tokens, bot user ID, webhook URL, and namespace declarations.',
+      'The registration that makes Waldur an appservice on the homeserver: tokens, bot user ID, webhook URL, and namespace declarations. Synapse reads it from a file; Tuwunel takes it through the admin room.',
     ),
   },
   {
     term: translate('Room alias'),
     description: translate(
-      'A human-readable room address (e.g., #waldur-a1b2c3d4:matrix.example.com). Waldur generates aliases based on the project UUID.',
+      'A human-readable room address (e.g., #waldur-0f8e3c2a9b7d4e6f8a1c5b3d7e9f2a4c:matrix.example.com). Waldur generates aliases based on the project UUID.',
     ),
   },
   {
     term: translate('Power levels'),
     description: translate(
-      'Matrix permission system. Project owners and admins get elevated power levels (50+), allowing them to manage the room. Regular members get the default level (0).',
+      'Matrix permission system. Project admins and organization owners (any role with the "Create matrix room" permission) get level 50, which Element shows as Moderator; staff and support get it when they join a room. Everyone else gets the default level (0). Inviting, removing members and changing room settings need level 100, which only the bot holds.',
     ),
   },
   {
@@ -201,7 +211,7 @@ export const MatrixHowItWorksDialog: FC = () => {
           <h4 className="mb-4">{translate('Appservice setup')}</h4>
           <p className="text-muted mb-4">
             {translate(
-              'The setup process generates authentication tokens and a registration YAML that must be added to your Matrix homeserver configuration.',
+              'Helm and Docker Compose deployments supply the tokens and, by default, register the appservice on every deploy, so they show no Setup button. On other installations, Setup generates the tokens and a registration YAML, which you then register on the homeserver.',
             )}
           </p>
           <div className="border rounded p-4">
@@ -221,17 +231,17 @@ export const MatrixHowItWorksDialog: FC = () => {
                 </li>
                 <li>
                   {translate(
-                    'Copy the generated registration YAML to your homeserver configuration directory',
+                    'On Tuwunel, run {command} with MATRIX_ADMIN_TOKEN set, or with MATRIX_BOOTSTRAP_PASSWORD set and the homeserver\'s registration_shared_secret equal to the registration secret (see "Registering on Tuwunel from the command line" in the admin guide); or send {adminCommand} with the YAML in the admin room',
+                    {
+                      command: <code>{REGISTER_APPSERVICE_COMMAND}</code>,
+                      adminCommand: <code>!admin appservices register</code>,
+                    },
+                    formatJsxTemplate,
                   )}
                 </li>
                 <li>
                   {translate(
-                    'Register the YAML file in your homeserver settings (e.g., app_service_config_files in Synapse, or the equivalent for your homeserver)',
-                  )}
-                </li>
-                <li>
-                  {translate(
-                    'Restart the homeserver — it will begin sending events to the Waldur webhook',
+                    'On Synapse, add the YAML file to app_service_config_files and restart the homeserver',
                   )}
                 </li>
               </ol>
@@ -244,7 +254,7 @@ export const MatrixHowItWorksDialog: FC = () => {
           <h4 className="mb-4">{translate('Room lifecycle')}</h4>
           <p className="text-muted mb-4">
             {translate(
-              'Each project can have one chat room. Rooms are created by project owners and automatically populated with project members. Owners can disable a room (kicking all members and exporting history) and later re-enable it or delete it entirely.',
+              'Each project can have one chat room. Rooms are created by organization owners (or any role with the "Create matrix room" permission), staff and support, and automatically populated with project members. Only staff can disable a room (kicking all members and exporting history) and later re-enable it or delete it entirely.',
             )}
           </p>
           <div className="border rounded p-4">
@@ -257,10 +267,12 @@ export const MatrixHowItWorksDialog: FC = () => {
 
         {/* Webhook Flow */}
         <section>
-          <h4 className="mb-4">{translate('Webhook event processing')}</h4>
+          <h4 className="mb-4">{translate('Webhook and Matrix bot')}</h4>
           <p className="text-muted mb-4">
             {translate(
-              'The homeserver pushes room events to Waldur via the appservice webhook. Waldur processes bot commands and ignores other events.',
+              'The homeserver pushes room events to Waldur via the appservice webhook, which only acknowledges them. The Matrix bot, a separate process ({command}) and the encrypted member of every room, reads the rooms through its own sync and answers commands. If commands go unanswered, check that this process is running.',
+              { command: <code>waldur matrix_bot</code> },
+              formatJsxTemplate,
             )}
           </p>
           <div className="border rounded p-4">

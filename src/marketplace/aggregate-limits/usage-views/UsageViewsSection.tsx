@@ -1,14 +1,13 @@
-import { QuestionIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FC, useState } from 'react';
-import { Col, Nav, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import {
   Project,
   marketplaceCustomerUsageComponentsUsageRetrieve,
   marketplaceProjectUsageComponentsUsageRetrieve,
 } from 'waldur-js-client';
 
-import { Tooltip } from 'waldur-ui';
+import { HelpIcon, Tabs, TabsContent, TabsList, TabsTrigger } from 'waldur-ui';
 
 import { SHORT_STALE_TIME } from '@/core/constants';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -74,25 +73,43 @@ const VARIANTS: VariantInfo[] = [
 interface Props {
   project?: Project;
   customer?: Customer;
+  /** Also count terminated resources; their usage is shown apart from live usage. */
+  includeTerminated?: boolean;
 }
+
+const getVisibleVariants = () =>
+  VARIANTS.filter((v) => isFeatureVisible(v.feature));
+
+/** Whether UsageViewsSection renders anything at all. */
+export const hasVisibleUsageViews = () => getVisibleVariants().length > 0;
 
 /**
  * Gate: renders nothing — and fetches nothing — unless at least one view is
  * enabled. Kept free of hooks so the early return cannot reorder them.
  */
-export const UsageViewsSection: FC<Props> = ({ project, customer }) => {
-  const variants = VARIANTS.filter((v) => isFeatureVisible(v.feature));
+export const UsageViewsSection: FC<Props> = ({
+  project,
+  customer,
+  includeTerminated,
+}) => {
+  const variants = getVisibleVariants();
   if (!variants.length || !(project ?? customer)) {
     return null;
   }
   return (
-    <UsageViews project={project} customer={customer} variants={variants} />
+    <UsageViews
+      project={project}
+      customer={customer}
+      includeTerminated={includeTerminated}
+      variants={variants}
+    />
   );
 };
 
 const UsageViews: FC<Props & { variants: VariantInfo[] }> = ({
   project,
   customer,
+  includeTerminated,
   variants,
 }) => {
   const isProject = !!project;
@@ -105,13 +122,17 @@ const UsageViews: FC<Props & { variants: VariantInfo[] }> = ({
         ? 'exp-project-components-usage'
         : 'exp-customer-components-usage',
       scope?.uuid,
+      includeTerminated,
     ],
     queryFn: () => {
       if (!scope?.uuid) return null;
       const fetcher = isProject
         ? marketplaceProjectUsageComponentsUsageRetrieve
         : marketplaceCustomerUsageComponentsUsageRetrieve;
-      return fetcher({ path: { uuid: scope.uuid } }).then((r) => r.data);
+      return fetcher({
+        path: { uuid: scope.uuid },
+        query: { include_terminated: includeTerminated },
+      }).then((r) => r.data);
     },
     enabled: !!scope?.uuid,
     refetchOnWindowFocus: false,
@@ -125,69 +146,76 @@ const UsageViews: FC<Props & { variants: VariantInfo[] }> = ({
   return (
     <Row className="mt-3">
       <Col xs={12} className="mb-5">
-        <Panel
-          cardBordered
-          title={
-            <>
-              {translate('Per-offering usage views')}{' '}
-              <Tooltip label={activeVariant.hint}>
-                <QuestionIcon weight="bold" />
-              </Tooltip>
-            </>
-          }
-          actions={
-            variants.length > 1 && (
-              <Nav
-                variant="tabs"
-                className="nav-line-tabs flex-nowrap border-0"
-                activeKey={activeVariant.key}
-                onSelect={(k) => k && setVariant(k as Variant)}
-              >
-                {variants.map((v) => (
-                  <Nav.Item key={v.key}>
-                    <Nav.Link eventKey={v.key} title={v.hint}>
-                      {v.label}
-                    </Nav.Link>
-                  </Nav.Item>
-                ))}
-              </Nav>
-            )
-          }
+        <Tabs
+          value={activeVariant.key}
+          onValueChange={(k) => setVariant(k as Variant)}
         >
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              {activeVariant.key === 'per-offering-bars' && (
-                <PerOfferingBarsWidget
-                  project={project}
-                  customer={customer}
-                  data={data || { components: [] }}
-                  isLoading={isLoading}
-                  error={error}
-                  refetch={refetch}
-                />
+          <Panel
+            cardBordered
+            title={
+              <>
+                {translate('Per-offering usage views')}{' '}
+                <HelpIcon label={activeVariant.hint} />
+              </>
+            }
+            actions={
+              variants.length > 1 && (
+                // Labels wrap onto a second line on a narrow card instead of
+                // the strip scrolling, as the Bootstrap strip did.
+                <TabsList bordered={false} aria-label={translate('Usage view')}>
+                  {variants.map((v) => (
+                    <TabsTrigger
+                      key={v.key}
+                      value={v.key}
+                      title={v.hint}
+                      className="whitespace-normal text-start"
+                    >
+                      {v.label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              )
+            }
+          >
+            <TabsContent value={activeVariant.key}>
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  {activeVariant.key === 'per-offering-bars' && (
+                    <PerOfferingBarsWidget
+                      project={project}
+                      customer={customer}
+                      data={data || { components: [] }}
+                      isLoading={isLoading}
+                      error={error}
+                      refetch={refetch}
+                    />
+                  )}
+                  {activeVariant.key === 'treemap' && (
+                    <TreemapView components={components} />
+                  )}
+                  {activeVariant.key === 'limit-horizon' && (
+                    <LimitHorizonView
+                      project={project}
+                      customer={customer}
+                      includeTerminated={includeTerminated}
+                      components={components}
+                    />
+                  )}
+                  {activeVariant.key === 'period-over-period' && (
+                    <PeriodOverPeriodView
+                      project={project}
+                      customer={customer}
+                      includeTerminated={includeTerminated}
+                      components={components}
+                    />
+                  )}
+                </>
               )}
-              {activeVariant.key === 'treemap' && (
-                <TreemapView components={components} />
-              )}
-              {activeVariant.key === 'limit-horizon' && (
-                <LimitHorizonView
-                  project={project}
-                  customer={customer}
-                  components={components}
-                />
-              )}
-              {activeVariant.key === 'period-over-period' && (
-                <PeriodOverPeriodView
-                  project={project}
-                  customer={customer}
-                  components={components}
-                />
-              )}
-            </>
-          )}
-        </Panel>
+            </TabsContent>
+          </Panel>
+        </Tabs>
       </Col>
     </Row>
   );

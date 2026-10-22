@@ -18,6 +18,17 @@ export interface TableOptionsType<RowType = any> {
   onFetch?: (rows: RowType[], totalCount: number, firstFetch: boolean) => void;
   onApplyFilter?: (filters: FilterItem[], firstFetch: boolean) => void;
   staleTime?: number;
+  /**
+   * How a failed fetch is retried before the error view shows; the app default
+   * retries a server error three times, several seconds of spinner. Pass
+   * `retryServerErrors(n)` to keep the 4xx exclusion with a lower limit.
+   */
+  retry?: boolean | ((failureCount: number, error: any) => boolean);
+  /**
+   * Query meta; `OWN_ERROR_STATE` keeps the global error handler from
+   * redirecting, since the table renders its own error view.
+   */
+  meta?: Record<string, unknown>;
   queryField?: string;
   exportFields?: string[] | ((props: any) => string[]);
   exportKeys?: string[];
@@ -137,7 +148,7 @@ export type TableWithPortal<T = {}> = {
 } & T;
 
 export interface TableTab {
-  key: string | number;
+  key: string;
   title: ReactNode;
   state?: string;
   params?: Record<string, any>;
@@ -147,7 +158,7 @@ export interface TableTab {
   /**
    * Local-state mode: when set, clicking the tab calls this callback
    * instead of navigating via ui-router state.go(). Use together with
-   * `active` so TableTabs knows which tab to highlight without reading
+   * `active` so TableNav knows which tab to highlight without reading
    * URL params. Useful when multiple instances of the table coexist on
    * one page and a single URL param can't disambiguate them (e.g.
    * sub-tabs inside expandable rows).
@@ -219,6 +230,14 @@ export interface TableProps<RowType = any> extends TableState {
   initialSorting?: Sorting;
   expandableRow?: React.ComponentType<{ row: RowType; fetch }>;
   expandableRowClassName?: string;
+  /**
+   * Rendered in each row's actions cell. Usually an inline arrow, which is
+   * called as a render function (TableBody's RowActionsCell) so that a new
+   * arrow on every parent render doesn't remount the cell and close an open
+   * menu. Any hooks it calls therefore belong to that cell: don't switch
+   * between two different hook-using components while the table is shown
+   * (switching to `undefined`, which removes the cell, is fine).
+   */
   rowActions?: React.ComponentType<{ row: RowType; fetch }>;
   toggleRow?(row: any): void;
   toggled?: Record<string, boolean>;

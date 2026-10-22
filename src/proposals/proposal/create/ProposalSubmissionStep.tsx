@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
-import { get } from 'lodash-es';
+import { FORM_ERROR } from 'final-form';
+import { get, pick } from 'lodash-es';
 import { createRef, FC, useCallback, useEffect, useMemo, useRef } from 'react';
-import { Form } from 'react-final-form';
+import { Field, Form } from 'react-final-form';
 import {
   proposalProposalsAttachDocument,
   proposalProposalsChecklistRetrieve,
@@ -16,6 +17,7 @@ import { formDataOptions } from '@/core/api';
 import { SHORT_STALE_TIME } from '@/core/constants';
 import { useAccordionUrlState } from '@/core/useAccordionUrlState';
 import { isEmpty } from '@/core/utils';
+import { hasUnsavedChanges, NavigationBlocker } from '@/form/NavigationBlocker';
 import { SidebarLayout } from '@/form/SidebarLayout';
 import { translate } from '@/i18n';
 import { evaluateCondition } from '@/marketplace-checklist/questionDependencies';
@@ -23,6 +25,7 @@ import { useModal } from '@/modal/actions';
 import { useCallFixedDuration } from '@/proposals/callQueries';
 import { usesCallVocabulary, requestListState } from '@/proposals/presentation';
 import { hasRequestedAmount } from '@/proposals/requestedResourceCost';
+import { useProposalCanSubmit } from '@/proposals/useProposalCanSubmit';
 import { useProposalResourceRows } from '@/proposals/useProposalResourceRows';
 import { useNotify } from '@/store/notify';
 
@@ -128,12 +131,25 @@ const submitComplianceAnswers = async (
   }
 };
 
+// What only Save as draft or Submit sends. Resource requests and the team are
+// saved by their own dialogs; the form just mirrors them for the step ticks.
+const MIRRORED_FIELDS = ['resources', 'resources_init', 'users'];
+const isSavedByDraft = (field: string) =>
+  !MIRRORED_FIELDS.some(
+    (name) =>
+      field === name ||
+      field.startsWith(`${name}.`) ||
+      field.startsWith(`${name}[`),
+  );
+
 export const ProposalSubmissionStep: FC<{
   proposal;
   call?;
   reviews?: ProposalReview[];
   refetch;
-}> = ({ proposal, call, reviews, refetch }) => {
+  /** Whether the viewer may submit, not only edit, the proposal. */
+  canSubmitProposal?: boolean;
+}> = ({ proposal, call, reviews, refetch, canSubmitProposal = true }) => {
   const { confirm } = useModal();
   const router = useRouter();
 
@@ -288,6 +304,30 @@ export const ProposalSubmissionStep: FC<{
   // of all of them.
   const { data: resourceRows } = useProposalResourceRows(proposal_uuid);
   const fixedDurationDays = useCallFixedDuration(proposal.call_uuid);
+  const { data: canSubmit } = useProposalCanSubmit(proposal);
+
+  // What Save as draft sent becomes the form's starting point, so none of it
+  // counts as unsaved. keepDirtyOnReinitialize would otherwise hold on to it
+  // after the refetch, and the next save would attach the same files again.
+  // Anything typed or dropped while the save ran stays unsaved. The mirrored
+  // lists keep their empty start: pristine, the next refetch would empty them.
+  const markSaved = (saved: any) => {
+    const form = formRef.current;
+    if (!form) return;
+    const uploaded = Object.values(saved.supporting_documentation || {});
+    form.batch(() => {
+      form.initialize({
+        ...saved,
+        ...pick(form.getState().initialValues, MIRRORED_FIELDS),
+        supporting_documentation: undefined,
+      });
+      const pending = Object.values(
+        form.getState().values.supporting_documentation || {},
+      );
+      const left = pending.filter((file) => !uploaded.includes(file));
+      form.change('supporting_documentation', left.length ? left : undefined);
+    });
+  };
 
   const { mutate: saveAsDraft, isPending: isSaving } = useMutation({
     mutationFn: async (formValues: any) => {
@@ -301,6 +341,7 @@ export const ProposalSubmissionStep: FC<{
           proposal_uuid,
           formValues.supporting_documentation,
         );
+        markSaved(formValues);
         showSuccess(
           usesCallVocabulary()
             ? translate('Proposal updated successfully')
@@ -327,7 +368,10 @@ export const ProposalSubmissionStep: FC<{
             : translate('Are you sure you want to submit the access request?'),
         );
       } catch {
-        return;
+        // Reported as a failed submit, not a successful one, so the form still
+        // counts its changes as unsaved and warns before leaving the page.
+        // Nothing renders the value; it only marks the submit as failed.
+        return { [FORM_ERROR]: 'cancelled' };
       }
       try {
         await proposalProposalsUpdateProjectDetails({
@@ -352,6 +396,7 @@ export const ProposalSubmissionStep: FC<{
         router.stateService.go(requestListState());
       } catch (error) {
         showErrorResponse(error, translate('Something went wrong'));
+        return { [FORM_ERROR]: error };
       }
     },
     [proposal, proposal_uuid, checklistData, router],
@@ -361,7 +406,11 @@ export const ProposalSubmissionStep: FC<{
     <Form
       onSubmit={submitForm}
       initialValues={initialValues}
-      render={({ handleSubmit, submitting, form, values }) => {
+      // initialValues is rebuilt whenever the proposal or checklist is refetched
+      // (after Save as draft, or on a revisit). Without this the reset drops
+      // unsaved input and empties the lists the steps tick against.
+      keepDirtyOnReinitialize
+      render={({ handleSubmit, submitting, form, values, dirtyFields }) => {
         // Store form reference for use in effects
         formRef.current = form;
 
@@ -391,6 +440,14 @@ export const ProposalSubmissionStep: FC<{
 
         return (
           <form onSubmit={handleSubmit}>
+            {/* Filled through change() rather than an input, so registered
+                here: keepDirtyOnReinitialize only keeps registered fields. */}
+            <Field
+              name="resources_init"
+              subscription={{}}
+              render={() => null}
+            />
+            <Field name="users" subscription={{}} render={() => null} />
             <SidebarLayout.Container>
               <SidebarLayout.Body>
                 {formSteps.map((step, i) => (
@@ -424,13 +481,23 @@ export const ProposalSubmissionStep: FC<{
                   fixedDurationDays={fixedDurationDays}
                   saveAsDraft={() => saveAsDraft(values)}
                   isSaving={isSaving}
+                  hasUnsavedChanges={hasUnsavedChanges(
+                    dirtyFields,
+                    isSavedByDraft,
+                  )}
                   editable={proposal.state === 'draft'}
                   submitting={submitting}
                   completedSteps={completedSteps}
-                  canSubmit={proposal.can_submit}
+                  canSubmit={canSubmit}
+                  canSubmitProposal={canSubmitProposal}
                 />
               </SidebarLayout.Sidebar>
             </SidebarLayout.Container>
+            <NavigationBlocker
+              exiting="proposals.manage-proposal"
+              isTracked={isSavedByDraft}
+              warnOnUnload
+            />
           </form>
         );
       }}

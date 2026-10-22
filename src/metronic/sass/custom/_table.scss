@@ -36,11 +36,11 @@
       svg {
         color: $gray-400;
       }
-      &.sorting-column .sorting-buttons > button {
+      &.sorting-column .sort-toggle {
         &:hover svg {
           color: $gray-500;
         }
-        &.active svg {
+        svg.active {
           color: $brand;
         }
       }
@@ -96,8 +96,10 @@
         padding-bottom: 16px;
         padding-left: 0;
       }
+      // !important: waldur-ui's TablePagination sets its padding with a
+      // Tailwind utility, which outranks this bootstrap-layer rule.
       .table-pagination {
-        padding-top: 0.5rem;
+        padding-top: 0.5rem !important;
       }
 
       .search-no-result,
@@ -120,10 +122,6 @@
         justify-content: center;
         gap: 0.75rem;
       }
-
-      .dropdown-toggle:before {
-        display: none;
-      }
     }
 
     > td.row-control > div {
@@ -132,7 +130,7 @@
 
       // When a row badge is rendered, nudge the checkbox/radio right so the
       // absolutely-positioned icon doesn't sit flush against it.
-      &:has(.error-mark) .form-check {
+      &:has(.error-mark) > span:has(> input) {
         margin-left: 6px;
       }
 
@@ -204,6 +202,24 @@
     > td > *,
     > td .td-data > * {
       vertical-align: middle;
+    }
+
+    // WCAG 2.2 SC 2.5.8: the copy button is at least 24×24 px. Its icon is
+    // 1em, so the negative side margins hand the extra width back. The height
+    // stays inside the cell: ellipsis cells clip overflow, which would cut off
+    // both the hit area and the focus ring.
+    > td .copy-to-clipboard-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      min-height: 24px;
+      margin: 0 calc((1em - 24px) / 2);
+      vertical-align: middle;
+
+      &:focus-visible {
+        outline-offset: -2px;
+      }
     }
 
     // Keyboard focus reveals a cell's filter shortcut just as hovering the row
@@ -339,8 +355,14 @@
     }
   }
 
+  // A card body inside a tab panel keeps its top padding. Keyed off the
+  // panel's role, which both waldur-ui's TabsContent and the old Bootstrap
+  // Tab.Pane carry; `.tab-content` (Bootstrap's panel wrapper) is kept for the
+  // few places that still set it by hand.
   &:not(.grid-table)
-    .card-body:not(.tab-content .card-body):not(.card-solid .card-body) {
+    .card-body:not(.tab-content .card-body):not(
+      [role='tabpanel'] .card-body
+    ):not(.card-solid .card-body) {
     padding-top: 0;
   }
 
@@ -422,58 +444,6 @@
     }
   }
 
-  .table-pagination {
-    padding-top: $table-pagination-padding-y;
-    border-top: 1px solid $border-secondary;
-
-    .page-item {
-      .page-link {
-        color: $text-quaternary;
-        width: 40px;
-        height: 40px;
-        transition: $transition-base;
-        @include svg-icon-color($fg-quinary);
-      }
-      .page-link:focus {
-        background-color: $bg-primary_hover;
-        box-shadow: $ring-primary-200;
-      }
-      .page-link:active,
-      .page-link:hover,
-      &.active .page-link {
-        color: $text-secondary;
-        background-color: $bg-primary_hover;
-        @include svg-icon-color($fg-quaternary);
-      }
-      &.disabled .page-link {
-        color: $fg-disabled;
-      }
-
-      &.next,
-      &.previous {
-        .page-link {
-          width: 28px;
-          height: 28px;
-          padding: 0;
-        }
-      }
-    }
-
-    // Page size selector
-    .form-select {
-      color: $dark;
-      width: auto;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      @include svg-bg-icon(arrow-bottom, $fg-quinary);
-      background-position: 100%;
-
-      option {
-        background-color: $body-bg;
-      }
-    }
-  }
-
   &.field-table {
     tr {
       cursor: pointer;
@@ -497,36 +467,12 @@
   }
 }
 
-// Filters menu and its inputs
-.drawer .filter-container,
-.card.card-table .table-filters-menu {
+// Sidebar filters (TableFilterContainer.tsx in the filter drawer)
+.drawer .filter-container {
   white-space: normal;
 
   .filter-field {
     padding-top: 0;
-  }
-
-  .menu-item .menu-link {
-    min-height: 40px;
-    padding-right: 16px;
-    padding-left: 16px;
-  }
-
-  // Column filter
-  &.column-filter {
-    text-transform: none;
-    text-align: start;
-    height: 0;
-    width: 0;
-
-    .menu-link {
-      display: none;
-    }
-  }
-}
-.card.card-table th:not(:first-child) .table-filters-menu.column-filter {
-  .menu-sub-dropdown {
-    margin-left: -125px !important;
   }
 }
 
@@ -569,16 +515,6 @@ $mobile-spacing: get($content-spacing, tablet-and-mobile);
     // horizontal scroll away from every wide table in a modal. The scroll
     // container clips to the radius on its own.
     border-radius: $border-radius-lg;
-  }
-
-  // Except a FormTable that has opted out of cell borders (`bordered={false}`):
-  // it already sits inside a framed panel, and the wrapper border reads as a
-  // second box drawn around plain rows. Keyed on .form-table rather than on the
-  // absence of .table-bordered alone, because plain modal tables carry no such
-  // class either and excluding them stripped the border this rule exists to add.
-  .plan-details-container
-    .table-responsive:has(> .form-table:not(.table-bordered)) {
-    border: 0;
   }
 
   .table-responsive .table {
@@ -724,11 +660,4 @@ $mobile-spacing: get($content-spacing, tablet-and-mobile);
 // Standalone table header
 .table-standalone-header {
   margin-bottom: 24px;
-}
-
-// The columns popover portals to <body>, so tables inside a modal or drawer
-// need the popover tier to show it above them; a plain `z-50` opens it hidden
-// behind the modal.
-.table-columns-popover {
-  z-index: $zindex-popover;
 }

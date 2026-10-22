@@ -3,6 +3,8 @@ import { CallReviewerPool, callReviewerPoolsList } from 'waldur-js-client';
 
 import { formatDate, formatDateTime } from '@/core/dateUtils';
 import { translate } from '@/i18n';
+import { InvitationStatusBadge } from '@/proposals/update/reviewer-pool/InvitationStatusBadge';
+import { ActionsDropdown } from '@/table/ActionsDropdown';
 import { createFetcher } from '@/table/api';
 import Table from '@/table/Table';
 import { useFilterValues } from '@/table/useFilterValues';
@@ -26,20 +28,23 @@ type CallReviewerPoolExtended = CallReviewerPool & {
 const InvitationActions: FC<{ row: CallReviewerPoolExtended }> = ({ row }) => {
   const isPending = row.invitation_status === 'pending';
 
-  // Only show actions for pending invitations
+  // Settled invitations have nothing to act on; the disabled menu keeps the
+  // column aligned with every other row.
   if (!isPending) {
-    return null;
+    return <ActionsDropdown disabled tooltip />;
   }
 
   return (
-    <div className="d-flex gap-2">
+    <ActionsDropdown row={row}>
       <AcceptInvitationAction row={row} />
       <DeclineInvitationAction row={row} />
-    </div>
+    </ActionsDropdown>
   );
 };
 
-const mandatoryFields = ['uuid', 'invitation_expires_at'];
+// The row actions read invitation_status even when the Status column is
+// hidden, so the sparse-field request always asks for it.
+const mandatoryFields = ['uuid', 'invitation_expires_at', 'invitation_status'];
 
 export const MyInvitationsPage: FC = () => {
   const tabs = useMyReviewsTabs();
@@ -114,8 +119,13 @@ export const MyInvitationsPage: FC = () => {
           },
           {
             title: translate('Status'),
-            render: ({ row }) => <>{row.invitation_status_display}</>,
-            keys: ['invitation_status_display'],
+            render: ({ row }) => (
+              <InvitationStatusBadge
+                status={row.invitation_status}
+                statusDisplay={row.invitation_status_display}
+              />
+            ),
+            keys: ['invitation_status', 'invitation_status_display'],
             id: 'status',
           },
         ]}

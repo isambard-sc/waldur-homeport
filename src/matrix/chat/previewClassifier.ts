@@ -49,6 +49,7 @@ const MEDIA_MSGTYPES: Record<string, PreviewKind> = {
 function classifyMessage(content: any): PreviewInfo {
   const msgtype: string = content.msgtype ?? 'm.text';
   const mediaKind = MEDIA_MSGTYPES[msgtype];
+  const body = typeof content.body === 'string' ? content.body : '';
 
   if (mediaKind) {
     // MSC3245 marks an m.audio clip as a voice note — surface a distinct
@@ -60,8 +61,8 @@ function classifyMessage(content: any): PreviewInfo {
       typeof content.info?.size === 'number' ? content.info.size : undefined;
     return {
       kind: isVoice ? 'voice' : mediaKind,
-      text: content.body ?? '',
-      fileName: content.body ?? '',
+      text: body,
+      fileName: body,
       fileSize: size,
     };
   }
@@ -72,7 +73,7 @@ function classifyMessage(content: any): PreviewInfo {
     content.format === 'org.matrix.custom.html' &&
     typeof content.formatted_body === 'string'
       ? htmlToPlainText(content.formatted_body)
-      : (content.body ?? '');
+      : body;
   return { kind: 'text', text };
 }
 
@@ -104,6 +105,11 @@ function classifyMembership(content: any, ctx: MembershipContext): PreviewInfo {
   return { kind: 'none', text: '' };
 }
 
+/** Preview for an event matrix-js-sdk failed to decrypt. */
+export function undecryptablePreview(): PreviewInfo {
+  return { kind: 'text', text: translate('Unable to decrypt this message.') };
+}
+
 export function classifyPreviewEvent(
   eventType: string,
   content: any,
@@ -111,6 +117,10 @@ export function classifyPreviewEvent(
 ): PreviewInfo {
   if (!content) return { kind: 'none', text: '' };
   if (eventType === 'm.room.message') return classifyMessage(content);
+  // Still encrypted: not decrypted yet, or it can't be.
+  if (eventType === 'm.room.encrypted') {
+    return { kind: 'text', text: translate('Encrypted message') };
+  }
   if (eventType === 'm.room.member') {
     return classifyMembership(content, membershipContext ?? {});
   }

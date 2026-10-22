@@ -1,23 +1,44 @@
-import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, RenderOptions } from '@testing-library/react';
+import {
+  QueryClient,
+  QueryClientConfig,
+  QueryClientProvider,
+} from '@tanstack/react-query';
+import {
+  render,
+  renderHook,
+  RenderHookOptions,
+  RenderOptions,
+} from '@testing-library/react';
 import { ReactElement, ReactNode } from 'react';
+
+import { Menu } from 'waldur-ui';
 
 /**
  * Creates a QueryClient pre-configured for tests:
- * - Retries disabled for both queries and mutations
- * - No caching surprises between tests
+ * - Retries disabled for both queries and mutations (fast fail)
+ * - gcTime set to Infinity to prevent unexpected background garbage collection during async tests
+ * - staleTime set to 0 for predictable invalidation behavior
+ * - refetchOnWindowFocus disabled in jsdom
  */
-export const createTestQueryClient = () =>
+export const createTestQueryClient = (config?: QueryClientConfig) =>
   new QueryClient({
     defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
+      queries: {
+        retry: false,
+        gcTime: Infinity,
+        staleTime: 0,
+        refetchOnWindowFocus: false,
+      },
+      mutations: {
+        retry: false,
+      },
     },
+    ...config,
   });
 
 interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
   queryClient?: QueryClient;
+  wrapper?: React.ComponentType<{ children: ReactNode }>;
 }
 
 /**
@@ -28,11 +49,17 @@ interface RenderWithProvidersOptions extends Omit<RenderOptions, 'wrapper'> {
  */
 export const renderWithProviders = (
   ui: ReactElement,
-  { queryClient, ...options }: RenderWithProvidersOptions = {},
+  {
+    queryClient,
+    wrapper: CustomWrapper,
+    ...options
+  }: RenderWithProvidersOptions = {},
 ) => {
   const client = queryClient ?? createTestQueryClient();
   const Wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    <QueryClientProvider client={client}>
+      {CustomWrapper ? <CustomWrapper>{children}</CustomWrapper> : children}
+    </QueryClientProvider>
   );
   return {
     ...render(ui, { wrapper: Wrapper, ...options }),
@@ -40,7 +67,44 @@ export const renderWithProviders = (
   };
 };
 
-interface RenderHookWithProvidersOptions {
+interface RenderHookWithProvidersOptions<Props> extends Omit<
+  RenderHookOptions<Props>,
+  'wrapper'
+> {
+  queryClient?: QueryClient;
+  wrapper?: React.ComponentType<{ children: ReactNode }>;
+}
+
+/**
+ * Renders a hook wrapped in QueryClientProvider with sensible test defaults.
+ *
+ * Returns the standard `renderHook` result plus the `queryClient` instance for direct
+ * inspection or cache operations.
+ *
+ * Usage:
+ *   const { result, queryClient } = renderHookWithProviders(() => useMyHook());
+ */
+export const renderHookWithProviders = <Result, Props>(
+  renderCallback: (initialProps: Props) => Result,
+  {
+    queryClient,
+    wrapper: CustomWrapper,
+    ...options
+  }: RenderHookWithProvidersOptions<Props> = {},
+) => {
+  const client = queryClient ?? createTestQueryClient();
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={client}>
+      {CustomWrapper ? <CustomWrapper>{children}</CustomWrapper> : children}
+    </QueryClientProvider>
+  );
+  return {
+    ...renderHook(renderCallback, { wrapper, ...options }),
+    queryClient: client,
+  };
+};
+
+interface CreateTestWrapperOptions {
   queryClient?: QueryClient;
 }
 
@@ -54,7 +118,7 @@ interface RenderHookWithProvidersOptions {
  */
 export const createTestWrapper = ({
   queryClient,
-}: RenderHookWithProvidersOptions = {}) => {
+}: CreateTestWrapperOptions = {}) => {
   const client = queryClient ?? createTestQueryClient();
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
@@ -63,7 +127,7 @@ export const createTestWrapper = ({
 };
 
 /**
- * Wraps a row-action component (anything built on ActionsDropdownItem) in an
+ * Wraps a row-action component (anything built on Menu.Item) in an
  * already-open Radix menu.
  *
  * Radix's menu item reads its context on render and throws "`MenuItem` must
@@ -76,13 +140,13 @@ export const createTestWrapper = ({
  *   renderWithProviders(inActionsMenu(<DeleteCreditButton row={row} />));
  */
 export const inActionsMenu = (children: ReactNode) => (
-  <RadixDropdownMenu.Root open modal={false}>
+  <Menu open>
     {/* No Trigger: it would render a real <button> into the container and
-        break the "this action renders nothing" assertions that check for an
-        empty container. The Content only needs an anchor for positioning,
-        which is irrelevant in jsdom. */}
-    <RadixDropdownMenu.Portal>
-      <RadixDropdownMenu.Content>{children}</RadixDropdownMenu.Content>
-    </RadixDropdownMenu.Portal>
-  </RadixDropdownMenu.Root>
+          break the "this action renders nothing" assertions that check for an
+          empty container. The Content only needs an anchor for positioning,
+          which is irrelevant in jsdom. */}
+    <Menu.Content look="actions">{children}</Menu.Content>
+  </Menu>
 );
+
+export { setViewport } from 'waldur-ui';

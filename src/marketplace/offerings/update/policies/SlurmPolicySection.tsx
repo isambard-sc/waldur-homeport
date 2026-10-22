@@ -8,7 +8,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import arrayMutators from 'final-form-arrays';
 import { FC, useState, useEffect, useMemo, useCallback } from 'react';
-import { Card, FormCheck } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { Field, Form, useFormState, useForm } from 'react-final-form';
 import { components } from 'react-select';
 import {
@@ -21,7 +21,7 @@ import {
   SlurmPeriodicUsagePolicy,
 } from 'waldur-js-client';
 
-import { AlertItem, BaseButton } from 'waldur-ui';
+import { AlertItem, BaseButton, Menu, Switch } from 'waldur-ui';
 
 import { lazyComponent } from '@/core/lazyComponent';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -36,11 +36,6 @@ import { useOrganizationGroups } from '@/marketplace/common/utils';
 import { ComponentLimitsField } from '@/marketplace/offerings/details/policies/ComponentLimitsField';
 import { useModal } from '@/modal/actions';
 import { useNotify } from '@/store/notify';
-import { ActionDropdownButton } from '@/table/ActionDropdownButton';
-import {
-  ActionsDropdownItem,
-  ActionsDropdownSeparator,
-} from '@/table/ActionsDropdown';
 import { useUser } from '@/workspace/hooks';
 
 import { OfferingSectionProps } from '../types';
@@ -172,25 +167,30 @@ const PolicyInfoDropdown: FC<{
   }, [policyUuid]);
 
   return (
-    <ActionDropdownButton title={translate('Policy info')}>
-      <ActionsDropdownItem onSelect={openSummary}>
-        <QuestionIcon weight="bold" className="me-2" />
-        {translate('How it works')}
-      </ActionsDropdownItem>
-      <ActionsDropdownItem onSelect={openPreview}>
-        <EyeIcon weight="bold" className="me-2" />
-        {translate('Preview impact')}
-      </ActionsDropdownItem>
-      {policyUuid && (
-        <>
-          <ActionsDropdownSeparator />
-          <ActionsDropdownItem onSelect={openExecutionLog}>
-            <ClockCounterClockwiseIcon weight="bold" className="me-2" />
-            {translate('Execution log')}
-          </ActionsDropdownItem>
-        </>
-      )}
-    </ActionDropdownButton>
+    <Menu>
+      <Menu.TriggerButton size="lg">
+        {translate('Policy info')}
+      </Menu.TriggerButton>
+      <Menu.Content look="actions" side="bottom">
+        <Menu.Item icon={<QuestionIcon weight="bold" />} onSelect={openSummary}>
+          {translate('How it works')}
+        </Menu.Item>
+        <Menu.Item icon={<EyeIcon weight="bold" />} onSelect={openPreview}>
+          {translate('Preview impact')}
+        </Menu.Item>
+        {policyUuid && (
+          <>
+            <Menu.Separator />
+            <Menu.Item
+              icon={<ClockCounterClockwiseIcon weight="bold" />}
+              onSelect={openExecutionLog}
+            >
+              {translate('Execution log')}
+            </Menu.Item>
+          </>
+        )}
+      </Menu.Content>
+    </Menu>
   );
 };
 
@@ -605,19 +605,16 @@ export const SlurmPolicySection: FC<OfferingSectionProps> = ({
 
   const enableToggle = (
     <div className="mb-6">
-      <FormCheck
-        type="switch"
+      <Switch
         id="slurm-policy-toggle"
         checked={isPolicyEnabled}
-        onChange={(e) => handleTogglePolicy(e.target.checked)}
+        onCheckedChange={handleTogglePolicy}
         disabled={isSubmitting}
         label={translate('Enable SLURM Periodic Usage Policy')}
-      />
-      <div className="form-text">
-        {translate(
+        description={translate(
           'When enabled, allows configuration of SLURM-specific usage policies. When disabled, removes any existing policies from the backend.',
         )}
-      </div>
+      />
     </div>
   );
 

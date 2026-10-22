@@ -1,4 +1,6 @@
+import { WarningCircleIcon } from '@phosphor-icons/react';
 import { useMemo } from 'react';
+import { ProposalCanSubmitResponse } from 'waldur-js-client';
 
 import { BaseButton } from 'waldur-ui';
 
@@ -13,6 +15,8 @@ import { FormSteps } from '@/wizard';
 interface CompletionPageSidebarProps extends SidebarProps {
   saveAsDraft(): void;
   isSaving?: boolean;
+  /** Whether the form holds edits that Save as draft has not sent yet. */
+  hasUnsavedChanges?: boolean;
   editable?: boolean;
   /** Every requested resource, for the summary. */
   resourceRows?: any[];
@@ -25,7 +29,10 @@ interface CompletionPageSidebarProps extends SidebarProps {
    * a missing purchase order — which otherwise surface as a rejected request
    * after the applicant has already pressed the button.
    */
-  canSubmit?: { can_submit: boolean; error: string | null };
+  canSubmit?: ProposalCanSubmitResponse;
+  /** Whether the viewer may submit the proposal. A proposal administrator
+   * edits it but leaves submitting to a proposal manager. */
+  canSubmitProposal?: boolean;
 }
 
 export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
@@ -79,26 +86,42 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
       />
       {props.editable && (
         <>
-          <FloatingSubmitButton
-            submitting={props.submitting}
-            label={translate('Submit')}
-            variant="primary"
-            disabled={
-              props.isSaving || hasIncompleteSteps || Boolean(serverRefusal)
-            }
-            errors={submitErrors}
-          />
+          {props.canSubmitProposal === false ? (
+            <p className="text-muted mb-0" data-testid="submit-by-manager">
+              {translate('Only a proposal manager can submit the proposal.')}
+            </p>
+          ) : (
+            <FloatingSubmitButton
+              submitting={props.submitting}
+              label={translate('Submit')}
+              variant="primary"
+              disabled={
+                props.isSaving || hasIncompleteSteps || Boolean(serverRefusal)
+              }
+              errors={submitErrors}
+            />
+          )}
 
           <BaseButton
             onClick={props.saveAsDraft}
             label={translate('Save as draft')}
             variant="secondary"
             className="w-100 mt-2"
-            disabled={props.submitting}
-            disabledReason={translate('Saving draft...')}
+            disabled={props.submitting || !props.hasUnsavedChanges}
+            disabledReason={
+              props.submitting
+                ? translate('Saving draft...')
+                : translate('No unsaved changes')
+            }
             pending={props.isSaving}
             size="lg"
           />
+          {props.hasUnsavedChanges && !props.isSaving && (
+            <p className="d-flex align-items-center justify-content-center gap-1 text-warning fs-6 mt-2 mb-0">
+              <WarningCircleIcon size={16} weight="bold" />
+              {translate('You have unsaved changes')}
+            </p>
+          )}
           <TosNotification />
         </>
       )}

@@ -3,7 +3,6 @@ import { FormApi } from 'final-form';
 import arrayMutators from 'final-form-arrays';
 import { isEqual } from 'lodash-es';
 import { FC, useMemo, useState } from 'react';
-import { Tab, Tabs } from 'react-bootstrap';
 import { Form } from 'react-final-form';
 import {
   Checklist,
@@ -23,8 +22,9 @@ import {
   QuestionAdminRequest,
 } from 'waldur-js-client';
 
+import { Checkbox, Tabs, TabsList, TabsTrigger, TabsContent } from 'waldur-ui';
+
 import { getAllPages, MAX_PAGE_SIZE } from '@/core/api';
-import { AwesomeCheckbox } from '@/core/AwesomeCheckbox';
 import { STALE_TIME } from '@/core/constants';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
@@ -441,12 +441,11 @@ export const QuestionFormDialog: FC<QuestionFormDialogProps> = ({
             footer={
               <>
                 {!isEdit && (
-                  <AwesomeCheckbox
-                    type="checkbox"
+                  <Checkbox
                     label={translate('Create another')}
                     disabled={submitting}
-                    value={createAnother}
-                    onChange={setCreateAnother}
+                    checked={createAnother}
+                    onCheckedChange={setCreateAnother}
                     className="me-auto"
                     id="check-another"
                   />
@@ -464,36 +463,50 @@ export const QuestionFormDialog: FC<QuestionFormDialogProps> = ({
               </>
             }
           >
-            <Tabs
-              defaultActiveKey="general"
-              id="questions-tabs"
-              className="nav-line-tabs mb-5"
-              mountOnEnter
-            >
-              <Tab eventKey="general" title={translate('General')}>
-                <QuestionGeneralForm values={values} checklist={checklist} />
-              </Tab>
-              {CHECKLIST_FLAGS.questionFormUserGuidance && (
-                <Tab
-                  eventKey="user-guidance"
-                  title={translate('User guidance')}
-                >
-                  <QuestionGuidanceForm values={values} />
-                </Tab>
-              )}
-              {CHECKLIST_FLAGS.questionFormVisibility && (
-                <Tab eventKey="visibility" title={translate('Visibility')}>
-                  <QuestionVisibilityForm
-                    checklistUuid={checklist.uuid}
-                    question={question || savedQuestion}
-                  />
-                </Tab>
-              )}
-              {CHECKLIST_FLAGS.questionFormTriggers && (
-                <Tab eventKey="triggers" title={translate('Triggers')}>
-                  <QuestionReviewTriggersForm />
-                </Tab>
-              )}
+            <Tabs mount="visited" defaultValue="general">
+              <TabsList className="mb-5">
+                <TabsTrigger value="general">
+                  {translate('General')}
+                </TabsTrigger>
+                {CHECKLIST_FLAGS.questionFormUserGuidance && (
+                  <TabsTrigger value="user-guidance">
+                    {translate('User guidance')}
+                  </TabsTrigger>
+                )}
+                {CHECKLIST_FLAGS.questionFormVisibility && (
+                  <TabsTrigger value="visibility">
+                    {translate('Visibility')}
+                  </TabsTrigger>
+                )}
+                {CHECKLIST_FLAGS.questionFormTriggers && (
+                  <TabsTrigger value="triggers">
+                    {translate('Triggers')}
+                  </TabsTrigger>
+                )}
+              </TabsList>
+              <div className="tab-content">
+                <TabsContent value="general">
+                  <QuestionGeneralForm values={values} checklist={checklist} />
+                </TabsContent>
+                {CHECKLIST_FLAGS.questionFormUserGuidance && (
+                  <TabsContent value="user-guidance">
+                    <QuestionGuidanceForm values={values} />
+                  </TabsContent>
+                )}
+                {CHECKLIST_FLAGS.questionFormVisibility && (
+                  <TabsContent value="visibility">
+                    <QuestionVisibilityForm
+                      checklistUuid={checklist.uuid}
+                      question={question || savedQuestion}
+                    />
+                  </TabsContent>
+                )}
+                {CHECKLIST_FLAGS.questionFormTriggers && (
+                  <TabsContent value="triggers">
+                    <QuestionReviewTriggersForm />
+                  </TabsContent>
+                )}
+              </div>
             </Tabs>
           </ModalDialog>
         </form>

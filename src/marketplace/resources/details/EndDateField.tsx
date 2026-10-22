@@ -1,13 +1,10 @@
-import { QuestionIcon } from '@phosphor-icons/react';
-
-import { Tooltip } from 'waldur-ui';
+import { HelpIcon, WarningTip } from 'waldur-ui';
 
 import {
   formatDate,
   formatRelativeEndDate,
   lastAccessDate,
 } from '@/core/dateUtils';
-import { WarnTip } from '@/core/WarnTip';
 import { translate } from '@/i18n';
 import { Field } from '@/resource/summary';
 
@@ -58,8 +55,7 @@ export const EndDateField = ({ resource }) => {
         <span className={isPastDate ? 'text-danger' : ''}>
           {effectiveDate} ({formatRelativeEndDate(effectiveDate)}) &nbsp;
           {ownEndDate && ownEndDate > effectiveDate ? (
-            <WarnTip
-              id={resource.uuid}
+            <WarningTip
               label={
                 <ul className="text-start mb-0">
                   <li>
@@ -70,15 +66,14 @@ export const EndDateField = ({ resource }) => {
                   <li>{translate('Resource will be terminated soon.')}</li>
                 </ul>
               }
-              hasSpace
-              autoWidth
-              className="w-100"
-              contentClassName="mw-275px"
+              className="ms-1"
+              tooltipProps={{
+                autoWidth: true,
+                contentClassName: 'mw-275px',
+              }}
             />
           ) : ownEndDate && projectEndDate ? (
-            <Tooltip label={tooltipContent}>
-              <QuestionIcon size={15} weight="bold" />
-            </Tooltip>
+            <HelpIcon label={tooltipContent} size={15} />
           ) : null}
         </span>
       }

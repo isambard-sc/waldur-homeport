@@ -89,15 +89,12 @@ const RESTRICTED_IMPORTS = [
     name: 'react-bootstrap',
     importNames: ['DropdownButton'],
     message:
-      'Avoid importing DropdownButton directly from react-bootstrap. Use Waldur wrapper components instead:\n' +
-      '  - ActionDropdownButton: for panel/card header dropdown menus (large size)\n' +
-      '  - CompactActionDropdownButton: for inline contexts like table cells (small size)\n' +
-      'Import from @/table/ActionDropdownButton.',
+      'Avoid importing DropdownButton from react-bootstrap. Use Menu with Menu.TriggerButton from "waldur-ui" (or ActionsMenu from "@/table/ActionsDropdown") instead.',
   },
   {
     name: 'react-bootstrap/DropdownButton',
     message:
-      'Use ActionDropdownButton from "@/table/ActionDropdownButton" instead of react-bootstrap/DropdownButton.',
+      'Use Menu with Menu.TriggerButton from "waldur-ui" (or ActionsMenu from "@/table/ActionsDropdown") instead of react-bootstrap/DropdownButton.',
   },
   {
     name: 'react-bootstrap',
@@ -109,6 +106,38 @@ const RESTRICTED_IMPORTS = [
     name: 'react-bootstrap/Accordion',
     message:
       'Use Accordion or Collapsible from "waldur-ui" instead of react-bootstrap/Accordion.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Pagination', 'PageItem'],
+    message:
+      'Use TablePagination (or Pagination for the page numbers alone) from "waldur-ui" instead of react-bootstrap. The Bootstrap pagination CSS has been removed.',
+  },
+  {
+    name: 'react-bootstrap/Pagination',
+    message:
+      'Use TablePagination or Pagination from "waldur-ui" instead of react-bootstrap/Pagination.',
+  },
+  {
+    name: 'react-bootstrap/PageItem',
+    message:
+      'Use TablePagination or Pagination from "waldur-ui" instead of react-bootstrap/PageItem.',
+  },
+];
+
+// Menus and popovers are built from waldur-ui's Menu / MenuPopover (see
+// docs/menus.md), which wrap these Radix packages with the app's looks and
+// defaults. Only packages/ui may import them directly.
+const RADIX_MENU_IMPORTS = [
+  {
+    name: '@radix-ui/react-dropdown-menu',
+    message:
+      'Use Menu from "waldur-ui" (or ActionsMenu / ActionsDropdown from "@/table/ActionsDropdown" for action menus) instead of @radix-ui/react-dropdown-menu. See docs/menus.md.',
+  },
+  {
+    name: '@radix-ui/react-popover',
+    message:
+      'Use MenuPopover (or Popover) from "waldur-ui" instead of @radix-ui/react-popover. See docs/menus.md.',
   },
 ];
 
@@ -173,7 +202,18 @@ export default tseslint
         'waldur-custom/enforce-dialog-button-order': 'error',
         'waldur-custom/no-direct-client-usage': 'error',
         'waldur-custom/no-edit-button-size-override': 'error',
-        'waldur-custom/enforce-formcheck-components': 'error',
+        // Zero instances remain: every checkbox, radio and switch is a waldur-ui
+        // Checkbox/Radio/Switch, and the .form-check styles are deleted.
+        'waldur-custom/no-bootstrap-form-check': 'error',
+        // Zero instances remain: every progress bar is a waldur-ui Progress and
+        // the .progress styles are deleted.
+        'waldur-custom/no-bootstrap-progress': 'error',
+        'waldur-custom/no-bootstrap-tabs': 'error',
+        'waldur-custom/no-interactive-in-tab-trigger': 'error',
+        'waldur-custom/check-needs-accessible-name': 'error',
+        // Existing call sites are migrated to HelpIcon incrementally; promote to
+        // 'error' once the count is zero.
+        'waldur-custom/no-tooltip-on-bare-icon': 'warn',
         'waldur-custom/enforce-phosphor-icon-weight': 'error',
         'waldur-custom/prefer-classnames-utility': 'error',
         'waldur-custom/enforce-render-field-or-dash': 'error',
@@ -184,7 +224,6 @@ export default tseslint
 
         // Design system rules
         'waldur-custom/enforce-featured-icon': 'error',
-        'waldur-custom/enforce-nav-tabs-pattern': 'error',
         'waldur-custom/enforce-border-radius-tokens': 'error',
         'waldur-custom/enforce-breadcrumb-colors': 'error',
         'waldur-custom/no-redundant-vi-mock': 'error',
@@ -246,12 +285,50 @@ export default tseslint
         // 'import/no-named-as-default': 'error',
         'require-await': 'error',
         'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],
+        // waldur-ui's Checkbox, Radio and Switch render a native <input>, so a
+        // <label> wrapping one is labelled the same as one wrapping <input>.
+        'jsx-a11y/label-has-associated-control': [
+          'error',
+          { controlComponents: ['Checkbox', 'Radio', 'Switch'] },
+        ],
         'no-restricted-globals': [
           'error',
           {
             name: 'close',
           },
         ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [...RESTRICTED_IMPORTS, ...RADIX_MENU_IMPORTS],
+          },
+        ],
+      },
+    },
+    {
+      // Route definitions only: other objects with a `url` (API paths such as
+      // `…?q=…`) are not UI-Router states.
+      files: ['src/**/*routes*.ts'],
+      ignores: ['**/*.test.ts'],
+      rules: {
+        'waldur-custom/dynamic-tab-params': 'error',
+      },
+    },
+    {
+      // Off elsewhere until its existing violations are fixed. Homeport's
+      // tests run without React's hook-order check, so a hook after an early
+      // return passes them and only breaks in the browser. Test files are
+      // left out: hooks called inside vi.mock factories trip the rule.
+      files: ['src/matrix/**/*.{ts,tsx}'],
+      ignores: ['**/*.test.{ts,tsx}'],
+      rules: {
+        'react-hooks/rules-of-hooks': 'error',
+      },
+    },
+    {
+      // waldur-ui is where Menu and MenuPopover wrap Radix.
+      files: ['packages/ui/**/*.{ts,tsx}'],
+      rules: {
         'no-restricted-imports': [
           'error',
           {
@@ -323,6 +400,7 @@ export default tseslint
           {
             paths: [
               ...RESTRICTED_IMPORTS,
+              ...RADIX_MENU_IMPORTS,
               {
                 name: '@/i18n',
                 importNames: ['translate'],

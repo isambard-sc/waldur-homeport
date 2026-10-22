@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 import { ComponentProps, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { Dialog, DialogContent, DialogTitle } from '../Dialog';
+
 import { DatePicker } from './DatePicker';
 import {
   Field,
@@ -10,6 +12,7 @@ import {
   closePicker,
   daysFromToday,
   displayValue,
+  dropdownOptions,
   ensureOpen,
   fieldContainer,
   firstWeekday,
@@ -21,6 +24,7 @@ import {
   isTriggerDisabled,
   openPicker,
   pickDay,
+  pickMonthAndYear,
   placeholderText,
   readFormValue,
   selectedDays,
@@ -130,13 +134,11 @@ export const Clear: Story = {
   render: () => <Harness initial={june15} />,
   play: async ({ canvasElement }) => {
     const field = fieldContainer(canvasElement);
-    await userEvent.click(
-      within(field).getByRole('button', { name: 'Remove' }),
-    );
+    await userEvent.click(within(field).getByRole('button', { name: 'Clear' }));
     await waitFor(() => expect(readFormValue(canvasElement)).toBeNull());
     await expect(displayValue(field)).toBe('');
     await expect(
-      within(field).queryByRole('button', { name: 'Remove' }),
+      within(field).queryByRole('button', { name: 'Clear' }),
     ).toBeNull();
   },
 };
@@ -146,7 +148,7 @@ export const NotClearable: Story = {
   play: async ({ canvasElement }) => {
     await expect(
       within(fieldContainer(canvasElement)).queryByRole('button', {
-        name: 'Remove',
+        name: 'Clear',
       }),
     ).toBeNull();
   },
@@ -253,6 +255,39 @@ export const Inline: Story = {
   },
 };
 
+/**
+ * `captionLayout="dropdown"` — month and year dropdowns in the caption for
+ * dates far from today, such as a birth date. With `maxDate` the years end
+ * at its year (later months are disabled); they start 100 years back.
+ */
+export const YearAndMonthDropdowns: Story = {
+  render: () => (
+    <Harness
+      captionLayout="dropdown"
+      maxDate="today"
+      placeholder="Birth date"
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const field = fieldContainer(canvasElement);
+    await openPicker(field);
+    const now = DateTime.now();
+    const years = await dropdownOptions('year');
+    await expect(years.at(0).value).toBe(now.year - 100);
+    await expect(years.at(-1).value).toBe(now.year);
+    await expect(years.find((year) => year.selected).value).toBe(now.year);
+    // Escape closes the option grid, not the calendar.
+    await userEvent.keyboard('{Escape}');
+    await expect(isCalendarOpen()).toBe(true);
+    await pickMonthAndYear('1990-03');
+    await pickDay('1990-03-21');
+    await waitFor(() =>
+      expect(readFormValue(canvasElement)).toBe('1990-03-21T00:00'),
+    );
+    await expect(displayValue(field)).toBe('1990-03-21');
+  },
+};
+
 export const Disabled: Story = {
   render: () => <Harness initial={june15} disabled />,
   play: async ({ canvasElement }) => {
@@ -260,7 +295,7 @@ export const Disabled: Story = {
     await expect(isTriggerDisabled(field)).toBe(true);
     await expect(displayValue(field)).toBe('2026-06-15');
     await expect(
-      within(field).queryByRole('button', { name: 'Remove' }),
+      within(field).queryByRole('button', { name: 'Clear' }),
     ).toBeNull();
     await userEvent.click(getTrigger(field), { pointerEventsCheck: 0 });
     await expect(isCalendarOpen()).toBe(false);
@@ -362,5 +397,41 @@ export const MinDateTimeClampsTheTime: Story = {
     await waitFor(() =>
       expect(readFormValue(canvasElement)).toBe('2026-06-15T14:00'),
     );
+  },
+};
+
+// ── In a modal dialog ───────────────────────────────────
+
+/**
+ * In a modal dialog, opening the calendar puts focus on its selected day,
+ * so the arrow keys move between days and Enter picks one. The dialog traps
+ * focus, and its trap used to pull focus straight back to the trigger: the
+ * calendar focused the day before its popup told the trap to stand aside.
+ */
+export const InAModalDialog: Story = {
+  render: () => (
+    <Dialog defaultOpen>
+      <DialogContent>
+        <DialogTitle>Set termination date</DialogTitle>
+        <Harness initial={june15} />
+      </DialogContent>
+    </Dialog>
+  ),
+  play: async () => {
+    // The dialog is portaled out of the story's canvas.
+    const field = fieldContainer(document.body);
+    await openPicker(field);
+    await waitFor(() =>
+      expect(document.activeElement).toHaveAccessibleName(/June 15th, 2026/),
+    );
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(document.activeElement).toHaveAccessibleName(
+      /June 16th, 2026/,
+    );
+    await userEvent.keyboard('{Enter}');
+    await waitFor(() =>
+      expect(readFormValue(document.body)).toBe('2026-06-16T00:00'),
+    );
+    await waitFor(() => expect(getTrigger(field)).toHaveFocus());
   },
 };

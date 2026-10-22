@@ -120,12 +120,20 @@ export const AccountOptionsPreviewResult: FC<{
   preview: AccountOptionsPreview;
 }> = ({ preview }) => (
   <>
+    {(preview.warnings ?? []).map((warning) => (
+      <AlertItem
+        key={warning}
+        variant="warning"
+        className="mb-4"
+        title={warning}
+      />
+    ))}
     {preview.username_conflicts > 0 && (
       <AlertItem
         variant="warning"
         className="mb-4"
         title={translate(
-          '{count} person(s) have different usernames on different offerings. Switching to per service provider accounts is refused until they are adopted under Accounts > Username conflicts.',
+          '{count} person(s) have different usernames on different offerings. Switching to per service provider accounts is refused until each keeps one: use Resolve conflicts below, or Accounts > Username conflicts.',
           { count: preview.username_conflicts },
         )}
       />

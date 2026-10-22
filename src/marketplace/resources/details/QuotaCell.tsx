@@ -1,6 +1,4 @@
-import { QuestionIcon } from '@phosphor-icons/react';
-
-import { Tooltip } from 'waldur-ui';
+import { HelpIcon } from 'waldur-ui';
 
 import { formatUsageValue } from '@/core/formatNumber';
 
@@ -37,9 +35,7 @@ const CellDescription = ({
       {description && (
         <>
           {' '}
-          <Tooltip label={description}>
-            <QuestionIcon weight="bold" className="inline-flex items-center" />
-          </Tooltip>
+          <HelpIcon label={description} />
         </>
       )}
     </span>
@@ -73,7 +69,7 @@ export const QuotaCell = ({
 
       <QuotaProgressBar
         percent={percent}
-        height={4}
+        size="xs"
         className="mt-1"
         label={typeof title === 'string' ? title : undefined}
       />

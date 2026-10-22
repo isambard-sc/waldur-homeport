@@ -1,21 +1,20 @@
-import { XIcon } from '@phosphor-icons/react';
+import { PencilSimpleIcon, XIcon } from '@phosphor-icons/react';
 import { isEmpty } from 'lodash-es';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Card, FormCheck, Stack } from 'react-bootstrap';
+import { Card, Stack } from 'react-bootstrap';
 import {
   OrderDetails,
   PublicOfferingDetails,
   OfferingComponent,
 } from 'waldur-js-client';
 
-import { BaseButton } from 'waldur-ui';
+import { BaseButton, Checkbox, Menu } from 'waldur-ui';
 
 import { EditAction } from '@/form/EditAction';
 import { translate } from '@/i18n';
 import { Limits } from '@/marketplace/common/types';
 import { useModal } from '@/modal/actions';
 import { NoResult } from '@/navigation/header/search/NoResult';
-import { ActionDropdownButton } from '@/table/ActionDropdownButton';
 import { ActionsDropdown } from '@/table/ActionsDropdown';
 
 import { EditOrderFieldDialog } from './EditOrderFieldDialog';
@@ -130,12 +129,19 @@ export const LimitsSection = ({
                 ({selectedRows.length}) {translate('Selected')}
               </span>
             </Stack>
-            <ActionDropdownButton
-              variant="primary"
-              title={translate('All actions')}
-            >
-              <EditAction action={openBulkEditDialog} />
-            </ActionDropdownButton>
+            <Menu>
+              <Menu.TriggerButton variant="primary">
+                {translate('All actions')}
+              </Menu.TriggerButton>
+              <Menu.Content look="actions" side="bottom">
+                <Menu.Item
+                  icon={<PencilSimpleIcon weight="bold" />}
+                  onSelect={openBulkEditDialog}
+                >
+                  {translate('Edit')}
+                </Menu.Item>
+              </Menu.Content>
+            </Menu>
           </div>
         )}
       </Card.Header>
@@ -151,10 +157,10 @@ export const LimitsSection = ({
                     paddingRight: 0,
                   }}
                 >
-                  <FormCheck
+                  <Checkbox
                     ref={headerCheckRef}
                     data-testid="select-all"
-                    className="form-check form-check-custom form-check-md"
+                    aria-label={translate('Select all components')}
                     checked={isAllSelected}
                     onChange={toggleAll}
                   />
@@ -174,8 +180,8 @@ export const LimitsSection = ({
               <tr key={id}>
                 {editable && (
                   <td style={{ paddingLeft: '16px', paddingRight: 0 }}>
-                    <FormCheck
-                      className="form-check form-check-custom form-check-md"
+                    <Checkbox
+                      aria-label={component.name}
                       checked={selected.includes(component.type)}
                       onChange={() => toggleOne(component.type)}
                     />

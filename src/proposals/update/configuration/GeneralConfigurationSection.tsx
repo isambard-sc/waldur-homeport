@@ -18,6 +18,10 @@ import { translate } from '@/i18n';
 import { userAutocomplete } from '@/marketplace/common/autocompletes';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 import { CallDurationPolicy } from '@/proposals/CallDurationPolicy';
+import {
+  getPublishResultsOptions,
+  getUndecidedAtCompletionOptions,
+} from '@/proposals/roundLifecycle';
 import { Call } from '@/proposals/types';
 import { getCallReadOnlyReason } from '@/proposals/utils';
 
@@ -130,6 +134,11 @@ export const GeneralConfigurationSection: FC<
 
   const orderAuthorOptions = useMemo(getOrderAuthorOptions, []);
   const evaluationStartOptions = useMemo(getEvaluationStartOptions, []);
+  const publishResultsOptions = useMemo(getPublishResultsOptions, []);
+  const undecidedAtCompletionOptions = useMemo(
+    getUndecidedAtCompletionOptions,
+    [],
+  );
 
   const loadComplianceChecklists = useMemo(
     () =>
@@ -190,6 +199,49 @@ export const GeneralConfigurationSection: FC<
             renderValue={(value) =>
               evaluationStartOptions.find((o) => o.value === value)?.label ||
               translate('On submission')
+            }
+          />
+          {/* Switching is refused while decisions are held for a round's
+              publication; the backend's reason is shown on a refused save. */}
+          <SelectEditField
+            name="publish_results"
+            label={translate('Applicants learn the decision')}
+            description={translate(
+              "As each decision is made announces every allocation decision to its applicant at once. Together for the whole round holds the decisions of a round, which the call team sees as tentative, until a call manager publishes the round's results; then every applicant is told at the same time. Cannot be changed while decisions are held.",
+            )}
+            options={publishResultsOptions}
+            simpleValue
+            isClearable={false}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              publishResultsOptions.find((o) => o.value === value)?.label ||
+              publishResultsOptions[0].label
+            }
+          />
+          <SelectEditField
+            name="undecided_at_round_completion"
+            label={translate('Undecided proposals when a round is completed')}
+            description={translate(
+              'What completing a round does with proposals that still have no decision. Blocking refuses to complete the round until each is decided; rejecting rejects each where it stands and tells its applicant. A round can override this rule.',
+            )}
+            options={undecidedAtCompletionOptions}
+            simpleValue
+            isClearable={false}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              undecidedAtCompletionOptions.find((o) => o.value === value)
+                ?.label || undecidedAtCompletionOptions[0].label
+            }
+          />
+          <BooleanEditField
+            name="carry_over_drafts"
+            label={translate('Carry unsubmitted drafts over to the next round')}
+            description={translate(
+              'When a round closes, move unsubmitted drafts to the next round instead of cancelling them. Applicants keep their content and are notified by email. Drafts are cancelled as before when the call has no later round.',
+            )}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
             }
           />
           <AsyncSelectEditField

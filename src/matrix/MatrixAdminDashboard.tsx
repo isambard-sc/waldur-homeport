@@ -1,4 +1,4 @@
-import { GearSixIcon, PlugsIcon } from '@phosphor-icons/react';
+import { GearSixIcon, StethoscopeIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -13,6 +13,10 @@ import { isStaff as isStaffSelector } from '@/workspace/selectors';
 import { MatrixAppserviceSetupDialog } from './MatrixAppserviceSetup';
 import { MatrixDiagnosticsDialog } from './MatrixDiagnostics';
 import { MatrixHowItWorksButton } from './MatrixHowItWorksButton';
+import {
+  isManagedByDeployment,
+  useMatrixAppserviceStatus,
+} from './useMatrixAppserviceStatus';
 import { isMatrixEnabled } from './utils';
 
 const ROOMS_TAB = {
@@ -53,6 +57,16 @@ export const MatrixAdminDashboard = () => {
   // MATRIX_ENABLED in the Settings tab; the appservice setup only makes sense
   // once the integration is on, so disable it with an explanatory tooltip.
   const matrixEnabled = isMatrixEnabled();
+  // The status endpoint is staff-only. Setup would rotate tokens that the
+  // deployment writes back on every deploy, so it is hidden there; the Settings
+  // tab says how to rotate instead. Shown only once the status allows it, or it
+  // would flash on exactly those deployments. If the status call fails, the
+  // Setup endpoint's own 409 still guards it.
+  const statusQuery = useMatrixAppserviceStatus({ enabled: staff });
+  const showSetup =
+    statusQuery.isError ||
+    (statusQuery.isSuccess &&
+      !isManagedByDeployment(statusQuery.data.tokens_managed_by));
 
   const openSetupDialog = useCallback(() => {
     openDialog(MatrixAppserviceSetupDialog, { size: 'lg' });
@@ -76,23 +90,25 @@ export const MatrixAdminDashboard = () => {
           {staff && (
             <>
               <BaseButton
-                label={translate('Check connectivity')}
+                label={translate('Diagnostics')}
                 onClick={openDiagnostics}
-                iconNode={<PlugsIcon weight="bold" />}
+                iconNode={<StethoscopeIcon weight="bold" />}
                 variant="tertiary"
                 size="lg"
               />
-              <BaseButton
-                label={translate('Setup appservice')}
-                onClick={openSetupDialog}
-                iconNode={<GearSixIcon weight="bold" />}
-                variant="tertiary"
-                disabled={!matrixEnabled}
-                disabledReason={translate(
-                  'Enable Matrix chat in the Settings tab before configuring the appservice.',
-                )}
-                size="lg"
-              />
+              {showSetup && (
+                <BaseButton
+                  label={translate('Setup appservice')}
+                  onClick={openSetupDialog}
+                  iconNode={<GearSixIcon weight="bold" />}
+                  variant="tertiary"
+                  disabled={!matrixEnabled}
+                  disabledReason={translate(
+                    'Enable Matrix chat in the Settings tab before configuring the appservice.',
+                  )}
+                  size="lg"
+                />
+              )}
             </>
           )}
         </>

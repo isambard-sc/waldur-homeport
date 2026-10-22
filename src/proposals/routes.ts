@@ -60,6 +60,9 @@ export const states: StateDeclaration[] = [
   {
     name: 'call-management.call-list',
     url: 'calls/?{state}',
+    // The state tabs rewrite ?state; without `dynamic` UI-Router would remount
+    // the whole page on every tab click.
+    params: { state: { dynamic: true } },
     component: lazyComponent(() =>
       import('./call-management/CallManagementPage').then((module) => ({
         default: module.CallManagementPage,
@@ -334,6 +337,9 @@ export const states: StateDeclaration[] = [
     name: 'calls-for-proposals-all-calls',
     url: 'all-calls/?:offering_uuid&{state}',
     parent: 'calls-for-proposals',
+    // The state tabs rewrite ?state; without `dynamic` UI-Router would remount
+    // the whole page on every tab click.
+    params: { state: { dynamic: true } },
     component: lazyComponent(() =>
       import('./PublicCallsPage').then((module) => ({
         default: module.PublicCallsPage,
@@ -418,6 +424,9 @@ export const states: StateDeclaration[] = [
     name: 'manage-calls',
     url: '/manage-calls/?{state}',
     parent: 'layout',
+    // The state tabs rewrite ?state; without `dynamic` UI-Router would remount
+    // the whole page on every tab click.
+    params: { state: { dynamic: true } },
     component: lazyComponent(() =>
       import('./call-management/ManageCallsPage').then((module) => ({
         default: module.ManageCallsPage,
@@ -503,6 +512,7 @@ export const states: StateDeclaration[] = [
   {
     name: 'public-call.details',
     url: '?tab',
+    params: { tab: { dynamic: true } },
     component: lazyComponent(() =>
       import('./details/PublicCallDetails').then((module) => ({
         default: module.PublicCallDetails,

@@ -1,9 +1,9 @@
-import { PlusIcon, QuestionIcon, TrashIcon } from '@phosphor-icons/react';
+import { PlusIcon, TrashIcon } from '@phosphor-icons/react';
 import { Fragment, ReactNode, useCallback, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { Field, useField } from 'react-final-form';
 
-import { Tooltip, BaseButton } from 'waldur-ui';
+import { BaseButton, HelpIcon, TablePagination } from 'waldur-ui';
 
 import { ENV } from '@/core/config';
 import { usePagination } from '@/core/usePagination';
@@ -19,7 +19,6 @@ import {
   ExistingRoleHit,
   getExistingRoleMessage,
 } from '@/permissions/existingRoles';
-import { TablePagination } from '@/table/TablePagination';
 
 import { findVerdictForRow, isVerdictForRow, RowVerdict } from '../rowVerdicts';
 
@@ -242,6 +241,8 @@ export const EmailsListGroup = ({
     }
   }, [fields, project, refreshPageOnAdd]);
 
+  const isOnlyRow = fields.length === 1;
+
   const removeRow = (index) => {
     fields.remove(index);
     refreshPageOnRemove();
@@ -252,32 +253,44 @@ export const EmailsListGroup = ({
       <div id="emails-list-group">
         {fields.length > 0 && (
           <Form.Group>
-            <table className="table align-middle px-0 gy-2 mb-0">
+            <table className="table h-auto table-fixed align-top px-0 gy-2 mb-0">
               <thead>
                 <tr className="fs-6 fw-bold">
-                  <td className="w-250px">{translate('Email')}</td>
+                  {/* Fixed-layout table: one column without a width takes
+                      the free space, so Email does when Civil number is
+                      hidden. */}
+                  <td
+                    className={
+                      isFeatureVisible(InvitationsFeatures.conceal_civil_number)
+                        ? undefined
+                        : 'w-250px'
+                    }
+                  >
+                    {translate('Email')}
+                  </td>
                   {!isFeatureVisible(
                     InvitationsFeatures.conceal_civil_number,
                   ) && (
                     <td className="id-column">
                       {ENV.plugins.WALDUR_CORE.INVITATION_CIVIL_NUMBER_LABEL ||
                         translate('Civil number')}{' '}
-                      <Tooltip
+                      <HelpIcon
                         label={translate(
                           'Must start with a country prefix ie EE34501234215',
                         )}
-                      >
-                        <QuestionIcon weight="bold" />
-                      </Tooltip>
+                      />
                     </td>
                   )}
-                  <td className="role-column">{translate('Role')}</td>
-                  <td className="w-5px" />
+                  <td className="role-column w-[380px]">{translate('Role')}</td>
+                  <td className="w-[54px]" />
                 </tr>
               </thead>
               <tbody>
                 {visibleItems.map((user, i) => {
                   if (!user) return null;
+                  // Every row has a Role and a Project select; name them
+                  // after the row so a screen reader can tell them apart.
+                  const rowEmail = fields.value?.[i]?.email;
                   return (
                     <Fragment key={user}>
                       <tr className="fs-6">
@@ -356,16 +369,41 @@ export const EmailsListGroup = ({
                             roles={roles}
                             customer={customer}
                             currentProject={project}
+                            roleLabel={
+                              rowEmail
+                                ? translate('Role for {email}', {
+                                    email: rowEmail,
+                                  })
+                                : translate('Role for row {number}', {
+                                    number: i + 1,
+                                  })
+                            }
+                            projectLabel={
+                              rowEmail
+                                ? translate('Project for {email}', {
+                                    email: rowEmail,
+                                  })
+                                : translate('Project for row {number}', {
+                                    number: i + 1,
+                                  })
+                            }
                           />
                         </td>
                         <td>
+                          {/* aria-disabled, not disabled: an unavailable
+                              button stays in the Tab order, so keyboard
+                              users can still reach the reason. */}
                           <BaseButton
                             variant="text-danger"
-                            onClick={() => removeRow(i)}
-                            disabled={fields.length === 1}
-                            disabledReason={translate(
-                              'At least one email is required',
-                            )}
+                            onClick={() => !isOnlyRow && removeRow(i)}
+                            aria-label={translate('Remove')}
+                            aria-disabled={isOnlyRow || undefined}
+                            data-disabled={isOnlyRow ? '' : undefined}
+                            tooltip={
+                              isOnlyRow
+                                ? translate('At least one user is required')
+                                : translate('Remove')
+                            }
                             iconNode={<TrashIcon weight="bold" />}
                             size="lg"
                           />
@@ -411,6 +449,7 @@ export const EmailsListGroup = ({
         showPageSizeSelector
         updatePageSize={changePageSize}
         gotoPage={setPage}
+        bordered={false}
       />
     </div>
   );
