@@ -43,7 +43,6 @@ import {
 } from './create/utils';
 import { SubmitReviewDialog } from './create-review/SubmitReviewDialog';
 import { FormResponsesSection } from './FormResponsesSection';
-import { ModifyAllocationDialog } from './resourceAdjustments/ModifyAllocationDialog';
 import { StepChecklistSection } from './StepChecklistSection';
 import { TechnicalAssessmentSection } from './TechnicalAssessmentSection';
 import { WorkflowStepActions } from './WorkflowStepActions';
@@ -138,13 +137,6 @@ export const ProposalDetails = ({
   const canEditActiveStepChecklist =
     canEditStepChecklist ||
     (activeStep?.step === 'technical_assessment' && !isApplicant);
-  // Resource adjustments are scoped to the award decision point, matching
-  // the backend's own gate (see _validate_adjustment_window) - not the whole
-  // review window.
-  const canManageAllocation =
-    isCallManagerView &&
-    canEditStepChecklist &&
-    activeStep?.step === 'allocation_decision';
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -172,24 +164,7 @@ export const ProposalDetails = ({
             <ComplianceSummary proposal={proposal} />
           </div>
         )}
-        <ResourceRequestsSummary
-          proposal={proposal}
-          reviews={reviews}
-          actions={
-            canManageAllocation && (
-              <BaseButton
-                variant="secondary"
-                size="sm"
-                onClick={() =>
-                  openDialog(ModifyAllocationDialog, {
-                    resolve: { proposal, refetch },
-                  })
-                }
-                label={translate('Modify allocation')}
-              />
-            )
-          }
-        />
+        <ResourceRequestsSummary proposal={proposal} reviews={reviews} />
         {activeStep?.checklist_status?.has_checklist && !isApplicant && (
           // Applicants don't fill evaluation-step checklists on the detail page
           // (they can't view them either — the backend 403s), so rendering the
