@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   AwardedResource,
+  NestedRequestedOffering,
   proposalProposalsAwardedResourcesList,
   ProposalWorkflowStepInstance,
   RequestedResource,
@@ -140,6 +141,49 @@ const sameLimits = (a: Record<string, number>, b: Record<string, number>) => {
 const prepaidMonths = (attributes?: Record<string, unknown> | null) =>
   Number(attributes?.[PREPAID_DURATION_MONTHS] ?? 0);
 
+export interface ResourceOptionValue {
+  key: string;
+  label: string;
+  value: unknown;
+}
+
+const hasValue = (value: unknown) =>
+  value !== undefined && value !== null && value !== '';
+
+/**
+ * The item's answers to its offering's resource options, in the offering's
+ * order. Some offerings take the amount as a resource option rather than a
+ * limit — the GPU hours a Formbricks application asks for are one — so these
+ * are amounts as much as the limits are.
+ */
+export const getResourceOptionValues = (
+  requestedOffering: Pick<NestedRequestedOffering, 'resource_options'>,
+  attributes?: Record<string, unknown> | null,
+): ResourceOptionValue[] => {
+  const options = requestedOffering?.resource_options?.options ?? {};
+  const order = requestedOffering?.resource_options?.order?.length
+    ? requestedOffering.resource_options.order
+    : Object.keys(options);
+  return order
+    .filter((key) => options[key] && hasValue(attributes?.[key]))
+    .map((key) => ({
+      key,
+      label: options[key].label || key,
+      value: attributes[key],
+    }));
+};
+
+const sameResourceOptions = (
+  requestedOffering: Pick<NestedRequestedOffering, 'resource_options'>,
+  a?: Record<string, unknown> | null,
+  b?: Record<string, unknown> | null,
+) =>
+  Object.keys(requestedOffering?.resource_options?.options ?? {}).every(
+    (key) =>
+      hasValue(a?.[key]) === hasValue(b?.[key]) &&
+      (!hasValue(a?.[key]) || String(a[key]) === String(b[key])),
+  );
+
 const compareItem = (
   requested: RequestedResource,
   awarded: AwardedResource,
@@ -156,6 +200,15 @@ const compareItem = (
   }
   if (
     prepaidMonths(requested.attributes) !== prepaidMonths(awarded.attributes)
+  ) {
+    return 'changed';
+  }
+  if (
+    !sameResourceOptions(
+      awarded.requested_offering,
+      requested.attributes,
+      awarded.attributes,
+    )
   ) {
     return 'changed';
   }

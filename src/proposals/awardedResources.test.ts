@@ -5,6 +5,7 @@ import {
   awardDiffers,
   canEditAward,
   compareAward,
+  getResourceOptionValues,
   hasReachedAllocationDecision,
   isAwardSectionShown,
   pickOfferingLimits,
@@ -89,6 +90,54 @@ describe('compareAward', () => {
       [award('a1', 'r1', hpc, { cpu_hours: 1000 }, 'plan-premium')],
     );
     expect(rows[0].change).toBe('changed');
+  });
+});
+
+// An offering that takes its amount as a resource option, as the Formbricks
+// GPU-hour allocation does: no limit component to name it.
+const isambard = {
+  uuid: 'call-offering-isambard',
+  offering_name: 'Isambard-AI',
+  plan_details: { uuid: 'plan-basic', name: 'Basic' },
+  components: [{ type: 'node', billing_type: 'usage' }],
+  resource_options: {
+    order: ['allocation'],
+    options: { allocation: { type: 'integer', label: 'GPUh' } },
+  },
+};
+
+describe('resource option amounts', () => {
+  const withAttributes = (item, attributes) => ({ ...item, attributes });
+
+  it('flags a changed resource option amount', () => {
+    const rows = compareAward(
+      [withAttributes(request('r1', isambard, {}), { allocation: 30000 })],
+      [withAttributes(award('a1', 'r1', isambard, {}), { allocation: 10000 })],
+    );
+    expect(rows.map((r) => r.change)).toEqual(['changed']);
+  });
+
+  it('keeps an unchanged resource option amount as requested', () => {
+    const rows = compareAward(
+      [withAttributes(request('r1', isambard, {}), { allocation: 30000 })],
+      [
+        withAttributes(award('a1', 'r1', isambard, {}), {
+          allocation: '30000',
+        }),
+      ],
+    );
+    expect(rows.map((r) => r.change)).toEqual(['unchanged']);
+  });
+
+  it('lists the values in the offering order and skips other attributes', () => {
+    expect(
+      getResourceOptionValues(isambard as any, {
+        allocation: 10000,
+        name: 'not an option',
+      }),
+    ).toEqual([{ key: 'allocation', label: 'GPUh', value: 10000 }]);
+    expect(getResourceOptionValues(isambard as any, {})).toEqual([]);
+    expect(getResourceOptionValues(hpc as any, { allocation: 1 })).toEqual([]);
   });
 });
 

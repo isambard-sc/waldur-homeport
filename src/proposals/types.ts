@@ -86,6 +86,7 @@ export interface CallOffering {
   plan: string;
   plan_details: Plan;
   options?: Offering['options'];
+  resource_options?: Offering['resource_options'];
   components?: Offering['components'];
   /** Set by the call manager, seeded from the offering's upload requirement. */
   require_purchase_order?: boolean;
