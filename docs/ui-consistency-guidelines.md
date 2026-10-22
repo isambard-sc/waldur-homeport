@@ -431,20 +431,24 @@ if (error) {
 ### 4.3 Pagination Rules
 
 ```tsx
+import { TablePagination } from 'waldur-ui';
+
 import { PAGE_SIZE_COMPACT, PAGE_SIZE_FULL } from '@/table/constants';
 
 // PAGE_SIZE_COMPACT = 5 (for embedded/secondary tables)
 // PAGE_SIZE_FULL = 10 (for primary tables)
 
-// Hide pagination when items ≤ PAGE_SIZE_COMPACT
-{
-  pagination.resultCount > PAGE_SIZE_COMPACT && (
-    <TablePagination {...pagination} />
-  );
-}
-
-// Show item count
-// Format: "Showing 1-10 of 100"
+// TablePagination hides itself when items ≤ PAGE_SIZE_COMPACT, and shows
+// the item count ("11-20 of 42 items"). <Table> renders it for you; render
+// it yourself only for a paged list that is not a <Table>, such as a list
+// of form fields — there, drop the table's top border:
+<TablePagination
+  {...pagination}
+  hasRows={rows.length > 0}
+  gotoPage={setPage}
+  updatePageSize={setPageSize}
+  bordered={false}
+/>;
 ```
 
 ---
@@ -679,6 +683,27 @@ import { StateIndicator } from '@/core/StateIndicator';
 > in a separate `Tooltip` — it already handles the disabled-only visibility
 > and keeps the DOM structure stable across enabled/disabled toggles.
 
+### 8.0 Icons that carry a tooltip
+
+Never wrap a bare icon in `Tooltip`: an icon is an `<svg>`, so the tooltip is
+hover-only and screen readers get nothing. Use `HelpIcon` (a "?" button) or
+`WarningTip` (warning colour) from `waldur-ui`. Both render a focusable button,
+show the tooltip on focus, and default to a translated "Help" / "Warning"
+`aria-label`:
+
+```tsx
+import { HelpIcon, WarningTip } from 'waldur-ui';
+
+<HelpIcon label={translate('Explains the field')} />
+<WarningTip label={translate('Exceeds the limit')} className="ms-1" />
+// Extra Tooltip props go in tooltipProps; pass `icon` / `weight` / `size` to vary the glyph.
+<HelpIcon label={content} tooltipProps={{ autoWidth: true }} />
+```
+
+Don't place them inside another interactive element (a button, a `<label>` of a
+check control, a select option). The lint rule
+`waldur-custom/no-tooltip-on-bare-icon` reports the bare form.
+
 ### 8.1 Usage Guidelines
 
 Use tooltips for:
@@ -816,23 +841,31 @@ translate('{count} item', '{count} items', { count });
 
 ## 11. Responsive Behavior
 
-### 11.1 Breakpoints
+### 11.1 Breakpoints & Media Query Hooks
+
+Always prefer pure CSS/Tailwind responsive utility classes (`sm:`, `md:`, `lg:`, `max-md:`, etc.) for purely visual layout, hiding/showing elements, and spacing. When React component logic, state, or conditional data fetching must adapt to viewport width, use the typed breakpoint helpers from `waldur-ui`:
 
 ```tsx
-import { GRID_BREAKPOINTS } from '@/core/constants';
+import { useBreakpointDown, useBreakpointUp, useMediaQuery } from 'waldur-ui';
 
-// GRID_BREAKPOINTS = { xs: 0, sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 }
+// Strictly below breakpoint (boundary-safe: max-width: bp - 1px)
+const isSm = useBreakpointDown('sm'); // < 576px
+const isMd = useBreakpointDown('md'); // < 768px
+const isMobile = useBreakpointDown('lg'); // < 992px
 
-import { useMediaQuery } from 'react-responsive';
+// At or above breakpoint (min-width: bp)
+const isDesktop = useBreakpointUp('lg'); // >= 992px
+const isWide = useBreakpointUp('xl'); // >= 1200px
 
-const isSm = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.sm });
-const isMd = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.md });
+// Device capabilities
+const cannotHover = useMediaQuery('(hover: none)');
 ```
 
 ### 11.2 Filter Position Adaptation
 
 ```tsx
 // Automatically converts 'menu' to 'sidebar' on small screens
+const isSm = useBreakpointDown('sm');
 const filterPosition =
   isSm && originalPosition === 'menu' ? 'sidebar' : originalPosition;
 ```

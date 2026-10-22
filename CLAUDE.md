@@ -35,6 +35,8 @@ For detailed guidance, see `docs/` — full index with one-line descriptions in 
 - `component-library.md` - UI components, BaseDeployPage
 - `api-integration.md` - React Query, CRUD patterns
 - `forms.md` - React Final Form and VStepperForm patterns
+- `tabs.md` - Tabs: `Tabs`, `TabNav`, `EmbeddedTabs`, mount modes, migrating off Bootstrap `Nav`/`Tab`
+- `menus.md` - Menus, dropdowns and popovers: `Menu`, `MenuPopover`, `ActionsMenu`, row actions
 - `tables.md` - Modular index for useTable, columns, filters, row actions, export, and visual customizations
 - `table/filter-migration-guide.md` - Generated table filters from OpenAPI schema
 - `development-setup.md` - Build, environment, tooling
@@ -138,7 +140,11 @@ Subagents in `.claude/agents/` provide deep expertise for each area.
 
 - Use design token button variants (`tertiary`, `danger`, `success`, `text-primary`) - linter enforces this
 
+- Use `waldur-ui`'s `Tabs` (state-driven panels) or `TabNav` (router-driven: `items` with `link: <Link … />`), and `EmbeddedTabs` (`@/table/EmbeddedTabs`) for tabs inside an expandable row or card section — never react-bootstrap `Tab`/`Tabs`/`Nav` or `nav-*` classes. Linter enforces this (`no-bootstrap-tabs`); see `docs/tabs.md`
+
 - Use the `waldur-ui` pickers (`DatePicker`, `DateRangePicker`, `MonthPicker`; `DateField`/`DateGroup` in forms) — never a native `<input type="date">`, `datetime-local`, `time`, `month` or `week`. Linter enforces this; see `docs/forms.md` → "Date & Time Pickers"
+
+- Use `waldur-ui`'s `Checkbox`, `Radio`, `Switch` (each takes `label` / `description` / `tooltip` and `checked` + `onCheckedChange`) and `RadioGroup` (options in, value out); in react-final-form use `BooleanGroup` / `RadioGroup` from `@/form` — never react-bootstrap `FormCheck` / `Form.Check` or `form-check*` / `form-switch*` classes. Linter enforces this (`no-bootstrap-form-check`)
 
 - Use **generated filters** for table filter components (see `docs/table/filter-migration-guide.md`):
   1. Add config to `generate-filters-config.yaml`
@@ -156,12 +162,24 @@ Subagents in `.claude/agents/` provide deep expertise for each area.
 - **Edit Field Architecture** — for any read-only-with-edit row in a details/settings panel, use the pre-bound `*EditField` exports from `@/form/editFields` inside an `EditFieldProvider` (see `docs/forms.md`). Never write a monolithic switch-style `EditFieldDialog` — those have been removed.
 
   ```tsx
-  import { EditFieldProvider, StringEditField, BooleanEditField } from '@/form/editFields';
+  import {
+    EditFieldProvider,
+    StringEditField,
+    BooleanEditField,
+  } from '@/form/editFields';
 
   <EditFieldProvider scope={offering} callback={update}>
-    <StringEditField name="service_attributes.backend_url" label={translate('API URL')} required />
-    <BooleanEditField name="service_attributes.verify_ssl" label={translate('Verify SSL')} hideLabel />
-  </EditFieldProvider>
+    <StringEditField
+      name="service_attributes.backend_url"
+      label={translate('API URL')}
+      required
+    />
+    <BooleanEditField
+      name="service_attributes.verify_ssl"
+      label={translate('Verify SSL')}
+      hideLabel
+    />
+  </EditFieldProvider>;
   ```
 
   - `callback` receives a partial PATCH body like `{ service_attributes: { backend_url: 'x' } }` (built via `lodash.set` from the field's `name` path). The backend endpoint must accept partial updates.

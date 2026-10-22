@@ -278,6 +278,24 @@ export const LayoutPreview: React.FC<LayoutPreviewProps> = ({
         </svg>
       );
 
+    case 'brics':
+      return (
+        <svg viewBox="0 0 100 60" fill="none">
+          <rect width="100" height="60" fill="#22305C" />
+          <rect x="10" y="22" width="34" height="5" rx="1" fill="white" />
+          <rect x="10" y="31" width="16" height="4" rx="2" fill="#6A98D8" />
+          <rect
+            x="58"
+            y="10"
+            width="32"
+            height="40"
+            rx="4"
+            fill="white"
+            fillOpacity="0.9"
+          />
+        </svg>
+      );
+
     /* --- DYNAMIC --- */
     case 'time-based':
       return (

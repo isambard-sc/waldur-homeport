@@ -8,12 +8,14 @@ export enum CustomerFeatures {
   show_onboarding = 'customer.show_onboarding',
   show_openportal_accounting_only = 'customer.show_openportal_accounting_only',
   show_openportal_remote_projects = 'customer.show_openportal_remote_projects',
+  show_organisation_reporting = 'customer.show_organisation_reporting',
   show_permission_reviews = 'customer.show_permission_reviews',
   show_project_digest = 'customer.show_project_digest',
 }
 
 export enum DashboardFeatures {
   spend_forecast = 'dashboard.spend_forecast',
+  usage_include_terminated = 'dashboard.usage_include_terminated',
   usage_limit_horizon = 'dashboard.usage_limit_horizon',
   usage_per_offering_bars = 'dashboard.usage_per_offering_bars',
   usage_period_over_period = 'dashboard.usage_period_over_period',
@@ -74,6 +76,7 @@ export enum ProjectFeatures {
   oecd_fos_2007_code = 'project.oecd_fos_2007_code',
   science_domain = 'project.science_domain',
   show_credit_in_create_dialog = 'project.show_credit_in_create_dialog',
+  show_custom_metrics = 'project.show_custom_metrics',
   show_description_in_create_dialog = 'project.show_description_in_create_dialog',
   show_end_date_in_create_dialog = 'project.show_end_date_in_create_dialog',
   show_image_in_create_dialog = 'project.show_image_in_create_dialog',

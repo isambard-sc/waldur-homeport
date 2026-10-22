@@ -1,9 +1,9 @@
-import { EyeIcon, QuestionIcon } from '@phosphor-icons/react';
+import { EyeIcon } from '@phosphor-icons/react';
 import { useCallback } from 'react';
 import { ComponentsUsageStats } from 'waldur-js-client';
 import { Project } from 'waldur-js-client';
 
-import { Tooltip, BaseButton } from 'waldur-ui';
+import { BaseButton, HelpIcon } from 'waldur-ui';
 
 import { EChart } from '@/core/EChart';
 import { lazyComponent } from '@/core/lazyComponent';
@@ -24,6 +24,8 @@ interface AggregateLimitWidgetProps {
   refetch(): void;
   error: any;
   type?: 'monthly' | 'all';
+  /** Usage includes terminated resources, reported in a separate series. */
+  includeTerminated?: boolean;
 }
 
 const AggregateLimitDetailsDialog = lazyComponent(() =>
@@ -46,6 +48,7 @@ export const AggregateLimitWidget = ({
   error,
   refetch,
   type = 'all',
+  includeTerminated,
 }: AggregateLimitWidgetProps) => {
   const { openDialog } = useModal();
   const isProject = !!project;
@@ -65,6 +68,7 @@ export const AggregateLimitWidget = ({
             resolve: {
               project,
               components: data?.components,
+              includeTerminated,
             },
             size: 'lg',
           })
@@ -72,10 +76,11 @@ export const AggregateLimitWidget = ({
             resolve: {
               customer,
               components: data?.components,
+              includeTerminated,
             },
             size: 'lg',
           }),
-    [project, customer, data, isProject],
+    [project, customer, data, isProject, includeTerminated],
   );
 
   const viewAllComponents = useCallback(
@@ -118,11 +123,9 @@ export const AggregateLimitWidget = ({
   const TitleWithTip = () => (
     <>
       {title}{' '}
-      <Tooltip
+      <HelpIcon
         label={translate('You are viewing the chart in log scale mode.')}
-      >
-        <QuestionIcon weight="bold" />
-      </Tooltip>
+      />
     </>
   );
 

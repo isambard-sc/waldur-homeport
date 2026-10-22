@@ -1,12 +1,9 @@
 import { XIcon } from '@phosphor-icons/react';
 import { FunctionComponent, useCallback } from 'react';
-import { Col, Row, Stack } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import { useMediaQuery } from 'react-responsive';
 
-import { BaseButton } from 'waldur-ui';
+import { BaseButton, useBreakpointDown } from 'waldur-ui';
 
-import { GRID_BREAKPOINTS } from '@/core/constants';
 import { translate } from '@/i18n';
 
 import { clearAllFilters } from './actions';
@@ -39,12 +36,14 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
     props.applyFiltersFn(true);
   }, [props, dispatch]);
 
-  const isMd = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.md });
+  const isMd = useBreakpointDown('md');
   const clearLabel = isMd ? translate('Clear') : translate('Clear filters');
 
   return props.filterPosition === 'menu' || props.filtersStorage.length > 0 ? (
-    <Row className="w-100 g-0 gap-4">
-      <Col className={isMd ? 'd-flex scroll-x' : 'd-flex'}>
+    <div className="w-100 d-flex flex-wrap gap-4">
+      <div
+        className={isMd ? 'd-flex flex-grow-1 scroll-x' : 'd-flex flex-grow-1'}
+      >
         <div
           className={
             isMd
@@ -53,15 +52,13 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
           }
         >
           {props.filtersStorage.map((item) => (
-            <Stack
+            <div
               key={item.name}
-              direction="horizontal"
-              gap={2}
-              className="flex-nowrap fw-bolder text-dark fs-7"
+              className="d-flex align-items-center flex-nowrap fw-bolder text-dark fs-7 gap-2"
             >
               {item.label}
               {item.component && <item.component />}
-            </Stack>
+            </div>
           ))}
           {props.filterPosition === 'menu' && (
             <TableFiltersMenu
@@ -76,9 +73,9 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
             />
           )}
         </div>
-      </Col>
+      </div>
       {!props.hideClearFilters && props.filtersStorage.length > 0 && (
-        <Col xs="auto" className="align-self-start text-end">
+        <div className="align-self-start text-end">
           <BaseButton
             variant="text-secondary"
             className="btn-no-focus"
@@ -87,8 +84,8 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
             label={clearLabel}
             size="sm"
           />
-        </Col>
+        </div>
       )}
-    </Row>
+    </div>
   ) : null;
 };

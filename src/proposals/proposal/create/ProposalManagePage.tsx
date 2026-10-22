@@ -22,6 +22,7 @@ import {
   useProposalBreadcrumbItems,
 } from '@/proposals/breadcrumbs';
 import { usesCallVocabulary } from '@/proposals/presentation';
+import { canEditProposal, canSubmitProposal } from '@/proposals/team/teamRules';
 import { Proposal } from '@/proposals/types';
 import { useUser } from '@/workspace/hooks';
 
@@ -108,8 +109,10 @@ export const ProposalManagePage = () => {
 
   const isEditPage = state.name === 'proposals.manage-proposal';
   const isCallManagerView = state.name?.startsWith('call-management');
-  const hasPermissionToSubmit =
-    user.is_staff || (proposal && user.uuid === proposal.created_by_uuid);
+  // Proposal administrators edit the draft as well; submitting stays with
+  // its creator, its managers and staff.
+  const hasPermissionToEdit = proposal && canEditProposal(user, proposal);
+  const hasPermissionToSubmit = proposal && canSubmitProposal(user, proposal);
 
   const { data: call } = useQuery({
     queryKey: ['ProposalCall', proposal?.call_uuid],
@@ -206,6 +209,11 @@ export const ProposalManagePage = () => {
     return <ArchivedProposalRedirect uuid={proposal_uuid} />;
   }
 
+  const isEditableDraft = proposal.state === 'draft' && isEditPage;
+  // A Formbricks call collects the application in Formbricks, so only the
+  // Lead (who can submit) resumes the flow here; everyone else sees details.
+  const usesFormbricks = Boolean((call as any)?.formbricks_flow_key);
+
   return (
     <>
       <SidebarLayout.Header className="pb-5">
@@ -243,17 +251,16 @@ export const ProposalManagePage = () => {
           )}
         </div>
       </SidebarLayout.Header>
-      {proposal.state === 'draft' && isEditPage && hasPermissionToSubmit ? (
-        (call as any)?.formbricks_flow_key ? (
-          <FormbricksProposalProgress proposal={proposal} refetch={refetch} />
-        ) : (
-          <ProposalSubmissionStep
-            proposal={proposal}
-            call={call}
-            refetch={refetch}
-            reviews={submittedReviews}
-          />
-        )
+      {isEditableDraft && usesFormbricks && hasPermissionToSubmit ? (
+        <FormbricksProposalProgress proposal={proposal} refetch={refetch} />
+      ) : isEditableDraft && !usesFormbricks && hasPermissionToEdit ? (
+        <ProposalSubmissionStep
+          proposal={proposal}
+          call={call}
+          refetch={refetch}
+          reviews={submittedReviews}
+          canSubmitProposal={hasPermissionToSubmit}
+        />
       ) : (
         <ProposalDetails
           proposal={proposal}

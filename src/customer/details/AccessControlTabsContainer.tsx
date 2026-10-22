@@ -1,8 +1,7 @@
-import { QuestionIcon } from '@phosphor-icons/react';
 import { FC, useState } from 'react';
-import { Card, Nav, Tab } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 
-import { Tooltip } from 'waldur-ui';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'waldur-ui';
 
 import { translate } from '@/i18n';
 import { PermissionEnum } from '@/permissions/enums';
@@ -49,50 +48,35 @@ export const AccessControlTabsContainer: FC<CustomerEditPanelProps> = ({
   });
 
   return (
-    <Card className="card-bordered">
-      <Card.Header className="border-bottom">
-        <Card.Title>
-          <h3>{translate('Access control')}</h3>
-        </Card.Title>
-      </Card.Header>
-      <Card.Header className="border-bottom align-items-stretch py-0 min-h-auto">
-        <Tab.Container
-          activeKey={activeKey}
-          onSelect={(k) => setActiveKey(k as SubTabKey)}
-        >
-          <div className="overflow-auto flex-grow-1 pb-2 pt-4">
-            <Nav
-              variant="tabs"
-              className="nav-line-tabs flex-nowrap mx-0 border-0"
-            >
-              {getSubTabs().map((tab) => (
-                <Nav.Item key={tab.key} className="text-nowrap">
-                  <Nav.Link as="button" eventKey={tab.key}>
-                    {tab.title}
-                    {tab.tooltip && (
-                      <Tooltip label={tab.tooltip}>
-                        <QuestionIcon
-                          size={16}
-                          weight="bold"
-                          className="ms-2 text-muted"
-                        />
-                      </Tooltip>
-                    )}
-                  </Nav.Link>
-                </Nav.Item>
-              ))}
-            </Nav>
-          </div>
-        </Tab.Container>
-      </Card.Header>
-      <Card.Body className="p-0">
-        {activeKey === 'subnets' && (
-          <AccessSubnetMatrix customer={customer} canManage={canManage} />
-        )}
-        {activeKey === 'restrictions' && (
-          <CustomerMembershipRestrictionsPanel customer={customer} />
-        )}
-      </Card.Body>
-    </Card>
+    <Tabs value={activeKey} onValueChange={(k) => setActiveKey(k as SubTabKey)}>
+      <Card className="card-bordered">
+        <Card.Header className="border-bottom">
+          <Card.Title>
+            <h3>{translate('Access control')}</h3>
+          </Card.Title>
+        </Card.Header>
+        <Card.Header className="border-bottom align-items-stretch py-0 min-h-auto">
+          <TabsList
+            scrollable
+            scrollClassName="flex-grow-1 pt-4"
+            bordered={false}
+          >
+            {getSubTabs().map((tab) => (
+              <TabsTrigger key={tab.key} value={tab.key} hint={tab.tooltip}>
+                {tab.title}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Card.Header>
+        <Card.Body className="p-0">
+          <TabsContent value="subnets">
+            <AccessSubnetMatrix customer={customer} canManage={canManage} />
+          </TabsContent>
+          <TabsContent value="restrictions">
+            <CustomerMembershipRestrictionsPanel customer={customer} />
+          </TabsContent>
+        </Card.Body>
+      </Card>
+    </Tabs>
   );
 };

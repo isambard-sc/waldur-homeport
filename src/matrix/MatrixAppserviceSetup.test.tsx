@@ -1,5 +1,5 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen } from '@testing-library/react';
+import type { QueryClient } from '@tanstack/react-query';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -9,6 +9,7 @@ import {
 } from 'waldur-js-client';
 
 import { useNotify } from '@/store/notify';
+import { createTestQueryClient, renderWithProviders } from '@/test/harness';
 
 import { MatrixAppserviceSetupDialog } from './MatrixAppserviceSetup';
 
@@ -18,18 +19,8 @@ const h = vi.hoisted(() => ({
   setupMutation: vi.fn(),
 }));
 
-const renderDialog = (queryClient?: QueryClient) => {
-  const client =
-    queryClient ??
-    new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
-  return render(
-    <QueryClientProvider client={client}>
-      <MatrixAppserviceSetupDialog />
-    </QueryClientProvider>,
-  );
-};
+const renderDialog = (queryClient?: QueryClient) =>
+  renderWithProviders(<MatrixAppserviceSetupDialog />, { queryClient });
 
 describe('MatrixAppserviceSetupDialog', () => {
   beforeEach(() => {
@@ -82,6 +73,42 @@ describe('MatrixAppserviceSetupDialog', () => {
     expect(
       screen.getByRole('button', { name: /^Setup$/i }),
     ).toBeInTheDocument();
+  });
+
+  it('warns that rotating tokens a deployment still supplies fails its next deploy', async () => {
+    // Setup is offered again once the ownership marker is cleared. If the
+    // deployment still seeds Matrix, the rotated tokens differ from its own
+    // and init_matrix_settings refuses on the next deploy.
+    h.statusData = { as_token_configured: true, hs_token_configured: true };
+    h.settingsData = {
+      MATRIX_HOMESERVER_URL: 'https://matrix.example.com',
+      MATRIX_HOMESERVER_DOMAIN: 'matrix.example.com',
+      MATRIX_USER_REGISTRATION_SECRET: 'pre-set',
+    };
+
+    renderDialog();
+
+    expect(
+      await screen.findByText('AS and HS tokens are already configured'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/do not run Setup.*the next deploy then fails/),
+    ).toBeInTheDocument();
+  });
+
+  it('shows no token warning before any tokens exist', async () => {
+    h.settingsData = {
+      MATRIX_HOMESERVER_URL: 'https://matrix.example.com',
+      MATRIX_HOMESERVER_DOMAIN: 'matrix.example.com',
+      MATRIX_USER_REGISTRATION_SECRET: 'pre-set',
+    };
+
+    renderDialog();
+
+    await screen.findByLabelText(/Waldur URL/i);
+    expect(
+      screen.queryByText('AS and HS tokens are already configured'),
+    ).not.toBeInTheDocument();
   });
 
   it('starts on the homeserver step when all three prereqs are missing', async () => {
@@ -356,9 +383,7 @@ describe('MatrixAppserviceSetupDialog', () => {
       MATRIX_USER_REGISTRATION_SECRET: 'pre-set',
     };
 
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false } },
-    });
+    const queryClient = createTestQueryClient();
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     const user = userEvent.setup();

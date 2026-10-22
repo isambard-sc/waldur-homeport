@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { ENV } from '@/core/config';
 
+import { CALL_STARTED_MESSAGE_TYPE } from './call/callTimeline';
+import { REDACTED_MESSAGE_TYPE } from './messageRelations';
 import { MatrixChatMessage } from './types';
 import {
   aggregateReactions,
@@ -11,6 +13,7 @@ import {
   mapEventToMessage,
   resolveMemberName,
   sanitizeName,
+  UNDECRYPTABLE_MESSAGE_TYPE,
 } from './utils';
 
 // @/core/config is mocked globally (test/setupTests.js); override just the
@@ -36,6 +39,114 @@ const makeEvent = (content: any, type = 'm.room.message') =>
   }) as any;
 
 describe('mapEventToMessage', () => {
+  const encrypted = (failed: boolean) =>
+    ({
+      ...makeEvent({}, 'm.room.encrypted'),
+      isDecryptionFailure: () => failed,
+    }) as any;
+
+  it('does not let a sender claim the undecryptable notice style', () => {
+    const spoof = makeEvent({
+      msgtype: UNDECRYPTABLE_MESSAGE_TYPE,
+      body: 'Unable to decrypt this message.',
+    });
+    expect(mapEventToMessage(spoof)?.type).toBe('m.text');
+  });
+
+  it('does not let a sender claim the deleted-message style', () => {
+    const spoof = makeEvent({ msgtype: REDACTED_MESSAGE_TYPE, body: 'x' });
+    const message = mapEventToMessage(spoof);
+    expect(message?.type).toBe('m.text');
+    expect(message?.redacted).toBeUndefined();
+  });
+
+  it('does not let a sender claim the call-started style', () => {
+    const spoof = makeEvent({ msgtype: CALL_STARTED_MESSAGE_TYPE, body: 'x' });
+    expect(mapEventToMessage(spoof)?.type).toBe('m.text');
+  });
+
+  it('waits for an encrypted event to be decrypted', () => {
+    expect(mapEventToMessage(encrypted(false))).toBeNull();
+  });
+
+  it('flags a message sent in clear into an encrypted room', () => {
+    const room = {
+      getMember: () => null,
+      hasEncryptionStateEvent: () => true,
+    } as any;
+    const event = (encrypted: boolean, status: string | null = null) =>
+      ({
+        ...makeEvent({ msgtype: 'm.text', body: 'hi' }),
+        isEncrypted: () => encrypted,
+        status,
+      }) as any;
+
+    expect(mapEventToMessage(event(false), room)?.unencrypted).toBe(true);
+    expect(mapEventToMessage(event(true), room)?.unencrypted).toBeUndefined();
+    const edit = (status: string | null = null) =>
+      ({
+        ...makeEvent({
+          msgtype: 'm.text',
+          body: '* hello',
+          'm.new_content': { msgtype: 'm.text', body: 'hello' },
+          'm.relates_to': { rel_type: 'm.replace', event_id: '$evt1' },
+        }),
+        getId: () => '$edit',
+        isEncrypted: () => false,
+        status,
+      }) as any;
+    // An edit in clear of an encrypted message is not applied at all: the
+    // homeserver could have written it.
+    const edited = {
+      ...event(true),
+      replacingEvent: () => edit(),
+    } as any;
+    expect(mapEventToMessage(edited, room)?.body).toBe('hi');
+    expect(mapEventToMessage(edited, room)?.edited).toBeUndefined();
+    expect(mapEventToMessage(edited, room)?.unencrypted).toBeUndefined();
+    // The user's own edit is encrypted only as it is sent.
+    const editing = {
+      ...event(true),
+      replacingEvent: () => edit('encrypting'),
+    } as any;
+    expect(mapEventToMessage(editing, room)).toEqual(
+      expect.objectContaining({ body: 'hello', edited: true }),
+    );
+    expect(mapEventToMessage(editing, room)?.unencrypted).toBeUndefined();
+    // A local echo is not encrypted until it is sent.
+    expect(
+      mapEventToMessage(event(false, 'sending'), room)?.unencrypted,
+    ).toBeUndefined();
+  });
+
+  it('keeps a row for an event that cannot be decrypted', () => {
+    expect(mapEventToMessage(encrypted(true))).toEqual(
+      expect.objectContaining({
+        eventId: '$evt1',
+        sender: '@bob:s',
+        type: UNDECRYPTABLE_MESSAGE_TYPE,
+        body: 'Unable to decrypt this message.',
+      }),
+    );
+  });
+
+  it('shows a notice, not the SDK error, for a failed decryption', () => {
+    // matrix-js-sdk reports a failed decryption as an m.room.message.
+    const failed = {
+      ...makeEvent({
+        msgtype: 'm.bad.encrypted',
+        body: '** Unable to decrypt: DecryptionError: no session **',
+      }),
+      isDecryptionFailure: () => true,
+    } as any;
+    expect(mapEventToMessage(failed)).toEqual(
+      expect.objectContaining({
+        type: UNDECRYPTABLE_MESSAGE_TYPE,
+        body: 'Unable to decrypt this message.',
+      }),
+    );
+  });
+
   it('keeps a media message that has an empty body', () => {
     const msg = mapEventToMessage(
       makeEvent({
@@ -52,6 +163,23 @@ describe('mapEventToMessage', () => {
   it('still drops a text message with no body', () => {
     const msg = mapEventToMessage(makeEvent({ msgtype: 'm.text', body: '' }));
     expect(msg).toBeNull();
+  });
+
+  // Any room member can send any JSON; a non-string body or url used to throw
+  // while rendering and broke the room for everyone until it was redacted.
+  it('drops a text message whose body is not a string', () => {
+    const msg = mapEventToMessage(
+      makeEvent({ msgtype: 'm.text', body: { evil: true } }),
+    );
+    expect(msg).toBeNull();
+  });
+
+  it('ignores a media url that is not a string', () => {
+    const msg = mapEventToMessage(
+      makeEvent({ msgtype: 'm.file', body: 'a.txt', url: ['mxc://x/y'] }),
+    );
+    expect(msg?.url).toBeUndefined();
+    expect(msg?.body).toBe('a.txt');
   });
 });
 
@@ -375,5 +503,111 @@ describe('aggregateReactionsForTarget', () => {
       '👍': ['@a:s', '@b:s'],
       '🎉': ['@a:s'],
     });
+  });
+});
+
+describe('mapEventToMessage edits, replies and deletions', () => {
+  const event = (
+    id: string,
+    content: Record<string, any>,
+    extra: Record<string, any> = {},
+  ) =>
+    ({
+      getType: () => 'm.room.message',
+      getContent: () => content,
+      getSender: () => '@bob:s',
+      getId: () => id,
+      getTs: () => 1000,
+      isRedacted: () => false,
+      ...extra,
+    }) as any;
+  const edit = (body: string, sender = '@bob:s', ts = 2000) =>
+    event(
+      `$edit-${body}`,
+      {
+        msgtype: 'm.text',
+        body: `* ${body}`,
+        'm.new_content': { msgtype: 'm.text', body },
+        'm.relates_to': { rel_type: 'm.replace', event_id: '$orig' },
+      },
+      { getSender: () => sender, getTs: () => ts },
+    );
+  const original = event('$orig', { msgtype: 'm.text', body: 'typo' });
+
+  it('gives an edit no row of its own', () => {
+    expect(mapEventToMessage(edit('fixed'))).toBeNull();
+  });
+
+  it('gives an undecryptable edit no row either', () => {
+    const failed = {
+      ...edit('fixed'),
+      isDecryptionFailure: () => true,
+    } as any;
+    expect(mapEventToMessage(failed)).toBeNull();
+  });
+
+  it('shows the latest edit and marks the message edited', () => {
+    const index = new Map([
+      ['$orig', [edit('first'), edit('second', undefined, 3000)]],
+    ]);
+    expect(mapEventToMessage(original, undefined, index)).toEqual(
+      expect.objectContaining({ body: 'second', edited: true }),
+    );
+  });
+
+  it('searches the room for edits when given no index', () => {
+    const room = {
+      getMember: () => null,
+      getLiveTimeline: () => ({ getEvents: () => [original, edit('fixed')] }),
+      getPendingEvents: () => [],
+    } as any;
+    expect(mapEventToMessage(original, room)?.body).toBe('fixed');
+  });
+
+  it("ignores another sender's edit, even one the SDK applied", () => {
+    const forged = edit('forged', '@mallory:s');
+    const replaced = {
+      ...original,
+      // matrix-js-sdk's own aggregation, which the row must not trust.
+      getContent: () => forged.getContent()['m.new_content'],
+      getOriginalContent: () => ({ msgtype: 'm.text', body: 'typo' }),
+      replacingEvent: () => forged,
+    } as any;
+    const message = mapEventToMessage(
+      replaced,
+      undefined,
+      new Map([['$orig', [forged]]]),
+    );
+    expect(message?.body).toBe('typo');
+    expect(message?.edited).toBeUndefined();
+  });
+
+  it('keeps a deleted message as a placeholder without its content', () => {
+    const deleted = event('$orig', {}, { isRedacted: () => true });
+    expect(mapEventToMessage(deleted)).toEqual(
+      expect.objectContaining({
+        eventId: '$orig',
+        body: '',
+        redacted: true,
+        type: REDACTED_MESSAGE_TYPE,
+      }),
+    );
+    const deletedEncrypted = event(
+      '$enc',
+      {},
+      { isRedacted: () => true, getType: () => 'm.room.encrypted' },
+    );
+    expect(mapEventToMessage(deletedEncrypted)?.redacted).toBe(true);
+  });
+
+  it('reads the replied-to message and drops the quote fallback', () => {
+    const reply = event('$reply', {
+      msgtype: 'm.text',
+      body: '> <@alice:s> question\n\nanswer',
+      'm.relates_to': { 'm.in_reply_to': { event_id: '$q' } },
+    });
+    expect(mapEventToMessage(reply)).toEqual(
+      expect.objectContaining({ body: 'answer', replyToEventId: '$q' }),
+    );
   });
 });

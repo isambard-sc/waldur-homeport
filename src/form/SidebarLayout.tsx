@@ -1,7 +1,8 @@
 import classNames from 'classnames';
 import { FC, PropsWithChildren } from 'react';
 import { Card } from 'react-bootstrap';
-import { useMediaQuery } from 'react-responsive';
+
+import { useBreakpointDown } from 'waldur-ui';
 
 import { useFullPage } from '@/navigation/context';
 
@@ -24,6 +25,26 @@ const Body: FC<PropsWithChildren<{ className? }>> = (props) => (
   </div>
 );
 
+// Sticks below the fixed header, page tabs and impersonation bar
+// (--layout-sticky-top, see layout/_sticky-top.scss).
+const stickyClassName = classNames(
+  'sticky z-95',
+  'h-[calc(100vh-var(--layout-sticky-top)-10px)]',
+);
+
+const cardClassName = classNames(
+  stickyClassName,
+  'top-(--layout-sticky-top)',
+  'in-[.toolbar-fixed]:h-[calc(100vh-var(--layout-sticky-top))]',
+);
+
+const transparentClassName = classNames(
+  stickyClassName,
+  'top-[calc(var(--layout-sticky-top)+10px)]',
+  'in-[.toolbar-fixed]:top-[calc(var(--layout-sticky-top)+20px)]',
+  'in-[.toolbar-fixed]:h-fit',
+);
+
 const Sidebar: FC<
   PropsWithChildren<{
     title?: string;
@@ -31,19 +52,18 @@ const Sidebar: FC<
     hideOnVertical?: boolean;
   }>
 > = (props) => {
-  const isVMode = useMediaQuery({ maxWidth: 1200 });
+  const isVMode = useBreakpointDown('xl');
   useFullPage();
 
   return !props.transparent ? (
     <div
-      className={
+      className={classNames(
+        'v-stepper-form-sidebar',
+        cardClassName,
         isVMode
-          ? classNames(
-              'v-stepper-form-sidebar',
-              props.hideOnVertical && 'd-none',
-            )
-          : 'v-stepper-form-sidebar drawer drawer-end drawer-on'
-      }
+          ? props.hideOnVertical && 'd-none'
+          : 'drawer drawer-end drawer-on',
+      )}
     >
       <Card className="card-bordered w-100">
         {props.title ? (
@@ -58,14 +78,13 @@ const Sidebar: FC<
     </div>
   ) : (
     <div
-      className={
+      className={classNames(
+        'v-stepper-form-sidebar transparent',
+        transparentClassName,
         isVMode
-          ? classNames(
-              'v-stepper-form-sidebar transparent',
-              props.hideOnVertical && 'd-none',
-            )
-          : 'v-stepper-form-sidebar transparent drawer drawer-end drawer-on'
-      }
+          ? props.hideOnVertical && 'd-none'
+          : 'drawer drawer-end drawer-on',
+      )}
     >
       <div className="w-100">
         {props.title ? <h4>{props.title}</h4> : null}

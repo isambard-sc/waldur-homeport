@@ -8,27 +8,40 @@ The application features a comprehensive set of reusable UI components organized
 
 ### Tables and Data Display
 
-| Component               | Location                            | Description                | Key Features                                              |
-| ----------------------- | ----------------------------------- | -------------------------- | --------------------------------------------------------- |
-| **Table**               | `src/table/Table.tsx`               | Main table component       | Filtering, sorting, pagination, column visibility, export |
-| **ActionsDropdown**     | `src/table/ActionsDropdown.tsx`     | Dropdown for table actions | Bulk operations, contextual actions                       |
-| **ExpandableContainer** | `src/table/ExpandableContainer.tsx` | Collapsible row details    | Table row expansion, detail views                         |
-| **TablePagination**     | `src/table/TablePagination.tsx`     | Pagination controls        | Page navigation, size selection                           |
+| Component               | Location                            | Description                | Key Features                                                |
+| ----------------------- | ----------------------------------- | -------------------------- | ----------------------------------------------------------- |
+| **Table**               | `src/table/Table.tsx`               | Main table component       | Filtering, sorting, pagination, column visibility, export   |
+| **ActionsDropdown**     | `src/table/ActionsDropdown.tsx`     | Dropdown for table actions | Row actions with `ActionItem`; a wrapper over `ActionsMenu` |
+| **ExpandableContainer** | `src/table/ExpandableContainer.tsx` | Collapsible row details    | Table row expansion, detail views                           |
+| **TablePagination**     | `waldur-ui`                         | Pagination controls        | Page navigation, size selection                             |
+
+### Menus and Popovers
+
+| Component       | Location                              | Description                          | Key Features                                                                                    |
+| --------------- | ------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| **Menu**        | `packages/ui/src/Menu/` (`waldur-ui`) | Every dropdown menu                  | `nav` and `actions` looks, `density` / `tone` on the panel, submenus, radio rows, `openOnHover` |
+| **MenuPopover** | `packages/ui/src/Menu/` (`waldur-ui`) | Menu surface for panels with inputs  | Filter and picker popovers with menu rows, `forceMount`; panels with no rows use `Popover`      |
+| **ActionsMenu** | `src/table/ActionsDropdown.tsx`       | Action menu with its trigger         | Kebab, labeled, "Add" or custom toggle; `actions-menu` / `action-item` test ids                 |
+| **ActionItem**  | `src/resource/actions/ActionItem.tsx` | An action row                        | Icon, tooltip, staff indicator; filtered by `ActionList`                                        |
+| **NavMenuLink** | `src/navigation/NavMenu.tsx`          | A nav menu row that is a router link | ui-router `state`/`params`                                                                      |
+
+See the [menus guide](menus.md) for when to use which, recipes and how the looks work.
 
 ### Forms and Input Components
 
-| Component                | Location                          | Description            | Key Features                                    |
-| ------------------------ | --------------------------------- | ---------------------- | ----------------------------------------------- |
-| **WizardForm**           | `src/wizard/WizardForm.tsx`       | Multi-step form wizard | Step navigation, validation, progress indicator |
-| **VStepperFormStepCard** | `src/wizard/VStepperFormStep.tsx` | Card-based form step   | Loading state, disabled state with tooltip      |
-| **AwesomeCheckbox**      | `src/core/AwesomeCheckbox.tsx`    | Enhanced checkbox      | Switch-style, tooltip support                   |
-| **SelectField**          | `src/form/SelectField.tsx`        | Dropdown selection     | Options, search, validation                     |
-| **StringField**          | `src/form/StringField.tsx`        | Text input field       | Validation, placeholder, help text              |
-| **NumberField**          | `src/form/NumberField.tsx`        | Numeric input          | Min/max validation, step control                |
-| **DateField**            | `src/form/DateField.tsx`          | Date picker            | Date selection, validation                      |
-| **FileUploadField**      | `src/form/FileUploadField.tsx`    | File upload            | Drag & drop, validation                         |
-| **MarkdownEditor**       | `src/form/MarkdownEditor.tsx`     | Markdown editor        | Preview, syntax highlighting                    |
-| **SecretField**          | `src/form/SecretField.tsx`        | Password/secret input  | Show/hide toggle, validation                    |
+| Component                     | Location                          | Description            | Key Features                                                                    |
+| ----------------------------- | --------------------------------- | ---------------------- | ------------------------------------------------------------------------------- |
+| **WizardForm**                | `src/wizard/WizardForm.tsx`       | Multi-step form wizard | Step navigation, validation, progress indicator                                 |
+| **VStepperFormStepCard**      | `src/wizard/VStepperFormStep.tsx` | Card-based form step   | Loading state, disabled state with tooltip                                      |
+| **Checkbox / Radio / Switch** | `waldur-ui`                       | Check controls         | `label`/`description`/`tooltip` props, `md`/`sm`, `checked` + `onCheckedChange` |
+| **RadioGroup**                | `waldur-ui`                       | Set of radio options   | Options in, value out; fieldset + legend, `orientation`                         |
+| **SelectField**               | `src/form/SelectField.tsx`        | Dropdown selection     | Options, search, validation                                                     |
+| **StringField**               | `src/form/StringField.tsx`        | Text input field       | Validation, placeholder, help text                                              |
+| **NumberField**               | `src/form/NumberField.tsx`        | Numeric input          | Min/max validation, step control                                                |
+| **DateField**                 | `src/form/DateField.tsx`          | Date picker            | Date selection, validation                                                      |
+| **FileUploadField**           | `src/form/FileUploadField.tsx`    | File upload            | Drag & drop, validation                                                         |
+| **MarkdownEditor**            | `src/form/MarkdownEditor.tsx`     | Markdown editor        | Preview, syntax highlighting                                                    |
+| **SecretField**               | `src/form/SecretField.tsx`        | Password/secret input  | Show/hide toggle, validation                                                    |
 
 ### Button Components
 
@@ -39,14 +52,15 @@ The application uses a unified button system built on Tailwind v4 and Radix UI. 
 
 #### Core Button Components
 
-| Component             | Location                          | Description                    | Key Features                                                                                   |
-| --------------------- | --------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------- |
-| **BaseButton**        | `waldur-ui`                       | General purpose action button  | Direct Tooltip, loading spinner, icon support, 12 variants, sizes (`sm`, `md` [default], `lg`) |
-| **SubmitButton**      | `src/form/SubmitButton.tsx`       | Form submission                | Loading spinner, disabled states, large size (`lg` default, `sm` for compact)                  |
-| **CompactEditButton** | `src/form/CompactEditButton.tsx`  | Edit button for key-value rows | Used in key-value component where label and edit button appear in the same row                 |
-| **CloseDialogButton** | `src/modal/CloseDialogButton.tsx` | Modal cancel/close             | Auto-closes dialog, customizable label, large size (`lg` default)                              |
-| **SaveButton**        | `src/core/SaveButton.tsx`         | Form save with dirty state     | Tracks form changes, dirty badge indicator, conditional visibility                             |
-| **SegmentedControl**  | `waldur-ui`                       | View switcher (a lens)         | Radix RadioGroup: arrows select, one tab stop; `segmentedItemClassName` styles `Tabs.Trigger`  |
+| Component             | Location                          | Description                                    | Key Features                                                                                                                         |
+| --------------------- | --------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **BaseButton**        | `waldur-ui`                       | General purpose action button                  | Direct Tooltip, loading spinner, icon support, 12 variants, sizes (`sm`, `md` [default], `lg`)                                       |
+| **SubmitButton**      | `src/form/SubmitButton.tsx`       | Form submission                                | Loading spinner, disabled states, large size (`lg` default, `sm` for compact)                                                        |
+| **CompactEditButton** | `src/form/CompactEditButton.tsx`  | Edit button for key-value rows                 | Used in key-value component where label and edit button appear in the same row                                                       |
+| **CloseDialogButton** | `src/modal/CloseDialogButton.tsx` | Modal cancel/close                             | Auto-closes dialog, customizable label, large size (`lg` default)                                                                    |
+| **SaveButton**        | `src/core/SaveButton.tsx`         | Form save with dirty state                     | Tracks form changes, dirty badge indicator, conditional visibility                                                                   |
+| **Tabs / TabNav**     | `waldur-ui`                       | Tab bars: panels on the page, or router-driven | `Tabs` (`mount`, `activationMode`), `TabNav` (`items` with router `link`s); `EmbeddedTabs` for table panels — see [tabs.md](tabs.md) |
+| **SegmentedControl**  | `waldur-ui`                       | View switcher (a lens)                         | Radix RadioGroup: arrows select, one tab stop; for panels use `TabsList variant="segmented"`                                         |
 
 #### Button Selection Guide
 
@@ -210,7 +224,7 @@ export const MyEditButton = ({ row, refetch }) => (
 | Component          | Location                                          | Description        | Key Features                         |
 | ------------------ | ------------------------------------------------- | ------------------ | ------------------------------------ |
 | **Panel**          | `src/core/Panel.tsx`                              | Basic card panel   | Header, actions, flexible content    |
-| **AccordionCard**  | `waldur-ui` (`packages/ui/src/AccordionCard.tsx`) | Collapsible card   | Toggle functionality, custom styling |
+| **AccordionCard**  | `waldur-ui` (`packages/ui/src/AccordionCard/AccordionCard.tsx`) | Collapsible card   | Toggle functionality, custom styling |
 | **WidgetCard**     | `src/dashboard/WidgetCard.tsx`                    | Dashboard widget   | Flexible layout, action dropdown     |
 | **StatisticsCard** | `src/core/StatisticsCard.tsx`                     | Statistics display | Large value display, "View all" link |
 
@@ -246,7 +260,7 @@ export const MyEditButton = ({ row, refetch }) => (
 | ------------------------- | ------------------------------------ | ------------------ | ------------------------------- |
 | **CopyToClipboard**       | `src/core/CopyToClipboard.tsx`       | Copy functionality | Click to copy, success feedback |
 | **CopyToClipboardButton** | `src/core/CopyToClipboardButton.tsx` | Copy button        | Icon button, tooltip            |
-| **Tooltip**               | `packages/ui/src/Tooltip.tsx`        | Tooltip wrapper    | Help text, positioning          |
+| **Tooltip**               | `packages/ui/src/Tooltip/Tooltip.tsx`        | Tooltip wrapper    | Help text, positioning          |
 | **ProgressSteps**         | `src/wizard/ProgressSteps.tsx`       | Step indicator     | Multi-step processes, progress  |
 
 ## Component Design Principles
@@ -420,7 +434,7 @@ const FieldRow = ({ field, ...rest }) =>
   field.type === 'string' ? (
     <StringField {...rest} />
   ) : field.type === 'boolean' ? (
-    <AwesomeCheckboxField
+    <SwitchField
       label={getKeyTitle(field.key)}
       hideLabel
       className="mt-3"
@@ -444,7 +458,7 @@ const FieldRow = ({ field, ...rest }) =>
 The application supports these field types:
 
 - **`string`** - Basic text input using `StringField`
-- **`boolean`** - Checkbox using `AwesomeCheckboxField`
+- **`boolean`** - Switch using `SwitchField`
 - **`email_field`** - Email input with validation using `EmailField`
 - **`text_field`** - Multi-line text using `TextField`
 - **`integer`** - Numeric input using `NumberField`
@@ -846,7 +860,7 @@ This guards against three real failure modes that otherwise produce a "ghost" ac
 import { BooleanFilter } from '@/table';
 ```
 
-Combines `TableFilterItem` and `AwesomeCheckboxField`. Usually used with `parse={(v) => v || undefined}` to remove filter when unchecked.
+Combines `TableFilterItem` and `SwitchField`. Usually used with `parse={(v) => v || undefined}` to remove filter when unchecked.
 
 ---
 

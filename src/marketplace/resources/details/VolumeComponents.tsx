@@ -1,19 +1,10 @@
-import { Col, Row } from 'react-bootstrap';
+import { QuotaSingleView } from './QuotaSingleView';
+import { getStorageTitle } from './storageTitle';
 
-import { translate } from '@/i18n';
-
-import { QuotaCell } from './QuotaCell';
-
-export const VolumeComponents = ({ resource }) => {
-  return (
-    <Row>
-      <Col xs={12}>
-        <QuotaCell
-          title={translate('{type} storage', { type: resource.type_name })}
-          usage={(resource.size / 1024).toFixed()}
-          units="GB"
-        />
-      </Col>
-    </Row>
-  );
-};
+export const VolumeComponents = ({ resource }) => (
+  <QuotaSingleView
+    title={getStorageTitle(resource.type_name)}
+    usage={(resource.size / 1024).toFixed()}
+    displayUnit="GB"
+  />
+);

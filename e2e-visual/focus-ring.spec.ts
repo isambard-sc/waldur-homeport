@@ -2,7 +2,9 @@ import { test, expect, Page } from '@playwright/test';
 
 import { contrastRatio, parseColor } from 'waldur-design-tokens/contrast';
 
-import { buttonVariants } from '../packages/ui/src/BaseButton';
+import { buttonVariants } from '../packages/ui/src/Button';
+import { menuItem } from '../packages/ui/src/Menu';
+import { tabTriggerVariants } from '../packages/ui/src/Tabs';
 
 /**
  * Asserts that keyboard focus produces a *visible* indicator, with enough
@@ -13,7 +15,7 @@ import { buttonVariants } from '../packages/ui/src/BaseButton';
  * which is what had happened across the login page.
  *
  * Each fixture below is a place where a `box-shadow`-based ring was previously
- * suppressed — elevation utilities, unlayered page CSS, `.menu-link` — so
+ * suppressed — elevation utilities, unlayered page CSS, menu rows — so
  * re-adding any such suppression fails CI instead of silently costing
  * keyboard users their focus indicator. The buttons are rendered with the
  * same `buttonVariants()` classes BaseButton uses.
@@ -49,14 +51,8 @@ const FIXTURES = `
   <div class="layout-neumorphism-card">
     <button class="${button('tertiary')}" data-ring="unlayered-override">Neumorphic</button>
   </div>
-  <ul class="menu"><li class="menu-item">
-    <a href="#" class="menu-link" data-ring="menu-link">Menu link</a>
-  </li></ul>
-  <ul class="nav nav-tabs nav-line-tabs">
-    <li class="nav-item">
-      <a href="#" class="nav-link" data-ring="nav-line-tab">View</a>
-    </li>
-  </ul>
+  <a href="#" class="${menuItem({ look: 'nav' })}" data-ring="nav-menu-row">Menu row</a>
+  <button type="button" role="tab" class="${tabTriggerVariants()}" data-ring="nav-line-tab">View</button>
 </div>`;
 
 const CASES = [
@@ -65,7 +61,7 @@ const CASES = [
   'text-primary',
   'shadow-sm',
   'unlayered-override',
-  'menu-link',
+  'nav-menu-row',
   'nav-line-tab',
 ] as const;
 
@@ -113,12 +109,7 @@ async function focusByKeyboardAndMeasure(page: Page, ring: string) {
       if (!active) return null;
       const styled = active;
       if (styled.dataset?.ring !== target) return null;
-      const ringHost =
-        target === 'nav-line-tab' ? styled.closest('.nav-item') : styled;
-      const ringSource =
-        target === 'nav-line-tab' && ringHost
-          ? getComputedStyle(ringHost, '::before')
-          : getComputedStyle(styled);
+      const ringSource = getComputedStyle(styled);
       return {
         outlineWidth: parseFloat(ringSource.outlineWidth),
         outlineStyle: ringSource.outlineStyle,

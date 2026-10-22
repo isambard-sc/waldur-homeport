@@ -5,16 +5,116 @@ import { stripHtml } from '@/core/sanitize';
 import { translate } from '@/i18n';
 import { getUserLocale } from '@/i18n/LanguageUtilsService';
 
+import { parseEncryptedFile } from './attachmentCrypto';
+import {
+  CALL_STARTED_MESSAGE_TYPE,
+  CallTransition,
+  isCallTransitionType,
+} from './call/callTimeline';
+import {
+  getReplacedEventId,
+  getReplyToEventId,
+  getDisplayedContent,
+  REDACTED_MESSAGE_TYPE,
+  stripReplyFallback,
+} from './messageRelations';
 import { MatrixChatMessage, ReactionAggregate } from './types';
 
+/** Message type of the row standing in for an event that can't be decrypted. */
+export const UNDECRYPTABLE_MESSAGE_TYPE = 'waldur.undecryptable';
+
+// Types Waldur gives its own stand-in rows; a sender can't claim them.
+const INTERNAL_MESSAGE_TYPES = new Set([
+  UNDECRYPTABLE_MESSAGE_TYPE,
+  REDACTED_MESSAGE_TYPE,
+]);
+
+const isInternalMessageType = (type: string) =>
+  INTERNAL_MESSAGE_TYPES.has(type) || isCallTransitionType(type);
+
+const memberDisplayName = (userId: string, room?: Room) =>
+  room?.getMember(userId)?.name || formatDisplayName(userId);
+
+/**
+ * The row marking where the room's call started or ended, at the call member
+ * event that did it (see `findCallTransitions`).
+ */
+export function mapCallTransitionToMessage(
+  event: MatrixEvent,
+  { type, participants }: CallTransition,
+  room?: Room,
+): MatrixChatMessage {
+  const senderId = event.getSender();
+  return {
+    eventId: event.getId(),
+    sender: senderId,
+    senderDisplayName: memberDisplayName(senderId, room),
+    body: '',
+    timestamp: event.getTs(),
+    type,
+    callParticipants:
+      type === CALL_STARTED_MESSAGE_TYPE
+        ? participants.map((userId) => ({
+            userId,
+            displayName: memberDisplayName(userId, room),
+          }))
+        : undefined,
+  };
+}
+
+/**
+ * Map a timeline event to a message row, or null when it has none.
+ *
+ * `editsIndex` holds the loaded edit events by the id of the message they
+ * edit (see `indexEdits`); without it the room's events are searched, which
+ * is fine for one event but not for a whole timeline.
+ */
 export function mapEventToMessage(
   event: MatrixEvent,
   room?: Room,
+  editsIndex?: Map<string, MatrixEvent[]>,
 ): MatrixChatMessage | null {
+  // An edit changes the message it replaces and has no row of its own, even
+  // when it can't be decrypted.
+  if (getReplacedEventId(event)) return null;
   const type = event.getType();
+  if (event.isRedacted?.()) {
+    // Other redacted events (reactions, state) have no row to keep.
+    if (type !== 'm.room.message' && type !== 'm.room.encrypted') return null;
+    const senderId = event.getSender();
+    return {
+      eventId: event.getId(),
+      sender: senderId,
+      senderDisplayName:
+        room?.getMember(senderId)?.name || formatDisplayName(senderId),
+      body: '',
+      timestamp: event.getTs(),
+      type: REDACTED_MESSAGE_TYPE,
+      redacted: true,
+    };
+  }
+  // Checked before the type: once decryption fails, matrix-js-sdk reports the
+  // event as an m.room.message (msgtype m.bad.encrypted) whose body is its own
+  // untranslated error text. Such an event keeps a row with a notice, so it
+  // doesn't silently vanish from the conversation.
+  if (event.isDecryptionFailure?.()) {
+    const senderId = event.getSender();
+    return {
+      eventId: event.getId(),
+      sender: senderId,
+      senderDisplayName:
+        room?.getMember(senderId)?.name || formatDisplayName(senderId),
+      body: translate('Unable to decrypt this message.'),
+      timestamp: event.getTs(),
+      type: UNDECRYPTABLE_MESSAGE_TYPE,
+    };
+  }
+  // Still being decrypted: it shows up once matrix-js-sdk emits
+  // Event.decrypted.
   if (type !== 'm.room.message') return null;
 
-  const content = event.getContent();
+  const { content, edit } = getDisplayedContent(event, room, editsIndex);
+  const replyToEventId = getReplyToEventId(event);
   const isMediaMsg =
     content.msgtype === 'm.image' ||
     content.msgtype === 'm.video' ||
@@ -22,7 +122,10 @@ export function mapEventToMessage(
     content.msgtype === 'm.file';
   // Drop only bodyless *text* events. Media/voice notes carry their payload in
   // url/info/MSC fields and are valid with an empty body (some clients omit it).
-  if (!content.body && !isMediaMsg) return null;
+  // Event content is whatever the sender wrote, not necessarily strings.
+  let body = typeof content.body === 'string' ? content.body : '';
+  if (replyToEventId) body = stripReplyFallback(body);
+  if (!body && !isMediaMsg) return null;
 
   const senderId = event.getSender();
   const member = room?.getMember(senderId);
@@ -50,22 +153,53 @@ export function mapEventToMessage(
         ? content.info.duration
         : undefined;
 
+  // Encrypted media carries `file` instead of `url`. A malformed one is kept
+  // as such, so it shows an error rather than falling back to a clear `url`.
+  const file =
+    isMediaMsg && content.file !== undefined
+      ? parseEncryptedFile(content.file)
+      : undefined;
+
   return {
     eventId: event.getId(),
     txnId: event.getTxnId?.() ?? undefined,
     sender: senderId,
     senderDisplayName: member?.name || formatDisplayName(senderId),
-    body: content.body ?? '',
+    body,
     timestamp: event.getTs(),
-    type: content.msgtype || 'm.text',
-    url: content.url,
+    // The stand-in types are Waldur's own; a sender who claims one gets a
+    // plain text message, not the notice style.
+    type:
+      typeof content.msgtype === 'string' &&
+      !isInternalMessageType(content.msgtype)
+        ? content.msgtype
+        : 'm.text',
+    url: typeof content.url === 'string' ? content.url : undefined,
+    file: file ?? undefined,
+    fileInvalid: file === null || undefined,
     info: content.info,
     mentionedUserIds,
     isVoice,
     waveform,
     durationMs,
+    // A local echo is not encrypted until it is sent; only a delivered event
+    // can be judged.
+    unencrypted:
+      (Boolean(room?.hasEncryptionStateEvent?.()) &&
+        !event.status &&
+        // An edit in clear of an encrypted message is never applied (see
+        // isValidEdit), so only the original is judged.
+        !event.isEncrypted()) ||
+      undefined,
+    replyToEventId,
+    edited: edit ? true : undefined,
   };
 }
+
+/** Whether a message carries an attachment, encrypted or not. */
+export const hasMedia = (
+  message: Pick<MatrixChatMessage, 'url' | 'file' | 'fileInvalid'>,
+) => Boolean(message.url || message.file || message.fileInvalid);
 
 /**
  * Resolve a Matrix user ID to their canonical Waldur full name.

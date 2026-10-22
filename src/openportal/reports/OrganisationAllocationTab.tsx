@@ -23,16 +23,7 @@ import { FileXlsIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { DateTime } from 'luxon';
 import { ChangeEvent, FC, useEffect, useMemo, useState } from 'react';
-import {
-  Card,
-  Col,
-  Container,
-  Form,
-  Modal,
-  Row,
-  Tab,
-  Tabs,
-} from 'react-bootstrap';
+import { Card, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import type { ProjectAccountingSummary } from 'waldur-js-client';
 import {
   openportalAccountingSummaryList,
@@ -43,12 +34,17 @@ import {
   AlertItem,
   Badge,
   BaseButton,
+  Checkbox,
   DatePicker,
   DateRangePicker,
-  SegmentedControl,
-  Tooltip,
   parseDateValue,
+  SegmentedControl,
   toIsoDate,
+  Tooltip,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
 } from 'waldur-ui';
 
 import { getNextPageUrl } from '@/core/api';
@@ -529,7 +525,7 @@ const ProjectAutocompleteDialog: FC<ProjectAutocompleteDialogProps> = ({
         </Row>
 
         <div className="d-flex align-items-center gap-2 mb-2">
-          <Form.Check
+          <Checkbox
             id="alloc-select-all"
             checked={allVisibleSelected && visible.length > 0}
             onChange={toggleAll}
@@ -562,47 +558,42 @@ const ProjectAutocompleteDialog: FC<ProjectAutocompleteDialogProps> = ({
           )}
           {visible.map((p) => (
             <div key={p.uuid} className="py-1">
-              <Form.Check className="d-flex align-items-start gap-2 mb-0">
-                <Form.Check.Input
-                  id={`alloc-proj-${p.uuid}`}
-                  className="mt-1 m-0"
-                  checked={draft.has(p.uuid)}
-                  onChange={() => toggle(p.uuid)}
-                />
-                <Form.Check.Label
-                  htmlFor={`alloc-proj-${p.uuid}`}
-                  className="flex-grow-1"
-                  style={{ cursor: 'pointer' }}
-                >
-                  <span className="fw-semibold">{p.name}</span>
-                  {(p.start_date || p.end_date) && (
-                    <span className="text-muted small ms-2">
-                      {p.start_date ?? '?'} →{' '}
-                      {p.end_date ?? translate('ongoing')}
-                    </span>
-                  )}
-                  {p.is_in_grace_period && (
-                    <Badge
-                      variant="warning"
-                      tone="outline"
-                      className="ms-2"
-                      style={{ fontSize: '0.7em' }}
-                    >
-                      {translate('In grace')}
-                    </Badge>
-                  )}
-                  {p.is_expired && !p.is_in_grace_period && (
-                    <Badge
-                      variant="neutral"
-                      tone="outline"
-                      className="ms-2"
-                      style={{ fontSize: '0.7em' }}
-                    >
-                      {translate('Finished')}
-                    </Badge>
-                  )}
-                </Form.Check.Label>
-              </Form.Check>
+              <Checkbox
+                id={`alloc-proj-${p.uuid}`}
+                checked={draft.has(p.uuid)}
+                onChange={() => toggle(p.uuid)}
+                label={
+                  <>
+                    <span className="fw-semibold">{p.name}</span>
+                    {(p.start_date || p.end_date) && (
+                      <span className="text-muted small ms-2">
+                        {p.start_date ?? '?'} →{' '}
+                        {p.end_date ?? translate('ongoing')}
+                      </span>
+                    )}
+                    {p.is_in_grace_period && (
+                      <Badge
+                        variant="warning"
+                        tone="outline"
+                        className="ms-2"
+                        style={{ fontSize: '0.7em' }}
+                      >
+                        {translate('In grace')}
+                      </Badge>
+                    )}
+                    {p.is_expired && !p.is_in_grace_period && (
+                      <Badge
+                        variant="neutral"
+                        tone="outline"
+                        className="ms-2"
+                        style={{ fontSize: '0.7em' }}
+                      >
+                        {translate('Finished')}
+                      </Badge>
+                    )}
+                  </>
+                }
+              />
             </div>
           ))}
         </div>
@@ -675,7 +666,7 @@ const OfferingFilterDialog: FC<OfferingFilterDialogProps> = ({
         </p>
 
         <div className="d-flex align-items-center gap-2 mb-2">
-          <Form.Check
+          <Checkbox
             id="alloc-offering-select-all"
             checked={allSelected}
             onChange={toggleAll}
@@ -707,21 +698,12 @@ const OfferingFilterDialog: FC<OfferingFilterDialogProps> = ({
           )}
           {offeringNames.map((name, idx) => (
             <div key={name} className="py-1">
-              <Form.Check className="d-flex align-items-start gap-2 mb-0">
-                <Form.Check.Input
-                  id={`alloc-offering-${idx}`}
-                  className="mt-1 m-0"
-                  checked={draft.has(name)}
-                  onChange={() => toggle(name)}
-                />
-                <Form.Check.Label
-                  htmlFor={`alloc-offering-${idx}`}
-                  className="flex-grow-1"
-                  style={{ cursor: 'pointer' }}
-                >
-                  {name}
-                </Form.Check.Label>
-              </Form.Check>
+              <Checkbox
+                id={`alloc-offering-${idx}`}
+                checked={draft.has(name)}
+                onChange={() => toggle(name)}
+                label={name}
+              />
             </div>
           ))}
         </div>
@@ -1866,13 +1848,12 @@ export const OrganisationAllocationTab: FC = () => {
               depleted.length > 0 ||
               offTrack.length > 0) && (
               <Tabs
-                activeKey={concerningTab}
-                onSelect={(k) => setConcerningTab(k as any)}
-                className="mb-3"
+                mount="all"
+                value={concerningTab}
+                onValueChange={(k) => setConcerningTab(k as any)}
               >
-                <Tab
-                  eventKey="slowStart"
-                  title={
+                <TabsList className="mb-3">
+                  <TabsTrigger value="slowStart">
                     <>
                       {translate('Slow start')}
                       {slowStart.length > 0 && (
@@ -1885,65 +1866,8 @@ export const OrganisationAllocationTab: FC = () => {
                         </Badge>
                       )}
                     </>
-                  }
-                >
-                  <div>
-                    <p className="text-muted small mb-2">
-                      {translate(
-                        'Started ≥ {months} {month} ago but spent less than {percent}% of their allocation — may not have got going yet.',
-                        {
-                          months: thresholds.slowStartMonths,
-                          month:
-                            thresholds.slowStartMonths !== 1
-                              ? translate('months')
-                              : translate('month'),
-                          percent: thresholds.slowStartPercent,
-                        },
-                      )}
-                    </p>
-                    {slowStart.length === 0 ? (
-                      <p className="text-muted mb-0">{translate('None.')}</p>
-                    ) : (
-                      <ul className="mb-0">
-                        {slowStart.map((s: ProjectAccountingSummary) => {
-                          const spent =
-                            parseCredits(s.total_spend) +
-                            parseCredits(s.current_month_spend);
-                          const totalAlloc = parseCredits(s.total_credits);
-                          const pct = (
-                            (spent / (totalAlloc || 1)) *
-                            100
-                          ).toFixed(1);
-                          return (
-                            <li key={s.project_uuid} className="mb-1">
-                              <a
-                                href={`/projects/${s.project_uuid}/`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {s.project_name}
-                              </a>
-                              {translate(
-                                ' — started {date}, {pct}% spent ({spent} / {total} {currency})',
-                                {
-                                  date: s.start_date,
-                                  pct,
-                                  spent: fmtCredits(spent),
-                                  total: fmtCredits(totalAlloc),
-                                  currency: currencyName,
-                                },
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                </Tab>
-
-                <Tab
-                  eventKey="inactive"
-                  title={
+                  </TabsTrigger>
+                  <TabsTrigger value="inactive">
                     <>
                       {translate('Inactive')}
                       {inactive.length > 0 && (
@@ -1956,67 +1880,8 @@ export const OrganisationAllocationTab: FC = () => {
                         </Badge>
                       )}
                     </>
-                  }
-                >
-                  <div>
-                    <p className="text-muted small mb-2">
-                      {translate(
-                        "Started ≥ {months} {month} ago, no spend recorded this month, and more than {percent}% of allocation still remaining. Note: only the current month's activity is visible here.",
-                        {
-                          months: thresholds.inactiveMonths,
-                          month:
-                            thresholds.inactiveMonths !== 1
-                              ? translate('months')
-                              : translate('month'),
-                          percent: thresholds.inactiveRemainingPercent,
-                        },
-                      )}
-                    </p>
-                    {inactive.length === 0 ? (
-                      <p className="text-muted mb-0">{translate('None.')}</p>
-                    ) : (
-                      <ul className="mb-0">
-                        {inactive.map((s: ProjectAccountingSummary) => {
-                          const spent =
-                            parseCredits(s.total_spend) +
-                            parseCredits(s.current_month_spend);
-                          const totalAlloc = parseCredits(s.total_credits);
-                          const remaining = totalAlloc - spent;
-                          const pct = (
-                            (remaining / (totalAlloc || 1)) *
-                            100
-                          ).toFixed(1);
-                          return (
-                            <li key={s.project_uuid} className="mb-1">
-                              <a
-                                href={`/projects/${s.project_uuid}/`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {s.project_name}
-                              </a>
-                              {translate(
-                                ' — started {date}, {noSpend}, {pct}% remaining ({remaining} / {total} {currency})',
-                                {
-                                  date: s.start_date,
-                                  noSpend: translate('no spend this month'),
-                                  pct,
-                                  remaining: fmtCredits(remaining),
-                                  total: fmtCredits(totalAlloc),
-                                  currency: currencyName,
-                                },
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                </Tab>
-
-                <Tab
-                  eventKey="depleted"
-                  title={
+                  </TabsTrigger>
+                  <TabsTrigger value="depleted">
                     <>
                       {translate('Nearly depleted')}
                       {depleted.length > 0 && (
@@ -2025,65 +1890,8 @@ export const OrganisationAllocationTab: FC = () => {
                         </Badge>
                       )}
                     </>
-                  }
-                >
-                  <div>
-                    <p className="text-muted small mb-2">
-                      {translate(
-                        'At least {percent}% of allocation spent, but still ≥ {days} days until the project ends — may need a top-up.',
-                        {
-                          percent: thresholds.depletedSpentPercent,
-                          days: thresholds.depletedDaysRemaining,
-                        },
-                      )}
-                    </p>
-                    {depleted.length === 0 ? (
-                      <p className="text-muted mb-0">{translate('None.')}</p>
-                    ) : (
-                      <ul className="mb-0">
-                        {depleted.map((s: ProjectAccountingSummary) => {
-                          const spent =
-                            parseCredits(s.total_spend) +
-                            parseCredits(s.current_month_spend);
-                          const totalAlloc = parseCredits(s.total_credits);
-                          const spentPct = (
-                            (spent / (totalAlloc || 1)) *
-                            100
-                          ).toFixed(1);
-                          // Access ends *at* end_date, so count to the last
-                          // usable day rather than to the date itself.
-                          const days = daysUntilAccessEnds(s.end_date!);
-                          return (
-                            <li key={s.project_uuid} className="mb-1">
-                              <a
-                                href={`/projects/${s.project_uuid}/`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {s.project_name}
-                              </a>
-                              {translate(
-                                ' — {spentPct}% spent ({spent} / {total} {currency}), ends {date} ({days} days remaining)',
-                                {
-                                  spentPct,
-                                  spent: fmtCredits(spent),
-                                  total: fmtCredits(totalAlloc),
-                                  currency: currencyName,
-                                  date: s.end_date,
-                                  days,
-                                },
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                </Tab>
-
-                <Tab
-                  eventKey="offTrack"
-                  title={
+                  </TabsTrigger>
+                  <TabsTrigger value="offTrack">
                     <>
                       {translate('Off track')}
                       {offTrack.length > 0 && (
@@ -2096,73 +1904,240 @@ export const OrganisationAllocationTab: FC = () => {
                         </Badge>
                       )}
                     </>
-                  }
-                >
-                  <div>
-                    <p className="text-muted small mb-2">
-                      {translate(
-                        'After the {day}th of the month, actual daily average spend differs from predicted by more than {percent}%.',
-                        {
-                          day: thresholds.offTrackDayOfMonth,
-                          percent: thresholds.offTrackPercent,
-                        },
+                  </TabsTrigger>
+                </TabsList>
+                <div className="tab-content">
+                  <TabsContent value="slowStart">
+                    <div>
+                      <p className="text-muted small mb-2">
+                        {translate(
+                          'Started ≥ {months} {month} ago but spent less than {percent}% of their allocation — may not have got going yet.',
+                          {
+                            months: thresholds.slowStartMonths,
+                            month:
+                              thresholds.slowStartMonths !== 1
+                                ? translate('months')
+                                : translate('month'),
+                            percent: thresholds.slowStartPercent,
+                          },
+                        )}
+                      </p>
+                      {slowStart.length === 0 ? (
+                        <p className="text-muted mb-0">{translate('None.')}</p>
+                      ) : (
+                        <ul className="mb-0">
+                          {slowStart.map((s: ProjectAccountingSummary) => {
+                            const spent =
+                              parseCredits(s.total_spend) +
+                              parseCredits(s.current_month_spend);
+                            const totalAlloc = parseCredits(s.total_credits);
+                            const pct = (
+                              (spent / (totalAlloc || 1)) *
+                              100
+                            ).toFixed(1);
+                            return (
+                              <li key={s.project_uuid} className="mb-1">
+                                <a
+                                  href={`/projects/${s.project_uuid}/`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {s.project_name}
+                                </a>
+                                {translate(
+                                  ' — started {date}, {pct}% spent ({spent} / {total} {currency})',
+                                  {
+                                    date: s.start_date,
+                                    pct,
+                                    spent: fmtCredits(spent),
+                                    total: fmtCredits(totalAlloc),
+                                    currency: currencyName,
+                                  },
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
                       )}
-                    </p>
-                    {offTrack.length === 0 ? (
-                      <p className="text-muted mb-0">{translate('None.')}</p>
-                    ) : (
-                      <ul className="mb-0">
-                        {offTrack.map((s: ProjectAccountingSummary) => {
-                          const today = DateTime.now().startOf('day');
-                          const end = DateTime.fromISO(s.end_date!).startOf(
-                            'day',
-                          );
-                          const remaining = Math.max(
-                            0,
-                            parseCredits(s.total_credits) -
-                              parseCredits(s.total_spend) -
-                              parseCredits(s.current_month_spend),
-                          );
-                          const predictedDaily =
-                            remaining / Math.max(1, daysBetween(today, end));
-                          const actualDaily =
-                            parseCredits(s.current_month_spend) /
-                            Math.max(1, today.day);
-                          const pct = (
-                            ((actualDaily - predictedDaily) /
-                              (predictedDaily || 1)) *
-                            100
-                          ).toFixed(1);
-                          const direction =
-                            actualDaily > predictedDaily ? 'over' : 'under';
-                          return (
-                            <li key={s.project_uuid} className="mb-1">
-                              <a
-                                href={`/projects/${s.project_uuid}/`}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {s.project_name}
-                              </a>
-                              {translate(
-                                ' — {percentage}% {direction} (actual {actual} vs {predicted} {currency}/day',
-                                {
-                                  direction,
-                                  percentage: Math.abs(parseFloat(pct)).toFixed(
-                                    1,
-                                  ),
-                                  actual: fmtCredits(actualDaily),
-                                  predicted: fmtCredits(predictedDaily),
-                                  currency: currencyName,
-                                },
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                </Tab>
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="inactive">
+                    <div>
+                      <p className="text-muted small mb-2">
+                        {translate(
+                          "Started ≥ {months} {month} ago, no spend recorded this month, and more than {percent}% of allocation still remaining. Note: only the current month's activity is visible here.",
+                          {
+                            months: thresholds.inactiveMonths,
+                            month:
+                              thresholds.inactiveMonths !== 1
+                                ? translate('months')
+                                : translate('month'),
+                            percent: thresholds.inactiveRemainingPercent,
+                          },
+                        )}
+                      </p>
+                      {inactive.length === 0 ? (
+                        <p className="text-muted mb-0">{translate('None.')}</p>
+                      ) : (
+                        <ul className="mb-0">
+                          {inactive.map((s: ProjectAccountingSummary) => {
+                            const spent =
+                              parseCredits(s.total_spend) +
+                              parseCredits(s.current_month_spend);
+                            const totalAlloc = parseCredits(s.total_credits);
+                            const remaining = totalAlloc - spent;
+                            const pct = (
+                              (remaining / (totalAlloc || 1)) *
+                              100
+                            ).toFixed(1);
+                            return (
+                              <li key={s.project_uuid} className="mb-1">
+                                <a
+                                  href={`/projects/${s.project_uuid}/`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {s.project_name}
+                                </a>
+                                {translate(
+                                  ' — started {date}, {noSpend}, {pct}% remaining ({remaining} / {total} {currency})',
+                                  {
+                                    date: s.start_date,
+                                    noSpend: translate('no spend this month'),
+                                    pct,
+                                    remaining: fmtCredits(remaining),
+                                    total: fmtCredits(totalAlloc),
+                                    currency: currencyName,
+                                  },
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="depleted">
+                    <div>
+                      <p className="text-muted small mb-2">
+                        {translate(
+                          'At least {percent}% of allocation spent, but still ≥ {days} days until the project ends — may need a top-up.',
+                          {
+                            percent: thresholds.depletedSpentPercent,
+                            days: thresholds.depletedDaysRemaining,
+                          },
+                        )}
+                      </p>
+                      {depleted.length === 0 ? (
+                        <p className="text-muted mb-0">{translate('None.')}</p>
+                      ) : (
+                        <ul className="mb-0">
+                          {depleted.map((s: ProjectAccountingSummary) => {
+                            const spent =
+                              parseCredits(s.total_spend) +
+                              parseCredits(s.current_month_spend);
+                            const totalAlloc = parseCredits(s.total_credits);
+                            const spentPct = (
+                              (spent / (totalAlloc || 1)) *
+                              100
+                            ).toFixed(1);
+                            // Access ends *at* end_date, so count to the last
+                            // usable day rather than to the date itself.
+                            const days = daysUntilAccessEnds(s.end_date!);
+                            return (
+                              <li key={s.project_uuid} className="mb-1">
+                                <a
+                                  href={`/projects/${s.project_uuid}/`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {s.project_name}
+                                </a>
+                                {translate(
+                                  ' — {spentPct}% spent ({spent} / {total} {currency}), ends {date} ({days} days remaining)',
+                                  {
+                                    spentPct,
+                                    spent: fmtCredits(spent),
+                                    total: fmtCredits(totalAlloc),
+                                    currency: currencyName,
+                                    date: s.end_date,
+                                    days,
+                                  },
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  </TabsContent>
+                  <TabsContent value="offTrack">
+                    <div>
+                      <p className="text-muted small mb-2">
+                        {translate(
+                          'After the {day}th of the month, actual daily average spend differs from predicted by more than {percent}%.',
+                          {
+                            day: thresholds.offTrackDayOfMonth,
+                            percent: thresholds.offTrackPercent,
+                          },
+                        )}
+                      </p>
+                      {offTrack.length === 0 ? (
+                        <p className="text-muted mb-0">{translate('None.')}</p>
+                      ) : (
+                        <ul className="mb-0">
+                          {offTrack.map((s: ProjectAccountingSummary) => {
+                            const today = DateTime.now().startOf('day');
+                            const end = DateTime.fromISO(s.end_date!).startOf(
+                              'day',
+                            );
+                            const remaining = Math.max(
+                              0,
+                              parseCredits(s.total_credits) -
+                                parseCredits(s.total_spend) -
+                                parseCredits(s.current_month_spend),
+                            );
+                            const predictedDaily =
+                              remaining / Math.max(1, daysBetween(today, end));
+                            const actualDaily =
+                              parseCredits(s.current_month_spend) /
+                              Math.max(1, today.day);
+                            const pct = (
+                              ((actualDaily - predictedDaily) /
+                                (predictedDaily || 1)) *
+                              100
+                            ).toFixed(1);
+                            const direction =
+                              actualDaily > predictedDaily ? 'over' : 'under';
+                            return (
+                              <li key={s.project_uuid} className="mb-1">
+                                <a
+                                  href={`/projects/${s.project_uuid}/`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  {s.project_name}
+                                </a>
+                                {translate(
+                                  ' — {percentage}% {direction} (actual {actual} vs {predicted} {currency}/day',
+                                  {
+                                    direction,
+                                    percentage: Math.abs(
+                                      parseFloat(pct),
+                                    ).toFixed(1),
+                                    actual: fmtCredits(actualDaily),
+                                    predicted: fmtCredits(predictedDaily),
+                                    currency: currencyName,
+                                  },
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  </TabsContent>
+                </div>
               </Tabs>
             )}
           </Card.Body>

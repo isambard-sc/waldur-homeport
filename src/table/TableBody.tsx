@@ -4,7 +4,6 @@ import {
   SquareLogoIcon,
   WarningCircleIcon,
 } from '@phosphor-icons/react';
-import * as RadixPopover from '@radix-ui/react-popover';
 import classNames from 'classnames';
 import React, {
   Fragment,
@@ -14,15 +13,13 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { FormCheck } from 'react-bootstrap';
 import { Field, useFormState } from 'react-final-form';
 
-import { BaseButton, Tooltip } from 'waldur-ui';
+import { BaseButton, Checkbox, MenuPopover, Radio, Tooltip } from 'waldur-ui';
 
 import { CopyToClipboardButton } from '@/core/CopyToClipboardButton';
 import { FieldErrorMessage } from '@/form/FieldError';
 import { translate } from '@/i18n';
-import { PopoverMenuContent } from '@/navigation/NavMenu';
 
 import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableFilterContext } from './FilterContextProvider';
@@ -56,6 +53,31 @@ interface TableBodyProps extends Pick<
   pinnedColumns?: PinnedColumns;
   pinnedOffsets?: PinnedOffsets;
 }
+
+/**
+ * Renders a table's `rowActions`. Callers usually pass an inline arrow,
+ * which is a new function on every parent render. Used as a component type
+ * (`createElement`), that remounted the cell whenever its row re-rendered,
+ * which happens after every refetch (window focus, a completed action,
+ * polling), and closed any row-action menu the user had open. Calling it as
+ * a render function inside this stable component keeps the cell mounted.
+ * Hooks it calls belong to RowActionsCell, which is safe because a table
+ * always passes the same code. Class, `memo` and `forwardRef` components
+ * cannot be called and are module-level constants anyway, so they keep
+ * `createElement`.
+ */
+const RowActionsCell = ({
+  rowActions,
+  row,
+  fetch,
+}: {
+  rowActions: TableProps['rowActions'];
+  row;
+  fetch;
+}) =>
+  typeof rowActions === 'function' && !rowActions.prototype?.isReactComponent
+    ? (rowActions as (props: { row; fetch }) => React.ReactNode)({ row, fetch })
+    : React.createElement(rowActions, { row, fetch });
 
 interface TableCellsProps {
   row;
@@ -95,8 +117,8 @@ const InlineFilterButton = memo(({ column, row }: { column: Column; row }) => {
     // the actual `.inline-filter` trigger button stays a normal in-flow element
     // inside it so BaseButton's tooltip wrapper span sizes correctly around it.
     <span className="inline-filter-anchor">
-      <RadixPopover.Root open={open} onOpenChange={setOpen} modal={false}>
-        <RadixPopover.Trigger asChild>
+      <MenuPopover open={open} onOpenChange={setOpen} modal={false}>
+        <MenuPopover.Trigger asChild>
           <BaseButton
             variant="text-secondary"
             size="sm"
@@ -104,25 +126,22 @@ const InlineFilterButton = memo(({ column, row }: { column: Column; row }) => {
             tooltip={translate('Add filter')}
             iconNode={<FunnelSimpleIcon weight="bold" size={20} />}
           />
-        </RadixPopover.Trigger>
-        <PopoverMenuContent
-          placement="bottom-start"
-          className="menu menu-column menu-gray-700 menu-state-bg-gray w-auto min-w-150px py-1 fw-bold"
+        </MenuPopover.Trigger>
+        <MenuPopover.Content
+          align="start"
+          className="w-auto min-w-150px py-1 fw-bold"
         >
-          <div className="menu-item">
-            <button
-              type="button"
-              className="menu-link px-5 py-3"
-              onClick={callback}
-            >
-              <span className="menu-icon w-auto me-4">
-                <SquareLogoIcon weight="bold" size={20} />
-              </span>
-              <span className="menu-title">{translate('Filter by')}</span>
-            </button>
-          </div>
-        </PopoverMenuContent>
-      </RadixPopover.Root>
+          <MenuPopover.Item
+            className="px-[16.25px] py-[9.75px]"
+            onClick={callback}
+          >
+            <span className="me-[13px] flex shrink-0 items-center">
+              <SquareLogoIcon weight="bold" size={20} />
+            </span>
+            {translate('Filter by')}
+          </MenuPopover.Item>
+        </MenuPopover.Content>
+      </MenuPopover>
     </span>
   );
 });
@@ -221,24 +240,26 @@ const TableCell = memo(
       ? showTruncationTooltip
       : undefined;
 
-    const content = column.copyField ? (
-      <>
-        <div className="with-copy d-flex align-items-center gap-1">
-          <div className="td-data">{renderedContent}</div>
-          <CopyToClipboardButton value={valueToCopy} />
-        </div>
-        {hasFilter && <InlineFilterButton column={column} row={row} />}
-      </>
-    ) : (
-      <>
-        {hasFilter ? (
-          <div className="td-data">{renderedContent}</div>
-        ) : (
-          renderedContent
-        )}
-        {hasFilter && <InlineFilterButton column={column} row={row} />}
-      </>
-    );
+    // Nothing to copy (a dash, "not assigned"): no copy button either.
+    const content =
+      column.copyField && valueToCopy !== '' && valueToCopy != null ? (
+        <>
+          <div className="with-copy d-flex align-items-center gap-1">
+            <div className="td-data">{renderedContent}</div>
+            <CopyToClipboardButton value={valueToCopy} />
+          </div>
+          {hasFilter && <InlineFilterButton column={column} row={row} />}
+        </>
+      ) : (
+        <>
+          {hasFilter ? (
+            <div className="td-data">{renderedContent}</div>
+          ) : (
+            renderedContent
+          )}
+          {hasFilter && <InlineFilterButton column={column} row={row} />}
+        </>
+      );
 
     const handleClick = column.disabledClick
       ? (e: React.MouseEvent) => e.stopPropagation()
@@ -497,20 +518,27 @@ const TableRow = memo<TableRowProps>(
                       </Tooltip>
                     )
                   )}
-                  <FormCheck
-                    name={fieldProps.input.name}
-                    type={fieldType}
-                    aria-label={translate('Select row')}
-                    className="form-check form-check-custom"
-                    checked={isChecked}
-                    onChange={handleFieldChange}
-                    onClick={(e) => e.stopPropagation()}
-                  />
+                  {fieldType === 'radio' ? (
+                    <Radio
+                      name={fieldProps.input.name}
+                      aria-label={translate('Select row')}
+                      checked={isChecked}
+                      onChange={handleFieldChange}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <Checkbox
+                      name={fieldProps.input.name}
+                      aria-label={translate('Select row')}
+                      checked={isChecked}
+                      onChange={handleFieldChange}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  )}
                 </>
               ) : (
-                <FormCheck
+                <Checkbox
                   aria-label={translate('Select row')}
-                  className="form-check form-check-custom form-check-md"
                   checked={isChecked}
                   onChange={handleSelectRow}
                 />
@@ -546,7 +574,9 @@ const TableRow = memo<TableRowProps>(
             )}
             onClick={(e) => e.stopPropagation()}
           >
-            <div>{React.createElement(rowActions, { row, fetch })}</div>
+            <div>
+              <RowActionsCell rowActions={rowActions} row={row} fetch={fetch} />
+            </div>
           </td>
         )}
       </tr>

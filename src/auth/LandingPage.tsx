@@ -32,6 +32,8 @@ import {
   DiagonalLayout,
   DuotoneLayout,
   LogoWatermarkLayout,
+  // This deployment's own
+  BricsLayout,
   // Dynamic layouts
   SeasonalLayout,
   TimeBasedLayout,
@@ -69,6 +71,8 @@ const LayoutComponents: Record<LandingPageLayout, React.ComponentType> = {
   'brand-pattern': BrandPatternLayout,
   duotone: DuotoneLayout,
   diagonal: DiagonalLayout,
+  // This deployment's own
+  brics: BricsLayout,
   // Dynamic
   'time-based': TimeBasedLayout,
   seasonal: SeasonalLayout,

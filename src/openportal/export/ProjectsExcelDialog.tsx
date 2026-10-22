@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { FC, useMemo, useState } from 'react';
-import { Form } from 'react-bootstrap';
 import { rolesList } from 'waldur-js-client';
+
+import { Checkbox } from 'waldur-ui';
 
 import { SubmitButton } from '@/form';
 import { translate } from '@/i18n';
@@ -177,9 +178,8 @@ export const ProjectsExcelDialog: FC<Props> = ({ resolve }) => {
           ['awards', translate('Awards — one row per award')],
         ] as [SheetKey, string][]
       ).map(([key, label]) => (
-        <Form.Check
+        <Checkbox
           key={key}
-          type="checkbox"
           id={`sheet-${key}`}
           label={label}
           checked={sheets.includes(key)}
@@ -193,9 +193,8 @@ export const ProjectsExcelDialog: FC<Props> = ({ resolve }) => {
           <h6 className="fw-bold mt-4">{translate('Project columns')}</h6>
           <div className="d-flex flex-wrap gap-3">
             {PROJECT_COLUMN_KEYS.map((key) => (
-              <Form.Check
+              <Checkbox
                 key={key}
-                type="checkbox"
                 id={`column-${key}`}
                 label={PROJECT_COLUMNS[key].label()}
                 checked={columns.includes(key)}
@@ -212,9 +211,8 @@ export const ProjectsExcelDialog: FC<Props> = ({ resolve }) => {
           <h6 className="fw-bold mt-4">{translate('Roles')}</h6>
           <div className="d-flex flex-wrap gap-3">
             {(projectRoles ?? []).map((role) => (
-              <Form.Check
+              <Checkbox
                 key={role}
-                type="checkbox"
                 id={`role-${role}`}
                 label={role}
                 checked={selectedRoles.includes(role)}

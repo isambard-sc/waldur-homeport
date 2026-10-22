@@ -1,20 +1,15 @@
-import {
-  DotsThreeIcon,
-  QuestionIcon,
-  WarningCircleIcon,
-} from '@phosphor-icons/react';
-import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
+import { DotsThreeIcon, WarningCircleIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { debounce } from 'lodash-es';
 import {
   FunctionComponent,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Nav, Tab } from 'react-bootstrap';
 import { Field, useField, useForm } from 'react-final-form';
 import {
   ComponentUserUsage,
@@ -24,9 +19,17 @@ import {
   OfferingComponent,
 } from 'waldur-js-client';
 
-import { BaseButton, Tooltip } from 'waldur-ui';
+import {
+  BaseButton,
+  HelpIcon,
+  Menu,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+} from 'waldur-ui';
 
-import { AwesomeRadioButton } from '@/core/AwesomeRadioButton';
 import { UI_STALE_TIME } from '@/core/constants';
 import { parseDate } from '@/core/dateUtils';
 import { LoadingErred } from '@/core/LoadingErred';
@@ -38,9 +41,9 @@ import {
   SelectGroup,
   StringGroup,
 } from '@/form';
+import { RadioGroupField } from '@/form/RadioGroupField';
 import { translate } from '@/i18n';
 import { HeaderButtonBullet } from '@/navigation/header/HeaderButtonBullet';
-import { ActionsDropdownItem } from '@/table/ActionsDropdown';
 
 import { getPeriodRange } from './api';
 import {
@@ -92,32 +95,58 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
   // Controlled so the overflow menu, which sits outside the tab Nav, can
   // switch tabs too.
   const [activeTab, setActiveTab] = useState(props.components[0]?.uuid);
+  const [promotedTab, setPromotedTab] = useState<string>();
 
-  const handleWindowResize = useCallback(
-    debounce(() => {
-      if (!refNav?.current) return;
-      const tabs = Array.from<HTMLElement>(refNav.current.children);
-      const wrappedItems = [];
-      if (!tabs?.length) return;
-      const firstTab = tabs[0].getBoundingClientRect();
-      for (let i = 0; i < tabs.length; i++) {
-        const currItem = tabs[i].getBoundingClientRect();
-        if (firstTab && firstTab.top < currItem.top) {
-          if (props.components[i]) {
-            wrappedItems.push(props.components[i]);
-          }
+  // A component picked from the overflow goes first, so the tab row always
+  // names the component being edited, even when only one tab fits.
+  const orderedComponents = useMemo(() => {
+    const promoted = props.components.find((c) => c.uuid === promotedTab);
+    return promoted
+      ? [promoted, ...props.components.filter((c) => c !== promoted)]
+      : props.components;
+  }, [props.components, promotedTab]);
+
+  const selectTab = (uuid: string | null) => {
+    // Promotion is recorded on pick rather than derived from the measurement:
+    // once promoted the tab no longer wraps, and a derived flag would drop it
+    // back into the overflow on the next measure.
+    if (wrappedComponents.some((c) => c.uuid === uuid)) {
+      setPromotedTab(uuid);
+    }
+    setActiveTab(uuid);
+  };
+
+  const measureWrappedComponents = useCallback(() => {
+    if (!refNav?.current) return;
+    const tabs = Array.from<HTMLElement>(refNav.current.children);
+    const wrappedItems = [];
+    if (!tabs?.length) return;
+    const firstTab = tabs[0].getBoundingClientRect();
+    for (let i = 0; i < tabs.length; i++) {
+      const currItem = tabs[i].getBoundingClientRect();
+      if (firstTab && firstTab.top < currItem.top) {
+        if (orderedComponents[i]) {
+          wrappedItems.push(orderedComponents[i]);
         }
       }
-      setWrappedComponents(wrappedItems);
-    }, 100),
-    [refNav?.current, props.components],
+    }
+    setWrappedComponents(wrappedItems);
+  }, [orderedComponents]);
+
+  const handleWindowResize = useMemo(
+    () => debounce(measureWrappedComponents, 100),
+    [measureWrappedComponents],
   );
+
+  // Before paint, so a reordered row never flashes with the promoted tab
+  // collapsed and the displaced one spilling onto a second line.
+  useLayoutEffect(measureWrappedComponents, [measureWrappedComponents]);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowResize);
-    handleWindowResize();
     return () => {
       window.removeEventListener('resize', handleWindowResize);
+      handleWindowResize.cancel();
     };
   }, [handleWindowResize]);
 
@@ -301,69 +330,63 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
         )}
       </div>
       {props.components.length > 0 && (
-        <Tab.Container activeKey={activeTab} onSelect={setActiveTab}>
+        <Tabs mount="all" value={activeTab} onValueChange={selectTab}>
           <div className="d-flex">
-            <Nav
-              ref={refNav}
-              variant="tabs"
-              className="nav-line-tabs flex-grow-1 mb-4"
-            >
-              {props.components.map((component) => {
+            <TabsList ref={refNav} className="flex-wrap flex-grow-1 mb-4">
+              {orderedComponents.map((component) => {
                 const isHidden = wrappedComponents.some(
                   (c) => component.uuid === c.uuid,
                 );
                 return (
-                  <Nav.Item key={component.uuid} className={isHidden && 'h-0'}>
-                    <Nav.Link eventKey={component.uuid}>
-                      {Boolean(errors.components?.[component.type]) && (
-                        <Tooltip
-                          label={
-                            isHidden ? null : (
-                              <FieldError
-                                error={errors.components[component.type]}
-                              />
-                            )
-                          }
-                          autoWidth
-                        >
-                          <WarningCircleIcon
-                            size={18}
-                            weight="bold"
-                            className="text-danger me-1"
-                          />
-                        </Tooltip>
-                      )}
-                      {component.name}
+                  <TabsTrigger
+                    key={component.uuid}
+                    value={component.uuid}
+                    hint={
+                      isHidden
+                        ? undefined
+                        : getBillingTypeLabelOrDash(component.billing_type)
+                    }
+                    className={
+                      isHidden
+                        ? 'invisible h-0 overflow-hidden !p-0 border-0'
+                        : undefined
+                    }
+                  >
+                    {Boolean(errors.components?.[component.type]) && (
                       <Tooltip
                         label={
-                          isHidden
-                            ? null
-                            : getBillingTypeLabelOrDash(component.billing_type)
+                          isHidden ? null : (
+                            <FieldError
+                              error={errors.components[component.type]}
+                            />
+                          )
                         }
+                        autoWidth
                       >
-                        <QuestionIcon
+                        <WarningCircleIcon
                           size={18}
                           weight="bold"
-                          className="ms-1"
+                          className="text-danger me-1"
                         />
                       </Tooltip>
-                    </Nav.Link>
-                  </Nav.Item>
+                    )}
+                    {component.name}
+                  </TabsTrigger>
                 );
               })}
-            </Nav>
+            </TabsList>
             {wrappedComponents.length > 0 ? (
-              <Nav variant="tabs" className="nav-line-tabs mb-4">
-                <Nav.Item>
-                  <RadixDropdownMenu.Root>
+              <div className="d-flex align-items-end border-bottom mb-4">
+                <div>
+                  <Menu>
                     <div className="position-relative d-inline-flex">
-                      <RadixDropdownMenu.Trigger asChild>
+                      <Menu.Trigger asChild>
                         <BaseButton
                           variant="text-secondary"
                           size="md"
                           iconNode={<DotsThreeIcon size={22} weight="bold" />}
                         />
-                      </RadixDropdownMenu.Trigger>
+                      </Menu.Trigger>
                       {wrappedComponents.some((comp) =>
                         Boolean(errors.components?.[comp.type]),
                       ) && (
@@ -375,61 +398,52 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                         />
                       )}
                     </div>
-                    <RadixDropdownMenu.Portal>
-                      <RadixDropdownMenu.Content
-                        sideOffset={2}
-                        className="dropdown-menu show position-static"
-                      >
-                        <div className="mh-200px overflow-auto">
-                          {wrappedComponents.map((component) => (
-                            <ActionsDropdownItem
-                              key={component.uuid}
-                              className="d-flex justify-content-between"
-                              onClick={() => setActiveTab(component.uuid)}
-                            >
-                              {Boolean(errors.components?.[component.type]) && (
-                                <Tooltip
-                                  label={
-                                    <FieldError
-                                      error={errors.components[component.type]}
-                                    />
-                                  }
-                                  autoWidth
-                                >
-                                  <WarningCircleIcon
-                                    size={18}
-                                    weight="bold"
-                                    className="text-danger me-1"
-                                  />
-                                </Tooltip>
-                              )}
-                              {component.name}
+                    <Menu.Content look="actions">
+                      <div className="mh-200px overflow-auto">
+                        {wrappedComponents.map((component) => (
+                          <Menu.Item
+                            key={component.uuid}
+                            className="d-flex justify-content-between"
+                            onClick={() => selectTab(component.uuid)}
+                          >
+                            {Boolean(errors.components?.[component.type]) && (
                               <Tooltip
-                                label={getBillingTypeLabelOrDash(
-                                  component.billing_type,
-                                )}
+                                label={
+                                  <FieldError
+                                    error={errors.components[component.type]}
+                                  />
+                                }
+                                autoWidth
                               >
-                                <QuestionIcon
+                                <WarningCircleIcon
                                   size={18}
                                   weight="bold"
-                                  className="ms-1"
+                                  className="text-danger me-1"
                                 />
                               </Tooltip>
-                            </ActionsDropdownItem>
-                          ))}
-                        </div>
-                      </RadixDropdownMenu.Content>
-                    </RadixDropdownMenu.Portal>
-                  </RadixDropdownMenu.Root>
-                </Nav.Item>
-              </Nav>
+                            )}
+                            {component.name}
+                            <HelpIcon
+                              label={getBillingTypeLabelOrDash(
+                                component.billing_type,
+                              )}
+                              size={18}
+                              className="ms-1"
+                            />
+                          </Menu.Item>
+                        ))}
+                      </div>
+                    </Menu.Content>
+                  </Menu>
+                </div>
+              </div>
             ) : (
               <div className="w-35px" />
             )}
           </div>
-          <Tab.Content>
+          <>
             {props.components.map((component) => (
-              <Tab.Pane key={component.uuid} eventKey={component.uuid}>
+              <TabsContent key={component.uuid} value={component.uuid}>
                 <div>
                   <div className="mb-7">
                     {component.description && (
@@ -493,22 +507,21 @@ export const ResourceUsageForm: FunctionComponent<ResourceUsageFormProps> = (
                       defaultValue={MISSING_USAGE_POLICY_DEFAULT}
                     >
                       {({ input }) => (
-                        <AwesomeRadioButton
+                        <RadioGroupField
                           input={input}
                           label={translate(
                             'When no usage is reported for the next month',
                           )}
                           choices={getMissingUsagePolicyChoices()}
-                          gap={2}
                         />
                       )}
                     </Field>
                   )}
                 </div>
-              </Tab.Pane>
+              </TabsContent>
             ))}
-          </Tab.Content>
-        </Tab.Container>
+          </>
+        </Tabs>
       )}
     </div>
   );

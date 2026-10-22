@@ -1,89 +1,32 @@
 import { ChecksIcon, FileIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import Markdown from 'markdown-to-jsx';
-import { FC, Fragment, useEffect, useMemo, useState } from 'react';
+import { FC, Fragment, useMemo } from 'react';
 
 import Avatar from '@/core/Avatar';
 import { formatFilesize } from '@/core/utils';
 import { translate } from '@/i18n';
 
 import { getChatAvatarColor } from './chatColors';
+import { MatrixMessageActions } from './MatrixMessageActions';
+import { useMatrixMessageActions } from './MatrixMessageActionsContext';
+import { MatrixMessageEditor } from './MatrixMessageEditor';
+import { MatrixReplyQuote } from './MatrixReplyQuote';
 import { MessageReactionChips } from './MessageReactionChips';
 import { MessageReactionToolbar } from './MessageReactionToolbar';
 import { MatrixChatMessage } from './types';
-import { useMatrixClient } from './useMatrixClient';
-import { formatTime, sanitizeName } from './utils';
+import {
+  MEDIA_UNAVAILABLE,
+  MEDIA_UNVERIFIED,
+  useAuthenticatedMediaUrl,
+} from './useAuthenticatedMediaUrl';
+import {
+  formatTime,
+  hasMedia,
+  sanitizeName,
+  UNDECRYPTABLE_MESSAGE_TYPE,
+} from './utils';
 import { VoiceMessagePlayer } from './voice/VoiceMessagePlayer';
-
-/**
- * Fetch media via the Matrix client's authenticated endpoint and return a
- * blob URL that can be used in <img>, <video>, <audio> src attributes.
- *
- * Returns `null` while loading or `MEDIA_UNAVAILABLE` if the fetch failed,
- * so the renderer can surface a placeholder instead of leaking the mxc to
- * an unauthenticated URL that bypasses the access check.
- */
-const MEDIA_UNAVAILABLE = '__matrix_media_unavailable__';
-
-function useAuthenticatedMediaUrl(mxcUrl: string | undefined) {
-  const { client } = useMatrixClient();
-  const [blobUrl, setBlobUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!mxcUrl || !client) return;
-
-    let revoked = false;
-    const match = mxcUrl.match(/^mxc:\/\/([^/]+)\/(.+)$/);
-    if (!match) return;
-
-    const [, serverName, mediaId] = match;
-    const baseUrl =
-      (client as any).baseUrl || (client as any).getHomeserverUrl?.();
-    if (!baseUrl) return;
-
-    const url = `${baseUrl}/_matrix/client/v1/media/download/${encodeURIComponent(serverName)}/${encodeURIComponent(mediaId)}`;
-    const accessToken = (client as any).getAccessToken?.();
-
-    fetch(url, {
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.blob();
-      })
-      .then((blob) => {
-        if (revoked) return;
-        const created = URL.createObjectURL(blob);
-        // A second guard inside the .then is required because the effect can
-        // re-run (new mxc/client) between the fetch dispatch and resolve.
-        // The cleanup will have set `revoked = true`; revoke the blob we
-        // just created before it leaks.
-        if (revoked) {
-          URL.revokeObjectURL(created);
-          return;
-        }
-        setBlobUrl(created);
-      })
-      .catch(() => {
-        // Do NOT fall back to the legacy unauthenticated /media/v3/download
-        // endpoint: it would bypass the homeserver's authenticated media
-        // gate and leak the mxc URL through the page's network log.
-        if (!revoked) {
-          setBlobUrl(MEDIA_UNAVAILABLE);
-        }
-      });
-
-    return () => {
-      revoked = true;
-      setBlobUrl((prev) => {
-        if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
-        return null;
-      });
-    };
-  }, [mxcUrl, client]);
-
-  return blobUrl;
-}
 
 const MARKDOWN_OVERRIDES = {
   a: {
@@ -216,6 +159,8 @@ interface MatrixMessageItemProps {
   continuation?: boolean;
   memberNames?: Map<string, string>;
   currentUserId?: string | null;
+  /** The message this one replies to, when it is in the loaded timeline. */
+  replyParent?: MatrixChatMessage;
 }
 
 const MediaContent: FC<{
@@ -223,9 +168,13 @@ const MediaContent: FC<{
   memberNames?: Map<string, string>;
   currentUserId?: string | null;
 }> = ({ message, memberNames, currentUserId }) => {
-  const httpUrl = useAuthenticatedMediaUrl(message.url);
+  const httpUrl = useAuthenticatedMediaUrl(message);
 
-  if (!message.url) {
+  if (message.type === UNDECRYPTABLE_MESSAGE_TYPE) {
+    return <em className="text-muted">{message.body}</em>;
+  }
+
+  if (!hasMedia(message)) {
     return (
       <TextBody
         body={message.body}
@@ -241,6 +190,14 @@ const MediaContent: FC<{
     return (
       <div className="text-muted" style={{ fontSize: '0.8rem' }}>
         Loading {message.body}...
+      </div>
+    );
+  }
+
+  if (httpUrl === MEDIA_UNVERIFIED) {
+    return (
+      <div className="text-danger" style={{ fontSize: '0.8rem' }}>
+        {translate('This attachment could not be decrypted.')} ({message.body})
       </div>
     );
   }
@@ -308,6 +265,7 @@ const MediaContent: FC<{
       return (
         <a
           href={httpUrl}
+          download={message.body}
           target="_blank"
           rel="noopener noreferrer"
           className="tc-file-card"
@@ -345,7 +303,10 @@ export const MatrixMessageItem: FC<MatrixMessageItemProps> = ({
   continuation = false,
   memberNames,
   currentUserId,
+  replyParent,
 }) => {
+  const { editingEventId } = useMatrixMessageActions();
+  const editing = editingEventId === message.eventId && !message.redacted;
   const cleanName = sanitizeName(senderName);
   // Own messages are right-aligned with no avatar (the design distinguishes them
   // by the green bubble + read receipt), so the avatar column is built lazily for
@@ -392,28 +353,57 @@ export const MatrixMessageItem: FC<MatrixMessageItemProps> = ({
         )}
         <div
           className={classNames('tc-bubble', {
+            'tc-bubble--editing': editing,
             // Image/video render flush — the padded, tinted bubble around a
             // picture reads as a thick frame.
             'tc-bubble--media':
-              !!message.url &&
+              hasMedia(message) &&
               ['m.image', 'm.sticker', 'm.video'].includes(message.type),
           })}
         >
-          <MediaContent
-            message={message}
-            memberNames={memberNames}
-            currentUserId={currentUserId}
-          />
-          <MessageReactionToolbar
+          {message.replyToEventId && !message.redacted && (
+            <MatrixReplyQuote
+              parentId={message.replyToEventId}
+              parent={replyParent}
+              memberNames={memberNames}
+              currentUserId={currentUserId}
+            />
+          )}
+          {message.redacted ? (
+            <em className="text-muted">{translate('Message deleted')}</em>
+          ) : editing ? (
+            <MatrixMessageEditor message={message} />
+          ) : (
+            <MediaContent
+              message={message}
+              memberNames={memberNames}
+              currentUserId={currentUserId}
+            />
+          )}
+          {message.edited && !editing && (
+            <span className="tc-msg-edited">{translate('(edited)')}</span>
+          )}
+          {message.unencrypted && (
+            <div className="text-danger small">
+              {translate('Not encrypted')}
+            </div>
+          )}
+          {!message.redacted && !editing && (
+            <MessageReactionToolbar
+              eventId={message.eventId}
+              reactions={message.reactions}
+            >
+              <MatrixMessageActions message={message} />
+            </MessageReactionToolbar>
+          )}
+        </div>
+        {!message.redacted && (
+          <MessageReactionChips
             eventId={message.eventId}
             reactions={message.reactions}
+            reactors={message.reactors ?? {}}
           />
-        </div>
-        <MessageReactionChips
-          eventId={message.eventId}
-          reactions={message.reactions}
-          reactors={message.reactors ?? {}}
-        />
+        )}
       </div>
     </div>
   );

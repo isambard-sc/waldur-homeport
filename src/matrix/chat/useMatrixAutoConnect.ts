@@ -1,12 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { matrixRoomsList } from 'waldur-js-client';
 
 import { getChatDrawerPreference } from '@/chat/chatDrawerPreferences';
 import { isMatrixChatEnabled } from '@/matrix/utils';
 import { useUser } from '@/workspace/hooks';
 
 import { useMatrixClient } from './useMatrixClient';
+import { useMemberMatrixRooms } from './useMemberMatrixRooms';
 
 /**
  * Boots the Matrix sync client on app load without opening any chat UI, so the
@@ -23,19 +22,12 @@ export function useMatrixAutoConnect(): void {
   const user = useUser();
   const enabled = isMatrixChatEnabled();
 
-  const { data: rooms } = useQuery({
-    // Same key as useAllMatrixRooms — the fetch is shared, not duplicated.
-    queryKey: ['matrixRoomsAll'],
-    queryFn: () =>
-      matrixRoomsList({ query: { member: true } as any }).then((r) => r.data),
-    enabled: enabled && Boolean(user?.uuid),
-  });
+  const { data: rooms } = useMemberMatrixRooms();
 
   useEffect(() => {
     if (!enabled || !user?.uuid || connectionState !== 'idle') return;
-    // Only active rooms are connectable — the credentials endpoint issues an
-    // access token only for ACTIVE rooms the user belongs to, so bootstrapping
-    // against any other state silently fails. Mirrors the room list's filter.
+    // Only a member of an active room has a conversation to sync, so the
+    // background session starts only then. Mirrors the room list's filter.
     const activeRooms = (rooms ?? []).filter((r) => r.state === 'active');
     if (activeRooms.length === 0) return;
     const lastRoomUuid = getChatDrawerPreference('lastRoomUuid');
