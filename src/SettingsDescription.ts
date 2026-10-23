@@ -1139,6 +1139,35 @@ export const SettingsDescription = [
     ],
   },
   {
+    description: translate('Formbricks integration settings'),
+    items: [
+      {
+        key: 'FORMBRICKS_BASE_URL',
+        description: translate('Public base URL of the Formbricks instance, used to build the survey links applicants\' browsers are sent to.'),
+        default: '',
+        type: 'url_field',
+      },
+      {
+        key: 'FORMBRICKS_MANAGEMENT_API_URL',
+        description: translate('Formbricks base URL reachable from the Waldur backend, used to fetch responses and survey schemas. Often an internal address such as http://formbricks:3000, distinct from the public base URL.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'FORMBRICKS_API_KEY',
+        description: translate('Formbricks Management API key.'),
+        default: '',
+        type: 'secret_field',
+      },
+      {
+        key: 'FORMBRICKS_WEBHOOK_SECRET',
+        description: translate('Signing secret configured on the Formbricks webhook. Webhooks are rejected while it is empty.'),
+        default: '',
+        type: 'secret_field',
+      },
+    ],
+  },
+  {
     description: translate('Publication API settings'),
     items: [
       {

@@ -14,6 +14,11 @@ const CALL_MANAGEMENT_TABS: SettingsTab[] = [
     groupName: translate('ORCID integration settings'),
   },
   {
+    key: 'formbricks',
+    title: translate('Formbricks integration'),
+    groupName: translate('Formbricks integration settings'),
+  },
+  {
     key: 'publication',
     title: translate('Publication API'),
     groupName: translate('Publication API settings'),

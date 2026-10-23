@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  proposalProtectedCallsFormbricksFlowKeysList,
+  proposalFormbricksFlowsList,
   proposalProtectedCallsPartialUpdate,
 } from 'waldur-js-client';
 
@@ -127,19 +127,22 @@ describe('GeneralConfigurationSection evaluation start', () => {
   });
 });
 
-describe('GeneralConfigurationSection formbricks_flow_key', () => {
+describe('GeneralConfigurationSection formbricks_flow', () => {
   const call = {
     uuid: 'call-uuid',
     customer_uuid: 'customer-uuid',
     evaluation_start: 'on_submission',
     order_author: 'applicant',
-    formbricks_flow_key: null,
+    formbricks_flow: null,
     has_proposals: false,
   } as any;
 
   beforeEach(() => {
-    vi.mocked(proposalProtectedCallsFormbricksFlowKeysList).mockResolvedValue({
-      data: [{ key: 'AIRR-GW' }, { key: 'AIRR-RA' }],
+    vi.mocked(proposalFormbricksFlowsList).mockResolvedValue({
+      data: [
+        { uuid: 'gw-uuid', name: 'AIRR-GW' },
+        { uuid: 'ra-uuid', name: 'AIRR-RA' },
+      ],
     } as any);
   });
 
@@ -153,17 +156,17 @@ describe('GeneralConfigurationSection formbricks_flow_key', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows the configured flow key when one is set', async () => {
+  it('shows the configured flow when one is set', async () => {
     renderWithProviders(
       <GeneralConfigurationSection
-        call={{ ...call, formbricks_flow_key: 'AIRR-GW' }}
+        call={{ ...call, formbricks_flow: 'gw-uuid' }}
         refetch={vi.fn()}
       />,
     );
     expect(await screen.findByText('AIRR-GW')).toBeInTheDocument();
   });
 
-  it('saves a chosen flow key on the call', async () => {
+  it('saves a chosen flow on the call', async () => {
     const user = userEvent.setup();
     const refetch = vi.fn();
     vi.mocked(proposalProtectedCallsPartialUpdate).mockResolvedValue({
@@ -174,9 +177,9 @@ describe('GeneralConfigurationSection formbricks_flow_key', () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByTestId('edit-formbricks_flow_key')).not.toBeDisabled(),
+      expect(screen.getByTestId('edit-formbricks_flow')).not.toBeDisabled(),
     );
-    await user.click(screen.getByTestId('edit-formbricks_flow_key'));
+    await user.click(screen.getByTestId('edit-formbricks_flow'));
     const { openDialog } = useModal();
     const [, dialogProps] = vi.mocked(openDialog).mock.lastCall as any;
     renderWithProviders(<EditFieldDialog {...dialogProps} />);
@@ -187,13 +190,13 @@ describe('GeneralConfigurationSection formbricks_flow_key', () => {
     await waitFor(() => {
       expect(proposalProtectedCallsPartialUpdate).toHaveBeenCalledWith({
         path: { uuid: 'call-uuid' },
-        body: { formbricks_flow_key: 'AIRR-GW' },
+        body: { formbricks_flow: 'gw-uuid' },
       });
       expect(refetch).toHaveBeenCalled();
     });
   });
 
-  it('saves clearing the flow key back to the native form', async () => {
+  it('saves clearing the flow back to the native form', async () => {
     const user = userEvent.setup();
     const refetch = vi.fn();
     vi.mocked(proposalProtectedCallsPartialUpdate).mockResolvedValue({
@@ -201,15 +204,15 @@ describe('GeneralConfigurationSection formbricks_flow_key', () => {
     } as any);
     renderWithProviders(
       <GeneralConfigurationSection
-        call={{ ...call, formbricks_flow_key: 'AIRR-GW' }}
+        call={{ ...call, formbricks_flow: 'gw-uuid' }}
         refetch={refetch}
       />,
     );
 
     await waitFor(() =>
-      expect(screen.getByTestId('edit-formbricks_flow_key')).not.toBeDisabled(),
+      expect(screen.getByTestId('edit-formbricks_flow')).not.toBeDisabled(),
     );
-    await user.click(screen.getByTestId('edit-formbricks_flow_key'));
+    await user.click(screen.getByTestId('edit-formbricks_flow'));
     const { openDialog } = useModal();
     const [, dialogProps] = vi.mocked(openDialog).mock.lastCall as any;
     renderWithProviders(<EditFieldDialog {...dialogProps} />);
@@ -224,7 +227,7 @@ describe('GeneralConfigurationSection formbricks_flow_key', () => {
     await waitFor(() => {
       expect(proposalProtectedCallsPartialUpdate).toHaveBeenCalledWith({
         path: { uuid: 'call-uuid' },
-        body: { formbricks_flow_key: null },
+        body: { formbricks_flow: null },
       });
       expect(refetch).toHaveBeenCalled();
     });
@@ -238,7 +241,7 @@ describe('GeneralConfigurationSection formbricks_flow_key', () => {
       />,
     );
     await waitFor(() =>
-      expect(screen.getByTestId('edit-formbricks_flow_key')).toBeDisabled(),
+      expect(screen.getByTestId('edit-formbricks_flow')).toBeDisabled(),
     );
   });
 });
@@ -249,7 +252,7 @@ describe('GeneralConfigurationSection draft carry-over', () => {
     customer_uuid: 'customer-uuid',
     evaluation_start: 'on_submission',
     order_author: 'applicant',
-    formbricks_flow_key: null,
+    formbricks_flow: null,
     has_proposals: false,
     carry_over_drafts: false,
   } as any;

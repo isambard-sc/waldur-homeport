@@ -1041,6 +1041,21 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-formbricks-flows',
+    url: 'formbricks-flows/',
+    parent: 'admin-configuration',
+    component: lazyComponent(() =>
+      import('./formbricks-flows/FormbricksFlowsList').then((module) => ({
+        default: module.FormbricksFlowsList,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Formbricks flows'),
+      feature: MarketplaceFeatures.show_call_management_functionality,
+    },
+  },
+
+  {
     name: 'admin-matrix-chat',
     url: 'matrix-chat/?tab',
     params: { tab: { dynamic: true } },

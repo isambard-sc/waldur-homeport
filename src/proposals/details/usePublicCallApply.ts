@@ -115,7 +115,7 @@ export const usePublicCallApply = (
         call.external_url
       ) {
         document.location.href = call.external_url;
-      } else if (call.formbricks_flow_key && activeRound) {
+      } else if (call.formbricks_flow && activeRound) {
         startFormbricksFlow();
       } else if (activeRound) {
         openDialog(ProposalCreateDialog, {

@@ -135,7 +135,7 @@ export const ProposalManagePage = () => {
             'evaluation_start',
             // Formbricks-driven calls route the draft-stage UI to
             // FormbricksProposalProgress instead of ProposalSubmissionStep.
-            'formbricks_flow_key',
+            'formbricks_flow',
             // Cast: compliance_checklist* are protected-call fields, so the
             // list is not assignable to keyof PublicCall.
           ] as any,
@@ -212,7 +212,7 @@ export const ProposalManagePage = () => {
   const isEditableDraft = proposal.state === 'draft' && isEditPage;
   // A Formbricks call collects the application in Formbricks, so only the
   // Lead (who can submit) resumes the flow here; everyone else sees details.
-  const usesFormbricks = Boolean((call as any)?.formbricks_flow_key);
+  const usesFormbricks = Boolean((call as any)?.formbricks_flow);
 
   return (
     <>

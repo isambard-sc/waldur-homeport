@@ -42,7 +42,7 @@ interface FormbricksEditLinkResponse {
 
 /** Draft-stage landing page for a Formbricks-driven proposal - shown
  * instead of the native ProposalSubmissionStep wizard while
- * proposal.state === 'draft' for calls with call.formbricks_flow_key set.
+ * proposal.state === 'draft' for calls with call.formbricks_flow set.
  * Tracking is at step granularity, not sub-step: a step only shows as
  * completed once Formbricks has actually finished it (a FormStepResponse
  * row exists server-side) - a Lead who started but didn't submit a step
