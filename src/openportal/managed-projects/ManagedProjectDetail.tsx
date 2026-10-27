@@ -1,24 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
-import { useCurrentStateAndParams } from '@uirouter/react';
-import { Card } from 'react-bootstrap';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { ReactNode } from 'react';
+import { Card, Col, Row } from 'react-bootstrap';
 import { openportalManagedProjectsRetrieveGet } from 'waldur-js-client';
 
 import { Badge } from 'waldur-ui';
 
-import { STALE_TIME } from '@/core/constants';
 import { formatDate, formatDateTime } from '@/core/dateUtils';
-import { ExternalLink } from '@/core/ExternalLink';
 import { Link } from '@/core/Link';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { translate } from '@/i18n';
+import { RefreshButton } from '@/marketplace/common/RefreshButton';
 import { useTitle } from '@/navigation/title';
 import { Field } from '@/resource/summary/Field';
 import { renderFieldOrDash } from '@/table/utils';
 
+import {
+  allowedDomainsLabel,
+  AwardLink,
+  memberRoleLabel,
+  offeringName,
+} from './awardDisplay';
 import { ManagedProjectActions } from './ManagedProjectActions';
 import { ManagedProjectAuditLog } from './ManagedProjectAuditLog';
-import { isEmbargoed } from './utils';
+import { ManagedProjectNotes } from './ManagedProjectNotes';
+import { embargoedUntil } from './utils';
 
 const membershipControlLabels: Record<string, string> = {
   open: translate('Open'),
@@ -27,46 +34,34 @@ const membershipControlLabels: Record<string, string> = {
   locked: translate('Locked'),
 };
 
-const renderOffering = (destination: string) => {
-  if (!destination) {
-    return renderFieldOrDash(destination);
-  }
-  const parts = destination.split('.');
-  return parts[parts.length - 1];
-};
-
-const LinkField = ({
-  label,
-  link,
+const Section = ({
+  title,
+  children,
 }: {
-  label: string;
-  link?: { id?: string; url?: string } | null;
-}) => {
-  if (!link || (!link.id && !link.url)) {
-    return <Field label={label} />;
-  }
-  return (
-    <Field
-      label={label}
-      value={
-        link.url ? (
-          <ExternalLink url={link.url} label={link.id || link.url} />
-        ) : (
-          link.id
-        )
-      }
-    />
-  );
-};
+  title: string;
+  children: ReactNode;
+}) => (
+  <Card className="h-100">
+    <Card.Header>
+      <Card.Title className="mb-0">{title}</Card.Title>
+    </Card.Header>
+    <Card.Body>{children}</Card.Body>
+  </Card>
+);
+
+const formatOptionalDate = (value?: string | null) =>
+  value ? formatDate(value) : undefined;
 
 export const ManagedProjectDetail = () => {
   const {
     params: { identifier, destination },
   } = useCurrentStateAndParams();
+  const router = useRouter();
 
   const {
     data: row,
     isLoading,
+    isFetching,
     isError,
     refetch,
   } = useQuery({
@@ -75,7 +70,10 @@ export const ManagedProjectDetail = () => {
       openportalManagedProjectsRetrieveGet({
         path: { identifier, destination },
       }).then((r) => r.data),
-    staleTime: STALE_TIME,
+    // The awarding portal changes an award, and reviewers add notes, while
+    // this page is open: keep it current without a manual reload.
+    refetchInterval: 60_000,
+    refetchIntervalInBackground: false,
   });
 
   useTitle(row?.details?.name || translate('Managed project'), '', 'browser');
@@ -89,190 +87,215 @@ export const ManagedProjectDetail = () => {
   }
 
   const details = row.details;
+  const embargo = embargoedUntil(row);
+  const breakdown =
+    details?.breakdown && Object.keys(details.breakdown).length > 0
+      ? details.breakdown
+      : null;
+  const members = details?.members ? Object.entries(details.members) : [];
 
   return (
     <>
-      <Card className="mb-4">
-        <Card.Body>
-          <div className="d-flex justify-content-between align-items-start mb-3">
-            <h3 className="mb-0">
-              {details?.name || row.identifier || translate('Unnamed project')}
-            </h3>
-            <ManagedProjectActions project={row} refetch={refetch} />
+      <div className="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-5">
+        <div>
+          <Link state="marketplace-provider-managed-projects">
+            {translate('Managed Projects')}
+          </Link>
+          <h3 className="mb-0 mt-1">
+            {details?.name || row.identifier || translate('Unnamed project')}
+          </h3>
+          <div className="d-flex flex-wrap align-items-center gap-2 mt-2">
+            <Badge variant="neutral" shape="pill">
+              {row.state}
+            </Badge>
+            {embargo && (
+              <Badge variant="warning" shape="pill" tone="outline">
+                {translate('Embargoed until {date}', {
+                  date: formatDateTime(embargo),
+                })}
+              </Badge>
+            )}
+            {offeringName(row.destination) && (
+              <span className="text-muted">
+                {offeringName(row.destination)}
+              </span>
+            )}
           </div>
+        </div>
+        <div className="d-flex align-items-center gap-2">
+          <RefreshButton refetch={refetch} isLoading={isFetching} />
+          <ManagedProjectActions
+            project={row}
+            refetch={refetch}
+            onDeleted={() =>
+              router.stateService.go('marketplace-provider-managed-projects')
+            }
+          />
+        </div>
+      </div>
 
-          <Field
-            label={translate('State')}
-            value={
-              <>
-                {row.state}
-                {isEmbargoed(row) && (
-                  <Badge
-                    variant="warning"
-                    shape="pill"
-                    tone="outline"
-                    className="ms-1"
+      <Row className="g-5 mb-5">
+        <Col lg={6}>
+          <Section title={translate('Project')}>
+            <Field
+              label={translate('Name')}
+              value={renderFieldOrDash(details?.name)}
+            />
+            <Field
+              label={translate('Waldur project')}
+              value={
+                row.project_data ? (
+                  <Link
+                    state="project.dashboard"
+                    params={{ uuid: row.project_data.uuid }}
                   >
-                    {translate('Embargoed')}
-                  </Badge>
-                )}
-              </>
-            }
-          />
-          <Field
-            label={translate('Project')}
-            value={
-              row.project_data ? (
-                <Link
-                  state="project.dashboard"
-                  params={{ uuid: row.project_data.uuid }}
-                >
-                  {row.project_data.name}
-                </Link>
-              ) : (
-                translate('Not attached to a local project')
-              )
-            }
-          />
-          <Field
-            label={translate('Identifier')}
-            value={renderFieldOrDash(row.identifier)}
-          />
-          <Field
-            label={translate('Local identifier')}
-            value={renderFieldOrDash(row.local_identifier)}
-          />
-          <Field
-            label={translate('Offering')}
-            value={renderOffering(row.destination)}
-          />
-          <Field
-            label={translate('Project template')}
-            value={renderFieldOrDash(row.project_template_data?.name)}
-          />
-          <Field
-            label={translate('Description')}
-            value={renderFieldOrDash(details?.description)}
-          />
-          <Field
-            label={translate('Allocation')}
-            value={renderFieldOrDash(details?.allocation)}
-          />
-          <Field
-            label={translate('Start date')}
-            value={
-              details?.start_date ? formatDate(details.start_date) : undefined
-            }
-          />
-          <Field
-            label={translate('End date')}
-            value={details?.end_date ? formatDate(details.end_date) : undefined}
-          />
-          <Field
-            label={translate('Earliest approve')}
-            value={
-              details?.earliest_approve
-                ? formatDateTime(details.earliest_approve)
-                : undefined
-            }
-          />
-          <Field
-            label={translate('Reviewed by')}
-            value={renderFieldOrDash(row.reviewed_by_full_name)}
-          />
-          <Field
-            label={translate('Review comment')}
-            value={renderFieldOrDash(row.review_comment)}
-          />
-          <Field
-            label={translate('Created')}
-            value={row.created ? formatDateTime(row.created) : undefined}
-          />
-        </Card.Body>
-      </Card>
+                    {row.project_data.name}
+                  </Link>
+                ) : (
+                  translate('Not attached to a local project')
+                )
+              }
+            />
+            <Field
+              label={translate('Offering')}
+              value={renderFieldOrDash(offeringName(row.destination))}
+            />
+            <Field
+              label={translate('Project template')}
+              value={renderFieldOrDash(
+                row.project_template_data?.name || details?.template,
+              )}
+            />
+            <Field
+              label={translate('Description')}
+              value={renderFieldOrDash(details?.description)}
+            />
+          </Section>
+        </Col>
 
-      <Card className="mb-4">
-        <Card.Header>
-          <Card.Title className="mb-0">{translate('Members')}</Card.Title>
-        </Card.Header>
-        <Card.Body>
-          {details?.members && Object.keys(details.members).length > 0 ? (
-            <div className="d-flex flex-column gap-1">
-              {Object.entries(details.members).map(([email, role]) => (
-                <Field key={email} label={email} value={role} />
+        <Col lg={6}>
+          <Section title={translate('Allocation')}>
+            <Field
+              label={translate('Allocation')}
+              value={renderFieldOrDash(details?.allocation)}
+            />
+            {breakdown &&
+              Object.entries(breakdown).map(([component, amount]) => (
+                <Field key={component} label={component} value={amount} />
               ))}
-            </div>
-          ) : (
-            <span className="text-muted">
-              {translate('No members assigned.')}
-            </span>
-          )}
-        </Card.Body>
-      </Card>
+          </Section>
+        </Col>
 
-      <Card className="mb-4">
-        <Card.Header>
-          <Card.Title className="mb-0">{translate('Links')}</Card.Title>
-        </Card.Header>
-        <Card.Body>
-          <LinkField label={translate('Award')} link={details?.award} />
-          <LinkField label={translate('Funding call')} link={details?.call} />
-          <LinkField
-            label={translate('Project page')}
-            link={details?.project_link}
-          />
-          <LinkField label={translate('Renewal')} link={details?.renewal} />
-        </Card.Body>
-      </Card>
+        <Col lg={6}>
+          <Section title={translate('Dates')}>
+            <Field
+              label={translate('Created')}
+              value={row.created ? formatDateTime(row.created) : undefined}
+            />
+            <Field
+              label={translate('Start date')}
+              value={formatOptionalDate(details?.start_date)}
+            />
+            <Field
+              label={translate('End date')}
+              value={formatOptionalDate(details?.end_date)}
+            />
+            <Field
+              label={translate('Earliest approve')}
+              value={
+                details?.earliest_approve
+                  ? formatDateTime(details.earliest_approve)
+                  : undefined
+              }
+            />
+          </Section>
+        </Col>
 
-      <Card className="mb-4">
-        <Card.Header>
-          <Card.Title className="mb-0">
-            {translate('Access control')}
-          </Card.Title>
-        </Card.Header>
-        <Card.Body>
-          <Field
-            label={translate('Membership control')}
-            value={
-              details?.membership_control
-                ? membershipControlLabels[details.membership_control] ||
-                  details.membership_control
-                : membershipControlLabels.open
-            }
-          />
-          <Field
-            label={translate('Allowed domains')}
-            value={
-              details?.allowed_domains && details.allowed_domains.length > 0
-                ? details.allowed_domains.join(', ')
-                : translate('All domains allowed')
-            }
-          />
-        </Card.Body>
-      </Card>
+        <Col lg={6}>
+          <Section title={translate('Review')}>
+            <Field label={translate('State')} value={row.state} />
+            <Field
+              label={translate('Remote identifier')}
+              value={renderFieldOrDash(row.identifier)}
+            />
+            <Field
+              label={translate('Local identifier')}
+              value={renderFieldOrDash(row.local_identifier)}
+            />
+            <Field
+              label={translate('Reviewed by')}
+              value={renderFieldOrDash(row.reviewed_by_full_name)}
+            />
+            <Field
+              label={translate('Review comment')}
+              value={renderFieldOrDash(row.review_comment)}
+            />
+          </Section>
+        </Col>
 
-      <Card className="mb-4">
-        <Card.Header>
-          <Card.Title className="mb-0">{translate('Notes')}</Card.Title>
-        </Card.Header>
-        <Card.Body>
-          {details?.notes && details.notes.length > 0 ? (
-            <div className="d-flex flex-column gap-2">
-              {details.notes.map((note, index) => (
-                <div key={index} className="border-bottom pb-2">
-                  <div className="text-muted small">
-                    {note.author} &middot; {formatDateTime(note.timestamp)}
-                  </div>
-                  <div>{note.text}</div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <span className="text-muted">{translate('No notes yet.')}</span>
-          )}
-        </Card.Body>
-      </Card>
+        <Col xs={12}>
+          <Section title={translate('Members')}>
+            {members.length > 0 ? (
+              members.map(([email, role]) => (
+                <Field
+                  key={email}
+                  label={email}
+                  value={memberRoleLabel(role, row.project_template_data)}
+                />
+              ))
+            ) : (
+              <span className="text-muted">
+                {translate('No members assigned.')}
+              </span>
+            )}
+          </Section>
+        </Col>
+
+        <Col lg={6}>
+          <Section title={translate('Links')}>
+            <Field
+              label={translate('Award')}
+              value={<AwardLink link={details?.award} />}
+            />
+            <Field
+              label={translate('Funding call')}
+              value={<AwardLink link={details?.call} />}
+            />
+            <Field
+              label={translate('Project page')}
+              value={<AwardLink link={details?.project_link} />}
+            />
+            <Field
+              label={translate('Renewal')}
+              value={<AwardLink link={details?.renewal} />}
+            />
+          </Section>
+        </Col>
+
+        <Col lg={6}>
+          <Section title={translate('Access control')}>
+            <Field
+              label={translate('Membership control')}
+              value={
+                details?.membership_control
+                  ? membershipControlLabels[details.membership_control] ||
+                    details.membership_control
+                  : membershipControlLabels.open
+              }
+            />
+            <Field
+              label={translate('Allowed domains')}
+              value={allowedDomainsLabel(details?.allowed_domains)}
+            />
+          </Section>
+        </Col>
+
+        <Col xs={12}>
+          <Section title={translate('Notes')}>
+            <ManagedProjectNotes project={row} refetch={refetch} />
+          </Section>
+        </Col>
+      </Row>
 
       <ManagedProjectAuditLog
         identifier={row.identifier}

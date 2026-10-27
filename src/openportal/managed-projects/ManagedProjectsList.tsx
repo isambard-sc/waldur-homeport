@@ -126,7 +126,8 @@ export const ManagedProjectsList = () => {
       title: translate('Notes'),
       render: ({ row }) => <NotesButton row={row} refetch={tableProps.fetch} />,
       keys: ['notes'],
-      optional: true,
+      // Shown by default: the button is how a reviewer reads and answers the
+      // awarding portal without opening each award.
       id: 'notes',
     },
     {
@@ -234,7 +235,9 @@ export const ManagedProjectsList = () => {
       hasQuery
       hasOptionalColumns
       expandableRowClassName="py-2 pe-2"
-      expandableRow={ManagedProjectExpandableRow}
+      expandableRow={({ row }) => (
+        <ManagedProjectExpandableRow row={row} refetch={tableProps.fetch} />
+      )}
       tableActions={
         <Link
           state="marketplace-provider-managed-projects-audit"
