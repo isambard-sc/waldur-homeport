@@ -59,6 +59,25 @@ export const states: StateDeclaration[] = [
     },
   },
 
+  // AI reporting - a tool (ask a question, get a report), not a settings
+  // form, so it lives here rather than under /administration/configuration/.
+  // Same staff/support gate as the rest of this section, inherited from the
+  // 'reporting' state above.
+  {
+    name: 'reporting-ai-reporting',
+    url: 'ai-reporting/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingPage').then((module) => ({
+        default: module.AIReportingPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting'),
+      priority: 20,
+    },
+  },
+
   // Resources category (consumer-facing)
   {
     name: 'reporting-resources',

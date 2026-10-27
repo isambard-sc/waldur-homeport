@@ -27,6 +27,7 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
   const categories = getCategoryConfig();
   const tabs: ReportingTab[] = [
     { title: translate('Overview'), state: 'reporting-dashboard' },
+    { title: translate('AI reporting'), state: 'reporting-ai-reporting' },
   ];
 
   Object.entries(categories).forEach(([key, category]) => {
