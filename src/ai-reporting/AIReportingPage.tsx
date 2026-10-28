@@ -40,8 +40,8 @@ const pendingPhase = (createdAt: string): string => {
 
 // A standalone page rather than a drawer: this is a deliberate reporting task
 // (not an ambient "quick question" the way the general assistant is), and
-// generated files/charts need real screen room to list. Staff/support-only,
-// same gate as the rest of /administration/ - see routes.ts.
+// generated files/charts need real screen room to list. Staff/support-only -
+// see the explicit permissions on this route in ../reporting/routes.ts.
 export const AIReportingPage: FC = () => {
   const [sessionUuid, setSessionUuid] = useState<string | null>(null);
   const [messages, setMessages] = useState<ReportingMessage[]>([]);
