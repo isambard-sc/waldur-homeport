@@ -1,6 +1,7 @@
 import { isStateVisible } from '@/core/stateVisibility';
 import { isFeatureVisible } from '@/features/connect';
 import { translate } from '@/i18n';
+import { isStaffOrSupport } from '@/workspace/selectors';
 
 import { getCategoryConfig, getVisibleReports } from './constants';
 
@@ -27,8 +28,16 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
   const categories = getCategoryConfig();
   const tabs: ReportingTab[] = [
     { title: translate('Overview'), state: 'reporting-dashboard' },
-    { title: translate('AI reporting'), state: 'reporting-ai-reporting' },
   ];
+  // Not a category (it's one tool, not a catalogue of reports), so it
+  // bypasses the category loop below - but it needs the same staff/support
+  // check those get, matching its route's own permissions (routes.ts) and
+  // its backend (ai_reporting's ask_permissions). Without this, an
+  // organisation owner - who can now reach /reporting/ at all - would see
+  // this tab and then be blocked the moment they clicked it.
+  if (isStaffOrSupport({ workspace } as any)) {
+    tabs.push({ title: translate('AI reporting'), state: 'reporting-ai-reporting' });
+  }
 
   Object.entries(categories).forEach(([key, category]) => {
     const state = `reporting-${key}-list`;

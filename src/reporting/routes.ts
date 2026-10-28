@@ -75,6 +75,12 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('AI reporting'),
       priority: 20,
+      // A child state's permissions replace the parent's rather than adding
+      // to it (see ./access.ts) - 'reporting' itself now also admits
+      // organisation owners, but this tool's backend is staff/support only
+      // (ai_reporting.views.ReportingMessageViewSet.ask_permissions), so it
+      // needs its own explicit, matching restriction here.
+      permissions: [isStaffOrSupport],
     },
   },
 
