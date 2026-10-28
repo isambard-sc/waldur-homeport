@@ -1,19 +1,15 @@
-import { Form } from 'react-final-form';
+import { ChatTeardropTextIcon } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import {
   ManagedProject,
-  openportalManagedProjectsAddNote,
+  openportalManagedProjectsRetrieveGet,
 } from 'waldur-js-client';
 
-import { formatDateTime } from '@/core/dateUtils';
-import { required } from '@/core/validators';
-import { SubmitButton, TextGroup } from '@/form';
 import { translate } from '@/i18n';
+import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
-import { useManagedMutation } from '@/modal/useManagedMutation';
 
-interface FormValues {
-  text: string;
-}
+import { ManagedProjectNotes } from './ManagedProjectNotes';
 
 interface ManagedProjectNotesDialogProps {
   row: ManagedProject;
@@ -22,63 +18,41 @@ interface ManagedProjectNotesDialogProps {
   };
 }
 
+/**
+ * The notes on one award, opened from the list.
+ *
+ * Stays open after a note is added, and reloads the award so the note joins
+ * the thread: a reviewer often writes more than one in a row. The list is
+ * refreshed too, for its note count.
+ */
 export const ManagedProjectNotesDialog: React.FC<
   ManagedProjectNotesDialogProps
 > = ({ row, resolve }) => {
-  const notes = row.details?.notes ?? [];
-
-  const addNoteMutation = useManagedMutation<any, any, FormValues>({
-    mutationFn: (values) =>
-      openportalManagedProjectsAddNote({
+  const { data: project = row, refetch } = useQuery({
+    queryKey: ['ManagedProjectDetail', row.identifier, row.destination],
+    queryFn: () =>
+      openportalManagedProjectsRetrieveGet({
         path: { identifier: row.identifier, destination: row.destination },
-        body: { text: values.text },
-      }),
-    successMessage: translate('Note has been added.'),
-    errorMessage: translate('Unable to add note.'),
-    refetch: resolve.refetch,
+      }).then((r) => r.data),
+    initialData: row,
+    // The list's copy is current when the dialog opens.
+    staleTime: Infinity,
   });
 
   return (
-    <Form<FormValues>
-      onSubmit={(values) => addNoteMutation.mutateAsync(values)}
-      subscription={{ submitting: true, invalid: true }}
-      render={({ handleSubmit, submitting, invalid }) => (
-        <form onSubmit={handleSubmit} noValidate>
-          <ModalDialog
-            title={translate('Notes')}
-            footer={
-              <SubmitButton
-                submitting={submitting}
-                invalid={invalid}
-                label={translate('Add note')}
-              />
-            }
-          >
-            {notes.length > 0 ? (
-              <div className="d-flex flex-column gap-2 mb-3">
-                {notes.map((note, index) => (
-                  <div key={index} className="border-bottom pb-2">
-                    <div className="text-muted small">
-                      {note.author} &middot; {formatDateTime(note.timestamp)}
-                    </div>
-                    <div>{note.text}</div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <span className="text-muted d-block mb-3">
-                {translate('No notes yet.')}
-              </span>
-            )}
-            <TextGroup
-              name="text"
-              label={translate('New note')}
-              validate={required}
-              required
-            />
-          </ModalDialog>
-        </form>
-      )}
-    />
+    <ModalDialog
+      title={translate('Notes — {name}', {
+        name: project.details?.name || project.identifier,
+      })}
+      iconNode={<ChatTeardropTextIcon weight="bold" />}
+      footer={<CloseDialogButton />}
+    >
+      <ManagedProjectNotes
+        project={project}
+        refetch={async () => {
+          await Promise.all([refetch(), resolve.refetch()]);
+        }}
+      />
+    </ModalDialog>
   );
 };

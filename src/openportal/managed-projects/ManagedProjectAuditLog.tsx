@@ -8,6 +8,7 @@ import { BadgeVariant } from 'waldur-ui';
 import { Badge } from 'waldur-ui';
 
 import { formatDateTime } from '@/core/dateUtils';
+import { Link } from '@/core/Link';
 import { translate } from '@/i18n';
 import { DetailsDiff } from '@/openportal/DetailsDiff';
 import { Field } from '@/resource/summary/Field';
@@ -150,8 +151,26 @@ export const ManagedProjectAuditLog = ({
   if (!scoped) {
     columns.splice(1, 0, {
       title: translate('Project'),
-      render: ({ row }) => renderFieldOrDash(row.identifier),
-      keys: ['identifier'],
+      // The award's name as the entry recorded it, linked to the award; the
+      // bare identifier only where neither copy of the details has a name.
+      render: ({ row }) => {
+        const name =
+          row.new_details?.name || row.previous_details?.name || row.identifier;
+        return row.identifier && row.destination ? (
+          <Link
+            state="marketplace-provider-managed-project-detail"
+            params={{
+              identifier: row.identifier,
+              destination: row.destination,
+            }}
+          >
+            {renderFieldOrDash(name)}
+          </Link>
+        ) : (
+          renderFieldOrDash(name)
+        );
+      },
+      keys: ['identifier', 'destination', 'new_details', 'previous_details'],
       id: 'identifier',
     });
   }
