@@ -61,8 +61,8 @@ export const states: StateDeclaration[] = [
 
   // AI reporting - a tool (ask a question, get a report), not a settings
   // form, so it lives here rather than under /administration/configuration/.
-  // Same staff/support gate as the rest of this section, inherited from the
-  // 'reporting' state above.
+  // See the explicit permissions below for why this needs its own gate
+  // rather than relying on the 'reporting' state above.
   {
     name: 'reporting-ai-reporting',
     url: 'ai-reporting/',
