@@ -10,7 +10,11 @@ ARG DOCKER_REGISTRY=docker.io/
 # Dockerfile changes, unlike the hand-maintained COPY list this replaced
 # (see git history — that list broke CI the first time a package's
 # package.json was forgotten here).
-FROM ${DOCKER_REGISTRY}node:lts-alpine AS manifests
+# Node is pinned to a major version rather than `lts`: the build relies on
+# corepack to provide the Yarn named in package.json's packageManager, and
+# Node stopped bundling corepack from 25, so `lts` lost it when Node 26
+# became LTS. Move this on deliberately, with corepack installed explicitly.
+FROM ${DOCKER_REGISTRY}node:24-alpine AS manifests
 WORKDIR /src
 COPY packages ./packages
 COPY apps ./apps
@@ -18,7 +22,7 @@ RUN find packages apps -name package.json -exec sh -c \
       'mkdir -p "/manifests/$(dirname "$1")" && cp "$1" "/manifests/$1"' _ {} \;
 
 # build environment
-FROM ${DOCKER_REGISTRY}node:lts-alpine AS build
+FROM ${DOCKER_REGISTRY}node:24-alpine AS build
 WORKDIR /app
 ENV PATH=/app/node_modules/.bin:$PATH
 COPY package.json yarn.lock .yarnrc.yml /app/
