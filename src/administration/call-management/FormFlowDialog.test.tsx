@@ -5,7 +5,11 @@ import { formFlowsCreate, formFlowsUpdate } from 'waldur-js-client';
 
 import { renderWithProviders } from '@/test/harness';
 
-import { FormFlowDialog, parseSteps } from './FormFlowDialog';
+import {
+  FormFlowDialog,
+  parseSteps,
+  SURVEY_ID_PLACEHOLDER,
+} from './FormFlowDialog';
 
 // The editor is a Monaco instance in the browser; a textarea stands in for it.
 vi.mock('@/form/MonacoField', () => ({
@@ -31,7 +35,9 @@ const flow: any = {
 
 describe('parseSteps', () => {
   it('reads a list of steps', () => {
-    expect(parseSteps('[{"key":"a"}]').steps).toEqual([{ key: 'a' }]);
+    expect(parseSteps('[{"key":"a","survey_id":"s1"}]').steps).toEqual([
+      { key: 'a', survey_id: 's1' },
+    ]);
   });
 
   it('explains JSON it cannot read', () => {
@@ -45,6 +51,33 @@ describe('parseSteps', () => {
     expect(parseSteps('{"key":"a"}').error).toBe(
       'Steps must be a list of at least one step.',
     );
+  });
+});
+
+describe('parseSteps survey IDs', () => {
+  const step = (survey_id: unknown) =>
+    JSON.stringify([
+      { key: 'project_details', label: 'Project details', survey_id },
+    ]);
+
+  it('asks for the survey ID when it is empty, and says where to find it', () => {
+    expect(parseSteps(step('')).error).toMatch(
+      /^Step 'project_details' needs the ID of its Formbricks survey\..*after \/surveys\//,
+    );
+  });
+
+  it('does not take the placeholder for an ID', () => {
+    expect(parseSteps(step(SURVEY_ID_PLACEHOLDER)).error).toMatch(
+      /needs the ID of its Formbricks survey/,
+    );
+  });
+
+  it('wants one on every step', () => {
+    expect(parseSteps(step(undefined)).error).toMatch(/needs the ID/);
+  });
+
+  it('accepts a real ID', () => {
+    expect(parseSteps(step('cmt4q1c400004qe01zta9vmnm')).error).toBeUndefined();
   });
 });
 
@@ -82,10 +115,24 @@ describe('FormFlowDialog', () => {
 
     await userEvent.type(screen.getByLabelText(/^Name/), 'AIRR Gateway');
     await userEvent.type(screen.getByLabelText(/^Key/), 'airr-gw');
+    const editor = screen.getByLabelText('steps');
+    await userEvent.clear(editor);
+    // Pasted, not typed: typing reads [ and { as key names.
+    await userEvent.paste('[{"key":"team","survey_id":"s1"}]');
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(
       await screen.findByText("Step 'team': key must be a slug."),
+    ).toBeInTheDocument();
+  });
+
+  it('starts a new flow with a placeholder survey ID it will not save', () => {
+    renderWithProviders(<FormFlowDialog resolve={{}} />);
+    expect(
+      (screen.getByLabelText('steps') as HTMLTextAreaElement).value,
+    ).toContain(SURVEY_ID_PLACEHOLDER);
+    expect(
+      screen.getByText(/needs the ID of its Formbricks survey/),
     ).toBeInTheDocument();
   });
 
