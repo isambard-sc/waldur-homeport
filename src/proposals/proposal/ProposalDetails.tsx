@@ -56,6 +56,7 @@ import {
   useCanCreateReview,
 } from './create/utils';
 import { SubmitReviewDialog } from './create-review/SubmitReviewDialog';
+import { FormResponsesSection } from './FormResponsesSection';
 import { StepChecklistSection } from './StepChecklistSection';
 import {
   canViewTechnicalAssessment,
@@ -105,6 +106,11 @@ export const ProposalDetails = ({
   const canCreateReview = useCanCreateReview(proposal);
 
   const isCallManagerView = state.name?.startsWith('call-management');
+  // form_responses is an array only for Formbricks-driven proposals (null
+  // otherwise) - use it as the signal to hide the native project-details
+  // summary, which would otherwise duplicate what's already shown in
+  // FormResponsesSection below in the applicant's own words.
+  const isFormbricksProposal = Array.isArray((proposal as any).form_responses);
 
   // The figures the applicant saw beside their form: the person deciding the
   // allocation needs the same total and the same project length.
@@ -224,7 +230,12 @@ export const ProposalDetails = ({
           id="step-general"
           params={{ proposal, canViewReviews: isCallManagerView }}
         />
-        <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
+        {!isFormbricksProposal && (
+          <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
+        )}
+        <FormResponsesSection
+          formResponses={(proposal as any).form_responses}
+        />
         {hasCompliance && (
           <div id="step-compliance">
             <ComplianceSummary proposal={proposal} />

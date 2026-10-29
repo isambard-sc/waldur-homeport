@@ -13,6 +13,7 @@ import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { getUUID } from '@/core/utils';
 import { SelectField, TextGroup } from '@/form';
 import { translate } from '@/i18n';
+import { OptionsForm } from '@/marketplace/common/OptionsForm';
 import { PlanDescriptionButton } from '@/marketplace/details/plan/PlanDescriptionButton';
 import { PrepaidMonthsModeProvider } from '@/marketplace/details/plan/prepaidDurationMode';
 import { TabbedPlanComponents } from '@/marketplace/details/plan/TabbedPlanComponents';
@@ -87,6 +88,8 @@ export const ResourceRequestWizardFormSecondPage: FunctionComponent<
       category_title: offering.category_name,
       components: offering.components ?? [],
       plans: offering.plan_details ? [offering.plan_details] : [],
+      options: offering.options,
+      resource_options: offering.resource_options,
     } as unknown as typeof queryData.data;
   }, [queryData.data, offering]);
 
@@ -95,6 +98,31 @@ export const ResourceRequestWizardFormSecondPage: FunctionComponent<
     () => (offeringDetails?.plans ?? []).filter((p: any) => !p.archived),
     [offeringDetails],
   );
+
+  // The amounts an offering takes as resource options rather than limits (the
+  // GPU hours of a Formbricks application) are part of what is awarded, so
+  // the award edits them here. Ones the order options already ask for are
+  // left to the options step.
+  const awardResourceOptions = useMemo(() => {
+    const resourceOptions = offeringDetails?.resource_options;
+    if (!isAward || !resourceOptions?.options) return undefined;
+    const orderKeys = new Set(
+      Object.keys(offeringDetails.options?.options ?? {}),
+    );
+    const order = (
+      resourceOptions.order?.length
+        ? resourceOptions.order
+        : Object.keys(resourceOptions.options)
+    ).filter((key) => resourceOptions.options[key] && !orderKeys.has(key));
+    return order.length
+      ? {
+          order,
+          options: Object.fromEntries(
+            order.map((key) => [key, resourceOptions.options[key]]),
+          ),
+        }
+      : undefined;
+  }, [isAward, offeringDetails]);
 
   // Store the main offering, so that we can access to it in other steps
   useEffect(() => {
@@ -171,6 +199,12 @@ export const ResourceRequestWizardFormSecondPage: FunctionComponent<
                 />
               </PrepaidMonthsModeProvider>
             </>
+          )}
+          {awardResourceOptions && (
+            <div className="mb-5">
+              <p className="fw-bold mb-3">{translate('Resource options')}</p>
+              <OptionsForm options={awardResourceOptions} />
+            </div>
           )}
           {isAward && (
             <TextGroup

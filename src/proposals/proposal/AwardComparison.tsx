@@ -3,7 +3,10 @@ import { FC, Fragment } from 'react';
 import { Badge, BadgeVariant } from 'waldur-ui';
 
 import { translate } from '@/i18n';
-import { AwardComparisonRow } from '@/proposals/awardedResources';
+import {
+  AwardComparisonRow,
+  getResourceOptionValues,
+} from '@/proposals/awardedResources';
 import {
   getRequestableComponents,
   getRowLimits,
@@ -90,6 +93,84 @@ const formatAmount = (value: number | undefined, unit?: string) =>
       ? `${value} ${unit}`
       : String(value);
 
+const formatOptionValue = (value: unknown) =>
+  value === undefined || value === null || value === ''
+    ? translate('none')
+    : typeof value === 'object'
+      ? JSON.stringify(value)
+      : String(value);
+
+/**
+ * The amounts an offering takes as resource options (the GPU hours of a
+ * Formbricks application), awarded beside requested like the limits below.
+ */
+const ResourceOptionLines: FC<{ row: AwardComparisonRow }> = ({ row }) => {
+  const { awarded, requested } = row;
+  const sameOffering =
+    awarded &&
+    requested &&
+    awarded.requested_offering.uuid === requested.requested_offering.uuid;
+  if (!awarded) {
+    return (
+      <>
+        {getResourceOptionValues(
+          requested.requested_offering,
+          requested.attributes,
+        ).map((option) => (
+          <span key={option.key} className="text-muted">
+            {option.label}: {formatOptionValue(option.value)}
+          </span>
+        ))}
+      </>
+    );
+  }
+  const awardedValues = getResourceOptionValues(
+    awarded.requested_offering,
+    awarded.attributes,
+  );
+  const requestedValues = sameOffering
+    ? getResourceOptionValues(
+        requested.requested_offering,
+        requested.attributes,
+      )
+    : [];
+  // Every option either side names, so an amount the award dropped still
+  // shows what was asked for.
+  const keys = [
+    ...awardedValues,
+    ...requestedValues.filter(
+      (option) => !awardedValues.some(({ key }) => key === option.key),
+    ),
+  ];
+  return (
+    <>
+      {keys.map(({ key, label }) => {
+        const value = awardedValues.find((option) => option.key === key)?.value;
+        const asked = requestedValues.find(
+          (option) => option.key === key,
+        )?.value;
+        const differs =
+          sameOffering && formatOptionValue(value) !== formatOptionValue(asked);
+        return (
+          <span key={key}>
+            {label}:{' '}
+            <span className={differs ? 'fw-bold' : undefined}>
+              {formatOptionValue(value)}
+            </span>
+            {differs && (
+              <span className="d-block text-muted fs-7">
+                {translate('requested {amount}', {
+                  amount: formatOptionValue(asked),
+                })}
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </>
+  );
+};
+
 /**
  * Awarded amounts per component, with the requested figure beside any that
  * differs. An item moved to another offering has different components, so
@@ -100,7 +181,12 @@ export const AwardAmountsCell: FC<{ row: AwardComparisonRow }> = ({ row }) => {
   const { awarded, requested } = row;
   const source = awarded ?? requested;
   const components = getRequestableComponents(source.requested_offering);
-  if (!components.length) {
+  const hasOptionValues = [awarded, requested].some(
+    (item) =>
+      item &&
+      getResourceOptionValues(item.requested_offering, item.attributes).length,
+  );
+  if (!components.length && !hasOptionValues) {
     return <>{renderFieldOrDash(null)}</>;
   }
   const awardedLimits = awarded ? getRowLimits(awarded) : {};
@@ -122,6 +208,7 @@ export const AwardAmountsCell: FC<{ row: AwardComparisonRow }> = ({ row }) => {
             )}
           </span>
         ))}
+        <ResourceOptionLines row={row} />
       </div>
     );
   }
@@ -151,6 +238,7 @@ export const AwardAmountsCell: FC<{ row: AwardComparisonRow }> = ({ row }) => {
           </span>
         );
       })}
+      <ResourceOptionLines row={row} />
       {requested && !sameOffering && (
         <span className="text-muted fs-7">
           {translate('Requested:')}{' '}

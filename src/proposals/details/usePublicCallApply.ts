@@ -3,6 +3,7 @@ import { useRouter } from '@uirouter/react';
 import { useCallback, useMemo } from 'react';
 import {
   NestedRound,
+  proposalProposalsStartFormbricksFlow,
   proposalPublicCallsCheckEligibilityRetrieve,
   ProtectedRound,
 } from 'waldur-js-client';
@@ -33,7 +34,7 @@ export const usePublicCallApply = (
   const router = useRouter();
 
   const { openDialog } = useModal();
-  const { showInfo } = useNotify();
+  const { showInfo, showErrorResponse } = useNotify();
 
   const activeRound = useMemo(() => {
     if (call.state !== 'active') return null;
@@ -79,6 +80,21 @@ export const usePublicCallApply = (
         ? translate('Checking eligibility…')
         : undefined;
 
+  const startFormbricksFlow = useCallback(async () => {
+    try {
+      const { data } = await proposalProposalsStartFormbricksFlow({
+        body: { round_uuid: (activeRound as NestedRound).uuid },
+      });
+      // The backend action's response isn't declared with a serializer
+      // (see StartFormbricksFlowSerializer's docstring in views.py), so
+      // drf-spectacular can't type its body - cast to what it actually
+      // returns (see ProposalViewSet.start_formbricks_flow).
+      window.location.assign((data as { redirect_url: string }).redirect_url);
+    } catch (error) {
+      showErrorResponse(error, translate('Unable to start proposal'));
+    }
+  }, [activeRound, showErrorResponse]);
+
   const handleApply = useCallback(
     (e?: React.MouseEvent) => {
       if (!user) {
@@ -99,6 +115,8 @@ export const usePublicCallApply = (
         call.external_url
       ) {
         document.location.href = call.external_url;
+      } else if (call.formbricks_flow_key && activeRound) {
+        startFormbricksFlow();
       } else if (activeRound) {
         openDialog(ProposalCreateDialog, {
           resolve: {
@@ -109,7 +127,7 @@ export const usePublicCallApply = (
       }
       e?.preventDefault();
     },
-    [activeRound, ineligible, user, router, call],
+    [activeRound, ineligible, user, router, call, startFormbricksFlow],
   );
 
   return { activeRound, hidden, handleApply, ineligible, disabledReason };

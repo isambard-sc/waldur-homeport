@@ -46,7 +46,7 @@ export const ProposalRoleBasedTabs = ({
     // The call-manager proposal view is customer-workspace-scoped and needs the
     // organization uuid. (proposal-review is review-scoped and needs no uuid.)
     if (state === 'call-management.proposal-details') {
-      Object.assign(params, { uuid: call.customer_uuid });
+      Object.assign(params, { uuid: call?.customer_uuid });
     }
 
     return params;

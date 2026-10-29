@@ -27,6 +27,7 @@ import { ProposalReview } from '@/proposals/types';
 import { useNotify } from '@/store/notify';
 
 import { useShowsComplianceSection } from '../create/ComplianceSummary';
+import { FormResponsesSection } from '../FormResponsesSection';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 
 import { ConflictOfInterestNotice } from './ConflictOfInterestNotice';
@@ -157,6 +158,9 @@ export const ProposalReviewCreatePage = () => {
                     />
                   </div>
                 ))}
+                <FormResponsesSection
+                  formResponses={(data.review as any).form_responses}
+                />
               </SidebarLayout.Body>
               <SidebarLayout.Sidebar transparent>
                 <CreatePageSidebar

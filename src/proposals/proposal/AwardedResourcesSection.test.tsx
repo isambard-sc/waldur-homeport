@@ -268,4 +268,57 @@ describe('AwardedResourcesSection', () => {
     expect(screen.getByText('GPU Burst Capacity')).toBeInTheDocument();
     expect(screen.getByText('Not awarded')).toBeInTheDocument();
   });
+
+  it('sets an awarded resource option amount against the requested one', async () => {
+    // The Formbricks GPU-hour allocation: a resource option, no limit.
+    const isambard = {
+      uuid: 'call-offering-isambard',
+      offering_name: 'Isambard-AI',
+      components: [
+        {
+          type: 'node',
+          name: 'Node',
+          measured_unit: 'h',
+          billing_type: 'usage',
+        },
+      ],
+      resource_options: {
+        order: ['allocation'],
+        options: { allocation: { type: 'integer', label: 'GPUh' } },
+      },
+      plan_details: null,
+    };
+    vi.mocked(proposalProposalsResourcesList).mockImplementation(() =>
+      page([
+        {
+          uuid: 'req-1',
+          requested_offering: isambard,
+          limits: {},
+          attributes: { allocation: 30000 },
+        },
+      ]),
+    );
+    vi.mocked(proposalProposalsAwardedResourcesList).mockImplementation(() =>
+      page([
+        {
+          uuid: 'award-1',
+          requested_resource: 'req-1',
+          requested_offering: isambard,
+          plan: null,
+          plan_name: 'Basic',
+          limits: {},
+          attributes: { allocation: 10000 },
+          description: '',
+        },
+      ]),
+    );
+
+    renderSection(
+      <AwardedResourcesSection proposal={proposal} editable={false} />,
+    );
+
+    expect(await screen.findByText('10000')).toBeInTheDocument();
+    expect(screen.getByText('requested 30000')).toBeInTheDocument();
+    expect(screen.getByText('Changed')).toBeInTheDocument();
+  });
 });

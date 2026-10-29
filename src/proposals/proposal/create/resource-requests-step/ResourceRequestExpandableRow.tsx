@@ -9,15 +9,13 @@ import { BooleanField } from '@/table/BooleanField';
 import { ExpandableContainer } from '@/table/ExpandableContainer';
 import { renderFieldOrDash } from '@/table/utils';
 
-const UserInputs = ({ callOffering, optionsValues }) => (
+const UserInputs = ({ options, optionsValues }) => (
   <section>
     <table className="table-details w-100">
       <tbody>
-        {callOffering.options?.order?.map((key) => (
+        {options?.order?.map((key) => (
           <tr key={key}>
-            <th className="col-md-4">
-              {callOffering.options.options[key]?.label}:
-            </th>
+            <th className="col-md-4">{options.options[key]?.label}:</th>
             <td className="col-md-8">
               {typeof optionsValues[key] === 'boolean' ? (
                 <BooleanField value={optionsValues[key]} />
@@ -88,20 +86,30 @@ export const ResourceRequestExpandableRow = ({
         limits={limits}
         prepaidDurationMonths={prepaidMonths}
         viewMode
-        extraTabs={
-          row.requested_offering.options?.order?.length > 0 && [
-            {
-              title: translate('User inputs'),
-              eventKey: 'user-inputs',
-              component: () => (
-                <UserInputs
-                  callOffering={row.requested_offering}
-                  optionsValues={optionsValues}
-                />
-              ),
-            },
-          ]
-        }
+        extraTabs={[
+          row.requested_offering.options?.order?.length > 0 && {
+            title: translate('User inputs'),
+            eventKey: 'user-inputs',
+            component: () => (
+              <UserInputs
+                options={row.requested_offering.options}
+                optionsValues={optionsValues}
+              />
+            ),
+          },
+          // Where some offerings take the amount (the GPU hours of a
+          // Formbricks application) rather than in limits.
+          row.requested_offering.resource_options?.order?.length > 0 && {
+            title: translate('Resource options'),
+            eventKey: 'resource-options',
+            component: () => (
+              <UserInputs
+                options={row.requested_offering.resource_options}
+                optionsValues={optionsValues}
+              />
+            ),
+          },
+        ].filter(Boolean)}
       />
     </ExpandableContainer>
   );

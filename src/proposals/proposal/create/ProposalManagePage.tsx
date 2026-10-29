@@ -31,6 +31,7 @@ import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 import { WorkflowTimeline } from '../WorkflowTimeline';
 
+import { FormbricksProposalProgress } from './FormbricksProposalProgress';
 import { ProposalHeader } from './ProposalHeader';
 import { ProposalSubmissionStep } from './ProposalSubmissionStep';
 
@@ -132,6 +133,9 @@ export const ProposalManagePage = () => {
             'proposal_field_config',
             // Tells the applicant when review of a submitted proposal starts.
             'evaluation_start',
+            // Formbricks-driven calls route the draft-stage UI to
+            // FormbricksProposalProgress instead of ProposalSubmissionStep.
+            'formbricks_flow_key',
             // Cast: compliance_checklist* are protected-call fields, so the
             // list is not assignable to keyof PublicCall.
           ] as any,
@@ -205,6 +209,11 @@ export const ProposalManagePage = () => {
     return <ArchivedProposalRedirect uuid={proposal_uuid} />;
   }
 
+  const isEditableDraft = proposal.state === 'draft' && isEditPage;
+  // A Formbricks call collects the application in Formbricks, so only the
+  // Lead (who can submit) resumes the flow here; everyone else sees details.
+  const usesFormbricks = Boolean((call as any)?.formbricks_flow_key);
+
   return (
     <>
       <SidebarLayout.Header className="pb-5">
@@ -217,7 +226,7 @@ export const ProposalManagePage = () => {
           <ProposalRoleBasedTabs
             review={userReview}
             proposal={proposal}
-            call={call}
+            call={call as any}
           />
           <ProposalHeader
             proposal={proposal}
@@ -242,7 +251,9 @@ export const ProposalManagePage = () => {
           )}
         </div>
       </SidebarLayout.Header>
-      {proposal.state === 'draft' && isEditPage && hasPermissionToEdit ? (
+      {isEditableDraft && usesFormbricks && hasPermissionToSubmit ? (
+        <FormbricksProposalProgress proposal={proposal} refetch={refetch} />
+      ) : isEditableDraft && !usesFormbricks && hasPermissionToEdit ? (
         <ProposalSubmissionStep
           proposal={proposal}
           call={call}
