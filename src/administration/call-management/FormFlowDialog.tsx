@@ -23,11 +23,15 @@ export const FORM_FLOWS_QUERY_KEY = 'FormFlows';
 
 const MonacoGroup = withFormGroup(MonacoField);
 
+// What a new flow starts from. The survey ID is a visible placeholder, not
+// an empty string, which read as a value that could be left as it was.
+export const SURVEY_ID_PLACEHOLDER = '<Formbricks survey id>';
+
 const EXAMPLE_STEPS: FormFlowStepRequest[] = [
   {
     key: 'project_details',
     label: 'Project details',
-    survey_id: '',
+    survey_id: SURVEY_ID_PLACEHOLDER,
     reviewer_visible: true,
     field_map: {},
   },
@@ -56,6 +60,20 @@ export const parseSteps = (
   }
   if (!Array.isArray(parsed) || parsed.length === 0) {
     return { error: translate('Steps must be a list of at least one step.') };
+  }
+  // Every step names a real survey. Said here, with where to find the ID,
+  // rather than left to the backend's "must be a Formbricks id".
+  const unnamed = parsed.find((step) => {
+    const id = typeof step?.survey_id === 'string' ? step.survey_id.trim() : '';
+    return !id || id.startsWith('<');
+  });
+  if (unnamed) {
+    return {
+      error: translate(
+        "Step '{step}' needs the ID of its Formbricks survey. Open the survey in Formbricks: the ID is the part of the address after /surveys/, or after /s/ in its share link (not the environment ID).",
+        { step: unnamed?.key || unnamed?.label || '?' },
+      ),
+    };
   }
   return { steps: parsed };
 };
@@ -186,7 +204,7 @@ export const FormFlowDialog = ({
               name="steps"
               label={translate('Steps')}
               description={translate(
-                'One entry per survey, in the order applicants answer them: key, label, survey_id, reviewer_visible, and optionally field_map and resources. See the proposal forms guide for the full format.',
+                "One entry per survey, in the order applicants answer them: key, label, survey_id, reviewer_visible, and optionally field_map and resources. survey_id is the ID in the survey's Formbricks address, after /surveys/. See the proposal forms guide for the full format.",
               )}
               validate={validateSteps}
               language="json"
