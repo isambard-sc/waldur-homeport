@@ -12,7 +12,10 @@ import { ExpandableContainer } from '@/table/ExpandableContainer';
 import { renderFieldOrDash } from '@/table/utils';
 
 // Per-field review comments, in display order. Only non-empty ones are shown.
-const COMMENT_FIELDS: { key: keyof ProposalReview; label: string }[] = [
+const COMMENT_FIELDS: {
+  key: Extract<keyof ProposalReview, `comment_${string}`>;
+  label: string;
+}[] = [
   { key: 'comment_project_title', label: translate('Project title') },
   { key: 'comment_project_summary', label: translate('Project summary') },
   {

@@ -91,6 +91,7 @@ export enum ProjectFeatures {
 
 export enum ProposalFeatures {
   auto_assign_award_id = 'proposal.auto_assign_award_id',
+  formbricks_forms = 'proposal.formbricks_forms',
 }
 
 export enum RancherFeatures {

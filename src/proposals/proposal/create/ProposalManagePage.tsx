@@ -26,6 +26,8 @@ import { canEditProposal, canSubmitProposal } from '@/proposals/team/teamRules';
 import { Proposal } from '@/proposals/types';
 import { useUser } from '@/workspace/hooks';
 
+import { ProposalFormProgress } from '../../forms/ProposalFormProgress';
+import { useProposalForm } from '../../forms/proposalForms';
 import { DownloadProposalPdfAction } from '../DownloadProposalPdfAction';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
@@ -142,6 +144,14 @@ export const ProposalManagePage = () => {
     staleTime: Infinity,
   });
 
+  // Only a draft on the edit page needs it here, to choose between the form
+  // flow's progress page and the built-in form; ProposalDetails asks for the
+  // answers itself.
+  const { data: proposalForm, isLoading: isLoadingForm } = useProposalForm(
+    proposal_uuid,
+    proposal?.state === 'draft' && isEditPage,
+  );
+
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ['ProposalReviews', proposal_uuid],
 
@@ -193,7 +203,7 @@ export const ProposalManagePage = () => {
     [reviews],
   );
 
-  if (isLoading || isLoadingReviews) {
+  if (isLoading || isLoadingReviews || isLoadingForm) {
     return <LoadingSpinner />;
   } else if (error) {
     return <LoadingErred loadData={refetch} />;
@@ -204,6 +214,8 @@ export const ProposalManagePage = () => {
     // Only a 404 comes here -- a 403 or a 500 surfaces as itself.
     return <ArchivedProposalRedirect uuid={proposal_uuid} />;
   }
+
+  const isEditableDraft = proposal.state === 'draft' && isEditPage;
 
   return (
     <>
@@ -242,7 +254,13 @@ export const ProposalManagePage = () => {
           )}
         </div>
       </SidebarLayout.Header>
-      {proposal.state === 'draft' && isEditPage && hasPermissionToEdit ? (
+      {isEditableDraft && proposalForm?.can_fill_in ? (
+        <ProposalFormProgress
+          proposal={proposal}
+          form={proposalForm}
+          canSubmit={Boolean(hasPermissionToSubmit)}
+        />
+      ) : isEditableDraft && !proposalForm && hasPermissionToEdit ? (
         <ProposalSubmissionStep
           proposal={proposal}
           call={call}

@@ -18,6 +18,7 @@ import { translate } from '@/i18n';
 import { userAutocomplete } from '@/marketplace/common/autocompletes';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 import { CallDurationPolicy } from '@/proposals/CallDurationPolicy';
+import { CallFormFlowField } from '@/proposals/forms/CallFormFlowField';
 import {
   getPublishResultsOptions,
   getUndecidedAtCompletionOptions,
@@ -267,6 +268,13 @@ export const GeneralConfigurationSection: FC<
               props.call.compliance_checklist_name ||
               translate('Not configured')
             }
+          />
+          <CallFormFlowField
+            callUuid={props.call.uuid}
+            readOnlyReason={
+              props.isReadOnly ? getCallReadOnlyReason(props.call) : undefined
+            }
+            refetch={props.refetch}
           />
           <SelectEditField
             name="order_author"

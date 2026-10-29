@@ -1,6 +1,12 @@
+import { useMemo } from 'react';
+
 import { translate } from '@/i18n';
+import { isProposalFormsEnabled } from '@/proposals/forms/proposalForms';
 
 import { SettingsTab, SettingsWithTabs } from '../settings/SettingsWithTabs';
+
+import { FormbricksConnectionCard } from './FormbricksConnectionCard';
+import { FormFlowsCard } from './FormFlowsCard';
 
 const CALL_MANAGEMENT_TABS: SettingsTab[] = [
   {
@@ -21,10 +27,33 @@ const CALL_MANAGEMENT_TABS: SettingsTab[] = [
 ];
 
 export const AdministrationCallManagement = () => {
+  // Application forms through Formbricks have their own API rather than
+  // being site settings, so their tab carries its own content. Shown only
+  // once the proposal.formbricks_forms feature is on.
+  const tabs = useMemo<SettingsTab[]>(
+    () =>
+      isProposalFormsEnabled()
+        ? [
+            ...CALL_MANAGEMENT_TABS,
+            {
+              key: 'application-forms',
+              title: translate('Application forms'),
+              content: (
+                <>
+                  <FormbricksConnectionCard />
+                  <FormFlowsCard />
+                </>
+              ),
+            },
+          ]
+        : CALL_MANAGEMENT_TABS,
+    [],
+  );
+
   return (
     <SettingsWithTabs
       title={translate('Call management settings')}
-      tabs={CALL_MANAGEMENT_TABS}
+      tabs={tabs}
       queryKey="AdministrationCallManagement"
     />
   );
