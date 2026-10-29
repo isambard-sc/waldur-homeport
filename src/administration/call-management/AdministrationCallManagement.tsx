@@ -1,6 +1,10 @@
 import { translate } from '@/i18n';
+import { isProposalFormsEnabled } from '@/proposals/forms/proposalForms';
 
 import { SettingsTab, SettingsWithTabs } from '../settings/SettingsWithTabs';
+
+import { FormbricksConnectionCard } from './FormbricksConnectionCard';
+import { FormFlowsCard } from './FormFlowsCard';
 
 const CALL_MANAGEMENT_TABS: SettingsTab[] = [
   {
@@ -22,10 +26,21 @@ const CALL_MANAGEMENT_TABS: SettingsTab[] = [
 
 export const AdministrationCallManagement = () => {
   return (
-    <SettingsWithTabs
-      title={translate('Call management settings')}
-      tabs={CALL_MANAGEMENT_TABS}
-      queryKey="AdministrationCallManagement"
-    />
+    <>
+      <SettingsWithTabs
+        title={translate('Call management settings')}
+        tabs={CALL_MANAGEMENT_TABS}
+        queryKey="AdministrationCallManagement"
+        className="mb-5"
+      />
+      {/* Application forms through Formbricks: set up here once the
+          proposal.formbricks_forms feature is on, before calls use them. */}
+      {isProposalFormsEnabled() && (
+        <>
+          <FormbricksConnectionCard />
+          <FormFlowsCard />
+        </>
+      )}
+    </>
   );
 };
