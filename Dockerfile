@@ -31,10 +31,6 @@ COPY --from=manifests /manifests/apps /app/apps
 # rather than manifest-only: portal: links the directory, not just its
 # package.json. Tiny and near-static, so it costs the install layer nothing.
 COPY stubs /app/stubs
-# vendor/ holds our local file: dependency (see package.json's
-# "waldur-js-client" entry) that must be present before `yarn install` runs,
-# not just in the later `COPY . /app`.
-COPY vendor /app/vendor
 # Git is needed to refer with yarn to unrealised versions of libraries from github
 # --no-cache: download package index on-the-fly, no need to cleanup afterwards
 # Skip unnecessary post-install scripts - not needed for production builds

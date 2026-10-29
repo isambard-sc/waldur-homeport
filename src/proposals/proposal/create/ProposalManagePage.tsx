@@ -26,12 +26,13 @@ import { canEditProposal, canSubmitProposal } from '@/proposals/team/teamRules';
 import { Proposal } from '@/proposals/types';
 import { useUser } from '@/workspace/hooks';
 
+import { ProposalFormProgress } from '../../forms/ProposalFormProgress';
+import { useProposalForm } from '../../forms/proposalForms';
 import { DownloadProposalPdfAction } from '../DownloadProposalPdfAction';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 import { WorkflowTimeline } from '../WorkflowTimeline';
 
-import { FormbricksProposalProgress } from './FormbricksProposalProgress';
 import { ProposalHeader } from './ProposalHeader';
 import { ProposalSubmissionStep } from './ProposalSubmissionStep';
 
@@ -133,9 +134,6 @@ export const ProposalManagePage = () => {
             'proposal_field_config',
             // Tells the applicant when review of a submitted proposal starts.
             'evaluation_start',
-            // Formbricks-driven calls route the draft-stage UI to
-            // FormbricksProposalProgress instead of ProposalSubmissionStep.
-            'formbricks_flow_key',
             // Cast: compliance_checklist* are protected-call fields, so the
             // list is not assignable to keyof PublicCall.
           ] as any,
@@ -145,6 +143,14 @@ export const ProposalManagePage = () => {
     refetchOnWindowFocus: false,
     staleTime: Infinity,
   });
+
+  // Only a draft on the edit page needs it here, to choose between the form
+  // flow's progress page and the built-in form; ProposalDetails asks for the
+  // answers itself.
+  const { data: proposalForm, isLoading: isLoadingForm } = useProposalForm(
+    proposal_uuid,
+    proposal?.state === 'draft' && isEditPage,
+  );
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ['ProposalReviews', proposal_uuid],
@@ -197,7 +203,7 @@ export const ProposalManagePage = () => {
     [reviews],
   );
 
-  if (isLoading || isLoadingReviews) {
+  if (isLoading || isLoadingReviews || isLoadingForm) {
     return <LoadingSpinner />;
   } else if (error) {
     return <LoadingErred loadData={refetch} />;
@@ -210,9 +216,6 @@ export const ProposalManagePage = () => {
   }
 
   const isEditableDraft = proposal.state === 'draft' && isEditPage;
-  // A Formbricks call collects the application in Formbricks, so only the
-  // Lead (who can submit) resumes the flow here; everyone else sees details.
-  const usesFormbricks = Boolean((call as any)?.formbricks_flow_key);
 
   return (
     <>
@@ -226,7 +229,7 @@ export const ProposalManagePage = () => {
           <ProposalRoleBasedTabs
             review={userReview}
             proposal={proposal}
-            call={call as any}
+            call={call}
           />
           <ProposalHeader
             proposal={proposal}
@@ -251,9 +254,13 @@ export const ProposalManagePage = () => {
           )}
         </div>
       </SidebarLayout.Header>
-      {isEditableDraft && usesFormbricks && hasPermissionToSubmit ? (
-        <FormbricksProposalProgress proposal={proposal} refetch={refetch} />
-      ) : isEditableDraft && !usesFormbricks && hasPermissionToEdit ? (
+      {isEditableDraft && proposalForm?.can_fill_in ? (
+        <ProposalFormProgress
+          proposal={proposal}
+          form={proposalForm}
+          canSubmit={Boolean(hasPermissionToSubmit)}
+        />
+      ) : isEditableDraft && !proposalForm && hasPermissionToEdit ? (
         <ProposalSubmissionStep
           proposal={proposal}
           call={call}

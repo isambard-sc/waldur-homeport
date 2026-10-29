@@ -26,8 +26,9 @@ import { useTitle } from '@/navigation/title';
 import { ProposalReview } from '@/proposals/types';
 import { useNotify } from '@/store/notify';
 
+import { FormResponsesSection } from '../../forms/FormResponsesSection';
+import { useProposalForm } from '../../forms/proposalForms';
 import { useShowsComplianceSection } from '../create/ComplianceSummary';
-import { FormResponsesSection } from '../FormResponsesSection';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 
 import { ConflictOfInterestNotice } from './ConflictOfInterestNotice';
@@ -77,6 +78,10 @@ export const ProposalReviewCreatePage = () => {
       setReviewObject(data.review);
     }
   }, [data]);
+
+  // The applicant's answers to the call's form flow, if it had one. The
+  // backend limits a reviewer to the steps the flow makes reviewer-visible.
+  const { data: proposalForm } = useProposalForm(data?.proposal?.uuid);
 
   const hasCompliance = useShowsComplianceSection(data?.proposal);
   const formSteps = useMemo(
@@ -158,9 +163,7 @@ export const ProposalReviewCreatePage = () => {
                     />
                   </div>
                 ))}
-                <FormResponsesSection
-                  formResponses={(data.review as any).form_responses}
-                />
+                <FormResponsesSection responses={proposalForm?.responses} />
               </SidebarLayout.Body>
               <SidebarLayout.Sidebar transparent>
                 <CreatePageSidebar

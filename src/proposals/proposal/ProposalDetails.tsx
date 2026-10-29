@@ -30,6 +30,8 @@ import { isReviewInFinalState } from '@/proposals/utils';
 import { FormSteps } from '@/wizard';
 import { useUser } from '@/workspace/hooks';
 
+import { FormResponsesSection } from '../forms/FormResponsesSection';
+import { useProposalForm } from '../forms/proposalForms';
 import { ProposalUsersListSummary } from '../team/ProposalUsersListSummary';
 import { Call, Proposal, ProposalReview } from '../types';
 import {
@@ -56,7 +58,6 @@ import {
   useCanCreateReview,
 } from './create/utils';
 import { SubmitReviewDialog } from './create-review/SubmitReviewDialog';
-import { FormResponsesSection } from './FormResponsesSection';
 import { StepChecklistSection } from './StepChecklistSection';
 import {
   canViewTechnicalAssessment,
@@ -106,11 +107,9 @@ export const ProposalDetails = ({
   const canCreateReview = useCanCreateReview(proposal);
 
   const isCallManagerView = state.name?.startsWith('call-management');
-  // form_responses is an array only for Formbricks-driven proposals (null
-  // otherwise) - use it as the signal to hide the native project-details
-  // summary, which would otherwise duplicate what's already shown in
-  // FormResponsesSection below in the applicant's own words.
-  const isFormbricksProposal = Array.isArray((proposal as any).form_responses);
+  // A proposal made through a form flow has its project details in the
+  // applicant's answers, so the built-in summary would only repeat them.
+  const { data: proposalForm } = useProposalForm(proposal.uuid);
 
   // The figures the applicant saw beside their form: the person deciding the
   // allocation needs the same total and the same project length.
@@ -230,12 +229,11 @@ export const ProposalDetails = ({
           id="step-general"
           params={{ proposal, canViewReviews: isCallManagerView }}
         />
-        {!isFormbricksProposal && (
+        {proposalForm ? (
+          <FormResponsesSection responses={proposalForm.responses} />
+        ) : (
           <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
         )}
-        <FormResponsesSection
-          formResponses={(proposal as any).form_responses}
-        />
         {hasCompliance && (
           <div id="step-compliance">
             <ComplianceSummary proposal={proposal} />

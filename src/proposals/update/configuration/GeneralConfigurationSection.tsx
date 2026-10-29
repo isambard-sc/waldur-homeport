@@ -1,8 +1,7 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { FC, useMemo } from 'react';
 import {
   proposalProtectedCallsAvailableComplianceChecklistsList,
-  proposalProtectedCallsFormbricksFlowKeysList,
   proposalProtectedCallsPartialUpdate,
 } from 'waldur-js-client';
 
@@ -19,6 +18,7 @@ import { translate } from '@/i18n';
 import { userAutocomplete } from '@/marketplace/common/autocompletes';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 import { CallDurationPolicy } from '@/proposals/CallDurationPolicy';
+import { CallFormFlowField } from '@/proposals/forms/CallFormFlowField';
 import {
   getPublishResultsOptions,
   getUndecidedAtCompletionOptions,
@@ -139,30 +139,6 @@ export const GeneralConfigurationSection: FC<
   const undecidedAtCompletionOptions = useMemo(
     getUndecidedAtCompletionOptions,
     [],
-  );
-
-  // A plain one-shot fetch, not AsyncSelectEditField's search-as-you-type
-  // pagination machinery: FORM_FLOWS is a short, deployment-configured list
-  // (unlike the compliance checklist catalogue below), not something that
-  // needs server-side search.
-  const { data: formbricksFlowKeys } = useQuery({
-    queryKey: ['FormbricksFlowKeys'],
-    queryFn: () =>
-      proposalProtectedCallsFormbricksFlowKeysList().then(
-        (response) => response.data ?? [],
-      ),
-    refetchOnWindowFocus: false,
-  });
-
-  const formbricksFlowKeyOptions = useMemo(
-    () => [
-      { value: null, label: translate('Not using Formbricks (native form)') },
-      ...(formbricksFlowKeys ?? []).map((flow) => ({
-        value: flow.key,
-        label: flow.key,
-      })),
-    ],
-    [formbricksFlowKeys],
   );
 
   const loadComplianceChecklists = useMemo(
@@ -293,27 +269,12 @@ export const GeneralConfigurationSection: FC<
               translate('Not configured')
             }
           />
-          <SelectEditField
-            name="formbricks_flow_key"
-            label={translate('Applicant intake form')}
-            description={translate(
-              'Routes applicants through an external Formbricks survey chain instead of the built-in proposal form. Cannot be changed once the call has any proposals.',
-            )}
-            options={formbricksFlowKeyOptions}
-            simpleValue
-            isClearable={false}
-            disabled={props.isReadOnly || props.call.has_proposals}
-            tooltip={
-              !props.isReadOnly && props.call.has_proposals
-                ? translate(
-                    'Cannot be changed once proposals exist for this call.',
-                  )
-                : undefined
+          <CallFormFlowField
+            callUuid={props.call.uuid}
+            readOnlyReason={
+              props.isReadOnly ? getCallReadOnlyReason(props.call) : undefined
             }
-            renderValue={(value) =>
-              formbricksFlowKeyOptions.find((o) => o.value === value)?.label ||
-              translate('Not using Formbricks (native form)')
-            }
+            refetch={props.refetch}
           />
           <SelectEditField
             name="order_author"
