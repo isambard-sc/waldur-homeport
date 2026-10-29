@@ -21,7 +21,13 @@ import { getKeyTitle } from './utils';
 export interface SettingsTab {
   key: string;
   title: ReactNode;
-  groupName: string;
+  /** The settings group whose settings the tab lists. */
+  groupName?: string;
+  /**
+   * What the tab shows instead of a settings group, for settings kept
+   * outside the site settings, with their own API and page.
+   */
+  content?: ReactNode;
 }
 
 interface SettingsWithTabsProps {
@@ -147,7 +153,9 @@ export const SettingsWithTabs: FC<SettingsWithTabsProps> = ({
           <>
             {filteredGroups.map(({ tab, items }) => (
               <TabsContent key={tab.key} value={tab.key}>
-                {items.length > 0 ? (
+                {tab.content ? (
+                  tab.content
+                ) : items.length > 0 ? (
                   <FormTable>
                     {items.map((item) => (
                       <FieldRow
