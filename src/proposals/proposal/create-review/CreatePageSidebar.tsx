@@ -45,8 +45,15 @@ export const CreatePageSidebar: FC<CreatePageSidebarProps> = ({
   const { data: resourceRows } = useProposalResourceRows(proposal?.uuid);
   const fixedDurationDays = useCallFixedDuration(proposal?.call_uuid);
 
-  const rejectMutation = useManagedMutation<any, any, void>({
-    mutationFn: () => proposalReviewsReject({ path: { uuid: review.uuid } }),
+  const rejectMutation = useManagedMutation<any, any, { input?: string }>({
+    // The reason is optional: sent only when one is given.
+    mutationFn: (variables) =>
+      proposalReviewsReject({
+        path: { uuid: review.uuid },
+        body: variables?.input?.trim()
+          ? { reason: variables.input.trim() }
+          : {},
+      }),
     successMessage: translate('Review has been rejected.'),
     errorMessage: translate('Unable to reject review.'),
     refetch,
@@ -61,6 +68,12 @@ export const CreatePageSidebar: FC<CreatePageSidebarProps> = ({
             formatJsxTemplate,
           )
         : undefined,
+      options: {
+        showInput: true,
+        inputMultiline: true,
+        inputLabel: translate('Reason (sent to the call managers)'),
+        inputPlaceholder: translate('Optional'),
+      },
     },
   });
   return (

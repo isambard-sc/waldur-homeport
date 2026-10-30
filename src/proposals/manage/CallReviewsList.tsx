@@ -57,7 +57,8 @@ export const CallReviewsList: FC<CallReviewsListProps> = ({ call }) => {
       description: translate(
         'Every review of the call, with reviewer, score and public comment.',
       ),
-      download: ({ withFilters, query }) =>
+      excel: true,
+      download: ({ withFilters, query, format }) =>
         downloadFile(
           buildCallExportUrl(
             call,
@@ -65,8 +66,9 @@ export const CallReviewsList: FC<CallReviewsListProps> = ({ call }) => {
             'review_state',
             withFilters ? formFilters : undefined,
             query,
+            format === 'excel' ? 'xlsx' : 'csv',
           ),
-          `${call.slug || call.uuid}-reviews.csv`,
+          `${call.slug || call.uuid}-reviews.${format === 'excel' ? 'xlsx' : 'csv'}`,
         ),
     }),
     [call, formFilters],

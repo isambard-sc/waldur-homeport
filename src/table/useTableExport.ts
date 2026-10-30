@@ -158,12 +158,17 @@ export function useTableExport(table, props?) {
     try {
       // The server writes this one; nothing to assemble from the rows.
       if (config.content === 'full' && props?.fullExport) {
+        const format =
+          config.format === 'excel' && props.fullExport.excel ? 'excel' : 'csv';
         await props.fullExport.download({
           withFilters: Boolean(config.withFilters),
           query: config.withFilters ? tableState.query : undefined,
+          format,
         });
         showSuccess(
-          translate('Table has been exported to {format}.', { format: 'CSV' }),
+          translate('Table has been exported to {format}.', {
+            format: format === 'excel' ? 'Excel' : 'CSV',
+          }),
         );
         closeDialog();
         return;

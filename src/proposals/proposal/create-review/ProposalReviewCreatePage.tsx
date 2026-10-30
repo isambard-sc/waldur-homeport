@@ -34,6 +34,7 @@ import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
 import { ConflictOfInterestNotice } from './ConflictOfInterestNotice';
 import { CreatePageSidebar } from './CreatePageSidebar';
 import { ReviewHeader } from './ReviewHeader';
+import { ReviewReturnedNotice } from './ReviewReturnedNotice';
 import { createReviewSteps } from './steps/steps';
 
 const CommentFormDialog = lazyComponent(() =>
@@ -148,6 +149,7 @@ export const ProposalReviewCreatePage = () => {
             <SidebarLayout.Container>
               <SidebarLayout.Body>
                 {/* Before the proposal body, not after it. */}
+                <ReviewReturnedNotice review={reviewObject} />
                 <ConflictOfInterestNotice review={reviewObject} />
                 {formSteps.map((step, i) => (
                   <div ref={stepRefs.current[i]} key={step.id}>

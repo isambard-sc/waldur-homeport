@@ -42,14 +42,29 @@ export const ExportDialog = (props: ExportDialogProps) => {
       createDecorator({
         field: 'content',
         updates: {
+          // A full report is written by the server: CSV, or Excel where it
+          // offers that too.
           format: (content, values: any) =>
-            content === 'full' ? 'csv' : values.format,
+            content === 'full' &&
+            !(values.format === 'excel' && fullExport?.excel)
+              ? 'csv'
+              : values.format,
           allPages: (content, values: any) =>
             content === 'full' ? true : values.allPages,
         },
       }),
     ],
-    [],
+    [fullExport],
+  );
+
+  const fullFormats = useMemo(
+    () =>
+      EXPORT_OPTIONS.filter(
+        (option) =>
+          option.value === 'csv' ||
+          (fullExport?.excel && option.value === 'excel'),
+      ),
+    [fullExport],
   );
 
   const callback = useTableExport(props.resolve.table, props.resolve.ownProps);
@@ -98,7 +113,9 @@ export const ExportDialog = (props: ExportDialogProps) => {
                       // Said before the choice, not after.
                       description: [
                         fullExport.description,
-                        translate('CSV, every page.'),
+                        fullExport.excel
+                          ? translate('CSV or Excel, every page.')
+                          : translate('CSV, every page.'),
                       ]
                         .filter(Boolean)
                         .join(' '),
@@ -111,11 +128,16 @@ export const ExportDialog = (props: ExportDialogProps) => {
                 name="format"
                 label={translate('Format')}
                 simpleValue={true}
-                options={EXPORT_OPTIONS}
+                options={
+                  values.content === 'full' ? fullFormats : EXPORT_OPTIONS
+                }
                 required={true}
                 isClearable={false}
                 validate={required}
-                isDisabled={submitting || values.content === 'full'}
+                isDisabled={
+                  submitting ||
+                  (values.content === 'full' && fullFormats.length < 2)
+                }
               />
 
               <BooleanGroup

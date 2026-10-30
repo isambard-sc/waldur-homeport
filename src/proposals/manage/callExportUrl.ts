@@ -25,8 +25,13 @@ export const buildCallExportUrl = (
   stateParameter: 'proposal_state' | 'review_state',
   filter?: CallExportFilter,
   search?: string,
+  format: 'csv' | 'xlsx' = 'csv',
 ): string => {
   const query = new URLSearchParams();
+  // Named file_format: the API reads a bare `format` itself.
+  if (format === 'xlsx') {
+    query.set('file_format', 'xlsx');
+  }
   UUID_FILTERS.filter((key) => filter?.[key]).forEach((key) =>
     query.set(key, filter[key] as string),
   );

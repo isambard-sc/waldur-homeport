@@ -2,10 +2,12 @@ import { useCurrentStateAndParams } from '@uirouter/react';
 
 import { PermissionEnum } from '@/permissions/enums';
 import { hasPermission } from '@/permissions/hasPermission';
+import { canReturnProposal } from '@/proposals/returns/permissions';
 import { ActionsDropdown } from '@/table/ActionsDropdown';
 import { useUser } from '@/workspace/hooks';
 
 import { ReviewDeleteAction } from './ReviewDeleteAction';
+import { ReviewReturnAction } from './ReviewReturnAction';
 import { ReviewViewAction } from './ReviewViewAction';
 
 export const ReviewsRowActions = ({ row, fetch }) => {
@@ -19,6 +21,7 @@ export const ReviewsRowActions = ({ row, fetch }) => {
   });
   const showActions =
     canDelete ||
+    (row.state === 'submitted' && canReturnProposal(user, row)) ||
     state.name === 'call-management.review-list' ||
     row.state === 'in_review';
   if (!showActions) {
@@ -29,9 +32,11 @@ export const ReviewsRowActions = ({ row, fetch }) => {
     <ActionsDropdown
       row={row}
       refetch={fetch}
-      actions={[ReviewViewAction, canDelete && ReviewDeleteAction].filter(
-        Boolean,
-      )}
+      actions={[
+        ReviewViewAction,
+        ReviewReturnAction,
+        canDelete && ReviewDeleteAction,
+      ].filter(Boolean)}
     />
   );
 };

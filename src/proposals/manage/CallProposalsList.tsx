@@ -72,7 +72,8 @@ export const CallProposalsList: FC<CallProposalsListProps> = ({ call }) => {
       description: translate(
         'Every field, including the amount requested per offering component and the review scores.',
       ),
-      download: ({ withFilters, query }) =>
+      excel: true,
+      download: ({ withFilters, query, format }) =>
         downloadFile(
           buildCallExportUrl(
             call,
@@ -80,8 +81,9 @@ export const CallProposalsList: FC<CallProposalsListProps> = ({ call }) => {
             'proposal_state',
             withFilters ? formFilters : undefined,
             query,
+            format === 'excel' ? 'xlsx' : 'csv',
           ),
-          `${call.slug || call.uuid}-proposals.csv`,
+          `${call.slug || call.uuid}-proposals.${format === 'excel' ? 'xlsx' : 'csv'}`,
         ),
     }),
     [call, formFilters],

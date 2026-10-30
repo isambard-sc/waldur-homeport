@@ -42,6 +42,17 @@ export const validateFixedDuration = (value: any) => {
     : translate('Enter a whole number of days, 1 or more.');
 };
 
+/** A whole number of documents, 0 for none. */
+export const validateMinimumDocuments = (value: any) => {
+  if (value === null || value === undefined || value === '') {
+    return undefined;
+  }
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0
+    ? undefined
+    : translate('Enter a whole number, 0 or more.');
+};
+
 /**
  * A call places one marketplace order per resource it grants. This decides
  * who those orders are created by — the person named on them, who receives
@@ -256,6 +267,50 @@ export const GeneralConfigurationSection: FC<
               value ? translate('Yes') : translate('No')
             }
           />
+          <BooleanEditField
+            name="one_request_per_offering"
+            label={translate('One resource request per offering')}
+            description={translate(
+              'A new request for an offering the proposal already requests replaces the earlier one.',
+            )}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
+            }
+          />
+          <NumberEditField
+            name="minimum_number_of_documents"
+            label={translate('Minimum supporting documents')}
+            description={translate(
+              "Proposals can't be submitted with fewer documents than this. 0 means none are required.",
+            )}
+            disabled={props.isReadOnly}
+            validate={validateMinimumDocuments}
+            renderValue={(value) =>
+              value ? String(value) : translate('None required')
+            }
+          />
+          <BooleanEditField
+            name="copy_summary_to_project"
+            label={translate(
+              'Use the proposal summary as the project description',
+            )}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
+            }
+          />
+          <BooleanEditField
+            name="single_proposal_manager"
+            label={translate('One proposal manager per proposal')}
+            description={translate(
+              'Adding a manager hands the proposal over: the previous manager becomes a proposal administrator, and the new one its owner.',
+            )}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
+            }
+          />
           <AsyncSelectEditField
             name="compliance_checklist"
             label={translate('Compliance checklist')}
@@ -338,6 +393,30 @@ export const GeneralConfigurationSection: FC<
           <BooleanEditField
             name="reviews_visible_to_submitters"
             label={translate('Reviews visible to applicants')}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
+            }
+          />
+          <BooleanEditField
+            name="withdraw_pending_reviews"
+            label={translate(
+              'Withdraw unfinished reviews when no longer needed',
+            )}
+            description={translate(
+              "When a proposal is accepted, rejected, cancelled or returned to its applicant, its unfinished reviews and unanswered review requests are deleted, so they leave the reviewers' lists.",
+            )}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
+            }
+          />
+          <BooleanEditField
+            name="reviewers_see_assigned_only"
+            label={translate('Reviewers see only the proposals they review')}
+            description={translate(
+              'Call reviewers read only the proposals they review. Panel members still see every submitted proposal.',
+            )}
             disabled={props.isReadOnly}
             renderValue={(value) =>
               value ? translate('Yes') : translate('No')
