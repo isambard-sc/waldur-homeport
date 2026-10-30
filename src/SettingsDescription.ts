@@ -1820,6 +1820,95 @@ export const SettingsDescription = [
     ],
   },
   {
+    description: translate('AI reporting settings'),
+    items: [
+      {
+        key: 'AI_REPORTING_NAME',
+        description: translate('Display name for the AI reporting assistant persona.'),
+        default: 'Isambard Reporting Assistant',
+        type: 'string',
+      },
+      {
+        key: 'AI_REPORTING_ENABLED',
+        description: translate('Enable the AI reporting feature and calls to the harness service.'),
+        default: true,
+        type: 'boolean',
+      },
+      {
+        key: 'AI_REPORTING_MODEL',
+        description: translate('Bedrock model id override for the AI reporting harness, e.g. \'anthropic.claude-opus-5-5\'. Leave empty to use the harness\'s own configured default instead.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'AI_REPORTING_CUSTOM_INSTRUCTIONS',
+        description: translate('Additional instructions injected into the AI reporting system prompt. Use this for organisation-specific context, terminology, or behavioural guidelines.'),
+        default: '',
+        type: 'text_field',
+      },
+      {
+        key: 'AI_REPORTING_HISTORY_LIMIT',
+        description: translate('Maximum number of past messages kept in an AI reporting conversation\'s context window. -1 means unlimited.'),
+        default: -1,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_MAX_TURNS',
+        description: translate('Maximum tool-use turns the harness may take per question before it must give a final answer. -1 means use the harness\'s own default.'),
+        default: -1,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_REQUEST_TIMEOUT_SECONDS',
+        description: translate('Timeout in seconds for a single call from Waldur to the AI reporting harness.'),
+        default: 600,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_TOKEN_LIMIT_DAILY',
+        description: translate('Per-user daily token cap for AI reporting. -1 means unlimited.'),
+        default: -1,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_TOKEN_LIMIT_WEEKLY',
+        description: translate('Per-user weekly token cap for AI reporting. -1 means unlimited.'),
+        default: -1,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_TOKEN_LIMIT_MONTHLY',
+        description: translate('Per-user monthly token cap for AI reporting. -1 means unlimited.'),
+        default: -1,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_GLOBAL_DAILY_TOKEN_BUDGET',
+        description: translate('Site-wide daily token cap across all AI reporting traffic. -1 means unlimited.'),
+        default: 5000000,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_GLOBAL_REQUESTS_PER_MINUTE',
+        description: translate('Site-wide burst cap across all AI reporting traffic.'),
+        default: 60,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_MESSAGE_RETENTION_DAYS',
+        description: translate('Number of days to retain AI reporting questions/answers before automatic deletion. Set to -1 to disable automatic cleanup.'),
+        default: 90,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_FILE_RETENTION_DAYS',
+        description: translate('Number of days to retain AI reporting generated files (charts, PDFs, CSVs) before automatic deletion - shorter than the message retention above since file bytes are the more expensive part to keep. Set to -1 to disable automatic cleanup.'),
+        default: 21,
+        type: 'integer',
+      },
+    ],
+  },
+  {
     description: translate('Software catalog general'),
     items: [
       {
