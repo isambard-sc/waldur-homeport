@@ -107,8 +107,8 @@ export const ProposalDetails = ({
   const canCreateReview = useCanCreateReview(proposal);
 
   const isCallManagerView = state.name?.startsWith('call-management');
-  // A proposal made through a form flow has its project details in the
-  // applicant's answers, so the built-in summary would only repeat them.
+  // A call with a form flow adds forms to Waldur's own: their answers are
+  // shown after the project details, never copied into them.
   const { data: proposalForm } = useProposalForm(proposal.uuid);
 
   // The figures the applicant saw beside their form: the person deciding the
@@ -229,11 +229,8 @@ export const ProposalDetails = ({
           id="step-general"
           params={{ proposal, canViewReviews: isCallManagerView }}
         />
-        {proposalForm ? (
-          <FormResponsesSection responses={proposalForm.responses} />
-        ) : (
-          <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
-        )}
+        <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
+        <FormResponsesSection responses={proposalForm?.responses} />
         {hasCompliance && (
           <div id="step-compliance">
             <ComplianceSummary proposal={proposal} />

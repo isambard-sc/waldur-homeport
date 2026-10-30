@@ -524,7 +524,10 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'proposals.manage-proposal',
-    url: ':proposal_uuid/?review_uuid&panels',
+    url: ':proposal_uuid/?review_uuid&panels&form_survey',
+    // A Formbricks survey ends here with ?form_survey; the page fetches the
+    // answers and drops it, which must not remount the page.
+    params: { form_survey: { dynamic: true } },
     component: lazyComponent(() =>
       import('./proposal/create/ProposalManagePage').then((module) => ({
         default: module.ProposalManagePage,

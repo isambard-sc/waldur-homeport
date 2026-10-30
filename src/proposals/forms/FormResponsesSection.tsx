@@ -31,7 +31,7 @@ interface FormResponsesSectionProps {
 /**
  * A proposal's answers to its form flow, step by step, read-only.
  *
- * Used on the applicant's progress page, the proposal page and the review
+ * Used on the applicant's draft, the proposal page and the review
  * page. The backend has already narrowed the steps to what the viewer may
  * see (reviewers get only the reviewer-visible ones), so this shows all it is
  * given, and nothing at all when there is nothing to show.
@@ -46,7 +46,7 @@ export const FormResponsesSection = ({
 
   return (
     <FormTable.Card
-      title={translate('Application form responses')}
+      title={translate('Form answers')}
       className={className ?? 'card-bordered mb-7'}
     >
       <FormTable detailsMode>

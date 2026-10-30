@@ -179,7 +179,7 @@ export const FormbricksConnectionCard = () => {
             name="api_key"
             label={translate('API key')}
             description={translate(
-              'A Formbricks management API key. It is never shown again once saved.',
+              'A Formbricks API key with write access to the environment holding the surveys: Waldur sets up their hidden fields and endings. It is never shown again once saved.',
             )}
             disabled={!canEdit}
             renderValue={() => secretState(connection.api_key_set)}
@@ -196,7 +196,7 @@ export const FormbricksConnectionCard = () => {
           <FormTable.Item
             label={translate('Webhook URL')}
             description={translate(
-              'Add a webhook in Formbricks with this URL, for responses being finished.',
+              'Add a webhook in Formbricks with this URL, triggered on "Response finished" and "Response updated".',
             )}
             value={<code className="text-break">{connection.webhook_url}</code>}
             actions={

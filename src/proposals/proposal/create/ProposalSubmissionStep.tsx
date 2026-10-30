@@ -10,11 +10,13 @@ import {
   proposalProposalsSubmit,
   proposalProposalsSubmitAnswers,
   proposalProposalsUpdateProjectDetails,
+  ProposalForm,
   ProposalReview,
 } from 'waldur-js-client';
 
 import { formDataOptions } from '@/core/api';
 import { SHORT_STALE_TIME } from '@/core/constants';
+import { getErrorBody } from '@/core/ErrorMessageFormatter';
 import { useAccordionUrlState } from '@/core/useAccordionUrlState';
 import { isEmpty } from '@/core/utils';
 import { hasUnsavedChanges, NavigationBlocker } from '@/form/NavigationBlocker';
@@ -23,6 +25,9 @@ import { translate } from '@/i18n';
 import { evaluateCondition } from '@/marketplace-checklist/questionDependencies';
 import { useModal } from '@/modal/actions';
 import { useCallFixedDuration } from '@/proposals/callQueries';
+import { FormResponsesSection } from '@/proposals/forms/FormResponsesSection';
+import { PROPOSAL_FORM_QUERY_KEY } from '@/proposals/forms/proposalForms';
+import { ProposalFormsCard } from '@/proposals/forms/ProposalFormsCard';
 import { usesCallVocabulary, requestListState } from '@/proposals/presentation';
 import { hasRequestedAmount } from '@/proposals/requestedResourceCost';
 import { useProposalCanSubmit } from '@/proposals/useProposalCanSubmit';
@@ -149,11 +154,20 @@ export const ProposalSubmissionStep: FC<{
   refetch;
   /** Whether the viewer may submit, not only edit, the proposal. */
   canSubmitProposal?: boolean;
-}> = ({ proposal, call, reviews, refetch, canSubmitProposal = true }) => {
+  /** The call's extra forms, when its call has a form flow. */
+  proposalForm?: ProposalForm | null;
+}> = ({
+  proposal,
+  call,
+  reviews,
+  refetch,
+  canSubmitProposal = true,
+  proposalForm,
+}) => {
   const { confirm } = useModal();
   const router = useRouter();
 
-  const { showErrorResponse, showSuccess } = useNotify();
+  const { showError, showErrorResponse, showSuccess } = useNotify();
 
   const queryClient = useQueryClient();
   const proposal_uuid = proposal.uuid;
@@ -395,11 +409,21 @@ export const ProposalSubmissionStep: FC<{
         // Send the applicant to their proposals list instead.
         router.stateService.go(requestListState());
       } catch (error) {
-        showErrorResponse(error, translate('Something went wrong'));
+        // The backend's refusal while a form is unanswered reads well on its
+        // own; the forms card is refreshed so it shows which.
+        const formsError = getErrorBody(error)?.forms;
+        if (formsError) {
+          showError([].concat(formsError).join(' '));
+          queryClient.invalidateQueries({
+            queryKey: [PROPOSAL_FORM_QUERY_KEY, proposal_uuid],
+          });
+        } else {
+          showErrorResponse(error, translate('Something went wrong'));
+        }
         return { [FORM_ERROR]: error };
       }
     },
-    [proposal, proposal_uuid, checklistData, router],
+    [proposal, proposal_uuid, checklistData, router, queryClient],
   );
 
   return (
@@ -472,6 +496,15 @@ export const ProposalSubmissionStep: FC<{
                     />
                   </div>
                 ))}
+                {proposalForm && (
+                  <>
+                    <ProposalFormsCard
+                      proposalUuid={proposal_uuid}
+                      form={proposalForm}
+                    />
+                    <FormResponsesSection responses={proposalForm.responses} />
+                  </>
+                )}
               </SidebarLayout.Body>
 
               <SidebarLayout.Sidebar transparent>
@@ -490,6 +523,13 @@ export const ProposalSubmissionStep: FC<{
                   completedSteps={completedSteps}
                   canSubmit={canSubmit}
                   canSubmitProposal={canSubmitProposal}
+                  proposalUuid={proposal_uuid}
+                  hasForms={Boolean(proposalForm)}
+                  // Not enforced while forms are unavailable: the backend
+                  // lets the proposal through on Waldur's form alone then.
+                  missingForms={
+                    proposalForm?.available ? proposalForm.missing : undefined
+                  }
                 />
               </SidebarLayout.Sidebar>
             </SidebarLayout.Container>
