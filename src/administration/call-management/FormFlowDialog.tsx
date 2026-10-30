@@ -6,12 +6,13 @@ import {
   FormFlow,
   FormFlowStepRequest,
   formFlowsCreate,
+  PurposeEnum,
   formFlowsUpdate,
 } from 'waldur-js-client';
 
 import { getErrorBody } from '@/core/ErrorMessageFormatter';
 import { required } from '@/core/validators';
-import { StringGroup, SubmitButton, TextGroup } from '@/form';
+import { RadioGroup, StringGroup, SubmitButton, TextGroup } from '@/form';
 import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
@@ -34,6 +35,7 @@ interface FormValues {
   key: string;
   name: string;
   description: string;
+  purpose: PurposeEnum;
   steps: StepValue[];
 }
 
@@ -83,6 +85,7 @@ export const FormFlowDialog = ({
     key: flow?.key ?? '',
     name: flow?.name ?? '',
     description: flow?.description ?? '',
+    purpose: flow?.purpose ?? 'application',
     steps: flow?.steps?.length
       ? flow.steps.map((step) => ({
           key: step.key,
@@ -98,6 +101,7 @@ export const FormFlowDialog = ({
       key: values.key,
       name: values.name,
       description: values.description ?? '',
+      purpose: values.purpose,
       steps: toStepRequests(values.steps),
     };
     try {
@@ -109,6 +113,7 @@ export const FormFlowDialog = ({
     } catch (error) {
       const errors = getErrorBody(error) ?? {};
       const fieldErrors = {
+        purpose: firstMessage(errors.purpose),
         key: firstMessage(errors.key),
         name: firstMessage(errors.name),
         description: firstMessage(errors.description),
@@ -179,6 +184,24 @@ export const FormFlowDialog = ({
               name="description"
               label={translate('Description')}
               rows={2}
+            />
+            <RadioGroup
+              name="purpose"
+              label={translate('Used for')}
+              description={
+                flow?.calls_count
+                  ? translate(
+                      'Cannot be changed while calls or the site use this flow.',
+                    )
+                  : translate(
+                      "Applications: forms beside a proposal. End of project: forms a project's PI fills in near its end date.",
+                    )
+              }
+              disabled={Boolean(flow?.calls_count)}
+              choices={[
+                { value: 'application', label: translate('Applications') },
+                { value: 'closing', label: translate('End of project') },
+              ]}
             />
             <FormFlowStepsField />
             {submitError && <p className="text-danger mb-0">{submitError}</p>}

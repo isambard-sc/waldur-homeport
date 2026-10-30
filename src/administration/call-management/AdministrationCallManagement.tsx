@@ -7,6 +7,7 @@ import { SettingsTab, SettingsWithTabs } from '../settings/SettingsWithTabs';
 
 import { FormbricksConnectionCard } from './FormbricksConnectionCard';
 import { FormFlowsCard } from './FormFlowsCard';
+import { SiteClosingFlowCard } from './SiteClosingFlowCard';
 
 const CALL_MANAGEMENT_TABS: SettingsTab[] = [
   {
@@ -42,6 +43,7 @@ export const AdministrationCallManagement = () => {
                 <>
                   <FormbricksConnectionCard />
                   <FormFlowsCard />
+                  <SiteClosingFlowCard />
                 </>
               ),
             },

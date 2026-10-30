@@ -26,6 +26,8 @@ export const formatAnswer = (answer: unknown): string | null => {
 interface FormResponsesSectionProps {
   responses?: FormStepResponse[] | null;
   className?: string;
+  /** Defaults to "Form answers". */
+  title?: string;
 }
 
 /**
@@ -39,6 +41,7 @@ interface FormResponsesSectionProps {
 export const FormResponsesSection = ({
   responses,
   className,
+  title,
 }: FormResponsesSectionProps) => {
   if (!responses?.length) {
     return null;
@@ -46,7 +49,7 @@ export const FormResponsesSection = ({
 
   return (
     <FormTable.Card
-      title={translate('Form answers')}
+      title={title ?? translate('Form answers')}
       className={className ?? 'card-bordered mb-7'}
     >
       <FormTable detailsMode>

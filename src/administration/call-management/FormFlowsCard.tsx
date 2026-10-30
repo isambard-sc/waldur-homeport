@@ -136,6 +136,13 @@ export const FormFlowsCard = () => {
       },
       { title: translate('Key'), render: ({ row }) => row.key },
       {
+        title: translate('Used for'),
+        render: ({ row }) =>
+          row.purpose === 'closing'
+            ? translate('End of project')
+            : translate('Applications'),
+      },
+      {
         title: translate('Steps'),
         render: ({ row }) => row.steps.length,
       },

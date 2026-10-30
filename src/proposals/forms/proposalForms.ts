@@ -85,11 +85,18 @@ export const fetchProposalForm = async (
 };
 
 /**
- * A Formbricks survey ends back on the proposal page with ?form_survey=<id>.
- * The answer may not have reached the backend yet, so it is fetched once,
- * and the parameter dropped so a reload does not fetch again.
+ * A Formbricks survey ends back on the page it was opened from (a proposal,
+ * a project) with ?form_survey=<id>. The answer may not have reached the
+ * backend yet, so it is fetched once, and the parameter dropped so a reload
+ * does not fetch again.
  */
-export const useFetchOnFormReturn = (proposalUuid: string | undefined) => {
+export const useFetchOnFormReturn = (
+  subjectUuid: string | undefined,
+  fetchAnswers: (
+    queryClient: QueryClient,
+    uuid: string,
+  ) => Promise<unknown> = fetchProposalForm,
+) => {
   const { params } = useCurrentStateAndParams();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -98,12 +105,19 @@ export const useFetchOnFormReturn = (proposalUuid: string | undefined) => {
   const formSurvey = params.form_survey;
 
   useEffect(() => {
-    if (!formSurvey || !proposalUuid || handled.current) return;
+    if (!formSurvey || !subjectUuid || handled.current) return;
     handled.current = true;
     router.stateService.go('.', { form_survey: null }, { location: 'replace' });
     if (!isProposalFormsEnabled()) return;
-    fetchProposalForm(queryClient, proposalUuid).catch((error) =>
+    fetchAnswers(queryClient, subjectUuid).catch((error) =>
       showErrorResponse(error, translate('Unable to fetch your form answers.')),
     );
-  }, [formSurvey, proposalUuid, router, queryClient, showErrorResponse]);
+  }, [
+    formSurvey,
+    subjectUuid,
+    fetchAnswers,
+    router,
+    queryClient,
+    showErrorResponse,
+  ]);
 };

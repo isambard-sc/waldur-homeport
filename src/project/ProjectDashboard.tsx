@@ -57,6 +57,7 @@ import { ProjectCreditHealthBlock } from './policy-watch/ProjectCreditHealthBloc
 import { ProjectDashboardBalance } from './ProjectDashboardBalance';
 import { ProjectDashboardCostLimits } from './ProjectDashboardCostLimits';
 import { ProjectDashboardCredit } from './ProjectDashboardCredit';
+import { ProjectFeedbackCard } from './ProjectFeedbackCard';
 import { useProjectAwardDetails } from './useProjectAwardDetails';
 import { getProjectTeamChart } from './utils';
 
@@ -325,6 +326,7 @@ export const ProjectDashboard: FunctionComponent<{}> = () => {
   }
   return (
     <>
+      <ProjectFeedbackCard project={project} />
       {shouldShowLimitBasedResources && (
         <ProjectLimitUsageBasedResources
           showCost={!shouldConcealPrices && showBillingInfo}
