@@ -6,7 +6,7 @@ import { AccordionCard } from 'waldur-ui';
 
 import { ReadOnlyFormControl } from '@/form/ReadOnlyFormControl';
 import { BaseTextField } from '@/form/TextField';
-import { translate } from '@/i18n';
+import { domainText, translate } from '@/i18n';
 import { publicCallKey } from '@/proposals/callQueries';
 import { Proposal, ProposalReview } from '@/proposals/types';
 import { renderFieldOrDash } from '@/table/utils';
@@ -71,7 +71,7 @@ export const ProjectDetailsSummary: FC<ProjectDetailsSummaryProps> = ({
         proposal.project_summary,
       ) && (
         <CommentSection
-          label={translate('Summary')}
+          label={domainText('proposal.summary', translate('Summary'))}
           valueField="project_summary"
           commentField="comment_project_summary"
           tooltip={translate('Brief description of the project.')}

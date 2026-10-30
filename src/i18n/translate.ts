@@ -2,7 +2,7 @@ import { setMessageTransform } from 'waldur-i18n-runtime';
 
 import { ENV } from '@/core/config';
 
-import { DOMAIN_MESSAGES } from './domainMessages';
+import { DOMAIN_MESSAGES, DOMAIN_SLOTS, DomainSlot } from './domainMessages';
 
 export {
   formatJsx,
@@ -18,3 +18,12 @@ setMessageTransform((message) => {
   }
   return DOMAIN_MESSAGES[domain][message] || message;
 });
+
+/**
+ * The deployment's own wording for a slot, or `fallback` (already
+ * translated) where it has none.
+ */
+export const domainText = (slot: DomainSlot, fallback: string): string => {
+  const domain = ENV.plugins?.WALDUR_CORE.TRANSLATION_DOMAIN;
+  return (domain && DOMAIN_SLOTS[domain]?.[slot]) || fallback;
+};

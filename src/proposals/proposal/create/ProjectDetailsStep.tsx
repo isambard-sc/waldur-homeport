@@ -6,7 +6,7 @@ import { AccordionCard } from 'waldur-ui';
 import { isEmpty } from '@/core/utils';
 import { StringGroup, TextGroup } from '@/form';
 import { FormGroup } from '@/form';
-import { translate } from '@/i18n';
+import { domainText, translate } from '@/i18n';
 import { ScienceDomainGroup } from '@/project/create/ScienceDomainGroup';
 import { ProposalReview } from '@/proposals/types';
 import { VStepperFormStepProps } from '@/wizard';
@@ -85,7 +85,7 @@ export const ProjectDetailsStep = (props: VStepperFormStepProps) => {
             name="project_summary"
             placeholder={translate('Enter a summary...')}
             maxLength={1000}
-            label={translate('Summary')}
+            label={domainText('proposal.summary', translate('Summary'))}
             required={isFieldRequired(fieldStates, 'project_summary')}
           />
           <FieldReviewComments
