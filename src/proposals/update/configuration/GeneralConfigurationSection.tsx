@@ -245,6 +245,17 @@ export const GeneralConfigurationSection: FC<
               value ? translate('Yes') : translate('No')
             }
           />
+          <BooleanEditField
+            name="cancel_drafts_at_cutoff"
+            label={translate('Cancel drafts left at the cut-off')}
+            description={translate(
+              "When a round closes, cancel the drafts still open (those not carried over). Off, they stay drafts that can no longer be submitted; the site's stale-draft clean-up warns their team and later deletes them.",
+            )}
+            disabled={props.isReadOnly}
+            renderValue={(value) =>
+              value ? translate('Yes') : translate('No')
+            }
+          />
           <AsyncSelectEditField
             name="compliance_checklist"
             label={translate('Compliance checklist')}

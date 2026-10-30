@@ -32,6 +32,8 @@ import { useUser } from '@/workspace/hooks';
 
 import { FormResponsesSection } from '../forms/FormResponsesSection';
 import { useProposalForm } from '../forms/proposalForms';
+import { ProposalReturnsSection } from '../returns/ProposalReturnsSection';
+import { ReturnActions } from '../returns/ReturnActions';
 import { ProposalUsersListSummary } from '../team/ProposalUsersListSummary';
 import { Call, Proposal, ProposalReview } from '../types';
 import {
@@ -225,6 +227,9 @@ export const ProposalDetails = ({
       <SidebarLayout.Body className="mb-10">
         <AllocationStartBanner proposal={proposal} />
         <AllocationOutcomeSection proposal={proposal} awardRows={awardRows} />
+        {isCallManagerView && (
+          <ProposalReturnsSection proposalUuid={proposal.uuid} />
+        )}
         <ProposalDetailsOverviewStep
           id="step-general"
           params={{ proposal, canViewReviews: isCallManagerView }}
@@ -321,6 +326,9 @@ export const ProposalDetails = ({
         )}
         {isCallManagerView && hasWorkflow && (
           <WorkflowStepActions proposal={proposal} refetch={refetch} />
+        )}
+        {isCallManagerView && (
+          <ReturnActions proposal={proposal} refetch={refetch} />
         )}
         {/* Applicant-facing award accept/decline (self-gates on the
             award_response step + the proposal creator). */}

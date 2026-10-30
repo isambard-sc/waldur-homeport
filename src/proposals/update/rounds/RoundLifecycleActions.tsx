@@ -22,6 +22,30 @@ import { getRoundLifecycleActions } from '@/proposals/roundLifecycle';
 import { Call } from '@/proposals/types';
 import { ActionItem } from '@/resource/actions/ActionItem';
 
+/** What closing a round does with the drafts still open, in the call's
+ * terms: carried over, cancelled, or left as drafts. */
+const draftsAtCutoff = (call: {
+  carry_over_drafts?: boolean;
+  cancel_drafts_at_cutoff?: boolean;
+}) => {
+  // Drafts not carried over are cancelled unless the call keeps them.
+  const keeps = call.cancel_drafts_at_cutoff === false;
+  if (call.carry_over_drafts) {
+    return keeps
+      ? translate(
+          "Unsubmitted drafts move to the call's next round; if there is none, they stay drafts that can no longer be submitted.",
+        )
+      : translate(
+          "Unsubmitted drafts move to the call's next round; if there is none, they are cancelled.",
+        );
+  }
+  return keeps
+    ? translate(
+        'Unsubmitted drafts stay drafts that can no longer be submitted.',
+      )
+    : translate('Unsubmitted drafts are cancelled.');
+};
+
 const PublishRoundResultsDialog = lazyComponent(() =>
   import('@/proposals/round/lifecycle/PublishRoundResultsDialog').then((m) => ({
     default: m.PublishRoundResultsDialog,
@@ -89,11 +113,7 @@ export const RoundLifecycleActions: FC<RoundLifecycleActionsProps> = ({
           'Close round "{name}" now? Its cut-off moves to this moment and no more proposals can be submitted to it.',
           { name: row.name },
         ),
-        call.carry_over_drafts
-          ? translate(
-              "Unsubmitted drafts move to the call's next round; if there is none, they are cancelled.",
-            )
-          : translate('Unsubmitted drafts are cancelled.'),
+        draftsAtCutoff(call),
         translate('Evaluation of the submitted proposals starts.'),
       ].join(' '),
     },
