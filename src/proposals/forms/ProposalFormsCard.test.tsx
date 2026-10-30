@@ -121,7 +121,7 @@ describe('ProposalFormsCard', () => {
       />,
     );
     expect(
-      screen.getByText('The forms are unavailable just now'),
+      screen.getByText('The forms cannot be opened just now'),
     ).toBeInTheDocument();
   });
 

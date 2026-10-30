@@ -30,6 +30,7 @@ import {
   useFetchOnFormReturn,
   useProposalForm,
 } from '../../forms/proposalForms';
+import { ReturnedBanner } from '../../returns/ReturnedBanner';
 import { DownloadProposalPdfAction } from '../DownloadProposalPdfAction';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
@@ -244,6 +245,14 @@ export const ProposalManagePage = () => {
               ) : undefined
             }
           />
+          {/* The applicant's notice that the call managers handed it back;
+              the call team has its returns listed on the page instead. */}
+          {!isCallManagerView && proposal.open_return && (
+            <ReturnedBanner
+              openReturn={proposal.open_return}
+              className="mb-7"
+            />
+          )}
           {/* No stepper while the proposal is a draft: the applicant hasn't
               submitted yet, so no workflow has started — the page shows the
               editable submission form instead. The stepper only appears from

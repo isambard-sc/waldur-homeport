@@ -145,7 +145,7 @@ export const CallProposalsList: FC<CallProposalsListProps> = ({ call }) => {
         {
           title: translate('State'),
           render: ({ row }) => <ProposalStateBadge row={row} />,
-          keys: ['state', 'decision_held'],
+          keys: ['state', 'decision_held', 'open_return'],
           id: 'state',
           filter: 'state',
           inlineFilter: (row) =>

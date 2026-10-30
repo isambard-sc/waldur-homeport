@@ -7,8 +7,11 @@ import { useModal } from '@/modal/actions';
 import { renderWithProviders } from '@/test/harness';
 import { useUser } from '@/workspace/hooks';
 
+import { ProposalStateBadge } from '../proposal/ProposalStateBadge';
+
 import { ProposalReturnsSection } from './ProposalReturnsSection';
 import { ReturnActions } from './ReturnActions';
+import { ReturnedBanner } from './ReturnedBanner';
 
 // The table renders through the app's store; a stand-in renders its cells
 // from the rows the section gives it.
@@ -38,9 +41,10 @@ vi.mock('@/table/Table', () => ({
   ),
 }));
 
-const proposal = (state: string): any => ({
+const proposal = (state: string, open_return = null): any => ({
   uuid: 'p-1',
   state,
+  open_return,
   call_uuid: 'call-1',
   call_managing_organisation_uuid: 'org-1',
 });
@@ -82,7 +86,15 @@ describe('ReturnActions', () => {
 
   it('offers to extend the deadline of a returned draft', async () => {
     renderWithProviders(
-      <ReturnActions proposal={proposal('draft')} refetch={vi.fn()} />,
+      <ReturnActions
+        proposal={proposal('draft', {
+          uuid: 'r-1',
+          created: '2026-10-01T10:00:00Z',
+          reason: 'Add a plan.',
+          resubmit_by: '2026-11-15T17:00:00Z',
+        })}
+        refetch={vi.fn()}
+      />,
     );
     expect(
       await screen.findByRole('button', { name: 'Extend the deadline' }),
@@ -101,7 +113,6 @@ describe('ReturnActions', () => {
       <ReturnActions proposal={proposal('submitted')} refetch={vi.fn()} />,
     );
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    expect(proposalProposalsReturnsList).not.toHaveBeenCalled();
   });
 });
 
@@ -143,5 +154,59 @@ describe('ProposalReturnsSection', () => {
       expect(proposalProposalsReturnsList).toHaveBeenCalled(),
     );
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe('ReturnedBanner and the list badge', () => {
+  const openReturn = (resubmit_by: string) => ({
+    uuid: 'r-1',
+    created: '2026-10-01T10:00:00Z',
+    reason: 'Please add a data management plan.',
+    resubmit_by,
+  });
+
+  it('tells the applicant why and until when', () => {
+    renderWithProviders(
+      <ReturnedBanner openReturn={openReturn('2999-01-01T17:00:00Z')} />,
+    );
+    expect(screen.getByTestId('returned-banner')).toHaveTextContent(
+      /Returned to you by the call managers on .* - resubmit by/,
+    );
+    expect(
+      screen.getByText('Please add a data management plan.'),
+    ).toBeInTheDocument();
+  });
+
+  it('says to ask for an extension once the deadline has passed', () => {
+    renderWithProviders(
+      <ReturnedBanner openReturn={openReturn('2000-01-01T17:00:00Z')} />,
+    );
+    expect(screen.getByTestId('returned-banner')).toHaveTextContent(
+      /ask the call managers to extend it/,
+    );
+  });
+
+  it('marks a returned draft in the call team lists, overdue or not', () => {
+    const { rerender } = renderWithProviders(
+      <ProposalStateBadge
+        row={{
+          uuid: 'p-1',
+          state: 'draft',
+          open_return: openReturn('2999-01-01T17:00:00Z'),
+        }}
+      />,
+    );
+    expect(screen.getByText(/^Returned, due/)).toBeInTheDocument();
+
+    rerender(
+      <ProposalStateBadge
+        row={{
+          uuid: 'p-1',
+          state: 'draft',
+          open_return: openReturn('2000-01-01T17:00:00Z'),
+        }}
+      />,
+    );
+    expect(screen.getByText(/^Overdue since/)).toBeInTheDocument();
   });
 });

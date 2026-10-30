@@ -10,7 +10,6 @@ import { Proposal } from '@/proposals/types';
 import { useUser } from '@/workspace/hooks';
 
 import { canReturnProposal, isReturnable } from './permissions';
-import { useProposalReturns } from './ProposalReturnsSection';
 
 const ReturnToApplicantDialog = lazyComponent(() =>
   import('./ReturnToApplicantDialog').then((module) => ({
@@ -35,13 +34,8 @@ export const ReturnActions: FC<{ proposal: Proposal; refetch(): void }> = ({
   const user = useUser();
   const { openDialog } = useModal();
   const allowed = canReturnProposal(user, proposal);
-  const isDraft = proposal.state === 'draft';
   // The open return, if any: its deadline is what Extend starts from.
-  const { data: returns } = useProposalReturns(
-    proposal.uuid,
-    allowed && isDraft,
-  );
-  const openReturn = isDraft ? returns?.find((item) => item.is_open) : null;
+  const openReturn = proposal.open_return;
 
   if (!allowed) return null;
 
