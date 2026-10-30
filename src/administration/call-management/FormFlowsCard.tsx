@@ -22,7 +22,6 @@ import { ExpandableContainer } from '@/table/ExpandableContainer';
 import Table from '@/table/Table';
 import { Column } from '@/table/types';
 import { useTable } from '@/table/useTable';
-import { renderFieldOrDash } from '@/table/utils';
 import { isStaff } from '@/workspace/selectors';
 
 import { FORM_FLOWS_QUERY_KEY } from './FormFlowDialog';
@@ -91,15 +90,6 @@ const FlowStepsTable = ({ row }: { row: FormFlow }) => {
       render: ({ row: step }) =>
         step.reviewer_visible ? translate('Yes') : translate('No'),
     },
-    {
-      title: translate('Resource choice'),
-      render: ({ row: step }) =>
-        step.resources
-          ? translate('{count} options', {
-              count: step.resources.options.length,
-            })
-          : renderFieldOrDash(null),
-    },
   ];
   return (
     <ExpandableContainer>
@@ -116,8 +106,8 @@ const FlowStepsTable = ({ row }: { row: FormFlow }) => {
 };
 
 /**
- * The site's form flows: each a chain of Formbricks surveys a call can send
- * applicants through instead of the built-in proposal form.
+ * The site's form flows: each a set of Formbricks surveys a call asks
+ * applicants to fill in beside the proposal form.
  *
  * Staff add, change and delete them; anyone else here sees them and can
  * check them against Formbricks.
@@ -189,7 +179,7 @@ export const FormFlowsCard = () => {
             />
           )}
           <ActionItem
-            title={translate('Check against Formbricks')}
+            title={translate('Check and sync surveys')}
             action={() =>
               openDialog(FormFlowCheckDialog, {
                 resolve: { flow: row },

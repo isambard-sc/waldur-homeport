@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from '@uirouter/react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   NestedRound,
-  proposalFormsStart,
   proposalPublicCallsCheckEligibilityRetrieve,
   ProtectedRound,
 } from 'waldur-js-client';
@@ -34,7 +33,7 @@ export const usePublicCallApply = (
   const router = useRouter();
 
   const { openDialog } = useModal();
-  const { showInfo, showErrorResponse } = useNotify();
+  const { showInfo } = useNotify();
 
   const activeRound = useMemo(() => {
     if (call.state !== 'active') return null;
@@ -80,30 +79,6 @@ export const usePublicCallApply = (
         ? translate('Checking eligibility…')
         : undefined;
 
-  // A call that takes applications through a form flow creates the draft
-  // itself and sends the applicant to the first survey. The backend returns
-  // form_flow only while the feature and the Formbricks connection are both
-  // on, so a call falls back to the built-in form without a check here.
-  const starting = useRef(false);
-  const startFormFlow = useCallback(
-    async (round: { uuid: string }) => {
-      // One draft per click: a second click while the first is on its way
-      // would start a second application.
-      if (starting.current) return;
-      starting.current = true;
-      try {
-        const { data } = await proposalFormsStart({
-          body: { round_uuid: round.uuid },
-        });
-        window.location.assign(data.survey_url);
-      } catch (error) {
-        starting.current = false;
-        showErrorResponse(error, translate('Unable to start the application.'));
-      }
-    },
-    [showErrorResponse],
-  );
-
   const handleApply = useCallback(
     (e?: React.MouseEvent) => {
       if (!user) {
@@ -124,8 +99,6 @@ export const usePublicCallApply = (
         call.external_url
       ) {
         document.location.href = call.external_url;
-      } else if (call.form_flow && activeRound) {
-        startFormFlow(activeRound);
       } else if (activeRound) {
         openDialog(ProposalCreateDialog, {
           resolve: {
@@ -136,7 +109,7 @@ export const usePublicCallApply = (
       }
       e?.preventDefault();
     },
-    [activeRound, ineligible, user, router, call, startFormFlow],
+    [activeRound, ineligible, user, router, call],
   );
 
   return { activeRound, hidden, handleApply, ineligible, disabledReason };

@@ -1,12 +1,8 @@
 import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  proposalFormsStart,
-  proposalPublicCallsCheckEligibilityRetrieve,
-} from 'waldur-js-client';
+import { proposalPublicCallsCheckEligibilityRetrieve } from 'waldur-js-client';
 
 import { isFeatureVisible } from '@/features/connect';
-import { useModal } from '@/modal/actions';
 import { renderHookWithProviders as renderHook } from '@/test/harness';
 import { useUser } from '@/workspace/hooks';
 
@@ -167,60 +163,6 @@ describe('usePublicCallApply', () => {
       expect(
         proposalPublicCallsCheckEligibilityRetrieve,
       ).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('applying to a call with a form flow', () => {
-    const formCall = () =>
-      ({
-        ...call(round('r-open', 'open')),
-        form_flow: { uuid: 'flow-1', key: 'airr-gw', name: 'AIRR Gateway' },
-      }) as any;
-
-    beforeEach(() => {
-      vi.mocked(proposalFormsStart).mockResolvedValue({
-        data: {
-          proposal_uuid: 'p-1',
-          step_key: 'project_details',
-          step_label: 'Project details',
-          survey_url: 'https://forms.example.org/s/abc?token=1',
-        },
-      } as any);
-      vi.spyOn(window.location, 'assign').mockImplementation(() => {});
-    });
-
-    it('starts the application and goes to the first survey', async () => {
-      const { result } = renderHook(() => usePublicCallApply(formCall()));
-      result.current.handleApply();
-
-      await waitFor(() =>
-        expect(window.location.assign).toHaveBeenCalledWith(
-          'https://forms.example.org/s/abc?token=1',
-        ),
-      );
-      expect(proposalFormsStart).toHaveBeenCalledWith({
-        body: { round_uuid: 'r-open' },
-      });
-      expect(useModal().openDialog).not.toHaveBeenCalled();
-    });
-
-    it('starts one application however many times Apply is clicked', async () => {
-      const { result } = renderHook(() => usePublicCallApply(formCall()));
-      result.current.handleApply();
-      result.current.handleApply();
-
-      await waitFor(() => expect(window.location.assign).toHaveBeenCalled());
-      expect(proposalFormsStart).toHaveBeenCalledTimes(1);
-    });
-
-    it('uses the built-in form for a call without one', () => {
-      const { result } = renderHook(() =>
-        usePublicCallApply(call(round('r-open', 'open'))),
-      );
-      result.current.handleApply();
-
-      expect(proposalFormsStart).not.toHaveBeenCalled();
-      expect(useModal().openDialog).toHaveBeenCalled();
     });
   });
 });

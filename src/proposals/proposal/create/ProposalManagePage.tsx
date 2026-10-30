@@ -26,8 +26,10 @@ import { canEditProposal, canSubmitProposal } from '@/proposals/team/teamRules';
 import { Proposal } from '@/proposals/types';
 import { useUser } from '@/workspace/hooks';
 
-import { ProposalFormProgress } from '../../forms/ProposalFormProgress';
-import { useProposalForm } from '../../forms/proposalForms';
+import {
+  useFetchOnFormReturn,
+  useProposalForm,
+} from '../../forms/proposalForms';
 import { DownloadProposalPdfAction } from '../DownloadProposalPdfAction';
 import { ProposalDetails } from '../ProposalDetails';
 import { ProposalRoleBasedTabs } from '../ProposalRoleBasedTabs';
@@ -144,13 +146,14 @@ export const ProposalManagePage = () => {
     staleTime: Infinity,
   });
 
-  // Only a draft on the edit page needs it here, to choose between the form
-  // flow's progress page and the built-in form; ProposalDetails asks for the
-  // answers itself.
+  // Only a draft on the edit page needs it here, for its extra forms beside
+  // the proposal form; ProposalDetails asks for the answers itself.
   const { data: proposalForm, isLoading: isLoadingForm } = useProposalForm(
     proposal_uuid,
     proposal?.state === 'draft' && isEditPage,
   );
+  // Back from a Formbricks survey: bring its answer in.
+  useFetchOnFormReturn(proposal_uuid);
 
   const { data: reviews, isLoading: isLoadingReviews } = useQuery({
     queryKey: ['ProposalReviews', proposal_uuid],
@@ -254,19 +257,14 @@ export const ProposalManagePage = () => {
           )}
         </div>
       </SidebarLayout.Header>
-      {isEditableDraft && proposalForm?.can_fill_in ? (
-        <ProposalFormProgress
-          proposal={proposal}
-          form={proposalForm}
-          canSubmit={Boolean(hasPermissionToSubmit)}
-        />
-      ) : isEditableDraft && !proposalForm && hasPermissionToEdit ? (
+      {isEditableDraft && hasPermissionToEdit ? (
         <ProposalSubmissionStep
           proposal={proposal}
           call={call}
           refetch={refetch}
           reviews={submittedReviews}
           canSubmitProposal={hasPermissionToSubmit}
+          proposalForm={proposalForm}
         />
       ) : (
         <ProposalDetails

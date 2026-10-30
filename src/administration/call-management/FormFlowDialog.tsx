@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { FORM_ERROR } from 'final-form';
+import arrayMutators from 'final-form-arrays';
 import { Form } from 'react-final-form';
 import {
   FormFlow,
@@ -11,74 +12,41 @@ import {
 import { getErrorBody } from '@/core/ErrorMessageFormatter';
 import { required } from '@/core/validators';
 import { StringGroup, SubmitButton, TextGroup } from '@/form';
-import { MonacoField } from '@/form/MonacoField';
-import { withFormGroup } from '@/form/withFormGroup';
 import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useNotify } from '@/store/notify';
 
+import { FormFlowStepsField, StepValue, stepKeys } from './FormFlowStepsField';
+
 export const FORM_FLOWS_QUERY_KEY = 'FormFlows';
 
-const MonacoGroup = withFormGroup(MonacoField);
-
-// What a new flow starts from. The survey ID is a visible placeholder, not
-// an empty string, which read as a value that could be left as it was.
-export const SURVEY_ID_PLACEHOLDER = '<Formbricks survey id>';
-
-const EXAMPLE_STEPS: FormFlowStepRequest[] = [
-  {
-    key: 'project_details',
-    label: 'Project details',
-    survey_id: SURVEY_ID_PLACEHOLDER,
-    reviewer_visible: true,
-    field_map: {},
-  },
-];
+const NEW_STEP: StepValue = {
+  key: '',
+  label: '',
+  survey_id: null,
+  reviewer_visible: true,
+  isNew: true,
+};
 
 interface FormValues {
   key: string;
   name: string;
   description: string;
-  steps: string;
+  steps: StepValue[];
 }
 
-/** The steps as typed, or why they cannot be read. */
-export const parseSteps = (
-  text: string,
-): { steps?: FormFlowStepRequest[]; error?: string } => {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(text);
-  } catch (e) {
-    return {
-      error: translate('Not valid JSON: {message}', {
-        message: (e as Error).message,
-      }),
-    };
-  }
-  if (!Array.isArray(parsed) || parsed.length === 0) {
-    return { error: translate('Steps must be a list of at least one step.') };
-  }
-  // Every step names a real survey. Said here, with where to find the ID,
-  // rather than left to the backend's "must be a Formbricks id".
-  const unnamed = parsed.find((step) => {
-    const id = typeof step?.survey_id === 'string' ? step.survey_id.trim() : '';
-    return !id || id.startsWith('<');
-  });
-  if (unnamed) {
-    return {
-      error: translate(
-        "Step '{step}' needs the ID of its Formbricks survey. Open the survey in Formbricks: the ID is the part of the address after /surveys/, or after /s/ in its share link (not the environment ID).",
-        { step: unnamed?.key || unnamed?.label || '?' },
-      ),
-    };
-  }
-  return { steps: parsed };
+/** The steps as the API takes them, keys included. */
+export const toStepRequests = (steps: StepValue[]): FormFlowStepRequest[] => {
+  const keys = stepKeys(steps);
+  return steps.map((step, index) => ({
+    key: keys[index],
+    label: step.label.trim(),
+    survey_id: step.survey_id,
+    reviewer_visible: Boolean(step.reviewer_visible),
+  }));
 };
-
-const validateSteps = (text: string) => parseSteps(text ?? '').error;
 
 const firstMessage = (value: unknown): string | undefined => {
   if (value === undefined || value === null) return undefined;
@@ -96,12 +64,13 @@ interface FormFlowDialogProps {
 }
 
 /**
- * Creates or edits a form flow: the chain of Formbricks surveys a call can
- * send applicants through.
+ * Creates or edits a form flow: the Formbricks surveys a call asks
+ * applicants to fill in beside the proposal form.
  *
- * Steps are edited as JSON for now. The backend checks them when they are
- * saved and answers in plain words ("Step 'team': key must be a slug..."),
- * which is shown under the field it is about.
+ * Each step picks a survey from the Formbricks environment. A new step's key
+ * comes from its label; a saved step keeps its key, since its answers are
+ * stored under it. The backend checks the steps when they are saved and
+ * answers in plain words, shown under the steps.
  */
 export const FormFlowDialog = ({
   resolve: { flow, refetch },
@@ -114,7 +83,14 @@ export const FormFlowDialog = ({
     key: flow?.key ?? '',
     name: flow?.name ?? '',
     description: flow?.description ?? '',
-    steps: JSON.stringify(flow?.steps ?? EXAMPLE_STEPS, null, 2),
+    steps: flow?.steps?.length
+      ? flow.steps.map((step) => ({
+          key: step.key,
+          label: step.label,
+          survey_id: step.survey_id,
+          reviewer_visible: Boolean(step.reviewer_visible),
+        }))
+      : [NEW_STEP],
   };
 
   const submit = async (values: FormValues) => {
@@ -122,7 +98,7 @@ export const FormFlowDialog = ({
       key: values.key,
       name: values.name,
       description: values.description ?? '',
-      steps: parseSteps(values.steps).steps,
+      steps: toStepRequests(values.steps),
     };
     try {
       if (flow) {
@@ -136,12 +112,15 @@ export const FormFlowDialog = ({
         key: firstMessage(errors.key),
         name: firstMessage(errors.name),
         description: firstMessage(errors.description),
-        steps: firstMessage(errors.steps),
       };
-      if (!Object.values(fieldErrors).some(Boolean)) {
+      const stepsError = firstMessage(errors.steps);
+      if (!Object.values(fieldErrors).some(Boolean) && !stepsError) {
         showErrorResponse(error, translate('Unable to save the form flow.'));
       }
-      return { ...fieldErrors, [FORM_ERROR]: firstMessage(errors.detail) };
+      return {
+        ...fieldErrors,
+        [FORM_ERROR]: stepsError ?? firstMessage(errors.detail),
+      };
     }
     showSuccess(
       flow
@@ -157,6 +136,7 @@ export const FormFlowDialog = ({
     <Form<FormValues>
       onSubmit={submit}
       initialValues={initialValues}
+      mutators={{ ...arrayMutators }}
       render={({ handleSubmit, submitting, invalid, submitError }) => (
         <form onSubmit={handleSubmit} noValidate>
           <ModalDialog
@@ -200,18 +180,7 @@ export const FormFlowDialog = ({
               label={translate('Description')}
               rows={2}
             />
-            <MonacoGroup
-              name="steps"
-              label={translate('Steps')}
-              description={translate(
-                "One entry per survey, in the order applicants answer them: key, label, survey_id, reviewer_visible, and optionally field_map and resources. survey_id is the ID in the survey's Formbricks address, after /surveys/. See the proposal forms guide for the full format.",
-              )}
-              validate={validateSteps}
-              language="json"
-              height={360}
-              required
-              forceTouched
-            />
+            <FormFlowStepsField />
             {submitError && <p className="text-danger mb-0">{submitError}</p>}
           </ModalDialog>
         </form>

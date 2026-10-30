@@ -12,6 +12,8 @@ import { translate } from '@/i18n';
 import { ProposalCostTotal } from '@/proposals/ProposalCostTotal';
 import { FormSteps } from '@/wizard';
 
+import { DeleteDraftButton } from './DeleteDraftButton';
+
 interface CompletionPageSidebarProps extends SidebarProps {
   saveAsDraft(): void;
   isSaving?: boolean;
@@ -33,6 +35,12 @@ interface CompletionPageSidebarProps extends SidebarProps {
   /** Whether the viewer may submit the proposal. A proposal administrator
    * edits it but leaves submitting to a proposal manager. */
   canSubmitProposal?: boolean;
+  /** The proposal, for deleting the draft. */
+  proposalUuid?: string;
+  /** Labels of the call's extra forms still to answer, when it has any. */
+  missingForms?: string[];
+  /** Whether the call asks for extra forms at all. */
+  hasForms?: boolean;
 }
 
 export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
@@ -44,6 +52,7 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
   }, [props.steps, props.completedSteps]);
 
   const hasIncompleteSteps = incompleteRequiredSteps.length > 0;
+  const hasMissingForms = Boolean(props.missingForms?.length);
   const serverRefusal =
     props.canSubmit && props.canSubmit.can_submit === false
       ? props.canSubmit.error
@@ -60,11 +69,24 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
         }),
       );
     }
+    if (hasMissingForms) {
+      reasons.push(
+        translate('Fill in these forms before submitting: {forms}', {
+          forms: props.missingForms.join(', '),
+        }),
+      );
+    }
     if (serverRefusal) {
       reasons.push(serverRefusal);
     }
     return reasons.length ? reasons : undefined;
-  }, [hasIncompleteSteps, incompleteRequiredSteps, serverRefusal]);
+  }, [
+    hasIncompleteSteps,
+    incompleteRequiredSteps,
+    hasMissingForms,
+    props.missingForms,
+    serverRefusal,
+  ]);
 
   return (
     <>
@@ -96,7 +118,10 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
               label={translate('Submit')}
               variant="primary"
               disabled={
-                props.isSaving || hasIncompleteSteps || Boolean(serverRefusal)
+                props.isSaving ||
+                hasIncompleteSteps ||
+                hasMissingForms ||
+                Boolean(serverRefusal)
               }
               errors={submitErrors}
             />
@@ -121,6 +146,13 @@ export const ProposalSidebar = (props: CompletionPageSidebarProps) => {
               <WarningCircleIcon size={16} weight="bold" />
               {translate('You have unsaved changes')}
             </p>
+          )}
+          {props.canSubmitProposal !== false && props.proposalUuid && (
+            <DeleteDraftButton
+              proposalUuid={props.proposalUuid}
+              hasForms={props.hasForms}
+              disabled={props.submitting || props.isSaving}
+            />
           )}
           <TosNotification />
         </>
