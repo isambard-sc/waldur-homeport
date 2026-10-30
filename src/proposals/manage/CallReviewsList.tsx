@@ -26,12 +26,21 @@ import { Call } from '../types';
 import { canExportCall } from '../utils';
 
 import { buildCallExportUrl } from './callExportUrl';
+import { ImportAssignmentsButton } from './import-assignments/ImportAssignmentsButton';
 
 interface CallReviewsListProps {
   call: Call;
 }
 
-const mandatoryFields = ['uuid', 'proposal_name', 'state'];
+// The row actions decide who may act from the call and its organisation.
+const mandatoryFields = [
+  'uuid',
+  'proposal_name',
+  'state',
+  'call_uuid',
+  'call_managing_organisation_uuid',
+  'reviewer_full_name',
+];
 
 export const CallReviewsList: FC<CallReviewsListProps> = ({ call }) => {
   const values = useFilterValues(`CallReviewsList-${call.uuid}`);
@@ -152,6 +161,13 @@ export const CallReviewsList: FC<CallReviewsListProps> = ({ call }) => {
       hasQuery
       verboseName={translate('Reviews')}
       rowActions={ReviewsRowActions}
+      tableActions={
+        <ImportAssignmentsButton
+          call={call}
+          roundUuid={formFilters.round_uuid}
+          refetch={tableProps.fetch}
+        />
+      }
       filters={<ProposalReviewsFilter callUuid={call.uuid} />}
       expandableRow={ReviewExpandableRow}
       formId={ProposalReviewsFilterFormId}
