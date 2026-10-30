@@ -4,7 +4,7 @@ import { ProposalReturn, proposalProposalsReturnsList } from 'waldur-js-client';
 
 import { Badge } from 'waldur-ui';
 
-import { formatDateTime } from '@/core/dateUtils';
+import { formatDateTime, formatDateTimeWithZone } from '@/core/dateUtils';
 import { Panel } from '@/core/Panel';
 import { translate } from '@/i18n';
 import { getStepDefinitions } from '@/proposals/workflow/constants';
@@ -136,7 +136,7 @@ const ReturnsTable: FC<{ proposalUuid: string; rows: ProposalReturn[] }> = ({
     },
     {
       title: translate('Resubmit by'),
-      render: ({ row }) => formatDateTime(row.resubmit_by),
+      render: ({ row }) => formatDateTimeWithZone(row.resubmit_by),
     },
     {
       title: translate('Resubmitted'),

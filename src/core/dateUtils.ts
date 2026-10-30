@@ -48,6 +48,24 @@ export const formatDate: DateFormatter = (date) =>
 export const formatDateTime: DateFormatter = (date) =>
   parseDate(date).toFormat('d LLL yyyy, t');
 
+/**
+ * The viewer's offset from UTC at that moment: summer time included, so a
+ * date in July and one in December may differ.
+ * @example GMT+7, GMT+5:30, GMT
+ */
+export const formatZoneOffset: DateFormatter = (date) => {
+  const local = parseDate(date).toLocal();
+  return local.offset === 0 ? 'GMT' : `GMT${local.toFormat('Z')}`;
+};
+
+/**
+ * A date and time in the viewer's time zone, saying which: for deadlines
+ * read by people in several countries.
+ * @example 13 Nov 2026, 17:00 (GMT+7)
+ */
+export const formatDateTimeWithZone: DateFormatter = (date) =>
+  `${parseDate(date).toLocal().toFormat('d LLL yyyy, t')} (${formatZoneOffset(date)})`;
+
 /** @example 14:21 */
 export const formatTime: DateFormatter = (date) =>
   parseDate(date).toFormat('T');

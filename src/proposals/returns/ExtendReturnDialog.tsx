@@ -2,17 +2,14 @@ import { FC, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { proposalProposalsExtendReturn } from 'waldur-js-client';
 
-import { DateTimeGroup, SubmitButton } from '@/form';
+import { SubmitButton } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 
 import { PROPOSAL_RETURNS_QUERY_KEY } from './permissions';
-import {
-  defaultResubmitBy,
-  validateResubmitBy,
-} from './ReturnToApplicantDialog';
+import { defaultResubmitBy, ResubmitByGroup } from './ResubmitByGroup';
 
 interface ExtendFormValues {
   resubmit_by?: string | null;
@@ -45,7 +42,7 @@ export const ExtendReturnDialog: FC<ExtendReturnDialogProps> = ({
     mutationFn: (values) =>
       proposalProposalsExtendReturn({
         path: { uuid: proposal.uuid },
-        body: { resubmit_by: new Date(values.resubmit_by).toISOString() },
+        body: { resubmit_by: values.resubmit_by },
       }),
     successMessage: translate('The deadline has been moved.'),
     errorMessage: translate('Unable to move the deadline.'),
@@ -75,15 +72,7 @@ export const ExtendReturnDialog: FC<ExtendReturnDialogProps> = ({
               </>
             }
           >
-            <DateTimeGroup
-              name="resubmit_by"
-              label={translate('Resubmit by')}
-              required
-              minDate={openedAt}
-              validate={validateResubmitBy}
-              forceTouched
-              placeholder={translate('Select date and time...')}
-            />
+            <ResubmitByGroup minDate={openedAt} />
           </ModalDialog>
         </form>
       )}
