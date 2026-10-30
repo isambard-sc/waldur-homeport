@@ -5,6 +5,7 @@ import {
   broadcastMessagesSchedule,
   broadcastMessagesSend,
   broadcastMessagesUpdate,
+  ProposalStatesEnum,
 } from 'waldur-js-client';
 
 import { formatDate } from '@/core/dateUtils';
@@ -16,6 +17,32 @@ import { BroadcastFormData, BroadcastRequestData } from './types';
 
 type SubmitAction = 'submit' | 'template' | 'draft';
 
+/** The states a round's broadcast can be narrowed to. */
+export const PROPOSAL_STATES: ProposalStatesEnum[] = [
+  'draft',
+  'submitted',
+  'in_review',
+  'accepted',
+  'rejected',
+  'canceled',
+];
+
+/** The round targeting, sent only when rounds are picked. */
+export const roundQuery = (
+  formData: Pick<
+    BroadcastFormData,
+    'rounds' | 'proposal_states' | 'proposal_teams' | 'reviewers'
+  >,
+) =>
+  formData.rounds?.length
+    ? {
+        rounds: formData.rounds.map((round) => round.uuid),
+        proposal_states: formData.proposal_states ?? [],
+        proposal_teams: formData.proposal_teams ?? true,
+        reviewers: formData.reviewers ?? false,
+      }
+    : {};
+
 const serializeBroadcast = (
   formData: BroadcastFormData,
 ): BroadcastRequestData => ({
@@ -25,6 +52,7 @@ const serializeBroadcast = (
     customers: formData.customers?.map((c) => c.uuid),
     offerings: formData.offerings?.map((c) => c.uuid),
     all_users: formData.all_users,
+    ...roundQuery(formData),
   },
   send_at: formData.send_at,
 });
@@ -37,6 +65,13 @@ export const parseBroadcast = (
   offerings: broadcast.query['offerings'],
   customers: broadcast.query['customers'],
   all_users: broadcast.query['all_users'],
+  rounds: broadcast.query.rounds ?? [],
+  // The stored query echoes plain strings; keep the ones that are states.
+  proposal_states: PROPOSAL_STATES.filter((state) =>
+    broadcast.query.proposal_states?.includes(state),
+  ),
+  proposal_teams: broadcast.query.proposal_teams ?? true,
+  reviewers: broadcast.query.reviewers ?? false,
   send_at: broadcast.send_at,
 });
 

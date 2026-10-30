@@ -1,12 +1,25 @@
 import { UserCirclePlusIcon } from '@phosphor-icons/react';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Form } from 'react-final-form';
-import { RoleDetails } from 'waldur-js-client';
+import { proposalProposalsAddUserByEmail, RoleDetails } from 'waldur-js-client';
+
+import { SegmentedControl } from 'waldur-ui';
 
 import { ENV } from '@/core/config';
-import { required } from '@/core/validators';
+import {
+  composeValidators,
+  email as validEmail,
+  required,
+} from '@/core/validators';
 import { usersAutocomplete } from '@/customer/team/utils';
-import { AsyncSelectGroup, SubmitButton } from '@/form';
+import { isFeatureVisible } from '@/features/connect';
+import { UserFeatures } from '@/FeaturesEnums';
+import {
+  AsyncSelectGroup,
+  EmailGroup,
+  StringGroup,
+  SubmitButton,
+} from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
@@ -21,8 +34,13 @@ import { AddUserDialogProps } from './types';
 interface AddUserDialogFormData {
   role: RoleDetails;
   expiration_time: string;
-  user: any;
+  user?: any;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
 }
+
+type AddMode = 'search' | 'email';
 
 const getOptionLabel = (option) =>
   option.email
@@ -35,13 +53,35 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
   roleTypes,
   roles,
 }) => {
+  // A proposal's team can take someone by email, creating their account
+  // when there is none, where the site lets accounts be created.
+  const canAddByEmail =
+    getTeamScopeType(roleTypes) === 'proposal' &&
+    isFeatureVisible(UserFeatures.allow_user_creation);
+  const [mode, setMode] = useState<AddMode>('search');
+  const byEmail = canAddByEmail && mode === 'email';
+
   const saveUserMutation = useManagedMutation<any, any, AddUserDialogFormData>({
-    mutationFn: (formData) =>
-      addTeamUser(getTeamScopeType(roleTypes), scope.uuid, {
+    mutationFn: (formData) => {
+      const role = roles && roles.length === 1 ? roles[0] : formData.role.name;
+      if (byEmail) {
+        return proposalProposalsAddUserByEmail({
+          path: { uuid: scope.uuid },
+          body: {
+            email: formData.email.trim(),
+            first_name: formData.first_name?.trim() || undefined,
+            last_name: formData.last_name?.trim() || undefined,
+            role,
+            expiration_time: formData.expiration_time || null,
+          },
+        });
+      }
+      return addTeamUser(getTeamScopeType(roleTypes), scope.uuid, {
         user: formData.user.uuid,
         expiration_time: formData.expiration_time,
-        role: roles && roles.length === 1 ? roles[0] : formData.role.name,
-      }),
+        role,
+      });
+    },
     successMessage: translate('User has been added.'),
     errorMessage: translate('Unable to add user.'),
     refetch,
@@ -77,17 +117,62 @@ export const AddUserDialog: FC<AddUserDialogProps> = ({
               </>
             }
           >
-            <AsyncSelectGroup
-              label={translate('User')}
-              required
-              name="user"
-              placeholder={translate('Search and select user...')}
-              loadOptions={usersAutocomplete}
-              getOptionValue={(option) => option.uuid}
-              getOptionLabel={getOptionLabel}
-              components={{ Option: UserListOptionInline }}
-              validate={required}
-            />
+            {canAddByEmail && (
+              <SegmentedControl<AddMode>
+                className="mb-5"
+                aria-label={translate('How to find the member')}
+                options={[
+                  { value: 'search', label: translate('Search users') },
+                  { value: 'email', label: translate('Add by email') },
+                ]}
+                value={mode}
+                onValueChange={setMode}
+              />
+            )}
+            {byEmail ? (
+              <>
+                <EmailGroup
+                  label={translate('Email')}
+                  name="email"
+                  required
+                  validate={composeValidators(required, validEmail)}
+                  description={translate(
+                    'Their account is found by this email, or created with it if they have none.',
+                  )}
+                />
+                <div className="row">
+                  <div className="col-sm-6">
+                    <StringGroup
+                      label={translate('First name')}
+                      name="first_name"
+                    />
+                  </div>
+                  <div className="col-sm-6">
+                    <StringGroup
+                      label={translate('Last name')}
+                      name="last_name"
+                    />
+                  </div>
+                </div>
+                <p className="text-muted fs-7 mt-n3">
+                  {translate(
+                    'Names are used only if a new account is created.',
+                  )}
+                </p>
+              </>
+            ) : (
+              <AsyncSelectGroup
+                label={translate('User')}
+                required
+                name="user"
+                placeholder={translate('Search and select user...')}
+                loadOptions={usersAutocomplete}
+                getOptionValue={(option) => option.uuid}
+                getOptionLabel={getOptionLabel}
+                components={{ Option: UserListOptionInline }}
+                validate={required}
+              />
+            )}
 
             {roles && roles.length === 1 ? null : (
               <RoleGroup types={roleTypes} roleNames={roles} />

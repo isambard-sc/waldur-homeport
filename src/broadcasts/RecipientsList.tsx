@@ -8,6 +8,8 @@ import { createFetcher } from '@/table/api';
 import Table from '@/table/Table';
 import { useTable } from '@/table/useTable';
 
+import { roundQuery } from './utils';
+
 const BadgesList = ({ items }) => (
   <>
     {items.map((c, index) => (
@@ -24,6 +26,7 @@ export const RecipientsList: FunctionComponent<{ query }> = ({ query }) => {
       all_users: query?.all_users,
       customers: query?.customers?.map((c) => c.uuid),
       offerings: query?.offerings?.map((c) => c.uuid),
+      ...roundQuery(query ?? {}),
     }),
     [query],
   );

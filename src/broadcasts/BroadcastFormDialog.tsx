@@ -148,6 +148,8 @@ export const BroadcastFormDialog: FC<BroadcastFormDialogProps> = ({
 
   const defaultInitialValues = useMemo(
     () => ({
+      // A round's proposal teams are its usual audience.
+      proposal_teams: true,
       ...initialValues,
     }),
     [initialValues],

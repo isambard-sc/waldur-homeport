@@ -11,6 +11,7 @@ import {
 import { WizardModal, WizardStepProps } from '@/wizard';
 
 import { RecipientsList } from '../RecipientsList';
+import { RoundTargetFields } from '../RoundTargetFields';
 import { BroadcastFormData } from '../types';
 
 const RecipientsListQuery = () => {
@@ -71,6 +72,8 @@ export const RecipientsStep: FC<WizardStepProps> = (props) => {
             noOptionsMessage={() => translate('No organizations found')}
             isMulti={true}
           />
+
+          <RoundTargetFields />
         </Col>
         <Col sm={7}>
           <RecipientsListQuery />
