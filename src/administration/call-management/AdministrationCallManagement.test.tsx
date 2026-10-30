@@ -16,6 +16,9 @@ vi.mock('./FormbricksConnectionCard', () => ({
 vi.mock('./FormFlowsCard', () => ({
   FormFlowsCard: () => <div>Form flows card</div>,
 }));
+vi.mock('./SiteClosingFlowCard', () => ({
+  SiteClosingFlowCard: () => <div>End-of-project forms card</div>,
+}));
 
 const openTab = (tab?: string) =>
   vi.mocked(useCurrentStateAndParams).mockReturnValue({
@@ -40,6 +43,7 @@ describe('AdministrationCallManagement', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Formbricks connection card')).toBeInTheDocument();
     expect(screen.getByText('Form flows card')).toBeInTheDocument();
+    expect(screen.getByText('End-of-project forms card')).toBeInTheDocument();
   });
 
   it('keeps them off the other tabs', async () => {
