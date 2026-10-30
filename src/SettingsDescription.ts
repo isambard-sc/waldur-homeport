@@ -1040,6 +1040,18 @@ export const SettingsDescription = [
         type: 'integer',
       },
       {
+        key: 'PROPOSAL_STALE_DRAFT_REMINDER_DAYS',
+        description: translate('Days without changes after which a draft proposal\'s team is told it will be deleted unless it is edited or submitted. 0 turns stale-draft clean-up off. Drafts returned to their applicant are exempt.'),
+        default: 0,
+        type: 'integer',
+      },
+      {
+        key: 'PROPOSAL_STALE_DRAFT_DELETION_DAYS',
+        description: translate('Days after that reminder, still without changes, at which the draft is deleted and its team told.'),
+        default: 14,
+        type: 'integer',
+      },
+      {
         key: 'DEFAULT_PROPOSAL_REQUIRED_FIELDS',
         description: translate('Project details fields a new call requires by default. Applied when the call is created; changing this never alters an existing call.'),
         default: ['project_summary'],

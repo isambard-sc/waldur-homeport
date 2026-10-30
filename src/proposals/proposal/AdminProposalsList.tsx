@@ -129,7 +129,7 @@ export const AdminProposalsList: FC<any> = ({ ...props }) => {
           filter: 'state',
           inlineFilter: (row) =>
             getProposalStateOptions().filter((s) => s.value === row.state),
-          keys: ['state', 'decision_held'],
+          keys: ['state', 'decision_held', 'open_return'],
           id: 'state',
         },
       ]}

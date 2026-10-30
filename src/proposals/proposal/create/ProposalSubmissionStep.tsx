@@ -525,11 +525,9 @@ export const ProposalSubmissionStep: FC<{
                   canSubmitProposal={canSubmitProposal}
                   proposalUuid={proposal_uuid}
                   hasForms={Boolean(proposalForm)}
-                  // Not enforced while forms are unavailable: the backend
-                  // lets the proposal through on Waldur's form alone then.
-                  missingForms={
-                    proposalForm?.available ? proposalForm.missing : undefined
-                  }
+                  // Enforced whether or not Formbricks can be reached:
+                  // the backend checks its own copy of the answers.
+                  missingForms={proposalForm?.missing}
                 />
               </SidebarLayout.Sidebar>
             </SidebarLayout.Container>

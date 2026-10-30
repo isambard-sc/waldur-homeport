@@ -98,10 +98,16 @@ export const ProposalFormsCard: FC<ProposalFormsCardProps> = ({
         <AlertItem
           variant="warning"
           className="mb-5"
-          title={translate('The forms are unavailable just now')}
-          body={translate(
-            'Your answers so far are kept. Please come back later to fill in the rest.',
-          )}
+          title={translate('The forms cannot be opened just now')}
+          body={
+            form.missing.length
+              ? translate(
+                  'Your answers so far are kept. Submitting waits until the remaining forms are answered: please try again later, or contact the call managers if it keeps happening.',
+                )
+              : translate(
+                  'Your answers are kept, and every form is answered, so you can still submit.',
+                )
+          }
         />
       )}
       <ul className="list-unstyled mb-0" aria-label={translate('Forms')}>
