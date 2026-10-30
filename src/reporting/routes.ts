@@ -84,6 +84,25 @@ export const states: StateDeclaration[] = [
     },
   },
 
+  // AI reporting usage - a dashboard, not a catalogue of reports, same
+  // reasoning (and same explicit permissions requirement) as the AI
+  // reporting tool state right above it.
+  {
+    name: 'reporting-ai-reporting-usage',
+    url: 'ai-reporting-usage/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingUsagePage').then((module) => ({
+        default: module.AIReportingUsagePage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting usage'),
+      priority: 21,
+      permissions: [isStaffOrSupport],
+    },
+  },
+
   // Resources category (consumer-facing)
   {
     name: 'reporting-resources',
