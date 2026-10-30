@@ -36,7 +36,14 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
   // organisation owner - who can now reach /reporting/ at all - would see
   // this tab and then be blocked the moment they clicked it.
   if (isStaffOrSupport({ workspace } as any)) {
-    tabs.push({ title: translate('AI reporting'), state: 'reporting-ai-reporting' });
+    tabs.push({
+      title: translate('AI reporting'),
+      state: 'reporting-ai-reporting',
+    });
+    tabs.push({
+      title: translate('AI reporting usage'),
+      state: 'reporting-ai-reporting-usage',
+    });
   }
 
   Object.entries(categories).forEach(([key, category]) => {
