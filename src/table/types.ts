@@ -180,8 +180,14 @@ interface TablePortal {
 export interface TableFullExport {
   label: string;
   description?: string;
+  /** Whether the server can write it as an Excel workbook as well as CSV. */
+  excel?: boolean;
   /** `query` is the table's search term, passed only when filters apply. */
-  download(options: { withFilters: boolean; query?: string }): Promise<void>;
+  download(options: {
+    withFilters: boolean;
+    query?: string;
+    format: 'csv' | 'excel';
+  }): Promise<void>;
 }
 
 export interface TableProps<RowType = any> extends TableState {

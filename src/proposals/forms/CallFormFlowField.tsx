@@ -7,13 +7,29 @@ import {
 } from 'waldur-js-client';
 
 import { getAllPages } from '@/core/api';
-import { EditFieldProvider, SelectEditField } from '@/form/editFields';
+import {
+  EditFieldProvider,
+  NumberEditField,
+  SelectEditField,
+} from '@/form/editFields';
 import { translate } from '@/i18n';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 
 import { isProposalFormsEnabled } from './proposalForms';
 
-const BUILT_IN_FORM = translate('Built-in proposal form');
+const BUILT_IN_FORM = translate('Built-in proposal form only');
+const NO_CLOSING_FORMS = translate("None (the site's, if it has one)");
+
+/** A whole number of days, 0 or more. */
+export const validateOpenDays = (value: any) => {
+  if (value === null || value === undefined || value === '') {
+    return undefined;
+  }
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0
+    ? undefined
+    : translate('Enter a whole number of days, 0 or more.');
+};
 
 export const callFormFlowQueryKey = (callUuid: string) => [
   'CallFormFlow',
@@ -59,17 +75,50 @@ const CallFormFlowSelect = ({
     refetchOnWindowFocus: false,
   });
 
+  // Each picker offers only the flows made for it: the backend refuses
+  // the others.
   const options = useMemo(
     () => [
       { value: null, label: BUILT_IN_FORM },
-      ...(flows ?? []).map((flow) => ({ value: flow.uuid, label: flow.name })),
+      ...(flows ?? [])
+        .filter((flow) => (flow.purpose ?? 'application') === 'application')
+        .map((flow) => ({ value: flow.uuid, label: flow.name })),
+    ],
+    [flows],
+  );
+  const closingOptions = useMemo(
+    () => [
+      { value: null, label: NO_CLOSING_FORMS },
+      ...(flows ?? [])
+        .filter((flow) => flow.purpose === 'closing')
+        .map((flow) => ({ value: flow.uuid, label: flow.name })),
     ],
     [flows],
   );
 
+  // A full update: whatever is not being changed is sent as it stands, so
+  // saving one choice never clears another.
   const { mutateAsync: saveFlow } = useManagedMutation({
-    mutationFn: ({ flow }: { flow: string | null }) =>
-      proposalFormCallsUpdate({ path: { uuid: callUuid }, body: { flow } }),
+    mutationFn: (changes: {
+      flow?: string | null;
+      closing_flow?: string | null;
+      closing_forms_open_days_before_end?: number | string;
+    }) =>
+      proposalFormCallsUpdate({
+        path: { uuid: callUuid },
+        body: {
+          flow: 'flow' in changes ? changes.flow : (callFlow?.flow ?? null),
+          closing_flow:
+            'closing_flow' in changes
+              ? changes.closing_flow
+              : (callFlow?.closing_flow ?? null),
+          closing_forms_open_days_before_end: Number(
+            ('closing_forms_open_days_before_end' in changes
+              ? changes.closing_forms_open_days_before_end
+              : callFlow?.closing_forms_open_days_before_end) || 0,
+          ),
+        },
+      }),
     successMessage: translate('The call has been updated.'),
     errorMessage: translate('Unable to change the application form.'),
     onSuccess: async () => {
@@ -82,10 +131,16 @@ const CallFormFlowSelect = ({
   });
 
   const locked = Boolean(callFlow?.locked);
+  const closingLocked = Boolean(callFlow?.closing_locked);
 
   return (
     <EditFieldProvider
-      scope={{ flow: callFlow?.flow ?? null }}
+      scope={{
+        flow: callFlow?.flow ?? null,
+        closing_flow: callFlow?.closing_flow ?? null,
+        closing_forms_open_days_before_end:
+          callFlow?.closing_forms_open_days_before_end ?? 0,
+      }}
       callback={saveFlow}
       readOnlyReason={readOnlyReason}
     >
@@ -93,7 +148,7 @@ const CallFormFlowSelect = ({
         name="flow"
         label={translate('Application form')}
         description={translate(
-          'Applicants either fill in the built-in proposal form or answer a form flow: a chain of Formbricks surveys. Cannot be changed once the call has proposals.',
+          "Applicants fill in Waldur's proposal form, and with a form flow also its Formbricks forms. Cannot be changed once the call has proposals.",
         )}
         options={options}
         simpleValue
@@ -108,6 +163,39 @@ const CallFormFlowSelect = ({
         }
         renderValue={() => callFlow?.flow_name || BUILT_IN_FORM}
       />
+      <SelectEditField
+        name="closing_flow"
+        label={translate('End-of-project forms')}
+        description={translate(
+          "Forms the PI of each project granted through the call fills in near its end date. Without one, the site's end-of-project forms apply, if it has any. Cannot be changed once a project has started them.",
+        )}
+        options={closingOptions}
+        simpleValue
+        isClearable={false}
+        disabled={!callFlow || closingLocked || Boolean(readOnlyReason)}
+        tooltip={
+          closingLocked && !readOnlyReason
+            ? translate('A project of the call has started these forms.')
+            : undefined
+        }
+        renderValue={() => callFlow?.closing_flow_name || NO_CLOSING_FORMS}
+      />
+      {callFlow?.closing_flow && (
+        <NumberEditField
+          name="closing_forms_open_days_before_end"
+          label={translate('End-of-project forms open')}
+          description={translate(
+            "How many days before a project's end date its forms open; 0 is on the end date. They stay open afterwards.",
+          )}
+          disabled={Boolean(readOnlyReason)}
+          validate={validateOpenDays}
+          renderValue={(value) =>
+            Number(value)
+              ? translate('{days} days before the end date', { days: value })
+              : translate('On the end date')
+          }
+        />
+      )}
     </EditFieldProvider>
   );
 };

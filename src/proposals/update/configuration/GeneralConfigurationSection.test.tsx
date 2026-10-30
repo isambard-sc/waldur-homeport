@@ -13,6 +13,7 @@ import {
   formatOrderAuthorUser,
   normalizeOrderAuthorUser,
   validateFixedDuration,
+  validateMinimumDocuments,
 } from './GeneralConfigurationSection';
 
 describe('validateFixedDuration', () => {
@@ -172,5 +173,22 @@ describe('GeneralConfigurationSection draft carry-over', () => {
       });
       expect(refetch).toHaveBeenCalled();
     });
+  });
+});
+
+describe('validateMinimumDocuments', () => {
+  it('takes 0 and whole numbers, and an empty value', () => {
+    expect(validateMinimumDocuments(0)).toBeUndefined();
+    expect(validateMinimumDocuments('3')).toBeUndefined();
+    expect(validateMinimumDocuments('')).toBeUndefined();
+  });
+
+  it('refuses negative and fractional numbers', () => {
+    expect(validateMinimumDocuments(-1)).toBe(
+      'Enter a whole number, 0 or more.',
+    );
+    expect(validateMinimumDocuments(1.5)).toBe(
+      'Enter a whole number, 0 or more.',
+    );
   });
 });

@@ -20,7 +20,10 @@ import { loadProject } from './resolve';
 export const states: StateDeclaration[] = [
   {
     name: 'project',
-    url: '/projects/:uuid/?include_terminated',
+    url: '/projects/:uuid/?include_terminated&form_survey',
+    // An end-of-project survey ends on the dashboard with ?form_survey; the
+    // page fetches the answers and drops it, which must not reload the page.
+    params: { form_survey: { dynamic: true } },
     abstract: true,
     parent: 'layout',
     component: lazyComponent(() =>

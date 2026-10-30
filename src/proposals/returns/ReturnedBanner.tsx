@@ -3,7 +3,7 @@ import { OpenReturn } from 'waldur-js-client';
 
 import { AlertItem } from 'waldur-ui';
 
-import { formatDateTime } from '@/core/dateUtils';
+import { formatDate, formatDateTimeWithZone } from '@/core/dateUtils';
 import { translate } from '@/i18n';
 
 import { isOverdue } from './permissions';
@@ -28,15 +28,15 @@ export const ReturnedBanner: FC<{
           ? translate(
               'Returned to you by the call managers on {created}. The deadline to resubmit passed on {deadline}: ask the call managers to extend it.',
               {
-                created: formatDateTime(openReturn.created),
-                deadline: formatDateTime(openReturn.resubmit_by),
+                created: formatDate(openReturn.created),
+                deadline: formatDateTimeWithZone(openReturn.resubmit_by),
               },
             )
           : translate(
               'Returned to you by the call managers on {created} - resubmit by {deadline}.',
               {
-                created: formatDateTime(openReturn.created),
-                deadline: formatDateTime(openReturn.resubmit_by),
+                created: formatDate(openReturn.created),
+                deadline: formatDateTimeWithZone(openReturn.resubmit_by),
               },
             )
       }

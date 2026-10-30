@@ -3,7 +3,7 @@ import { OpenReturn, ProposalStates } from 'waldur-js-client';
 
 import { Badge } from 'waldur-ui';
 
-import { formatDate } from '@/core/dateUtils';
+import { formatDateTimeWithZone } from '@/core/dateUtils';
 import { translate } from '@/i18n';
 
 import { HeldDecisionBadge } from '../manage/HeldDecisionBadge';
@@ -16,13 +16,13 @@ const ReturnedBadge: FC<{ openReturn: OpenReturn }> = ({ openReturn }) =>
   isOverdue(openReturn.resubmit_by) ? (
     <Badge variant="danger" shape="pill">
       {translate('Overdue since {date}', {
-        date: formatDate(openReturn.resubmit_by),
+        date: formatDateTimeWithZone(openReturn.resubmit_by),
       })}
     </Badge>
   ) : (
     <Badge variant="warning" shape="pill">
       {translate('Returned, due {date}', {
-        date: formatDate(openReturn.resubmit_by),
+        date: formatDateTimeWithZone(openReturn.resubmit_by),
       })}
     </Badge>
   );

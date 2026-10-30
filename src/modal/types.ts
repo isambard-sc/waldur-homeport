@@ -29,6 +29,8 @@ export interface ConfirmationOptions {
   inputLabel?: string;
   inputPlaceholder?: string;
   inputRequired?: boolean;
+  /** A text area for the input rather than one line. */
+  inputMultiline?: boolean;
   showRouterSelect?: boolean;
   tenantUuid?: string;
 }

@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { DateTime, Settings } from 'luxon';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   proposalProposalsExtendReturn,
   proposalProposalsReturnToApplicant,
@@ -9,11 +10,8 @@ import {
 import { renderWithProviders } from '@/test/harness';
 
 import { ExtendReturnDialog } from './ExtendReturnDialog';
-import {
-  defaultResubmitBy,
-  ReturnToApplicantDialog,
-  validateResubmitBy,
-} from './ReturnToApplicantDialog';
+import { defaultResubmitBy, validateResubmitBy } from './ResubmitByGroup';
+import { ReturnToApplicantDialog } from './ReturnToApplicantDialog';
 
 const proposal = { uuid: 'p-1', name: 'Fusion modelling' };
 
@@ -26,11 +24,17 @@ describe('validateResubmitBy', () => {
     expect(validateResubmitBy(defaultResubmitBy())).toBeUndefined();
   });
 
-  it('suggests two weeks ahead', () => {
-    const days =
-      (new Date(defaultResubmitBy()).getTime() - Date.now()) / 86_400_000;
-    expect(days).toBeGreaterThan(13);
-    expect(days).toBeLessThan(15);
+  it('suggests 16:00 UK time two weeks ahead, with its offset', () => {
+    const value = defaultResubmitBy();
+    expect(value).toMatch(/T16:00:00\.000\+0[01]:00$/);
+    const uk = DateTime.fromISO(value).setZone('Europe/London');
+    expect(uk.hour).toBe(16);
+    expect(
+      uk
+        .startOf('day')
+        .diff(DateTime.now().setZone('Europe/London').startOf('day'), 'days')
+        .days,
+    ).toBe(14);
   });
 });
 
@@ -74,7 +78,9 @@ describe('ReturnToApplicantDialog', () => {
         path: { uuid: 'p-1' },
         body: {
           reason: 'Please add a data management plan.',
-          resubmit_by: expect.stringMatching(/^\d{4}-\d\d-\d\dT.*Z$/),
+          resubmit_by: expect.stringMatching(
+            /^\d{4}-\d\d-\d\dT16:00:00\.000\+0[01]:00$/,
+          ),
         },
       }),
     );
@@ -98,8 +104,28 @@ describe('ExtendReturnDialog', () => {
     await waitFor(() =>
       expect(proposalProposalsExtendReturn).toHaveBeenCalledWith({
         path: { uuid: 'p-1' },
-        body: { resubmit_by: new Date(resubmitBy).toISOString() },
+        body: { resubmit_by: resubmitBy },
       }),
     );
+  });
+});
+
+describe('the deadline in another time zone', () => {
+  const defaultZone = Settings.defaultZone;
+  const defaultLocale = Settings.defaultLocale;
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Settings.defaultZone = 'Asia/Bangkok';
+    Settings.defaultLocale = 'en-GB';
+  });
+  afterEach(() => {
+    Settings.defaultZone = defaultZone;
+    Settings.defaultLocale = defaultLocale;
+  });
+
+  it("shows the viewer's zone beside the picker, and the UK time", () => {
+    renderWithProviders(<ReturnToApplicantDialog resolve={{ proposal }} />);
+    expect(screen.getByTestId('deadline-zone')).toHaveTextContent('GMT+7');
+    expect(screen.getByText(/That is .*, 16:00 UK time\./)).toBeInTheDocument();
   });
 });

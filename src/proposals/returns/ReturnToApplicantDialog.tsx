@@ -1,17 +1,17 @@
-import { DateTime } from 'luxon';
 import { FC, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import { proposalProposalsReturnToApplicant } from 'waldur-js-client';
 
 import { AlertItem } from 'waldur-ui';
 
-import { DateTimeGroup, SubmitButton, TextGroup } from '@/form';
+import { SubmitButton, TextGroup } from '@/form';
 import { translate } from '@/i18n';
 import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { useManagedMutation } from '@/modal/useManagedMutation';
 
 import { PROPOSAL_RETURNS_QUERY_KEY } from './permissions';
+import { defaultResubmitBy, ResubmitByGroup } from './ResubmitByGroup';
 
 interface ReturnFormValues {
   reason?: string;
@@ -28,20 +28,6 @@ interface ReturnToApplicantDialogProps {
 // The backend trims the reason, so spaces alone would arrive empty.
 export const validateReason = (value?: string) =>
   value?.trim() ? undefined : translate('This field is required.');
-
-export const validateResubmitBy = (value?: string | null) => {
-  if (!value) return translate('This field is required.');
-  return new Date(value) <= new Date()
-    ? translate('The deadline must be in the future.')
-    : undefined;
-};
-
-/** Two weeks from now, at the end of that day's working hours. */
-export const defaultResubmitBy = (): string =>
-  DateTime.now()
-    .plus({ weeks: 2 })
-    .set({ hour: 17, minute: 0, second: 0, millisecond: 0 })
-    .toISO();
 
 /**
  * Hands a submitted proposal back to its applicant to fix: a decision beside
@@ -62,7 +48,9 @@ export const ReturnToApplicantDialog: FC<ReturnToApplicantDialogProps> = ({
         path: { uuid: proposal.uuid },
         body: {
           reason: values.reason.trim(),
-          resubmit_by: new Date(values.resubmit_by).toISOString(),
+          // As the form holds it: an ISO timestamp with the offset it
+          // was set in.
+          resubmit_by: values.resubmit_by,
         },
       }),
     successMessage: translate(
@@ -113,19 +101,11 @@ export const ReturnToApplicantDialog: FC<ReturnToApplicantDialogProps> = ({
               validate={validateReason}
               rows={5}
             />
-            <DateTimeGroup
-              name="resubmit_by"
-              label={translate('Resubmit by')}
+            <ResubmitByGroup
+              minDate={openedAt}
               description={translate(
                 'Nothing happens on its own when it passes: the applicant can no longer submit, and you decide whether to extend it.',
               )}
-              required
-              // A Date, not "today": with times enabled it bounds the hours
-              // and minutes of today as well as earlier days.
-              minDate={openedAt}
-              validate={validateResubmitBy}
-              forceTouched
-              placeholder={translate('Select date and time...')}
             />
           </ModalDialog>
         </form>

@@ -119,6 +119,7 @@ describe('FormFlowDialog', () => {
           key: 'airr-gw',
           name: 'AIRR Gateway',
           description: '',
+          purpose: 'application',
           steps: flow.steps,
         },
       }),
@@ -161,5 +162,29 @@ describe('FormFlowDialog', () => {
         "Step 'team': survey s9 is in another environment.",
       ),
     ).toBeInTheDocument();
+  });
+});
+
+describe('FormFlowDialog purpose', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(formbricksSurveysList).mockResolvedValue({
+      data: surveys,
+    } as any);
+  });
+
+  it('keeps an end-of-project flow an end-of-project flow', async () => {
+    vi.mocked(formFlowsUpdate).mockResolvedValue({ data: flow } as any);
+    renderWithProviders(
+      <FormFlowDialog resolve={{ flow: { ...flow, purpose: 'closing' } }} />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(formFlowsUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ purpose: 'closing' }),
+        }),
+      ),
+    );
   });
 });

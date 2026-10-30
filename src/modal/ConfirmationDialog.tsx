@@ -31,6 +31,7 @@ interface ConfirmationDialogProps {
     hideIcon?: boolean;
     bodyClassName?: string;
     showInput?: boolean;
+    inputMultiline?: boolean;
     inputRequired?: boolean;
     inputLabel?: string;
     inputPlaceholder?: string;
@@ -53,6 +54,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     hideIcon = false,
     bodyClassName,
     showInput = false,
+    inputMultiline = false,
     inputRequired = false,
     inputLabel,
     inputPlaceholder,
@@ -131,7 +133,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               {inputRequired && <span className="text-danger"> *</span>}
             </Form.Label>
             <Form.Control
-              type="text"
+              {...(inputMultiline
+                ? { as: 'textarea' as const, rows: 4 }
+                : { type: 'text' })}
               placeholder={inputPlaceholder}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}

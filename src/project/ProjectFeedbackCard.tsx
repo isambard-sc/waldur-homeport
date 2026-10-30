@@ -1,0 +1,101 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { FC } from 'react';
+import { projectFormsLink } from 'waldur-js-client';
+
+import { AlertItem } from 'waldur-ui';
+
+import { formatDate } from '@/core/dateUtils';
+import { translate } from '@/i18n';
+import { PermissionEnum } from '@/permissions/enums';
+import { hasPermission } from '@/permissions/hasPermission';
+import { FormResponsesSection } from '@/proposals/forms/FormResponsesSection';
+import { FormsCard } from '@/proposals/forms/FormsCard';
+import {
+  fetchProjectForm,
+  useProjectForm,
+} from '@/proposals/forms/projectForms';
+import { useFetchOnFormReturn } from '@/proposals/forms/proposalForms';
+import { useUser } from '@/workspace/hooks';
+
+interface ProjectFeedbackCardProps {
+  project: { uuid: string; customer_uuid?: string };
+}
+
+/**
+ * The project's end-of-project forms, for its PI and the owners of its
+ * organisation: from its call's closing flow, or the site's for projects
+ * without one. They open near the project's end date; before then the PI is
+ * told when. Answers stay readable afterwards. Nothing at all for a project
+ * with no such forms.
+ */
+export const ProjectFeedbackCard: FC<ProjectFeedbackCardProps> = ({
+  project,
+}) => {
+  const queryClient = useQueryClient();
+  const user = useUser();
+  const { data: form } = useProjectForm(project.uuid);
+  // Back from a survey: bring its answer in.
+  useFetchOnFormReturn(project.uuid, fetchProjectForm);
+
+  if (!form) {
+    return null;
+  }
+
+  // Those the backend lets fill in once the forms open, so they can be
+  // told when that is.
+  const mayFillIn =
+    user?.is_staff ||
+    hasPermission(user, {
+      permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
+      projectId: project.uuid,
+    }) ||
+    hasPermission(user, {
+      permission: PermissionEnum.CREATE_PROJECT_PERMISSION,
+      customerId: project.customer_uuid,
+    });
+  const waiting = !form.is_open && Boolean(form.opens_on) && mayFillIn;
+
+  if (!form.can_fill_in && !form.responses.length && !waiting) {
+    return null;
+  }
+
+  return (
+    <>
+      <FormsCard
+        title={translate('Project feedback')}
+        subtitle={translate(
+          'Please tell us how the project went. Your answers help us run future calls.',
+        )}
+        form={form}
+        notice={
+          waiting ? (
+            <AlertItem
+              variant="info"
+              className="mb-5"
+              title={translate('These forms open on {date}.', {
+                date: formatDate(form.opens_on),
+              })}
+            />
+          ) : form.is_open && !form.available ? (
+            <AlertItem
+              variant="warning"
+              className="mb-5"
+              title={translate('The forms cannot be opened just now')}
+              body={translate(
+                'Your answers so far are kept. Please try again later.',
+              )}
+            />
+          ) : null
+        }
+        openLink={(step) =>
+          projectFormsLink({
+            path: { uuid: project.uuid },
+            body: { step },
+          }).then(({ data }) => data.survey_url)
+        }
+        fetchResponses={() => fetchProjectForm(queryClient, project.uuid)}
+      />
+      <FormResponsesSection responses={form.responses} />
+    </>
+  );
+};

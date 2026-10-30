@@ -100,6 +100,29 @@ export const ReviewDetails: FC<{ review: ProposalReview }> = ({ review }) => {
         label={translate('Private comment')}
         value={renderFieldOrDash(review.summary_private_comment)}
       />
+      {/* For the call managers: the reviewer's reason for declining, and
+          what they were asked to change. Applicants never receive either. */}
+      {review.state === 'rejected' && review.rejection_reason && (
+        <Field
+          label={translate('Reason for declining')}
+          value={
+            <span className="text-pre-wrap">{review.rejection_reason}</span>
+          }
+        />
+      )}
+      {review.return_reason && (
+        <Field
+          label={translate('Returned to the reviewer')}
+          value={
+            <span className="text-pre-wrap">
+              {review.returned_at
+                ? `${formatDateTime(review.returned_at)}: `
+                : ''}
+              {review.return_reason}
+            </span>
+          }
+        />
+      )}
       {review.created && (
         <Field
           label={translate('Created')}

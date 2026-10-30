@@ -65,3 +65,27 @@ describe('buildCallExportUrl filters', () => {
     expect(url).toContain('proposal_name=perovskite');
   });
 });
+
+describe('buildCallExportUrl as Excel', () => {
+  // A bare `format` would be read by the API itself.
+  it('asks for a workbook with file_format', () => {
+    expect(
+      buildCallExportUrl(
+        call,
+        'export-reviews',
+        'review_state',
+        {},
+        '',
+        'xlsx',
+      ),
+    ).toBe(
+      'https://example.com/api/proposal-protected-calls/abc/export-reviews/?file_format=xlsx',
+    );
+  });
+
+  it('leaves CSV, the default, unsaid', () => {
+    expect(
+      buildCallExportUrl(call, 'export-reviews', 'review_state', {}, '', 'csv'),
+    ).not.toContain('file_format');
+  });
+});

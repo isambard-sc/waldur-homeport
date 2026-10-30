@@ -8,6 +8,7 @@ import { AccordionCard, BaseButton } from 'waldur-ui';
 import { LoadingErred } from '@/core/LoadingErred';
 import { LoadingSpinner } from '@/core/LoadingSpinner';
 import { Panel } from '@/core/Panel';
+import { getUUID } from '@/core/utils';
 import { SidebarLayout } from '@/form/SidebarLayout';
 import { translate } from '@/i18n';
 import { useModal } from '@/modal/actions';
@@ -31,6 +32,7 @@ import { FormSteps } from '@/wizard';
 import { useUser } from '@/workspace/hooks';
 
 import { FormResponsesSection } from '../forms/FormResponsesSection';
+import { useProjectForm } from '../forms/projectForms';
 import { useProposalForm } from '../forms/proposalForms';
 import { ProposalReturnsSection } from '../returns/ProposalReturnsSection';
 import { ReturnActions } from '../returns/ReturnActions';
@@ -112,6 +114,15 @@ export const ProposalDetails = ({
   // A call with a form flow adds forms to Waldur's own: their answers are
   // shown after the project details, never copied into them.
   const { data: proposalForm } = useProposalForm(proposal.uuid);
+  // The granted project's end-of-project answers, for the call team; read
+  // only, as only the project's PI fills them in.
+  const grantedProjectUuid = proposal.project
+    ? getUUID(proposal.project)
+    : undefined;
+  const { data: closingForm } = useProjectForm(
+    grantedProjectUuid,
+    isCallManagerView && proposal.state === 'accepted',
+  );
 
   // The figures the applicant saw beside their form: the person deciding the
   // allocation needs the same total and the same project length.
@@ -236,6 +247,10 @@ export const ProposalDetails = ({
         />
         <ProjectDetailsSummary proposal={proposal} reviews={reviews} />
         <FormResponsesSection responses={proposalForm?.responses} />
+        <FormResponsesSection
+          responses={closingForm?.responses}
+          title={translate('End-of-project answers')}
+        />
         {hasCompliance && (
           <div id="step-compliance">
             <ComplianceSummary proposal={proposal} />
