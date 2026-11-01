@@ -1023,6 +1023,20 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'admin-ai-reporting-settings',
+    url: 'ai-reporting-settings/',
+    parent: 'admin-configuration',
+    component: lazyComponent(() =>
+      import('./ai-reporting/AIReportingSettings').then((module) => ({
+        default: module.AIReportingSettings,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting settings'),
+    },
+  },
+
+  {
     name: 'admin-call-management-settings',
     url: 'call-management-settings/?tab&q',
     params: { tab: { dynamic: true }, q: { dynamic: true } },
