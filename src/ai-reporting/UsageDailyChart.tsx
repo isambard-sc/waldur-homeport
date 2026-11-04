@@ -22,8 +22,16 @@ export const UsageDailyChart: FC<UsageDailyChartProps> = ({ daily }) => {
 
     return {
       tooltip: { trigger: 'axis' },
-      legend: { data: [translate('Input tokens'), translate('Output tokens')] },
-      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      legend: {
+        data: [translate('Input tokens'), translate('Output tokens')],
+        bottom: 0,
+        left: 'center',
+      },
+      // bottom reserves room for both the rotated date labels and the
+      // legend row below them - 3% was only ever enough for the labels
+      // alone, so the legend collided with them once there were enough
+      // days (e.g. spanning several months) to need the full rotated width.
+      grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
       xAxis: {
         type: 'category',
         data: dates,
