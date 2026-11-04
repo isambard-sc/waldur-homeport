@@ -12,6 +12,7 @@ import {
   getReportingMessage,
   ReportingMessage,
 } from './aiReportingApi';
+import { AIReportingNav } from './AIReportingNav';
 import { MarkdownAnswer } from './MarkdownAnswer';
 import { ReportFiles } from './ReportFiles';
 
@@ -94,6 +95,7 @@ export const AIReportingPage: FC = () => {
 
   return (
     <div className="ai-reporting-page">
+      <AIReportingNav />
       <AlertItem
         variant="info"
         type="floating"
@@ -147,8 +149,9 @@ export const AIReportingPage: FC = () => {
         <textarea
           className="form-control"
           rows={2}
-          autoFocus
-          placeholder={translate('Ask for a report, e.g. "active projects by organisation this quarter"')}
+          placeholder={translate(
+            'Ask for a report, e.g. "active projects by organisation this quarter"',
+          )}
           value={prompt}
           disabled={askMutation.isPending || !!pendingUuid}
           onChange={(e) => setPrompt(e.target.value)}
@@ -167,6 +170,11 @@ export const AIReportingPage: FC = () => {
           label={translate('Send')}
           aria-label={translate('Send message')}
           disabled={!prompt.trim() || askMutation.isPending || !!pendingUuid}
+          disabledReason={
+            !prompt.trim()
+              ? translate('Type a question first.')
+              : translate('Waiting for the current answer.')
+          }
           onClick={submit}
         />
       </div>

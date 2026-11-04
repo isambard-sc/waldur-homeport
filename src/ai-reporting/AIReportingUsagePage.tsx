@@ -9,6 +9,7 @@ import { NoResult } from '@/navigation/header/search/NoResult';
 
 import { OrdersFilter } from '../reporting/orders/OrdersFilter';
 
+import { AIReportingNav } from './AIReportingNav';
 import { UsageByUserTable } from './UsageByUserTable';
 import { UsageDailyChart } from './UsageDailyChart';
 import { useUsageStats } from './useUsageStats';
@@ -23,6 +24,7 @@ export const AIReportingUsagePage: FC = () => {
 
   return (
     <>
+      <AIReportingNav />
       <div className="d-flex justify-content-between align-items-center flex-wrap gap-4 mb-5">
         <div>
           <h3 className="mb-1">{translate('AI reporting usage')}</h3>

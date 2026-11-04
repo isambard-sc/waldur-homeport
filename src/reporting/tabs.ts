@@ -2,7 +2,6 @@ import { isAIReportingEnabledForUser } from '@/ai-reporting/utils';
 import { isStateVisible } from '@/core/stateVisibility';
 import { isFeatureVisible } from '@/features/connect';
 import { translate } from '@/i18n';
-import { isStaffOrSupport } from '@/workspace/selectors';
 
 import { getCategoryConfig, getVisibleReports } from './constants';
 
@@ -31,26 +30,23 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
     { title: translate('Overview'), state: 'reporting-dashboard' },
   ];
   // Not a category (it's one tool, not a catalogue of reports), so it
-  // bypasses the category loop below - but it needs the same gate its route
-  // gets (routes.ts) and its backend enforces
+  // bypasses the category loop below - but it needs the same gate its
+  // route gets (routes.ts) and its backend enforces
   // (ai_reporting.permissions.check_enabled_roles), driven by the
   // admin-configurable AI_REPORTING_ENABLED_ROLES setting rather than a
   // fixed staff/support check. Without this, an organisation owner - who
   // can now reach /reporting/ at all - would see this tab and then be
   // blocked the moment they clicked it.
+  //
+  // "AI reporting usage" is not a tab here - it stays staff/support-only
+  // (routes.ts) and is reached as an internal view inside the AI reporting
+  // tool itself (AIReportingNav), not as a sibling of these report
+  // categories: it isn't a report category, it's a usage/cost view of one
+  // specific tool, which doesn't belong in this top-level row.
   if (isAIReportingEnabledForUser({ workspace } as any)) {
     tabs.push({
       title: translate('AI reporting'),
       state: 'reporting-ai-reporting',
-    });
-  }
-  // Usage dashboard stays staff/support-only regardless of
-  // AI_REPORTING_ENABLED_ROLES - see routes.ts's matching comment on why
-  // seeing everyone's usage is a different boundary than using the tool.
-  if (isStaffOrSupport({ workspace } as any)) {
-    tabs.push({
-      title: translate('AI reporting usage'),
-      state: 'reporting-ai-reporting-usage',
     });
   }
 
