@@ -110,6 +110,26 @@ export const states: StateDeclaration[] = [
     },
   },
 
+  // AI reporting files - the caller's own generated files, flat across every
+  // session. Not a site-wide view like usage above, so it gets the same gate
+  // as the tool itself (isAIReportingEnabledForUser), matching the backend's
+  // own ReportingFileViewSet permissions.
+  {
+    name: 'reporting-ai-reporting-files',
+    url: 'ai-reporting-files/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingFilesPage').then((module) => ({
+        default: module.AIReportingFilesPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting files'),
+      priority: 22,
+      permissions: [isAIReportingEnabledForUser],
+    },
+  },
+
   // Resources category (consumer-facing)
   {
     name: 'reporting-resources',
