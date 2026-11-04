@@ -10,11 +10,16 @@ import { translate } from '@/i18n';
 import {
   askReportingQuestion,
   getReportingMessage,
+  listReportingMessages,
   ReportingMessage,
 } from './aiReportingApi';
 import { AIReportingNav } from './AIReportingNav';
 import { MarkdownAnswer } from './MarkdownAnswer';
 import { ReportFiles } from './ReportFiles';
+import {
+  getActiveReportingSessionUuid,
+  setActiveReportingSessionUuid,
+} from './session';
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -41,13 +46,60 @@ const pendingPhase = (createdAt: string): string => {
 
 // A standalone page rather than a drawer: this is a deliberate reporting task
 // (not an ambient "quick question" the way the general assistant is), and
-// generated files/charts need real screen room to list. Staff/support-only -
-// see the explicit permissions on this route in ../reporting/routes.ts.
+// generated files/charts need real screen room to list. Gated by the
+// admin-configurable AI_REPORTING_ENABLED_ROLES, not a fixed staff/support
+// check - see the explicit permissions on this route in ../reporting/routes.ts.
 export const AIReportingPage: FC = () => {
-  const [sessionUuid, setSessionUuid] = useState<string | null>(null);
+  // Captured once, at mount: the session (if any) this tab was already
+  // talking to before this page last unmounted - e.g. the user navigated to
+  // another tab and back. Reading the module state again on a later render
+  // would make a conversation that starts fresh here think it still needs
+  // restoring once it has its own session going.
+  const [restoreSessionUuid] = useState(() => getActiveReportingSessionUuid());
+  const [sessionUuid, setSessionUuid] = useState<string | null>(
+    restoreSessionUuid ?? null,
+  );
   const [messages, setMessages] = useState<ReportingMessage[]>([]);
   const [pendingUuid, setPendingUuid] = useState<string | null>(null);
   const [prompt, setPrompt] = useState('');
+
+  const { data: restoredMessages } = useQuery({
+    queryKey: ['AIReportingRestoreSession', restoreSessionUuid],
+    queryFn: () => listReportingMessages(restoreSessionUuid as string),
+    enabled: !!restoreSessionUuid,
+    // NOT staleTime: Infinity - react-query's cache is keyed globally, not
+    // per mount, and this same session uuid is reused every time the page
+    // is navigated away from and back to within one page load. An infinite
+    // staleTime made the *second* restore replay the *first* restore's
+    // snapshot verbatim (e.g. still just "hi", with a later "yes please"
+    // missing) instead of fetching what the session actually looks like
+    // now. refetchOnMount: 'always' means every remount still shows last
+    // known data instantly (no flash of the restoring spinner for a
+    // conversation already seen once this page load) but always confirms
+    // it against the server right after.
+    refetchOnMount: 'always',
+    retry: false,
+  });
+
+  // Nothing to restore -> already "restored". Otherwise stays false until
+  // the hydration effect below has actually populated messages, so the
+  // composer below doesn't accept a question that the restore is about to
+  // overwrite the message list underneath. Derived rather than its own
+  // state: it's exactly "restoredMessages has arrived (or there was never
+  // anything to wait for)", nothing more to keep in sync by hand.
+  const hasRestored = !restoreSessionUuid || restoredMessages !== undefined;
+
+  useEffect(() => {
+    if (!restoredMessages) return;
+    setMessages(restoredMessages);
+    // The page may have been navigated away from mid-answer - resume
+    // polling exactly like a freshly-asked question would, instead of
+    // leaving a stale "pending" bubble with nothing watching it.
+    const last = restoredMessages[restoredMessages.length - 1];
+    if (last?.status === 'pending') {
+      setPendingUuid(last.uuid);
+    }
+  }, [restoredMessages]);
 
   const askMutation = useMutation({
     mutationFn: (nextPrompt: string) =>
@@ -58,6 +110,7 @@ export const AIReportingPage: FC = () => {
       ),
     onSuccess: (message) => {
       setSessionUuid(message.session);
+      setActiveReportingSessionUuid(message.session);
       setMessages((prev) => [...prev, message]);
       setPendingUuid(message.uuid);
       setPrompt('');
@@ -106,6 +159,14 @@ export const AIReportingPage: FC = () => {
       />
 
       <div className="ai-reporting-messages mt-4 mb-4">
+        {!hasRestored ? (
+          <div className="d-flex align-items-center gap-2 text-muted">
+            <LoadingSpinnerSimple className="fs-4" />
+            <span className="fs-7">
+              {translate('Restoring your conversation...')}
+            </span>
+          </div>
+        ) : null}
         {messages.map((message) => (
           <div key={message.uuid} className="ai-reporting-message mb-4">
             <div className="ai-reporting-question border-start border-3 border-primary ps-3 mb-2">
@@ -153,7 +214,7 @@ export const AIReportingPage: FC = () => {
             'Ask for a report, e.g. "active projects by organisation this quarter"',
           )}
           value={prompt}
-          disabled={askMutation.isPending || !!pendingUuid}
+          disabled={!hasRestored || askMutation.isPending || !!pendingUuid}
           onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -169,11 +230,18 @@ export const AIReportingPage: FC = () => {
           iconNode={<PaperPlaneTiltIcon weight="bold" />}
           label={translate('Send')}
           aria-label={translate('Send message')}
-          disabled={!prompt.trim() || askMutation.isPending || !!pendingUuid}
+          disabled={
+            !hasRestored ||
+            !prompt.trim() ||
+            askMutation.isPending ||
+            !!pendingUuid
+          }
           disabledReason={
-            !prompt.trim()
-              ? translate('Type a question first.')
-              : translate('Waiting for the current answer.')
+            !hasRestored
+              ? translate('Restoring your conversation...')
+              : !prompt.trim()
+                ? translate('Type a question first.')
+                : translate('Waiting for the current answer.')
           }
           onClick={submit}
         />

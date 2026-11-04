@@ -49,3 +49,19 @@ export const getReportingMessage = (uuid: string) =>
       path: { uuid },
     })
     .then((response) => response.data as ReportingMessage);
+
+/**
+ * GET /api/ai-reporting-messages/?session={uuid} - one conversation's own
+ * messages, oldest first (ReportingMessage.Meta.ordering). Used to restore
+ * AIReportingPage's state when it remounts (e.g. after navigating away and
+ * back) instead of starting from an empty page - see AIReportingPage.tsx.
+ * page_size caps LinkHeaderPagination's default of 10, which a real
+ * conversation can easily exceed; 300 is that paginator's own max.
+ */
+export const listReportingMessages = (session: string) =>
+  client
+    .get({
+      url: '/api/ai-reporting-messages/',
+      query: { session, page_size: 300 },
+    })
+    .then((response) => (response.data ?? []) as ReportingMessage[]);
