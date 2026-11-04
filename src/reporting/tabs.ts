@@ -1,3 +1,4 @@
+import { isAIReportingEnabledForUser } from '@/ai-reporting/utils';
 import { isStateVisible } from '@/core/stateVisibility';
 import { isFeatureVisible } from '@/features/connect';
 import { translate } from '@/i18n';
@@ -30,16 +31,23 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
     { title: translate('Overview'), state: 'reporting-dashboard' },
   ];
   // Not a category (it's one tool, not a catalogue of reports), so it
-  // bypasses the category loop below - but it needs the same staff/support
-  // check those get, matching its route's own permissions (routes.ts) and
-  // its backend (ai_reporting's ask_permissions). Without this, an
-  // organisation owner - who can now reach /reporting/ at all - would see
-  // this tab and then be blocked the moment they clicked it.
-  if (isStaffOrSupport({ workspace } as any)) {
+  // bypasses the category loop below - but it needs the same gate its route
+  // gets (routes.ts) and its backend enforces
+  // (ai_reporting.permissions.check_enabled_roles), driven by the
+  // admin-configurable AI_REPORTING_ENABLED_ROLES setting rather than a
+  // fixed staff/support check. Without this, an organisation owner - who
+  // can now reach /reporting/ at all - would see this tab and then be
+  // blocked the moment they clicked it.
+  if (isAIReportingEnabledForUser({ workspace } as any)) {
     tabs.push({
       title: translate('AI reporting'),
       state: 'reporting-ai-reporting',
     });
+  }
+  // Usage dashboard stays staff/support-only regardless of
+  // AI_REPORTING_ENABLED_ROLES - see routes.ts's matching comment on why
+  // seeing everyone's usage is a different boundary than using the tool.
+  if (isStaffOrSupport({ workspace } as any)) {
     tabs.push({
       title: translate('AI reporting usage'),
       state: 'reporting-ai-reporting-usage',

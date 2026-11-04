@@ -1,6 +1,7 @@
 import { UIView } from '@uirouter/react';
 import React from 'react';
 
+import { isAIReportingEnabledForUser } from '@/ai-reporting/utils';
 import { lazyComponent } from '@/core/lazyComponent';
 import { StateDeclaration } from '@/core/types';
 import { MarketplaceFeatures, SupportFeatures } from '@/FeaturesEnums';
@@ -77,16 +78,22 @@ export const states: StateDeclaration[] = [
       priority: 20,
       // A child state's permissions replace the parent's rather than adding
       // to it (see ./access.ts) - 'reporting' itself now also admits
-      // organisation owners, but this tool's backend is staff/support only
-      // (ai_reporting.views.ReportingMessageViewSet.ask_permissions), so it
-      // needs its own explicit, matching restriction here.
-      permissions: [isStaffOrSupport],
+      // organisation owners, but this tool's backend gate
+      // (ai_reporting.permissions.check_enabled_roles) is driven by the
+      // admin-configurable AI_REPORTING_ENABLED_ROLES Constance setting, not
+      // a fixed staff/support check - isAIReportingEnabledForUser reads the
+      // same public setting so the two can't drift apart.
+      permissions: [isAIReportingEnabledForUser],
     },
   },
 
   // AI reporting usage - a dashboard, not a catalogue of reports, same
-  // reasoning (and same explicit permissions requirement) as the AI
-  // reporting tool state right above it.
+  // reasoning as the AI reporting tool state right above it. Deliberately
+  // still isStaffOrSupport, NOT isAIReportingEnabledForUser: seeing every
+  // other user's usage data is a different, more sensitive boundary than
+  // being allowed to use the tool at all - matches the backend's
+  // usage_stats_permissions staying fixed regardless of
+  // AI_REPORTING_ENABLED_ROLES.
   {
     name: 'reporting-ai-reporting-usage',
     url: 'ai-reporting-usage/',

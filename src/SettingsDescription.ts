@@ -1847,6 +1847,13 @@ export const SettingsDescription = [
         type: 'boolean',
       },
       {
+        key: 'AI_REPORTING_ENABLED_ROLES',
+        description: translate('Controls which user roles can access AI reporting. \'disabled\': No role-based access. \'staff\': Staff users only. \'staff_and_support\': Staff and support users (today\'s fixed behavior). \'all\': All authenticated users.'),
+        default: 'staff_and_support',
+        type: 'choice_field',
+        options: [{ value: 'disabled', label: 'Disabled' }, { value: 'staff', label: 'Staff users' }, { value: 'staff_and_support', label: 'Staff and support users' }, { value: 'all', label: 'All users' }],
+      },
+      {
         key: 'AI_REPORTING_MODEL',
         description: translate('Bedrock model id override for the AI reporting harness, e.g. \'anthropic.claude-opus-5-5\'. Leave empty to use the harness\'s own configured default instead.'),
         default: '',
