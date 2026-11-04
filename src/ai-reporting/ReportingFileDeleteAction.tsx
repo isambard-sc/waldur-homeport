@@ -14,10 +14,12 @@ interface ReportingFileDeleteActionProps {
   refetch: () => void | Promise<void>;
 }
 
-// A convenience, not the only way a file goes away - it's also deleted
-// automatically after AI_REPORTING_FILE_RETENTION_DAYS regardless (see
-// AIReportingFilesPage's own retention line and ai_reporting.tasks
-// .cleanup_old_reporting_files on the backend).
+// Deleting a file here is a convenience for the user, not the only way a
+// file gets deleted: every file is also deleted automatically once it's
+// AI_REPORTING_FILE_RETENTION_DAYS old, whether or not anyone ever clicks
+// this button (see the backend task ai_reporting.tasks
+// .cleanup_old_reporting_files, and the line of text about this on
+// AIReportingFilesPage).
 export const ReportingFileDeleteAction: FC<ReportingFileDeleteActionProps> = ({
   row,
   refetch,

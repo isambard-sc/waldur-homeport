@@ -10,19 +10,31 @@ import { isStaffOrSupport } from '@/workspace/selectors';
 
 import { isAIReportingEnabledForUser } from './utils';
 
-// Switches between the tool itself, its usage dashboard and its file list,
-// all reached as their own ui-router states (routes.ts) so each keeps its
-// own permission gate - Chat/Files follow the admin-configurable
-// AI_REPORTING_ENABLED_ROLES (same as their routes), while Usage stays
-// staff/support-only regardless (see routes.ts's comment on that split).
-// Each tab is shown only if its own gate actually passes - a user allowed
-// onto Chat under AI_REPORTING_ENABLED_ROLES=all but who isn't staff/support
-// still needs a working nav to reach Files, so the whole nav can't be
-// hidden behind a single staff/support check the way it used to be.
+// This component renders a row of tabs that switches between three pages:
+// the chat tool itself, its usage dashboard, and its file list. Each page
+// is its own ui-router state (see routes.ts) and has its own permission
+// check:
+//   - Chat and Files are shown if the current user passes the
+//     admin-configurable AI_REPORTING_ENABLED_ROLES check (the same check
+//     their routes use).
+//   - Usage is shown only to staff or support, no matter what
+//     AI_REPORTING_ENABLED_ROLES is set to (see routes.ts for why this one
+//     case is kept separate).
+//
+// Each tab below is added to the list only if the current user passes that
+// specific tab's own check. This matters for a concrete reason: if an admin
+// sets AI_REPORTING_ENABLED_ROLES to "all", a regular (non-staff) user is
+// now allowed to use Chat - but that same user is not staff or support, so
+// they still need Files to show up in this nav for them too. An earlier
+// version of this component hid the entire nav unless the user was staff
+// or support, which broke exactly this case.
 export const AIReportingNav: FC = () => {
   const router = useRouter();
-  // Subscribes to transitions, so the active tab re-renders on navigation -
-  // same reasoning as ReportingLayout.tsx's own identical use of this hook.
+  // useCurrentStateAndParams's return value isn't used here - just calling
+  // it subscribes this component to route changes, so "active" below gets
+  // re-evaluated (and the highlighted tab updates) every time the user
+  // navigates. ReportingLayout.tsx calls this same hook for this same
+  // reason.
   useCurrentStateAndParams();
   const canUseTool = useSelector(isAIReportingEnabledForUser);
   const isStaff = useSelector(isStaffOrSupport);

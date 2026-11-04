@@ -43,10 +43,13 @@ export const isAIReportingAllowedForUser = (
   }
 };
 
-/** Same calling shape as workspace/selectors' isStaffOrSupport - a drop-in
- * for routes.ts's `permissions: [...]` and tabs.ts's visibility check, so
- * the AI reporting route/tab are gated by the current
- * AI_REPORTING_ENABLED_ROLES value instead of a fixed staff/support check. */
+/** Takes the whole Redux state and returns a boolean, exactly like
+ * workspace/selectors' isStaffOrSupport does. That matters because
+ * routes.ts's `permissions: [...]` list and tabs.ts's visibility check both
+ * expect a function with this exact shape - so this function can be used
+ * as a direct replacement for isStaffOrSupport in both places, swapping a
+ * fixed staff/support check for one driven by the current
+ * AI_REPORTING_ENABLED_ROLES value instead. */
 export const isAIReportingEnabledForUser = (state: RootState): boolean =>
   isAIReportingAllowedForUser(state.workspace.user, getAIReportingMode());
 

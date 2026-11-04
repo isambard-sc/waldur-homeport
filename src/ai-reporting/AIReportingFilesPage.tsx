@@ -17,11 +17,15 @@ import {
 } from './reportingFilesApi';
 import { getAIReportingFileRetentionDays } from './utils';
 
-// A standalone page, not part of the category-report system - same
-// reasoning as AIReportingPage.tsx/AIReportingUsagePage.tsx: this is one
-// tool's own file list, not a catalogue of reports. See routes.ts/tabs.ts
-// for how it's wired in, and AIReportingNav for the Chat/Usage/Files
-// switcher shown at its top.
+// Most of the Reporting section is built from a shared system: a category
+// of reports (defined in constants.ts) is listed by ReportingReportList,
+// and the user picks which report to view. This page does not use that
+// system, because it isn't a catalogue of reports to choose between - it's
+// the file list belonging to one specific tool (AI reporting), so it's
+// built as its own standalone page instead, the same way AIReportingPage.tsx
+// and AIReportingUsagePage.tsx are. See routes.ts and tabs.ts for how this
+// page is wired into the app's navigation, and AIReportingNav.tsx for the
+// Chat / Usage / Files switcher rendered at the top of this page.
 export const AIReportingFilesPage: FC = () => {
   const retentionDays = getAIReportingFileRetentionDays();
 
