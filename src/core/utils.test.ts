@@ -219,4 +219,11 @@ describe('titleCase', () => {
     );
     expect(titleCase('auto approve user tos')).toBe('Auto approve user ToS');
   });
+
+  it('keeps "ai" uppercase anywhere in the phrase, not just as the first word', () => {
+    expect(titleCase('ai reporting name')).toBe('AI reporting name');
+    expect(titleCase('auto approve ai requests')).toBe(
+      'Auto approve AI requests',
+    );
+  });
 });
