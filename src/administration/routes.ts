@@ -1024,7 +1024,8 @@ export const states: StateDeclaration[] = [
 
   {
     name: 'admin-ai-reporting-settings',
-    url: 'ai-reporting-settings/',
+    url: 'ai-reporting-settings/?tab&q',
+    params: { tab: { dynamic: true }, q: { dynamic: true } },
     parent: 'admin-configuration',
     component: lazyComponent(() =>
       import('./ai-reporting/AIReportingSettings').then((module) => ({

@@ -1832,7 +1832,7 @@ export const SettingsDescription = [
     ],
   },
   {
-    description: translate('AI reporting settings'),
+    description: translate('AI reporting general'),
     items: [
       {
         key: 'AI_REPORTING_NAME',
@@ -1883,6 +1883,11 @@ export const SettingsDescription = [
         default: 600,
         type: 'integer',
       },
+    ],
+  },
+  {
+    description: translate('AI reporting limits'),
+    items: [
       {
         key: 'AI_REPORTING_TOKEN_LIMIT_DAILY',
         description: translate('Per-user daily token cap for AI reporting. -1 means unlimited.'),
@@ -1913,6 +1918,11 @@ export const SettingsDescription = [
         default: 60,
         type: 'integer',
       },
+    ],
+  },
+  {
+    description: translate('AI reporting retention'),
+    items: [
       {
         key: 'AI_REPORTING_MESSAGE_RETENTION_DAYS',
         description: translate('Number of days to retain AI reporting questions/answers before automatic deletion. Set to -1 to disable automatic cleanup.'),
