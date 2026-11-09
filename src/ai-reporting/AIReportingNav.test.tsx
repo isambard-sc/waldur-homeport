@@ -36,7 +36,7 @@ describe('AIReportingNav', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('shows Chat and Files, but not Usage, for a user the tool is enabled for but who is not staff/support', () => {
+  it('shows Chat, History and Files, but not Usage, for a user the tool is enabled for but who is not staff/support', () => {
     // Reproduces a real bug: AI_REPORTING_ENABLED_ROLES="all" lets a regular
     // user reach Chat/Files, but the nav used to hide itself entirely for
     // anyone who wasn't staff/support, leaving that user with no way to
@@ -44,6 +44,7 @@ describe('AIReportingNav', () => {
     mockGates(true, false);
     render(<AIReportingNav />);
     expect(screen.getByText('Chat')).toBeInTheDocument();
+    expect(screen.getByText('History')).toBeInTheDocument();
     expect(screen.getByText('Files')).toBeInTheDocument();
     expect(screen.queryByText('Usage')).not.toBeInTheDocument();
   });
@@ -53,14 +54,16 @@ describe('AIReportingNav', () => {
     render(<AIReportingNav />);
     expect(screen.getByText('Usage')).toBeInTheDocument();
     expect(screen.queryByText('Chat')).not.toBeInTheDocument();
+    expect(screen.queryByText('History')).not.toBeInTheDocument();
     expect(screen.queryByText('Files')).not.toBeInTheDocument();
   });
 
-  it('shows all three for staff when the tool is also enabled', () => {
+  it('shows all four for staff when the tool is also enabled', () => {
     mockGates(true, true);
     render(<AIReportingNav />);
     expect(screen.getByText('Chat')).toBeInTheDocument();
     expect(screen.getByText('Usage')).toBeInTheDocument();
+    expect(screen.getByText('History')).toBeInTheDocument();
     expect(screen.getByText('Files')).toBeInTheDocument();
   });
 });

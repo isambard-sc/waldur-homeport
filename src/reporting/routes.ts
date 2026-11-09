@@ -130,6 +130,26 @@ export const states: StateDeclaration[] = [
     },
   },
 
+  // AI reporting history - the caller's own past conversations, so one can
+  // be reopened later (see AIReportingHistoryPage.tsx). Same gate as the
+  // tool itself and Files above, matching the backend's own
+  // ReportingSessionViewSet permissions.
+  {
+    name: 'reporting-ai-reporting-history',
+    url: 'ai-reporting-history/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingHistoryPage').then((module) => ({
+        default: module.AIReportingHistoryPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting history'),
+      priority: 23,
+      permissions: [isAIReportingEnabledForUser],
+    },
+  },
+
   // Resources category (consumer-facing)
   {
     name: 'reporting-resources',

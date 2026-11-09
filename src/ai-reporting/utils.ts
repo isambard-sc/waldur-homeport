@@ -63,3 +63,11 @@ export const getAIReportingFileRetentionDays = (): number | null => {
   const days = ENV.plugins?.WALDUR_CORE?.AI_REPORTING_FILE_RETENTION_DAYS;
   return typeof days === 'number' && days >= 0 ? days : null;
 };
+
+/** AI_REPORTING_MESSAGE_RETENTION_DAYS from public configuration, for the
+ * History tab's "deleted automatically after N days" line - same mechanism
+ * as getAIReportingFileRetentionDays above. */
+export const getAIReportingMessageRetentionDays = (): number | null => {
+  const days = ENV.plugins?.WALDUR_CORE?.AI_REPORTING_MESSAGE_RETENTION_DAYS;
+  return typeof days === 'number' && days >= 0 ? days : null;
+};

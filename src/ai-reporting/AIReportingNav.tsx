@@ -10,11 +10,11 @@ import { isStaffOrSupport } from '@/workspace/selectors';
 
 import { isAIReportingEnabledForUser } from './utils';
 
-// This component renders a row of tabs that switches between three pages:
-// the chat tool itself, its usage dashboard, and its file list. Each page
-// is its own ui-router state (see routes.ts) and has its own permission
-// check:
-//   - Chat and Files are shown if the current user passes the
+// This component renders a row of tabs that switches between four pages:
+// the chat tool itself, its usage dashboard, its file list, and its
+// conversation history. Each page is its own ui-router state (see routes.ts)
+// and has its own permission check:
+//   - Chat, Files and History are shown if the current user passes the
 //     admin-configurable AI_REPORTING_ENABLED_ROLES check (the same check
 //     their routes use).
 //   - Usage is shown only to staff or support, no matter what
@@ -50,6 +50,14 @@ export const AIReportingNav: FC = () => {
       title: translate('Chat'),
       link: <Link state="reporting-ai-reporting" />,
       active: router.stateService.includes('reporting-ai-reporting'),
+    });
+  }
+  if (canUseTool) {
+    items.push({
+      key: 'reporting-ai-reporting-history',
+      title: translate('History'),
+      link: <Link state="reporting-ai-reporting-history" />,
+      active: router.stateService.includes('reporting-ai-reporting-history'),
     });
   }
   if (isStaff) {
