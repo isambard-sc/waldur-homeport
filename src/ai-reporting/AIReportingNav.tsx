@@ -10,31 +10,14 @@ import { isStaffOrSupport } from '@/workspace/selectors';
 
 import { isAIReportingEnabledForUser } from './utils';
 
-// This component renders a row of tabs that switches between four pages:
-// the chat tool itself, its usage dashboard, its file list, and its
-// conversation history. Each page is its own ui-router state (see routes.ts)
-// and has its own permission check:
-//   - Chat, Files and History are shown if the current user passes the
-//     admin-configurable AI_REPORTING_ENABLED_ROLES check (the same check
-//     their routes use).
-//   - Usage is shown only to staff or support, no matter what
-//     AI_REPORTING_ENABLED_ROLES is set to (see routes.ts for why this one
-//     case is kept separate).
-//
-// Each tab below is added to the list only if the current user passes that
-// specific tab's own check. This matters for a concrete reason: if an admin
-// sets AI_REPORTING_ENABLED_ROLES to "all", a regular (non-staff) user is
-// now allowed to use Chat - but that same user is not staff or support, so
-// they still need Files to show up in this nav for them too. An earlier
-// version of this component hid the entire nav unless the user was staff
-// or support, which broke exactly this case.
+// The Chat / History / Usage / Files tabs, each shown only if the user
+// passes its own check. Usage is staff/support only; the others follow
+// the AI reporting settings, so a regular user allowed to use Chat still
+// gets the nav.
 export const AIReportingNav: FC = () => {
   const router = useRouter();
-  // useCurrentStateAndParams's return value isn't used here - just calling
-  // it subscribes this component to route changes, so "active" below gets
-  // re-evaluated (and the highlighted tab updates) every time the user
-  // navigates. ReportingLayout.tsx calls this same hook for this same
-  // reason.
+  // Result unused - calling it re-renders on navigation, so the active tab
+  // updates.
   useCurrentStateAndParams();
   const canUseTool = useSelector(isAIReportingEnabledForUser);
   const isStaff = useSelector(isStaffOrSupport);

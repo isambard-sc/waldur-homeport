@@ -4,13 +4,8 @@ import { SettingsWithTabs } from '../settings/SettingsWithTabs';
 
 import { HarnessConnectionFields } from './HarnessConnectionFields';
 
-// Split into tabs (Connection/General/Limits/Retention) rather than one long
-// stacked page: 14 Constance settings plus the 2 connection fields is the
-// same kind of crowding AdministrationSoftwareCatalog.tsx's own
-// general/EESSI/Spack tabs were split to avoid. The backend fieldset split
-// (constance_settings.py's "AI reporting general"/"limits"/"retention", was
-// one "AI reporting settings" fieldset) and the regenerated
-// SettingsDescription.ts both have to match the groupName values used below.
+// The groupName values must match the AI reporting fieldsets in
+// constance_settings.py, and so the generated SettingsDescription.ts.
 export const AIReportingSettings = () => (
   <SettingsWithTabs
     title={translate('AI reporting settings')}

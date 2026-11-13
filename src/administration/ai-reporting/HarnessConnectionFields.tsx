@@ -38,24 +38,8 @@ const secretState = (isSet: boolean) =>
     </Badge>
   );
 
-/**
- * Where Waldur reaches the AI reporting harness, and the key it signs
- * requests with - same shape as FormbricksConnectionCard for the same kind
- * of value (an internal service's connection details, editable through the
- * API rather than baked into deployment settings). Rendered as the
- * "Connection" tab's content in AIReportingSettings.tsx, not its own card -
- * SettingsWithTabs already gives the tab its own card and title, so adding
- * another one here would just repeat the "Connection" heading inside a
- * second border, the same reasoning AdministrationSoftwareCatalog.tsx's own
- * settings tabs follow.
- *
- * The signing key is never sent back by the API, only whether one is set;
- * leaving it blank when saving keeps whatever is already stored, and an
- * explicit empty value clears it (turning signing back off). The harness
- * itself only starts requiring a signature once its own
- * WALDUR_SIGNING_PUBLIC_KEY is configured, so this can be left unset
- * indefinitely with no effect on whether AI reporting works.
- */
+/** The Connection tab: the harness URL and the key Waldur signs requests
+ * with. The key is never returned by the API, only whether one is set. */
 export const HarnessConnectionFields = () => {
   const canEdit = useSelector(isStaff);
   const queryClient = useQueryClient();
@@ -120,7 +104,7 @@ export const HarnessConnectionFields = () => {
           name="signing_private_key"
           label={translate('Signing private key')}
           description={translate(
-            'Optional. Signs every request to the harness so it can verify the request genuinely came from Waldur. Leave unset to send requests unsigned - AI reporting works the same either way. It is never shown again once saved.',
+            'Signs every request so the harness can check it came from Waldur. Required: the harness rejects unsigned requests. It is never shown again once saved.',
           )}
           disabled={!canEdit}
           renderValue={() => secretState(connection.signing_private_key_set)}

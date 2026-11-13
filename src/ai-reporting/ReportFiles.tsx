@@ -21,21 +21,15 @@ const ReportImage: FC<{ file: ReportingFile }> = ({ file }) => {
       )}
       <figcaption className="fs-8 text-muted mt-1 d-flex align-items-center gap-2">
         <span>{file.name}</span>
-        {/* The inline preview above is just for viewing in the page - for
-            pulling the chart into a slide deck or saving it, it needs an
-            explicit download the same way a PDF/CSV already gets. */}
+        {/* A download link too, for saving the chart or using it elsewhere. */}
         <FileDownloader url={file.file} name={file.name} size={14} />
       </figcaption>
     </figure>
   );
 };
 
-// FileDownloader (not a plain <a href>), and blob-fetched <img> (not a plain
-// <img src>): the media endpoint is token-authenticated, so a bare link or
-// image navigation can't carry the app's Authorization header and 404s
-// (Waldur's media access is deny-by-default, so an unauthenticated request
-// looks the same as a nonexistent file). Both fetch through the app's own
-// authenticated client instead.
+// The media endpoint needs the Authorization header, which a plain link
+// or <img src> can't send, so both fetch through the app's own client.
 export const ReportFiles: FC<{ files: ReportingFile[] }> = ({ files }) => {
   if (!files.length) return null;
 

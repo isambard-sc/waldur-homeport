@@ -10,10 +10,7 @@ import { AIReportingFilesPage } from './AIReportingFilesPage';
 vi.mock('./AIReportingNav', () => ({ AIReportingNav: () => null }));
 vi.mock('./reportingFilesApi', () => ({ fetchReportingFiles: vi.fn() }));
 
-// Table itself is stubbed out (same approach as
-// SupportAIAssistantLogsList.test.tsx) - this page's own job is wiring the
-// retention line and handing useTable/Table the right columns and delete
-// action, not re-proving Table's own rendering.
+// Table is stubbed out - this tests the page's wiring, not Table itself.
 let tableRenderProps: any;
 vi.mock('@/table/Table', () => ({
   default: (props: any) => {

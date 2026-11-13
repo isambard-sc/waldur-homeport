@@ -29,20 +29,9 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
   const tabs: ReportingTab[] = [
     { title: translate('Overview'), state: 'reporting-dashboard' },
   ];
-  // Not a category (it's one tool, not a catalogue of reports), so it
-  // bypasses the category loop below - but it needs the same gate its
-  // route gets (routes.ts) and its backend enforces
-  // (ai_reporting.permissions.check_enabled_roles), driven by the
-  // admin-configurable AI_REPORTING_ENABLED_ROLES setting rather than a
-  // fixed staff/support check. Without this, an organisation owner - who
-  // can now reach /reporting/ at all - would see this tab and then be
-  // blocked the moment they clicked it.
-  //
-  // "AI reporting usage" is not a tab here - it stays staff/support-only
-  // (routes.ts) and is reached as an internal view inside the AI reporting
-  // tool itself (AIReportingNav), not as a sibling of these report
-  // categories: it isn't a report category, it's a usage/cost view of one
-  // specific tool, which doesn't belong in this top-level row.
+  // One tool, not a report category, so it skips the category loop but
+  // needs the same check as its route. Usage is reached from inside the
+  // tool (AIReportingNav), not as a tab here.
   if (isAIReportingEnabledForUser({ workspace } as any)) {
     tabs.push({
       title: translate('AI reporting'),

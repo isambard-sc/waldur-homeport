@@ -15,9 +15,7 @@ vi.mock('./reportingSessionsApi', () => ({
 }));
 vi.mock('./session', () => ({ setActiveReportingSessionUuid: vi.fn() }));
 
-// Table itself is stubbed out (same approach as AIReportingFilesPage.test.tsx)
-// - this page's own job is wiring the retention line, the columns, and the
-// row-click handoff to Chat, not re-proving Table's own rendering.
+// Table is stubbed out - this tests the page's wiring, not Table itself.
 let tableRenderProps: any;
 vi.mock('@/table/Table', () => ({
   default: (props: any) => {

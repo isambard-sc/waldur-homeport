@@ -1,8 +1,7 @@
 import { client } from 'waldur-js-client/client.gen';
 
-// Mirrors waldur_mastermind.ai_reporting.serializers.UsageStatsResponseSerializer.
-// Same situation as aiReportingApi.ts - not yet in the generated waldur-js-client,
-// so this is a raw call through the same configured client instance.
+// Mirrors ai_reporting's UsageStatsResponseSerializer. Raw call until
+// waldur-js-client includes this endpoint.
 export interface DailyUsage {
   date: string;
   input_tokens: number;

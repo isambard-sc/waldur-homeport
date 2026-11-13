@@ -14,10 +14,8 @@ import { UsageByUserTable } from './UsageByUserTable';
 import { UsageDailyChart } from './UsageDailyChart';
 import { useUsageStats } from './useUsageStats';
 
-// A standalone page, not part of the category-report system (getCategoryConfig/
-// ReportingReportList) - same reasoning as AIReportingPage.tsx itself: this is
-// one dashboard, not a catalogue of reports, so that machinery would be
-// unneeded boilerplate. See routes.ts/tabs.ts for how it's wired in.
+// A standalone page rather than part of the report catalogue, like the
+// other AI reporting pages.
 export const AIReportingUsagePage: FC = () => {
   const [days, setDays] = useState(30);
   const { isLoading, error, refetch, data } = useUsageStats(days);

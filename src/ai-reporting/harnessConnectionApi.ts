@@ -1,22 +1,17 @@
 import { client } from 'waldur-js-client/client.gen';
 
-// Mirrors waldur_mastermind.ai_reporting.serializers.HarnessConnectionSerializer.
-// Not yet in the generated waldur-js-client - same situation as
-// aiReportingApi.ts/reportingFilesApi.ts/usageStatsApi.ts, so this is a raw
-// call through the same configured client instance.
+// Mirrors ai_reporting's HarnessConnectionSerializer. Raw calls until
+// waldur-js-client includes this endpoint.
 export interface HarnessConnection {
   base_url: string;
-  // The key itself is never returned by the API - only whether one is
-  // currently stored, so the UI can show "Set"/"Not set" without ever
-  // having the actual key pass through the browser once it's saved.
+  // The key itself is never returned, only whether one is stored.
   signing_private_key_set: boolean;
   modified: string;
 }
 
 export interface PatchedHarnessConnectionRequest {
   base_url?: string;
-  // Leave out to keep the currently stored key; send an empty string to
-  // clear it (turning signing back off).
+  // Omit to keep the stored key; send an empty string to clear it.
   signing_private_key?: string;
 }
 

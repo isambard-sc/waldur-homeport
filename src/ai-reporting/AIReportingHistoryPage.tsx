@@ -16,13 +16,8 @@ import {
 import { setActiveReportingSessionUuid } from './session';
 import { getAIReportingMessageRetentionDays } from './utils';
 
-// Lists the caller's own past AI reporting conversations so they can be
-// reopened later, the way Amazon Q's own conversation history panel works -
-// clicking a row sets it as this tab's active session (session.ts) and
-// hands off to AIReportingPage (the Chat tab), which then restores it
-// exactly as it would after navigating away and back to an in-progress
-// conversation. Same Chat/Usage/Files/History switcher as the other AI
-// reporting pages - see AIReportingNav.tsx, routes.ts and tabs.ts.
+// Lists the caller's past conversations. Clicking one makes it this tab's
+// active session and opens Chat, which shows its messages.
 export const AIReportingHistoryPage: FC = () => {
   const router = useRouter();
   const retentionDays = getAIReportingMessageRetentionDays();

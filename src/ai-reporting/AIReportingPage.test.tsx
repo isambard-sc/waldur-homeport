@@ -105,13 +105,8 @@ describe('AIReportingPage session restore', () => {
   });
 
   it('refetches a session already restored once this page load, instead of replaying that first snapshot', async () => {
-    // Reproduces the actual bug: the same QueryClient instance persists
-    // across a navigate-away-and-back cycle (React Query's cache is keyed
-    // globally, not per component mount), and the restored session uuid is
-    // identical both times - a staleTime: Infinity on the restore query
-    // made the second mount replay the first mount's already-resolved
-    // snapshot verbatim, so a message sent during the first mount (after
-    // that snapshot was taken) never appeared on the second.
+    // The cache survives navigating away, so with staleTime: Infinity the
+    // second visit showed the first visit's messages and missed newer ones.
     vi.mocked(getActiveReportingSessionUuid).mockReturnValue('session-1');
     vi.mocked(listReportingMessages)
       .mockResolvedValueOnce([message({ uuid: 'msg-1', prompt: 'hi' })])

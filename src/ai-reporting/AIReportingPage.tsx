@@ -30,13 +30,8 @@ const errorDetail = (error: unknown): string | null => {
   return typeof detail === 'string' && detail ? detail : null;
 };
 
-// There's no real mid-flight signal from the harness today - the backend
-// task is one blocking call, and ReportingMessage.progress (the field meant
-// for genuine per-turn status) is never actually populated - so this is a
-// plausible-sounding approximation, not a true reflection of what's
-// happening. Rotates on elapsed time since the question was asked, which
-// lines up with the poll interval re-rendering every few seconds anyway.
-// message.progress (if it's ever wired up for real) always wins over this.
+// There's no real progress from the harness yet, so this rotates through
+// plausible phases by elapsed time. message.progress wins once it's set.
 const PENDING_PHASES = [
   translate('Looking up the data...'),
   translate('Analysing...'),
@@ -51,28 +46,11 @@ const pendingPhase = (createdAt: string): string => {
   return PENDING_PHASES[index];
 };
 
-// This is a full standalone page, not a drawer that floats over other
-// content. Two reasons: asking for a report here is a deliberate task the
-// user chose to do, unlike the general AI assistant feature elsewhere in
-// the app, which is meant to be an ambient "quick question" you can ask
-// from anywhere without leaving your current page. Also, the files this
-// page's answers can produce (charts, CSVs) need real screen space to
-// display properly, which a drawer doesn't have.
-//
-// Who can reach this page is controlled by the admin-configurable
-// AI_REPORTING_ENABLED_ROLES setting, not a fixed staff/support check - see
-// the permissions on this route in ../reporting/routes.ts.
+// A full page rather than a drawer: asking for a report is a deliberate
+// task, and the charts it produces need room. Access is set in routes.ts.
 export const AIReportingPage: FC = () => {
-  // On the very first render, read whatever session UUID this browser tab
-  // was already talking to - for example, if the user clicked away to a
-  // different page in the app and has now come back. If this tab never had
-  // a conversation, this is undefined, and this page starts a fresh one.
-  //
-  // This read only happens once per mount (that's what the function form of
-  // useState's initial value does): reading it again on a later render
-  // would also apply to a conversation that was started fresh on THIS
-  // mount, making it think it still needs to be restored from storage, when
-  // it already has its own, newer session going.
+  // Read once per mount: the session this tab was in, if the user navigated
+  // away and came back.
   const [restoreSessionUuid] = useState(() => getActiveReportingSessionUuid());
   const [sessionUuid, setSessionUuid] = useState<string | null>(
     restoreSessionUuid ?? null,
@@ -85,53 +63,20 @@ export const AIReportingPage: FC = () => {
     queryKey: ['AIReportingRestoreSession', restoreSessionUuid],
     queryFn: () => listReportingMessages(restoreSessionUuid as string),
     enabled: !!restoreSessionUuid,
-    //
-    // Do not set staleTime: Infinity here. React Query keeps one shared
-    // cache for the whole app, not a separate cache per time this
-    // component mounts. Since the same session UUID is reused every time
-    // this page is left and come back to within one browser tab, a second
-    // visit to this page uses the exact same cache entry as the first
-    // visit did.
-    //
-    // This caused a real bug: with staleTime: Infinity, the SECOND time you
-    // opened this page, React Query would not fetch again - it would just
-    // hand back the exact result from the FIRST time you opened it. For
-    // example: you ask "hi", get an answer, leave the page, come back, ask
-    // "yes please", leave the page again, come back again - at that third
-    // visit, this component would only show "hi", because that's what was
-    // cached from the very first visit; "yes please" would be missing
-    // entirely, even though it really happened and is really saved on the
-    // server.
-    //
-    // refetchOnMount: 'always' fixes this: on every mount, it still shows
-    // the cached result immediately (so there's no flash of the loading
-    // spinner if this conversation was already seen once this page load),
-    // but it also triggers a fresh request to the server right after, and
-    // updates the screen once that request comes back.
+    // Not staleTime: Infinity - the cache outlives this page, so a later
+    // visit would show an old copy of the conversation. This shows the
+    // cached copy straight away and refetches.
     refetchOnMount: 'always',
     retry: false,
   });
 
-  // True once there is nothing left to wait for before the user can type a
-  // new question: either there was nothing to restore in the first place
-  // (restoreSessionUuid is undefined), or the restore request above has
-  // finished and restoredMessages now holds a real value (even an empty
-  // array counts as "finished" here - only "undefined", meaning the
-  // request hasn't resolved yet, counts as "not restored").
-  //
-  // This is computed directly from restoreSessionUuid and restoredMessages
-  // on every render, rather than stored in its own separate useState that
-  // would need to be manually set to true at the right moment. There is
-  // nothing else this value needs to track, so there is nothing that could
-  // get out of sync by computing it this way.
+  // Ready once there's nothing to restore, or the restore has finished.
   const hasRestored = !restoreSessionUuid || restoredMessages !== undefined;
 
   useEffect(() => {
     if (!restoredMessages) return;
     setMessages(restoredMessages);
-    // The page may have been navigated away from mid-answer - resume
-    // polling exactly like a freshly-asked question would, instead of
-    // leaving a stale "pending" bubble with nothing watching it.
+    // Navigated away mid-answer: resume polling it.
     const last = restoredMessages[restoredMessages.length - 1];
     if (last?.status === 'pending') {
       setPendingUuid(last.uuid);

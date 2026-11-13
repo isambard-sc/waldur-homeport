@@ -12,10 +12,8 @@ interface UsageByUserTableProps {
   byUser: UserUsage[];
 }
 
-// byUser is already complete in memory (part of the one usage_stats
-// response), not independently paginated - fetchData just resolves it
-// directly rather than calling a list endpoint, per the shared Table
-// component's own convention for in-memory rows.
+// The rows are already in memory from usage_stats, so fetchData just
+// returns them.
 export const UsageByUserTable: FC<UsageByUserTableProps> = ({ byUser }) => {
   const fetchData = useCallback(
     () => Promise.resolve({ rows: byUser, resultCount: byUser.length }),

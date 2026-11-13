@@ -1,11 +1,7 @@
 import { client } from 'waldur-js-client/client.gen';
 
-// Mirrors waldur_mastermind.ai_reporting.serializers.ReportingMessageSerializer.
-// Not yet in published waldur-js-client exports - the ai_reporting app hasn't
-// shipped a release with a regenerated client yet, so these are raw calls
-// through the same configured client instance every generated function uses,
-// instead of a typed wrapper. Replace with the generated equivalents once
-// waldur-js-client picks up this endpoint.
+// Mirrors ai_reporting's ReportingMessageSerializer. Raw calls until
+// waldur-js-client includes these endpoints.
 export interface ReportingFile {
   uuid: string;
   name: string;
@@ -50,14 +46,8 @@ export const getReportingMessage = (uuid: string) =>
     })
     .then((response) => response.data as ReportingMessage);
 
-/**
- * GET /api/ai-reporting-messages/?session={uuid} - one conversation's own
- * messages, oldest first (ReportingMessage.Meta.ordering). Used to restore
- * AIReportingPage's state when it remounts (e.g. after navigating away and
- * back) instead of starting from an empty page - see AIReportingPage.tsx.
- * page_size caps LinkHeaderPagination's default of 10, which a real
- * conversation can easily exceed; 300 is that paginator's own max.
- */
+/** GET /api/ai-reporting-messages/?session={uuid} - one conversation's
+ * messages, oldest first. 300 is the paginator's maximum page size. */
 export const listReportingMessages = (session: string) =>
   client
     .get({

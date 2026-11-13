@@ -60,10 +60,8 @@ export const states: StateDeclaration[] = [
     },
   },
 
-  // AI reporting - a tool (ask a question, get a report), not a settings
-  // form, so it lives here rather than under /administration/configuration/.
-  // See the explicit permissions below for why this needs its own gate
-  // rather than relying on the 'reporting' state above.
+  // AI reporting is a tool, not a settings form, so it lives here rather
+  // than under administration.
   {
     name: 'reporting-ai-reporting',
     url: 'ai-reporting/',
@@ -76,24 +74,14 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('AI reporting'),
       priority: 20,
-      // A child state's permissions replace the parent's rather than adding
-      // to it (see ./access.ts) - 'reporting' itself now also admits
-      // organisation owners, but this tool's backend gate
-      // (ai_reporting.permissions.check_enabled_roles) is driven by the
-      // admin-configurable AI_REPORTING_ENABLED_ROLES Constance setting, not
-      // a fixed staff/support check - isAIReportingEnabledForUser reads the
-      // same public setting so the two can't drift apart.
+      // A child state's permissions replace the parent's (see access.ts), so
+      // this needs its own check, matching the backend's.
       permissions: [isAIReportingEnabledForUser],
     },
   },
 
-  // AI reporting usage - a dashboard, not a catalogue of reports, same
-  // reasoning as the AI reporting tool state right above it. Deliberately
-  // still isStaffOrSupport, NOT isAIReportingEnabledForUser: seeing every
-  // other user's usage data is a different, more sensitive boundary than
-  // being allowed to use the tool at all - matches the backend's
-  // usage_stats_permissions staying fixed regardless of
-  // AI_REPORTING_ENABLED_ROLES.
+  // Staff/support only, whatever the AI reporting settings say, like the
+  // backend's usage_stats.
   {
     name: 'reporting-ai-reporting-usage',
     url: 'ai-reporting-usage/',
@@ -110,10 +98,7 @@ export const states: StateDeclaration[] = [
     },
   },
 
-  // AI reporting files - the caller's own generated files, flat across every
-  // session. Not a site-wide view like usage above, so it gets the same gate
-  // as the tool itself (isAIReportingEnabledForUser), matching the backend's
-  // own ReportingFileViewSet permissions.
+  // The caller's own files, so the same check as the tool itself.
   {
     name: 'reporting-ai-reporting-files',
     url: 'ai-reporting-files/',
@@ -130,10 +115,7 @@ export const states: StateDeclaration[] = [
     },
   },
 
-  // AI reporting history - the caller's own past conversations, so one can
-  // be reopened later (see AIReportingHistoryPage.tsx). Same gate as the
-  // tool itself and Files above, matching the backend's own
-  // ReportingSessionViewSet permissions.
+  // The caller's own past conversations, same check as the tool itself.
   {
     name: 'reporting-ai-reporting-history',
     url: 'ai-reporting-history/',
