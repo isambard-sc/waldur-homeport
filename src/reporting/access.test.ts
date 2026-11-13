@@ -66,11 +66,13 @@ let features;
 beforeEach(() => {
   features = ENV.FEATURES;
   ENV.FEATURES = { customer: { show_organisation_reporting: true } };
+  (ENV.plugins as any).WALDUR_CORE.AI_REPORTING_ENABLED = true;
 });
 
 afterEach(() => {
   ENV.FEATURES = features;
   delete (ENV.plugins as any).WALDUR_CORE.ENABLED_REPORTING_SCREENS;
+  delete (ENV.plugins as any).WALDUR_CORE.AI_REPORTING_ENABLED;
 });
 
 describe('reporting access', () => {
@@ -103,6 +105,12 @@ describe('reporting access', () => {
   it('keeps owners out when organisation reporting is turned off', () => {
     ENV.FEATURES = { customer: { show_organisation_reporting: false } };
     reportStates.forEach((name) => expect(canEnter(name, owner)).toBe(false));
+  });
+
+  it('keeps everyone out of AI reporting while it is switched off', () => {
+    (ENV.plugins as any).WALDUR_CORE.AI_REPORTING_ENABLED = false;
+    expect(canEnter('reporting-ai-reporting', staff)).toBe(false);
+    expect(canEnter('reporting-ai-reporting-history', staff)).toBe(false);
   });
 
   it('keeps staff access when organisation reporting is turned off', () => {
