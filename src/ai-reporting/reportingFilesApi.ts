@@ -28,7 +28,7 @@ export const fetchReportingFiles: Fetcher<ReportingFileListItem> = (
   request: TableRequest,
 ) =>
   client
-    .get({
+    .get<ReportingFileListItem[]>({
       url: '/api/ai-reporting-files/',
       query: {
         page: request.currentPage,
@@ -36,7 +36,7 @@ export const fetchReportingFiles: Fetcher<ReportingFileListItem> = (
         ...request.filter,
       },
     })
-    .then((result) => processApiResponse<ReportingFileListItem>(result));
+    .then((result) => processApiResponse<ReportingFileListItem[]>(result));
 
 /** DELETE /api/ai-reporting-files/{uuid}/ - lets a user clear up a file
  * early, ahead of AI_REPORTING_FILE_RETENTION_DAYS' automatic cleanup. */

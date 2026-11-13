@@ -56,12 +56,24 @@ describe('AI reporting role gating', () => {
   });
 
   it('isAIReportingEnabledForUser reads both the user and the mode from state', () => {
-    (ENV as any).plugins.WALDUR_CORE = { AI_REPORTING_ENABLED_ROLES: 'staff' };
+    (ENV as any).plugins.WALDUR_CORE = {
+      AI_REPORTING_ENABLED: true,
+      AI_REPORTING_ENABLED_ROLES: 'staff',
+    };
     const state = { workspace: { user: staff } } as any;
     expect(isAIReportingEnabledForUser(state)).toBe(true);
 
     const otherState = { workspace: { user: regular } } as any;
     expect(isAIReportingEnabledForUser(otherState)).toBe(false);
+  });
+
+  it('isAIReportingEnabledForUser is false while the feature is off', () => {
+    (ENV as any).plugins.WALDUR_CORE = {
+      AI_REPORTING_ENABLED: false,
+      AI_REPORTING_ENABLED_ROLES: 'all',
+    };
+    const state = { workspace: { user: staff } } as any;
+    expect(isAIReportingEnabledForUser(state)).toBe(false);
   });
 });
 

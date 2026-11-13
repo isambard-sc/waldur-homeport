@@ -50,7 +50,15 @@ export const isAIReportingAllowedForUser = (
  * as a direct replacement for isStaffOrSupport in both places, swapping a
  * fixed staff/support check for one driven by the current
  * AI_REPORTING_ENABLED_ROLES value instead. */
+// Settings that are public but not yet in the generated CoreConfiguration
+// type. Read them directly until waldur-js-client is regenerated.
+const unlistedSetting = (key: string): unknown =>
+  (
+    ENV.plugins?.WALDUR_CORE as unknown as Record<string, unknown> | undefined
+  )?.[key];
+
 export const isAIReportingEnabledForUser = (state: RootState): boolean =>
+  unlistedSetting('AI_REPORTING_ENABLED') === true &&
   isAIReportingAllowedForUser(state.workspace.user, getAIReportingMode());
 
 /** AI_REPORTING_FILE_RETENTION_DAYS from public configuration, for the
@@ -68,6 +76,6 @@ export const getAIReportingFileRetentionDays = (): number | null => {
  * History tab's "deleted automatically after N days" line - same mechanism
  * as getAIReportingFileRetentionDays above. */
 export const getAIReportingMessageRetentionDays = (): number | null => {
-  const days = ENV.plugins?.WALDUR_CORE?.AI_REPORTING_MESSAGE_RETENTION_DAYS;
+  const days = unlistedSetting('AI_REPORTING_MESSAGE_RETENTION_DAYS');
   return typeof days === 'number' && days >= 0 ? days : null;
 };

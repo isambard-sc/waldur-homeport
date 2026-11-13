@@ -11,9 +11,10 @@ export interface DailyUsage {
 }
 
 export interface UserUsage {
-  user: string;
+  // Null once the user has been deleted; their usage is kept.
+  user: string | null;
   full_name: string;
-  username: string;
+  username: string | null;
   input_tokens: number;
   output_tokens: number;
   requests: number;
@@ -24,6 +25,8 @@ export interface UsageStatsResponse {
   total_input_tokens: number;
   total_output_tokens: number;
   total_requests: number;
+  total_cache_read_tokens: number;
+  total_cache_write_tokens: number;
   daily: DailyUsage[];
   by_user: UserUsage[];
 }

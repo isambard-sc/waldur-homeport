@@ -30,12 +30,15 @@ export const UsageByUserTable: FC<UsageByUserTableProps> = ({ byUser }) => {
   const columns: Column<UserUsage>[] = [
     {
       title: translate('User'),
-      render: ({ row }) => (
-        <>
-          <span className="fw-semibold">{row.full_name || row.username}</span>{' '}
-          <span className="text-muted fs-8">@{row.username}</span>
-        </>
-      ),
+      render: ({ row }) =>
+        row.username ? (
+          <>
+            <span className="fw-semibold">{row.full_name || row.username}</span>{' '}
+            <span className="text-muted fs-8">@{row.username}</span>
+          </>
+        ) : (
+          <span className="text-muted">{translate('Deleted user')}</span>
+        ),
       export: 'username',
       exportTitle: translate('User'),
     },

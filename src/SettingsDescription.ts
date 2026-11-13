@@ -1842,13 +1842,13 @@ export const SettingsDescription = [
       },
       {
         key: 'AI_REPORTING_ENABLED',
-        description: translate('Enable the AI reporting feature and calls to the harness service.'),
-        default: true,
+        description: translate('Turn AI reporting on. While off, the tab is hidden and every request is refused.'),
+        default: false,
         type: 'boolean',
       },
       {
         key: 'AI_REPORTING_ENABLED_ROLES',
-        description: translate('Controls which user roles can access AI reporting. \'disabled\': No role-based access. \'staff\': Staff users only. \'staff_and_support\': Staff and support users (today\'s fixed behavior). \'all\': All authenticated users.'),
+        description: translate('Who can use AI reporting. \'disabled\': nobody. \'staff\': staff users only. \'staff_and_support\': staff and support users. \'all\': all authenticated users.'),
         default: 'staff_and_support',
         type: 'choice_field',
         options: [{ value: 'disabled', label: 'Disabled' }, { value: 'staff', label: 'Staff users' }, { value: 'staff_and_support', label: 'Staff and support users' }, { value: 'all', label: 'All users' }],
@@ -1879,7 +1879,7 @@ export const SettingsDescription = [
       },
       {
         key: 'AI_REPORTING_REQUEST_TIMEOUT_SECONDS',
-        description: translate('Timeout in seconds for a single call from Waldur to the AI reporting harness.'),
+        description: translate('Timeout in seconds for a single question to the AI reporting harness. Keep it under 1200 (20 minutes), the Celery task limit.'),
         default: 600,
         type: 'integer',
       },
@@ -1908,13 +1908,13 @@ export const SettingsDescription = [
       },
       {
         key: 'AI_REPORTING_GLOBAL_DAILY_TOKEN_BUDGET',
-        description: translate('Site-wide daily token cap across all AI reporting traffic. -1 means unlimited.'),
+        description: translate('Site-wide token cap per calendar day (UTC) across all AI reporting traffic. -1 means unlimited.'),
         default: 5000000,
         type: 'integer',
       },
       {
         key: 'AI_REPORTING_GLOBAL_REQUESTS_PER_MINUTE',
-        description: translate('Site-wide burst cap across all AI reporting traffic.'),
+        description: translate('Site-wide cap on AI reporting questions per minute. -1 means unlimited.'),
         default: 60,
         type: 'integer',
       },
@@ -1925,13 +1925,13 @@ export const SettingsDescription = [
     items: [
       {
         key: 'AI_REPORTING_MESSAGE_RETENTION_DAYS',
-        description: translate('Number of days to retain AI reporting questions/answers before automatic deletion. Set to -1 to disable automatic cleanup.'),
+        description: translate('Days to keep AI reporting questions and answers. Deleting a message also deletes its files; usage records are always kept. Set to -1 to disable automatic cleanup.'),
         default: 90,
         type: 'integer',
       },
       {
         key: 'AI_REPORTING_FILE_RETENTION_DAYS',
-        description: translate('Number of days to retain AI reporting generated files (charts, PDFs, CSVs) before automatic deletion - shorter than the message retention above since file bytes are the more expensive part to keep. Set to -1 to disable automatic cleanup.'),
+        description: translate('Days to keep AI reporting generated files (charts, PDFs, CSVs). Usually shorter than message retention, since files are larger. Set to -1 to disable automatic cleanup.'),
         default: 21,
         type: 'integer',
       },

@@ -25,7 +25,7 @@ export const ReportingFileDeleteAction: FC<ReportingFileDeleteActionProps> = ({
   refetch,
 }) => {
   const { mutate, isPending } = useManagedMutation<void, unknown, void>({
-    mutationFn: () => deleteReportingFile(row.uuid),
+    mutationFn: () => deleteReportingFile(row.uuid).then(() => undefined),
     successMessage: translate('File has been deleted.'),
     errorMessage: translate('Unable to delete file.'),
     refetch,

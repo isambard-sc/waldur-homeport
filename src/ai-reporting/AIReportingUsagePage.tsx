@@ -57,6 +57,14 @@ export const AIReportingUsagePage: FC = () => {
                 label: translate('Output tokens'),
                 value: formatUsageValue(data.total_output_tokens, true),
               },
+              {
+                label: translate('Cache reads'),
+                value: formatUsageValue(data.total_cache_read_tokens, true),
+              },
+              {
+                label: translate('Cache writes'),
+                value: formatUsageValue(data.total_cache_write_tokens, true),
+              },
             ]}
           />
 

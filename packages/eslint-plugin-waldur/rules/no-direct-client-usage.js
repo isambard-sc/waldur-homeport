@@ -5,6 +5,7 @@
 
 const ALLOWED_FILES = [
   'src/administration/api.ts',
+  'src/ai-reporting/useAuthenticatedBlobUrl.ts',
   'src/administration/dashboard/AdminStatistics.tsx',
   'src/customer/team/utils.ts',
   'src/form/upload/FileDownloader.tsx',

@@ -23,6 +23,13 @@ import {
 
 const POLL_INTERVAL_MS = 3000;
 
+// A failed request throws the parsed body, so a limit (429) or a question
+// already in progress (409) arrives with the server's own `detail` text.
+const errorDetail = (error: unknown): string | null => {
+  const detail = (error as any)?.detail;
+  return typeof detail === 'string' && detail ? detail : null;
+};
+
 // There's no real mid-flight signal from the harness today - the backend
 // task is one blocking call, and ReportingMessage.progress (the field meant
 // for genuine per-turn status) is never actually populated - so this is a
@@ -280,8 +287,11 @@ export const AIReportingPage: FC = () => {
         <AlertItem
           variant="error"
           type="floating"
-          title={translate('Could not reach the AI reporting harness')}
-          body={translate('Try again in a moment.')}
+          title={translate('Could not send your question')}
+          body={
+            errorDetail(askMutation.error) ||
+            translate('Try again in a moment.')
+          }
         />
       ) : null}
     </div>

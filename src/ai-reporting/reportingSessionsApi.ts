@@ -27,7 +27,7 @@ export const fetchReportingSessions: Fetcher<ReportingSessionListItem> = (
   request: TableRequest,
 ) =>
   client
-    .get({
+    .get<ReportingSessionListItem[]>({
       url: '/api/ai-reporting-sessions/',
       query: {
         page: request.currentPage,
@@ -35,4 +35,4 @@ export const fetchReportingSessions: Fetcher<ReportingSessionListItem> = (
         ...request.filter,
       },
     })
-    .then((result) => processApiResponse<ReportingSessionListItem>(result));
+    .then((result) => processApiResponse<ReportingSessionListItem[]>(result));
