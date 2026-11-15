@@ -1890,25 +1890,25 @@ export const SettingsDescription = [
     items: [
       {
         key: 'AI_REPORTING_TOKEN_LIMIT_DAILY',
-        description: translate('Per-user daily token cap for AI reporting. -1 means unlimited.'),
+        description: translate('Per-user daily token cap for AI reporting, counting input, output and cache tokens. -1 means unlimited.'),
         default: -1,
         type: 'integer',
       },
       {
         key: 'AI_REPORTING_TOKEN_LIMIT_WEEKLY',
-        description: translate('Per-user weekly token cap for AI reporting. -1 means unlimited.'),
+        description: translate('Per-user weekly token cap for AI reporting, counting input, output and cache tokens. -1 means unlimited.'),
         default: -1,
         type: 'integer',
       },
       {
         key: 'AI_REPORTING_TOKEN_LIMIT_MONTHLY',
-        description: translate('Per-user monthly token cap for AI reporting. -1 means unlimited.'),
+        description: translate('Per-user monthly token cap for AI reporting, counting input, output and cache tokens. -1 means unlimited.'),
         default: -1,
         type: 'integer',
       },
       {
         key: 'AI_REPORTING_GLOBAL_DAILY_TOKEN_BUDGET',
-        description: translate('Site-wide token cap per calendar day (UTC) across all AI reporting traffic. -1 means unlimited.'),
+        description: translate('Site-wide token cap per calendar day (UTC) across all AI reporting traffic, counting input, output and cache tokens. -1 means unlimited.'),
         default: 5000000,
         type: 'integer',
       },
