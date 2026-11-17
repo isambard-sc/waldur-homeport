@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ENV } from '@/core/config';
 
 import {
+  getAIReportingLinkDomains,
   getAIReportingFileRetentionDays,
   getAIReportingMode,
   isAIReportingAllowedForUser,
@@ -98,5 +99,24 @@ describe('getAIReportingFileRetentionDays', () => {
   it('returns null when retention is disabled (-1), rather than a negative day count', () => {
     (ENV as any).plugins.WALDUR_CORE = { AI_REPORTING_FILE_RETENTION_DAYS: -1 };
     expect(getAIReportingFileRetentionDays()).toBeNull();
+  });
+});
+
+describe('AI reporting link domains', () => {
+  it('is empty when unset', () => {
+    (ENV as any).plugins.WALDUR_CORE = {};
+    expect(getAIReportingLinkDomains()).toEqual([]);
+  });
+
+  it('splits on commas and spaces and tidies each domain', () => {
+    (ENV as any).plugins.WALDUR_CORE = {
+      AI_REPORTING_LINK_DOMAINS:
+        ' Docs.Isambard.ac.uk, *.bristol.ac.uk  example.org. ',
+    };
+    expect(getAIReportingLinkDomains()).toEqual([
+      'docs.isambard.ac.uk',
+      'bristol.ac.uk',
+      'example.org',
+    ]);
   });
 });

@@ -1866,6 +1866,12 @@ export const SettingsDescription = [
         type: 'text_field',
       },
       {
+        key: 'AI_REPORTING_LINK_DOMAINS',
+        description: translate('Domains whose links in AI reporting answers are clickable, comma-separated, e.g. \'docs.isambard.ac.uk, bristol.ac.uk\'. Subdomains are included. Other links are shown as text.'),
+        default: '',
+        type: 'string',
+      },
+      {
         key: 'AI_REPORTING_HISTORY_LIMIT',
         description: translate('Maximum number of previous messages sent with each question. -1 for unlimited.'),
         default: -1,

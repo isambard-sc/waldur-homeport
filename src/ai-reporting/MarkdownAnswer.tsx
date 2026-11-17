@@ -1,6 +1,8 @@
 import Markdown, { RuleType } from 'markdown-to-jsx';
 import { FC, ReactNode } from 'react';
 
+import { getAIReportingLinkDomains, isTrustedLink } from './utils';
+
 // Copied from the AI assistant's MarkdownBlock rather than imported, since
 // that one takes the assistant's internal block type.
 
@@ -19,19 +21,38 @@ const escapeFilenameUnderscores = (text: string): string =>
 const ImageAltText: FC<{ alt?: string }> = ({ alt }) =>
   alt ? <span>{alt}</span> : null;
 
-// Links aren't clickable for the same reason: a link's address could carry
-// report data, or lead to a fake login page. The address is shown instead.
-const PlainLink: FC<{ href?: string; children?: ReactNode }> = ({
+const textOf = (children: ReactNode): string | null => {
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children) && children.every((c) => typeof c === 'string'))
+    return children.join('');
+  return null;
+};
+
+// Only links to allowed domains are clickable: a link's address could carry
+// report data, or lead to a fake login page. Others show their address.
+const AnswerLink: FC<{ href?: string; children?: ReactNode }> = ({
   href,
   children,
-}) => (
-  <span>
-    {children}
-    {href && href !== children ? (
-      <span className="text-muted"> ({href})</span>
-    ) : null}
-  </span>
-);
+}) => {
+  if (
+    href &&
+    isTrustedLink(href, getAIReportingLinkDomains(), window.location.hostname)
+  ) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    );
+  }
+  return (
+    <span>
+      {children}
+      {href && textOf(children) !== href ? (
+        <span className="text-muted"> ({href})</span>
+      ) : null}
+    </span>
+  );
+};
 
 export const MarkdownAnswer: FC<{ content: string }> = ({ content }) => {
   return (
@@ -41,7 +62,7 @@ export const MarkdownAnswer: FC<{ content: string }> = ({ content }) => {
           disableParsingRawHTML: true,
           overrides: {
             img: { component: ImageAltText },
-            a: { component: PlainLink },
+            a: { component: AnswerLink },
           },
           renderRule: (next, node, _, state) => {
             if (node.type === RuleType.codeBlock) {

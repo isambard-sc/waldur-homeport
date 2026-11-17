@@ -56,3 +56,40 @@ export const getAIReportingMessageRetentionDays = (): number | null => {
   const days = unlistedSetting('AI_REPORTING_MESSAGE_RETENTION_DAYS');
   return typeof days === 'number' && days >= 0 ? days : null;
 };
+
+/** AI_REPORTING_LINK_DOMAINS from public configuration, as lower-case
+ * domains. Empty when unset. */
+export const getAIReportingLinkDomains = (): string[] => {
+  const value = unlistedSetting('AI_REPORTING_LINK_DOMAINS');
+  if (typeof value !== 'string') return [];
+  return value
+    .split(/[\s,]+/)
+    .map((domain) =>
+      domain
+        .trim()
+        .toLowerCase()
+        .replace(/^\*?\.+|\.+$/g, ''),
+    )
+    .filter(Boolean);
+};
+
+/** Whether a link in an answer may be clickable: https, no user:password
+ * part, and on the portal's own host or one of the allowed domains (or a
+ * subdomain of one). */
+export const isTrustedLink = (
+  href: string,
+  domains: string[],
+  ownHost: string,
+): boolean => {
+  let url: URL;
+  try {
+    url = new URL(href);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== 'https:' || url.username || url.password) return false;
+  const host = url.hostname.toLowerCase();
+  return [ownHost.toLowerCase(), ...domains].some(
+    (domain) => domain && (host === domain || host.endsWith(`.${domain}`)),
+  );
+};

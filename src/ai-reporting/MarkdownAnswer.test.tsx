@@ -1,9 +1,17 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { ENV } from '@/core/config';
 
 import { MarkdownAnswer } from './MarkdownAnswer';
 
 describe('MarkdownAnswer', () => {
+  beforeEach(() => {
+    (ENV as any).plugins.WALDUR_CORE = {
+      AI_REPORTING_LINK_DOMAINS: 'docs.isambard.ac.uk, bristol.ac.uk',
+    };
+  });
+
   it('shows raw HTML as text instead of rendering it', () => {
     render(
       <MarkdownAnswer content='<iframe src="https://evil.example"></iframe>' />,
@@ -29,6 +37,53 @@ describe('MarkdownAnswer', () => {
     expect(
       screen.getByText('(https://evil.example/login)', { exact: false }),
     ).toBeInTheDocument();
+  });
+
+  it('makes links to allowed domains clickable, in a new tab', () => {
+    render(
+      <MarkdownAnswer content="[Docs](https://docs.isambard.ac.uk/specs/)" />,
+    );
+
+    const link = screen.getByRole('link', { name: 'Docs' });
+    expect(link).toHaveAttribute('href', 'https://docs.isambard.ac.uk/specs/');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  it('allows subdomains of an allowed domain', () => {
+    render(
+      <MarkdownAnswer content="[HPC](https://www.bristol.ac.uk/supercomputing)" />,
+    );
+
+    expect(screen.getByRole('link', { name: 'HPC' })).toBeInTheDocument();
+  });
+
+  it.each([
+    ['a look-alike domain', 'https://docs.isambard.ac.uk.evil.example/'],
+    ['plain http', 'http://docs.isambard.ac.uk/'],
+    ['a user:password prefix', 'https://docs.isambard.ac.uk@evil.example/'],
+  ])('keeps %s as text', (_, href) => {
+    render(<MarkdownAnswer content={`[Docs](${href})`} />);
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('keeps every link as text when no domains are set', () => {
+    (ENV as any).plugins.WALDUR_CORE = {};
+    render(<MarkdownAnswer content="[Docs](https://docs.isambard.ac.uk/)" />);
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('shows a bare address only once', () => {
+    render(
+      <MarkdownAnswer content="See https://evil.example/docs for more." />,
+    );
+
+    expect(
+      screen.getByText('https://evil.example/docs', { exact: false }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/\(https:\/\/evil/)).not.toBeInTheDocument();
   });
 
   it('still renders normal Markdown', () => {
