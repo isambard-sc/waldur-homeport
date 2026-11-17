@@ -1,4 +1,4 @@
-import { PaperPlaneTiltIcon } from '@phosphor-icons/react';
+import { PaperPlaneTiltIcon, PlusIcon } from '@phosphor-icons/react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { FC, useEffect, useState } from 'react';
 
@@ -17,6 +17,7 @@ import { AIReportingNav } from './AIReportingNav';
 import { MarkdownAnswer } from './MarkdownAnswer';
 import { ReportFiles } from './ReportFiles';
 import {
+  clearActiveReportingSessionUuid,
   getActiveReportingSessionUuid,
   setActiveReportingSessionUuid,
 } from './session';
@@ -29,6 +30,10 @@ const errorDetail = (error: unknown): string | null => {
   const detail = (error as any)?.detail;
   return typeof detail === 'string' && detail ? detail : null;
 };
+
+// A 400 on `session` means that conversation is gone (deleted by retention,
+// or another user logged in in this tab).
+const isGoneSession = (error: unknown): boolean => !!(error as any)?.session;
 
 // There's no real progress from the harness yet, so this rotates through
 // plausible phases by elapsed time. message.progress wins once it's set.
@@ -59,7 +64,7 @@ export const AIReportingPage: FC = () => {
   const [pendingUuid, setPendingUuid] = useState<string | null>(null);
   const [prompt, setPrompt] = useState('');
 
-  const { data: restoredMessages } = useQuery({
+  const { data: restoredMessages, isError: restoreFailed } = useQuery({
     queryKey: ['AIReportingRestoreSession', restoreSessionUuid],
     queryFn: () => listReportingMessages(restoreSessionUuid as string),
     enabled: !!restoreSessionUuid,
@@ -67,33 +72,68 @@ export const AIReportingPage: FC = () => {
     // visit would show an old copy of the conversation. This shows the
     // cached copy straight away and refetches.
     refetchOnMount: 'always',
+    refetchOnWindowFocus: false,
     retry: false,
   });
 
   // Ready once there's nothing to restore, or the restore has finished.
-  const hasRestored = !restoreSessionUuid || restoredMessages !== undefined;
+  const hasRestored =
+    !restoreSessionUuid || restoredMessages !== undefined || restoreFailed;
 
   useEffect(() => {
-    if (!restoredMessages) return;
-    setMessages(restoredMessages);
+    // A failed restore starts a new conversation instead of hanging.
+    if (!restoreFailed) return;
+    setSessionUuid(null);
+    clearActiveReportingSessionUuid();
+  }, [restoreFailed]);
+
+  useEffect(() => {
+    // Only while still in the restored conversation, so a late refetch
+    // can't replace a new one.
+    if (!restoredMessages || sessionUuid !== restoreSessionUuid) return;
+    // Merged, so a question asked meanwhile isn't dropped.
+    setMessages((prev) => {
+      const restored = new Set(restoredMessages.map((m) => m.uuid));
+      return [
+        ...restoredMessages,
+        ...prev.filter((m) => !restored.has(m.uuid)),
+      ];
+    });
     // Navigated away mid-answer: resume polling it.
     const last = restoredMessages[restoredMessages.length - 1];
     if (last?.status === 'pending') {
       setPendingUuid(last.uuid);
     }
-  }, [restoredMessages]);
+  }, [restoredMessages, sessionUuid, restoreSessionUuid]);
 
   const askMutation = useMutation({
-    mutationFn: (nextPrompt: string) =>
-      askReportingQuestion(
-        sessionUuid
-          ? { prompt: nextPrompt, session: sessionUuid }
-          : { prompt: nextPrompt, new_session: true },
-      ),
-    onSuccess: (message) => {
+    mutationFn: async (nextPrompt: string) => {
+      if (!sessionUuid) {
+        const message = await askReportingQuestion({
+          prompt: nextPrompt,
+          new_session: true,
+        });
+        return { message, restarted: false };
+      }
+      try {
+        const message = await askReportingQuestion({
+          prompt: nextPrompt,
+          session: sessionUuid,
+        });
+        return { message, restarted: false };
+      } catch (error) {
+        if (!isGoneSession(error)) throw error;
+        const message = await askReportingQuestion({
+          prompt: nextPrompt,
+          new_session: true,
+        });
+        return { message, restarted: true };
+      }
+    },
+    onSuccess: ({ message, restarted }) => {
       setSessionUuid(message.session);
       setActiveReportingSessionUuid(message.session);
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => (restarted ? [message] : [...prev, message]));
       setPendingUuid(message.uuid);
       setPrompt('');
     },
@@ -122,6 +162,16 @@ export const AIReportingPage: FC = () => {
     }
   }, [polledMessage]);
 
+  const startNewConversation = () => {
+    setSessionUuid(null);
+    clearActiveReportingSessionUuid();
+    setMessages([]);
+    setPrompt('');
+    askMutation.reset();
+  };
+
+  const busy = askMutation.isPending || !!pendingUuid;
+
   const submit = () => {
     const trimmed = prompt.trim();
     if (!trimmed || askMutation.isPending) return;
@@ -139,6 +189,27 @@ export const AIReportingPage: FC = () => {
           'Responses are generated by AI and may be inaccurate. Verify figures before sharing a report.',
         )}
       />
+      {restoreFailed ? (
+        <AlertItem
+          variant="warning"
+          type="floating"
+          title={translate('Could not load your conversation')}
+          body={translate('Your next question starts a new conversation.')}
+        />
+      ) : null}
+      {messages.length ? (
+        <div className="d-flex justify-content-end mt-4">
+          <BaseButton
+            variant="text-primary"
+            size="sm"
+            iconNode={<PlusIcon weight="bold" />}
+            label={translate('New conversation')}
+            disabled={busy}
+            disabledReason={translate('Waiting for the current answer.')}
+            onClick={startNewConversation}
+          />
+        </div>
+      ) : null}
 
       <div className="ai-reporting-messages mt-4 mb-4">
         {!hasRestored ? (

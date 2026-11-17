@@ -70,7 +70,7 @@ export const AIReportingUsagePage: FC = () => {
             <UsageDailyChart daily={data.daily} />
           </div>
 
-          <UsageByUserTable byUser={data.by_user} />
+          <UsageByUserTable byUser={data.by_user} days={days} />
         </>
       ) : (
         <NoResult

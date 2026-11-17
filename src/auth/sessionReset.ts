@@ -1,3 +1,4 @@
+import { clearActiveReportingSessionUuid } from '@/ai-reporting/session';
 import { ENV } from '@/core/config';
 import { BOOTSTRAP_QUERY_KEY, queryClient } from '@/core/queryClient';
 import { resetSession } from '@/store/reducers';
@@ -26,6 +27,7 @@ export function resetSessionState({ queries = true } = {}) {
     });
   }
   ENV.roles = [];
+  clearActiveReportingSessionUuid();
   resetUserCache();
   store.dispatch(resetSession());
 }

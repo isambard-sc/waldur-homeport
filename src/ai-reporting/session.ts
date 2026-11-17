@@ -9,3 +9,9 @@ export const getActiveReportingSessionUuid = (): string | undefined =>
 export const setActiveReportingSessionUuid = (uuid: string): void => {
   activeSessionUuid = uuid;
 };
+
+/** Start the next question in a new conversation. Also called on logout,
+ * so the next user in this tab doesn't inherit it. */
+export const clearActiveReportingSessionUuid = (): void => {
+  activeSessionUuid = undefined;
+};

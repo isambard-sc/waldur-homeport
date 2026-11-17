@@ -10,11 +10,15 @@ import { UserUsage } from './usageStatsApi';
 
 interface UsageByUserTableProps {
   byUser: UserUsage[];
+  days: number;
 }
 
 // The rows are already in memory from usage_stats, so fetchData just
 // returns them.
-export const UsageByUserTable: FC<UsageByUserTableProps> = ({ byUser }) => {
+export const UsageByUserTable: FC<UsageByUserTableProps> = ({
+  byUser,
+  days,
+}) => {
   const fetchData = useCallback(
     () => Promise.resolve({ rows: byUser, resultCount: byUser.length }),
     [byUser],
@@ -23,6 +27,8 @@ export const UsageByUserTable: FC<UsageByUserTableProps> = ({ byUser }) => {
   const tableProps = useTable<UserUsage>({
     table: 'aiReportingUsageByUser',
     fetchData,
+    // The table caches by key, not by fetchData, so the period must be in it.
+    filter: { days },
   });
 
   const columns: Column<UserUsage>[] = [

@@ -11,11 +11,15 @@ const IMAGE_RE = /\.(png|jpe?g|gif|svg)$/i;
 const isImage = (f: ReportingFile) => IMAGE_RE.test(f.name);
 
 const ReportImage: FC<{ file: ReportingFile }> = ({ file }) => {
-  const src = useAuthenticatedBlobUrl(file.file);
+  const { objectUrl: src, failed } = useAuthenticatedBlobUrl(file.file);
   return (
     <figure className="mb-3">
       {src ? (
         <img src={src} alt={file.name} className="img-fluid rounded border" />
+      ) : failed ? (
+        <div className="text-muted fs-8">
+          {translate('Could not load this image.')}
+        </div>
       ) : (
         <div className="text-muted fs-8">{translate('Loading image...')}</div>
       )}

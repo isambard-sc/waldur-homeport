@@ -1855,7 +1855,7 @@ export const SettingsDescription = [
       },
       {
         key: 'AI_REPORTING_MODEL',
-        description: translate('Bedrock model id override for the AI reporting harness, e.g. \'anthropic.claude-opus-5-5\'. Leave empty to use the harness\'s own configured default instead.'),
+        description: translate('Bedrock model id for AI reporting, e.g. \'anthropic.claude-opus-5-5\'. Leave empty to use the model set in the harness\'s ConfigMap (WALDUR_AGENT_MODEL).'),
         default: '',
         type: 'string',
       },
@@ -1873,8 +1873,8 @@ export const SettingsDescription = [
       },
       {
         key: 'AI_REPORTING_MAX_TURNS',
-        description: translate('Maximum tool-use turns the harness may take per question before it must give a final answer. -1 means use the harness\'s own default.'),
-        default: -1,
+        description: translate('Maximum tool-use turns the harness may take per question before it must give a final answer. -1 means use the harness\'s own default (also 25).'),
+        default: 25,
         type: 'integer',
       },
       {

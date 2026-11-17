@@ -1,8 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
+  askReportingQuestion,
   getReportingMessage,
   listReportingMessages,
   ReportingMessage,
@@ -21,6 +23,7 @@ vi.mock('./aiReportingApi', async () => {
   };
 });
 vi.mock('./session', () => ({
+  clearActiveReportingSessionUuid: vi.fn(),
   getActiveReportingSessionUuid: vi.fn(),
   setActiveReportingSessionUuid: vi.fn(),
 }));
@@ -154,5 +157,74 @@ describe('AIReportingPage session restore', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Message input')).toBeEnabled(),
     );
+  });
+});
+
+const ask = async (text: string) => {
+  const input = screen.getByLabelText('Message input');
+  await waitFor(() => expect(input).toBeEnabled());
+  await userEvent.type(input, `${text}{Enter}`);
+};
+
+describe('AIReportingPage conversations', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('New conversation sends the next question as a new session', async () => {
+    vi.mocked(getActiveReportingSessionUuid).mockReturnValue('session-1');
+    vi.mocked(listReportingMessages).mockResolvedValue([
+      message({ uuid: 'msg-1', prompt: 'hi', answer: 'Hello.' }),
+    ]);
+    vi.mocked(askReportingQuestion).mockResolvedValue(
+      message({ uuid: 'msg-2', session: 'session-2', status: 'pending' }),
+    );
+
+    renderPage();
+    expect(await screen.findByText('Hello.')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('New conversation'));
+
+    expect(screen.queryByText('Hello.')).not.toBeInTheDocument();
+    await ask('next question');
+    await waitFor(() =>
+      expect(askReportingQuestion).toHaveBeenCalledWith({
+        prompt: 'next question',
+        new_session: true,
+      }),
+    );
+  });
+
+  it('starts a new conversation when the old one is gone', async () => {
+    vi.mocked(getActiveReportingSessionUuid).mockReturnValue('session-1');
+    vi.mocked(listReportingMessages).mockResolvedValue([]);
+    vi.mocked(askReportingQuestion)
+      .mockRejectedValueOnce({ session: ['Object does not exist.'] })
+      .mockResolvedValueOnce(
+        message({ uuid: 'msg-2', session: 'session-2', prompt: 'again' }),
+      );
+
+    renderPage();
+    await ask('again');
+
+    expect(await screen.findByText('again')).toBeInTheDocument();
+    expect(askReportingQuestion).toHaveBeenLastCalledWith({
+      prompt: 'again',
+      new_session: true,
+    });
+    expect(
+      screen.queryByText('Could not send your question'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not hang when the conversation cannot be restored', async () => {
+    vi.mocked(getActiveReportingSessionUuid).mockReturnValue('session-1');
+    vi.mocked(listReportingMessages).mockRejectedValue(new Error('500'));
+
+    renderPage();
+
+    expect(
+      await screen.findByText('Could not load your conversation'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Message input')).toBeEnabled();
   });
 });

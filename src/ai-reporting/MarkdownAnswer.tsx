@@ -13,12 +13,20 @@ const FILENAME_RE =
 const escapeFilenameUnderscores = (text: string): string =>
   text.replace(FILENAME_RE, (match) => match.replace(/_/g, '\\_'));
 
+// The answer can repeat text from Waldur data, which anyone may write, so
+// no raw HTML and no images: an outside image URL could carry report data
+// away. Charts are shown separately, by ReportFiles.
+const ImageAltText: FC<{ alt?: string }> = ({ alt }) =>
+  alt ? <span>{alt}</span> : null;
+
 export const MarkdownAnswer: FC<{ content: string }> = ({ content }) => {
   return (
     <div className="aui-md">
       <Markdown
         options={{
+          disableParsingRawHTML: true,
           overrides: {
+            img: { component: ImageAltText },
             a: {
               props: {
                 target: '_blank',
