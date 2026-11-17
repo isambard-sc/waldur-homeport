@@ -19,6 +19,18 @@ describe('MarkdownAnswer', () => {
     expect(screen.getByText('chart')).toBeInTheDocument();
   });
 
+  it('shows links as text with their address, not as clickable links', () => {
+    render(
+      <MarkdownAnswer content="[Log in here](https://evil.example/login)" />,
+    );
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('Log in here')).toBeInTheDocument();
+    expect(
+      screen.getByText('(https://evil.example/login)', { exact: false }),
+    ).toBeInTheDocument();
+  });
+
   it('still renders normal Markdown', () => {
     render(<MarkdownAnswer content="**Seventeen** projects" />);
 

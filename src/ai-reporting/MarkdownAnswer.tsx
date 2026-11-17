@@ -1,5 +1,5 @@
 import Markdown, { RuleType } from 'markdown-to-jsx';
-import { FC } from 'react';
+import { FC, ReactNode } from 'react';
 
 // Copied from the AI assistant's MarkdownBlock rather than imported, since
 // that one takes the assistant's internal block type.
@@ -19,6 +19,20 @@ const escapeFilenameUnderscores = (text: string): string =>
 const ImageAltText: FC<{ alt?: string }> = ({ alt }) =>
   alt ? <span>{alt}</span> : null;
 
+// Links aren't clickable for the same reason: a link's address could carry
+// report data, or lead to a fake login page. The address is shown instead.
+const PlainLink: FC<{ href?: string; children?: ReactNode }> = ({
+  href,
+  children,
+}) => (
+  <span>
+    {children}
+    {href && href !== children ? (
+      <span className="text-muted"> ({href})</span>
+    ) : null}
+  </span>
+);
+
 export const MarkdownAnswer: FC<{ content: string }> = ({ content }) => {
   return (
     <div className="aui-md">
@@ -27,12 +41,7 @@ export const MarkdownAnswer: FC<{ content: string }> = ({ content }) => {
           disableParsingRawHTML: true,
           overrides: {
             img: { component: ImageAltText },
-            a: {
-              props: {
-                target: '_blank',
-                rel: 'noopener noreferrer',
-              },
-            },
+            a: { component: PlainLink },
           },
           renderRule: (next, node, _, state) => {
             if (node.type === RuleType.codeBlock) {

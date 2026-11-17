@@ -1848,10 +1848,10 @@ export const SettingsDescription = [
       },
       {
         key: 'AI_REPORTING_ENABLED_ROLES',
-        description: translate('Who can use AI reporting. \'disabled\': nobody. \'staff\': staff users only. \'staff_and_support\': staff and support users. \'all\': all authenticated users.'),
+        description: translate('Who can use AI reporting. \'disabled\': nobody. \'staff\': staff users only. \'staff_and_support\': staff and support users. There\'s no option for all users: the harness reads Waldur as a support account, so it could show anyone anything.'),
         default: 'staff_and_support',
         type: 'choice_field',
-        options: [{ value: 'disabled', label: 'Disabled' }, { value: 'staff', label: 'Staff users' }, { value: 'staff_and_support', label: 'Staff and support users' }, { value: 'all', label: 'All users' }],
+        options: [{ value: 'disabled', label: 'Disabled' }, { value: 'staff', label: 'Staff users' }, { value: 'staff_and_support', label: 'Staff and support users' }],
       },
       {
         key: 'AI_REPORTING_MODEL',

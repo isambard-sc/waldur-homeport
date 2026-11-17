@@ -2,8 +2,9 @@ import { ENV } from '@/core/config';
 import { type RootState } from '@/store/reducers';
 import { User } from '@/workspace/types';
 
-type AIReportingEnabledRoles =
-  'disabled' | 'staff' | 'staff_and_support' | 'all';
+// No 'all': the harness reads Waldur as a support account. Typed as string,
+// since an old stored value may still arrive, and is refused.
+type AIReportingEnabledRoles = string;
 
 /** AI_REPORTING_ENABLED_ROLES from public configuration. Falls back to
  * 'staff_and_support', the backend default, so the tab doesn't disappear
@@ -24,8 +25,6 @@ export const isAIReportingAllowedForUser = (
       return user.is_staff;
     case 'staff_and_support':
       return user.is_staff || user.is_support;
-    case 'all':
-      return true;
     default:
       // Fails closed on an unrecognised value, like the backend.
       return false;

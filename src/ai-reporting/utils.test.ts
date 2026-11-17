@@ -23,8 +23,8 @@ describe('AI reporting role gating', () => {
   });
 
   it('reads the configured mode from public config', () => {
-    (ENV as any).plugins.WALDUR_CORE = { AI_REPORTING_ENABLED_ROLES: 'all' };
-    expect(getAIReportingMode()).toBe('all');
+    (ENV as any).plugins.WALDUR_CORE = { AI_REPORTING_ENABLED_ROLES: 'staff' };
+    expect(getAIReportingMode()).toBe('staff');
   });
 
   it('"disabled" blocks every user, including staff', () => {
@@ -47,12 +47,16 @@ describe('AI reporting role gating', () => {
     );
   });
 
-  it('"all" allows everyone', () => {
-    expect(isAIReportingAllowedForUser(regular, 'all')).toBe(true);
+  it('an old "all" value is refused for everyone', () => {
+    for (const user of [staff, support, regular]) {
+      expect(isAIReportingAllowedForUser(user, 'all')).toBe(false);
+    }
   });
 
   it('is false with no user at all, regardless of mode', () => {
-    expect(isAIReportingAllowedForUser(undefined, 'all')).toBe(false);
+    expect(isAIReportingAllowedForUser(undefined, 'staff_and_support')).toBe(
+      false,
+    );
   });
 
   it('isAIReportingEnabledForUser reads both the user and the mode from state', () => {
@@ -70,7 +74,7 @@ describe('AI reporting role gating', () => {
   it('isAIReportingEnabledForUser is false while the feature is off', () => {
     (ENV as any).plugins.WALDUR_CORE = {
       AI_REPORTING_ENABLED: false,
-      AI_REPORTING_ENABLED_ROLES: 'all',
+      AI_REPORTING_ENABLED_ROLES: 'staff',
     };
     const state = { workspace: { user: staff } } as any;
     expect(isAIReportingEnabledForUser(state)).toBe(false);
