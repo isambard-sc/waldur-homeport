@@ -2,8 +2,7 @@ import { FC, useMemo } from 'react';
 import { Form } from 'react-final-form';
 import {
   Project,
-  projectsAddUser,
-  projectsDeleteUser,
+  projectsChangeUserRole,
   projectsUpdateUser,
 } from 'waldur-js-client';
 
@@ -13,6 +12,7 @@ import { CloseDialogButton } from '@/modal/CloseDialogButton';
 import { ModalDialog } from '@/modal/ModalDialog';
 import { ScopeSubtitle } from '@/modal/ScopeSubtitle';
 import { useManagedMutation } from '@/modal/useManagedMutation';
+import { changedExpiry } from '@/permissions/roleChange';
 import { GenericPermission, Role } from '@/permissions/types';
 import { getHeldRole } from '@/permissions/utils';
 import { useProject } from '@/workspace/hooks';
@@ -21,6 +21,7 @@ import { ExpirationTimeGroup } from './ExpirationTimeGroup';
 import {
   getOnlyOneProjectManagerTooltip,
   isProjectManagerSelectionBlocked,
+  PROJECT_MANAGER_QUERIES,
 } from './onlyOneProjectManager';
 import { RoleGroup } from './RoleGroup';
 import { useProjectHasActiveManager } from './useProjectHasActiveManager';
@@ -59,19 +60,18 @@ const savePermissions = async (
         },
       });
     } else {
-      await projectsDeleteUser({
+      // One step: the member keeps their old role should the new one be
+      // refused, and nothing that follows a member leaving runs.
+      await projectsChangeUserRole({
         path: { uuid: project.uuid },
         body: {
           user: resolve.permission.user_uuid,
-          role: resolve.permission.role_name,
-        },
-      });
-      await projectsAddUser({
-        path: { uuid: project.uuid },
-        body: {
-          user: resolve.permission.user_uuid,
+          previous_role: resolve.permission.role_name,
           role: formData.role.name,
-          expiration_time: formData.expiration_time,
+          ...changedExpiry(
+            formData.expiration_time,
+            resolve.permission.expiration_time,
+          ),
         },
       });
     }
@@ -158,6 +158,7 @@ export const EditUserDialog: FC<EditUserDialogProps> = ({ resolve }) => {
 
   const saveUserMutation = useManagedMutation<any, any, EditUserDialogFormData>(
     {
+      invalidateQueries: PROJECT_MANAGER_QUERIES,
       mutationFn: (formData) => savePermissions(project, formData, resolve),
       successMessage: translate('Permission has been updated.'),
       errorMessage: translate('Unable to update permission.'),
@@ -166,7 +167,10 @@ export const EditUserDialog: FC<EditUserDialogProps> = ({ resolve }) => {
 
   return (
     <Form<EditUserDialogFormData>
-      onSubmit={(values) => saveUserMutation.mutateAsync(values)}
+      onSubmit={(values) =>
+        // A refusal is shown by the mutation, and the dialog stays open.
+        saveUserMutation.mutateAsync(values).catch(() => undefined)
+      }
       initialValues={initialValues}
     >
       {({ handleSubmit, submitting, invalid, values }) => (
