@@ -26,12 +26,37 @@ import { getQuotaCellProps } from '@/marketplace/resources/details/ResourceCompo
 import { ResourceStateField } from '@/marketplace/resources/list/ResourceStateField';
 import { getResourceAccessEndpoints, isSshFormat } from '@/resource/utils';
 import { useNotify } from '@/store/notify';
+import { useThemeFeatures } from '@/theme/useThemeFeatures';
 
 interface ResourceQuickInfoProps {
   resource: Resource;
 }
 
 const MAX_COMPONENTS_DISPLAY = 4;
+
+/**
+ * The links the provider set on the offering (its "Links" settings), in
+ * reading order. Its documentation comes first, as the place to start.
+ */
+export const getOfferingLinks = (
+  offering:
+    | {
+        documentation_url?: string | null;
+        access_url?: string | null;
+        helpdesk_url?: string | null;
+        privacy_policy_link?: string | null;
+      }
+    | undefined,
+): { url: string; label: string }[] =>
+  [
+    {
+      url: offering?.documentation_url,
+      label: translate('How to get started'),
+    },
+    { url: offering?.access_url, label: translate('Open') },
+    { url: offering?.helpdesk_url, label: translate('Get help') },
+    { url: offering?.privacy_policy_link, label: translate('Privacy policy') },
+  ].filter((link): link is { url: string; label: string } => Boolean(link.url));
 
 const formatSshCommand = (url: string, username: string) => {
   const [hostname, port] = url.split('://')[1].split(':');
@@ -85,6 +110,8 @@ export const ResourceQuickInfo: FC<ResourceQuickInfoProps> = ({ resource }) => {
       .filter((c) => c.usage || c.limit); // Only show components with values
   }, [offering?.components, resource]);
 
+  const { ShowResourceLimits } = useThemeFeatures();
+  const links = getOfferingLinks(offering);
   const hasGettingStarted = offering?.getting_started || endpoints.length > 0;
 
   return (
@@ -111,6 +138,27 @@ export const ResourceQuickInfo: FC<ResourceQuickInfoProps> = ({ resource }) => {
           <p className="text-muted fs-7 mb-3">{offering.description}</p>
         )}
 
+        {/* The provider's own links: how to get started, access, help. */}
+        {links.length > 0 && (
+          <div
+            className="d-flex flex-wrap gap-4 mb-3"
+            data-testid="offering-links"
+          >
+            {links.map((link) => (
+              <a
+                key={link.label}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary text-decoration-none d-flex align-items-center fs-7 fw-semibold"
+              >
+                <ArrowSquareOutIcon size={14} weight="bold" className="me-1" />
+                {link.label}
+              </a>
+            ))}
+          </div>
+        )}
+
         {/* Components section */}
         {isLoadingOffering ? (
           <div className="d-flex align-items-center text-muted mb-3">
@@ -119,6 +167,9 @@ export const ResourceQuickInfo: FC<ResourceQuickInfoProps> = ({ resource }) => {
             <span className="fs-7">{translate('Loading details...')}</span>
           </div>
         ) : (
+          // Hidden where the deployment hides resource limits: there a
+          // usage over a limit (0/1000) means nothing to the reader.
+          ShowResourceLimits &&
           components.length > 0 && (
             <div className="mb-3">
               <div className="text-muted fs-7 fw-bold mb-2">
