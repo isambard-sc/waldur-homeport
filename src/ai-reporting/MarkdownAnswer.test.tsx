@@ -86,6 +86,31 @@ describe('MarkdownAnswer', () => {
     expect(screen.queryByText(/\(https:\/\/evil/)).not.toBeInTheDocument();
   });
 
+  it("does not make the portal's own address clickable unless it is listed", () => {
+    render(
+      <MarkdownAnswer
+        content={`[Sign out](https://${window.location.hostname}/logout/)`}
+      />,
+    );
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('stays fast on long underscore-separated text', () => {
+    const start = Date.now();
+    render(<MarkdownAnswer content={`${'a_'.repeat(200)}a and more`} />);
+
+    expect(Date.now() - start).toBeLessThan(1000);
+  });
+
+  it('still escapes underscores in filenames', () => {
+    render(<MarkdownAnswer content="See projects_per_university.png" />);
+
+    expect(
+      screen.getByText('See projects_per_university.png'),
+    ).toBeInTheDocument();
+  });
+
   it('still renders normal Markdown', () => {
     render(<MarkdownAnswer content="**Seventeen** projects" />);
 

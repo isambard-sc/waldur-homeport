@@ -74,13 +74,10 @@ export const getAIReportingLinkDomains = (): string[] => {
 };
 
 /** Whether a link in an answer may be clickable: https, no user:password
- * part, and on the portal's own host or one of the allowed domains (or a
- * subdomain of one). */
-export const isTrustedLink = (
-  href: string,
-  domains: string[],
-  ownHost: string,
-): boolean => {
+ * part, and on one of the allowed domains (or a subdomain of one). The
+ * portal's own host isn't implied: a link to its logout or login callback
+ * pages could log the user out, or into someone else's account. */
+export const isTrustedLink = (href: string, domains: string[]): boolean => {
   let url: URL;
   try {
     url = new URL(href);
@@ -89,7 +86,7 @@ export const isTrustedLink = (
   }
   if (url.protocol !== 'https:' || url.username || url.password) return false;
   const host = url.hostname.toLowerCase();
-  return [ownHost.toLowerCase(), ...domains].some(
+  return domains.some(
     (domain) => domain && (host === domain || host.endsWith(`.${domain}`)),
   );
 };

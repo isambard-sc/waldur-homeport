@@ -7,7 +7,7 @@ import { translate } from '@/i18n';
 import { ReportingFile } from './aiReportingApi';
 import { useAuthenticatedBlobUrl } from './useAuthenticatedBlobUrl';
 
-const IMAGE_RE = /\.(png|jpe?g|gif|svg)$/i;
+const IMAGE_RE = /\.(png|jpe?g|gif)$/i;
 const isImage = (f: ReportingFile) => IMAGE_RE.test(f.name);
 
 const ReportImage: FC<{ file: ReportingFile }> = ({ file }) => {

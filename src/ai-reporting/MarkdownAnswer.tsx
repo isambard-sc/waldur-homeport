@@ -9,8 +9,10 @@ import { getAIReportingLinkDomains, isTrustedLink } from './utils';
 // markdown-to-jsx treats underscores inside words as emphasis, so a
 // filename like projects_per_university.png shows "per" in italics.
 // Escape underscores in anything that looks like a filename first.
+// Parts between underscores exclude "_", so the pattern can't backtrack
+// exponentially on long underscore-separated text (any user can write that).
 const FILENAME_RE =
-  /\b[\w-]+(?:_[\w-]+)+\.(?:png|jpe?g|gif|svg|csv|pdf|json|xlsx?|txt|zip)\b/gi;
+  /\b[A-Za-z0-9-]{1,100}(?:_[A-Za-z0-9-]{1,100})+\.(?:png|jpe?g|gif|svg|csv|pdf|json|xlsx?|txt|zip)\b/gi;
 
 const escapeFilenameUnderscores = (text: string): string =>
   text.replace(FILENAME_RE, (match) => match.replace(/_/g, '\\_'));
@@ -34,10 +36,7 @@ const AnswerLink: FC<{ href?: string; children?: ReactNode }> = ({
   href,
   children,
 }) => {
-  if (
-    href &&
-    isTrustedLink(href, getAIReportingLinkDomains(), window.location.hostname)
-  ) {
+  if (href && isTrustedLink(href, getAIReportingLinkDomains())) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer">
         {children}
