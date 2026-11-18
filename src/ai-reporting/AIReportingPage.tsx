@@ -35,8 +35,8 @@ const errorDetail = (error: unknown): string | null => {
 // or another user logged in in this tab).
 const isGoneSession = (error: unknown): boolean => !!(error as any)?.session;
 
-// There's no real progress from the harness yet, so this rotates through
-// plausible phases by elapsed time. message.progress wins once it's set.
+// Shown until the harness sends its first progress line (message.progress),
+// or if it never does: rotates through plausible phases by elapsed time.
 const PENDING_PHASES = [
   translate('Looking up the data...'),
   translate('Analysing...'),
