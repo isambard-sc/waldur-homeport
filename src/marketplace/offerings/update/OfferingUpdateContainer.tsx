@@ -1,9 +1,14 @@
+import classNames from 'classnames';
 import { FC } from 'react';
-import { PluginComponent } from 'waldur-js-client';
+import {
+  PluginComponent,
+  ProviderOfferingDetails as Offering,
+} from 'waldur-js-client';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { Category, Offering } from '@waldur/marketplace/types';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+import { Category } from '@/marketplace/types';
+import { ActionsUnavailable } from '@/table/ActionsDropdown';
 
 interface OwnProps {
   data: {
@@ -32,14 +37,27 @@ export const OfferingUpdateContainer: FC<OwnProps> = (props) => {
   }
 
   return props.tabSpec ? (
-    <div className="provider-offering">
-      <props.tabSpec.component
-        offering={data.offering}
-        category={data.category}
-        components={data.components}
-        refetch={props.refetch}
-        loading={props.isRefetching}
-      />
+    <div
+      className={classNames(
+        'provider-offering',
+        data.offering.state === 'Unavailable' && 'disabled-view',
+      )}
+    >
+      <ActionsUnavailable
+        reason={
+          data.offering.state === 'Unavailable'
+            ? translate('This offering is unavailable.')
+            : undefined
+        }
+      >
+        <props.tabSpec.component
+          offering={data.offering}
+          category={data.category}
+          components={data.components}
+          refetch={props.refetch}
+          loading={props.isRefetching}
+        />
+      </ActionsUnavailable>
     </div>
   ) : null;
 };

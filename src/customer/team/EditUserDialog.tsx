@@ -1,25 +1,25 @@
-import { useCallback, FC } from 'react';
+import { FC, useMemo } from 'react';
 import { Form } from 'react-final-form';
-import { useSelector } from 'react-redux';
 import {
   customersAddUser,
-  customersDeleteUser,
+  customersChangeUserRole,
   customersUpdateUser,
   CustomerUser,
 } from 'waldur-js-client';
 
-import { SubmitButton } from '@waldur/form';
-import { translate } from '@waldur/i18n';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { useModal } from '@waldur/modal/hooks';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { Role } from '@waldur/permissions/types';
-import { getCustomerRoles } from '@waldur/permissions/utils';
-import { ExpirationTimeGroup } from '@waldur/project/team/ExpirationTimeGroup';
-import { RoleGroup } from '@waldur/project/team/RoleGroup';
-import { useNotify } from '@waldur/store/hooks';
-import { getCustomer } from '@waldur/workspace/selectors';
-import { Customer } from '@waldur/workspace/types';
+import { SubmitButton } from '@/form';
+import { translate } from '@/i18n';
+import { CloseDialogButton } from '@/modal/CloseDialogButton';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { ScopeSubtitle } from '@/modal/ScopeSubtitle';
+import { useManagedMutation } from '@/modal/useManagedMutation';
+import { changedExpiry } from '@/permissions/roleChange';
+import { Role } from '@/permissions/types';
+import { getHeldRole } from '@/permissions/utils';
+import { ExpirationTimeGroup } from '@/project/team/ExpirationTimeGroup';
+import { RoleGroup } from '@/project/team/RoleGroup';
+import { useCustomer } from '@/workspace/hooks';
+import { Customer } from '@/workspace/types';
 
 import { UserGroup } from './UserGroup';
 
@@ -52,16 +52,23 @@ const savePermissions = async (
           expiration_time: formData.expiration_time,
         },
       });
+    } else if (resolve.customer.role_name) {
+      // One step: the member keeps their old role should the new one be
+      // refused, and nothing that follows a member leaving runs.
+      await customersChangeUserRole({
+        path: { uuid: customer.uuid },
+        body: {
+          user: resolve.customer.uuid,
+          previous_role: resolve.customer.role_name,
+          role: formData.role.name,
+          ...changedExpiry(
+            formData.expiration_time,
+            resolve.customer.expiration_time,
+          ),
+        },
+      });
     } else {
-      if (resolve.customer.role_name) {
-        await customersDeleteUser({
-          path: { uuid: customer.uuid },
-          body: {
-            user: resolve.customer.uuid,
-            role: resolve.customer.role_name,
-          },
-        });
-      }
+      // No role here yet: a grant, not a change.
       await customersAddUser({
         path: { uuid: customer.uuid },
         body: {
@@ -76,36 +83,41 @@ const savePermissions = async (
 };
 
 export const EditUserDialog: FC<EditUserDialogProps> = ({ resolve }) => {
-  const { closeDialog } = useModal();
-  const { showSuccess, showErrorResponse } = useNotify();
-  const currentCustomer = useSelector(getCustomer);
+  const currentCustomer = useCustomer();
 
-  const initialValues = {
-    role: getCustomerRoles().find(
-      ({ name }) => name === resolve.customer.role_name,
-    ),
-    expiration_time: resolve.customer.expiration_time,
-  };
-
-  const saveUser = useCallback(
-    async (formData: EditUserDialogFormData) => {
-      try {
-        await savePermissions(currentCustomer, formData, resolve);
-        showSuccess(translate('Permission has been updated.'));
-        closeDialog();
-      } catch (error) {
-        showErrorResponse(error, translate('Unable to update permission.'));
-      }
-    },
-    [currentCustomer, resolve, showSuccess, showErrorResponse, closeDialog],
+  const initialValues = useMemo(
+    () => ({
+      role: getHeldRole(resolve.customer.role_name, 'customer'),
+      expiration_time: resolve.customer.expiration_time,
+    }),
+    [resolve.customer],
   );
 
+  const updateMutation = useManagedMutation<any, any, EditUserDialogFormData>({
+    mutationFn: (formData) =>
+      savePermissions(currentCustomer, formData, resolve),
+    successMessage: translate('Permission has been updated.'),
+    errorMessage: translate('Unable to update permission.'),
+  });
+
   return (
-    <Form onSubmit={saveUser} initialValues={initialValues}>
+    <Form<EditUserDialogFormData>
+      onSubmit={(values) =>
+        // A refusal is shown by the mutation, and the dialog stays open.
+        updateMutation.mutateAsync(values).catch(() => undefined)
+      }
+      initialValues={initialValues}
+    >
       {({ handleSubmit, submitting, invalid }) => (
         <form onSubmit={handleSubmit}>
           <ModalDialog
             title={translate('Edit organization member')}
+            subtitle={
+              <ScopeSubtitle
+                label={translate('Member')}
+                name={resolve.customer.full_name || resolve.customer.username}
+              />
+            }
             footer={
               <>
                 <CloseDialogButton />
@@ -116,7 +128,10 @@ export const EditUserDialog: FC<EditUserDialogProps> = ({ resolve }) => {
             }
           >
             <UserGroup permission={resolve.customer} />
-            <RoleGroup types={['customer']} />
+            <RoleGroup
+              types={['customer']}
+              scope={{ customerId: currentCustomer?.uuid }}
+            />
             <ExpirationTimeGroup disabled={submitting} />
           </ModalDialog>
         </form>

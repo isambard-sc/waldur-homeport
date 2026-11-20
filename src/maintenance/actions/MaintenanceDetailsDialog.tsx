@@ -2,13 +2,14 @@ import { WarningCircleIcon } from '@phosphor-icons/react';
 import { FC, useMemo } from 'react';
 import { MaintenanceAnnouncement } from 'waldur-js-client';
 
-import { formatDateTime } from '@waldur/core/dateUtils';
-import { getUUID } from '@waldur/core/utils';
-import { translate } from '@waldur/i18n';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { Field } from '@waldur/resource/summary';
+import { formatMediumDateTime } from '@/core/dateUtils';
+import { getUUID } from '@/core/utils';
+import { translate } from '@/i18n';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { Field } from '@/resource/summary';
 
 import { AffectedOfferingsTable } from '../create/AffectedOfferingsTable';
+import { InternalNotes } from '../InternalNotesField';
 
 export const MaintenanceDetailsDialog: FC<{
   resolve: {
@@ -37,7 +38,6 @@ export const MaintenanceDetailsDialog: FC<{
   return (
     <ModalDialog
       title={translate('Maintenance: {name}', { name: maintenance.name })}
-      closeButton
       className="maintenance-details"
       iconNode={<WarningCircleIcon weight="bold" />}
       iconColor="warning"
@@ -48,13 +48,14 @@ export const MaintenanceDetailsDialog: FC<{
       />
       <Field
         label={translate('Ongoing since')}
-        value={formatDateTime(maintenance.scheduled_start)}
+        value={formatMediumDateTime(maintenance.scheduled_start)}
       />
       <Field
         label={translate('Expected completion')}
-        value={formatDateTime(maintenance.scheduled_end)}
+        value={formatMediumDateTime(maintenance.scheduled_end)}
       />
       <Field label={translate('Message')} value={maintenance.message} />
+      <InternalNotes maintenance={maintenance} />
       <Field
         label={translate('Affected offerings')}
         valueCol={12}

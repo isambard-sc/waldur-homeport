@@ -1,33 +1,41 @@
 import { FunctionComponent, useMemo } from 'react';
 import { keysList, SshKey } from 'waldur-js-client';
 
-import { CopyToClipboardContainer } from '@waldur/core/CopyToClipboardContainer';
-import { translate } from '@waldur/i18n';
-import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { Column } from '@waldur/table/types';
-import { useTable } from '@waldur/table/useTable';
-import { KeysListExpandableRow } from '@waldur/user/keys/KeysListExpandableRow';
-import { useUser } from '@waldur/workspace/hooks';
+import { CopyToClipboardContainer } from '@/core/CopyToClipboardContainer';
+import { translate } from '@/i18n';
+import { ActionsDropdown } from '@/table/ActionsDropdown';
+import { createFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { Column } from '@/table/types';
+import { useTable } from '@/table/useTable';
+import { KeysListExpandableRow } from '@/user/keys/KeysListExpandableRow';
+import { useUser } from '@/workspace/hooks';
 
 import { KeyCreateButton } from './KeyCreateButton';
 import { KeyRemoveButton } from './KeyRemoveButton';
+import { KeyVersionHistoryAction } from './KeyVersionHistoryAction';
 
 const KeysListRowActions = ({ row, fetch }) => {
+  const user = useUser();
+  const showVersionHistory = user?.is_staff || user?.is_support;
   return (
     <ActionsDropdown
       row={row}
       refetch={fetch}
-      actions={[KeyRemoveButton].filter(Boolean)}
+      actions={[
+        KeyRemoveButton,
+        showVersionHistory && KeyVersionHistoryAction,
+      ].filter(Boolean)}
     />
   );
 };
 
-export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
-  user,
-  hasActionBar = true,
-}) => {
+export const KeysList: FunctionComponent<{
+  user;
+  hasActionBar?: boolean;
+  fullWidth?: boolean;
+  cardBordered?: boolean;
+}> = ({ user, hasActionBar = true, fullWidth, cardBordered = true }) => {
   const currentUser = useUser();
   const isSelf = user.uuid === currentUser.uuid;
   const filter = useMemo(
@@ -47,12 +55,14 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
       title: translate('Title'),
       render: ({ row }) => row.name,
       export: 'name',
+      copyField: (row) => row.name,
     },
     {
       visible: false,
       title: translate('Public key'),
       render: null,
       export: 'public_key',
+      copyField: (row) => row.public_key,
     },
     {
       title: translate('Type'),
@@ -93,6 +103,8 @@ export const KeysList: FunctionComponent<{ user; hasActionBar? }> = ({
       enableExport={true}
       expandableRow={KeysListExpandableRow}
       hasActionBar={hasActionBar}
+      fullWidth={fullWidth}
+      cardBordered={cardBordered}
     />
   );
 };

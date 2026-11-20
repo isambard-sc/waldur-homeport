@@ -1,50 +1,55 @@
 import { XIcon } from '@phosphor-icons/react';
-import { FunctionComponent } from 'react';
-import { Button } from 'react-bootstrap';
-import { Field, FormSection } from 'redux-form';
+import { FC } from 'react';
+import { Field } from 'react-final-form';
 
-import { InputField } from '@waldur/form/InputField';
-import { translate } from '@waldur/i18n';
+import { BaseButton } from 'waldur-ui';
 
-interface OwnProps {
+import { InputField } from '@/form/InputField';
+import { translate } from '@/i18n';
+
+interface EnvironmentVariablePanelProps {
   index: number;
   variable: string;
   onRemove(index: number): void;
 }
 
-export const EnvironmentVariablePanel: FunctionComponent<OwnProps> = (
-  props,
-) => {
+export const EnvironmentVariablePanel: FC<EnvironmentVariablePanelProps> = ({
+  index,
+  variable,
+  onRemove,
+}) => {
   return (
-    <FormSection name={props.variable}>
-      <tr className="border-bottom">
-        <td>
-          <Field
-            name="name"
-            component={InputField}
-            placeholder={translate('Key')}
-          />
-        </td>
-        <td>
-          <Field
-            name="value"
-            component={InputField}
-            placeholder={translate('Value')}
-          />
-        </td>
-        <td>
-          <Button
-            variant="text-danger"
-            size="sm"
-            className="btn-icon"
-            onClick={() => props.onRemove(props.index)}
-          >
-            <span className="svg-icon svg-icon-2">
-              <XIcon weight="bold" />
-            </span>
-          </Button>
-        </td>
-      </tr>
-    </FormSection>
+    <tr className="border-bottom">
+      <td>
+        <Field name={`${variable}.name`}>
+          {({ input, meta }) => (
+            <InputField
+              input={input}
+              meta={meta}
+              placeholder={translate('Key')}
+            />
+          )}
+        </Field>
+      </td>
+      <td>
+        <Field name={`${variable}.value`}>
+          {({ input, meta }) => (
+            <InputField
+              input={input}
+              meta={meta}
+              placeholder={translate('Value')}
+            />
+          )}
+        </Field>
+      </td>
+      <td>
+        <BaseButton
+          variant="text-danger"
+          onClick={() => onRemove(index)}
+          iconNode={<XIcon weight="bold" />}
+          size="sm"
+        />
+      </td>
+    </tr>
   );
 };

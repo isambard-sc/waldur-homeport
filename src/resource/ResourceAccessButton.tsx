@@ -4,12 +4,12 @@ import {
   CopyIcon,
 } from '@phosphor-icons/react';
 import { FC, useCallback, useMemo } from 'react';
-import { Button, Dropdown } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
-import { showSuccess } from '@waldur/store/notify';
+import { BaseButton, Menu, Tooltip } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { useNotify } from '@/store/notify';
+import { ActionsMenu } from '@/table/ActionsDropdown';
 
 import { getResourceAccessEndpoints, isSshFormat } from './utils';
 
@@ -31,7 +31,7 @@ export const ResourceAccessButton: FC<ResourceAccessButtonProps> = ({
   resource,
   offering,
 }) => {
-  const dispatch = useDispatch();
+  const { showSuccess } = useNotify();
 
   const extendURLWithUsername = (url) => {
     const [protocol, restUrl] = url.split('://');
@@ -41,25 +41,22 @@ export const ResourceAccessButton: FC<ResourceAccessButtonProps> = ({
     }${port ? `:${port}` : ''}`;
   };
 
-  const copyText = useCallback(
-    (value) => {
-      if (isSshFormat(value) && resource.username) {
-        const [hostname, port] = value.split('://')[1].split(':');
-        const valueToCopy = `ssh ${resource.username}@${hostname}${
-          port ? ` -p ${port}` : ''
-        }`;
+  const copyText = useCallback((value) => {
+    if (isSshFormat(value) && resource.username) {
+      const [hostname, port] = value.split('://')[1].split(':');
+      const valueToCopy = `ssh ${resource.username}@${hostname}${
+        port ? ` -p ${port}` : ''
+      }`;
 
-        navigator.clipboard.writeText(valueToCopy).then(() => {
-          dispatch(showSuccess(translate('Text has been copied')));
-        });
-      } else {
-        navigator.clipboard.writeText(value).then(() => {
-          dispatch(showSuccess(translate('Text has been copied')));
-        });
-      }
-    },
-    [dispatch, resource.username],
-  );
+      navigator.clipboard.writeText(valueToCopy).then(() => {
+        showSuccess(translate('Text has been copied'));
+      });
+    } else {
+      navigator.clipboard.writeText(value).then(() => {
+        showSuccess(translate('Text has been copied'));
+      });
+    }
+  }, []);
 
   const endpoints = useMemo(
     () => getResourceAccessEndpoints(resource, offering),
@@ -70,54 +67,60 @@ export const ResourceAccessButton: FC<ResourceAccessButtonProps> = ({
     return null;
   }
   return (
-    <Dropdown placement="bottom-end">
-      <Dropdown.Toggle variant="tertiary" className="no-arrow btn-icon-right">
-        {translate('Access resource')}
-        <span className="svg-icon svg-icon-2 rotate-180">
-          <CaretDownIcon weight="bold" />
-        </span>
-      </Dropdown.Toggle>
-      <Dropdown.Menu flip>
-        {endpoints.map((endpoint, index) => (
-          <Dropdown.Item
-            key={index}
-            eventKey={endpoint.url}
+    <ActionsMenu
+      side="bottom"
+      toggle={
+        <BaseButton
+          variant="tertiary"
+          label={translate('Access resource')}
+          iconNode={<CaretDownIcon weight="bold" />}
+          iconRight
+        />
+      }
+      align="end"
+    >
+      {endpoints.map((endpoint, index) => (
+        <Menu.Item
+          key={index}
+          asChild
+          className="d-flex justify-content-between px-5 py-3"
+        >
+          <a
             href={endpoint.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="d-flex justify-content-between text-anchor text-primary px-5 py-3"
+            // On the link, not the row: the row's classes go through
+            // tailwind-merge, which reads `text-anchor` and `text-primary`
+            // as two colours and drops `text-anchor`; Slot only joins them.
+            className="text-anchor text-primary"
           >
             <span className="d-flex flex-center me-6">
-              <span className="svg-icon svg-icon-2 svg-icon-primary">
+              <span className="svg-icon svg-icon-2 svg-icon-primary me-[12px]">
                 <ArrowSquareOutIcon weight="bold" />
               </span>
               {endpoint.name}
             </span>
-            <Tip
-              id="resource-endpoint-tooltip"
+            <Tooltip
               label={
                 isSshFormat(endpoint.url) && resource.username
                   ? extendURLWithUsername(endpoint.url)
                   : endpoint.url
               }
             >
-              <Button
-                variant="link"
-                size="sm"
-                className="btn-icon h-20px"
+              <BaseButton
+                variant="text-primary"
                 onClick={(e) => {
                   copyText(endpoint.url);
                   e.preventDefault();
                 }}
-              >
-                <span className="svg-icon svg-icon-2">
-                  <CopyIcon weight="bold" />
-                </span>
-              </Button>
-            </Tip>
-          </Dropdown.Item>
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
+                iconNode={<CopyIcon weight="bold" />}
+                className="h-20px"
+                size="sm"
+              />
+            </Tooltip>
+          </a>
+        </Menu.Item>
+      ))}
+    </ActionsMenu>
   );
 };

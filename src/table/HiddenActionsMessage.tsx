@@ -1,8 +1,9 @@
 import { WarningCircleIcon, XIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 
-import { RadarIcon } from '@waldur/core/RadarIcon';
-import { translate } from '@waldur/i18n';
+import { BaseButton, FeaturedIcon } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableProps } from './types';
@@ -17,8 +18,8 @@ export const HiddenActionsMessage: FunctionComponent<
 > = ({ toggleColumn, close }) => {
   return (
     <div className="d-flex gap-5 my-5 w-100">
-      <RadarIcon
-        IconComponent={WarningCircleIcon}
+      <FeaturedIcon
+        icon={<WarningCircleIcon weight="bold" />}
         variant="warning"
         className="me-2"
       />
@@ -37,13 +38,12 @@ export const HiddenActionsMessage: FunctionComponent<
         </button>
       </div>
       <div className="ms-auto">
-        <button
-          type="button"
-          className="btn btn-sm btn-icon btn-text-secondary"
+        <BaseButton
+          variant="text-secondary"
+          size="sm"
           onClick={close}
-        >
-          <XIcon size={18} weight="bold" />
-        </button>
+          iconNode={<XIcon size={18} weight="bold" />}
+        />
       </div>
     </div>
   );

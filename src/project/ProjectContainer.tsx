@@ -1,13 +1,14 @@
-import { UIView, useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import { useMemo } from 'react';
-import { Nav, Tab } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 
-import { translate } from '@waldur/i18n';
-import { useBreadcrumbs, usePageHero } from '@waldur/navigation/context';
-import { usePresetBreadcrumbItems } from '@waldur/navigation/header/breadcrumb/utils';
-import { IBreadcrumbItem } from '@waldur/navigation/types';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+import { TabNav } from 'waldur-ui';
+
+import { Link } from '@/core/Link';
+import { translate } from '@/i18n';
+import { useBreadcrumbs, usePageHero } from '@/navigation/context';
+import { usePresetBreadcrumbItems } from '@/navigation/header/breadcrumb/utils';
+import { IBreadcrumbItem } from '@/navigation/types';
+import { useUser, useCustomer, useProject } from '@/workspace/hooks';
 
 import { ProjectBreadcrumbPopover } from './ProjectBreadcrumbPopover';
 import { ProjectGracePeriodBanner } from './ProjectGracePeriodBanner';
@@ -15,39 +16,35 @@ import { ProjectProfile } from './ProjectProfile';
 import { canEditProject } from './utils';
 
 const PageHero = ({ project }) => {
-  const user = useSelector(getUser);
-  const customer = useSelector(getCustomer);
+  const user = useUser();
+  const customer = useCustomer();
 
   const canEdit = canEditProject(user, { customer, project });
 
-  const router = useRouter();
   const { state } = useCurrentStateAndParams();
-  const goTo = (stateName) =>
-    router.stateService.go(stateName, { uuid: project.uuid });
+  const params = { uuid: project.uuid };
 
   return (
     <div className="container-fluid my-5">
       {canEdit && (
-        <Tab.Container defaultActiveKey={state.name} onSelect={goTo}>
-          <Nav variant="tabs" className="nav-line-tabs mb-4">
-            <Nav.Item>
-              <Nav.Link
-                eventKey="project.dashboard"
-                className="text-center min-w-60px"
-              >
-                {translate('View')}
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link
-                eventKey="project-manage"
-                className="text-center min-w-60px"
-              >
-                {translate('Edit')}
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </Tab.Container>
+        <TabNav
+          activeKey={state.name}
+          listClassName="mb-4"
+          items={[
+            {
+              key: 'project.dashboard',
+              title: translate('View'),
+              link: <Link state="project.dashboard" params={params} />,
+              className: 'text-center min-w-60px',
+            },
+            {
+              key: 'project-manage',
+              title: translate('Edit'),
+              link: <Link state="project-manage" params={params} />,
+              className: 'text-center min-w-60px',
+            },
+          ]}
+        />
       )}
       <ProjectProfile project={project} />
       <ProjectGracePeriodBanner project={project} />
@@ -56,30 +53,24 @@ const PageHero = ({ project }) => {
 };
 
 const ProjectContainerWithHero = (props) => {
-  const project = useSelector(getProject);
+  const project = useProject();
 
   usePageHero(<PageHero project={project} />, [project]);
 
-  const { getOrganizationBreadcrumbItem } = usePresetBreadcrumbItems();
+  const {
+    getOrganizationsBreadcrumbItem,
+    getOrganizationBreadcrumbItem,
+    getOrganizationProjectsBreadcrumbItem,
+  } = usePresetBreadcrumbItems();
 
   const breadcrumbItems = useMemo<IBreadcrumbItem[]>(
     () => [
-      {
-        key: 'organizations',
-        text: translate('Organizations'),
-        to: 'organizations',
-      },
+      getOrganizationsBreadcrumbItem(),
       getOrganizationBreadcrumbItem(
         { uuid: project.customer_uuid, name: project.customer_name },
         { ellipsis: 'md' },
       ),
-      {
-        key: 'organization.projects',
-        text: translate('Projects'),
-        to: 'organization.projects',
-        params: { uuid: project.customer_uuid },
-        ellipsis: 'xl',
-      },
+      getOrganizationProjectsBreadcrumbItem(project.customer_uuid),
       {
         key: 'project',
         text: project.name,
@@ -101,7 +92,7 @@ const ProjectContainerWithHero = (props) => {
 
 export const ProjectContainer = (props) => {
   const { state } = useCurrentStateAndParams();
-  const project = useSelector(getProject);
+  const project = useProject();
 
   if (!project) {
     return null;

@@ -5,30 +5,34 @@ import {
   RancherCluster,
 } from 'waldur-js-client';
 
-import { formatDate } from '@waldur/core/dateUtils';
-import { translate } from '@waldur/i18n';
-import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { TableWithPortal } from '@waldur/table/types';
-import { useTable } from '@waldur/table/useTable';
+import { formatDate } from '@/core/dateUtils';
+import { translate } from '@/i18n';
+import { ActionsMenu } from '@/table/ActionsDropdown';
+import { createFetcher } from '@/table/api';
+import {
+  RancherClusterFilter,
+  RancherClusterFilterFormId,
+} from '@/table/generated/RancherClusterFilter';
+import Table from '@/table/Table';
+import { TableWithPortal } from '@/table/types';
+import { useTable } from '@/table/useTable';
 
-import { ClusterFilter, useClusterResourceFilter } from '../ClusterFilter';
+import { useClusterResourceFilter } from '../ClusterFilterHooks';
 
 import { ApplicationDeleteButton } from './ApplicationDeleteButton';
 import { ApplicationDetailsButton } from './ApplicationDetailsButton';
 
 const ApplicationActions = ({ row }) => (
-  <ActionsDropdownComponent>
+  <ActionsMenu>
     <ApplicationDetailsButton application={row} />
     <ApplicationDeleteButton application={row} />
-  </ActionsDropdownComponent>
+  </ActionsMenu>
 );
 
 export const ClusterApplicationsList: FunctionComponent<
   TableWithPortal<{ resourceScope: RancherCluster }>
 > = ({ resourceScope, portal }) => {
-  const filter = useClusterResourceFilter(resourceScope);
+  const { filter } = useClusterResourceFilter(resourceScope, 'rancher-apps');
 
   const props = useTable({
     table: 'rancher-apps',
@@ -39,6 +43,7 @@ export const ClusterApplicationsList: FunctionComponent<
   return (
     <Table<RancherApplication>
       {...props}
+      formId={RancherClusterFilterFormId}
       columns={[
         {
           title: translate('Name'),
@@ -69,7 +74,7 @@ export const ClusterApplicationsList: FunctionComponent<
       ]}
       rowActions={ApplicationActions}
       verboseName={translate('applications')}
-      filters={<ClusterFilter cluster={resourceScope} />}
+      filters={<RancherClusterFilter cluster={resourceScope} />}
       showPageSizeSelector
       portal={portal}
       hasActionBar={false}

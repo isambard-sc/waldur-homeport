@@ -1,31 +1,27 @@
 import { ProhibitIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
-import { FC, useMemo, useState } from 'react';
+import { FC } from 'react';
 import { Table } from 'react-bootstrap';
 
-import { Tip } from '@waldur/core/Tooltip';
+import { Radio, Tooltip } from 'waldur-ui';
+
 import {
   CustomComponentInputProps,
-  FilterOptions,
   SelectDialogFieldChoice,
   SelectDialogFieldColumn,
-} from '@waldur/form/types';
+} from '@/form/types';
+import { translate } from '@/i18n';
 
 import './ChoicesTable.scss';
-import { ChoicesTableFilter } from './ChoicesTableFilter';
 
-interface PureChoicesTableProps {
+interface ChoicesTableProps {
   enableSelect?: boolean;
   columns: SelectDialogFieldColumn[];
   choices: SelectDialogFieldChoice[];
   input: CustomComponentInputProps<SelectDialogFieldChoice>;
 }
 
-interface ChoicesTableProps extends PureChoicesTableProps {
-  filterOptions?: FilterOptions;
-}
-
-const PureChoicesTable: FC<ChoicesTableProps> = ({
+export const ChoicesTable: FC<ChoicesTableProps> = ({
   enableSelect = true,
   ...props
 }) => (
@@ -60,12 +56,13 @@ const PureChoicesTable: FC<ChoicesTableProps> = ({
             {enableSelect && (
               <td>
                 {choice.disabled ? (
-                  <Tip id={choice.uuid} label={choice.disabledReason}>
-                    <ProhibitIcon />
-                  </Tip>
+                  <Tooltip label={choice.disabledReason}>
+                    <ProhibitIcon weight="bold" />
+                  </Tooltip>
                 ) : (
-                  <input
-                    type="radio"
+                  <Radio
+                    aria-label={translate('Select row')}
+                    size="sm"
                     checked={
                       props.input.value &&
                       choice.uuid === props.input.value.uuid
@@ -92,33 +89,3 @@ const PureChoicesTable: FC<ChoicesTableProps> = ({
     </Table>
   </div>
 );
-
-export const ChoicesTable: FC<ChoicesTableProps> = (props) => {
-  const [filter, setFilter] = useState<string>();
-
-  const choices = useMemo(() => {
-    if (props.filterOptions && filter) {
-      return props.choices.filter(
-        (choice) => choice[props.filterOptions.name] === filter,
-      );
-    }
-    return props.choices;
-  }, [props.choices]);
-
-  return (
-    <>
-      {props.filterOptions && (
-        <ChoicesTableFilter
-          filterOptions={props.filterOptions}
-          input={{ onChange: setFilter, value: filter }}
-          wrapperClassName="btn-group mb-1"
-        />
-      )}
-      <PureChoicesTable
-        columns={props.columns}
-        choices={choices}
-        input={props.input}
-      />
-    </>
-  );
-};

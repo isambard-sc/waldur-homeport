@@ -1,6 +1,8 @@
-import { AwesomeCheckbox } from '@waldur/core/AwesomeCheckbox';
-import { defaultCurrency } from '@waldur/core/formatCurrency';
-import { translate } from '@waldur/i18n';
+import { Switch } from 'waldur-ui';
+
+import { defaultCurrency } from '@/core/formatCurrency';
+import { translate } from '@/i18n';
+import { DASH_ESCAPE_CODE } from '@/table/constants';
 
 import { PlanPeriod } from './types';
 
@@ -8,30 +10,50 @@ export const ComponentRowTotal = (props: {
   amount: number;
   period?: PlanPeriod;
   setPeriod?;
+  /**
+   * Set when some components have no quantity yet, so the amount is the
+   * lowest the plan can cost rather than its price.
+   */
+  isFloor?: boolean;
+  /**
+   * Set when usage-based components are part of the plan: their cost is only
+   * known once usage is reported, so the total is a floor plus usage.
+   */
+  hasUsage?: boolean;
 }) => {
+  const amount =
+    defaultCurrency(props.amount ?? 0) +
+    (props.period ? (props.period === 'annual' ? ' /year' : ' /month') : '');
+  const usageAmount = props.hasUsage
+    ? props.amount
+      ? translate('{amount} + usage', { amount })
+      : translate('Billed by usage')
+    : null;
   return (
     <tr className="total">
       <th className="col-md title fs-4 fw-normal">{translate('Total')}</th>
       <td colSpan={2} className="col-md-auto col-actions">
         <div className="d-flex align-items-center justify-content-end gap-4">
           {props.period && props.setPeriod && (
-            <AwesomeCheckbox
+            <Switch
               label={translate('Yearly estimate')}
-              value={props.period === 'monthly' ? false : true}
+              checked={props.period === 'monthly' ? false : true}
               size="sm"
-              onChange={(value) =>
+              onCheckedChange={(value) =>
                 props.setPeriod(value ? 'annual' : 'monthly')
               }
             />
           )}
-          <span className="fs-4 text-gray-700 min-w-150px text-start">
-            {defaultCurrency(props.amount)}
-            {Boolean(props.period) && (
-              <>
-                {' /'}
-                {props.period === 'annual' ? 'year' : 'month'}
-              </>
-            )}
+          <span className="fs-4 text-gray-700 min-w-150px text-end">
+            {usageAmount
+              ? usageAmount
+              : !props.isFloor
+                ? amount
+                : // Nothing in the plan has a known quantity, so there is no
+                  // floor to quote either — "From 0.00" would read as free.
+                  props.amount
+                  ? translate('From {amount}', { amount })
+                  : DASH_ESCAPE_CODE}
           </span>
         </div>
       </td>

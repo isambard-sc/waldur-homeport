@@ -1,24 +1,3 @@
-.nav.nav-tabs {
-  .nav-item {
-    // Badge in tab header
-    .nav-link .badge {
-      background-color: $gray-100;
-      border-color: $gray-200;
-      color: $gray-700;
-    }
-    &:hover .nav-link .badge,
-    .nav-link.active .badge {
-      background-color: $brand-50;
-      border-color: $brand-200;
-      color: $brand-700;
-    }
-
-    .nav-link.disabled {
-      color: $gray-400 !important;
-    }
-  }
-}
-
 .btn-nav-item {
   width: 40px;
   height: 40px;
@@ -35,13 +14,25 @@
     @include svg-icon-color($gray-400);
   }
 
-  &:hover {
-    background-color: $brand-50;
+  // `aria-expanded`: the drawer this button opens is showing. The drawer takes
+  // focus (and, being modal, hover), so without it the button looks idle and
+  // nothing says a second click closes the drawer.
+  &:focus,
+  &:active,
+  &:hover,
+  &[aria-expanded='true'] {
+    background-color: $btn-secondary-bg;
+
+    i {
+      color: $text-brand-secondary;
+    }
+    .svg-icon {
+      @include svg-icon-color($text-brand-secondary);
+    }
   }
 
   &:focus,
   &:active {
-    background-color: $bg-primary;
-    box-shadow: $ring-gray-100;
+    box-shadow: $ring-primary-100;
   }
 }

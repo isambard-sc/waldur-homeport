@@ -1,1 +1,6 @@
-export { translate, formatJsx, formatJsxTemplate } from './translate';
+export {
+  domainText,
+  translate,
+  formatJsx,
+  formatJsxTemplate,
+} from './translate';

@@ -1,9 +1,11 @@
 import { StarIcon } from '@phosphor-icons/react';
+import classNames from 'classnames';
 import { ReactNode } from 'react';
 
-import { Link } from '@waldur/core/Link';
-import { useOrganizationAndProjectFiltersForResources } from '@waldur/navigation/sidebar/resources-filter/utils';
-import { ItemIcon } from '@waldur/navigation/workspace/context-selector/ItemIcon';
+import { Link } from '@/core/Link';
+import { translate } from '@/i18n';
+import { useOrganizationAndProjectAutocompletesForResources } from '@/navigation/sidebar/resources-filter/utils';
+import { ItemImage } from '@/navigation/workspace/context-selector/ItemImage';
 
 import { useFavoritePages } from '../favorite-pages/FavoritePageService';
 
@@ -18,71 +20,102 @@ export interface SearchItemProps {
   to: string;
   params?: { [key: string]: string };
   badge?: ReactNode;
+  actions?: ReactNode;
   onClick?(item: SearchItemProps);
   isFavorite?: ReturnType<typeof useFavoritePages>['isFavorite'];
   addFavoritePage?: ReturnType<typeof useFavoritePages>['addFavoritePage'];
-  removeFavorite: ReturnType<typeof useFavoritePages>['removeFavorite'];
+  removeFavorite?: ReturnType<typeof useFavoritePages>['removeFavorite'];
 }
 
+/**
+ * The row is a container with two independent siblings: the link and the
+ * trailing controls (favourite star, per-row actions). The controls used to
+ * sit inside the link, which is invalid HTML — axe reports it as
+ * `nested-interactive`, the row's accessible name swallowed the button's
+ * label, and a click on the star only avoided navigating because every
+ * handler remembered to call `preventDefault`/`stopPropagation`.
+ * The link keeps covering the whole row through the stretching
+ * pseudo-element in SearchItem.scss, so clicking anywhere outside the
+ * controls still follows it.
+ */
 export const SearchItem = (props: SearchItemProps) => {
   const isFav = props.isFavorite
     ? props.isFavorite(props.to, props.params)
     : false;
 
   const { syncResourceFilters } =
-    useOrganizationAndProjectFiltersForResources();
+    useOrganizationAndProjectAutocompletesForResources();
 
   return (
-    <Link
-      state={props.to}
-      params={props.params}
-      className="search-result-item d-flex text-dark text-hover-primary align-items-center py-2 px-5 bg-hover-primary-50"
-      onClick={(e) => {
-        if (props.onClick) {
-          props.onClick(props);
-        } else e.stopPropagation();
-        syncResourceFilters(getResourceFilterFromSearchItem(props));
-      }}
-      aria-hidden={true}
-    >
-      <ItemIcon
-        item={{ image: props.image, name: props.title }}
-        className="me-4"
-        circle
-      />
+    <div className="search-result-item d-flex align-items-center py-2 px-5 bg-hover-primary-50">
+      <Link
+        state={props.to}
+        params={props.params}
+        className="search-result-item__link d-flex text-dark text-hover-primary align-items-center me-4"
+        onClick={(e) => {
+          if (props.onClick) {
+            props.onClick(props);
+          } else e.stopPropagation();
+          syncResourceFilters(getResourceFilterFromSearchItem(props));
+        }}
+      >
+        <ItemImage
+          item={{ image: props.image, name: props.title }}
+          className="me-4"
+          circle
+        />
 
-      <div className="d-flex flex-column justify-content-start fw-semibold">
-        <span className="fs-6 fw-semibold">{props.title}</span>
-        {Boolean(props.subtitle) && (
-          <span className="fs-7 fw-semibold text-muted">{props.subtitle}</span>
+        <div className="d-flex flex-column justify-content-start fw-semibold">
+          <span className="fs-6 fw-semibold">{props.title}</span>
+          {Boolean(props.subtitle) && (
+            <span className="fs-7 fw-semibold text-muted">
+              {props.subtitle}
+            </span>
+          )}
+        </div>
+      </Link>
+      {/*
+        The link's me-4 keeps the trailing controls the same distance from the
+        title that the avatar keeps on the other side, and gap-2 separates them
+        from each other. The distance sits on the link rather than as padding
+        here: the controls are lifted above the link's stretched overlay, so
+        their padding would be a strip of the row that no longer opens it.
+      */}
+      <div className="search-result-item__controls ms-auto d-flex gap-2">
+        {props.badge && <div>{props.badge}</div>}
+        {props.actions}
+        {props.addFavoritePage && (
+          <button
+            type="button"
+            aria-label={
+              isFav
+                ? translate('Remove from favourites')
+                : translate('Add to favourites')
+            }
+            className={classNames('btn-fav', isFav && 'show')}
+            onClick={(e) =>
+              isFav
+                ? props.removeFavorite(props.to, props.params, e)
+                : props.addFavoritePage(
+                    {
+                      state: props.to,
+                      params: props.params,
+                      title: props.title,
+                      subtitle: props.subtitle,
+                      image: props.image,
+                    },
+                    e,
+                  )
+            }
+          >
+            {isFav ? (
+              <StarIcon size={20} weight="fill" className="text-warning" />
+            ) : (
+              <StarIcon size={20} className="text-dark" weight="bold" />
+            )}
+          </button>
         )}
       </div>
-      <div className="ms-auto d-flex">
-        {props.badge && <div>{props.badge}</div>}
-        <button
-          className={'btn-fav' + (isFav ? ' show' : '')}
-          onClick={(e) =>
-            isFav
-              ? props.removeFavorite(props.to, props.params, e)
-              : props.addFavoritePage(
-                  {
-                    state: props.to,
-                    params: props.params,
-                    title: props.title,
-                    subtitle: props.subtitle,
-                    image: props.image,
-                  },
-                  e,
-                )
-          }
-        >
-          {isFav ? (
-            <StarIcon size={20} weight="fill" className="text-warning" />
-          ) : (
-            <StarIcon size={20} className="text-dark" />
-          )}
-        </button>
-      </div>
-    </Link>
+    </div>
   );
 };

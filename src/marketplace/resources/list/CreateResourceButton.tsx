@@ -1,14 +1,17 @@
 import { FC, useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import { Project } from 'waldur-js-client';
 
-import { AddButton } from '@waldur/core/AddButton';
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { openModalDialog } from '@waldur/modal/actions';
-import { Customer } from '@waldur/workspace/types';
+import { AddButton } from '@/core/AddButton';
+import { lazyComponent } from '@/core/lazyComponent';
+import { canUseMarketplaceShopUi } from '@/marketplace/canUseMarketplaceShopUi';
+import { useModal } from '@/modal/actions';
+import { PermissionEnum } from '@/permissions/enums';
+import { hasPermissionOnAnyScope } from '@/permissions/hasPermission';
+import { useUser } from '@/workspace/hooks';
+import { Customer } from '@/workspace/types';
 
 const MarketplacePopup = lazyComponent(() =>
-  import('@waldur/navigation/sidebar/marketplace-popup/MarketplacePopup').then(
+  import('@/navigation/sidebar/marketplace-popup/MarketplacePopup').then(
     (module) => ({ default: module.MarketplacePopup }),
   ),
 );
@@ -20,16 +23,25 @@ interface CreateResourceButtonProps {
 }
 
 export const CreateResourceButton: FC<CreateResourceButtonProps> = (props) => {
-  const dispatch = useDispatch();
+  const user = useUser();
+  const { openDialog } = useModal();
+
   const openFormDialog = useCallback(
     () =>
-      dispatch(
-        openModalDialog(MarketplacePopup, {
-          size: 'lg',
-          resolve: props,
-        }),
-      ),
-    [dispatch],
+      openDialog(MarketplacePopup, {
+        size: 'lg',
+        resolve: props,
+      }),
+    [openDialog, props],
   );
+
+  if (!canUseMarketplaceShopUi(user)) {
+    return null;
+  }
+
+  if (!hasPermissionOnAnyScope(user, PermissionEnum.CREATE_ORDER)) {
+    return null;
+  }
+
   return <AddButton action={openFormDialog} />;
 };

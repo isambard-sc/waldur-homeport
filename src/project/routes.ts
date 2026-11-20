@@ -1,19 +1,29 @@
 import { UIView } from '@uirouter/react';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { StateDeclaration } from '@waldur/core/types';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { ProjectFeatures, InvitationsFeatures } from '@waldur/FeaturesEnums';
-import { translate } from '@waldur/i18n';
-import { hasSupport } from '@waldur/issues/hooks';
-import { getProject } from '@waldur/workspace/selectors';
+import { lazyComponent } from '@/core/lazyComponent';
+import { StateDeclaration } from '@/core/types';
+import { isFeatureVisible } from '@/features/connect';
+import {
+  MarketplaceFeatures,
+  ProjectFeatures,
+  InvitationsFeatures,
+} from '@/FeaturesEnums';
+import { translate } from '@/i18n';
+import { hasSupport } from '@/issues/hooks';
+import { hasActiveProjectMatrixRoomInCache } from '@/matrix/chat/useProjectMatrixRooms';
+import { isMatrixChatEnabled } from '@/matrix/utils';
+import { canViewProjectTeam } from '@/permissions/teamVisibility';
+import { getProject, isStaffOrSupport } from '@/workspace/selectors';
 
 import { loadProject } from './resolve';
 
 export const states: StateDeclaration[] = [
   {
     name: 'project',
-    url: '/projects/:uuid/?include_terminated',
+    url: '/projects/:uuid/?include_terminated&form_survey',
+    // An end-of-project survey ends on the dashboard with ?form_survey; the
+    // page fetches the answers and drops it, which must not reload the page.
+    params: { form_survey: { dynamic: true } },
     abstract: true,
     parent: 'layout',
     component: lazyComponent(() =>
@@ -44,6 +54,9 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Team'),
       priority: 120,
+      // Children inherit these; a child declaring its own permissions has to
+      // repeat canViewProjectTeam.
+      permissions: [canViewProjectTeam],
     },
   },
 
@@ -75,8 +88,12 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'project-manage',
-    url: 'manage/?tab',
+    url: 'manage/?tab&section',
     parent: 'project-manage-container',
+    params: {
+      tab: { dynamic: true },
+      section: { dynamic: true },
+    },
     component: lazyComponent(() =>
       import('./ProjectManage').then((module) => ({
         default: module.ProjectManage,
@@ -103,6 +120,23 @@ export const states: StateDeclaration[] = [
   },
 
   {
+    name: 'project.metrics',
+    url: 'metrics/',
+    component: lazyComponent(() =>
+      import('./metrics/ProjectMetricsPage').then((module) => ({
+        default: module.ProjectMetricsPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Metrics'),
+      priority: 105,
+      feature: ProjectFeatures.show_custom_metrics,
+      // Only where a resource comes from an offering that reports metrics.
+      permissions: [(state) => Boolean(getProject(state)?.has_metrics)],
+    },
+  },
+
+  {
     name: 'project.issues',
     url: 'issues/',
     component: lazyComponent(() =>
@@ -111,9 +145,9 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('Requests'),
+      breadcrumb: () => translate('Support'),
+      skipBreadcrumb: true,
       permissions: [hasSupport],
-      priority: 140,
     },
   },
 
@@ -128,6 +162,31 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Audit logs'),
       priority: 130,
+      permissions: [
+        (state) =>
+          !isFeatureVisible(
+            MarketplaceFeatures.conceal_audit_log_from_end_users,
+          ) || isStaffOrSupport(state),
+      ],
+    },
+  },
+
+  {
+    name: 'project.communication',
+    url: 'communication/',
+    component: lazyComponent(() =>
+      import('@/matrix/ProjectCommunication').then((module) => ({
+        default: module.ProjectCommunication,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Communication'),
+      priority: 125,
+      permissions: [
+        (state) =>
+          isMatrixChatEnabled() &&
+          hasActiveProjectMatrixRoomInCache(getProject(state)?.uuid),
+      ],
     },
   },
   {
@@ -187,6 +246,7 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Course accounts'),
       feature: InvitationsFeatures.show_course_accounts,
       permissions: [
+        canViewProjectTeam,
         (state) => {
           const project = getProject(state);
           if (isFeatureVisible(InvitationsFeatures.show_course_accounts)) {

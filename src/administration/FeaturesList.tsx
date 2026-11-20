@@ -1,18 +1,50 @@
-import { Button } from 'react-bootstrap';
+import { DotsThreeVerticalIcon } from '@phosphor-icons/react';
+import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import classNames from 'classnames';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { Card } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
 import { featureValues } from 'waldur-js-client';
 
-import { TelemetryExampleButton } from '@waldur/administration/TelemetryExampleButton';
-import { ENV } from '@waldur/core/config';
-import { FeaturesDescription } from '@waldur/features/FeaturesDescription';
-import { DeploymentFeatures } from '@waldur/FeaturesEnums';
-import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
-import FormTable from '@waldur/form/FormTable';
-import { translate } from '@waldur/i18n';
-import { useNotify } from '@waldur/store/hooks';
+import {
+  BaseButton,
+  Badge,
+  Menu,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from 'waldur-ui';
 
-const FeatureSection = ({ section }) => (
-  <FormTable.Card title={section.description} className="card-bordered mb-5">
+import { TelemetryExampleButton } from '@/administration/TelemetryExampleButton';
+import { ENV } from '@/core/config';
+import { SaveButton } from '@/core/SaveButton';
+import { FeaturesDescription } from '@/features/FeaturesDescription';
+import { FeatureSection } from '@/features/types';
+import { DeploymentFeatures } from '@/FeaturesEnums';
+import FormTable from '@/form/FormTable';
+import { SwitchField } from '@/form/SwitchField';
+import { translate } from '@/i18n';
+import { NoResult } from '@/navigation/header/search/NoResult';
+import { useUrlTab } from '@/navigation/useUrlTab';
+import { useNotify } from '@/store/notify';
+import { ActionsMenu } from '@/table/ActionsDropdown';
+import { TableQuery } from '@/table/TableQuery';
+import { useUser } from '@/workspace/hooks';
+
+// Plugin sections that will be grouped into a single "Plugins" tab
+const PLUGIN_SECTION_KEYS = ['openstack', 'rancher'];
+
+const FeatureSectionContent = ({ section }: { section: FeatureSection }) => {
+  const canEdit = Boolean(useUser()?.is_staff);
+  return (
     <FormTable>
       {section.items.map((item) => (
         <FormTable.Item
@@ -29,20 +61,139 @@ const FeatureSection = ({ section }) => (
             </>
           }
           actions={
-            <Field
-              name={`${section.key}.${item.key}`}
-              component={AwesomeCheckboxField as any}
-              data-testid={`${section.key}.${item.key}`}
-            />
+            canEdit ? (
+              <Field name={`${section.key}.${item.key}`} type="checkbox">
+                {({ input }) => (
+                  <SwitchField
+                    input={input}
+                    aria-label={item.description}
+                    data-testid={`${section.key}.${item.key}`}
+                  />
+                )}
+              </Field>
+            ) : (
+              <Field name={`${section.key}.${item.key}`}>
+                {({ input }) => (
+                  <span>
+                    {input.value ? translate('Yes') : translate('No')}
+                  </span>
+                )}
+              </Field>
+            )
           }
         />
       ))}
     </FormTable>
+  );
+};
+
+const FeatureSectionPanel = ({
+  section,
+  hasItems,
+}: {
+  section: FeatureSection;
+  hasItems: boolean;
+}) => (
+  <FormTable.Card
+    title={section.description}
+    className="card-bordered mb-5"
+    key={section.key}
+  >
+    {hasItems ? (
+      <FeatureSectionContent section={section} />
+    ) : (
+      <p className="text-muted p-5 mb-0">
+        {translate('No matching features in this section.')}
+      </p>
+    )}
   </FormTable.Card>
 );
 
+// Build tabs: regular sections + grouped Plugins tab, sorted alphabetically
+const FEATURES_TABS = [
+  ...FeaturesDescription.filter(
+    (section) => !PLUGIN_SECTION_KEYS.includes(section.key),
+  ).map((section) => ({
+    key: section.key,
+    title: section.description,
+    isPluginsTab: false,
+  })),
+  {
+    key: 'plugins',
+    title: translate('Plugins'),
+    isPluginsTab: true,
+  },
+].sort((a, b) => a.title.localeCompare(b.title));
+
 export const FeaturesList = () => {
   const { showErrorResponse, showSuccess } = useNotify();
+  const canEdit = Boolean(useUser()?.is_staff);
+  const { state, params } = useCurrentStateAndParams();
+  const router = useRouter();
+  const { activeKey, handleSelect } = useUrlTab(FEATURES_TABS, 'tab');
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [hiddenTabKeys, setHiddenTabKeys] = useState<Set<string>>(new Set());
+
+  const updateOverflow = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const containerRect = el.getBoundingClientRect();
+    const items = el.querySelectorAll('[role="tab"]');
+    const hidden = new Set<string>();
+    items.forEach((item, i) => {
+      const rect = item.getBoundingClientRect();
+      if (
+        rect.right > containerRect.right + 1 ||
+        rect.left < containerRect.left - 1
+      ) {
+        hidden.add(FEATURES_TABS[i].key);
+      }
+    });
+    setHiddenTabKeys(hidden);
+  }, []);
+
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateOverflow();
+    el.addEventListener('scroll', updateOverflow);
+    window.addEventListener('resize', updateOverflow);
+    return () => {
+      el.removeEventListener('scroll', updateOverflow);
+      window.removeEventListener('resize', updateOverflow);
+    };
+  }, [updateOverflow]);
+
+  const scrollToTab = useCallback((tabKey: string) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const index = FEATURES_TABS.findIndex((t) => t.key === tabKey);
+    const tabEl = el.querySelectorAll<HTMLElement>('[role="tab"]')[index];
+    if (tabEl && tabEl.scrollIntoView) {
+      tabEl.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeKey) {
+      scrollToTab(activeKey);
+    }
+  }, [activeKey, scrollToTab]);
+
+  // Sync search query with URL
+  const query = (params.q as string) || '';
+  const setQuery = (newQuery: string) => {
+    router.stateService.go(
+      state.name,
+      { ...params, q: newQuery || undefined },
+      { location: 'replace' },
+    );
+  };
 
   const saveFeaturesCallback = async (formData) => {
     try {
@@ -54,18 +205,264 @@ export const FeaturesList = () => {
     }
   };
 
+  const filteredSections = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return FeaturesDescription;
+
+    return FeaturesDescription.map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) =>
+          item.description.toLowerCase().includes(q) ||
+          item.key.toLowerCase().includes(q) ||
+          section.description.toLowerCase().includes(q),
+      ),
+    }));
+  }, [query]);
+
+  const getFilteredCount = (tabKey: string) => {
+    if (tabKey === 'plugins') {
+      return filteredSections
+        .filter((s) => PLUGIN_SECTION_KEYS.includes(s.key))
+        .reduce((sum, s) => sum + s.items.length, 0);
+    }
+    const section = filteredSections.find((s) => s.key === tabKey);
+    return section?.items.length || 0;
+  };
+
+  const pluginSections = filteredSections.filter((s) =>
+    PLUGIN_SECTION_KEYS.includes(s.key),
+  );
+
+  // Compute total search results and tabs with matches for search summary
+  const tabsWithMatches = useMemo(() => {
+    if (!query) return [];
+    return FEATURES_TABS.filter((tab) => getFilteredCount(tab.key) > 0);
+  }, [query, filteredSections]);
+
+  const totalResults = useMemo(() => {
+    if (!query) return 0;
+    return filteredSections.reduce((sum, s) => sum + s.items.length, 0);
+  }, [query, filteredSections]);
+
   return (
     <Form
       onSubmit={saveFeaturesCallback}
       initialValues={ENV.FEATURES}
-      render={({ handleSubmit, submitting }) => (
+      render={({ handleSubmit, submitting, dirty }) => (
         <form onSubmit={handleSubmit}>
-          {FeaturesDescription.map((section) => (
-            <FeatureSection key={section.key} section={section} />
-          ))}
-          <Button type="submit" variant="primary" disabled={submitting}>
-            {translate('Save')}
-          </Button>
+          <Card className="card-bordered">
+            <Card.Header>
+              <div className="d-flex flex-column">
+                <Card.Title className="mb-0">
+                  <h3>{translate('Features')}</h3>
+                </Card.Title>
+              </div>
+              <div className="card-toolbar d-flex align-items-center gap-4 flex-nowrap">
+                <TableQuery query={query} setQuery={setQuery} />
+                {canEdit && (
+                  <SaveButton
+                    type="submit"
+                    onClick={handleSubmit}
+                    submitting={submitting}
+                    dirty={dirty}
+                  />
+                )}
+              </div>
+            </Card.Header>
+            <Card.Body style={{ paddingTop: 8 }}>
+              <Tabs mount="all" value={activeKey} onValueChange={handleSelect}>
+                <div
+                  className="d-flex align-items-end gap-1"
+                  style={{ borderBottom: '1px solid var(--bs-border-color)' }}
+                >
+                  <div
+                    ref={scrollRef}
+                    className="flex-grow-1"
+                    style={{
+                      overflowX: 'auto',
+                      scrollbarWidth: 'none',
+                      minWidth: 0,
+                      paddingBottom: 2,
+                      marginBottom: -2,
+                    }}
+                  >
+                    <TabsList
+                      bordered={false}
+                      style={{ minWidth: 'max-content' }}
+                    >
+                      {FEATURES_TABS.map((tab) => {
+                        const filteredCount = getFilteredCount(tab.key);
+                        const hasMatches = filteredCount > 0;
+                        return (
+                          <TabsTrigger
+                            key={tab.key}
+                            style={{ whiteSpace: 'nowrap' }}
+                            value={tab.key}
+                            disabled={!hasMatches && !!query}
+                            className={!hasMatches && query ? 'text-muted' : ''}
+                          >
+                            {tab.title}
+                            {query && (
+                              <Badge
+                                variant="secondary"
+                                size="sm"
+                                tone="light"
+                                className="ms-2"
+                              >
+                                {filteredCount}
+                              </Badge>
+                            )}
+                          </TabsTrigger>
+                        );
+                      })}
+                    </TabsList>
+                  </div>
+                  {hiddenTabKeys.size > 0 && (
+                    <ActionsMenu
+                      side="bottom"
+                      toggle={
+                        <BaseButton
+                          variant="text-secondary"
+                          size="md"
+                          className="flex-shrink-0"
+                          style={{ marginBottom: 2 }}
+                          tooltip={translate('More tabs')}
+                          iconNode={
+                            <DotsThreeVerticalIcon size={22} weight="bold" />
+                          }
+                        />
+                      }
+                      align="end"
+                      onOpenChange={updateOverflow}
+                    >
+                      <div className="mh-200px overflow-auto">
+                        {FEATURES_TABS.filter((tab) =>
+                          hiddenTabKeys.has(tab.key),
+                        ).map((tab) => {
+                          const filteredCount = getFilteredCount(tab.key);
+                          const hasMatches = filteredCount > 0;
+                          return (
+                            <Menu.Item
+                              key={tab.key}
+                              disabled={!hasMatches && !!query}
+                              className={classNames(
+                                'd-flex justify-content-between align-items-center',
+                                { active: tab.key === activeKey },
+                              )}
+                              onClick={() => {
+                                handleSelect(tab.key);
+                                scrollToTab(tab.key);
+                              }}
+                            >
+                              {tab.title}
+                              {query && (
+                                <Badge
+                                  variant="neutral"
+                                  size="sm"
+                                  tone="outline"
+                                  className="ms-2"
+                                >
+                                  {filteredCount}
+                                </Badge>
+                              )}
+                            </Menu.Item>
+                          );
+                        })}
+                      </div>
+                    </ActionsMenu>
+                  )}
+                </div>
+                {query && tabsWithMatches.length > 0 && (
+                  <div className="d-flex align-items-center gap-2 pt-3 pb-4 flex-wrap border-bottom">
+                    <span className="text-muted fs-7">
+                      {translate('{count} results found in:', {
+                        count: totalResults,
+                      })}
+                    </span>
+                    {tabsWithMatches.map((tab) => (
+                      <BaseButton
+                        key={tab.key}
+                        variant="tertiary-ghost"
+                        className="p-0"
+                        onClick={() => handleSelect(tab.key)}
+                        label={
+                          <Badge variant="neutral" size="sm" tone="outline">
+                            {tab.title} ({getFilteredCount(tab.key)})
+                          </Badge>
+                        }
+                      />
+                    ))}
+                  </div>
+                )}
+                {query && tabsWithMatches.length === 0 && (
+                  <NoResult
+                    title={translate('No results found')}
+                    message={translate(
+                      'No matching features found. Try a different search term.',
+                    )}
+                    callback={() => setQuery('')}
+                    buttonTitle={translate('Clear search')}
+                  />
+                )}
+                {!(query && tabsWithMatches.length === 0) && (
+                  <>
+                    {FEATURES_TABS.map((tab) => {
+                      if (tab.isPluginsTab) {
+                        const hasAnyItems = pluginSections.some(
+                          (s) => s.items.length > 0,
+                        );
+                        return (
+                          <TabsContent key={tab.key} value={tab.key}>
+                            {hasAnyItems || !query ? (
+                              pluginSections.map((section) => (
+                                <FeatureSectionPanel
+                                  key={section.key}
+                                  section={section}
+                                  hasItems={section.items.length > 0}
+                                />
+                              ))
+                            ) : (
+                              <NoResult
+                                title={translate('No results found')}
+                                message={translate(
+                                  'No matching features in this section. Try a different search term.',
+                                )}
+                                callback={() => setQuery('')}
+                                buttonTitle={translate('Clear search')}
+                              />
+                            )}
+                          </TabsContent>
+                        );
+                      }
+
+                      const section = filteredSections.find(
+                        (s) => s.key === tab.key,
+                      );
+                      if (!section) return null;
+
+                      return (
+                        <TabsContent key={tab.key} value={tab.key}>
+                          {section.items.length > 0 ? (
+                            <FeatureSectionContent section={section} />
+                          ) : (
+                            <NoResult
+                              title={translate('No results found')}
+                              message={translate(
+                                'No matching features in this section. Try a different search term.',
+                              )}
+                              callback={() => setQuery('')}
+                              buttonTitle={translate('Clear search')}
+                            />
+                          )}
+                        </TabsContent>
+                      );
+                    })}
+                  </>
+                )}
+              </Tabs>
+            </Card.Body>
+          </Card>
         </form>
       )}
     />

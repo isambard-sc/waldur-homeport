@@ -3,11 +3,12 @@ import classNames from 'classnames';
 import { isEqual } from 'lodash-es';
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
-import { ImagePlaceholder } from '@waldur/core/ImagePlaceholder';
-import { Select } from '@waldur/form/themed-select';
-import { FormField } from '@waldur/form/types';
-import { translate } from '@waldur/i18n';
-import { MenuComponent } from '@waldur/metronic/components';
+import { Menu, Radio } from 'waldur-ui';
+
+import { ImagePlaceholder } from '@/core/ImagePlaceholder';
+import { Select } from '@/form/select';
+import { FormField } from '@/form/types';
+import { translate } from '@/i18n';
 
 import './BoxRadioField.scss';
 
@@ -69,25 +70,22 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
         return prev;
       });
       onChange(option.value);
-      MenuComponent.hideDropdowns(null);
     },
     [onChange, setSelectedVersions],
   );
 
   useEffect(() => {
     setSelectedVersions(getRadioVersions(choices));
-    MenuComponent.reinitialization();
   }, [choices, setSelectedVersions]);
 
   if (vertical) {
     return (
       <div
-        className={
-          'form-check-boxes-wrapper vertical' +
-          (leftRadio ? ' left-radio' : '') +
-          (alignTop ? ' align-top' : '') +
-          (hoverable ? ' hoverable' : '')
-        }
+        className={classNames('box-radio-wrapper vertical', {
+          'left-radio': leftRadio,
+          'align-top': alignTop,
+          hoverable,
+        })}
       >
         {choices.map((choice, index) => {
           const isChecked = [choice.value]
@@ -100,11 +98,10 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
           return (
             <div
               key={index}
-              className={
-                'form-check-box' +
-                (isChecked ? ' active' : '') +
-                (hasOptions ? ' flex-wrap' : '')
-              }
+              className={classNames('box-radio', {
+                'flex-wrap': hasOptions,
+                active: isChecked,
+              })}
               onClick={() => onChange(selectedVersions[index].value)}
               role="radio"
               aria-checked={isChecked}
@@ -113,9 +110,9 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
                 e.key === 'Enter' && onChange(selectedVersions[index].value)
               }
             >
-              <div className="form-check-header">
+              <div className="box-radio-header">
                 {hasImage && (
-                  <div className="form-check-wrapper">
+                  <div className="box-radio-media">
                     {choice.image ? (
                       choice.image
                     ) : imagePlaceholder ? (
@@ -126,7 +123,7 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
                       </ImagePlaceholder>
                     ) : (
                       <span className="display-6">
-                        <CheckIcon />
+                        <CheckIcon weight="bold" />
                       </span>
                     )}
                   </div>
@@ -150,7 +147,7 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
                     ))}
                 </div>
               </div>
-              <div className="form-check-info">
+              <div className="box-radio-info">
                 {hasOptions && (
                   <Select
                     value={selectedVersions[index]}
@@ -159,19 +156,14 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
                     getOptionLabel={(option) =>
                       option.label || translate('Default')
                     }
-                    className="metronic-select-container"
-                    classNamePrefix="metronic-select"
                   />
                 )}
-                <div className="form-check form-check-custom form-check-sm d-block">
-                  <input
-                    className="form-check-input flex-shrink-0"
-                    type="radio"
-                    checked={isChecked}
-                    onChange={() => onChange(selectedVersions[index].value)}
-                    {...rest}
-                  />
-                </div>
+                <Radio
+                  size="sm"
+                  checked={isChecked}
+                  onChange={() => onChange(selectedVersions[index].value)}
+                  {...rest}
+                />
               </div>
             </div>
           );
@@ -182,7 +174,9 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
 
   return (
     <div
-      className={'form-check-boxes-wrapper' + (hoverable ? ' hoverable' : '')}
+      className={classNames('box-radio-wrapper', {
+        hoverable: hoverable,
+      })}
     >
       {choices.map((choice, index) => {
         const isChecked = [choice.value]
@@ -195,23 +189,21 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
         return (
           <div
             key={index}
-            className={'form-check-box' + (isChecked ? ' active' : '')}
+            className={classNames('box-radio', { active: isChecked })}
           >
-            <label className="form-check-header">
-              <div className="form-check-wrapper">
+            <label className="box-radio-header">
+              <div className="box-radio-media">
                 {choice.image ? (
                   choice.image
                 ) : typeof choice.label === 'string' ? (
                   choice.label.toUpperCase().substring(0, 4)
                 ) : (
                   <span className="display-6">
-                    <CheckIcon />
+                    <CheckIcon weight="bold" />
                   </span>
                 )}
               </div>
-              <input
-                className="form-check-input"
-                type="radio"
+              <Radio
                 checked={isChecked}
                 hidden
                 onChange={() => onChange(selectedVersions[index].value)}
@@ -219,58 +211,68 @@ export const BoxRadioField: React.FC<BoxRadioFieldProps> = ({
               />
             </label>
             <button
-              className="form-check-info"
+              className="box-radio-info"
               type="button"
               onClick={() => onChange(selectedVersions[index].value)}
             >
               {choice.options?.length ? (
-                <>
-                  {/* Trigger */}
-                  <div
-                    className="version-selector"
-                    data-kt-menu-trigger="click"
-                    data-kt-menu-attach="parent"
-                    data-kt-menu-placement="bottom"
-                  >
-                    <div />
-                    <div>
-                      <div className="form-check-label">{choice.label}</div>
-                      <div className="form-check-metadata">
-                        {selectedVersions[index].label}
+                <Menu modal={false}>
+                  {/* Trigger. asChild composes onto the existing <div> —
+                      Radix's own default Trigger element is a <button>,
+                      which can't nest inside the enclosing
+                      "box-radio-info" <button> without breaking HTML
+                      validity. */}
+                  <Menu.Trigger asChild>
+                    <div className="version-selector">
+                      <div />
+                      <div>
+                        <div className="box-radio-label">{choice.label}</div>
+                        <div className="box-radio-metadata">
+                          {selectedVersions[index].label}
+                        </div>
                       </div>
+                      <span className="fs-1 fw-light">
+                        <CaretDownIcon weight="bold" />
+                      </span>
                     </div>
-                    <span className="fs-1 fw-light">
-                      <CaretDownIcon />
-                    </span>
-                  </div>
+                  </Menu.Trigger>
 
                   {/* Options menu */}
-                  <div
-                    className="versions menu menu-sub menu-sub-dropdown menu-rounded menu-gray-600 menu-active-bg-light-primary menu-hover-title-primary border fw-bold rounded-0 mw-250px fs-6 py-3"
-                    data-kt-menu="true"
+                  <Menu.Content
+                    align="start"
+                    className="border fw-bold rounded-0 mw-250px fs-6 py-3"
+                    // Compact rows, as in the footer menus.
+                    density="compact"
                   >
-                    {choice.options.map((option, i) => (
-                      <div
-                        key={i}
-                        className="menu-item px-3"
-                        data-kt-menu-trigger
-                      >
-                        <span
-                          className="menu-link px-3"
-                          onClick={() => onChangeSelect(option, index)}
-                          aria-hidden="true"
+                    {/* Radio items: picking a version is a single choice,
+                        and the current one is announced as checked. */}
+                    <Menu.RadioGroup
+                      value={String(
+                        choice.options.findIndex((option) =>
+                          isEqual(option.value, selectedVersions[index].value),
+                        ),
+                      )}
+                      onValueChange={(value) =>
+                        onChangeSelect(choice.options[Number(value)], index)
+                      }
+                    >
+                      {choice.options.map((option, i) => (
+                        <Menu.RadioItem
+                          key={i}
+                          value={String(i)}
+                          className="mx-[9.75px] rounded-md"
                         >
-                          <span className="menu-title">{option.label}</span>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
+                          {option.label}
+                        </Menu.RadioItem>
+                      ))}
+                    </Menu.RadioGroup>
+                  </Menu.Content>
+                </Menu>
               ) : (
                 <>
-                  <div className="form-check-label">{choice.label}</div>
+                  <div className="box-radio-label">{choice.label}</div>
                   {choice.metadata && (
-                    <div className="form-check-metadata">{choice.metadata}</div>
+                    <div className="box-radio-metadata">{choice.metadata}</div>
                   )}
                 </>
               )}

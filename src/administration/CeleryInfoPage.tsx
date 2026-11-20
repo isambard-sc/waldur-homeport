@@ -1,70 +1,93 @@
 import { useQuery } from '@tanstack/react-query';
 import { celeryStatsRetrieve } from 'waldur-js-client';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import FormTable from '@waldur/form/FormTable';
-import { translate } from '@waldur/i18n';
+import { AlertItem } from 'waldur-ui';
 
-type CeleryStats = Record<string, Array<any>>;
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+
+import { CeleryOverviewCards } from './celery/CeleryOverviewCards';
+import { CeleryResourceUsage } from './celery/CeleryResourceUsage';
+import { CeleryTaskQueues } from './celery/CeleryTaskQueues';
+import { CeleryTaskStats } from './celery/CeleryTaskStats';
+import { CeleryWorkerInfo } from './celery/CeleryWorkerInfo';
 
 const getCeleryStats = () =>
-  celeryStatsRetrieve().then(
-    (response) =>
-      response.data as {
-        active: CeleryStats;
-        scheduled: CeleryStats;
-        reserved: CeleryStats;
-        revoked: CeleryStats;
-      },
-  );
+  celeryStatsRetrieve().then((response) => response.data);
 
 export const CeleryInfoPage = () => {
   const { isLoading, error, data } = useQuery({
     queryKey: ['CeleryInfoPage'],
-
-    queryFn: () => getCeleryStats(),
+    queryFn: getCeleryStats,
   });
-  if (isLoading) {
-    return <LoadingSpinner />;
+
+  // Early returns for loading and error states
+  if (isLoading || !data) {
+    return (
+      <div className="text-center py-10">
+        <LoadingSpinner />
+        <p className="text-muted mt-4">
+          {translate('Fetching Celery statistics, please standby...')}
+        </p>
+      </div>
+    );
   }
+
   if (error) {
-    return translate('Unable to load data');
+    return (
+      <div className="text-danger">{translate('Unable to load data')}</div>
+    );
   }
+
+  // Handle case when all values are null (Celery is down)
+  const stats = data.stats ?? null;
+  const workers = stats ? Object.entries(stats) : [];
+  const hasWorkers = workers.length > 0;
+
   return (
-    <FormTable.Card className="card-bordered">
-      <FormTable>
-        <FormTable.Item
-          label={translate('Active tasks')}
-          value={Object.values(data.active).reduce(
-            (result, item) => result + item.length,
-            0,
+    <div className="celery-info-page pt-5">
+      {!hasWorkers && (
+        <AlertItem
+          variant="warning"
+          type="floating"
+          className="mb-6"
+          title={translate('No Celery workers detected')}
+          body={translate(
+            'Celery may be down or not responding. Task queues and statistics are unavailable.',
           )}
         />
+      )}
 
-        <FormTable.Item
-          label={translate('Scheduled tasks')}
-          value={Object.values(data.scheduled).reduce(
-            (result, item) => result + item.length,
-            0,
-          )}
-        />
+      <CeleryOverviewCards data={data} />
 
-        <FormTable.Item
-          label={translate('Reserved tasks')}
-          value={Object.values(data.reserved).reduce(
-            (result, item) => result + item.length,
-            0,
-          )}
+      {workers.map(([workerName, workerStats]) => (
+        <CeleryWorkerInfo
+          key={workerName}
+          workerName={workerName}
+          stats={workerStats}
         />
+      ))}
 
-        <FormTable.Item
-          label={translate('Revoked tasks')}
-          value={Object.values(data.revoked).reduce(
-            (result, item) => result + item.length,
-            0,
+      <CeleryTaskQueues
+        active={data.active}
+        reserved={data.reserved}
+        scheduled={data.scheduled}
+      />
+
+      {workers.map(([workerName, workerStats]) => (
+        <div key={`stats-${workerName}`}>
+          {workerStats.total && (
+            <CeleryTaskStats
+              total={workerStats.total as Record<string, number>}
+            />
           )}
-        />
-      </FormTable>
-    </FormTable.Card>
+          {workerStats.rusage && (
+            <CeleryResourceUsage
+              rusage={workerStats.rusage as Record<string, number>}
+            />
+          )}
+        </div>
+      ))}
+    </div>
   );
 };

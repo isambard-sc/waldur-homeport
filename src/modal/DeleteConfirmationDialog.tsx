@@ -1,10 +1,11 @@
 import { TrashIcon } from '@phosphor-icons/react';
 import React, { ReactNode } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
-import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
+import { CloseDialogButton } from '@/modal/CloseDialogButton';
 
 import { ModalDialog } from './ModalDialog';
 
@@ -17,14 +18,25 @@ interface DeleteConfirmationDialogProps {
     title: ReactNode;
     body: ReactNode;
     iconNode?: ReactNode;
+    /**
+     * Both labels come from `ConfirmationOptions`, which `confirm` spreads into
+     * `resolve`. They used to be dropped here while `ConfirmationDialog`
+     * honoured them, so every `forDeletion` caller got "Delete" -- including
+     * "Purge queue", which is a different operation, and the OpenStack actions
+     * that remove an interface from a router rather than delete the router.
+     */
+    positiveButton?: string;
+    negativeButton?: string;
   };
 }
 
 export const DeleteConfirmationDialog: React.FC<
   DeleteConfirmationDialogProps
-> = ({ resolve: { title, body, deferred, iconNode } }) => {
-  const dispatch = useDispatch();
-  const closeDialog = () => dispatch(closeModalDialog('HIDE_CONFIRM'));
+> = ({
+  resolve: { title, body, deferred, iconNode, positiveButton, negativeButton },
+}) => {
+  const { closeDialog: closeModal } = useModal();
+  const closeDialog = () => closeModal('HIDE_CONFIRM');
 
   const handleSubmit = () => {
     deferred.resolve();
@@ -41,23 +53,21 @@ export const DeleteConfirmationDialog: React.FC<
       title={title}
       iconNode={iconNode || <TrashIcon weight="bold" />}
       iconColor="danger"
-      bodyClassName="text-gray-500 pt-2"
+      bodyClassName="text-quaternary pt-8px"
       footer={
         <>
-          <Button
-            variant="tertiary"
-            className="flex-equal"
+          <CloseDialogButton
+            label={negativeButton}
+            className="min-w-150px"
             onClick={handleCancel}
-          >
-            {translate('Cancel')}
-          </Button>
-          <Button
+          />
+          <BaseButton
             variant="danger"
-            className="flex-equal"
+            className="min-w-150px"
             onClick={handleSubmit}
-          >
-            {translate('Delete')}
-          </Button>
+            label={positiveButton || translate('Delete')}
+            size="lg"
+          />
         </>
       }
     >

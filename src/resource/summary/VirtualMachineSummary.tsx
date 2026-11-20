@@ -1,10 +1,9 @@
-import { QuestionIcon } from '@phosphor-icons/react';
+import { HelpIcon } from 'waldur-ui';
 
-import { formatRelative } from '@waldur/core/dateUtils';
-import { Tip } from '@waldur/core/Tooltip';
-import FormTable from '@waldur/form/FormTable';
-import { translate } from '@waldur/i18n';
-import { formatSummary } from '@waldur/resource/utils';
+import { formatRelative } from '@/core/dateUtils';
+import FormTable from '@/form/FormTable';
+import { translate } from '@/i18n';
+import { formatSummary } from '@/resource/utils';
 
 import { IPList } from '../IPList';
 
@@ -18,15 +17,13 @@ export const ResourceSummaryField = ({ resource }) => (
   <>
     {formatSummary(resource)}
     {resource.flavor_name && (
-      <Tip
-        id="resourceSummary"
+      <HelpIcon
         label={translate('Flavor name: {flavor_name}', {
           flavor_name: resource.flavor_name,
         })}
-      >
-        {' '}
-        <QuestionIcon size={17} />
-      </Tip>
+        size={17}
+        className="ms-1"
+      />
     )}
   </>
 );
@@ -40,18 +37,26 @@ export const PureVirtualMachineSummary = (props: ResourceSummaryProps) => {
         value={<ResourceSummaryField {...props} />}
       />
 
+      {/*
+        Three different things, so three different names. `internal_ips` are the
+        addresses the instance holds on the tenant's own networks -- fixed IPs,
+        in Nova's own term, which says where an address comes from rather than
+        who can reach it. `external_ips` are the floating IPs plus any directly
+        connected ones, so "Floating IPs" would not cover them. `external_address`
+        is narrower still: the address a floating IP is itself mapped to.
+      */}
       <Component
-        label={translate('Internal IP')}
+        label={translate('Fixed IPs')}
         value={<IPList value={props.resource.internal_ips} />}
       />
 
       <Component
-        label={translate('Floating IP')}
+        label={translate('External IPs')}
         value={<IPList value={props.resource.external_ips} />}
       />
 
       <Component
-        label={translate('External IPs')}
+        label={translate('Mapped public IPs')}
         value={<IPList value={props.resource.external_address} />}
       />
 

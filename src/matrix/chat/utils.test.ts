@@ -1,0 +1,613 @@
+import { describe, expect, it } from 'vitest';
+
+import { ENV } from '@/core/config';
+
+import { CALL_STARTED_MESSAGE_TYPE } from './call/callTimeline';
+import { REDACTED_MESSAGE_TYPE } from './messageRelations';
+import { MatrixChatMessage } from './types';
+import {
+  aggregateReactions,
+  aggregateReactionsForTarget,
+  getSenderName,
+  htmlToPlainText,
+  mapEventToMessage,
+  resolveMemberName,
+  sanitizeName,
+  UNDECRYPTABLE_MESSAGE_TYPE,
+} from './utils';
+
+// @/core/config is mocked globally (test/setupTests.js); override just the
+// value the bot-name path reads so the assertion below is whitelabel-specific.
+ENV.plugins.WALDUR_CORE.SITE_NAME = 'Acme';
+
+const message: MatrixChatMessage = {
+  eventId: 'e1',
+  sender: '@robin:waldur.example.com',
+  senderDisplayName: 'robin 💕',
+  body: 'hi',
+  timestamp: 0,
+  type: 'm.text',
+};
+
+const makeEvent = (content: any, type = 'm.room.message') =>
+  ({
+    getType: () => type,
+    getContent: () => content,
+    getSender: () => '@bob:s',
+    getId: () => '$evt1',
+    getTs: () => 1000,
+  }) as any;
+
+describe('mapEventToMessage', () => {
+  const encrypted = (failed: boolean) =>
+    ({
+      ...makeEvent({}, 'm.room.encrypted'),
+      isDecryptionFailure: () => failed,
+    }) as any;
+
+  it('does not let a sender claim the undecryptable notice style', () => {
+    const spoof = makeEvent({
+      msgtype: UNDECRYPTABLE_MESSAGE_TYPE,
+      body: 'Unable to decrypt this message.',
+    });
+    expect(mapEventToMessage(spoof)?.type).toBe('m.text');
+  });
+
+  it('does not let a sender claim the deleted-message style', () => {
+    const spoof = makeEvent({ msgtype: REDACTED_MESSAGE_TYPE, body: 'x' });
+    const message = mapEventToMessage(spoof);
+    expect(message?.type).toBe('m.text');
+    expect(message?.redacted).toBeUndefined();
+  });
+
+  it('does not let a sender claim the call-started style', () => {
+    const spoof = makeEvent({ msgtype: CALL_STARTED_MESSAGE_TYPE, body: 'x' });
+    expect(mapEventToMessage(spoof)?.type).toBe('m.text');
+  });
+
+  it('waits for an encrypted event to be decrypted', () => {
+    expect(mapEventToMessage(encrypted(false))).toBeNull();
+  });
+
+  it('flags a message sent in clear into an encrypted room', () => {
+    const room = {
+      getMember: () => null,
+      hasEncryptionStateEvent: () => true,
+    } as any;
+    const event = (encrypted: boolean, status: string | null = null) =>
+      ({
+        ...makeEvent({ msgtype: 'm.text', body: 'hi' }),
+        isEncrypted: () => encrypted,
+        status,
+      }) as any;
+
+    expect(mapEventToMessage(event(false), room)?.unencrypted).toBe(true);
+    expect(mapEventToMessage(event(true), room)?.unencrypted).toBeUndefined();
+    const edit = (status: string | null = null) =>
+      ({
+        ...makeEvent({
+          msgtype: 'm.text',
+          body: '* hello',
+          'm.new_content': { msgtype: 'm.text', body: 'hello' },
+          'm.relates_to': { rel_type: 'm.replace', event_id: '$evt1' },
+        }),
+        getId: () => '$edit',
+        isEncrypted: () => false,
+        status,
+      }) as any;
+    // An edit in clear of an encrypted message is not applied at all: the
+    // homeserver could have written it.
+    const edited = {
+      ...event(true),
+      replacingEvent: () => edit(),
+    } as any;
+    expect(mapEventToMessage(edited, room)?.body).toBe('hi');
+    expect(mapEventToMessage(edited, room)?.edited).toBeUndefined();
+    expect(mapEventToMessage(edited, room)?.unencrypted).toBeUndefined();
+    // The user's own edit is encrypted only as it is sent.
+    const editing = {
+      ...event(true),
+      replacingEvent: () => edit('encrypting'),
+    } as any;
+    expect(mapEventToMessage(editing, room)).toEqual(
+      expect.objectContaining({ body: 'hello', edited: true }),
+    );
+    expect(mapEventToMessage(editing, room)?.unencrypted).toBeUndefined();
+    // A local echo is not encrypted until it is sent.
+    expect(
+      mapEventToMessage(event(false, 'sending'), room)?.unencrypted,
+    ).toBeUndefined();
+  });
+
+  it('keeps a row for an event that cannot be decrypted', () => {
+    expect(mapEventToMessage(encrypted(true))).toEqual(
+      expect.objectContaining({
+        eventId: '$evt1',
+        sender: '@bob:s',
+        type: UNDECRYPTABLE_MESSAGE_TYPE,
+        body: 'Unable to decrypt this message.',
+      }),
+    );
+  });
+
+  it('shows a notice, not the SDK error, for a failed decryption', () => {
+    // matrix-js-sdk reports a failed decryption as an m.room.message.
+    const failed = {
+      ...makeEvent({
+        msgtype: 'm.bad.encrypted',
+        body: '** Unable to decrypt: DecryptionError: no session **',
+      }),
+      isDecryptionFailure: () => true,
+    } as any;
+    expect(mapEventToMessage(failed)).toEqual(
+      expect.objectContaining({
+        type: UNDECRYPTABLE_MESSAGE_TYPE,
+        body: 'Unable to decrypt this message.',
+      }),
+    );
+  });
+
+  it('keeps a media message that has an empty body', () => {
+    const msg = mapEventToMessage(
+      makeEvent({
+        msgtype: 'm.image',
+        body: '',
+        url: 'mxc://x',
+        info: { mimetype: 'image/png' },
+      }),
+    );
+    expect(msg).not.toBeNull();
+    expect(msg!.type).toBe('m.image');
+  });
+
+  it('still drops a text message with no body', () => {
+    const msg = mapEventToMessage(makeEvent({ msgtype: 'm.text', body: '' }));
+    expect(msg).toBeNull();
+  });
+
+  // Any room member can send any JSON; a non-string body or url used to throw
+  // while rendering and broke the room for everyone until it was redacted.
+  it('drops a text message whose body is not a string', () => {
+    const msg = mapEventToMessage(
+      makeEvent({ msgtype: 'm.text', body: { evil: true } }),
+    );
+    expect(msg).toBeNull();
+  });
+
+  it('ignores a media url that is not a string', () => {
+    const msg = mapEventToMessage(
+      makeEvent({ msgtype: 'm.file', body: 'a.txt', url: ['mxc://x/y'] }),
+    );
+    expect(msg?.url).toBeUndefined();
+    expect(msg?.body).toBe('a.txt');
+  });
+});
+
+describe('getSenderName', () => {
+  it('returns the Waldur full name when the sender is a known room member', () => {
+    const names = new Map([['@robin:waldur.example.com', 'Robin Hood']]);
+    expect(getSenderName(message, names)).toBe('Robin Hood');
+  });
+
+  it('falls back to the sanitized Matrix display name when the sender is not a Waldur member', () => {
+    expect(getSenderName(message, new Map())).toBe('robin');
+  });
+});
+
+describe('resolveMemberName', () => {
+  const userId = '@robin:waldur.example.com';
+
+  it('returns the Waldur full name when the user is a known member', () => {
+    const names = new Map([[userId, 'Robin Hood']]);
+    expect(resolveMemberName(userId, names, 'robin 💕')).toBe('Robin Hood');
+  });
+
+  it('falls back to the sanitized Matrix name for non-Waldur users', () => {
+    expect(resolveMemberName(userId, new Map(), 'robin 💕')).toBe('robin');
+  });
+
+  it('humanizes the localpart when there is no Matrix name', () => {
+    expect(resolveMemberName('@john.doe:waldur.example.com', new Map())).toBe(
+      'John Doe',
+    );
+  });
+
+  it('humanizes the localpart when the Matrix name is only emoji', () => {
+    expect(
+      resolveMemberName('@john.doe:waldur.example.com', new Map(), '💕💕'),
+    ).toBe('John Doe');
+  });
+
+  it('uses the SITE_NAME-derived bot name when the localpart looks like a bot', () => {
+    // matrix-js-sdk's RoomMember.name returns the raw user ID when no display
+    // name is set — e.g. the appservice bot before it is renamed. We must not
+    // surface "Waldur Bot" on whitelabel deployments, so any `*-bot` localpart
+    // resolves to `${SITE_NAME} Bot` instead of being humanized.
+    expect(
+      resolveMemberName(
+        '@waldur-bot:localhost',
+        new Map(),
+        '@waldur-bot:localhost',
+      ),
+    ).toBe('Acme Bot');
+  });
+});
+
+describe('sanitizeName', () => {
+  it('strips emoji and collapses the leftover whitespace', () => {
+    expect(sanitizeName('robin 💕')).toBe('robin');
+    expect(sanitizeName('hendrik 💕 jaks')).toBe('hendrik jaks');
+  });
+
+  it('leaves a plain name untouched', () => {
+    expect(sanitizeName('Robin Hood')).toBe('Robin Hood');
+  });
+
+  it('keeps initials derivable — first letters survive', () => {
+    expect(sanitizeName('💕 Robin Hood').charAt(0)).toBe('R');
+  });
+});
+
+describe('htmlToPlainText', () => {
+  it('strips tags from a formatted_body preview', () => {
+    expect(htmlToPlainText('<p><strong>Room members (2):</strong></p>')).toBe(
+      'Room members (2):',
+    );
+  });
+
+  it('decodes entities and collapses whitespace across blocks', () => {
+    expect(
+      htmlToPlainText(
+        '<p><strong>Members:</strong></p>\n<ul>\n<li><code>a&lt;b</code> — bot</li>\n</ul>',
+      ),
+    ).toBe('Members: a<b — bot');
+  });
+
+  it('drops embedded script content instead of surfacing it as text', () => {
+    // DOMPurify removes <script> along with its content, so the preview shows
+    // only the real message text — never the script body.
+    expect(htmlToPlainText('<p>hi<script>alert(1)</script></p>')).toBe('hi');
+  });
+
+  it('returns empty string for empty input', () => {
+    expect(htmlToPlainText('')).toBe('');
+  });
+});
+
+// Minimal mock MatrixEvent shape — only the fields aggregateReactions reads.
+function reactionEvent(opts: {
+  eventId: string;
+  sender: string;
+  target: string;
+  key: string;
+  redacted?: boolean;
+}) {
+  return {
+    getType: () => 'm.reaction',
+    getId: () => opts.eventId,
+    getSender: () => opts.sender,
+    getContent: () => ({
+      'm.relates_to': {
+        rel_type: 'm.annotation',
+        event_id: opts.target,
+        key: opts.key,
+      },
+    }),
+    isRedacted: () => Boolean(opts.redacted),
+  } as any;
+}
+
+function nonReactionEvent() {
+  return {
+    getType: () => 'm.room.message',
+    getId: () => 'msg-1',
+    getSender: () => '@a:s',
+    getContent: () => ({ body: 'hi' }),
+    isRedacted: () => false,
+  } as any;
+}
+
+describe('aggregateReactions', () => {
+  const me = '@me:server';
+
+  it('returns empty maps when there are no events', () => {
+    const result = aggregateReactions([], me);
+    expect(result.aggregates.size).toBe(0);
+    expect(result.reactors.size).toBe(0);
+  });
+
+  it('ignores non-reaction events', () => {
+    const result = aggregateReactions([nonReactionEvent()], me);
+    expect(result.aggregates.size).toBe(0);
+  });
+
+  it('aggregates a single reaction', () => {
+    const events = [
+      reactionEvent({
+        eventId: 'r1',
+        sender: '@alice:s',
+        target: 'm1',
+        key: '👍',
+      }),
+    ];
+    const result = aggregateReactions(events, me);
+    expect(result.aggregates.get('m1')).toEqual([
+      { key: '👍', count: 1, reactedByMe: false, myEventId: undefined },
+    ]);
+  });
+
+  it('groups multiple same-key reactions on the same target', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r2', sender: '@b:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r3', sender: '@c:s', target: 'm1', key: '👍' }),
+    ];
+    const result = aggregateReactions(events, me);
+    expect(result.aggregates.get('m1')).toEqual([
+      { key: '👍', count: 3, reactedByMe: false, myEventId: undefined },
+    ]);
+  });
+
+  it('produces separate aggregates per key on the same target', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r2', sender: '@a:s', target: 'm1', key: '🎉' }),
+    ];
+    const result = aggregateReactions(events, me);
+    const aggregates = result.aggregates.get('m1');
+    expect(aggregates).toHaveLength(2);
+    expect(aggregates).toContainEqual({
+      key: '👍',
+      count: 1,
+      reactedByMe: false,
+      myEventId: undefined,
+    });
+    expect(aggregates).toContainEqual({
+      key: '🎉',
+      count: 1,
+      reactedByMe: false,
+      myEventId: undefined,
+    });
+  });
+
+  it('flags reactedByMe and captures myEventId when the current user reacted', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'mine', sender: me, target: 'm1', key: '👍' }),
+    ];
+    const result = aggregateReactions(events, me);
+    expect(result.aggregates.get('m1')).toEqual([
+      { key: '👍', count: 2, reactedByMe: true, myEventId: 'mine' },
+    ]);
+  });
+
+  it('excludes redacted reactions', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({
+        eventId: 'r2',
+        sender: '@b:s',
+        target: 'm1',
+        key: '👍',
+        redacted: true,
+      }),
+    ];
+    const result = aggregateReactions(events, me);
+    expect(result.aggregates.get('m1')).toEqual([
+      { key: '👍', count: 1, reactedByMe: false, myEventId: undefined },
+    ]);
+  });
+
+  it('collects reactor user_ids per key', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r2', sender: '@b:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r3', sender: '@a:s', target: 'm1', key: '🎉' }),
+    ];
+    const result = aggregateReactions(events, me);
+    expect(result.reactors.get('m1')).toEqual({
+      '👍': ['@a:s', '@b:s'],
+      '🎉': ['@a:s'],
+    });
+  });
+});
+
+describe('aggregateReactionsForTarget', () => {
+  const me = '@me:server';
+
+  it('returns empty result when there are no events', () => {
+    const result = aggregateReactionsForTarget([], 'm1', me);
+    expect(result.reactions).toEqual([]);
+    expect(result.reactors).toEqual({});
+  });
+
+  it('ignores reactions targeting a different message', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm2', key: '👍' }),
+    ];
+    const result = aggregateReactionsForTarget(events, 'm1', me);
+    expect(result.reactions).toEqual([]);
+    expect(result.reactors).toEqual({});
+  });
+
+  it('ignores non-reaction events', () => {
+    const result = aggregateReactionsForTarget(
+      [nonReactionEvent()],
+      'msg-1',
+      me,
+    );
+    expect(result.reactions).toEqual([]);
+  });
+
+  it('aggregates a single reaction on the target', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+    ];
+    const result = aggregateReactionsForTarget(events, 'm1', me);
+    expect(result.reactions).toEqual([
+      { key: '👍', count: 1, reactedByMe: false, myEventId: undefined },
+    ]);
+  });
+
+  it('groups multiple same-key reactions on the target', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r2', sender: '@b:s', target: 'm1', key: '👍' }),
+      // Different target — must be ignored.
+      reactionEvent({ eventId: 'r3', sender: '@c:s', target: 'm2', key: '👍' }),
+    ];
+    const result = aggregateReactionsForTarget(events, 'm1', me);
+    expect(result.reactions).toEqual([
+      { key: '👍', count: 2, reactedByMe: false, myEventId: undefined },
+    ]);
+  });
+
+  it('flags reactedByMe and captures myEventId for the current user', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'mine', sender: me, target: 'm1', key: '👍' }),
+    ];
+    const result = aggregateReactionsForTarget(events, 'm1', me);
+    expect(result.reactions).toEqual([
+      { key: '👍', count: 2, reactedByMe: true, myEventId: 'mine' },
+    ]);
+  });
+
+  it('excludes redacted reactions', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({
+        eventId: 'r2',
+        sender: '@b:s',
+        target: 'm1',
+        key: '👍',
+        redacted: true,
+      }),
+    ];
+    const result = aggregateReactionsForTarget(events, 'm1', me);
+    expect(result.reactions).toEqual([
+      { key: '👍', count: 1, reactedByMe: false, myEventId: undefined },
+    ]);
+  });
+
+  it('collects reactor user_ids per key for the target', () => {
+    const events = [
+      reactionEvent({ eventId: 'r1', sender: '@a:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r2', sender: '@b:s', target: 'm1', key: '👍' }),
+      reactionEvent({ eventId: 'r3', sender: '@a:s', target: 'm1', key: '🎉' }),
+      // Different target — reactor must not appear in the result.
+      reactionEvent({ eventId: 'r4', sender: '@z:s', target: 'm2', key: '👍' }),
+    ];
+    const result = aggregateReactionsForTarget(events, 'm1', me);
+    expect(result.reactors).toEqual({
+      '👍': ['@a:s', '@b:s'],
+      '🎉': ['@a:s'],
+    });
+  });
+});
+
+describe('mapEventToMessage edits, replies and deletions', () => {
+  const event = (
+    id: string,
+    content: Record<string, any>,
+    extra: Record<string, any> = {},
+  ) =>
+    ({
+      getType: () => 'm.room.message',
+      getContent: () => content,
+      getSender: () => '@bob:s',
+      getId: () => id,
+      getTs: () => 1000,
+      isRedacted: () => false,
+      ...extra,
+    }) as any;
+  const edit = (body: string, sender = '@bob:s', ts = 2000) =>
+    event(
+      `$edit-${body}`,
+      {
+        msgtype: 'm.text',
+        body: `* ${body}`,
+        'm.new_content': { msgtype: 'm.text', body },
+        'm.relates_to': { rel_type: 'm.replace', event_id: '$orig' },
+      },
+      { getSender: () => sender, getTs: () => ts },
+    );
+  const original = event('$orig', { msgtype: 'm.text', body: 'typo' });
+
+  it('gives an edit no row of its own', () => {
+    expect(mapEventToMessage(edit('fixed'))).toBeNull();
+  });
+
+  it('gives an undecryptable edit no row either', () => {
+    const failed = {
+      ...edit('fixed'),
+      isDecryptionFailure: () => true,
+    } as any;
+    expect(mapEventToMessage(failed)).toBeNull();
+  });
+
+  it('shows the latest edit and marks the message edited', () => {
+    const index = new Map([
+      ['$orig', [edit('first'), edit('second', undefined, 3000)]],
+    ]);
+    expect(mapEventToMessage(original, undefined, index)).toEqual(
+      expect.objectContaining({ body: 'second', edited: true }),
+    );
+  });
+
+  it('searches the room for edits when given no index', () => {
+    const room = {
+      getMember: () => null,
+      getLiveTimeline: () => ({ getEvents: () => [original, edit('fixed')] }),
+      getPendingEvents: () => [],
+    } as any;
+    expect(mapEventToMessage(original, room)?.body).toBe('fixed');
+  });
+
+  it("ignores another sender's edit, even one the SDK applied", () => {
+    const forged = edit('forged', '@mallory:s');
+    const replaced = {
+      ...original,
+      // matrix-js-sdk's own aggregation, which the row must not trust.
+      getContent: () => forged.getContent()['m.new_content'],
+      getOriginalContent: () => ({ msgtype: 'm.text', body: 'typo' }),
+      replacingEvent: () => forged,
+    } as any;
+    const message = mapEventToMessage(
+      replaced,
+      undefined,
+      new Map([['$orig', [forged]]]),
+    );
+    expect(message?.body).toBe('typo');
+    expect(message?.edited).toBeUndefined();
+  });
+
+  it('keeps a deleted message as a placeholder without its content', () => {
+    const deleted = event('$orig', {}, { isRedacted: () => true });
+    expect(mapEventToMessage(deleted)).toEqual(
+      expect.objectContaining({
+        eventId: '$orig',
+        body: '',
+        redacted: true,
+        type: REDACTED_MESSAGE_TYPE,
+      }),
+    );
+    const deletedEncrypted = event(
+      '$enc',
+      {},
+      { isRedacted: () => true, getType: () => 'm.room.encrypted' },
+    );
+    expect(mapEventToMessage(deletedEncrypted)?.redacted).toBe(true);
+  });
+
+  it('reads the replied-to message and drops the quote fallback', () => {
+    const reply = event('$reply', {
+      msgtype: 'm.text',
+      body: '> <@alice:s> question\n\nanswer',
+      'm.relates_to': { 'm.in_reply_to': { event_id: '$q' } },
+    });
+    expect(mapEventToMessage(reply)).toEqual(
+      expect.objectContaining({ body: 'answer', replyToEventId: '$q' }),
+    );
+  });
+});

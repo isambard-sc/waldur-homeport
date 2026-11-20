@@ -1,88 +1,322 @@
 import { ChatTeardropTextIcon } from '@phosphor-icons/react';
-import { useQuery } from '@tanstack/react-query';
 import { useCurrentStateAndParams } from '@uirouter/react';
-import { proposalReviewsList } from 'waldur-js-client';
+import { FC } from 'react';
 
-import { isFeatureVisible } from '@waldur/features/connect';
-import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
-import { translate } from '@waldur/i18n';
-import { MenuAccordion } from '@waldur/navigation/sidebar/MenuAccordion';
-import { MenuItem } from '@waldur/navigation/sidebar/MenuItem';
-import { useUser } from '@waldur/workspace/hooks';
+import { SidebarMenuAccordion, SidebarMenuSeparator } from 'waldur-ui';
+
+import { isFeatureVisible } from '@/features/connect';
+import { MarketplaceFeatures } from '@/FeaturesEnums';
+import { translate } from '@/i18n';
+import { getServiceAccessMode } from '@/marketplace/serviceAccessMode';
+import { MenuItem } from '@/navigation/sidebar/MenuItem';
+import { RoleEnum } from '@/permissions/enums';
+import { useHasProposalArchive } from '@/proposals/archive/useHasProposalArchive';
+import { useUser } from '@/workspace/hooks';
 
 import { isDescendantOf } from '../useTabs';
 
-export const CallPublicMenu = () => {
+const hasCallManagerRole = (user) =>
+  user?.permissions?.some(
+    (permission) =>
+      permission.scope_type === 'call' &&
+      permission.role_name === RoleEnum.CALL_MANAGER,
+  );
+
+/**
+ * The organisations whose calls this user manages.
+ *
+ * A call-manager permission already carries the organisation that runs the
+ * call, so the manager's own surface can be linked without asking the API
+ * again. One entry per organisation, not per call: managing three calls for
+ * one council is the common case and must not read as three destinations.
+ *
+ * Empty for everyone else — reviewers and panel members have work on a call
+ * but nothing to manage.
+ */
+export const getCallManagerCustomerUuids = (user): string[] => [
+  ...new Set<string>(
+    (user?.permissions ?? [])
+      .filter(
+        (permission) =>
+          permission.scope_type === 'call' &&
+          permission.role_name === RoleEnum.CALL_MANAGER &&
+          permission.customer_uuid,
+      )
+      .map((permission) => permission.customer_uuid as string),
+  ),
+];
+
+/**
+ * A call organizer's CUSTOMER.CALL_ORGANIZER role is bound to the
+ * CallManagingOrganisation, so it never appears as a call-scoped CALL.MANAGER
+ * row and a manager-only scan misses it entirely — leaving a role that ships
+ * with CALL.UPDATE and CALL.LIST no entry point to the calls it runs.
+ */
+const isCallOrganizer = (user): boolean =>
+  Boolean(
+    user?.permissions?.some(
+      (permission) => permission.scope_type === 'call_organizer',
+    ),
+  );
+
+/**
+ * Whether this user has any calls to manage.
+ *
+ * Staff and support hold no call-scoped roles — their reach comes from the
+ * flags, not from permission rows — so a permission scan alone would leave
+ * them with no entry point at all.
+ *
+ * The destination does not depend on the answer: `manage-calls` lists the
+ * calls the user can manage, whichever organisation runs them, because the
+ * protected calls endpoint is already scoped by role. An earlier version sent
+ * anyone with more than one organisation to the organisations list, which
+ * answered "which calls do I run" with "here is every organisation, work it
+ * out" — and for staff that is every organisation on the deployment.
+ */
+export const canManageCalls = (user): boolean =>
+  Boolean(user?.is_staff) ||
+  Boolean(user?.is_support) ||
+  isCallOrganizer(user) ||
+  getCallManagerCustomerUuids(user).length > 0;
+
+/**
+ * Anyone with work to do on a call — managing it, reviewing for it, sitting on
+ * its panel. Used to keep the operator surface reachable in marketplace mode,
+ * where applicants get no calls section at all.
+ */
+const hasCallRole = (user) =>
+  user?.permissions?.some(
+    (permission) =>
+      permission.scope_type === 'call' &&
+      [
+        RoleEnum.CALL_MANAGER,
+        RoleEnum.CALL_REVIEWER,
+        RoleEnum.CALL_PANEL_MEMBER,
+      ].includes(permission.role_name),
+  );
+
+interface CallPublicMenuProps {
+  disabled?: boolean;
+  disabledTooltip?: string;
+  /** Threaded from UnifiedSidebar's own top-level useExclusiveOpen —
+   * forwarded onto whichever of the three mutually-exclusive
+   * `itemId="calls-menu"` MenuAccordion variants below actually renders. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const CallPublicMenu: FC<CallPublicMenuProps> = ({
+  disabled,
+  disabledTooltip,
+  open,
+  onOpenChange,
+}) => {
   const { state } = useCurrentStateAndParams();
   const user = useUser();
+  // Called unconditionally, ahead of every early return below: the menu takes
+  // several of them, and a hook may not sit behind one.
+  const hasArchive = useHasProposalArchive();
 
-  // Check if user has any reviews assigned
-  const { data: hasReviews = false } = useQuery({
-    queryKey: ['userReviewsCheck', user?.uuid],
-    queryFn: async () => {
-      if (!user?.uuid) return false;
-      // Staff and support users should always see Reviews menu
-      if (user.is_staff || user.is_support) return true;
-      try {
-        const response = await proposalReviewsList({
-          query: {
-            reviewer_uuid: user.uuid,
-            page_size: 1, // Only need to check if any exist
-          },
-        });
-        return response.data.length > 0;
-      } catch (error) {
-        return false;
+  const mode = getServiceAccessMode();
+
+  const isOperator = user?.is_staff || user?.is_support || hasCallRole(user);
+  // Managers get their own calls; everyone else gets the catalogue, named as
+  // the browsing surface it is rather than as management they cannot do.
+  const showManageCalls = canManageCalls(user);
+  const browseCallsItem = (
+    <MenuItem
+      title={translate('Calls for proposals')}
+      state="calls-for-proposals-dashboard"
+      activeState={
+        ['calls-for-proposals', 'protected-call', 'public-calls'].some((name) =>
+          isDescendantOf(name, state),
+        )
+          ? state.name
+          : undefined
       }
-    },
-    enabled: !!user?.uuid,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+    />
+  );
+  const manageCallsItem = showManageCalls ? (
+    <MenuItem
+      title={translate('Manage calls')}
+      state="manage-calls"
+      activeState={
+        isDescendantOf('call-management', state) ||
+        state.name === 'manage-calls'
+          ? state.name
+          : undefined
+      }
+    />
+  ) : null;
 
-  if (isFeatureVisible(MarketplaceFeatures.call_only)) {
+  // Marketplace-only: applicants reach services through offerings and track
+  // their proposals in the profile, so they get no calls section.
+  //
+  // Operators still do. Whether a deployment runs calls at all is
+  // show_call_management_functionality, a separate axis from how applicants
+  // browse — a marketplace-only portal can still be backed by calls, and the
+  // people running them need somewhere to stand.
+  if (mode === 'marketplace') {
+    if (
+      !isOperator ||
+      !isFeatureVisible(MarketplaceFeatures.show_call_management_functionality)
+    ) {
+      return null;
+    }
+    // Titled by the job, not by the object: a marketplace-only deployment does
+    // not present itself as running calls for proposals, but the items below
+    // still open calls, proposals and reviews — so the objects keep their
+    // names and only the grouping is reframed.
+    //
+    // UnifiedSidebar renders this last in marketplace mode; the separator
+    // belongs here rather than there so it disappears along with the menu for
+    // users who are not operators.
+    return (
+      <>
+        <SidebarMenuSeparator />
+        <SidebarMenuAccordion
+          title={translate('Access management')}
+          icon={<ChatTeardropTextIcon weight="bold" />}
+          disabled={disabled}
+          disabledTooltip={disabledTooltip}
+          open={open}
+          onOpenChange={onOpenChange}
+        >
+          {manageCallsItem}
+          {browseCallsItem}
+          <MenuItem
+            title={translate('My reviews')}
+            state="reviews-all-reviews"
+            activeState={
+              isDescendantOf('reviews', state) ? state.name : undefined
+            }
+          />
+          {(user?.is_staff || user?.is_support || hasCallManagerRole(user)) && (
+            <>
+              <SidebarMenuSeparator />
+              <MenuItem
+                title={translate('All proposals')}
+                state="admin-proposals"
+              />
+              <MenuItem
+                title={translate('All reviews')}
+                state="admin-reviews"
+              />
+            </>
+          )}
+        </SidebarMenuAccordion>
+      </>
+    );
+  }
+
+  // Calls-only: one link, since there is no marketplace to sit beside.
+  if (mode === 'calls') {
     return (
       <MenuItem
         title={translate('Calls for proposals')}
         state="calls-for-proposals-dashboard"
         icon={<ChatTeardropTextIcon weight="bold" />}
-        child={false}
+        disabled={disabled}
+        disabledTooltip={disabledTooltip}
       />
     );
   }
-  if (
-    !isFeatureVisible(MarketplaceFeatures.show_call_management_functionality)
-  ) {
+
+  // 'both' from here: the calls section sits beside the marketplace.
+  //
+  // Without call management there are no calls. The feature reads as if it
+  // governed a management screen, but management *is* the call lifecycle --
+  // reviewing, approving, awarding -- so a deployment with it switched off
+  // cannot run a call at all, and the proposals and reviews below would have
+  // nothing to list. The marketplace branch above already treats it this way;
+  // this branch used to answer the same state with a smaller menu instead,
+  // leaving a portal that runs no calls with a Proposals section it could not
+  // switch off. See docs/guides/upstream-bug-reports.md, finding 9.
+  const callsEnabled = isFeatureVisible(
+    MarketplaceFeatures.show_call_management_functionality,
+  );
+
+  // A deployment that runs no calls may still hold an archive of ones it ran
+  // before, and those records have to stay reachable — the section is then
+  // just the archive.
+  if (!callsEnabled && !hasArchive) {
     return null;
   }
+
+  const showAdminItems =
+    user?.is_staff || user?.is_support || hasCallManagerRole(user);
+
   return (
-    <MenuAccordion
+    <SidebarMenuAccordion
       title={translate('Calls')}
-      itemId="calls-menu"
       icon={<ChatTeardropTextIcon weight="bold" />}
+      disabled={disabled}
+      disabledTooltip={disabledTooltip}
+      open={open}
+      onOpenChange={onOpenChange}
     >
-      <MenuItem
-        title={translate('Calls for proposals')}
-        state="calls-for-proposals-dashboard"
-        activeState={
-          ['calls-for-proposals', 'protected-call', 'public-calls'].some(
-            (name) => isDescendantOf(name, state),
-          )
-            ? state.name
-            : undefined
-        }
-      />
+      {callsEnabled && manageCallsItem}
+      {callsEnabled && browseCallsItem}
 
-      <MenuItem
-        title={translate('Proposals')}
-        state="proposals-all-proposals"
-        activeState={
-          isDescendantOf('proposals', state) ? state.name : undefined
-        }
-      />
+      {callsEnabled && (
+        <MenuItem
+          title={translate('My proposals')}
+          state="proposals-all-proposals"
+          activeState={
+            isDescendantOf('proposals', state) ? state.name : undefined
+          }
+        />
+      )}
 
-      {hasReviews ? (
-        <MenuItem title={translate('Reviews')} state="reviews-all-reviews" />
-      ) : null}
-    </MenuAccordion>
+      {callsEnabled && (
+        <MenuItem
+          title={translate('My reviews')}
+          state="reviews-all-reviews"
+          activeState={
+            isDescendantOf('reviews', state) ? state.name : undefined
+          }
+        />
+      )}
+
+      {callsEnabled && showAdminItems && (
+        <>
+          <SidebarMenuSeparator />
+          <MenuItem
+            title={translate('All proposals')}
+            state="admin-proposals"
+          />
+          <MenuItem title={translate('All reviews')} state="admin-reviews" />
+        </>
+      )}
+
+      {hasArchive && (
+        <>
+          <SidebarMenuSeparator />
+          <MenuItem
+            title={translate('Archived calls')}
+            state="proposal-archive-calls"
+            activeState={
+              isDescendantOf('proposal-archive', state) ? state.name : undefined
+            }
+          />
+          <MenuItem
+            title={translate('Archived proposals')}
+            state="proposal-archive-proposals"
+          />
+          {showAdminItems && (
+            <>
+              <MenuItem
+                title={translate('Archived reviews')}
+                state="proposal-archive-reviews"
+              />
+              <MenuItem
+                title={translate('Archived access')}
+                state="proposal-archive-memberships"
+              />
+            </>
+          )}
+        </>
+      )}
+    </SidebarMenuAccordion>
   );
 };

@@ -1,47 +1,35 @@
-import { CaretDownIcon, PlusCircleIcon } from '@phosphor-icons/react';
-import { Dropdown } from 'react-bootstrap';
-
-import { translate } from '@waldur/i18n';
-import { InvitationCreateButton } from '@waldur/invitations/actions/create/InvitationCreateButton';
-import { GenericInvitationContext } from '@waldur/invitations/types';
+import { InvitationCreateButton } from '@/invitations/actions/create/InvitationCreateButton';
+import { GenericInvitationContext } from '@/invitations/types';
+import { ActionsMenu } from '@/table/ActionsDropdown';
 
 import { AddUserButton } from './AddUserButton';
-import { ImportReviewersButton } from './ImportReviewersButton';
 
 interface TeamDropdownActionsProps extends GenericInvitationContext {
   refetchUsers?(): void;
   refetchInvitations?(): void;
-  showImportReviewers?: boolean;
+  /** Overrides who may add a member, see AddUserButton. */
+  canAddUser?: boolean;
+  /** Overrides who may invite by mail; false leaves the item out. */
+  canInvite?: boolean;
 }
 
 export const TeamDropdownActions = ({
   refetchUsers,
   refetchInvitations,
-  showImportReviewers = false,
+  canAddUser,
+  canInvite,
   ...rest
 }: TeamDropdownActionsProps) => {
   return (
-    <Dropdown placement="bottom-end">
-      <Dropdown.Toggle variant="primary" className="no-arrow btn-icon-right">
-        <span className="svg-icon svg-icon-2">
-          <PlusCircleIcon weight="bold" />
-        </span>
-        {translate('Add')}
-        <span className="svg-icon svg-icon-2 rotate-180">
-          <CaretDownIcon weight="bold" />
-        </span>
-      </Dropdown.Toggle>
-      <Dropdown.Menu flip>
+    <ActionsMenu side="bottom" toggle="add" align="start">
+      {canInvite === false ? null : (
         <InvitationCreateButton
           refetch={refetchInvitations}
-          enableBulkUpload={true}
+          canInvite={canInvite}
           {...rest}
         />
-        <AddUserButton refetch={refetchUsers} {...rest} />
-        {showImportReviewers && (
-          <ImportReviewersButton refetch={refetchUsers} {...rest} />
-        )}
-      </Dropdown.Menu>
-    </Dropdown>
+      )}
+      <AddUserButton refetch={refetchUsers} canAddUser={canAddUser} {...rest} />
+    </ActionsMenu>
   );
 };

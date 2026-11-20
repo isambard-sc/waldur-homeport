@@ -1,3 +1,5 @@
+import { IdNamePair, ProposalStatesEnum } from 'waldur-js-client';
+
 interface Message {
   subject: string;
   body: string;
@@ -7,19 +9,7 @@ export interface MessageTemplate extends Message {
   uuid: string;
 }
 
-export interface IdNamePair {
-  name: string;
-  uuid: string;
-}
-
-export interface BroadcastAttachment {
-  uuid: string;
-  filename: string;
-  size: number;
-  created: string;
-  uploaded_by_full_name: string;
-  file_url: string;
-}
+export type { IdNamePair };
 
 interface Broadcast extends Message {
   send_at: string;
@@ -29,24 +19,23 @@ export interface BroadcastFormData extends Broadcast {
   customers: IdNamePair[];
   offerings: IdNamePair[];
   all_users: boolean;
-  round?: IdNamePair & { call_name?: string };
-  proposal_states?: string[];
-  include_reviewers?: boolean;
-  send_to_me?: boolean;
-  additional_recipients?: any[];
-  excluded_recipients?: string[];
+  /** Only picks the rounds offered; not sent. */
+  round_call?: IdNamePair | null;
+  rounds?: IdNamePair[];
+  proposal_states?: ProposalStatesEnum[];
+  proposal_teams?: boolean;
+  reviewers?: boolean;
+  action?: 'draft' | 'submit';
 }
 
 interface QueryRequest {
   customers: string[];
   offerings: string[];
   all_users: boolean;
-  round?: string;
-  proposal_states?: string[];
-  include_reviewers?: boolean;
-  send_to_me?: boolean;
-  additional_recipients?: string[];
-  excluded_recipients?: string[];
+  rounds?: string[];
+  proposal_states?: ProposalStatesEnum[];
+  proposal_teams?: boolean;
+  reviewers?: boolean;
 }
 
 export interface BroadcastRequestData extends Broadcast {

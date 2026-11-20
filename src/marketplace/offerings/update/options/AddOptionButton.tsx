@@ -1,11 +1,8 @@
-import { PlusCircleIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { AddButton } from '@/core/AddButton';
+import { lazyComponent } from '@/core/lazyComponent';
+import { useModal } from '@/modal/actions';
 
 import { OPTION_FORM_ID } from './constants';
 
@@ -20,20 +17,13 @@ export const AddOptionButton: FunctionComponent<{
   refetch;
   type;
 }> = ({ offering, refetch, type }) => {
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const callback = () => {
-    dispatch(
-      openModalDialog(AddOptionDialog, {
-        resolve: { offering, refetch, type },
-        formId: OPTION_FORM_ID,
-      }),
-    );
+    openDialog(AddOptionDialog, {
+      resolve: { offering, refetch, type },
+      formId: OPTION_FORM_ID,
+      size: 'lg',
+    });
   };
-  return (
-    <ActionButton
-      iconNode={<PlusCircleIcon weight="bold" />}
-      title={translate('Add option')}
-      action={callback}
-    />
-  );
+  return <AddButton action={callback} />;
 };

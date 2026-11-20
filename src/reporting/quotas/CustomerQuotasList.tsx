@@ -1,31 +1,46 @@
-import { useSelector } from 'react-redux';
-import { getFormValues } from 'redux-form';
-import { createSelector } from 'reselect';
+import { FC, useMemo } from 'react';
 import { customerQuotasList } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { useTable } from '@waldur/table/useTable';
+import { translate } from '@/i18n';
+import { createFetcher } from '@/table/api';
+import {
+  CustomerQuotasFilter,
+  CustomerQuotasFilterInitialValues,
+  selectCustomerQuotasFilter,
+  CustomerQuotasFilterFormId,
+} from '@/table/generated/CustomerQuotasFilter';
+import Table from '@/table/Table';
+import { useFilterValues } from '@/table/useFilterValues';
+import { useTable } from '@/table/useTable';
 
-import { CustomerQuotasFilter } from './CustomerQuotasFilter';
-import { CustomerQuota, QuotaChoice } from './types';
+import { CustomerScopedReport } from '../CustomerScopedReport';
 
-const filterSelector = createSelector(
-  getFormValues('CustomerQuotasFilter'),
-  (filters: { quota: { key } }) => ({ quota_name: filters?.quota.key }),
-);
+import { getQuotas } from './constants';
+import { QuotasAnalytics } from './QuotasAnalytics';
+import { CustomerQuota } from './types';
 
-export const CustomerQuotasList = () => {
-  const filter = useSelector(filterSelector);
+const CustomerQuotasTable: FC<{ customerUuid?: string }> = ({
+  customerUuid,
+}) => {
+  const values = useFilterValues('CustomerQuotasList');
+  const filter = useMemo(
+    () => ({
+      ...selectCustomerQuotasFilter(values),
+      ...(customerUuid && { customer_uuid: customerUuid }),
+    }),
+    [values, customerUuid],
+  );
   const tableProps = useTable({
     table: 'CustomerQuotasList',
+    syncFiltersToURL: true,
     fetchData: createFetcher(customerQuotasList),
     filter,
+    // The /customer-quotas/ endpoint requires a quota_name; seed the default so
+    // the first request is valid (otherwise it 400s and the table never loads).
+    initialFilters: CustomerQuotasFilterInitialValues,
   });
-  const formValues = useSelector<any, { quota: QuotaChoice }>(
-    getFormValues('CustomerQuotasFilter') as any,
-  );
+
+  const activeQuota = getQuotas(true).find((q) => q.key === filter?.quota_name);
 
   return (
     <Table<CustomerQuota>
@@ -45,8 +60,8 @@ export const CustomerQuotasList = () => {
           title: translate('Value'),
           render: ({ row }) => (
             <>
-              {formValues.quota.tooltipValueFormatter
-                ? formValues.quota.tooltipValueFormatter(row.value)
+              {activeQuota?.tooltipValueFormatter
+                ? activeQuota.tooltipValueFormatter(row.value)
                 : row.value}
             </>
           ),
@@ -57,6 +72,16 @@ export const CustomerQuotasList = () => {
       showPageSizeSelector={true}
       filters={<CustomerQuotasFilter />}
       hideClearFilters
+      tableActions={
+        <QuotasAnalytics data={tableProps.rows} loading={tableProps.loading} />
+      }
+      formId={CustomerQuotasFilterFormId}
     />
   );
 };
+
+export const CustomerQuotasList: FC = () => (
+  <CustomerScopedReport reportKey="quotas">
+    {(customerUuid) => <CustomerQuotasTable customerUuid={customerUuid} />}
+  </CustomerScopedReport>
+);

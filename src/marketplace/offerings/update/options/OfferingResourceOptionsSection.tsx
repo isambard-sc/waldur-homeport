@@ -1,8 +1,8 @@
-import { QuestionIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
 
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
+import { HelpIcon } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 import { OfferingSectionProps } from '../types';
 
@@ -17,20 +17,17 @@ export const OfferingResourceOptionsSection: FC<OfferingSectionProps> = (
       title={
         <>
           {translate('Resource options')}{' '}
-          <Tip
-            id="form-field-tooltip"
+          <HelpIcon
             label={translate(
               'If you want user to be able to modify resource options after creation, please configure options for user below',
             )}
-            className="mx-2 text-muted"
-          >
-            <QuestionIcon size={24} weight="fill" />
-          </Tip>
+            size={20}
+          />
         </>
       }
+      verboseName={translate('resource options')}
       offering={props.offering}
       refetch={props.refetch}
-      loading={props.loading}
     />
   );
 };

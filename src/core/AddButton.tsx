@@ -1,19 +1,26 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
 import { ComponentProps } from 'react';
 
-import { translate } from '@waldur/i18n';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
 
-interface AddButtonProps
-  extends Omit<ComponentProps<typeof ActionButton>, 'title' | 'variant'> {}
+import { translate } from '@/i18n';
 
-export const AddButton = (props: AddButtonProps) => {
+type BaseButtonProps = ComponentProps<typeof BaseButton>;
+
+interface AddButtonProps extends Omit<BaseButtonProps, 'label' | 'variant'> {
+  /** @deprecated Use `onClick` instead */
+  action?: BaseButtonProps['onClick'];
+}
+
+export const AddButton = ({ action, ...props }: AddButtonProps) => {
   return (
-    <ActionButton
-      title={translate('Add')}
+    <BaseButton
+      label={translate('Add')}
       iconNode={props.iconNode || <PlusCircleIcon weight="bold" />}
       variant="primary"
+      onClick={action ?? props.onClick}
       {...props}
+      size="lg"
     />
   );
 };

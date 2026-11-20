@@ -5,7 +5,7 @@ import {
   useRouter,
 } from '@uirouter/react';
 import { isMatch, pickBy, uniqueId } from 'lodash-es';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 import { useSelector } from 'react-redux';
 import {
   marketplaceCategoriesRetrieve,
@@ -15,17 +15,12 @@ import {
   Resource,
 } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { getTitle } from '@waldur/navigation/title';
-import { isDescendantOf } from '@waldur/navigation/useTabs';
-import store from '@waldur/store/store';
-import { useUser } from '@waldur/workspace/hooks';
-import {
-  getCustomer,
-  getProject,
-  getResource,
-} from '@waldur/workspace/selectors';
-import { Customer, Project, User } from '@waldur/workspace/types';
+import { translate } from '@/i18n';
+import { getTitle, getSubtitle } from '@/navigation/title';
+import { isDescendantOf } from '@/navigation/useTabs';
+import { useUser, useCustomer, useProject } from '@/workspace/hooks';
+import { getResource } from '@/workspace/selectors';
+import { Customer, Project, User } from '@/workspace/types';
 
 const FAVORITE_PAGES_KEY = 'waldur/favorite/pages';
 
@@ -45,7 +40,33 @@ interface FavoritePageContext {
   resource?: Resource;
 }
 
+/**
+ * The favourite pages, kept in localStorage, and a store over them: every
+ * useFavoritePages() reads the same list and sees each change, wherever it
+ * was made (the header search, a breadcrumb switcher).
+ */
 class FavoritePageServiceClass {
+  private listeners = new Set<() => void>();
+  private snapshot: FavoritePage[] | null = null;
+
+  subscribe = (listener: () => void) => {
+    this.listeners.add(listener);
+    return () => {
+      this.listeners.delete(listener);
+    };
+  };
+
+  /** The list as last read, the same array until it changes. */
+  getSnapshot = (): FavoritePage[] => {
+    this.snapshot ??= this.list();
+    return this.snapshot;
+  };
+
+  private changed = () => {
+    this.snapshot = null;
+    this.listeners.forEach((listener) => listener());
+  };
+
   add = (page: Omit<FavoritePage, 'id'>) => {
     const prevList = this.list();
     let id = uniqueId();
@@ -57,6 +78,7 @@ class FavoritePageServiceClass {
       FAVORITE_PAGES_KEY,
       JSON.stringify(prevList.concat(newPage)),
     );
+    this.changed();
   };
 
   list = (): FavoritePage[] => {
@@ -78,6 +100,7 @@ class FavoritePageServiceClass {
     const prevList = this.list();
     const newList = prevList.filter((p) => p.id !== page.id);
     localStorage.setItem(FAVORITE_PAGES_KEY, JSON.stringify(newList));
+    this.changed();
   };
 }
 
@@ -88,8 +111,8 @@ const getDataForFavoritePage = async (
   params: RawParams,
   context: FavoritePageContext,
 ) => {
-  let title = store.getState().title?.title;
-  let subtitle = store.getState().title?.subtitle;
+  let title = getTitle();
+  let subtitle = getSubtitle();
   let image;
   const newParams = params ? { ...params } : {};
   if (state.name.startsWith('marketplace-offering') && params.offering_uuid) {
@@ -145,10 +168,7 @@ const getDataForFavoritePage = async (
     title = context.customer?.name || context.customer?.display_name;
     image = context.customer?.image;
   } else if (isDescendantOf('project', state)) {
-    const titleFromState = store
-      .getState()
-      .title.title.replace('resources', '')
-      .trim();
+    const titleFromState = getTitle().replace('resources', '').trim();
     title = context.project?.name;
     image = context.project?.image;
     subtitle = titleFromState;
@@ -179,15 +199,19 @@ const getDataForFavoritePage = async (
 export const useFavoritePages = () => {
   const router = useRouter();
   const { state, params } = useCurrentStateAndParams();
-  const pageTitle = useSelector(getTitle);
+  const pageTitle = getTitle();
 
   const user = useUser();
-  const customer = useSelector(getCustomer);
-  const project = useSelector(getProject);
+  const customer = useCustomer();
+  const project = useProject();
   const resource = useSelector(getResource);
 
-  const getPagesList = () => FavoritePageService.list().reverse();
-  const [favPages, setFavPages] = useState(() => getPagesList());
+  const pages = useSyncExternalStore(
+    FavoritePageService.subscribe,
+    FavoritePageService.getSnapshot,
+  );
+  // Newest first.
+  const favPages = useMemo(() => [...pages].reverse(), [pages]);
 
   const findFavoritePage = useCallback(
     (state, params) =>
@@ -205,10 +229,9 @@ export const useFavoritePages = () => {
       page.params = pickBy(page.params, (value) => value !== null);
       if (findFavoritePage(page.state, page.params)) return;
       FavoritePageService.add(page);
-      setFavPages(getPagesList());
       if (event) event.stopPropagation();
     },
-    [favPages, setFavPages, getPagesList, findFavoritePage],
+    [findFavoritePage],
   );
 
   const currentPageSavedId = useMemo(() => {
@@ -252,10 +275,9 @@ export const useFavoritePages = () => {
       if (event) event.preventDefault();
       const page = findFavoritePage(state, params);
       FavoritePageService.remove(page);
-      setFavPages(getPagesList());
       if (event) event.stopPropagation();
     },
-    [setFavPages, getPagesList, findFavoritePage],
+    [findFavoritePage],
   );
 
   return {

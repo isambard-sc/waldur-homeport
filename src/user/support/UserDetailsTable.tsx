@@ -1,20 +1,24 @@
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
 import { User } from 'waldur-js-client';
 
-import { formatDateTime } from '@waldur/core/dateUtils';
-import { FieldWithCopy } from '@waldur/core/FieldWithCopy';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { UserFeatures } from '@waldur/FeaturesEnums';
-import FormTable from '@waldur/form/FormTable';
-import { translate } from '@waldur/i18n';
-import { getNativeNameVisible } from '@waldur/store/config';
-import { type RootState } from '@waldur/store/reducers';
-import {
-  formatUserIsActive,
-  formatUserStatus,
-} from '@waldur/user/support/utils';
-import { isStaffOrSupport } from '@waldur/workspace/selectors';
+import { HelpIcon, Tooltip } from 'waldur-ui';
+import { Badge } from 'waldur-ui';
+
+import { CopyToClipboardButton } from '@/core/CopyToClipboardButton';
+import { formatDate, formatDateTime } from '@/core/dateUtils';
+import { FieldWithCopy } from '@/core/FieldWithCopy';
+import { formatPhoneNumber } from '@/core/utils';
+import { isFeatureVisible } from '@/features/connect';
+import { UserFeatures } from '@/FeaturesEnums';
+import FormTable from '@/form/FormTable';
+import { translate } from '@/i18n';
+import { renderFieldOrDash } from '@/table/utils';
+import { formatUserIsActive, formatUserStatus } from '@/user/support/utils';
+import { useUser } from '@/workspace/hooks';
+import { checkIsStaffOrSupport } from '@/workspace/selectors';
+
+import { EXTRA_PROFILE_FIELDS } from './extraProfileFields';
+import { isProfileAttributeEnabled } from './profileAttributes';
 
 interface OwnProps {
   user: User;
@@ -23,7 +27,8 @@ interface OwnProps {
 }
 
 export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
-  const isVisible = useSelector((state: RootState) => isStaffOrSupport(state));
+  const user = useUser();
+  const isVisible = checkIsStaffOrSupport(user);
 
   return (
     <FormTable hideActions alignTop detailsMode className="gy-5">
@@ -32,7 +37,7 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
         value={<FieldWithCopy value={props.user.full_name} />}
       />
 
-      {getNativeNameVisible() && (
+      {isProfileAttributeEnabled('native_name') && (
         <FormTable.Item
           label={translate('Native name')}
           value={<FieldWithCopy value={props.user.native_name} />}
@@ -45,7 +50,9 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
 
       <FormTable.Item
         label={translate('Phone numbers')}
-        value={<FieldWithCopy value={props.user.phone_number} />}
+        value={
+          <FieldWithCopy value={formatPhoneNumber(props.user.phone_number)} />
+        }
       />
 
       <FormTable.Item
@@ -58,26 +65,24 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
         value={<FieldWithCopy value={props.user.email} />}
       />
 
-      {isFeatureVisible(UserFeatures.show_slug) &&
-        props.user.slug &&
-        props.user.unix_username && (
-          <FormTable.Item
-            label={
-              isFeatureVisible(UserFeatures.show_slug_as_id)
-                ? translate('ID')
-                : translate('Shortname')
-            }
-            value={
-              isFeatureVisible(UserFeatures.show_slug_as_id) ? (
-                <span className="fw-semibold">
-                  <FieldWithCopy value={props.user.slug} />
-                </span>
-              ) : (
+      {isFeatureVisible(UserFeatures.show_slug) && props.user.slug && (
+        <FormTable.Item
+          label={
+            isFeatureVisible(UserFeatures.show_slug_as_id)
+              ? translate('ID')
+              : translate('Shortname')
+          }
+          value={
+            isFeatureVisible(UserFeatures.show_slug_as_id) ? (
+              <span className="fw-semibold">
                 <FieldWithCopy value={props.user.slug} />
-              )
-            }
-          />
-        )}
+              </span>
+            ) : (
+              <FieldWithCopy value={props.user.slug} />
+            )
+          }
+        />
+      )}
       {isFeatureVisible(UserFeatures.preferred_language) && (
         <FormTable.Item
           label={translate('Preferred language')}
@@ -86,7 +91,89 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
       )}
       <FormTable.Item
         label={translate('Registration method')}
-        value={<FieldWithCopy value={props.user.identity_provider_label} />}
+        value={
+          <div className="d-flex justify-content-between align-items-center gap-2">
+            <div className="d-flex align-items-center gap-2">
+              {renderFieldOrDash(props.user.identity_provider_label)}
+              {props.user.should_protect_user_details && (
+                <Tooltip
+                  label={translate(
+                    'Profile fields (organization, name, email) are managed by the identity provider and cannot be edited in Waldur.',
+                  )}
+                >
+                  <Badge variant="purple" tone="outline">
+                    {translate('Details protected')}
+                  </Badge>
+                </Tooltip>
+              )}
+            </div>
+            {props.user.identity_provider_label && (
+              <CopyToClipboardButton
+                value={props.user.identity_provider_label}
+                size={20}
+                className="mb-0 mt-0"
+                buttonClassName="text-gray-500"
+              />
+            )}
+          </div>
+        }
+      />
+
+      <FormTable.Item
+        label={translate('Identity source')}
+        value={<FieldWithCopy value={props.user.identity_source} />}
+      />
+
+      {/* Raw claims the identity provider asserted, for the claims listed in
+          its extra fields. Auto-provisioning rules match on these to grant
+          roles, so this is the surface for answering "why did (or didn't) a
+          rule fire for this user". Staff and support only — the backend omits
+          the field entirely for everyone else. */}
+      {isVisible && Object.keys(props.user.details ?? {}).length > 0 && (
+        <FormTable.Item
+          label={translate('Identity provider claims')}
+          value={
+            <div className="d-flex flex-column gap-1">
+              {Object.entries(props.user.details).map(([claim, value]) => (
+                <div key={claim}>
+                  <span className="fw-semibold me-2">{claim}</span>
+                  <FieldWithCopy
+                    value={
+                      Array.isArray(value) ? value.join(', ') : String(value)
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          }
+        />
+      )}
+
+      {isProfileAttributeEnabled('uid_number') &&
+        props.user.uid_number != null && (
+          <FormTable.Item
+            label={translate('POSIX UID')}
+            value={<FieldWithCopy value={String(props.user.uid_number)} />}
+          />
+        )}
+
+      {isProfileAttributeEnabled('primary_gid') &&
+        props.user.primary_gid != null && (
+          <FormTable.Item
+            label={translate('POSIX primary GID')}
+            value={<FieldWithCopy value={String(props.user.primary_gid)} />}
+          />
+        )}
+
+      <FormTable.Item
+        label={translate('Birth date')}
+        value={
+          <FieldWithCopy
+            value={
+              props.user.birth_date ? formatDate(props.user.birth_date) : null
+            }
+          />
+        }
       />
 
       <FormTable.Item
@@ -95,7 +182,17 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
       />
 
       <FormTable.Item
-        label={translate('Organization')}
+        label={
+          <span className="d-inline-flex align-items-center gap-1">
+            {translate('Organization')}
+            <HelpIcon
+              side="top"
+              label={translate(
+                'Supplied by the identity provider. Auto-provisioning rules that match by organization name compare this value against Waldur customer names.',
+              )}
+            />
+          </span>
+        }
         value={<FieldWithCopy value={props.user.organization} />}
       />
 
@@ -111,6 +208,24 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
           value={<FieldWithCopy value={props.user.affiliations.join(', ')} />}
         />
       ) : null}
+
+      {EXTRA_PROFILE_FIELDS.map((field) => {
+        if (!isProfileAttributeEnabled(field.attr)) {
+          return null;
+        }
+        const value = field.getValue(props.user);
+        if (field.skipWhenEmpty && !value) {
+          return null;
+        }
+        return (
+          <FormTable.Item
+            key={field.attr}
+            label={field.label()}
+            value={<FieldWithCopy value={value} />}
+          />
+        );
+      })}
+
       {isVisible && (
         <FormTable.Item
           label={translate('User type')}
@@ -121,6 +236,31 @@ export const UserDetailsTable: FunctionComponent<OwnProps> = (props) => {
         <FormTable.Item
           label={translate('Account status')}
           value={formatUserIsActive(props.user)}
+        />
+      )}
+      {isVisible &&
+        !props.user.is_active &&
+        Boolean(props.user.deactivation_reason) && (
+          <FormTable.Item
+            label={translate('Deactivation reason')}
+            value={<FieldWithCopy value={props.user.deactivation_reason} />}
+          />
+        )}
+      {isVisible && props.user.is_admin_deactivated && (
+        <FormTable.Item
+          label={translate('Administrative status')}
+          value={
+            <div className="d-inline-flex align-items-center gap-2">
+              <Badge variant="danger" tone="outline">
+                {translate('Administratively disabled')}
+              </Badge>
+              <HelpIcon
+                label={translate(
+                  'This account was disabled by an administrator. When automatic role-based deactivation is enabled, the system will not re-enable it automatically, even if the user regains roles. A staff member must reactivate it manually.',
+                )}
+              />
+            </div>
+          }
         />
       )}
       {props.profile?.is_active && (

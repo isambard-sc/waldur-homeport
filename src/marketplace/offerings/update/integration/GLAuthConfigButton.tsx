@@ -1,14 +1,18 @@
 import { EyeIcon } from '@phosphor-icons/react';
 import { useQuery } from '@tanstack/react-query';
 import { FC } from 'react';
-import { useDispatch } from 'react-redux';
-import { marketplaceProviderOfferingsGlauthUsersConfigRetrieve } from 'waldur-js-client';
+import {
+  marketplaceProviderOfferingsGlauthTreeRetrieve,
+  marketplaceProviderOfferingsGlauthUsersConfigRetrieve,
+} from 'waldur-js-client';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { LoadingErred } from '@waldur/core/LoadingErred';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { STALE_TIME } from '@/core/constants';
+import { lazyComponent } from '@/core/lazyComponent';
+import { LoadingErred } from '@/core/LoadingErred';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
 
 const GLAuthConfigDialog = lazyComponent(() =>
   import('./GLAuthConfigDialog').then((module) => ({
@@ -21,9 +25,8 @@ export const GLAuthConfigButton: FC<{
 }> = ({ offering }) => {
   const enabled =
     offering.plugin_options?.service_provider_can_create_offering_user;
-  const { data, error, isLoading, refetch } = useQuery({
+  const configQuery = useQuery({
     queryKey: ['OfferingGLAuthConfig', offering.uuid, enabled],
-
     queryFn: () =>
       enabled
         ? marketplaceProviderOfferingsGlauthUsersConfigRetrieve({
@@ -34,27 +37,46 @@ export const GLAuthConfigButton: FC<{
             },
           }).then((response) => response.data)
         : null,
-
     refetchOnWindowFocus: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: STALE_TIME,
+  });
+  const treeQuery = useQuery({
+    queryKey: ['OfferingGLAuthTree', offering.uuid, enabled],
+    queryFn: () =>
+      enabled
+        ? marketplaceProviderOfferingsGlauthTreeRetrieve({
+            path: { uuid: offering.uuid },
+          }).then((response) => response.data ?? null)
+        : null,
+    refetchOnWindowFocus: false,
+    staleTime: STALE_TIME,
   });
 
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const callback = () => {
-    dispatch(
-      openModalDialog(GLAuthConfigDialog, {
-        resolve: { offering, config: data },
-        size: 'lg',
-      }),
-    );
+    openDialog(GLAuthConfigDialog, {
+      resolve: {
+        offering,
+        config: configQuery.data,
+        tree: treeQuery.data,
+      },
+      size: 'lg',
+    });
   };
+  const isLoading = configQuery.isLoading || treeQuery.isLoading;
+  const error = configQuery.error || treeQuery.error;
+  const refetch = () => {
+    configQuery.refetch();
+    treeQuery.refetch();
+  };
+  const ready = configQuery.data && treeQuery.data;
   return error ? (
     <LoadingErred loadData={refetch} />
   ) : (
-    <ActionButton
-      action={callback}
-      title={translate('View GLAuth configuration')}
-      iconNode={enabled && data && <EyeIcon />}
+    <BaseButton
+      onClick={callback}
+      label={translate('View GLAuth configuration')}
+      iconNode={enabled && ready && <EyeIcon weight="bold" />}
       pending={isLoading}
       disabled={!enabled}
       tooltip={
@@ -63,6 +85,8 @@ export const GLAuthConfigButton: FC<{
           '"Enable automatic creation of offering users" must be enabled for GLAuth generation',
         )
       }
+      variant="tertiary"
+      size="lg"
     />
   );
 };

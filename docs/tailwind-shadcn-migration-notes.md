@@ -1,0 +1,614 @@
+# Tailwind & shadcn UI Architecture
+
+Current architecture and implementation guidance for Tailwind CSS v4, shadcn UI, and Radix UI in Waldur Homeport. Covers framework coexistence, design tokens, component standards, styling conventions, linting guardrails, and testing.
+
+> [!NOTE]
+> **Status**: every button in the app is rendered by `BaseButton` (or by `buttonVariants()` on an element that cannot be a `BaseButton`), and the legacy Bootstrap/Metronic `.btn` CSS has been deleted. Every menu and menu-like popover is built from `waldur-ui`'s `Menu` / `MenuPopover`. Every checkbox, radio and switch is a `waldur-ui` `Checkbox` / `Radio` / `Switch`, and the Bootstrap/Metronic `.form-check` CSS has been deleted. The remaining Bootstrap-backed UI is layout, forms, tables, modals and the shells listed under [Component Systems Overview](#component-systems-overview). New UI is built on `waldur-ui`.
+
+---
+
+## Table of Contents
+
+1. [UI Architecture & Framework Coexistence](#ui-architecture-framework-coexistence)
+   - [Component Systems Overview](#component-systems-overview)
+   - [Component Standards & Usage Guide](#component-standards-usage-guide)
+   - [Cascade Layers](#cascade-layers)
+   - [The `!important` & Class-Name Collision Rules](#the-important-class-name-collision-rules)
+   - [Root Font-Size & Fractional Rem Scaling](#root-font-size-fractional-rem-scaling)
+   - [The Preflight Reset Shim](#the-preflight-reset-shim)
+   - [Grid Breakpoint Synchronization](#grid-breakpoint-synchronization)
+   - [Design Tokens & Color Systems](#design-tokens-color-systems)
+   - [Brand Color Token Bridge](#brand-color-token-bridge)
+   - [Dark Mode Mechanics](#dark-mode-mechanics)
+2. [Component Architecture & Guidelines](#component-architecture-guidelines)
+   - [AlertItem](#alertitem)
+   - [Badge](#badge)
+   - [Tooltip](#tooltip)
+   - [Popover](#popover)
+   - [Checkbox, Radio & Switch](#checkbox-radio-switch)
+   - [Progress](#progress)
+   - [Buttons](#buttons)
+   - [Sidebar & Mobile Sheet](#sidebar-mobile-sheet)
+   - [Content Drawer (`#kt_drawer`)](#content-drawer-kt-drawer)
+   - [Dropdown & Menu System Map](#dropdown-menu-system-map)
+   - [ActionsMenu & ActionItem](#actionsmenu-actionitem)
+   - [Nav menus](#nav-menus)
+3. [Linting & Guardrails](#linting-guardrails)
+   - [Restricted Imports](#restricted-imports)
+   - [Custom ESLint Rules Matrix](#custom-eslint-rules-matrix)
+4. [Storybook & Testing Toolchain](#storybook-testing-toolchain)
+   - [Storybook Environment & Vitest](#storybook-environment-vitest)
+   - [Visual E2E Specs](#visual-e2e-specs)
+   - [Testing Gotchas & Pitfalls](#testing-gotchas-pitfalls)
+
+---
+
+## UI Architecture & Framework Coexistence
+
+### Component Systems Overview
+
+Waldur Homeport operates on two active UI component patterns:
+
+1. **Modern Tailwind / Radix Primitives (`packages/ui`, exported as `waldur-ui`)**
+   - Built with pure Tailwind v4 utilities and CSS design tokens from `packages/design-tokens`.
+   - Free of all Bootstrap and Metronic classes, SCSS variables, and runtime mixins.
+   - Includes `BaseButton`, `SegmentedControl`, `AlertItem`, `Badge`, `Tooltip`, `Popover`, `Sidebar`, `Sheet`, `Dialog`, `Menu`, `MenuPopover`, `Checkbox`, `Radio`, `Switch`, `RadioGroup`, `Progress`, `Tag`, `Card`, `Avatar`, `Toast`, `FeaturedIcon`, `StatCard`, `CopyButton`, `LoadingSpinner`, `Accordion`, `AccordionCard`, `Collapsible`, and `TablePagination` (with `Pagination` and `PageSizeSelect`).
+   - Exports `buttonVariants()`, `ButtonVariant` and `ButtonSize` so elements that cannot be a `BaseButton` (links, Radix triggers that need a specific child shape) still get the exact same classes.
+
+2. **Transitional Shells (Radix Engine with Themed Skins)**
+   - Used where extensive surface area requires maintaining existing container styling while leveraging accessible Radix primitives:
+     - `#kt_drawer` (`DrawerRoot.tsx`): Radix `Dialog` driving slide-over content panels.
+   - These still wear Bootstrap/Metronic panel classes; only their _buttons_ have moved to `waldur-ui`.
+   - The header, page-tab and footer menus, the table filter popovers and the action menus used to be shells too. They are now `waldur-ui`'s `Menu` / `MenuPopover`, whose looks keep the Metronic and Bootstrap originals; see [Dropdown & Menu System Map](#dropdown-menu-system-map).
+
+---
+
+### Component Standards & Usage Guide
+
+| UI Element                    | Standard Component          | Package       | Usage & Styling Notes                                                                                                                                    | Prohibited                                                            |
+| :---------------------------- | :-------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------- |
+| **Alert / Banner**            | `AlertItem`                 | `waldur-ui`   | Pure Tailwind, `--surface-card-border`, 5 variants                                                                                                       | `react-bootstrap` `Alert`                                             |
+| **Badge / Pill**              | `Badge`                     | `waldur-ui`   | 15 variants × 3 tones, structural `border-[1px]`                                                                                                         | `react-bootstrap` `Badge`                                             |
+| **Tooltip**                   | `Tooltip`                   | `waldur-ui`   | Radix Tooltip (hover/focus) + Popover (click fallback)                                                                                                   | `react-bootstrap` `Tooltip`, `OverlayTrigger`                         |
+| **Popover**                   | `Popover`, `PopoverContent` | `waldur-ui`   | Radix Popover with `--surface-card-*` tokens                                                                                                             | `react-bootstrap` `Popover`                                           |
+| **Button**                    | `BaseButton`                | `waldur-ui`   | 12 variants × 3 sizes, inset `box-shadow` border, outline focus ring, semantic button tokens                                                             | `react-bootstrap` `Button`, hand-written `btn` class markup           |
+| **Link styled as button**     | `Link` with `buttonVariant` | `@/core/Link` | Same classes as `BaseButton` via `buttonVariants()`; keeps anchor semantics and routing                                                                  | `<a className="btn …">`                                               |
+| **Checkbox / radio**          | `Checkbox`, `Radio`         | `waldur-ui`   | Hidden native input + drawn box and SVG mark, `md` 20px / `sm` 16px, `--check-*` tokens; `label` / `description` / `tooltip` props                       | `react-bootstrap` `FormCheck` / `Form.Check`, `form-check*` classes   |
+| **Progress meter**            | `Progress`                  | `waldur-ui`   | One value, stacked `segments` or `indeterminate`; neutral track, `variant` colours the fill; `xs` 4 / `sm` 6 / `md` 8 / `lg` 24px; `--progress-*` tokens | `react-bootstrap` `ProgressBar`, `.progress` / `.progress-bar` markup |
+| **On/off toggle**             | `Switch`                    | `waldur-ui`   | Hidden native checkbox + drawn track and knob, `md` 44×24 / `sm` 36×20, `--switch-*` tokens                                                              | `type="switch"` `FormCheck`, `form-switch*` classes                   |
+| **Mutually exclusive choice** | `SegmentedControl`          | `waldur-ui`   | Radix RadioGroup, `neutral` / `brand` variants, button sizes                                                                                             | `react-bootstrap` `ToggleButtonGroup`, `btn-group` markup             |
+| **Expandable panel group**    | `Accordion`                 | `waldur-ui`   | Radix Accordion, `single` / `multiple`, open header in runtime brand colour; closed panels unmount                                                       | `react-bootstrap` `Accordion`                                         |
+| **Single expandable panel**   | `Collapsible`               | `waldur-ui`   | Radix Collapsible, unstyled; `keepMounted` keeps form fields mounted while closed                                                                        | `react-bootstrap` `Collapse`, `useAccordionButton`                    |
+| **Sidebar Navigation**        | `Sidebar`, `Sheet`          | `waldur-ui`   | Collapsible desktop rail + mobile Radix Sheet                                                                                                            | Metronic sidebar JS                                                   |
+| **Table pagination**          | `TablePagination`           | `waldur-ui`   | `--pagination-*` tokens; `bordered={false}` under a non-table list; desktop/mobile layouts                                                               | `react-bootstrap` `Pagination`, `page-link` markup                    |
+| **Table Actions**             | `ActionsMenu`               | `@/table`     | `Menu` in the actions look, with the kebab / labeled / Add toggles                                                                                       | `react-bootstrap` `DropdownButton`                                    |
+| **Header Chrome Menu**        | `Menu`                      | `waldur-ui`   | `Menu` in the nav look; `openOnHover="desktop"` for hover triggers                                                                                       | N/A                                                                   |
+| **Slide-Over Drawer**         | `DrawerRoot`                | `@/drawer`    | Radix Dialog with CSS keyframe transitions                                                                                                               | N/A                                                                   |
+
+The _Prohibited_ column is convention; the subset that lint enforces is listed under [Linting & Guardrails](#linting-guardrails) (`ToggleButtonGroup` and `btn-group` markup are not).
+
+---
+
+### Cascade Layers
+
+`src/tailwind.css` imports Tailwind's `theme`, `preflight`, and `utilities` chunks separately, defining an explicit layer order:
+
+```css
+@layer theme, base, bootstrap, utilities;
+```
+
+Compiled Metronic and Bootstrap styles are wrapped in `@layer bootstrap`. The browser merges all occurrences into one virtual layer order:
+
+1. `@layer theme` (Tailwind design tokens)
+2. `@layer base` (Tailwind preflight reset)
+3. `@layer bootstrap` (Bootstrap 5 & Metronic compiled styles)
+4. `@layer utilities` (Tailwind generated utilities)
+
+Placing `bootstrap` below `utilities` ensures Tailwind utility classes win specificity ties against Bootstrap rules, while remaining above `base` so preflight resets do not clobber core layout rules.
+
+#### The Unlayered SCSS Specificity Trap
+
+Unlayered CSS **always beats layered CSS**, regardless of selector specificity.
+Vite injects component-level stylesheets (`import './Foo.scss'`) as **unlayered** styles into `<head>`.
+Consequently, any selector in a component SCSS file will override styles inside `@layer bootstrap`.
+
+> [!IMPORTANT]
+> **Scoping Rule**: Component SCSS must be strictly scoped under its own unique component class (e.g. `.my-component .title`), **never** directly under a layout root (`.aside`, `.header`, `.toolbar`, `.card`). Nesting a layout class inside your own root is safe; styling an ancestor layout root directly in component SCSS breaks layout rules app-wide. Global layout overrides belong exclusively in `src/metronic/sass/custom/` inside the bootstrap layer.
+
+#### Production Layer Optimization
+
+In production bundles, Vite's CSS minifier removes the explicit `@layer theme, base, bootstrap, utilities;` statement because `dist/assets/index-*.css` already emits the layers in that physical order. Because Metronic's theme stylesheet is injected at runtime as an external `<link>` tag _after_ initial document parse, the layer order established by `index-*.css` remains authoritative.
+
+---
+
+### The `!important` & Class-Name Collision Rules
+
+CSS Cascade Layers do **not** outrank `!important`. Bootstrap 5's utility API emits utilities with `!important` by default. Because Tailwind and Bootstrap share identical utility names, collisions occur on shared class strings:
+
+| Colliding Class           | Bootstrap Rule (`!important`)                          | Tailwind Expected Rule               | Rendered on App Pages                  |
+| :------------------------ | :----------------------------------------------------- | :----------------------------------- | :------------------------------------- |
+| `.text-white`             | `color: #fff !important;`                              | `color: var(--color-white);`         | **Bootstrap** (breaks `dark:text-...`) |
+| `.bg-transparent`         | `background-color: transparent !important;`            | `background-color: transparent;`     | **Bootstrap**                          |
+| `.border`                 | `border: 1px solid var(--bs-border-color) !important;` | `border-width: 1px;`                 | **Bootstrap**                          |
+| `.p-1` through `.p-5`     | `padding: $spacers[N] !important;`                     | `padding: calc(var(--spacing) * N);` | **Bootstrap**                          |
+| `.gap-1` through `.gap-5` | `gap: $spacers[N] !important;`                         | `gap: calc(var(--spacing) * N);`     | **Bootstrap**                          |
+
+#### Spacing Anomaly
+
+Bootstrap defines `$spacers: (0: 0, 1: $spacer * .25, 2: $spacer * .5, 3: $spacer * .75, 4: $spacer * 0.154 * 6, 5: $spacer * 1.25)`.
+At Metronic's forced root font size of `13px` (and `12px` on mobile):
+
+- `p-1`, `p-2`, `p-3`, `p-5` render at `0.25rem × N` (`3.25px`, `6.5px`, `9.75px`, `16.25px`).
+- `p-4` renders at `0.924rem` (`12.012px` on desktop, `11.088px` on mobile), whereas Tailwind's `p-4` expects `16px`.
+- Steps above 20 fall through to Tailwind because Bootstrap's `$spacers` map stops at 20.
+
+#### Practical Workaround Rules
+
+1. **Exact Pixel Sizing**: For spacing or padding that must match design tokens precisely, use Tailwind arbitrary values: `p-[12px]`, `gap-[8px]`, `px-[16px]`.
+2. **Structural Borders**: Use `border-[1px]` instead of the bare `.border` utility.
+3. **White Text in Inverting Themes**: Use `text-[#fff]` instead of `text-white`. `text-[#fff]` compiles to a unique class name (`text-_fff_`) that avoids Bootstrap's `.text-white { color: #fff !important; }`, allowing dark-mode overrides (`dark:text-brand-300`) to apply correctly.
+
+---
+
+### Root Font-Size & Fractional Rem Scaling
+
+Metronic's compiled CSS forces a non-standard root font size:
+
+- Desktop (`>= 768px`): `html, body { font-size: 13px !important; }`
+- Mobile (`< 768px`): `html, body { font-size: 12px !important; }`
+
+Tailwind's default rem-based scale assumes a `16px` root. In `src/tailwind.css`, `@theme` overrides standard tokens (`--spacing`, `--text-sm`, `--text-base`, `--radius-md`, `--radius-lg`) with explicit values to compensate.
+
+> [!WARNING]
+> **Inline Styles & Rem Trap**: While Tailwind utilities can be adjusted via `@theme`, **inline styles** like `style={{ width: '18rem' }}` bypass Tailwind entirely. In standard browsers `18rem = 288px`, but in Waldur `18rem = 18 × 13px = 234px` (and `216px` on mobile). **Always use explicit pixel values (`style={{ width: '250px' }}`) for inline sizing.**
+
+---
+
+### The Preflight Reset Shim
+
+Tailwind Preflight resets two core element behaviors that have no counterpart in Bootstrap:
+
+1. `img, svg, video, canvas { display: block; }` — Drops inline SVG icons below the text baseline.
+2. `ol, ul, menu { list-style: none; }` — Strips list formatting from Markdown user content (offering descriptions, Terms of Service).
+
+`src/tailwind.css` includes a targeted `@layer bootstrap` block that restores browser defaults using `revert`:
+
+```css
+@layer bootstrap {
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: revert;
+  }
+  ol,
+  ul,
+  menu {
+    list-style: revert;
+  }
+}
+```
+
+Using `revert` respects user-agent specifics (e.g. `audio:not([controls]) { display: none; }`) while neutralizing unwanted Preflight side-effects.
+
+---
+
+### Grid Breakpoint Synchronization
+
+`src/tailwind.css` aligns Tailwind breakpoints with Bootstrap's `$grid-breakpoints` and `GRID_BREAKPOINTS` in `src/core/constants.ts`:
+
+```css
+@theme {
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1400px;
+}
+```
+
+This guarantees `lg` resolves to `992px` identically across Tailwind `lg:` variants, Bootstrap `.d-lg-*` classes, SCSS `@include media-breakpoint-up(lg)`, and TSX `useMediaQuery()` hooks.
+
+---
+
+### Design Tokens & Color Systems
+
+1. **Single Source of Truth**: All color ramps originate in `packages/design-tokens/tokens/colors.json`. Running `yarn tokens:generate` outputs:
+   - `src/metronic/sass/_color-ramps.scss` (consumed by Bootstrap & Metronic SCSS)
+   - `packages/design-tokens/src/colorRamps.css` (consumed by Tailwind)
+2. **Theme Color Semantics**:
+   - In Tailwind CSS: `--color-gray-N` maintains physical lightness across themes (e.g., `gray-900` is always dark). Dark UI uses a dedicated inverted ramp: `--color-gray-dark-N`.
+   - In Metronic SCSS: `$gray-N` variables invert automatically in dark mode (`$gray-900` becomes light in dark mode).
+3. **Surface & Component Tokens**:
+   - `surfaceColors.css`: `--surface-card-bg`, `--surface-card-border`, `--surface-text-primary`, `--surface-text-secondary`, `--dropdown-shadow`.
+   - `buttonColors.css`: Per-variant button backgrounds, borders, hover states, and focus rings.
+   - `zIndex.css`: Coordinated stack order across Bootstrap and Radix layers.
+
+---
+
+### Brand Color Token Bridge
+
+`src/tailwind.css` bridges runtime brand variables into Tailwind:
+
+```css
+@theme {
+  --color-brand-50: var(--waldur-brand-50);
+  --color-brand-500: var(--waldur-brand-500);
+  --color-brand-600: var(--waldur-brand-600);
+  /* ... */
+}
+```
+
+These CSS variables are initialized at runtime by `afterBootstrap.tsx` (`initCssVariables()`). Storybook decorators and test harnesses must seed `--waldur-brand-*` variables so brand-dependent components render valid colors.
+
+---
+
+### Dark Mode Mechanics
+
+Waldur does **not** toggle dark mode via a `.dark` HTML class. Instead:
+
+1. `loadTheme()` in `src/theme/utils.ts` swaps the stylesheet `<link>` between `style.css` and `style.dark.css`.
+2. Simultaneously, `loadTheme()` sets the `data-theme="dark"` attribute on `<html>`.
+3. Tailwind dark mode is configured via an explicit variant:
+
+```css
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+```
+
+---
+
+## Component Architecture & Guidelines
+
+### AlertItem
+
+`packages/ui/src/AlertItem/` (exported from `waldur-ui`).
+
+- **Architecture**: Pure Tailwind utilities and CSS design tokens (`--surface-card-border`).
+- **Typography & Proportions**:
+  - Title: `text-[1.077rem] font-medium leading-[1.43]` to match Metronic typography across desktop and mobile root font sizes.
+  - Border: `var(--surface-card-border)` (`#E4E7EC` light, `#1F242F` dark).
+  - Slot spacing: `gap-[0.924rem]`.
+- **Enforcement**: `react-bootstrap` `Alert` is prohibited in `RESTRICTED_IMPORTS` (`eslint.config.js`), blocking direct imports and guiding call sites to `AlertItem` from `waldur-ui`.
+
+---
+
+### Badge
+
+`packages/ui/src/Badge/` (exported from `waldur-ui`).
+
+- **Variants & Tones**: 15 semantic variants (`primary`, `secondary`, `success`, `warning`, `danger`, `info`, `neutral`, `purple`, `blue`, `indigo`, `moss`, `pink`, `teal`, `orange`, `rose`) × 3 tones (`solid`, `light`, `outline`) × 4 shapes (`rounded`, `pill`, `circle`, `roundless`).
+- **Structural 1px Border**: Uses `border-[1px]` paired with `border-transparent` on solid/light tones to maintain uniform dimensions without subpixel shift across tones.
+- **Enforcement**:
+  - `react-bootstrap` `Badge` is prohibited in `RESTRICTED_IMPORTS`.
+  - `enforce-badge-icon-patterns`: Enforces 12px icons inside badges.
+  - `enforce-badge-props-consistency`: Enforces variant/tone prop rules.
+  - `no-manual-icon-colors-in-badges`: Prevents manual color classes on icons rendered inside `Badge`.
+  - `enforce-badge-right-icon-pattern`: Standardizes dismiss/action icons.
+
+---
+
+### Tooltip
+
+`packages/ui/src/Tooltip/` (exported from `waldur-ui`).
+
+- **Dual Engine Architecture**:
+  - `trigger="hover"` (default): Uses `@radix-ui/react-tooltip` with pointer enter/leave delays and keyboard focus detection.
+  - `trigger="click"`: Uses `@radix-ui/react-popover` for click-to-open tooltips (Radix Tooltip lacks click-trigger support). Styled identically as a bubble surface.
+- **Seam-Free Arrow Construction**: Standard Radix SVG arrows leave an anti-aliasing hairline seam between the SVG path and the HTML popup. `Tooltip.tsx` uses a custom polygon that extends 1 viewBox unit (~0.5px) past its box with `overflow: visible` to prevent rasterization seams.
+- **Adaptive Color Inversion**:
+  - `theme="dark"` (default): Dark bubble with `text-[#fff]` in light mode; light bubble with dark text in dark mode.
+  - `theme="light"`: Fixed dark bubble regardless of active mode.
+- **Enforcement**: `Tooltip` and `OverlayTrigger` from `react-bootstrap` are prohibited in `RESTRICTED_IMPORTS`.
+
+---
+
+### Popover
+
+`packages/ui/src/Popover/` (exported from `waldur-ui`).
+
+- **Design Token Styling**: Styled with semantic tokens:
+
+  ```tsx
+  className =
+    'rounded-lg border border-[var(--surface-card-border)] bg-[var(--surface-card-bg)] shadow-[var(--dropdown-shadow)] text-[var(--surface-text-primary)] outline-hidden';
+  ```
+
+- **Menu vs. Popover**:
+  > [!TIP]
+  > **When to use `Menu` vs. a popover**:
+  >
+  > - **`Menu`**: Use when _every child is a command row_. A Radix DropdownMenu owns focus with a roving tabindex and treats keystrokes as item typeahead.
+  > - **`MenuPopover`** (or `Popover`): Use if the panel contains _form inputs, filters, date pickers, or interactive search fields_. A menu will intercept keystrokes typed into a nested input if they match a menu item!
+- **Enforcement**: `react-bootstrap/Popover` is prohibited in `RESTRICTED_IMPORTS`.
+
+---
+
+### Accordion & Collapsible
+
+`packages/ui/src/Accordion/` and `packages/ui/src/Collapsible/` (exported from `waldur-ui`).
+
+- **Accordion** is the shadcn recipe on Radix Accordion: each trigger is a real `<button>` inside an `<h3>` (Bootstrap/Metronic heading margin and type reset), with `aria-expanded`/`aria-controls` and arrow/Home/End keys between headers. Use `type="multiple"` where several panels stay open (table filters sidebar).
+- **Brand colour**: the open header is `text-brand-700` / `dark:text-brand-200`, the runtime tenant ramp. The chevron is a Phosphor icon in `currentColor`, so it always matches — react-bootstrap's version baked the build-time default green into a data-URI SVG.
+- **Motion**: 250ms ease-out slide. Accordion and plain Collapsible use `waldur-collapsible-down/-up` in `waldur-design-tokens/animations.css`, driven by Radix's `--radix-collapsible-content-height`; `overflow: hidden` lives in the keyframes so an open panel lets inline select menus overflow it. `Collapsible keepMounted` (its children stay mounted, so Radix's Presence can't drive keyframes) transitions grid rows 0fr ↔ 1fr instead, clipping only mid-slide and applying `hidden` once closed. Both respect `prefers-reduced-motion`.
+- **Unmount vs. `keepMounted`**:
+  > [!WARNING]
+  > Radix renders `isOpen && children` inside its Content, so a closed panel's children are **unmounted even with `forceMount`**. react-final-form fields inside it unregister and lose their values and validation. For panels holding form fields, use `<Collapsible keepMounted>`: children stay mounted and are only `hidden` while closed. `Accordion` has no such option — none of its intended users hold form fields.
+- **Call sites**: the table filters sidebar (`Accordion type="multiple"`), `AccordionCard` (now in `waldur-ui`; `Collapsible keepMounted`, same props as before; pure Tailwind with rem spacing ported from Metronic's card, and `--card-header-text` / `--card-title-text` / `--card-title-secondary-text` / `--card-header-solid-bg` tokens in `surfaceColors.css` — measured identical to the Metronic card in light and dark), `CategoriesPanel` (`Collapsible`) and a handful of standalone accordions, which add an outer border via `className` (`rounded-md border-[1px] border-solid border-[var(--surface-card-border)]`) — the component itself draws only separators between items.
+- **Enforcement**: `Accordion`, `AccordionContext` and `useAccordionButton` from `react-bootstrap` (and `react-bootstrap/Accordion`) are prohibited in `RESTRICTED_IMPORTS`.
+
+---
+
+### Progress
+
+`packages/ui/src/Progress/` (exported from `waldur-ui`); tokens in `packages/design-tokens/src/progressColors.css`.
+
+- **Three modes**: `<Progress value max variant />`, `<Progress segments={[{ value, variant, label? }]} max />` for stacked bars, and `<Progress indeterminate />` for an unknown amount (a sweeping bar; a static half-opaque bar under `prefers-reduced-motion`).
+- **No height override**: `size` is `xs` (4px), `sm` (6px), `md` (8px, default) or `lg` (24px, the only size meant for text inside a segment). There is no `style`/`h-*` escape hatch; pick a size.
+- **Neutral track**: the track never takes the variant's colour (a tinted track made an empty meter look full). `variant` is a `BadgeVariant` minus `secondary`, and the fills are Badge's `solid` colours in both themes. `primary` reads `--waldur-brand-600`, so tenant re-branding applies.
+- **Accessibility**: the track carries `role="progressbar"` with `aria-valuenow/min/max`; `label` is its accessible name. A non-finite `value` or a `max <= 0` (a 0/0 quota) reads as 0, never `NaN`. Segments are clamped so they never exceed the track.
+- **`PercentProgress`** (`src/core/PercentProgress.tsx`) is the bar plus its share of `max` printed under it (`unit`, `compact`). Use plain `Progress` when the surrounding markup already prints the figure.
+- **Inner labels**: each variant has its own `--progress-label-{variant}` (white or gray-900, whichever reads better on the fill); a token test keeps every pair at or above 4.4:1.
+- **Enforcement**: the custom rule `no-bootstrap-progress` reports react-bootstrap's `ProgressBar` (by name or deep path) and any `progress`, `progress-bar*` or `progress-themed` class token. The Bootstrap/Metronic `.progress` styles and the `$progress-*` variables are deleted.
+
+---
+
+### Checkbox, Radio & Switch
+
+`packages/ui/src/Check/`: `Checkbox.tsx`, `Radio.tsx`, `RadioGroup.tsx` and `Switch.tsx` (exported from `waldur-ui` through `Check/index.ts`), plus the internal `CheckLabel.tsx` (label row), `CheckMark.tsx` (the check path, also drawn by the select) and `checkStyles.ts` (class recipes); colours in `waldur-design-tokens/checkColors.css`.
+
+- **Hidden input + `peer`**: each control is a box holding a native `<input>` that is invisible (`opacity-0`, not `sr-only`) and on top, so it still takes clicks, focus, keyboard and form state, followed by elements that draw the control and read the input's state with `peer-*`: the box and the check/dash SVGs (`Checkbox`), the circle and dot (`Radio`), the track and knob (`Switch`). No background images or data URIs; marks are `currentColor` (`--check-mark` / `--check-mark-disabled`). Compound states use arbitrary peer variants (`peer-[:checked:disabled]:`, `peer-[:hover:enabled:not(:checked)]:`). `className` and `hidden` go on the box (layout); every other prop, and the `ref`, reach the input. Indeterminate styling is checkbox-only: `:indeterminate` also matches every radio in a group with nothing selected.
+- **Motion** matches the legacy `$form-check-transition`: colours and border fade and the switch knob slides over 0.15s `ease-in-out` (written `ease-[ease-in-out]`; Tailwind's `ease-in-out` is a different curve), and `motion-reduce:transition-none` turns it off, as Bootstrap's `transition` mixin did. The marks appear instantly, as the background images did.
+- **`SwitchVisual`** is the switch's look as a `<span>` with no input, for `Menu.CheckboxItem`, which already has `role="menuitemcheckbox"`.
+- **Sizes** are the legacy ones at the 13px root, in px: checkbox/radio `md` 20px (radius 6px) and `sm` 16px (radius 4px); switch `md` 44×24 and `sm` 36×20. The legacy controls were rem-sized, so they shrank about 8% at the 12px mobile root; these do not.
+- **Tokens** (`--check-*`, `--switch-*`) map one-to-one onto the SCSS tokens the old stylesheet used (`$border-primary`, `$bg-brand-solid`, `$bg-disabled_subtle`, `$fg-senary`, …); the file's header lists every mapping. Only colours live there: the marks are elements (below).
+- **Labels are props**: `Checkbox`, `Radio` and `Switch` take `label`, `description`, `tooltip`, `align` and `inline`. With any of them the control renders its whole row (the internal `CheckLabel`): control, then a 14px/20px `<label htmlFor>` naming it and a muted description linked with `aria-describedby`, 8px apart. Without them it renders bare, for tables (give it an `aria-label`). `align` defaults to `start` (the control stays on the first line when the label wraps), except a `Switch` without a description, which centres; a 16px control in `start` drops 2px on its own; `Switch` rows are `inline` by default, as the legacy switches were. All three report `onCheckedChange(boolean)` (`Checkbox` also keeps native `onChange`); `className` goes on the outermost element.
+- **`RadioGroup`**: options in, one value out (`value` / `onValueChange`), like `SegmentedControl`, but as native radios in a `<fieldset>` whose `<legend>` is `label`, with `description`, per-option `description` / `tooltip` / `disabled`, `orientation` and a generated `name`. Disabling the group disables every option through the fieldset. Use `SegmentedControl` to switch a view, `RadioGroup` for a form question.
+- **react-final-form**: `SwitchField` and `RadioGroupField` (`src/form`) only map `input` onto the control. `BooleanGroup` / `BooleanEditField` / `BooleanFilter` and the form-level `RadioGroup` keep their names; with `passLabelToControl` the control draws the field's `label`, `tooltip` and `description`, and `FormGroup` adds only spacing, required mark and errors. The old `AwesomeCheckbox`, `AwesomeCheckboxField` and `AwesomeRadioButton` are gone, along with their `help_text` (now `description`), `alignMiddle` (now `align="center"`), `tooltipEnd`, `direction` (now `orientation`), `justify` and `gap` props.
+- **Enforcement**: the custom rule `no-bootstrap-form-check` reports `FormCheck`, `Form.Check` (under any local name for `Form`) and any `form-check*` / `form-switch*` class token.
+
+---
+
+### Buttons
+
+Three primitives in `waldur-ui` (`packages/ui/src`) and `Link` in `@/core/Link` make up the application's unified button architecture:
+
+| Primitive                     | Role & Use Case                                                                    | Package / Location |
+| :---------------------------- | :--------------------------------------------------------------------------------- | :----------------- |
+| `BaseButton`                  | Standard action buttons across dialogs, tables, and page headers                   | `waldur-ui`        |
+| `buttonVariants()`            | Shared CVA styling applied to non-button elements (router links, dropdown toggles) | `waldur-ui`        |
+| `SegmentedControl`            | Mutually exclusive view switchers (Radix RadioGroup)                               | `waldur-ui`        |
+| `Link` (with `buttonVariant`) | State-based router navigation styled with button aesthetics                        | `@/core/Link`      |
+
+`ButtonVariant` and `ButtonSize` are derived directly from the `cva` definition (`VariantProps<typeof buttonVariants>`), guaranteeing types stay synchronized with rendered classes.
+
+#### Architectural Highlights
+
+- **Integer Heights & Inset Borders**: Decoupled from physical CSS `border-box` calculations via `shadow-[inset_0_0_0_1px_var(...)]`, guaranteeing exact heights: 28px (`sm`), 36px (`md`, default), and 44px (`lg`).
+- **Direct Tooltip Integration**: `buttonVariants` does not declare `disabled:pointer-events-none`; instead, it pairs `disabled:cursor-not-allowed` with matching `data-disabled:*` styles. `<BaseButton>` passes `data-disabled` and wraps `<button>` inside `<Tooltip>` with **zero wrapper `<span>` elements**, eliminating flexbox alignment bugs (`self-center`, `w-100`).
+- **Outline Focus Rings**: Focus indicators use native CSS `outline` (`focus-visible:[outline:2px_solid_var(...)]`) for forced-colors compatibility and resistance to container resets.
+- **Toggles in `ActionsDropdown`**: Dropdown toggles render a direct `<button>` with `buttonVariants()` (rather than `BaseButton`) so the rotating caret (`rotate-toggle-180`) remains an immediate child for CSS animation.
+- **SegmentedControl**: Built on Radix RadioGroup (<kbd>←</kbd>/<kbd>→</kbd> select, single <kbd>Tab</kbd> stop) with `inline-flex self-center` preventing layout stretching.
+
+> [!TIP]
+> **Authoritative Guide**: For complete variant tokens, full prop specifications, icon sizing rules, dropdown toggle architecture, and the call-site conversion guide, see the dedicated [Button UI Guide](button-ui-guide.md).
+
+---
+
+### Sidebar & Mobile Sheet
+
+`packages/ui/src/Sidebar.tsx` + `Sheet.tsx`.
+
+- **Separate Desktop and Mobile Trees**: `useIsMobile()` splits execution into two distinct branches:
+  - **Desktop**: Collapsible rail with `group/panel` variants, hover expansion, and fixed positioning over an invisible spacer element.
+  - **Mobile**: Rendered inside a Radix `Sheet` / `Dialog` drawer pinned to `width: 250px` (avoiding rem shrinkage).
+- **Hover Expansion Mechanics**: Synchronized via React state (`isHoverExpanded`) rather than pure CSS `:hover` to prevent desynchronization during collapse animations.
+- **Radix Collapsible Tree**: Built using `@radix-ui/react-collapsible` rather than `Accordion` to avoid wrapper DOM nodes that interfere with menu styling. Heights are measured dynamically via `ResizeObserver` into `--sidebar-accordion-height`.
+- **The Mobile Sheet Animation Trap**:
+  > [!CAUTION]
+  > **Never use `forceMount` on the mobile Sheet**:
+  > Radix's `DismissableLayer` registers global `pointerdown` listeners while mounted. Force-mounting the closed sheet causes its `DismissableLayer` to intercept clicks across the entire application, breaking unrelated header buttons.
+  > Instead, the Sheet uses Tailwind v4's `starting:` variant (`@starting-style`), allowing elements to animate from a defined initial frame upon dynamic mounting.
+
+---
+
+### Content Drawer (`#kt_drawer`)
+
+`src/drawer/DrawerRoot.tsx` wraps the shared drawer panel in Radix `Dialog.Root` and `Dialog.Content`.
+
+- **Animation Detection via `@keyframes`**: Radix `Presence` monitors CSS `@keyframes` (`animationstart`/`animationend`) to delay unmounting. Plain CSS transitions are ignored. `_shell.scss` attaches explicit `@keyframes kt-drawer-slide-in` and `kt-drawer-slide-out` to `#kt_drawer`.
+- **Width Custom Property**: Sizing is controlled via `--drawer-width`, allowing responsive full-screen toggles without direct inline style overrides.
+
+---
+
+### Dropdown & Menu System Map
+
+Every menu and menu-like popover is built from one set of parts in `waldur-ui` (see the [Menus guide](menus.md) for which part to use, recipes and rules):
+
+1. **`Menu`** (`packages/ui/src/Menu/`): Radix DropdownMenu with the defaults built in: `modal={false}`, a Portal (with an optional `container`), the look's z-index layer, scrolling inside the space Radix measures, `sideOffset={2}` and the keyframe entrance. Parts: `Menu.Trigger`, `Menu.Content`, `Menu.Item`, `Menu.Group`, `Menu.RadioGroup`/`Menu.RadioItem`, `Menu.Sub`/`Menu.SubTrigger`/`Menu.SubContent`, `Menu.Label`, `Menu.Separator`, `Menu.CheckboxItem` (a setting, shown as a switch) and `Menu.CopyItem` (copies a value).
+2. **`MenuPopover`**: the same surfaces on a Radix Popover, for panels holding inputs. Parts: `Trigger`, `Anchor`, `Close`, `Content` (with `forceMount` and `container` for the table filter panels) and `Item` (a button row that does _not_ close the panel, since the filter menus use it as a nested popover's trigger).
+3. **App components** in `src/table/ActionsDropdown.tsx`: `ActionsMenu` and its rows (below), and `NavMenuLink` in `src/navigation/NavMenu.tsx`, a nav row that is a ui-router link.
+
+- **Looks**: `Menu.Content look="nav"` (the default; header, page tabs, footer, filter popovers) or `look="actions"` (row actions, "Add" menus). Popovers with a layout of their own (the column picker, search, breadcrumb, call settings) are plain `Popover`s, whose `PopoverContent` is a bordered card on `z-popover`. The looks are cva recipes collocated with each component in `packages/ui/src/Menu/` (`menuSurface` in `MenuContent.tsx`, `menuItem` in `MenuItem.tsx`, `menuText` in `MenuStatic.tsx`, `menuLabel` in `MenuLabel.tsx`, `menuSeparator` in `MenuSeparator.tsx`), measured against the original Metronic and Bootstrap menus and pinned by `menuLooks.test.ts`.
+- **Look and kind in context**: a panel provides its look and its kind (`menu`, `popover` or, with no panel, `plain`) through React context (`packages/ui/src/Menu/menuContext.tsx`), so rows in a portaled submenu still inherit them. `Menu.Item` renders for its kind: a Radix item in a menu, a button that closes the panel in a popover, a plain `<button role="menuitem">` anywhere else. `onSelect` works the same in all three; calling `event.preventDefault()` keeps the panel open.
+- **Placement**: Radix `side` and `align` only. Radix's default `align` is `center`, so menus that open from the start edge say `align="start"`.
+- **Hover to open**: `<Menu openOnHover="desktop">` opens on hover at `lg`+ (clicking below it) with Metronic's 200ms close delay (`TabsList.tsx`, `FooterDropdown.tsx`).
+- **Shell**: `packages/shell` and the micro-app use the same parts in the nav look. They have no Bootstrap, so their panels set their typography with Tailwind (`py-[12px] text-[14px] font-medium`, as the main app's `fw-bold fs-6 py-4`).
+
+#### `asChild` and `forwardRef` Requirement
+
+Radix's `Slot` clones trigger elements and attaches positioning refs and event handlers. **Every intermediate trigger component in an `asChild` hierarchy must be wrapped in `forwardRef` and spread `...props`**, or clicks will silently fail.
+
+#### Bootstrap utilities on panels
+
+Bootstrap's spacing utilities are `!important`, so a Bootstrap class on a panel (`py-4`, `p-0`) beats any Tailwind spacing. The surfaces reset their own margin and padding with arbitrary values (`m-[0px] p-[0px]`) rather than `m-0`/`p-0` for that reason: Bootstrap's `.p-0` would otherwise cancel a caller's Tailwind `py-*`. Tailwind-merge also reads `text-anchor` and `text-primary` as two colours and drops the first; put such classes on the `asChild` child (Slot joins class names without merging them) rather than on the row (see `ResourceAccessButton.tsx`).
+
+---
+
+### `ActionsMenu` & `ActionItem`
+
+`src/table/ActionsDropdown.tsx` / `src/resource/actions/ActionItem.tsx`.
+
+- **`ActionsMenu`**: a trigger plus an actions-look panel. `toggle` is `"kebab"` (the default), `"labeled"` (with `label`), `"add"` or an element of your own (which must forward its ref). The panel opens to the left of the toggle, aligned to its start, as row actions always have; "Add" and toolbar menus pass `side="bottom"`. For panels with search inputs, use `MenuPopover` with `TableDropdownToggle` directly. `ActionsDropdown` is a wrapper over it. For standalone dropdown buttons, use `Menu.TriggerButton`.
+- **`Menu.Content look="actions"`**: the panel on its own, for menus whose trigger sits elsewhere in the markup (`WaldurSidebarBrand`, `ResourceUsageForm`).
+- **Rows**: `Menu.Item`, `Menu.Group` with `Menu.Label`, and `Menu.Separator` from `waldur-ui` are used directly with `look="actions"` (or inheriting it from the parent panel). `Menu.Item` automatically receives `data-testid="action-item"` in the actions look.
+- **`ActionItem`**: a `Menu.Item` with an icon, tooltip and staff indicator, or a `BaseButton` with `as`. It hides itself when `isActionVisible` says so: an action switched off for the resource's offering (`actionId` + `resource`), or one that fails the enclosing `ActionList`'s filter (`query`, `hideDisabled`, `hideNonImportant`; `hideGroupName` hides `ActionGroup` captions). `ActionList` is in `src/marketplace/resources/actions/ActionList.tsx`.
+- **Highlighted rows**: hover, focus, Radix `[data-highlighted]` and `.active` share one style; disabled rows (`data-disabled`, `:disabled` or `.disabled`) are skipped.
+- **Isolated Row Testing**: `inActionsMenu(children)` (`src/test/harness.tsx`) wraps action rows in an open `Menu` with `<Menu.Content look="actions">`, so they render as real menu items in Vitest without a table harness.
+- **Toggle buttons use `buttonVariants()`, not `BaseButton`**: `TableDropdownToggle` / `AddDropdownToggle` in this file render a raw `<button>` carrying `buttonVariants()` classes. The toggle is a `group/toggle`, and `ButtonCaret` flips while it is `data-state="open"`. Their icons are sized with the Phosphor `size` prop (16.25px `sm`, 19.5px otherwise) rather than a `.svg-icon` wrapper. Standalone dropdown buttons use `Menu.TriggerButton` which wraps `BaseButton`.
+- **Unavailable offerings**: the page wraps itself in `ActionsUnavailable`, and every action menu inside shows its toggle disabled with the reason in a tooltip. This replaced a `data-actions-toggle` attribute and a `.disabled-view` rule that hid the toggles.
+
+---
+
+### Nav menus
+
+The header user menu, the language submenu, page-tab submenus, the footer menus and the filter popovers.
+
+- **Nav look**: Metronic's `.menu-sub-dropdown` panel and `.menu-link` row, measured against the live app. Colours come from the `--menu-*` tokens in `surfaceColors.css`; the shadow is `--dropdown-shadow`.
+- **Row options instead of theme classes**: `density` (`default` 10×16px, `compact` 8×9.75px, `base` 8×12px) and `tone` (gray-600 or gray-700). Every highlighted row is gray-700 on gray-50. A panel sets them for its rows with `density` / `tone` props, as `data-*` attributes the rows' group variants read (the footer uses `compact`; `MenuPopover.Content` defaults to `base`/gray-700 for the filter rows).
+- **Highlighted rows**: hover, Radix `[data-highlighted]`, an open submenu (`data-[state=open]`), a checked radio row (`data-[state=checked]`, e.g. the current language) and `.active` (what `UISrefActive` adds) share one style (the `menu-row-active:` variant); disabled rows (`data-disabled`) are skipped.
+- **`NavMenuLink`**: a row that is a ui-router `Link`. It wraps its label in a span so `Link` doesn't add `text-anchor`.
+- **Page tabs and footer bar** (`TabsList.tsx`, `footer/MenuItem.tsx`) are plain `<nav><ul>` link lists with their own Tailwind classes and `--page-tab-*` / `--footer-link-text` tokens. The current tab is marked with `aria-current`.
+
+---
+
+## Linting & Guardrails
+
+### Restricted Imports
+
+Configured in `eslint.config.js` via `no-restricted-imports` (`RESTRICTED_IMPORTS`). Each entry has a `message` that names the replacement:
+
+| `react-bootstrap` import                              | Use instead                                                                            |
+| :---------------------------------------------------- | :------------------------------------------------------------------------------------- |
+| `Badge`                                               | `Badge` from `waldur-ui`                                                               |
+| `Tooltip`, `OverlayTrigger`                           | `Tooltip` (or `Popover`) from `waldur-ui`                                              |
+| `Popover`                                             | `Popover` from `waldur-ui`                                                             |
+| `Alert`                                               | `AlertItem` from `waldur-ui`                                                           |
+| `Button`                                              | `BaseButton` from `waldur-ui` (or `SubmitButton` / `CloseDialogButton` where they fit) |
+| `DropdownButton`                                      | `ActionsDropdown`                                                                      |
+| `Accordion`, `AccordionContext`, `useAccordionButton` | `Accordion` or `Collapsible` from `waldur-ui`                                          |
+| `Pagination`, `PageItem`                              | `TablePagination` (or `Pagination` for page numbers alone) from `waldur-ui`            |
+
+Two Radix packages are restricted too, everywhere except `packages/ui` (where `Menu` / `MenuPopover` wrap them):
+
+| Import                          | Use instead                                                                    |
+| :------------------------------ | :----------------------------------------------------------------------------- |
+| `@radix-ui/react-dropdown-menu` | `Menu` from `waldur-ui`, or `ActionsMenu` / `ActionsDropdown` for action menus |
+| `@radix-ui/react-popover`       | `MenuPopover` (or `Popover`) from `waldur-ui`                                  |
+
+Each `react-bootstrap` entry is blocked both as a named import from `react-bootstrap` and as a deep import (`react-bootstrap/Badge`, …). A genuinely new exception belongs on the offending line as `// eslint-disable-next-line no-restricted-imports -- <reason>`.
+
+Import restrictions only see imports. A button hand-written as `<button className="btn btn-danger">` imports nothing, so it is caught by the custom rule `no-bootstrap-button-markup` below.
+
+---
+
+### Custom ESLint Rules Matrix
+
+Implemented in `packages/eslint-plugin-waldur` and enabled as `waldur-custom/*` in `eslint.config.js`. Rules marked `warn` steer new code while existing violations (over a hundred hand-rolled tables, for example) are converted one screen at a time; promote them to `error` when the count reaches zero.
+
+#### Buttons, dialogs and tables
+
+| Rule Name                            | Severity | Enforced Pattern                                                                                                                                    |
+| :----------------------------------- | :------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-bootstrap-button-markup`         | `error`  | Flags `btn` as a class token on a native `<button>`, `<a>`, `<input>` or `<label>`. No allowlist: use `BaseButton`, or `Link` with `buttonVariant`. |
+| `enforce-disabled-button-tooltip`    | `error`  | A disabled `BaseButton` needs a `tooltip` or `disabledReason` explaining why.                                                                       |
+| `no-edit-button-size-override`       | `error`  | Prevents `size="sm"` on `EditButton`; use `CompactEditButton`.                                                                                      |
+| `enforce-dialog-button-order`        | `error`  | Dismissive actions first, primary submission/approval last (rightmost) in dialog footers.                                                           |
+| `no-hand-rolled-modal-footer`        | `error`  | Prefer `ModalDialog`'s `footer` prop over hand-rolling action buttons inside its children.                                                          |
+| `enforce-actions-dropdown-in-tables` | `warn`   | Steers table row actions toward `ActionsDropdown`.                                                                                                  |
+| `no-hand-rolled-table`               | `warn`   | Prefer `@/table/Table` over `react-bootstrap` `Table` or raw `<table>` markup.                                                                      |
+| `enforce-noresult-with-cta`          | `error`  | `NoResult` empty states need an actionable call-to-action button.                                                                                   |
+| `enforce-render-field-or-dash`       | `error`  | Table cells use `renderFieldOrDash()` for empty values.                                                                                             |
+
+#### Visual patterns
+
+| Rule Name                          | Severity | Enforced Pattern                                                                                                          |
+| :--------------------------------- | :------- | :------------------------------------------------------------------------------------------------------------------------ |
+| `enforce-badge-icon-patterns`      | `error`  | Enforces 12px icon sizing inside `Badge` components.                                                                      |
+| `enforce-badge-props-consistency`  | `error`  | Validates `variant`, `tone` and `shape` prop combinations on `Badge`.                                                     |
+| `no-manual-icon-colors-in-badges`  | `error`  | Prevents manual colour classes on icons rendered inside `Badge`.                                                          |
+| `enforce-badge-right-icon-pattern` | `error`  | Standardizes right-side action icon styling in badges.                                                                    |
+| `enforce-featured-icon`            | `error`  | Requires `FeaturedIcon` (with `tone`/`size`) for highlighted icon emblems.                                                |
+| `enforce-phosphor-icon-weight`     | `error`  | Consistent `weight` prop on Phosphor icons.                                                                               |
+| `enforce-border-radius-tokens`     | `error`  | Design-token radius classes instead of hard-coded values.                                                                 |
+| `no-bootstrap-tabs`                | `error`  | `Tabs` / `TabNav` from `waldur-ui`; no react-bootstrap `Tab`/`Tabs`/`Nav` or `nav-*` classes.                             |
+| `enforce-breadcrumb-colors`        | `error`  | Breadcrumb links use the `$text-brand-secondary` token.                                                                   |
+| `no-bootstrap-form-check`          | `error`  | `Checkbox` / `Radio` / `Switch` from `waldur-ui`; no `FormCheck`, `Form.Check` or `form-check*` / `form-switch*` classes. |
+| `no-bootstrap-progress`            | `error`  | `Progress` from `waldur-ui`; no react-bootstrap `ProgressBar` or `progress` / `progress-bar*` classes.                    |
+
+#### Code hygiene
+
+| Rule Name                        | Severity | Enforced Pattern                                                                                                                  |
+| :------------------------------- | :------- | :-------------------------------------------------------------------------------------------------------------------------------- |
+| `no-direct-client-usage`         | `error`  | No direct use of low-level API client methods.                                                                                    |
+| `no-direct-field-adapter`        | `error`  | Adapter components are not passed straight to `Field`'s `component` prop.                                                         |
+| `no-template-in-translate`       | `error`  | No template literals or concatenation inside `translate()` calls.                                                                 |
+| `prefer-classnames-utility`      | `error`  | Use `classNames()` instead of manual `className` string concatenation.                                                            |
+| `no-redundant-vi-mock`           | `error`  | No `vi.mock` for modules that are already mocked globally.                                                                        |
+| `no-undefined-in-mutation-body`  | `warn`   | Do not collapse a request-body field to `undefined`: the key is dropped and clearing the field becomes a silent no-op.            |
+| `prefer-mutate-over-mutateAsync` | `warn`   | Buttons and action items (`BaseButton`, `ActionItem`, …) call `.mutate()`; keep `.mutateAsync()` for forms that need the promise. |
+
+The former `enforce-button-variants` rule was deleted: the variant list lives in the `ButtonVariant` type, so the compiler enforces it.
+
+---
+
+## Storybook & Testing Toolchain
+
+### Storybook Environment & Vitest
+
+- **Dev Server**: `yarn storybook` (port 6006)
+- **Production Build**: `yarn build-storybook`
+- **Vitest Runner**: `yarn test:storybook` (runs every story through Playwright browser assertions).
+- **Concurrency Gotcha**: When running Vitest against Storybook while a Storybook dev server is active, always prefix the command with `CHOKIDAR_USEPOLLING=1` to prevent inotify file-watcher limits:
+
+  ```bash
+  CHOKIDAR_USEPOLLING=1 yarn vitest run --project=storybook
+  ```
+
+- **Stories to look at**: `Actions/BaseButton` (`packages/ui/src/Button/BaseButton.stories.tsx`: playground, every state, sizes, icon-only, realistic usage), `Actions/SegmentedControl` (variants, sizes, `BesideTallerSibling`, `AsTabsWithPanels`), and `src/table/ActionsMenu.stories.tsx`.
+- **Storybook is not the app**: it applies the theme through `storybook-addon-pseudo-states`, which rewrites `:focus-visible` / `:hover` selectors. See the pitfall below before trusting a `:not(:focus-visible)` result there.
+
+---
+
+### Visual E2E Specs
+
+`yarn test:e2e:visual` runs `e2e-visual/*.spec.ts` through Playwright (project `visual`, against the app on :8001 and Storybook on :6006).
+
+- **`focus-ring.spec.ts`**: asserts that keyboard focus produces a _visible_ indicator with at least 3:1 contrast (WCAG 2.4.7 and 1.4.11), in light and dark. Its fixtures are built from `buttonVariants()` on the `actions-basebutton--playground` story's stylesheet and cover the places a ring was once suppressed: elevation utilities (`shadow-sm`), an unlayered page stylesheet setting a `box-shadow`, a menu row (`navMenuRowClassName()`) and `nav-line-tabs`. The `primary` case is a recorded contrast gap (`test.fail()`): a brand ring on a brand-filled button is about 1.6:1. `.btn-no-focus` is deliberately not a fixture — see the pseudo-states pitfall.
+- **`stat-card-parity.spec.ts`**, **`charts.spec.ts`**, **`wizards.spec.ts`**: parity and screenshot checks for other components; `visualParityHarness.ts` holds the shared pixel-diff and chromaticity helpers.
+
+Run one spec with `yarn playwright test focus-ring --project=visual --workers=1` (a filter, not a path; passing a path is read as a project name). Playwright executes specs in Node, so a spec may import `packages/ui/src/Button` directly but not the `waldur-ui` barrel, whose modules touch `document` at import time.
+
+---
+
+### Testing Gotchas & Pitfalls
+
+1. **CSS Transitions Require a Paint**: Calling `getComputedStyle()` synchronously after `.hover()` or `.focus()` returns pre-transition values. Test harnesses must disable animations via injected CSS or wait for transition settling.
+2. **jsdom Mocking**:
+   - `ResizeObserver`: jsdom lacks `ResizeObserver`. Tests rendering `Collapsible` or `Sidebar` must mock it:
+
+     ```typescript
+     vi.stubGlobal(
+       'ResizeObserver',
+       class {
+         observe() {}
+         unobserve() {}
+         disconnect() {}
+       },
+     );
+     ```
+
+   - `matchMedia` & Virtual Viewport: `waldur-ui`'s `useMediaQuery`, `useBreakpointDown`, and `useBreakpointUp` read `window.matchMedia` dynamically via React 18's `useSyncExternalStore`. In tests (jsdom), `test/setupTests.js` initializes the query-aware virtual viewport controller (`setupVirtualViewport()`), defaulting to 1440px desktop with hover enabled and automatic `afterEach` teardown (`resetViewport()`). In responsive test suites, never stub `matchMedia` blindly with `vi.stubGlobal`; instead call `setViewport('mobile' | 'desktop' | BreakpointKey | px | { hover: false })` from `waldur-ui/testing` (or re-exported from `@/test/harness`).
+
+3. **Headless Browser Animation Polling**: CDP/Playwright tabs in automated modes skip compositing animation frames if backgrounded. `setTimeout` polling of `getAnimations()` may read `currentTime: 0`. Trigger a screenshot capture or force a reflow to guarantee paint completion.
+4. **Tailwind only generates classes it can read literally**: Tailwind v4 scans source files for complete class strings. A class assembled at runtime (`` `[&>svg]:h-[${px}]` ``) is never generated, so it silently does nothing. `BaseButton`'s icons rendered at 16px instead of 20px for exactly this reason. Write the class as a literal and pass the varying part through a CSS custom property (`style={{ '--icon-size': px }}` with `[&>svg]:h-[var(--icon-size)]`), or choose between whole literal classes. Classes inside HTML strings (chart tooltips) are scanned too, provided they are literals — `buttonVariants()` returns literals.
+5. **Compound Bootstrap selectors are dead without the parent class**: most Metronic rules are written `.btn.btn-sm { … }` or `.btn { &.btn-icon { … } }`. Adding `btn-sm` to an element that lacks `.btn` does nothing, and a hand-rolled `Link`/`div` that dropped `.btn` loses the rule with no error. Grep the SCSS for the class before relying on it; prefer `variant`/`size` props.
+6. **A different tree shape at the same position remounts**: a component that returns `<Wrapper>{child}</Wrapper>` on one render and bare `child` on the next makes React discard and recreate `child`, losing focus and any ref held on it. The filter button's count badge did this until it got a wrapper that is always mounted; `BaseButton`'s tooltip uses `alwaysMount` for the same reason. If a control's focus is lost when a badge or tooltip appears, look for this.
+7. **A flex row stretches its children**: `align-items: stretch` is the default, so a control with no explicit height grows to the tallest sibling. A `SegmentedControl` measured 36px in isolation and 44px in a toolbar. Give shared controls `self-center` (or an explicit size) instead of relying on the host row.
+8. **Cascade layers invert for `!important`**: in `@layer bootstrap`, an `!important` declaration beats Tailwind utilities (a later layer) because important declarations reverse layer order. That is why `.btn-no-focus { box-shadow: none !important }` removes a `BaseButton`'s inset border, and why an override meant to win over a Tailwind utility from the `bootstrap` layer must itself be `!important`.
+9. **Storybook rewrites pseudo-classes**: `storybook-addon-pseudo-states` turns `:not(:focus-visible)` into `:not(.pseudo-focus-visible)`, which matches every element, so a rule such as `.btn-no-focus:not(:focus-visible) { outline: none !important }` suppresses the outline permanently _in Storybook_ while behaving correctly in the app. Measure focus and hover behaviour against the running app (the dev server on :8001) before changing CSS on the strength of a Storybook or `e2e-visual` result.
+10. **Radix RadioGroup in jsdom**: arrow keys move _and_ select only while the key is held. With `userEvent`, use `keyboard('{ArrowRight>}')` (press without release) followed by `waitFor`, not `keyboard('{ArrowRight}')`. Radix `Tabs` reports `data-state="active"`, a `RadioGroup` item `data-state="checked"`.
+11. **Test conventions**: mock the current user with `vi.mocked(useUser).mockReturnValue(…)` — `@/workspace/hooks` is mocked globally, and a local `vi.mock` of it trips `no-redundant-vi-mock`. Testing Library's `no-node-access` rule forbids `.querySelector`/`.closest` in tests; reach elements by role, label or text. Prove a new regression test by reverting the fix and watching it fail.

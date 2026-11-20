@@ -1,23 +1,20 @@
 import { PencilIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
-import { Tabs, Tab } from 'react-bootstrap';
 import { Field, Form } from 'react-final-form';
-import { useDispatch } from 'react-redux';
 import { marketplaceOfferingTermsOfServiceUpdate } from 'waldur-js-client';
 
-import { SafeMarkdown } from '@waldur/core/SafeMarkdown';
-import { required } from '@waldur/core/validators';
-import { AwesomeCheckboxField } from '@waldur/form/AwesomeCheckboxField';
-import MarkdownEditor from '@waldur/form/MarkdownEditor';
-import { SelectField } from '@waldur/form/SelectField';
-import { StringField } from '@waldur/form/StringField';
-import { SubmitButton } from '@waldur/form/SubmitButton';
-import { translate } from '@waldur/i18n';
-import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
-import { closeModalDialog } from '@waldur/modal/actions';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from 'waldur-ui';
+
+import { SafeMarkdown } from '@/core/SafeMarkdown';
+import { required } from '@/core/validators';
+import { StringGroup, SelectGroup, NumberGroup, BooleanGroup } from '@/form';
+import { FormGroup } from '@/form';
+import MarkdownEditor from '@/form/MarkdownEditor';
+import { SubmitButton } from '@/form/SubmitButton';
+import { translate } from '@/i18n';
+import { CloseDialogButton } from '@/modal/CloseDialogButton';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { useManagedMutation } from '@/modal/useManagedMutation';
 
 const addAsOptions = [
   { value: 'markdown', label: translate('Markdown') },
@@ -25,11 +22,10 @@ const addAsOptions = [
 ];
 
 export const TosEditDialog = ({ resolve: { tos, refetch } }) => {
-  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState('write');
 
-  const onSubmit = async (formData) => {
-    try {
+  const updateTosMutation = useManagedMutation<any, any, any>({
+    mutationFn: (formData) => {
       const updateData: any = {
         version: formData.version,
         is_active: formData.is_active,
@@ -44,37 +40,32 @@ export const TosEditDialog = ({ resolve: { tos, refetch } }) => {
         updateData.terms_of_service = '';
       }
 
-      await marketplaceOfferingTermsOfServiceUpdate({
+      if (formData.requires_reconsent && formData.grace_period_days) {
+        updateData.grace_period_days = formData.grace_period_days;
+      }
+
+      return marketplaceOfferingTermsOfServiceUpdate({
         path: { uuid: tos.uuid },
         body: updateData,
       });
-
-      dispatch(
-        showSuccess(
-          translate('Terms of Service has been updated successfully.'),
-        ),
-      );
-      await refetch();
-      dispatch(closeModalDialog());
-    } catch (error) {
-      dispatch(
-        showErrorResponse(
-          error,
-          translate('Unable to update Terms of Service.'),
-        ),
-      );
-    }
-  };
+    },
+    successMessage: translate(
+      'Terms of Service has been updated successfully.',
+    ),
+    errorMessage: translate('Unable to update Terms of Service.'),
+    refetch,
+  });
 
   return (
     <Form
-      onSubmit={onSubmit}
+      onSubmit={(values) => updateTosMutation.mutateAsync(values)}
       initialValues={{
         version: tos.version,
         terms_of_service: tos.terms_of_service || '',
         terms_of_service_link: tos.terms_of_service_link || '',
         is_active: tos.is_active || false,
         requires_reconsent: tos.requires_reconsent || false,
+        grace_period_days: tos.grace_period_days || 60,
         add_as: tos.terms_of_service ? 'markdown' : 'external_link',
       }}
       render={({ handleSubmit, submitting, invalid, values }) => (
@@ -84,12 +75,12 @@ export const TosEditDialog = ({ resolve: { tos, refetch } }) => {
               version: tos.version,
             })}
             iconNode={<PencilIcon weight="bold" />}
-            closeButton
             footer={
               <div className="d-flex gap-3 justify-content-end mt-4">
                 <CloseDialogButton className="min-w-125px" />
                 <SubmitButton
-                  className="btn btn-primary min-w-125px"
+                  variant="primary"
+                  className="min-w-125px"
                   disabled={invalid}
                   submitting={submitting}
                   label={translate('Update')}
@@ -98,85 +89,99 @@ export const TosEditDialog = ({ resolve: { tos, refetch } }) => {
             }
           >
             <div className="size-lg">
-              <FormGroup label={translate('Version')} required>
-                <Field
-                  name="version"
-                  validate={required}
-                  component={StringField as any}
-                />
-              </FormGroup>
+              <StringGroup
+                name="version"
+                validate={required}
+                label={translate('Version')}
+                required
+              />
 
-              <FormGroup label={translate('Add as')} required>
-                <Field
-                  name="add_as"
-                  component={SelectField as any}
-                  options={addAsOptions}
-                  simpleValue
-                />
-              </FormGroup>
+              <SelectGroup
+                name="add_as"
+                options={addAsOptions}
+                simpleValue
+                label={translate('Add as')}
+                required
+              />
 
               {values.add_as === 'markdown' && (
                 <FormGroup label={translate('Terms of Service')} required>
                   <Tabs
-                    activeKey={activeTab}
-                    onSelect={(k) => setActiveTab(k)}
-                    className="mb-3"
-                    id="tos-edit-tabs"
+                    mount="all"
+                    value={activeTab}
+                    onValueChange={(k) => setActiveTab(k)}
                   >
-                    <Tab eventKey="write" title={translate('Write')}>
-                      <div className="markdown-editor-wrapper">
-                        <Field
-                          name="terms_of_service"
-                          component={MarkdownEditor as any}
-                          required
-                          autoFocus
-                          hideLabel
-                          spaceless
-                        />
-                      </div>
-                    </Tab>
-                    <Tab eventKey="preview" title={translate('Preview')}>
-                      <div className="markdown-editor-wrapper markdown-editor-preview">
-                        {values.terms_of_service ? (
-                          <SafeMarkdown text={values.terms_of_service} />
-                        ) : (
-                          <div className="text-muted">
-                            {translate(
-                              'No content to preview. Switch to Write tab to add content.',
+                    <TabsList className="mb-3">
+                      <TabsTrigger value="write">
+                        {translate('Write')}
+                      </TabsTrigger>
+                      <TabsTrigger value="preview">
+                        {translate('Preview')}
+                      </TabsTrigger>
+                    </TabsList>
+                    <div className="tab-content">
+                      <TabsContent value="write">
+                        <div className="markdown-editor-wrapper">
+                          <Field name="terms_of_service" validate={required}>
+                            {({ input, meta }) => (
+                              <MarkdownEditor
+                                input={input}
+                                meta={meta}
+                                autoFocus
+                              />
                             )}
-                          </div>
-                        )}
-                      </div>
-                    </Tab>
+                          </Field>
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="preview">
+                        <div className="markdown-editor-wrapper markdown-editor-preview">
+                          {values.terms_of_service ? (
+                            <SafeMarkdown text={values.terms_of_service} />
+                          ) : (
+                            <div className="text-muted">
+                              {translate(
+                                'No content to preview. Switch to Write tab to add content.',
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </TabsContent>
+                    </div>
                   </Tabs>
                 </FormGroup>
               )}
 
               {values.add_as === 'external_link' && (
-                <FormGroup label={translate('Terms of Service Link')} required>
-                  <Field
-                    name="terms_of_service_link"
-                    validate={required}
-                    component={StringField as any}
-                  />
-                </FormGroup>
+                <StringGroup
+                  name="terms_of_service_link"
+                  validate={required}
+                  label={translate('Terms of Service Link')}
+                  required
+                />
               )}
 
-              <div className="mb-3">
-                <Field
-                  name="is_active"
-                  component={AwesomeCheckboxField as any}
-                  label={translate('Active')}
-                />
-              </div>
+              <BooleanGroup name="is_active" label={translate('Active')} />
 
-              <div className="mb-3">
-                <Field
-                  name="requires_reconsent"
-                  component={AwesomeCheckboxField as any}
-                  label={translate('Requires re-consent')}
+              <BooleanGroup
+                name="requires_reconsent"
+                label={translate('Requires re-consent')}
+              />
+
+              {values.requires_reconsent && (
+                <NumberGroup
+                  name="grace_period_days"
+                  min={0}
+                  parse={(value) => (value === '' ? undefined : Number(value))}
+                  label={translate('Grace period (days)')}
+                  help={translate(
+                    'Number of days before outdated consents are automatically revoked. Only applies when requires re-consent is enabled.',
+                  )}
+                  helpEnd
+                  description={translate(
+                    'After this period expires, user consents for outdated terms will be automatically revoked.',
+                  )}
                 />
-              </div>
+              )}
             </div>
           </ModalDialog>
         </form>

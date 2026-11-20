@@ -1,17 +1,14 @@
 import { useRouter } from '@uirouter/react';
-import { Tab, Tabs } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
 import { Proposal, ProposalReview, PublicCall } from 'waldur-js-client';
 
-import { isFeatureVisible } from '@waldur/features/connect';
-import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
-import { translate } from '@waldur/i18n';
-import { checkIsCallManager } from '@waldur/proposals/utils';
-import { RootState } from '@waldur/store/reducers';
-import {
-  checkCustomerUser,
-  getUser,
-} from '@waldur/workspace/selectors';
+import { TabNav } from 'waldur-ui';
+
+import { Link } from '@/core/Link';
+import { isFeatureVisible } from '@/features/connect';
+import { MarketplaceFeatures } from '@/FeaturesEnums';
+import { translate } from '@/i18n';
+import { userHasRole } from '@/permissions/hasPermission';
+import { useUser } from '@/workspace/hooks';
 
 export const ProposalRoleBasedTabs = ({
   proposal,
@@ -21,10 +18,11 @@ export const ProposalRoleBasedTabs = ({
   proposal: Proposal;
   /** user review */
   review: ProposalReview;
-  call: PublicCall;
+  call: Pick<PublicCall, 'uuid' | 'customer_uuid' | 'manager_uuid'>;
 }) => {
   const router = useRouter();
-  const goTo = (state: string) => {
+  const user = useUser();
+  const getParams = (state: string) => {
     const params = {};
     if (
       [
@@ -45,55 +43,64 @@ export const ProposalRoleBasedTabs = ({
       Object.assign(params, { review_uuid: review.uuid });
     }
 
-    // Add call's organization uuid if needed
-    if (
-      ['call-management.proposal-details', 'proposal-review'].includes(state)
-    ) {
-      Object.assign(params, { uuid: call.customer_uuid });
+    // The call-manager proposal view is customer-workspace-scoped and needs the
+    // organization uuid. (proposal-review is review-scoped and needs no uuid.)
+    if (state === 'call-management.proposal-details') {
+      Object.assign(params, { uuid: call?.customer_uuid });
     }
 
-    router.stateService.go(state, params);
+    return params;
   };
 
-  const isStaffOrOwnerOrManager = useSelector((state: RootState) => {
-    const user = getUser(state);
-    if (user?.is_staff) return true;
-    if (checkCustomerUser({ uuid: call?.customer_uuid } as any, user))
-      return true;
-    if (checkIsCallManager(call, user)) return true;
-    return false;
-  });
+  const userIsCallOrganizer = userHasRole(
+    user,
+    'CUSTOMER.CALL_ORGANIZER',
+    call?.manager_uuid,
+  );
+  const userIsCallManager = userHasRole(user, 'CALL.MANAGER', call?.uuid);
+
   const showCallManagement = isFeatureVisible(
     MarketplaceFeatures.show_call_management_functionality,
   );
 
+  const showsReviewerTab = Boolean(review);
+  const showsCallManagerTab =
+    (userIsCallManager || userIsCallOrganizer) && showCallManagement;
+
+  // With nothing to switch between, the bar is a control that does nothing —
+  // which is every applicant on a marketplace-only deployment.
+  if (!showsReviewerTab && !showsCallManagerTab) {
+    return null;
+  }
+
+  const reviewerState =
+    router.globals.current.parent === 'reviews'
+      ? 'proposal-review-view'
+      : 'proposal-review';
+
   return (
-    <Tabs
-      defaultActiveKey={router.globals.current.name}
-      className="nav-line-tabs mb-8"
-      onSelect={goTo}
-    >
-      <Tab
-        eventKey="proposals.manage-proposal"
-        title={translate('Applicant')}
-      />
-      {review ? (
-        <Tab
-          eventKey={
-            router.globals.current.parent === 'reviews'
-              ? 'proposal-review-view'
-              : 'proposal-review'
-          }
-          title={translate('Reviewer')}
-        />
-      ) : null}
-      {isStaffOrOwnerOrManager && showCallManagement && (
-        <Tab
-          eventKey="call-management.proposal-details"
-          title={translate('Call manager')}
-          disabled={!call?.customer_uuid}
-        />
-      )}
-    </Tabs>
+    <TabNav
+      // Follows the router: a tab click the unsaved-changes prompt cancels
+      // must not leave the clicked tab looking active.
+      activeKey={router.globals.current.name}
+      className="mb-8"
+      items={[
+        { key: 'proposals.manage-proposal', title: translate('Applicant') },
+        showsReviewerTab && {
+          key: reviewerState,
+          title: translate('Reviewer'),
+        },
+        showsCallManagerTab && {
+          key: 'call-management.proposal-details',
+          title: translate('Call manager'),
+          disabled: !call?.customer_uuid,
+        },
+      ]
+        .filter(Boolean)
+        .map((item) => ({
+          ...item,
+          link: <Link state={item.key} params={getParams(item.key)} />,
+        }))}
+    />
   );
 };

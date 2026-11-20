@@ -1,20 +1,19 @@
 import { FORM_ERROR } from 'final-form';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 import { Form } from 'react-final-form';
-import { useDispatch } from 'react-redux';
 import {
   marketplaceComponentUsagesSetUsage,
   marketplaceComponentUsagesSetUserUsage,
-  type ComponentUsageCreateRequest,
-  type ComponentUserUsageCreateRequest,
-  type ResourcePlanPeriod,
-  type BaseComponentUsage,
+  ComponentUsageCreateRequest,
+  ComponentUserUsageCreateRequest,
+  ResourcePlanPeriod,
+  BaseComponentUsage,
+  OfferingComponent,
 } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { OfferingComponent } from '@waldur/marketplace/types';
-import { closeModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { translate } from '@/i18n';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { useManagedMutation } from '@/modal/useManagedMutation';
 
 import { ResourceUsageForm } from './ResourceUsageForm';
 import { ResourceUsageSubmitButton } from './ResourceUsageSubmitButton';
@@ -26,6 +25,7 @@ interface Period {
 }
 
 interface OwnProps {
+  title: ReactNode;
   components: OfferingComponent[];
   periods: Period[];
   params: UsageReportContext;
@@ -41,7 +41,7 @@ const mapComponents = (components: BaseComponentUsage[], userUsage = false) =>
             uuid: component.uuid,
             amount: component.usage ? parseFloat(component.usage) : 0,
             description: component.description,
-            recurring: component.recurring,
+            missing_usage_policy: component.missing_usage_policy || 'none',
           },
     }),
     {},
@@ -50,8 +50,6 @@ const mapComponents = (components: BaseComponentUsage[], userUsage = false) =>
 export const ResourceUsageFormContainer: FunctionComponent<OwnProps> = (
   props,
 ) => {
-  const dispatch = useDispatch();
-
   const initialValues = props.periods
     ? {
         period: props.periods[0],
@@ -64,10 +62,10 @@ export const ResourceUsageFormContainer: FunctionComponent<OwnProps> = (
       }
     : {};
 
-  const onSubmit = async ({ period, components, user, username }) => {
-    const isUserUsage = props.params.userUsage;
+  const mutation = useManagedMutation({
+    mutationFn: async ({ period, components, user, username }) => {
+      const isUserUsage = props.params.userUsage;
 
-    try {
       if (isUserUsage) {
         // Report user usage
         const promises = Object.keys(components).map((key) => {
@@ -87,25 +85,31 @@ export const ResourceUsageFormContainer: FunctionComponent<OwnProps> = (
           type: key,
           amount: components[key].amount.toString(),
           description: components[key].description,
-          recurring: components[key].recurring,
+          missing_usage_policy: components[key].missing_usage_policy,
         }));
         // Report resource usage
         const requestBody: ComponentUsageCreateRequest = {
           plan_period: period.value?.uuid,
+          resource: period.value?.uuid ? undefined : props.params.resource_uuid,
           usages,
         };
         await marketplaceComponentUsagesSetUsage({
           body: requestBody,
         });
       }
-      dispatch(showSuccess(translate('Usage report has been submitted.')));
-      dispatch(closeModalDialog());
-    } catch (error: any) {
-      // Show user-friendly error notification (existing pattern)
-      dispatch(
-        showErrorResponse(error, translate('Unable to submit usage report.')),
-      );
+    },
+    successMessage: translate('Usage report has been submitted.'),
+    errorMessage: translate('Unable to submit usage report.'),
+    refetch: props.params.refetch,
+    // The usage history chart has its own query, which the resource refetch
+    // doesn't reach.
+    invalidateQueries: [{ queryKey: ['UsageCard'] }],
+  });
 
+  const onSubmit = async (values) => {
+    try {
+      await mutation.mutateAsync(values);
+    } catch (error: any) {
       // Return form-level errors for React Final Form
       if (error.response?.status === 400 && error.response?.data) {
         return error.response.data; // Field-level validation errors
@@ -120,14 +124,16 @@ export const ResourceUsageFormContainer: FunctionComponent<OwnProps> = (
       initialValues={initialValues}
       render={({ handleSubmit }) => (
         <form onSubmit={handleSubmit}>
-          <ResourceUsageForm
-            components={props.components}
-            periods={props.periods}
-            params={props.params}
-          />
-          <div className="modal-footer">
-            <ResourceUsageSubmitButton params={props.params} />
-          </div>
+          <ModalDialog
+            title={props.title}
+            footer={<ResourceUsageSubmitButton params={props.params} />}
+          >
+            <ResourceUsageForm
+              components={props.components}
+              periods={props.periods}
+              params={props.params}
+            />
+          </ModalDialog>
         </form>
       )}
     />

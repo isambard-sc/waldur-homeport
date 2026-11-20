@@ -1,22 +1,14 @@
-import {
-  FileCsvIcon,
-  FileXlsIcon,
-  PrinterIcon,
-  FilePngIcon,
-} from '@phosphor-icons/react';
 import { init } from 'echarts';
-import { sum } from 'lodash-es';
+import { sum, uniq } from 'lodash-es';
 import { useCallback } from 'react';
-import { DropdownButton } from 'react-bootstrap';
-import { ProjectUser } from 'waldur-js-client';
+import { ProjectUser, OfferingComponent } from 'waldur-js-client';
 
-import { ENV } from '@waldur/core/config';
-import { translate } from '@waldur/i18n';
-import { OfferingComponent } from '@waldur/marketplace/types';
-import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { useNotify } from '@waldur/store/hooks';
-import exportAs from '@waldur/table/exporters';
-import { ExportData } from '@waldur/table/exporters/types';
+import { ChartExportDropdown } from '@/core/ChartExportDropdown';
+import { getBrandColor } from '@/core/utils';
+import { translate } from '@/i18n';
+import { useNotify } from '@/store/notify';
+import exportAs from '@/table/exporters';
+import { ExportData } from '@/table/exporters/types';
 
 import { ComponentUsage, ComponentUserUsage } from './types';
 import {
@@ -31,16 +23,30 @@ export interface UsageExportDropdownProps {
     name: string;
   };
   data: {
-    components: OfferingComponent[];
-    usages: ComponentUsage[];
-    userUsages: ComponentUserUsage[];
+    components: Pick<
+      OfferingComponent,
+      'name' | 'type' | 'measured_unit' | 'billing_type'
+    >[];
+    usages: Pick<
+      ComponentUsage,
+      | 'component_type'
+      | 'type'
+      | 'billing_period'
+      | 'usage'
+      | 'total_consumed'
+      | 'total_allocated'
+    >[];
+    userUsages: Pick<
+      ComponentUserUsage,
+      'component_type' | 'billing_period' | 'username'
+    >[];
   };
   users: ProjectUser[];
   months: number;
 }
 
 const exportAsPng = (props: UsageExportDropdownProps) => {
-  const color = ENV.plugins.WALDUR_CORE.BRAND_COLOR;
+  const color = getBrandColor();
   let exportSuccessed = false;
 
   props.data.components.forEach((component, index) => {
@@ -126,6 +132,15 @@ export const useUsageExport = (props: UsageExportDropdownProps) => {
       const components = props.data.components;
 
       const hasUserStats = Boolean(userUsages?.length);
+      // Roster from the usage records (incl. robot accounts); non-empty users prop = active filter
+      const filterUsernames = props.users?.length
+        ? props.users.map((user) => user.offering_user_username)
+        : null;
+      const usernames = uniq((userUsages || []).map((usage) => usage.username))
+        .filter(
+          (username) => !filterUsernames || filterUsernames.includes(username),
+        )
+        .sort((a, b) => a.localeCompare(b));
       const exportData: ExportData = {
         fields: [],
         data: [],
@@ -160,22 +175,20 @@ export const useUsageExport = (props: UsageExportDropdownProps) => {
         );
         if (hasUsage) {
           if (hasUserStats) {
-            // For each user, if has usage for at least one component per month, add it
-            props.users.forEach((user) => {
+            // For each username, if has usage for at least one component per month, add it
+            usernames.forEach((username) => {
               const hasUserUsage = allFormattedUsages.some((compUsages) =>
                 compUsages[monthIndex]?.details.some(
-                  (uu) =>
-                    uu.username === user.offering_user_username &&
-                    Number(uu.usage),
+                  (uu) => uu.username === username && Number(uu.usage),
                 ),
               );
 
               if (hasUserUsage) {
-                const userRecord: any[] = [user.offering_user_username, label];
+                const userRecord: any[] = [username, label];
                 userRecord.push(
                   ...allFormattedUsages.map((compUsages) => {
                     const userUsage = compUsages[monthIndex]?.details.find(
-                      (uu) => uu.username === user.offering_user_username,
+                      (uu) => uu.username === username,
                     );
                     return userUsage?.usage || '0';
                   }),
@@ -235,30 +248,13 @@ export const UsageExportDropdown = (props: UsageExportDropdownProps) => {
   const exportUsages = useUsageExport(props);
 
   return (
-    <DropdownButton variant="tertiary" title={translate('Export all')}>
-      <ActionItem
-        title={translate('PNG')}
-        action={() => exportUsages('png')}
-        iconNode={<FilePngIcon weight="bold" />}
-      />
-
-      <ActionItem
-        title={translate('PDF')}
-        action={() => exportUsages('pdf')}
-        iconNode={<PrinterIcon weight="bold" />}
-      />
-
-      <ActionItem
-        title={translate('CSV')}
-        action={() => exportUsages('csv')}
-        iconNode={<FileCsvIcon weight="bold" />}
-      />
-
-      <ActionItem
-        title={translate('Excel')}
-        action={() => exportUsages('excel')}
-        iconNode={<FileXlsIcon weight="bold" />}
-      />
-    </DropdownButton>
+    <ChartExportDropdown
+      label={translate('Export all')}
+      size="lg"
+      onExportPng={() => exportUsages('png')}
+      onExportPdf={() => exportUsages('pdf')}
+      onExportCsv={() => exportUsages('csv')}
+      onExportExcel={() => exportUsages('excel')}
+    />
   );
 };

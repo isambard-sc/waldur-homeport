@@ -1,40 +1,48 @@
-import { QuestionIcon } from '@phosphor-icons/react';
+import { HelpIcon, WarningTip } from 'waldur-ui';
 
-import { formatRelative } from '@waldur/core/dateUtils';
-import { Tip } from '@waldur/core/Tooltip';
-import { WarnTip } from '@waldur/core/WarnTip';
-import { translate } from '@waldur/i18n';
-import { Field } from '@waldur/resource/summary';
+import {
+  formatDate,
+  formatRelativeEndDate,
+  lastAccessDate,
+} from '@/core/dateUtils';
+import { translate } from '@/i18n';
+import { Field } from '@/resource/summary';
 
 export const EndDateField = ({ resource }) => {
-  const resourceTerminationDate = resource.end_date;
+  const ownEndDate = resource.end_date;
   const projectEndDate = resource.project_end_date;
+  // Backend-computed: the earliest of the resource's own end date and the
+  // project-driven termination date, already grace-aware (incl. the offering's
+  // disable-grace-period flag).
+  const effectiveDate = resource.resource_effective_end_date;
 
-  if (!resourceTerminationDate && !projectEndDate) {
+  if (!effectiveDate) {
     return null;
   }
 
-  const closestDate =
-    resourceTerminationDate && projectEndDate
-      ? resourceTerminationDate < projectEndDate
-        ? resourceTerminationDate
-        : projectEndDate
-      : resourceTerminationDate || projectEndDate;
-
-  const isPastDate = closestDate < new Date();
+  // Parse to a Date: comparing the 'YYYY-MM-DD' string directly to a Date
+  // coerces it to NaN, so the comparison would always be false.
+  const isPastDate = new Date(effectiveDate) < new Date();
 
   const tooltipContent = (
     <div className="flex-grow-1">
-      {resourceTerminationDate && (
+      {/* Spelled out because the countdown beside the termination date runs to
+          this day, not to the date itself, and that is worth being able to
+          check. */}
+      <div>
+        {translate('Last day of access')}:{' '}
+        {formatDate(lastAccessDate(effectiveDate))}
+      </div>
+      {ownEndDate && (
         <div>
-          {translate('Resource termination date')}: {resourceTerminationDate} (
-          {formatRelative(resourceTerminationDate)})
+          {translate('Resource termination date')}: {ownEndDate} (
+          {formatRelativeEndDate(ownEndDate)})
         </div>
       )}
       {projectEndDate && (
         <div>
           {translate('Project end date')}: {projectEndDate} (
-          {formatRelative(projectEndDate)})
+          {formatRelativeEndDate(projectEndDate)})
         </div>
       )}
     </div>
@@ -45,10 +53,9 @@ export const EndDateField = ({ resource }) => {
       label={translate('Termination date')}
       value={
         <span className={isPastDate ? 'text-danger' : ''}>
-          {closestDate} ({formatRelative(closestDate)}) &nbsp;
-          {projectEndDate && resourceTerminationDate > projectEndDate ? (
-            <WarnTip
-              id={resource.uuid}
+          {effectiveDate} ({formatRelativeEndDate(effectiveDate)}) &nbsp;
+          {ownEndDate && ownEndDate > effectiveDate ? (
+            <WarningTip
               label={
                 <ul className="text-start mb-0">
                   <li>
@@ -59,15 +66,14 @@ export const EndDateField = ({ resource }) => {
                   <li>{translate('Resource will be terminated soon.')}</li>
                 </ul>
               }
-              hasSpace
-              autoWidth
-              className="w-100"
-              tipClassName="mw-275px"
+              className="ms-1"
+              tooltipProps={{
+                autoWidth: true,
+                contentClassName: 'mw-275px',
+              }}
             />
-          ) : resourceTerminationDate && projectEndDate ? (
-            <Tip id="end-date-tooltip" label={tooltipContent}>
-              <QuestionIcon size={15} />
-            </Tip>
+          ) : ownEndDate && projectEndDate ? (
+            <HelpIcon label={tooltipContent} size={15} />
           ) : null}
         </span>
       }

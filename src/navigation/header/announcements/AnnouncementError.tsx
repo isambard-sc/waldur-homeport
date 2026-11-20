@@ -1,15 +1,18 @@
-import { Button } from 'react-bootstrap';
+import { BaseButton } from 'waldur-ui';
 
-import { translate } from '@waldur/i18n';
+import { translate } from '@/i18n';
 
 export const AnnouncementError = ({ refetch }) => (
   <div className="bar bar-warning">
     <div>
       <p>
         {translate('Unable to load announcements')}
-        <Button variant="text" onClick={() => refetch()}>
-          {translate('Retry')}
-        </Button>
+        <BaseButton
+          variant="text-primary"
+          onClick={() => refetch()}
+          label={translate('Retry')}
+          size="lg"
+        />
       </p>
     </div>
   </div>

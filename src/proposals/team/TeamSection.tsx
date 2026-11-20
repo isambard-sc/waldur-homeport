@@ -1,30 +1,36 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { FC, useMemo } from 'react';
-import { Card, Nav, Tab } from 'react-bootstrap';
+import { FC, ReactNode, useCallback, useMemo, useRef } from 'react';
+import { Card } from 'react-bootstrap';
 import {
   proposalProposalsListUsersList,
   proposalProtectedCallsListUsersList,
   userInvitationsList,
 } from 'waldur-js-client';
 
-import { TableTabsContainer } from '@waldur/customer/list/TableTabsContainer';
-import { BaseEventsList } from '@waldur/events/BaseEventsList';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
-import { translate } from '@waldur/i18n';
-import { GenericInvitationContext } from '@waldur/invitations/types';
-import { RoleEnum } from '@waldur/permissions/enums';
-import { createFetcher } from '@waldur/table/api';
-import { TableTabs } from '@waldur/table/TableTabs';
-import { useTable } from '@waldur/table/useTable';
+import { BaseEventsList } from '@/events/BaseEventsList';
+import { isFeatureVisible } from '@/features/connect';
+import { MarketplaceFeatures } from '@/FeaturesEnums';
+import { translate } from '@/i18n';
+import { GenericInvitationContext } from '@/invitations/types';
+import { RoleEnum } from '@/permissions/enums';
+import { GenericPermission } from '@/permissions/types';
+import { createFetcher } from '@/table/api';
+import { EmbeddedTabs } from '@/table/EmbeddedTabs';
+import { TableNav } from '@/table/TableNav';
+import { useTable } from '@/table/useTable';
 
 import { CALL_REVIEWERS_QUERY_KEY } from '../constants';
 import { AddCommentButton } from '../proposal/create-review/AddCommentButton';
 import { FieldReviewComments } from '../proposal/create-review/FieldReviewComments';
-import { ProposalReview } from '../types';
+import { Proposal, ProposalReview } from '../types';
 
 import { InvitationsList } from './InvitationsList';
+import { ReviewerExpandableRow } from './ReviewerExpandableRow';
+import { getTeamScopeType } from './teamApi';
 import { TeamDropdownActions } from './TeamDropdownActions';
+import { TEAM_EVENT_TYPES } from './teamRules';
+import { TransferManagementAction } from './TransferManagementAction';
+import { useProposalTeamRules } from './useProposalTeamRules';
 import { UsersList } from './UsersList';
 
 export const TeamSection: FC<
@@ -36,12 +42,25 @@ export const TeamSection: FC<
     readOnlyMode?: boolean;
     id?: string;
     hasTeamTabs?: boolean;
+    extraRowActions?: FC<{ row: GenericPermission }>;
+    hasExtraRowActions?: (row: GenericPermission) => boolean;
+    roleSuffix?: (row: GenericPermission) => ReactNode;
+    /** The proposal's call has one manager per proposal, so its management
+     * can be handed over to a team member. */
+    singleProposalManager?: boolean;
   }
 > = (props) => {
   const queryClient = useQueryClient();
   const hideRole = props.roles && props.roles.length === 1;
-  const isReviewersSection =
-    props.roles && props.roles.includes(RoleEnum.CALL_REVIEWER);
+
+  const roleType = props.roleTypes?.[0];
+  // A proposal's team follows rules of its own: who may grant or revoke which
+  // role depends on the proposal's state and the viewer's role on it or on
+  // its call, not only on the scope's team permission.
+  const isProposalTeam = roleType === 'proposal' && !props.roles;
+  const proposal = isProposalTeam ? (props.scope as Proposal) : undefined;
+  const rules = useProposalTeamRules(proposal, props.singleProposalManager);
+  const scopeType = getTeamScopeType(props.roleTypes);
 
   const usersFilter = useMemo(
     () => ({
@@ -50,7 +69,30 @@ export const TeamSection: FC<
     [props.roles],
   );
 
-  const roleType = props.roleTypes?.[0];
+  // useTableQuery runs onFetch in an effect keyed on the callback, so an
+  // inline function would run it on every render (every keystroke in the
+  // draft form). The latest handler is kept in a ref behind a stable callback.
+  const onUsersFetchRef = useRef<(rows: any[]) => void>(undefined);
+  onUsersFetchRef.current = (rows) => {
+    if (props.change) {
+      props.change('users', rows);
+    }
+    // Update query data for the call reviewers
+    if (props.roles && props.roles.includes(RoleEnum.CALL_REVIEWER)) {
+      const newReviewers = rows.filter(
+        (row) => row.role_name === RoleEnum.CALL_REVIEWER,
+      );
+      queryClient.setQueryData(
+        [CALL_REVIEWERS_QUERY_KEY, props.scope.uuid],
+        newReviewers,
+      );
+    }
+  };
+  const onUsersFetch = useCallback(
+    (rows: any[]) => onUsersFetchRef.current?.(rows),
+    [],
+  );
+
   const usersTable = useTable({
     table: `UserList${props.title}`,
     fetchData: createFetcher(
@@ -60,21 +102,7 @@ export const TeamSection: FC<
       { path: { uuid: props.scope.uuid } },
     ),
     filter: usersFilter,
-    onFetch(rows) {
-      if (props.change) {
-        props.change('users', rows);
-      }
-      // Update query data for the call reviewers
-      if (props.roles && props.roles.includes(RoleEnum.CALL_REVIEWER)) {
-        const newReviewers = rows.filter(
-          (row) => row.role_name === RoleEnum.CALL_REVIEWER,
-        );
-        queryClient.setQueryData(
-          [CALL_REVIEWERS_QUERY_KEY, props.scope.uuid],
-          newReviewers,
-        );
-      }
-    },
+    onFetch: onUsersFetch,
   });
 
   const invitationsFilter = useMemo(
@@ -91,10 +119,66 @@ export const TeamSection: FC<
   const eventsFilter = useMemo(
     () => ({
       scope: props.scope.url,
-      event_type: ['role_granted', 'role_revoked', 'role_updated'],
+      event_type: TEAM_EVENT_TYPES,
     }),
     [props.scope],
   );
+
+  // After a member was added or removed, not on every reload of the table
+  // (paging, search): the team change may decide whether the proposal can be
+  // submitted.
+  const fetchUsers = usersTable.fetch;
+  const onTeamChange = rules?.onTeamChange;
+  const refetchUsers = useCallback(() => {
+    fetchUsers();
+    onTeamChange?.();
+  }, [fetchUsers, onTeamChange]);
+
+  // "Transfer management" joins the row actions the caller gives, if any.
+  const CallerRowActions = props.extraRowActions;
+  const hasCallerRowActions = props.hasExtraRowActions;
+  const canTransferTo = rules?.canTransferTo;
+  const viewerIsManager = rules?.viewerIsManager;
+  const currentManagerName = rules?.currentManagerName;
+  const extraRowActions = useMemo(() => {
+    if (!canTransferTo) return CallerRowActions;
+    const RowActions: FC<{ row: GenericPermission }> = ({ row }) => (
+      <>
+        {CallerRowActions && (hasCallerRowActions?.(row) ?? true) ? (
+          <CallerRowActions row={row} />
+        ) : null}
+        {canTransferTo(row) ? (
+          <TransferManagementAction
+            row={row}
+            proposal={proposal}
+            viewerIsManager={viewerIsManager}
+            currentManagerName={currentManagerName}
+            refetch={refetchUsers}
+          />
+        ) : null}
+      </>
+    );
+    return RowActions;
+  }, [
+    CallerRowActions,
+    hasCallerRowActions,
+    canTransferTo,
+    proposal,
+    viewerIsManager,
+    currentManagerName,
+    refetchUsers,
+  ]);
+  const hasExtraRowActions = useCallback(
+    (row: GenericPermission) =>
+      Boolean(canTransferTo?.(row)) ||
+      (Boolean(CallerRowActions) && (hasCallerRowActions?.(row) ?? true)),
+    [canTransferTo, CallerRowActions, hasCallerRowActions],
+  );
+
+  const showTeamActions = !props.readOnlyMode && (!rules || rules.dropdown);
+  // Invitations and the change log are for those who manage the team.
+  const showManagementTabs =
+    !props.readOnlyMode && (!rules || rules.canManageTeam);
 
   return (
     <Card className="card-bordered" id={props.id}>
@@ -102,13 +186,13 @@ export const TeamSection: FC<
         <Card.Title>
           <h3>{props.title}</h3>
         </Card.Title>
-        <div className="card-toolbar gap-3">
-          {!props.readOnlyMode ? (
+        <div className="card-toolbar gap-4">
+          {showTeamActions ? (
             <TeamDropdownActions
-              refetchUsers={usersTable.fetch}
+              refetchUsers={refetchUsers}
               refetchInvitations={invitationsTable.fetch}
-              showImportReviewers={isReviewersSection}
               {...props}
+              {...rules?.dropdown}
             />
           ) : props.onAddCommentClick ? (
             <AddCommentButton
@@ -126,7 +210,7 @@ export const TeamSection: FC<
       {props.hasTeamTabs &&
         !isFeatureVisible(MarketplaceFeatures.call_only) && (
           <Card.Header className="table-tabs border-bottom align-items-stretch py-0 min-h-auto">
-            <TableTabs
+            <TableNav
               tabs={[
                 {
                   key: 'reviewers',
@@ -145,56 +229,76 @@ export const TeamSection: FC<
           </Card.Header>
         )}
       <Card.Body className="pt-0">
-        <TableTabsContainer defaultActiveKey="users" className="min-h-175px">
-          <div className="overflow-auto">
-            <Nav variant="tabs" className="nav-line-tabs flex-nowrap">
-              <Nav.Item className="text-nowrap">
-                <Nav.Link eventKey="users">{translate('Users')}</Nav.Link>
-              </Nav.Item>
-              <Nav.Item className="text-nowrap">
-                <Nav.Link eventKey="invitations">
-                  {translate('Invitations')}
-                </Nav.Link>
-              </Nav.Item>
-              <Nav.Item className="text-nowrap">
-                <Nav.Link eventKey="permissions">
-                  {translate('Permissions')}
-                </Nav.Link>
-              </Nav.Item>
-            </Nav>
-          </div>
-          <Tab.Content className="overflow-auto">
-            <Tab.Pane eventKey="users" unmountOnExit={true}>
-              <UsersList
-                table={usersTable}
-                scope={props.scope}
-                hideRole={hideRole}
-                cardBordered={false}
-                hasActionBar={false}
-                fullWidth
-              />
-            </Tab.Pane>
-            <Tab.Pane eventKey="invitations" unmountOnExit={true}>
-              <InvitationsList
-                table={invitationsTable}
-                hideRole={hideRole}
-                cardBordered={false}
-                hasActionBar={false}
-                fullWidth
-              />
-            </Tab.Pane>
-            <Tab.Pane eventKey="permissions" unmountOnExit={true}>
-              <BaseEventsList
-                table={`permissions-log${props.scope.url}`}
-                filter={eventsFilter}
-                cardBordered={false}
-                hasActionBar={false}
-                fullWidth
-                minHeight="auto"
-              />
-            </Tab.Pane>
-          </Tab.Content>
-        </TableTabsContainer>
+        {/* Invitations and the permissions log are management surfaces the
+            backend denies to reviewers; in read-only (review) mode we show
+            only the team roster so the info matches the viewer's role. */}
+        <EmbeddedTabs
+          defaultValue="users"
+          className="min-h-175px"
+          tabs={[
+            {
+              key: 'users',
+              title: translate('Users'),
+              content: (
+                <>
+                  {rules?.teamNote && !props.readOnlyMode ? (
+                    <p className="text-muted py-3 mb-0">{rules.teamNote}</p>
+                  ) : null}
+                  <UsersList
+                    table={usersTable}
+                    scope={props.scope}
+                    hideRole={hideRole}
+                    cardBordered={false}
+                    hasActionBar={false}
+                    fullWidth
+                    expandableRow={
+                      props.roles?.includes(RoleEnum.CALL_REVIEWER)
+                        ? ReviewerExpandableRow
+                        : undefined
+                    }
+                    readOnly={props.readOnlyMode || rules?.readOnly}
+                    extraRowActions={extraRowActions}
+                    hasExtraRowActions={hasExtraRowActions}
+                    roleSuffix={props.roleSuffix}
+                    canRemoveRow={rules?.canRemoveRow}
+                    getRemoveDisabledReason={rules?.getRemoveDisabledReason}
+                    scopeType={scopeType}
+                    refetch={refetchUsers}
+                  />
+                </>
+              ),
+            },
+            {
+              key: 'invitations',
+              title: translate('Invitations'),
+              hidden: !showManagementTabs,
+              content: (
+                <InvitationsList
+                  table={invitationsTable}
+                  hideRole={hideRole}
+                  cardBordered={false}
+                  hasActionBar={false}
+                  fullWidth
+                />
+              ),
+            },
+            {
+              key: 'permissions',
+              title: translate('Permissions'),
+              hidden: !showManagementTabs,
+              content: (
+                <BaseEventsList
+                  table={`permissions-log${props.scope.url}`}
+                  filter={eventsFilter}
+                  cardBordered={false}
+                  hasActionBar={false}
+                  fullWidth
+                  minHeight="auto"
+                />
+              ),
+            },
+          ]}
+        />
 
         <FieldReviewComments
           reviews={props.reviews}

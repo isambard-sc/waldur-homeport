@@ -1,14 +1,22 @@
-import { Button } from 'react-bootstrap';
+import { BaseButton } from 'waldur-ui';
 
-import { translate } from '@waldur/i18n';
+import { translate } from '@/i18n';
 
 export const InvitationButtons = ({ dismiss, closeAcceptingInvitation }) => {
   return (
     <>
-      <Button variant="primary" onClick={closeAcceptingInvitation}>
-        {translate('Accept invitation')}
-      </Button>
-      <Button onClick={dismiss}>{translate('Cancel invitation')}</Button>
+      <BaseButton
+        variant="primary"
+        onClick={closeAcceptingInvitation}
+        label={translate('Accept invitation')}
+        size="lg"
+      />
+      <BaseButton
+        onClick={dismiss}
+        label={translate('Cancel invitation')}
+        variant="primary"
+        size="lg"
+      />
     </>
   );
 };

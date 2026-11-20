@@ -1,30 +1,26 @@
 import { ProhibitIcon } from '@phosphor-icons/react';
 import { useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { userInvitationsCancel } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { ActionItem } from '@waldur/resource/actions/ActionItem';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
-import { getCustomer, getProject, getUser } from '@waldur/workspace/selectors';
+import { Menu } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { useManagedMutation } from '@/modal/useManagedMutation';
+import { useUser, useCustomer, useProject } from '@/workspace/hooks';
 
 import { InvitationPolicyService } from './InvitationPolicyService';
 
 export const InvitationCancelButton = ({ row, refetch }) => {
-  const dispatch = useDispatch();
-  const user = useSelector(getUser);
-  const customer = useSelector(getCustomer);
-  const project = useSelector(getProject);
+  const user = useUser();
+  const customer = useCustomer();
+  const project = useProject();
 
-  const callback = async () => {
-    try {
-      await userInvitationsCancel({ path: { uuid: row.uuid } });
-      dispatch(showSuccess(translate('Invitation has been canceled.')));
-      refetch();
-    } catch (e) {
-      dispatch(showErrorResponse(e, translate('Unable to cancel invitation.')));
-    }
-  };
+  const { mutate, isPending } = useManagedMutation({
+    mutationFn: () => userInvitationsCancel({ path: { uuid: row.uuid } }),
+    successMessage: translate('Invitation has been canceled.'),
+    errorMessage: translate('Unable to cancel invitation.'),
+    refetch,
+  });
 
   const isDisabled = useMemo(() => {
     if (
@@ -57,12 +53,13 @@ export const InvitationCancelButton = ({ row, refetch }) => {
   }, [user, customer, row]);
 
   return (
-    <ActionItem
-      action={callback}
-      title={translate('Cancel')}
-      iconNode={<ProhibitIcon weight="bold" />}
-      disabled={isDisabled}
+    <Menu.Item
+      onSelect={() => mutate()}
+      icon={<ProhibitIcon weight="bold" />}
+      disabled={isDisabled || isPending}
       tooltip={tooltip}
-    />
+    >
+      {translate('Cancel')}
+    </Menu.Item>
   );
 };

@@ -1,8 +1,7 @@
 import { DownloadSimpleIcon, FileCsvIcon } from '@phosphor-icons/react';
 import { FC } from 'react';
-import { Button } from 'react-bootstrap';
 
-import '@waldur/form/upload/AttachmentItem.scss';
+import { BaseButton } from 'waldur-ui';
 
 interface DownloadTemplateItemProps {
   name: string;
@@ -27,16 +26,13 @@ export const DownloadTemplateItem: FC<DownloadTemplateItemProps> = (props) => {
         <p className="fs-6 text-muted mb-0">{props.size}</p>
       </div>
       <div>
-        <Button
-          variant="link"
-          size="sm"
-          className="btn-icon-right"
+        <BaseButton
           onClick={props.onClick}
-        >
-          <span className="svg-icon svg-icon-2">
-            <DownloadSimpleIcon weight="bold" />
-          </span>
-        </Button>
+          iconNode={<DownloadSimpleIcon weight="bold" />}
+          iconRight
+          variant="text-primary"
+          size="sm"
+        />
       </div>
     </div>
   );

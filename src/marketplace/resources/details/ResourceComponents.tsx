@@ -1,8 +1,5 @@
 import { Col, Row } from 'react-bootstrap';
-import { useMediaQuery } from 'react-responsive';
-import { Resource } from 'waldur-js-client';
-
-import { OfferingComponent } from '@waldur/marketplace/types';
+import { Resource, OfferingComponent } from 'waldur-js-client';
 
 import { ResourceComponentItem } from './ResourceComponentItem';
 import { ResourceShowMoreComponents } from './ResourceShowMoreComponents';
@@ -11,18 +8,26 @@ export const ResourceComponents = ({
   resource,
   components,
 }: {
-  resource: Pick<Resource, 'current_usages' | 'limits' | 'limit_usage'>;
+  resource: Pick<
+    Resource,
+    'name' | 'current_usages' | 'limits' | 'limit_usage'
+  >;
   components: OfferingComponent[];
 }) => {
-  const isSmallScreen = useMediaQuery({ maxWidth: 320 });
-
-  if (components.length === 1) {
+  if (components.length <= 2) {
     return (
-      <ResourceComponentItem
-        expanded
-        resource={resource}
-        component={components[0]}
-      />
+      <Row className="gy-4">
+        {components.map((component) => (
+          <Col key={component.type} xs={12} sm={12 / components.length}>
+            <ResourceComponentItem
+              expanded
+              stacked={components.length === 2}
+              resource={resource}
+              component={component}
+            />
+          </Col>
+        ))}
+      </Row>
     );
   }
 
@@ -30,13 +35,7 @@ export const ResourceComponents = ({
     <>
       <Row>
         {components.slice(0, 4).map((component) => (
-          <Col
-            key={component.type}
-            xs={isSmallScreen ? 12 : 6}
-            sm={6}
-            md={12}
-            xl={6}
-          >
+          <Col key={component.type} xs={12} sm={6} md={12} xl={6}>
             <ResourceComponentItem resource={resource} component={component} />
           </Col>
         ))}

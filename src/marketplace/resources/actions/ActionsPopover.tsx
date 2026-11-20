@@ -1,18 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { FC, PropsWithChildren, useCallback, useMemo } from 'react';
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { FC, PropsWithChildren, useCallback } from 'react';
 
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
+import { ShowAllMenuItem } from '@/resource/actions/ShowAllMenuItem';
 
+import { ActionList } from './ActionList';
 import { loadData } from './loadData';
 import { ModalActionsDialog } from './ModalActionsDialog';
-import {
-  ResourceActionMenuContext,
-  ResourceActionMenuContextModel,
-} from './ResourceActionMenuContext';
 
 const ModalMessage: FC<PropsWithChildren> = ({ children }) => (
   <div className="justify-content-center mx-5 my-5">
@@ -35,30 +31,26 @@ export const ActionsPopover = ({
     queryKey: ['ActionsPopover', url],
     queryFn: () => loadData(url),
   });
-  const actionMenuContextValue = useMemo<ResourceActionMenuContextModel>(
-    () => ({
-      hideDisabled: false,
-      query: '',
-      hideGroupName: true,
-      hideNonImportant: true,
-    }),
-    [],
-  );
   const refetch = useCallback(
     () => Promise.all([refetchParent(), refetchChild()]),
     [refetchParent, refetchChild],
   );
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
   const callback = () => {
-    dispatch(
-      openModalDialog(ModalActionsDialog, {
-        name,
-        refetch,
-        ActionsList,
-        className: 'resource-actions-modal',
-        ...value,
-      }),
-    );
+    openDialog(ModalActionsDialog, {
+      name,
+      refetch,
+      ActionsList,
+      className: 'resource-actions-modal',
+      // The dialog's accessible name (ModalShell's hidden Dialog.Title):
+      // named for the resource rather than by the visible title, which also
+      // holds the state badge and is only the badge for a resource with no
+      // name.
+      title: name
+        ? translate('Actions for {name}', { name })
+        : translate('Resource actions'),
+      ...value,
+    });
   };
 
   return loading ? (
@@ -72,20 +64,10 @@ export const ActionsPopover = ({
     </ModalMessage>
   ) : value ? (
     <>
-      <ResourceActionMenuContext.Provider value={actionMenuContextValue}>
+      <ActionList hideGroupName hideNonImportant>
         <ActionsList {...value} refetch={refetch} />
-      </ResourceActionMenuContext.Provider>
-      <div className="d-flex flex-column justify-content-center flex-grow-1">
-        <Button
-          variant="link"
-          size="sm"
-          className="text-decoration-underline my-1"
-          role="button"
-          onClick={callback}
-        >
-          {translate('Show all')}
-        </Button>
-      </div>
+      </ActionList>
+      <ShowAllMenuItem onSelect={callback} />
     </>
   ) : null;
 };

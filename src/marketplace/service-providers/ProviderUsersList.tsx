@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
 import { marketplaceServiceProvidersUsersList } from 'waldur-js-client';
 
-import { Link } from '@waldur/core/Link';
-import { translate } from '@waldur/i18n';
-import { createFetcher } from '@waldur/table/api';
-import Table from '@waldur/table/Table';
-import { useTable } from '@waldur/table/useTable';
-import { renderFieldOrDash } from '@waldur/table/utils';
+import { Link } from '@/core/Link';
+import { translate } from '@/i18n';
+import { createFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { useTable } from '@/table/useTable';
+import { renderFieldOrDash } from '@/table/utils';
 
 import { CustomerResourcesListPlaceholder } from '../resources/list/CustomerResourcesListPlaceholder';
 
@@ -14,7 +14,7 @@ import { CustomerContactColumn } from './CustomerContactColumn';
 import { ProjectsCountColumn } from './ProjectsCountColumn';
 import { ProviderUserCustomersList } from './ProviderUserCustomersList';
 import { ProviderUsersRowActions } from './ProviderUsersRowActions';
-import { PROVIDER_CUSTOMERS_TABLE_TABS } from './utils';
+import { useProviderCustomersTabs } from './useProviderCustomersTabs';
 
 const UserNameColumn = ({ row }) => (
   <>
@@ -32,6 +32,7 @@ const UserNameColumn = ({ row }) => (
 );
 
 const ProviderUsersListComponent = ({ provider }) => {
+  const tabs = useProviderCustomersTabs();
   const tableProps = useTable({
     table: 'marketplace-provider-users',
     fetchData: createFetcher(marketplaceServiceProvidersUsersList, {
@@ -65,7 +66,7 @@ const ProviderUsersListComponent = ({ provider }) => {
       ]}
       rowActions={ProviderUsersRowActions}
       showPageSizeSelector={true}
-      tabs={PROVIDER_CUSTOMERS_TABLE_TABS}
+      tabs={tabs}
       verboseName={translate('users')}
       expandableRow={ExpandableRow}
       hasQuery={true}

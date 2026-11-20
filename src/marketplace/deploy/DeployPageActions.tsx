@@ -1,23 +1,33 @@
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react';
-import { Dropdown } from 'react-bootstrap';
+import { forwardRef } from 'react';
 
-import { translate } from '@waldur/i18n';
-import { ActionItem } from '@waldur/resource/actions/ActionItem';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { ActionItem } from '@/resource/actions/ActionItem';
+import { ActionsMenu } from '@/table/ActionsDropdown';
+
+/** forwardRef for the asChild Trigger below — see ActionsDropdown.tsx's TableDropdownToggle for the general requirement. */
+const DeployPageActionsToggle = forwardRef<HTMLButtonElement>((props, ref) => (
+  <BaseButton
+    ref={ref}
+    variant="tertiary"
+    tooltip={translate('Actions')}
+    iconNode={<DotsThreeVerticalIcon weight="bold" />}
+    {...props}
+  />
+));
+DeployPageActionsToggle.displayName = 'DeployPageActionsToggle';
 
 export const DeployPageActions = () => {
   return (
-    <Dropdown id="deploy-actions" align="end">
-      <Dropdown.Toggle variant="light" bsPrefix="btn-icon bg-body">
-        <DotsThreeVerticalIcon />
-      </Dropdown.Toggle>
-      <Dropdown.Menu>
-        <ActionItem action={() => null} title={translate('Import config')} />
-        <ActionItem action={() => null} title={translate('Edit as YAML')} />
-        <ActionItem
-          action={() => null}
-          title={translate('Order with script over API')}
-        />
-      </Dropdown.Menu>
-    </Dropdown>
+    <ActionsMenu side="bottom" toggle={<DeployPageActionsToggle />} align="end">
+      <ActionItem action={() => null} title={translate('Import config')} />
+      <ActionItem action={() => null} title={translate('Edit as YAML')} />
+      <ActionItem
+        action={() => null}
+        title={translate('Order with script over API')}
+      />
+    </ActionsMenu>
   );
 };

@@ -1,0 +1,232 @@
+import { FunctionComponent, useCallback, useMemo } from 'react';
+import {
+  marketplacePosixIdPoolsList,
+  PosixIdPool,
+  ServiceProvider,
+} from 'waldur-js-client';
+
+import { Badge } from 'waldur-ui';
+
+import { formatDateTime } from '@/core/dateUtils';
+import { PercentProgress } from '@/core/PercentProgress';
+import { translate } from '@/i18n';
+import { CustomerResourcesListPlaceholder } from '@/marketplace/resources/list/CustomerResourcesListPlaceholder';
+import { createFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { useTable } from '@/table/useTable';
+import { renderFieldOrDash } from '@/table/utils';
+
+import { roundUtilization } from './poolRanges';
+import { PosixIdPoolCreateButton } from './PosixIdPoolCreateButton';
+import { PosixIdPoolRowActions } from './PosixIdPoolRowActions';
+import { PosixIdPoolStatsExpandable } from './PosixIdPoolStatsExpandable';
+
+const utilizationVariant = (utilization: number) =>
+  utilization >= 90 ? 'danger' : utilization >= 70 ? 'warning' : 'success';
+
+const getScopeLabel = (scope?: string) =>
+  scope === 'offering' ? translate('Offering') : translate('Service provider');
+
+interface PosixIdPoolsListViewProps {
+  tableKey: string;
+  filter?: Record<string, unknown>;
+  provider?: ServiceProvider;
+  showCustomerColumn?: boolean;
+  showCreateButton?: boolean;
+}
+
+const PosixIdPoolsListView: FunctionComponent<PosixIdPoolsListViewProps> = ({
+  tableKey,
+  filter,
+  provider,
+  showCustomerColumn,
+  showCreateButton,
+}) => {
+  const tableProps = useTable({
+    table: tableKey,
+    fetchData: createFetcher(marketplacePosixIdPoolsList),
+    filter,
+  });
+
+  // The dialogs show which ranges the other pools already use.
+  const RowActions = useCallback(
+    ({ row }: { row: PosixIdPool }) => (
+      <PosixIdPoolRowActions
+        row={row}
+        pools={tableProps.rows}
+        refetch={tableProps.fetch}
+      />
+    ),
+    [tableProps.rows, tableProps.fetch],
+  );
+
+  const ExpandableRow = useCallback(
+    ({ row }: { row: PosixIdPool }) => <PosixIdPoolStatsExpandable row={row} />,
+    [],
+  );
+
+  const columns = useMemo(
+    () => [
+      {
+        title: translate('Scope'),
+        render: ({ row }: { row: PosixIdPool }) => (
+          <Badge variant="primary" tone="light">
+            {getScopeLabel(row.scope)}
+          </Badge>
+        ),
+      },
+      {
+        title: translate('UID range'),
+        render: ({ row }: { row: PosixIdPool }) =>
+          row.min_uid == null ? (
+            <>{renderFieldOrDash(null)}</>
+          ) : (
+            <>
+              {row.min_uid} – {row.max_uid}
+            </>
+          ),
+        copyField: (row: PosixIdPool) =>
+          row.min_uid == null ? '' : `${row.min_uid}-${row.max_uid}`,
+      },
+      {
+        title: translate('GID range'),
+        render: ({ row }: { row: PosixIdPool }) =>
+          row.min_gid == null ? (
+            <>{renderFieldOrDash(null)}</>
+          ) : (
+            <>
+              {row.min_gid} – {row.max_gid}
+            </>
+          ),
+        copyField: (row: PosixIdPool) =>
+          row.min_gid == null ? '' : `${row.min_gid}-${row.max_gid}`,
+      },
+      {
+        title: translate('Project group GID range'),
+        render: ({ row }: { row: PosixIdPool }) =>
+          row.min_group_gid == null ? (
+            <>{renderFieldOrDash(null)}</>
+          ) : (
+            <>
+              {row.min_group_gid} – {row.max_group_gid}
+            </>
+          ),
+        copyField: (row: PosixIdPool) =>
+          row.min_group_gid == null
+            ? ''
+            : `${row.min_group_gid}-${row.max_group_gid}`,
+      },
+      ...(showCustomerColumn
+        ? [
+            {
+              title: translate('Organization'),
+              render: ({ row }: { row: PosixIdPool }) =>
+                renderFieldOrDash(row.customer_name),
+            },
+          ]
+        : []),
+      {
+        title: translate('UID utilization'),
+        render: ({ row }: { row: PosixIdPool }) => (
+          <div style={{ minWidth: 90 }}>
+            <PercentProgress
+              value={roundUtilization(row.uid_utilization)}
+              compact
+              variant={utilizationVariant(row.uid_utilization ?? 0)}
+            />
+          </div>
+        ),
+      },
+      {
+        title: translate('GID utilization'),
+        render: ({ row }: { row: PosixIdPool }) => (
+          <div style={{ minWidth: 90 }}>
+            <PercentProgress
+              value={roundUtilization(row.gid_utilization)}
+              compact
+              variant={utilizationVariant(row.gid_utilization ?? 0)}
+            />
+          </div>
+        ),
+      },
+      {
+        title: translate('Project group GID utilization'),
+        render: ({ row }: { row: PosixIdPool }) =>
+          row.group_gid_utilization == null ? (
+            <>{renderFieldOrDash(null)}</>
+          ) : (
+            <div style={{ minWidth: 90 }}>
+              <PercentProgress
+                value={roundUtilization(row.group_gid_utilization)}
+                compact
+                variant={utilizationVariant(row.group_gid_utilization)}
+              />
+            </div>
+          ),
+      },
+      {
+        title: translate('Description'),
+        render: ({ row }: { row: PosixIdPool }) =>
+          renderFieldOrDash(row.description),
+      },
+      {
+        title: translate('Created'),
+        render: ({ row }: { row: PosixIdPool }) => (
+          <>{formatDateTime(row.created)}</>
+        ),
+      },
+    ],
+    [showCustomerColumn],
+  );
+
+  return (
+    <Table<PosixIdPool>
+      {...tableProps}
+      columns={columns}
+      verboseName={translate('POSIX ID pools')}
+      initialSorting={{ field: 'min_uid', mode: 'asc' }}
+      tableActions={
+        showCreateButton && provider ? (
+          <PosixIdPoolCreateButton
+            providerUuid={provider.uuid as string}
+            customerUuid={provider.customer_uuid as string}
+            pools={tableProps.rows}
+            refetch={tableProps.fetch}
+          />
+        ) : undefined
+      }
+      rowActions={RowActions}
+      expandableRow={ExpandableRow}
+      showPageSizeSelector={true}
+    />
+  );
+};
+
+export const ProviderPosixIdPoolsList: FunctionComponent<{
+  provider?: ServiceProvider;
+}> = ({ provider }) => {
+  const filter = useMemo(
+    () => (provider ? { customer_uuid: provider.customer_uuid } : undefined),
+    [provider?.customer_uuid],
+  );
+
+  if (!provider) {
+    return <CustomerResourcesListPlaceholder />;
+  }
+
+  return (
+    <PosixIdPoolsListView
+      tableKey="marketplace-provider-posix-id-pools"
+      filter={filter}
+      provider={provider}
+      showCreateButton
+    />
+  );
+};
+
+export const AdminPosixIdPoolsList: FunctionComponent = () => (
+  <PosixIdPoolsListView
+    tableKey="admin-marketplace-posix-id-pools"
+    showCustomerColumn
+  />
+);

@@ -1,15 +1,19 @@
-import { useSelector } from 'react-redux';
-import { OfferingUser } from 'waldur-js-client';
+import { OfferingUser, ServiceProvider } from 'waldur-js-client';
 
-import { ProviderOfferingUserDeleteButton } from '@waldur/marketplace/service-providers/ProviderOfferingUserDeleteButton';
-import { ProviderOfferingUserUpdateButton } from '@waldur/marketplace/service-providers/ProviderOfferingUserUpdateButton';
-import { RestrictOfferingUserButton } from '@waldur/marketplace/service-providers/RestrictOfferingUser';
-import { ServiceProvider } from '@waldur/marketplace/types';
-import { PermissionEnum } from '@waldur/permissions/enums';
-import { hasPermission } from '@waldur/permissions/hasPermission';
-import { ActionsDropdown } from '@waldur/table/ActionsDropdown';
-import { useUser } from '@waldur/workspace/hooks';
-import { getCustomer } from '@waldur/workspace/selectors';
+import { isFeatureVisible } from '@/features/connect';
+import { MarketplaceFeatures } from '@/FeaturesEnums';
+import { OfferingUserDetailsButton } from '@/marketplace/offerings/details/OfferingUserDetailsButton';
+import {
+  isProviderBacked,
+  ProviderAccountAction,
+} from '@/marketplace/service-providers/accounts/ProviderAccountLink';
+import { ProviderOfferingUserDeleteButton } from '@/marketplace/service-providers/ProviderOfferingUserDeleteButton';
+import { ProviderOfferingUserUpdateButton } from '@/marketplace/service-providers/ProviderOfferingUserUpdateButton';
+import { RestrictOfferingUserButton } from '@/marketplace/service-providers/RestrictOfferingUser';
+import { PermissionEnum } from '@/permissions/enums';
+import { hasPermission } from '@/permissions/hasPermission';
+import { ActionsDropdown } from '@/table/ActionsDropdown';
+import { useUser, useCustomer } from '@/workspace/hooks';
 
 type OfferingUserRowActionsProps = {
   row: OfferingUser;
@@ -25,7 +29,7 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
   offering,
 }) => {
   const user = useUser();
-  const customer = useSelector(getCustomer);
+  const customer = useCustomer();
   const canUpdateRestrictedStatus = customer
     ? hasPermission(user, {
         permission: PermissionEnum.UPDATE_OFFERING_USER_RESTRICTION,
@@ -33,20 +37,45 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
       })
     : true;
 
+  // In administration context (no provider), check permissions based on offering customer
+  const canUpdateOfferingUser = provider
+    ? hasPermission(user, {
+        permission: PermissionEnum.UPDATE_OFFERING_USER,
+        customerId: provider.customer_uuid,
+      })
+    : hasPermission(user, {
+        permission: PermissionEnum.UPDATE_OFFERING_USER,
+        customerId: row.customer_uuid, // Use the row's customer_uuid for admin context
+      });
+
+  // Hide POSIX editing when this offering manages no POSIX account.
+  const posixEnabled =
+    isFeatureVisible(MarketplaceFeatures.show_posix_id_pools) &&
+    offering?.plugin_options?.enable_posix_account !== false;
+  // A backed account's username and POSIX attributes belong to its provider
+  // account: edited there, so the row offers a way to it instead.
+  const backed = isProviderBacked(row);
+
   return (
     <ActionsDropdown
       row={row}
       refetch={fetch}
       actions={[
         (props) => (
+          <OfferingUserDetailsButton row={props.row} offering={offering} />
+        ),
+        backed ? (props) => <ProviderAccountAction row={props.row} /> : null,
+        (props) => (
           <>
-            <ProviderOfferingUserUpdateButton
-              {...props}
-              provider={provider}
-              offering={offering}
-              updateScope="username"
-            />
-            {Boolean(provider) && (
+            {!backed && (
+              <ProviderOfferingUserUpdateButton
+                {...props}
+                provider={provider}
+                offering={offering}
+                updateScope="username"
+              />
+            )}
+            {(Boolean(provider) || canUpdateOfferingUser) && (
               <>
                 <ProviderOfferingUserUpdateButton
                   {...props}
@@ -60,6 +89,20 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
                   offering={offering}
                   updateScope="state"
                 />
+                <ProviderOfferingUserUpdateButton
+                  {...props}
+                  provider={provider}
+                  offering={offering}
+                  updateScope="runtime_state"
+                />
+                {posixEnabled && !backed && (
+                  <ProviderOfferingUserUpdateButton
+                    {...props}
+                    provider={provider}
+                    offering={offering}
+                    updateScope="posix"
+                  />
+                )}
               </>
             )}
 
@@ -73,7 +116,6 @@ export const OfferingUserRowActions: React.FC<OfferingUserRowActionsProps> = ({
 
         canUpdateRestrictedStatus ? RestrictOfferingUserButton : null,
       ].filter(Boolean)}
-      data-cy="offering-users-list-actions-dropdown-btn"
     />
   );
 };

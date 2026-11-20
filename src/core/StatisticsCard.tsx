@@ -1,8 +1,8 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 
-import { Link } from '@waldur/core/Link';
-import { translate } from '@waldur/i18n';
+import { Link } from '@/core/Link';
+import { translate } from '@/i18n';
 
 interface StatisticsCardProps {
   title: string;
@@ -19,11 +19,7 @@ export const StatisticsCard: React.FC<StatisticsCardProps> = ({
     <Card.Body className="d-flex d-md-block justify-content-between align-items-center">
       {to && (
         <div className="buttons text-end order-2">
-          <Link
-            state={to.state}
-            params={to.params}
-            className="btn btn-tertiary"
-          >
+          <Link state={to.state} params={to.params} buttonVariant="tertiary">
             {translate('View all')}
           </Link>
         </div>

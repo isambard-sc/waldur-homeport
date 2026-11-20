@@ -1,17 +1,10 @@
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
 import classNames from 'classnames';
-import {
-  FC,
-  Fragment,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { Card, Col, Nav, Row, Tab } from 'react-bootstrap';
+import { FC, Fragment, ReactNode, useState } from 'react';
+import { Card, Col, Row } from 'react-bootstrap';
 
-import { TableTabsContainer } from '@waldur/customer/list/TableTabsContainer';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'waldur-ui';
+
+import { useUrlTab } from '@/navigation/useUrlTab';
 
 import { TableProps } from './types';
 
@@ -22,9 +15,8 @@ export const TableWithTabs: FC<
   > & {
     data?: Record<string, any>;
     syncWithUrlKey?: string;
-    actions?:
-      | ReactNode
-      | Array<{ activeKeys: (string | number)[]; component: ReactNode }>;
+    actions?: ReactNode | Array<{ activeKeys: string[]; component: ReactNode }>;
+    headerActions?: ReactNode;
   }
 > = ({
   title,
@@ -35,72 +27,25 @@ export const TableWithTabs: FC<
   data = {},
   syncWithUrlKey,
   actions,
+  headerActions,
 }) => {
-  const { state, params } = useCurrentStateAndParams();
-  const router = useRouter();
+  const { activeKey, handleSelect } = useUrlTab(tabs, syncWithUrlKey, {
+    history: 'push',
+  });
 
-  const defaultActiveKey = useMemo(
-    () => tabs.find((tab) => tab.key)?.key,
-    [tabs],
-  );
-  const [activeKey, setActiveKey] = useState<string | number | null>(
-    defaultActiveKey,
-  );
-
-  const [isRefsReady, setRefsReady] = useState(false);
-  const refToolbar = useRef<HTMLDivElement>(null);
-  const refTitle = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (refToolbar.current && refTitle.current) {
-      setRefsReady(true);
-    }
-  }, [refToolbar.current, refTitle.current]);
-
-  // Sync activeKey with URL query if syncWithUrlKey is provided
-  useEffect(() => {
-    if (syncWithUrlKey) {
-      const urlKey = params[syncWithUrlKey];
-      if (urlKey && tabs.some((tab) => tab.key === urlKey)) {
-        setActiveKey(urlKey);
-      } else {
-        setActiveKey(defaultActiveKey);
-      }
-    }
-  }, [params, syncWithUrlKey, tabs, defaultActiveKey]);
-
-  const handleSelect = (key: string | null) => {
-    // Remove all children that came through the portal from the toolbar and title,
-    // to prevent previous children to be visible when the new tab is rendered
-    const childrenToBeRemoved = [];
-    if (refToolbar.current) {
-      const toolbarNode = refToolbar.current;
-      childrenToBeRemoved.push(...Array.from(toolbarNode.childNodes));
-    }
-    if (refTitle.current) {
-      const titleNode = refTitle.current;
-      const children = Array.from(titleNode.childNodes);
-      childrenToBeRemoved.push(...children.slice(1));
-    }
-    if (childrenToBeRemoved.length > 0) {
-      for (const child of childrenToBeRemoved) {
-        child.style.display = 'none';
-      }
-    }
-    setActiveKey(key);
-
-    // Update URL query if syncWithUrlKey is provided
-    if (syncWithUrlKey && key) {
-      router.stateService.go(state.name, { ...params, [syncWithUrlKey]: key });
-    }
-  };
+  // The open tab's table portals its toolbar and refresh button into these
+  // header slots. Callback refs re-render once both exist, so the panels mount
+  // with real targets. Only the open panel is mounted (mount="active"), so a
+  // tab switch unmounts the old table and its portalled controls with it.
+  const [titleNode, setTitleNode] = useState<HTMLDivElement | null>(null);
+  const [toolbarNode, setToolbarNode] = useState<HTMLDivElement | null>(null);
 
   return (
     <Card className={classNames('card-table card-bordered', className)}>
       <Card.Header className={headerClassName}>
         <Row className="card-toolbar g-0 gap-4 w-100">
           <Col xs>
-            <Card.Title ref={refTitle}>
+            <Card.Title ref={setTitleNode}>
               <div className="me-2">
                 <h3>{title}</h3>
                 {Boolean(subtitle) && (
@@ -112,33 +57,35 @@ export const TableWithTabs: FC<
             </Card.Title>
             {/* Portal destination */}
           </Col>
-          <Col sm="auto" className="ms-auto">
+          <Col
+            sm="auto"
+            className="ms-auto mw-100 d-flex gap-4 flex-wrap flex-sm-nowrap text-nowrap"
+          >
+            {headerActions}
             <div
-              ref={refToolbar}
-              className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-3"
+              ref={setToolbarNode}
+              className="d-flex justify-content-sm-end flex-wrap flex-sm-nowrap text-nowrap gap-4"
             >
               {/* Portal destination */}
             </div>
           </Col>
         </Row>
       </Card.Header>
-      <Card.Body className="pt-0">
-        <TableTabsContainer
-          defaultActiveKey={defaultActiveKey}
-          activeKey={activeKey ?? defaultActiveKey}
-          onSelect={handleSelect}
+      <Card.Body className="pt-3">
+        <Tabs
+          value={activeKey}
+          onValueChange={handleSelect}
+          mount="active"
           className="min-h-175px"
         >
           <div className="d-flex justify-content-between">
-            <div className="overflow-auto flex-grow-1">
-              <Nav variant="tabs" className="nav-line-tabs flex-nowrap">
-                {tabs.map((tab) => (
-                  <Nav.Item key={tab.key} className="text-nowrap">
-                    <Nav.Link eventKey={tab.key}>{tab.title}</Nav.Link>
-                  </Nav.Item>
-                ))}
-              </Nav>
-            </div>
+            <TabsList scrollable scrollClassName="flex-grow-1">
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.key} value={tab.key}>
+                  {tab.title}
+                </TabsTrigger>
+              ))}
+            </TabsList>
             {actions ? (
               Array.isArray(actions) && actions.length ? (
                 <div className="d-flex align-items-center border-bottom gap-2">
@@ -155,23 +102,20 @@ export const TableWithTabs: FC<
               )
             ) : null}
           </div>
-          {isRefsReady && (
-            <Tab.Content className="overflow-auto">
+          {titleNode && toolbarNode && (
+            <div className="overflow-auto">
               {tabs.map((tab) => (
-                <Tab.Pane key={tab.key} eventKey={tab.key} unmountOnExit={true}>
+                <TabsContent key={tab.key} value={tab.key}>
                   <tab.component
                     {...data}
                     activeTab={activeKey}
-                    portal={{
-                      toolbar: refToolbar.current,
-                      refresh: refTitle.current,
-                    }}
+                    portal={{ toolbar: toolbarNode, refresh: titleNode }}
                   />
-                </Tab.Pane>
+                </TabsContent>
               ))}
-            </Tab.Content>
+            </div>
           )}
-        </TableTabsContainer>
+        </Tabs>
       </Card.Body>
     </Card>
   );

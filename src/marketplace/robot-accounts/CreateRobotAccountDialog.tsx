@@ -1,17 +1,15 @@
-import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
-import { marketplaceRobotAccountsCreate, usersList } from 'waldur-js-client';
-
-import { parseSelectData } from '@waldur/core/api';
-import { ENV } from '@waldur/core/config';
+import { useMemo } from 'react';
 import {
-  LATIN_NAME_PATTERN,
-  returnReactSelectAsyncPaginateObject,
-} from '@waldur/core/utils';
-import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
-import { ResourceActionDialog } from '@waldur/resource/actions/ResourceActionDialog';
-import { showSuccess, showErrorResponse } from '@waldur/store/notify';
+  marketplaceProviderResourcesRobotAccountUsersList,
+  marketplaceRobotAccountsCreate,
+} from 'waldur-js-client';
+
+import { LATIN_NAME_PATTERN } from '@/core/utils';
+import { createLoadOptions } from '@/form/select';
+import { translate } from '@/i18n';
+import { ScopeSubtitle } from '@/modal/ScopeSubtitle';
+import { useManagedMutation } from '@/modal/useManagedMutation';
+import { ResourceActionDialog } from '@/resource/actions/ResourceActionDialog';
 
 export interface RobotAccountFormData {
   type: string;
@@ -21,26 +19,40 @@ export interface RobotAccountFormData {
   responsible_user: { url: string; full_name: string; email: string };
 }
 
-export const useRobotAccountFields = (resource) => {
-  const loadUsers = useCallback(
-    (query, prevOptions, page) =>
-      usersList({
-        query: {
-          full_name: query,
-          project_uuid: resource.project_uuid,
-          field: ['full_name', 'email', 'url', 'uuid'],
-          o: ['full_name'],
-          page,
-          page_size: ENV.pageSize,
-        },
-      }).then((response) =>
-        returnReactSelectAsyncPaginateObject(
-          parseSelectData(response),
-          prevOptions,
-          page,
-        ),
+// Locking the username needs the offering's effective account settings, which
+// only the marketplace resource carries: the policy may be inherited from the
+// service provider, so the offering's own plugin option is just a fallback for
+// an older API.
+export const isUsernameManagedByProvider = (resource: {
+  offering_account_settings?: {
+    username_generation_policy?: { value?: string };
+  };
+  offering_plugin_options?: { username_generation_policy?: string };
+}) =>
+  (resource.offering_account_settings?.username_generation_policy?.value ??
+    resource.offering_plugin_options?.username_generation_policy) ===
+  'service_provider';
+
+// `resourceUuid` is the marketplace resource the robot account belongs to. The
+// backend lists only the users such an account may link, so people who have
+// not accepted the offering's Terms of Service are never offered.
+export const useRobotAccountFields = ({
+  resourceUuid,
+  usernameManagedByProvider,
+}: {
+  resourceUuid: string;
+  usernameManagedByProvider: boolean;
+}) => {
+  const loadUsers = useMemo(
+    () =>
+      createLoadOptions(
+        marketplaceProviderResourcesRobotAccountUsersList,
+        // Matches full name, username or email, not just the name.
+        'user_keyword',
+        {},
+        { uuid: resourceUuid },
       ),
-    [resource],
+    [resourceUuid],
   );
 
   return [
@@ -57,10 +69,7 @@ export const useRobotAccountFields = (resource) => {
       maxlength: 32,
       type: 'string',
       pattern: LATIN_NAME_PATTERN,
-      disabled:
-        resource.offering_plugin_options &&
-        resource.offering_plugin_options['username_generation_policy'] ===
-          'service_provider',
+      disabled: usernameManagedByProvider,
       disabled_tooltip: translate('Username is managed by service provider.'),
     },
     {
@@ -92,38 +101,46 @@ export const useRobotAccountFields = (resource) => {
   ];
 };
 
-export const CreateRobotAccountDialog = ({ resolve: { resource } }) => {
-  const dispatch = useDispatch();
-  const fields = useRobotAccountFields(resource);
+export const CreateRobotAccountDialog = ({
+  resolve: { resource, refetch },
+}: {
+  resolve: { resource: any; refetch?: () => void };
+}) => {
+  const mutation = useManagedMutation<any, any, RobotAccountFormData>({
+    mutationFn: (formData) =>
+      marketplaceRobotAccountsCreate({
+        body: {
+          ...formData,
+          resource: resource.url,
+          users: formData.users?.map(({ url }) => url),
+          responsible_user: formData.responsible_user?.url,
+          keys: formData.keys ? formData.keys.split(/\r?\n/) : [],
+        },
+      }),
+
+    successMessage: translate('Robot account has been created.'),
+    errorMessage: translate('Unable to create robot account.'),
+    refetch: refetch,
+  });
+
+  const fields = useRobotAccountFields({
+    resourceUuid: resource.uuid,
+    usernameManagedByProvider: isUsernameManagedByProvider(resource),
+  });
   return (
     <ResourceActionDialog
-      dialogTitle={translate('Create robot account for {resource_name}', {
-        resource_name: resource.name,
-      })}
+      dialogTitle={translate('Create robot account')}
+      dialogSubtitle={
+        <ScopeSubtitle
+          label={translate('Resource name')}
+          name={resource.name}
+        />
+      }
       formFields={fields}
       initialValues={{
         type: 'cicd',
       }}
-      submitForm={async (formData: RobotAccountFormData) => {
-        const keys = formData.keys?.trim();
-        try {
-          await marketplaceRobotAccountsCreate({
-            body: {
-              ...formData,
-              resource: resource.url,
-              users: formData.users?.map(({ url }) => url),
-              responsible_user: formData.responsible_user.url,
-              keys: keys ? keys.split(/\r?\n/) : [],
-            },
-          });
-          dispatch(showSuccess(translate('Robot account has been created.')));
-          dispatch(closeModalDialog());
-        } catch (e) {
-          dispatch(
-            showErrorResponse(e, translate('Unable to create robot account.')),
-          );
-        }
-      }}
+      submitForm={mutation.mutateAsync}
     />
   );
 };

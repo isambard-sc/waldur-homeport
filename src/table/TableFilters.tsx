@@ -1,60 +1,49 @@
+import { XIcon } from '@phosphor-icons/react';
 import { FunctionComponent, useCallback } from 'react';
-import { Button, Col, Row, Stack } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { useMediaQuery } from 'react-responsive';
-import { change, getFormValues } from 'redux-form';
+import { useDispatch } from 'react-redux';
 
-import { GRID_BREAKPOINTS } from '@waldur/core/constants';
-import { translate } from '@waldur/i18n';
+import { BaseButton, useBreakpointDown } from 'waldur-ui';
 
+import { translate } from '@/i18n';
+
+import { clearAllFilters } from './actions';
 import { TableFiltersMenu } from './TableFiltersMenu';
 import { TableProps } from './types';
-import { getFiltersFormId } from './utils';
 
-interface TableFiltersProps
-  extends Pick<
-    TableProps,
-    | 'filters'
-    | 'renderFiltersDrawer'
-    | 'filtersStorage'
-    | 'hideClearFilters'
-    | 'filterPosition'
-    | 'setFilter'
-    | 'applyFiltersFn'
-    | 'selectedSavedFilter'
-  > {
+interface TableFiltersProps extends Pick<
+  TableProps,
+  | 'filters'
+  | 'formId'
+  | 'renderFiltersDrawer'
+  | 'filtersStorage'
+  | 'hideClearFilters'
+  | 'filterPosition'
+  | 'setFilter'
+  | 'applyFiltersFn'
+  | 'selectedSavedFilter'
+> {
   table?: TableProps['table'];
 }
 
 export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
   const dispatch = useDispatch();
-  const formId = getFiltersFormId(props.filters);
-  const formValues = useSelector(getFormValues(formId));
+
   const clearFilters = useCallback(() => {
-    if (formValues) {
-      Object.keys(formValues).forEach((key) => {
-        dispatch(change(formId, key, null));
-        if (props.filterPosition === 'menu') {
-          props.setFilter({
-            label: null,
-            name: key,
-            value: null,
-            component: null,
-          });
-        }
-      });
-    }
+    dispatch(clearAllFilters(props.table));
     if (props.filterPosition === 'sidebar') {
-      props.renderFiltersDrawer(props.filters);
+      props.renderFiltersDrawer(props.filters, props.formId);
     }
     props.applyFiltersFn(true);
-  }, [dispatch, props, formValues]);
+  }, [props, dispatch]);
 
-  const isMd = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.md });
+  const isMd = useBreakpointDown('md');
+  const clearLabel = isMd ? translate('Clear') : translate('Clear filters');
 
   return props.filterPosition === 'menu' || props.filtersStorage.length > 0 ? (
-    <Row className="card-toolbar w-100 my-4 g-0 gap-4">
-      <Col className={isMd ? 'd-flex scroll-x' : 'd-flex'}>
+    <div className="w-100 d-flex flex-wrap gap-4">
+      <div
+        className={isMd ? 'd-flex flex-grow-1 scroll-x' : 'd-flex flex-grow-1'}
+      >
         <div
           className={
             isMd
@@ -63,20 +52,19 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
           }
         >
           {props.filtersStorage.map((item) => (
-            <Stack
+            <div
               key={item.name}
-              direction="horizontal"
-              gap={2}
-              className="flex-nowrap fw-bolder text-dark fs-7"
+              className="d-flex align-items-center flex-nowrap fw-bolder text-dark fs-7 gap-2"
             >
               {item.label}
-              <item.component />
-            </Stack>
+              {item.component && <item.component />}
+            </div>
           ))}
           {props.filterPosition === 'menu' && (
             <TableFiltersMenu
               table={props.table}
               filters={props.filters}
+              formId={props.formId}
               filterPosition={props.filterPosition}
               filtersStorage={props.filtersStorage}
               setFilter={props.setFilter}
@@ -85,18 +73,19 @@ export const TableFilters: FunctionComponent<TableFiltersProps> = (props) => {
             />
           )}
         </div>
-      </Col>
+      </div>
       {!props.hideClearFilters && props.filtersStorage.length > 0 && (
-        <Col xs="auto" className="align-self-start text-end">
-          <Button
-            variant="flush"
-            className="btn-active-text-primary h-40px"
+        <div className="align-self-start text-end">
+          <BaseButton
+            variant="text-secondary"
+            className="btn-no-focus"
             onClick={clearFilters}
-          >
-            {isMd ? translate('Clear') : translate('Clear filters')}
-          </Button>
-        </Col>
+            iconNode={<XIcon weight="bold" />}
+            label={clearLabel}
+            size="sm"
+          />
+        </div>
       )}
-    </Row>
+    </div>
   ) : null;
 };

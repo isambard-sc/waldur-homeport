@@ -1,12 +1,11 @@
 import { FileIcon, TrashIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { FC } from 'react';
-import { Button, ProgressBar } from 'react-bootstrap';
 
-import { formatFilesize } from '@waldur/core/utils';
-import { translate } from '@waldur/i18n';
+import { BaseButton, Progress } from 'waldur-ui';
 
-import './AttachmentItem.scss';
+import { formatFilesize } from '@/core/utils';
+import { translate } from '@/i18n';
 
 interface AttachmentItemPendingProps {
   file: File;
@@ -21,7 +20,7 @@ export const AttachmentItemPending: FC<AttachmentItemPendingProps> = ({
   file,
   progress,
   error,
-  iconSize = 20,
+  iconSize = 22,
   onRetry,
   onCancel,
 }) => {
@@ -31,51 +30,42 @@ export const AttachmentItemPending: FC<AttachmentItemPendingProps> = ({
       data-testid="pending-attachment-item"
     >
       <div className="attachment-item__thumb">
-        <FileIcon
-          size={iconSize}
-          weight="bold"
-          className={error ? 'text-danger' : 'text-muted'}
-        />
+        <FileIcon size={iconSize} weight="bold" />
       </div>
 
       <div className="attachment-item__body">
-        <h6 className="fw-bold text-gray-700 mb-0">
+        <h6 className="fw-bold text-secondary">
           {error ? translate('Upload failed, please try again') : file.name}
         </h6>
-        <p className="fs-6 text-muted mb-0">
+        <p className="fs-6 text-muted">
           {error ? file.name : formatFilesize(file.size, 'B')}
         </p>
         {error ? (
           <button
             type="button"
-            className="text-btn text-gray-700 text-hover-primary fw-bold"
+            className="text-anchor text-anchor-danger mt-4px"
             onClick={() => onRetry(file)}
           >
             {translate('Try again')}
           </button>
         ) : progress || progress === 0 ? (
-          <ProgressBar
-            animated={!progress}
-            now={progress || 100}
-            className="h-8px mt-2"
-          />
+          progress ? (
+            <Progress className="mt-2" value={progress} />
+          ) : (
+            <Progress className="mt-2" indeterminate />
+          )
         ) : null}
       </div>
       <div>
-        <Button
-          variant="flush"
-          size="sm"
-          className={classNames(
-            'btn-active-icon-danger attachment-item__delete btn-icon-right',
-            error && 'btn-icon-danger',
-          )}
-          disabled={!error && progress && progress !== 0}
+        <BaseButton
+          iconNode={<TrashIcon weight="bold" />}
+          tooltip={translate('Cancel upload')}
           onClick={() => onCancel(file)}
-        >
-          <span className="svg-icon svg-icon-2">
-            <TrashIcon weight="bold" />
-          </span>
-        </Button>
+          variant="text-danger"
+          className="attachment-item__delete"
+          disabled={!error && progress && progress !== 0}
+          size="sm"
+        />
       </div>
     </div>
   );

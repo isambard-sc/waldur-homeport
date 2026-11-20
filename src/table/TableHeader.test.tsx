@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 
 import { TableHeader } from './TableHeader';
@@ -34,25 +35,48 @@ const renderTableHeader = (props = {}) => {
 };
 
 describe('TableHeader', () => {
+  const user = userEvent.setup();
+
   it('renders column headers', () => {
     renderTableHeader();
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Email')).toBeInTheDocument();
   });
 
-  it('handles sort click', () => {
+  it('handles sort click', async () => {
     const onSortClick = vi.fn();
     renderTableHeader({
       onSortClick,
       currentSorting: { field: 'name', mode: 'asc' },
     });
 
-    const sortDescButton = screen.getAllByTestId('sort-desc')[0];
-    fireEvent.click(sortDescButton);
+    await user.click(screen.getAllByTestId('sort-toggle')[0]);
     expect(onSortClick).toHaveBeenCalledWith({ field: 'name', mode: 'desc' });
   });
 
-  it('shows select all checkbox when multiSelect is enabled', () => {
+  it('sorts an unsorted column ascending', async () => {
+    const onSortClick = vi.fn();
+    renderTableHeader({
+      onSortClick,
+      currentSorting: { field: 'email', mode: 'desc' },
+    });
+
+    await user.click(screen.getAllByTestId('sort-toggle')[0]);
+    expect(onSortClick).toHaveBeenCalledWith({ field: 'name', mode: 'asc' });
+  });
+
+  it('clears sorting after descending', async () => {
+    const onSortClick = vi.fn();
+    renderTableHeader({
+      onSortClick,
+      currentSorting: { field: 'name', mode: 'desc' },
+    });
+
+    await user.click(screen.getAllByTestId('sort-toggle')[0]);
+    expect(onSortClick).toHaveBeenCalledWith({ field: null, mode: undefined });
+  });
+
+  it('shows select all checkbox when multiSelect is enabled', async () => {
     const onSelectAllRows = vi.fn();
     renderTableHeader({
       enableMultiSelect: true,
@@ -62,7 +86,7 @@ describe('TableHeader', () => {
     const checkbox = screen.getByRole('checkbox');
     expect(checkbox).toBeInTheDocument();
 
-    fireEvent.click(checkbox);
+    await user.click(checkbox);
     expect(onSelectAllRows).toHaveBeenCalledWith(mockRows);
   });
 
@@ -125,20 +149,20 @@ describe('TableHeader', () => {
       ] as any,
     });
 
-    expect(screen.queryByTestId('sort-asc')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('sort-desc')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('sort-toggle')).not.toBeInTheDocument();
   });
 
-  it('should render column for expandable indicator if header has expandable row', () => {
+  it('should render expandable indicator inside first data column header', () => {
     renderTableHeader({
       expandableRow: true,
     });
 
     const headers = screen.getAllByRole('columnheader');
-    expect(headers).toHaveLength(mockColumns.length + 1);
+    expect(headers).toHaveLength(mockColumns.length);
+    expect(screen.getByLabelText('Expand all rows')).toBeInTheDocument();
   });
 
-  it('should select all rows when clicking on select-all checkbox', () => {
+  it('should select all rows when clicking on select-all checkbox', async () => {
     const onSelectAllRows = vi.fn();
     renderTableHeader({
       enableMultiSelect: true,
@@ -147,7 +171,7 @@ describe('TableHeader', () => {
     });
 
     const checkbox = screen.getByTestId('select-all');
-    fireEvent.click(checkbox);
+    await user.click(checkbox);
 
     expect(onSelectAllRows).toHaveBeenCalledWith(mockRows);
   });

@@ -1,8 +1,9 @@
 import { Modal } from 'react-bootstrap';
 
-import { Image } from '@waldur/core/Image';
-import { Tip } from '@waldur/core/Tooltip';
-import { getMarketplaceResourceLogo } from '@waldur/marketplace/resources/details/MarketplaceResourceLogo';
+import { Tooltip } from 'waldur-ui';
+
+import { Image } from '@/core/Image';
+import { getMarketplaceResourceLogo } from '@/marketplace/resources/details/MarketplaceResourceLogo';
 
 import { ResourceStateField } from '../list/ResourceStateField';
 
@@ -13,24 +14,27 @@ export const ActionDialogHeader = ({
   marketplaceResource;
   name: string;
 }) => (
-  <Modal.Header className="without-border pb-0">
-    <Modal.Title className="fw-bold">
+  <Modal.Header closeButton className="without-border pb-0">
+    {/* A heading, with the h4 look of Modal.Title's default div. */}
+    <Modal.Title as="h2" className="fw-bold h4">
       {marketplaceResource ? (
         <div className="d-flex flex-column-auto align-items-stretch gap-3 flex-grow-1">
-          <Tip label={marketplaceResource.category_title} id="resource-tooltip">
-            <Image
-              src={getMarketplaceResourceLogo(marketplaceResource)}
-              size={24}
-              isContain
-            />
-          </Tip>
+          <Tooltip label={marketplaceResource.category_title}>
+            <span className="d-inline-flex">
+              <Image
+                src={getMarketplaceResourceLogo(marketplaceResource)}
+                size={24}
+                isContain
+              />
+            </span>
+          </Tooltip>
           {name}
           <div>
             <ResourceStateField
               resource={marketplaceResource}
               size="sm"
-              pill
-              outline
+              shape="pill"
+              tone="outline"
             />
           </div>
         </div>

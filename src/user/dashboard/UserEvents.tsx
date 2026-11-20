@@ -1,24 +1,42 @@
 import { FC, useMemo } from 'react';
 
-import { BaseEventsList } from '@waldur/events/BaseEventsList';
+import { BaseEventsList } from '@/events/BaseEventsList';
+import { useFilterValues } from '@/table/useFilterValues';
 
-export const UserEvents: FC<{ user?; hasActionBar? }> = ({
-  user,
-  hasActionBar = true,
-}) => {
-  const filter = useMemo(
-    () => ({
+import { UserEventsFilter, UserEventsFilterFormId } from './UserEventsFilter';
+
+export const UserEvents: FC<{
+  user?;
+  hasActionBar?;
+  fullWidth?: boolean;
+  cardBordered?: boolean;
+}> = ({ user, hasActionBar = true, fullWidth, cardBordered }) => {
+  const tableId = `user-events-${user.uuid}`;
+  const values = useFilterValues(tableId);
+  const includeRelated = Boolean(values?.include_related);
+
+  const filter = useMemo(() => {
+    if (includeRelated) {
+      return {
+        related_user_uuid: user.uuid,
+      };
+    }
+    return {
       scope: user.url,
       feature: 'users',
       exclude_extra: true,
-    }),
-    [user],
-  );
+    };
+  }, [includeRelated, user.url, user.uuid]);
+
   return (
     <BaseEventsList
       filter={filter}
-      table={`user-events-${user.uuid}`}
+      table={tableId}
+      formId={UserEventsFilterFormId}
+      filters={<UserEventsFilter />}
       hasActionBar={hasActionBar}
+      fullWidth={fullWidth}
+      cardBordered={cardBordered}
     />
   );
 };

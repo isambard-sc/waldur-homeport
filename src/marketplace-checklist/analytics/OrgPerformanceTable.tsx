@@ -1,8 +1,11 @@
-import { ProgressBar, Stack } from 'react-bootstrap';
+import { Stack } from 'react-bootstrap';
 
-import { translate } from '@waldur/i18n';
-import Table from '@waldur/table/Table';
-import { useTable } from '@waldur/table/useTable';
+import { Progress } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { createClientPaginatedFetcher } from '@/table/api';
+import Table from '@/table/Table';
+import { useTable } from '@/table/useTable';
 
 const orgPerformance = [
   { name: 'TechCorp Inc.', assigned: 18, compliance: 82, last: '2 hours ago' },
@@ -23,7 +26,7 @@ const orgPerformance = [
 export const OrgPerformanceTable = () => {
   const tableProps = useTable({
     table: 'OrganizationPerformanceComparison',
-    fetchData: () => Promise.resolve({ rows: orgPerformance }),
+    fetchData: createClientPaginatedFetcher(orgPerformance),
   });
 
   return (
@@ -43,10 +46,7 @@ export const OrgPerformanceTable = () => {
           title: translate('Compliance rate'),
           render: ({ row }) => (
             <Stack>
-              <ProgressBar
-                now={row.compliance}
-                className="h-8px shadow-none w-100 mt-1"
-              />
+              <Progress value={row.compliance} className="mt-1" />
               <small className="d-block text-end fw-bolder">
                 {row.compliance}%
               </small>

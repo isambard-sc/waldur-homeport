@@ -1,10 +1,9 @@
-import { WarningIcon } from '@phosphor-icons/react';
+import { WarningTip } from 'waldur-ui';
 
-import { Link } from '@waldur/core/Link';
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
+import { Link } from '@/core/Link';
+import { translate } from '@/i18n';
 
-import { ResourceIcon } from './ResourceIcon';
+import { ResourceIconName } from './ResourceIconName';
 import { ResourceLink } from './ResourceLink';
 
 interface ResourceNameProps {
@@ -21,13 +20,10 @@ interface ResourceNameProps {
 
 const ResourceWarning = (props: ResourceNameProps) =>
   props.resource.is_link_valid === false ? (
-    <Tip
-      id={`resourceWarning-${props.resource.uuid}`}
+    <WarningTip
       label={translate('Provider does not comply with project policies')}
-    >
-      {' '}
-      <WarningIcon className="text-muted" />
-    </Tip>
+      className="ms-1"
+    />
   ) : null;
 
 export const ResourceName = (props: ResourceNameProps) =>
@@ -43,11 +39,11 @@ export const ResourceName = (props: ResourceNameProps) =>
     <>
       <ResourceLink
         uuid={props.resource.marketplace_uuid}
-        label={<ResourceIcon resource={props.resource} />}
+        label={<ResourceIconName resource={props.resource} />}
       />
 
       <ResourceWarning resource={props.resource} />
     </>
   ) : (
-    <ResourceIcon resource={props.resource} />
+    <ResourceIconName resource={props.resource} />
   );

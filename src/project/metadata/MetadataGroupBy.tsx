@@ -1,34 +1,35 @@
-import { FormLabel, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { FormLabel } from 'react-bootstrap';
 
-import { translate } from '@waldur/i18n';
+import { SegmentedControl } from 'waldur-ui';
 
-export const MetadataGroupBy = ({ value, onChange }) => {
+import { translate } from '@/i18n';
+
+interface GroupByButton {
+  value: string;
+  label: string;
+}
+
+interface MetadataGroupByProps {
+  value;
+  onChange;
+  buttons: GroupByButton[];
+}
+
+export const MetadataGroupBy = ({
+  value,
+  onChange,
+  buttons,
+}: MetadataGroupByProps) => {
   return (
     <>
       <FormLabel className="mb-0">{translate('Group by:')}</FormLabel>
-      <ToggleButtonGroup
-        type="radio"
-        name="groupBy"
+      <SegmentedControl
+        aria-label={translate('Group by')}
+        size="sm"
+        options={buttons}
         value={value}
-        onChange={onChange}
-      >
-        <ToggleButton
-          id="tbg-answer"
-          value="answer"
-          variant="tertiary"
-          size="sm"
-        >
-          {translate('Answer')}
-        </ToggleButton>
-        <ToggleButton
-          id="tbg-project"
-          value="project"
-          variant="tertiary"
-          size="sm"
-        >
-          {translate('Project')}
-        </ToggleButton>
-      </ToggleButtonGroup>
+        onValueChange={onChange}
+      />
     </>
   );
 };

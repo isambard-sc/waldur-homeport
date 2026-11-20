@@ -1,0 +1,74 @@
+import { UIView, useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { FC, createContext, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
+
+import { SegmentedControl, TabNav } from 'waldur-ui';
+
+import { Link } from '@/core/Link';
+import { translate } from '@/i18n';
+import { useFullPage } from '@/navigation/context';
+import { isStaffOrSupport } from '@/workspace/selectors';
+
+import { CustomerReportingLanding } from './CustomerReportingLanding';
+import { getReportingTabs } from './tabs';
+
+export const ReportingPeriodContext = createContext(0);
+
+export const ReportingLayout: FC = () => {
+  useFullPage();
+  const router = useRouter();
+  const workspace = useSelector((s: any) => s.workspace);
+  const [months, setMonths] = useState(0);
+  // Subscribes to transitions, so the tab highlight and the toggle below
+  // re-render on navigation rather than relying on an ancestor to do it.
+  const { state } = useCurrentStateAndParams();
+  const isDashboard = state.name === 'reporting-dashboard';
+
+  const tabs = useMemo(() => getReportingTabs(workspace), [workspace]);
+  const isStaff = useSelector(isStaffOrSupport);
+
+  // Organization owners reach only the landing page under this layout; the
+  // category tabs and their lists stay staff/support only.
+  if (!isStaff) {
+    return (
+      <div className="container-fluid py-9">
+        <h1 className="mb-5">{translate('Reporting')}</h1>
+        <CustomerReportingLanding />
+      </div>
+    );
+  }
+
+  return (
+    <div className="container-fluid py-9">
+      <div className="d-flex justify-content-between align-items-center gap-4 mb-5">
+        <h1>{translate('Reporting')}</h1>
+        {isDashboard && (
+          <SegmentedControl<number>
+            aria-label={translate('Time period')}
+            options={[
+              { value: 0, label: translate('All time') },
+              { value: 6, label: translate('6 months') },
+              { value: 12, label: translate('12 months') },
+            ]}
+            value={months}
+            onValueChange={setMonths}
+          />
+        )}
+      </div>
+
+      <TabNav
+        listClassName="mb-5"
+        items={tabs.map((tab) => ({
+          key: tab.state,
+          title: tab.title,
+          link: <Link state={tab.state} />,
+          active: router.stateService.includes(tab.state),
+        }))}
+      />
+
+      <ReportingPeriodContext.Provider value={months}>
+        <UIView />
+      </ReportingPeriodContext.Provider>
+    </div>
+  );
+};

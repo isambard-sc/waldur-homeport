@@ -1,9 +1,10 @@
 import { EyeIcon } from '@phosphor-icons/react';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { translate } from '@waldur/i18n';
-import { DialogActionItem } from '@waldur/resource/actions/DialogActionItem';
-import { ActionItemType } from '@waldur/resource/actions/types';
+import { lazyComponent } from '@/core/lazyComponent';
+import { translate } from '@/i18n';
+import { ResourceAction } from '@/marketplace/resources/actions/constants';
+import { DialogActionItem } from '@/resource/actions/DialogActionItem';
+import { ActionItemType } from '@/resource/actions/types';
 
 const ResourceDetailsDialog = lazyComponent(() =>
   import('./ResourceDetailsDialog').then((module) => ({
@@ -14,8 +15,10 @@ const ResourceDetailsDialog = lazyComponent(() =>
 export const ResourceDetailsAction: ActionItemType = ({ resource }) => (
   <DialogActionItem
     title={translate('View details')}
+    important
     modalComponent={ResourceDetailsDialog}
     resource={resource}
     iconNode={<EyeIcon weight="bold" />}
+    actionId={ResourceAction.VIEW_DETAILS}
   />
 );

@@ -1,37 +1,46 @@
 import { debounce } from 'lodash-es';
 import { useCallback, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useForm } from 'react-final-form';
 import { OpenStackFlavor, OpenStackImage } from 'waldur-js-client';
 
-import { FilterBox } from '@waldur/form/FilterBox';
-import { VStepperFormStepCard } from '@waldur/form/VStepperFormStep';
-import { translate } from '@waldur/i18n';
-import { orderFormSelector } from '@waldur/marketplace/deploy/selectors';
-import { FormStepProps } from '@waldur/marketplace/deploy/types';
+import { FilterBox } from '@/form/FilterBox';
+import { translate } from '@/i18n';
+import { useOrderFormData } from '@/marketplace/deploy/selectors';
+import { FormStepProps } from '@/marketplace/deploy/types';
+import { VStepperFormStepCard } from '@/wizard';
 
 import { calculateSystemVolumeSize } from '../utils';
 
 import { FlavorTable } from './FlavorTable';
 import { FormAbstractVolumeFields } from './FormAbstractVolumeFields';
 
+const SYSTEM_VOLUME = {
+  typeField: 'attributes.system_volume_type',
+  sizeField: 'attributes.system_volume_size',
+};
+
+const DATA_VOLUME = {
+  typeField: 'attributes.data_volume_type',
+  sizeField: 'attributes.data_volume_size',
+};
+
 export const FormHardwareConfigurationStep = (props: FormStepProps) => {
   const [query, setQuery] = useState('');
+  const form = useForm();
 
   const applyQuery = useCallback(
     debounce((value) => {
       setQuery(value);
-      props.change('attributes.flavor', null);
+      form.change('attributes.flavor', null);
     }, 1000),
-    [],
+    [form],
   );
 
-  const image = useSelector((state) =>
-    orderFormSelector(state, 'attributes.image'),
-  ) as OpenStackImage;
+  const formData = useOrderFormData();
 
-  const flavor = useSelector((state) =>
-    orderFormSelector(state, 'attributes.flavor'),
-  ) as OpenStackFlavor;
+  const image = formData.attributes?.image as OpenStackImage;
+
+  const flavor = formData.attributes?.flavor as OpenStackFlavor;
 
   const minSystemVolumeSize = useMemo(() => {
     const minSize = calculateSystemVolumeSize({
@@ -69,8 +78,8 @@ export const FormHardwareConfigurationStep = (props: FormStepProps) => {
           typeTitle={translate('System volume type')}
           sizeTitle={translate('System volume size (GB)')}
           helpText={translate('Non-detachable and non-resizable boot disk')}
-          typeField="attributes.system_volume_type"
-          sizeField="attributes.system_volume_size"
+          {...SYSTEM_VOLUME}
+          siblingVolumes={[DATA_VOLUME]}
           optional={false}
           minSize={minSystemVolumeSize}
         />
@@ -81,8 +90,8 @@ export const FormHardwareConfigurationStep = (props: FormStepProps) => {
         typeTitle={translate('Data volume type')}
         sizeTitle={translate('Data volume size (GB)')}
         helpText={translate('Detachable and resizable data disk')}
-        typeField="attributes.data_volume_type"
-        sizeField="attributes.data_volume_size"
+        {...DATA_VOLUME}
+        siblingVolumes={[SYSTEM_VOLUME]}
         optional={true}
       />
     </VStepperFormStepCard>

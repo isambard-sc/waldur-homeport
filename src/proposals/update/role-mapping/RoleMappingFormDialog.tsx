@@ -1,30 +1,33 @@
 import { PlusCircleIcon } from '@phosphor-icons/react';
-import { Field, Form } from 'react-final-form';
+import { Form } from 'react-final-form';
 import {
   callProposalProjectRoleMappingsCreate,
   callProposalProjectRoleMappingsPartialUpdate,
 } from 'waldur-js-client';
 
-import { required } from '@waldur/core/validators';
-import { FormGroup, SelectField, SubmitButton } from '@waldur/form';
-import { translate } from '@waldur/i18n';
-import { CloseDialogButton } from '@waldur/modal/CloseDialogButton';
-import { useModal } from '@waldur/modal/hooks';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
+import { required } from '@/core/validators';
+import { SelectGroup, SubmitButton } from '@/form';
+import { translate } from '@/i18n';
+import { CloseDialogButton } from '@/modal/CloseDialogButton';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { useManagedMutation } from '@/modal/useManagedMutation';
+import { Role } from '@/permissions/types';
 import {
   formatRole,
+  formatRoleLabel,
+  getRoleQualifiers,
   getProjectRoles,
   getProposalRoles,
-} from '@waldur/permissions/utils';
-import { useNotify } from '@waldur/store/hooks';
+} from '@/permissions/utils';
 
 export const RoleMappingFormDialog = ({ resolve }) => {
-  const { showErrorResponse, showSuccess } = useNotify();
-  const { closeDialog } = useModal();
-
   const isEdit = Boolean(resolve.mapping);
   const proposalRoleOptions = getProposalRoles();
   const projectRoleOptions = getProjectRoles();
+  // Descriptions shared by two offered roles (a system role and an
+  // organization's clone) get a qualifier to tell them apart.
+  const proposalRoleQualifiers = getRoleQualifiers(proposalRoleOptions);
+  const projectRoleQualifiers = getRoleQualifiers(projectRoleOptions);
 
   // Helper to find option object by name for initial values
   const findOption = (options, value) =>
@@ -45,56 +48,54 @@ export const RoleMappingFormDialog = ({ resolve }) => {
       }
     : undefined;
 
-  const onSubmit = async (formValues) => {
-    try {
+  const saveRoleMappingMutation = useManagedMutation<any, any, any>({
+    mutationFn: (formValues) => {
       if (isEdit) {
-        await callProposalProjectRoleMappingsPartialUpdate({
+        return callProposalProjectRoleMappingsPartialUpdate({
           path: { uuid: resolve.mapping.uuid },
           body: {
             project_role: formValues.project_role?.name || null,
           },
         });
-        showSuccess(translate('Role mapping has been updated'));
       } else {
-        await callProposalProjectRoleMappingsCreate({
+        return callProposalProjectRoleMappingsCreate({
           body: {
             call: resolve.call.url,
             project_role: formValues.project_role?.name || null,
             proposal_role: formValues.proposal_role.name,
           },
         });
-        showSuccess(translate('Role mapping has been created'));
       }
-      closeDialog();
-      await resolve.refetch();
-    } catch (error) {
-      showErrorResponse(
-        error,
-        isEdit
-          ? translate('Unable to update the role mapping.')
-          : translate('Unable to create a role mapping.'),
-      );
-    }
-  };
+    },
+    successMessage: isEdit
+      ? translate('Role mapping has been updated')
+      : translate('Role mapping has been created'),
+    errorMessage: isEdit
+      ? translate('Unable to update the role mapping.')
+      : translate('Unable to create a role mapping.'),
+    refetch: resolve.refetch,
+  });
 
   return (
     <Form
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={(values) => saveRoleMappingMutation.mutateAsync(values)}
       render={({ handleSubmit, submitting, invalid }) => (
         <form onSubmit={handleSubmit}>
           <ModalDialog
             title={
               isEdit
                 ? translate('Edit role mapping for {proposalRole}', {
-                    proposalRole: formatRole(initialValues.proposal_role),
+                    proposalRole: formatRole(
+                      resolve.mapping.proposal_role,
+                      'proposal',
+                    ),
                   })
                 : translate('Create role mapping')
             }
             subtitle={translate(
               'If the project role is not set, corresponding users in proposal role will not be transferred to the project.',
             )}
-            closeButton
             iconNode={!isEdit ? <PlusCircleIcon weight="bold" /> : null}
             iconColor={isEdit ? 'warning' : 'success'}
             footer={
@@ -104,36 +105,35 @@ export const RoleMappingFormDialog = ({ resolve }) => {
                   submitting={submitting}
                   disabled={invalid}
                   label={isEdit ? translate('Update') : translate('Create')}
-                  className="btn btn-primary min-w-125px"
+                  variant="primary"
+                  className="min-w-125px"
                 />
               </>
             }
           >
             {!isEdit ? (
-              <Field
+              <SelectGroup
                 name="proposal_role"
                 label={translate('Proposal role')}
-                component={FormGroup as any}
                 options={proposalRoleOptions}
-                getOptionLabel={(option) => option.label || option.name}
+                getOptionLabel={(option: Role) =>
+                  formatRoleLabel(option, proposalRoleQualifiers)
+                }
                 getOptionValue={(option) => option.name}
                 validate={required}
                 isClearable={false}
-              >
-                <SelectField />
-              </Field>
+              />
             ) : null}
-            <Field
+            <SelectGroup
               name="project_role"
               label={translate('Project role')}
-              component={FormGroup as any}
               options={projectRoleOptions}
-              getOptionLabel={(option) => option.label || option.name}
+              getOptionLabel={(option: Role) =>
+                formatRoleLabel(option, projectRoleQualifiers)
+              }
               getOptionValue={(option) => option.name || null}
               isClearable={true}
-            >
-              <SelectField />
-            </Field>
+            />
           </ModalDialog>
         </form>
       )}

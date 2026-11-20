@@ -1,4 +1,5 @@
 import {
+  Announcements,
   closestCenter,
   DndContext,
   KeyboardSensor,
@@ -13,47 +14,92 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { DotsSixVerticalIcon, GearIcon } from '@phosphor-icons/react';
-import { FC, useMemo, useState } from 'react';
-import { Button, Dropdown, OverlayTrigger, Popover } from 'react-bootstrap';
+import {
+  ArrowCounterClockwiseIcon,
+  DotsSixVerticalIcon,
+  GearIcon,
+} from '@phosphor-icons/react';
+import { FC, ReactNode, useId, useMemo, useState } from 'react';
 
-import { FilterBox } from '@waldur/form/FilterBox';
-import { translate } from '@waldur/i18n';
+import {
+  BaseButton,
+  Checkbox,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  cn,
+  menuItem,
+} from 'waldur-ui';
 
-import CheckboxIcon from './Checkbox.svg';
-import CheckboxEmptyIcon from './CheckboxEmpty.svg';
+import { FilterBox } from '@/form/FilterBox';
+import { translate } from '@/i18n';
+
 import { COLUMN_ACTIONS_KEY } from './constants';
 import { TableProps } from './types';
 
-const SortableItem = (props) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id });
+interface SortableItemProps {
+  id: string;
+  title: ReactNode;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+const SortableItem: FC<SortableItemProps> = ({
+  id,
+  title,
+  isActive,
+  onClick,
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
+  const checkboxId = useId();
+  const labelText = typeof title === 'string' ? title : id;
+
   return (
-    <div
-      className="dropdown-item"
+    <li
+      className={cn(menuItem({ look: 'actions' }), isDragging && 'opacity-50')}
+      data-testid="column-row"
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
     >
-      <span className="svg-icon svg-icon-2 svg-icon-gray me-3">
-        <DotsSixVerticalIcon size={32} />
-      </span>{' '}
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-      <span
-        className="svg-icon svg-icon-2 svg-icon-transparent me-3"
-        onClick={props.onClick}
+      <button
+        type="button"
+        ref={setActivatorNodeRef}
+        {...attributes}
+        {...listeners}
+        className="inline-flex items-center justify-center size-[20px] shrink-0 p-0 me-[12px] cursor-grab active:cursor-grabbing border-0 bg-transparent text-gray-500 hover:text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary rounded"
+        aria-label={translate('Reorder column {title}', { title: labelText })}
       >
-        {props.isActive ? <CheckboxIcon /> : <CheckboxEmptyIcon />}
-      </span>
-      {props.title}
-    </div>
+        <DotsSixVerticalIcon weight="bold" size={16} />
+      </button>
+      <label
+        htmlFor={checkboxId}
+        className="d-flex align-items-center flex-grow-1 cursor-pointer m-0"
+      >
+        <Checkbox
+          id={checkboxId}
+          size="sm"
+          className="me-[12px]"
+          checked={Boolean(isActive)}
+          onChange={onClick}
+          aria-label={typeof title === 'string' ? title : undefined}
+        />
+        <span>{title}</span>
+      </label>
+    </li>
   );
 };
 
@@ -64,8 +110,10 @@ const ColumnsPopover = ({
   swapColumns,
   columnPositions,
   hasActions,
+  resetColumns,
 }) => {
   const [query, setQuery] = useState('');
+  const actionsCheckboxId = useId();
 
   const columnMap = useMemo(
     () =>
@@ -90,7 +138,7 @@ const ColumnsPopover = ({
   function handleDragEnd(event) {
     const { active, over } = event;
 
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       swapColumns(active.id, over.id);
     }
   }
@@ -106,48 +154,137 @@ const ColumnsPopover = ({
     }),
   );
 
+  const announcements: Announcements = useMemo(
+    () => ({
+      onDragStart({ active }) {
+        const title = columnMap[active.id]?.title ?? active.id;
+        return translate(
+          'Picked up column {title}. Use arrow keys to reorder, space to drop.',
+          { title },
+        );
+      },
+      onDragOver({ active, over }) {
+        if (over) {
+          const title = columnMap[active.id]?.title ?? active.id;
+          const overIndex = matches.indexOf(String(over.id)) + 1;
+          return translate(
+            'Column {title} was moved over position {position} of {total}.',
+            { title, position: overIndex, total: matches.length },
+          );
+        }
+      },
+      onDragEnd({ active, over }) {
+        const title = columnMap[active.id]?.title ?? active.id;
+        if (over) {
+          const overIndex = matches.indexOf(String(over.id)) + 1;
+          return translate(
+            'Column {title} was dropped at position {position} of {total}.',
+            { title, position: overIndex, total: matches.length },
+          );
+        }
+        return translate('Column {title} was dropped.', { title });
+      },
+      onDragCancel({ active }) {
+        const title = columnMap[active.id]?.title ?? active.id;
+        return translate(
+          'Reordering was cancelled. Column {title} returned to its original position.',
+          { title },
+        );
+      },
+    }),
+    [columnMap, matches],
+  );
+
   return (
-    <div className="border mw-400px">
+    <div className="mw-400px">
       <div className="p-5">
         <FilterBox
           type="search"
           placeholder={translate('Search...')}
+          aria-label={translate('Search columns')}
+          value={query}
           onChange={(e) => setQuery(e.target.value)}
+          rightAction={
+            <BaseButton
+              iconNode={<ArrowCounterClockwiseIcon weight="bold" />}
+              tooltip={translate('Reset settings to default')}
+              aria-label={translate('Reset settings to default')}
+              onClick={resetColumns}
+              variant="text-secondary"
+              size="sm"
+            />
+          }
         />
       </div>
-      <div className="mh-300px overflow-auto">
+      <div role="status" className="sr-only">
+        {query
+          ? translate('Columns found: {count}', { count: matches.length })
+          : ''}
+      </div>
+      <div className="mh-300px overflow-auto pb-2">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
+          accessibility={{
+            announcements,
+          }}
         >
           <SortableContext
             items={matches}
             strategy={verticalListSortingStrategy}
           >
-            {matches.map((id) => (
-              <SortableItem
-                key={id}
-                id={id}
-                title={columnMap[id].title}
-                onClick={() => toggleColumn(id, columnMap[id])}
-                isActive={activeColumns[id]}
-              />
-            ))}
+            <ul
+              className="list-unstyled p-0 m-0"
+              aria-label={translate('Columns')}
+            >
+              {matches.map((id) => (
+                <SortableItem
+                  key={id}
+                  id={id}
+                  title={columnMap[id].title}
+                  onClick={() => toggleColumn(id, columnMap[id])}
+                  isActive={Boolean(activeColumns[id])}
+                />
+              ))}
+              {hasActions && (
+                <li
+                  data-testid="column-row"
+                  className={menuItem({ look: 'actions' })}
+                >
+                  <span
+                    className="d-inline-block size-[20px] shrink-0 me-[12px] opacity-0"
+                    aria-hidden="true"
+                  />
+                  <label
+                    htmlFor={actionsCheckboxId}
+                    className="d-flex align-items-center flex-grow-1 cursor-pointer m-0"
+                  >
+                    <Checkbox
+                      id={actionsCheckboxId}
+                      key={activeColumns[COLUMN_ACTIONS_KEY]}
+                      size="sm"
+                      className="me-[12px]"
+                      checked={Boolean(activeColumns[COLUMN_ACTIONS_KEY])}
+                      onChange={() =>
+                        toggleColumn(COLUMN_ACTIONS_KEY, {
+                          keys: [COLUMN_ACTIONS_KEY],
+                        })
+                      }
+                      aria-label={translate('Actions')}
+                    />
+                    <span>{translate('Actions')}</span>
+                  </label>
+                </li>
+              )}
+            </ul>
           </SortableContext>
         </DndContext>
 
-        {hasActions && (
-          <Dropdown.Item onClick={() => toggleColumn(COLUMN_ACTIONS_KEY)}>
-            <span className="svg-icon svg-icon-2 svg-icon-transparent me-3">
-              {activeColumns[COLUMN_ACTIONS_KEY] ? (
-                <CheckboxIcon />
-              ) : (
-                <CheckboxEmptyIcon />
-              )}
-            </span>
-            {translate('Actions')}
-          </Dropdown.Item>
+        {matches.length === 0 && (
+          <div className="text-muted text-center py-4 fs-7">
+            {translate('No columns found')}
+          </div>
         )}
       </div>
     </div>
@@ -160,14 +297,44 @@ export const TableColumnButton: FC<TableProps> = ({
   toggleColumn,
   swapColumns,
   columnPositions,
+  initColumnPositions,
+  resetColumns,
   rowActions,
   mode,
-}) => (
-  <OverlayTrigger
-    trigger="click"
-    placement="bottom"
-    overlay={
-      <Popover id="TableColumnButton">
+}) => {
+  const handleReset = () => {
+    resetColumns();
+    initColumnPositions(columns.map((column) => column.id));
+    // Re-run the same initialization Table.tsx uses on mount:
+    // column.optional === true → hidden by default; otherwise → visible.
+    columns.forEach((column) => {
+      toggleColumn(column.id, column, column.optional ? false : true);
+    });
+    if (rowActions) {
+      toggleColumn(COLUMN_ACTIONS_KEY, { keys: [] }, true);
+    }
+  };
+  return (
+    <Popover>
+      {/* BaseButton's own `tooltip` prop wraps the button in its own
+          Tooltip internally — Radix's nested asChild composition delivers
+          Popover's props down to the underlying <button>. */}
+      <PopoverTrigger asChild disabled={mode !== 'table'}>
+        <BaseButton
+          disabled={mode !== 'table'}
+          variant="tertiary"
+          size="lg"
+          tooltip={translate('Toggle visible columns')}
+          iconNode={<GearIcon weight="bold" />}
+        />
+      </PopoverTrigger>
+      <PopoverContent
+        side="bottom"
+        align="end"
+        sideOffset={2}
+        className="table-columns-popover"
+        aria-label={translate('Visible columns')}
+      >
         <ColumnsPopover
           columns={columns}
           activeColumns={activeColumns}
@@ -175,20 +342,9 @@ export const TableColumnButton: FC<TableProps> = ({
           swapColumns={swapColumns}
           columnPositions={columnPositions}
           hasActions={Boolean(rowActions)}
+          resetColumns={handleReset}
         />
-      </Popover>
-    }
-    rootClose
-  >
-    <Button
-      disabled={mode !== 'table'}
-      variant="tertiary"
-      size="lg"
-      className="btn-icon"
-    >
-      <span className="svg-icon svg-icon-2">
-        <GearIcon weight="bold" />
-      </span>
-    </Button>
-  </OverlayTrigger>
-);
+      </PopoverContent>
+    </Popover>
+  );
+};

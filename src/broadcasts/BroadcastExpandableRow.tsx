@@ -2,11 +2,12 @@ import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { BroadcastMessage } from 'waldur-js-client';
 
-import { ENV } from '@waldur/core/config';
-import { formatDateTime } from '@waldur/core/dateUtils';
-import { translate } from '@waldur/i18n';
-import { Field } from '@waldur/resource/summary';
-import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import { ENV } from '@/core/config';
+import { formatDateTime } from '@/core/dateUtils';
+import { translate } from '@/i18n';
+import { getProposalStateOptions } from '@/proposals/utils';
+import { Field } from '@/resource/summary';
+import { ExpandableContainer } from '@/table/ExpandableContainer';
 
 import { OptionsList } from './OptionsList';
 import { RecipientsField } from './RecipientsField';
@@ -30,6 +31,42 @@ export const BroadcastExpandableRow: FunctionComponent<{
           label={translate('Offerings')}
           list={row.query['offerings']}
         />
+
+        {row.query.rounds?.length ? (
+          <>
+            <OptionsList
+              label={translate('Proposal rounds')}
+              list={row.query.rounds}
+            />
+            <Field
+              label={translate('Round recipients')}
+              value={[
+                row.query.proposal_teams !== false &&
+                  translate('Proposal teams'),
+                row.query.reviewers && translate('Reviewers'),
+              ]
+                .filter(Boolean)
+                .join(', ')}
+              labelCol={5}
+              valueCol={7}
+            />
+            {row.query.proposal_states?.length ? (
+              <Field
+                label={translate('Proposal states')}
+                value={row.query.proposal_states
+                  .map(
+                    (state) =>
+                      getProposalStateOptions().find(
+                        (option) => option.value === state,
+                      )?.label ?? state,
+                  )
+                  .join(', ')}
+                labelCol={5}
+                valueCol={7}
+              />
+            ) : null}
+          </>
+        ) : null}
 
         <RecipientsField row={row} />
 

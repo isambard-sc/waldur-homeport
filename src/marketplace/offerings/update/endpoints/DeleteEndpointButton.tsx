@@ -1,46 +1,39 @@
-import { Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 import { marketplaceProviderOfferingsDeleteEndpoint } from 'waldur-js-client';
 
-import { formatJsxTemplate, translate } from '@waldur/i18n';
-import { waitForConfirmation } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { BaseButton } from 'waldur-ui';
+
+import { formatJsxTemplate, translate } from '@/i18n';
+import { useManagedMutation } from '@/modal/useManagedMutation';
 
 export const DeleteEndpointButton = ({ endpoint, offering, refetch }) => {
-  const dispatch = useDispatch();
-  const handler = async () => {
-    try {
-      await waitForConfirmation(
-        dispatch,
-        translate('Confirmation'),
-        translate(
-          'Are you sure you want to delete endpoint {name}?',
-          {
-            name: <b>{endpoint.name}</b>,
-          },
-          formatJsxTemplate,
-        ),
-        { forDeletion: true },
-      );
-    } catch {
-      return;
-    }
-    try {
-      await marketplaceProviderOfferingsDeleteEndpoint({
+  const deleteMutation = useManagedMutation<any, any, void>({
+    mutationFn: () =>
+      marketplaceProviderOfferingsDeleteEndpoint({
         path: { uuid: offering.uuid },
         body: { uuid: endpoint.uuid },
-      });
-      dispatch(showSuccess(translate('Endpoint has been removed.')));
-      await refetch();
-    } catch (error) {
-      dispatch(
-        showErrorResponse(error, translate('Unable to remove endpoint.')),
-      );
-    }
-  };
+      }),
+    successMessage: translate('Endpoint has been removed.'),
+    errorMessage: translate('Unable to remove endpoint.'),
+    refetch,
+    confirmation: {
+      title: translate('Confirmation'),
+      body: translate(
+        'Are you sure you want to delete endpoint {name}?',
+        {
+          name: <b>{endpoint.name}</b>,
+        },
+        formatJsxTemplate,
+      ),
+      options: { forDeletion: true },
+    },
+  });
   return (
-    <Button className="btn-sm btn-danger" onClick={handler}>
-      {translate('Delete')}
-    </Button>
+    <BaseButton
+      variant="danger"
+      onClick={() => deleteMutation.mutate()}
+      pending={deleteMutation.isPending}
+      label={translate('Delete')}
+      size="sm"
+    />
   );
 };

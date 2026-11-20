@@ -10,18 +10,16 @@ import {
 } from '@phosphor-icons/react';
 import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC, useMemo, useState } from 'react';
-import { Button, DropdownItem } from 'react-bootstrap';
-import { useMediaQuery } from 'react-responsive';
+import { ProviderOfferingDetails as Offering } from 'waldur-js-client';
 
-import { GRID_BREAKPOINTS } from '@waldur/core/constants';
-import { CopyToClipboardButton } from '@waldur/core/CopyToClipboardButton';
-import { Link } from '@waldur/core/Link';
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { FilterBox } from '@waldur/form/FilterBox';
-import { Select } from '@waldur/form/themed-select';
-import { translate } from '@waldur/i18n';
-import { Offering } from '@waldur/marketplace/types';
-import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
+import { BaseButton, Menu, MenuPopover, useBreakpointDown } from 'waldur-ui';
+
+import { CopyToClipboardButton } from '@/core/CopyToClipboardButton';
+import { Link } from '@/core/Link';
+import { FilterBox } from '@/form/FilterBox';
+import { Select } from '@/form/select';
+import { translate } from '@/i18n';
+import { TableDropdownToggle } from '@/table/ActionsDropdown';
 
 import { SCRIPT_ROWS } from './utils';
 
@@ -77,7 +75,7 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
 
   const envItems = useMemo<EnvItem[]>(() => {
     const items = [];
-    ((offering.secret_options?.environ as any[]) || []).forEach((variable) => {
+    (offering.secret_options?.environ || []).forEach((variable) => {
       items.push({
         label: variable.name,
         type: 'environ',
@@ -117,7 +115,7 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
     return items.concat(envLinks);
   }, [query, envItems]);
 
-  const isSmallScr = useMediaQuery({ maxWidth: GRID_BREAKPOINTS.xl });
+  const isSmallScr = useBreakpointDown('xl');
 
   return (
     <>
@@ -131,116 +129,129 @@ export const ScriptEditorHeader: FC<ScriptEditorHeaderProps> = ({
           className={isSmallScr ? 'w-250px' : 'w-300px'}
         />
 
-        <Button onClick={onSave} disabled={submitting || executing || !dirty}>
-          <span className="svg-icon svg-icon-2">
-            <CheckIcon weight="bold" />
-          </span>
-          {isSmallScr ? translate('Save') : translate('Save script')}
-        </Button>
-        <Button
+        <BaseButton
+          pending={submitting || executing}
+          disabled={!dirty}
+          disabledReason={
+            !dirty ? translate('There are no changes to save') : undefined
+          }
+          onClick={onSave}
+          iconNode={<CheckIcon weight="bold" />}
+          label={isSmallScr ? translate('Save') : translate('Save script')}
+          variant="primary"
+          size="lg"
+        />
+        <BaseButton
           onClick={onReset}
           variant="secondary"
           disabled={submitting || !dirty}
-        >
-          <span className="svg-icon svg-icon-2">
-            <ArrowClockwiseIcon weight="bold" />
-          </span>
-          {isSmallScr ? translate('Reset') : translate('Reset to saved')}
-        </Button>
-        <Button
+          disabledReason={
+            submitting
+              ? translate('Saving in progress')
+              : translate('No changes to reset')
+          }
+          iconNode={<ArrowClockwiseIcon weight="bold" />}
+          label={isSmallScr ? translate('Reset') : translate('Reset to saved')}
+          size="lg"
+        />
+        <BaseButton
           variant="secondary"
           onClick={onDryRun}
-          disabled={submitting || executing}
+          disabled={submitting}
+          disabledReason={translate('Saving in progress')}
+          pending={executing}
           className="text-nowrap"
-        >
-          <span className="svg-icon svg-icon-2">
-            {executing ? (
-              <LoadingSpinnerIcon className="me-1" />
-            ) : (
-              <PlayIcon weight="bold" />
-            )}
-          </span>
-          {isSmallScr ? translate('Dry run') : translate('Dry run script')}
-        </Button>
-      </div>
-      <ActionsDropdownComponent
-        label={
-          isSmallScr
-            ? translate('Env variables')
-            : translate('Environment variables')
-        }
-        labeled
-        menuStyle={{ zIndex: 1056 }}
-        drop="down"
-        size="md"
-      >
-        <FilterBox
-          type="search"
-          placeholder={translate('Search...')}
-          onChange={(e) => setQuery(e.target.value)}
-          inputClassName="border-0 shadow-none"
-          className="border-bottom"
-          autoFocus
+          iconNode={<PlayIcon weight="bold" />}
+          label={
+            isSmallScr ? translate('Dry run') : translate('Dry run script')
+          }
+          size="lg"
         />
+      </div>
+      {/* MenuPopover, not Menu: the search box below needs its
+          keystrokes to reach it reliably, which a Radix DropdownMenu's
+          typeahead-over-its-item-collection cannot guarantee. */}
+      <MenuPopover>
+        <MenuPopover.Trigger asChild>
+          <TableDropdownToggle
+            label={
+              isSmallScr
+                ? translate('Env variables')
+                : translate('Environment variables')
+            }
+            labeled
+          />
+        </MenuPopover.Trigger>
+        <MenuPopover.Content
+          look="actions"
+          side="bottom"
+          style={{ zIndex: 1056 }}
+          className="max-h-(--radix-popover-content-available-height) overflow-y-auto"
+        >
+          <FilterBox
+            type="search"
+            placeholder={translate('Search...')}
+            onChange={(e) => setQuery(e.target.value)}
+            inputClassName="border-0 shadow-none"
+            className="border-bottom"
+            autoFocus
+          />
 
-        {filteredEnvItems.map((option) => {
-          return (
-            <DropdownItem
-              key={option.type + option.value}
-              className="d-flex justify-content-between"
-              as={option.type === 'link' ? Link : undefined}
-              state={option.type === 'link' ? state.name : undefined}
-              params={
-                option.type === 'link' ? { tab: option.value } : undefined
-              }
-            >
-              {option.type === 'link' ? (
-                <>
-                  <span>{option.label}</span>
-                  <ArrowSquareOutIcon
-                    weight="bold"
-                    size={20}
-                    className="text-muted"
-                  />
-                </>
-              ) : (
-                <>
-                  <span>
-                    <span className="svg-icon svg-icon-2">
-                      {option.type === 'environ' ? (
-                        <KeyIcon weight="bold" />
-                      ) : option.type === 'options' ? (
-                        <KeyboardIcon weight="bold" />
-                      ) : option.type === 'roles' ? (
-                        <UserIcon weight="bold" />
-                      ) : (
-                        <SlidersIcon weight="bold" />
-                      )}
-                    </span>
+          {filteredEnvItems.map((option) => {
+            return (
+              <Menu.Item
+                key={option.type + option.value}
+                className="d-flex justify-content-between"
+                asChild={option.type === 'link'}
+              >
+                {option.type === 'link' ? (
+                  <Link state={state.name} params={{ tab: option.value }}>
                     <span>{option.label}</span>
-                    <span className="text-muted ms-3">
-                      {option.type === 'environ'
-                        ? 'ENV'
-                        : option.type === 'options'
-                          ? translate('User input')
-                          : option.type === 'roles'
-                            ? translate('Role')
-                            : option.type === 'resource_options'
-                              ? translate('Resource option')
-                              : null}
+                    <ArrowSquareOutIcon
+                      weight="bold"
+                      size={20}
+                      className="text-muted"
+                    />
+                  </Link>
+                ) : (
+                  <>
+                    <span>
+                      <span className="svg-icon svg-icon-2">
+                        {option.type === 'environ' ? (
+                          <KeyIcon weight="bold" />
+                        ) : option.type === 'options' ? (
+                          <KeyboardIcon weight="bold" />
+                        ) : option.type === 'roles' ? (
+                          <UserIcon weight="bold" />
+                        ) : (
+                          <SlidersIcon weight="bold" />
+                        )}
+                      </span>
+                      <span>{option.label}</span>
+                      <span className="text-muted ms-3">
+                        {option.type === 'environ'
+                          ? 'ENV'
+                          : option.type === 'options'
+                            ? translate('User input')
+                            : option.type === 'roles'
+                              ? translate('Role')
+                              : option.type === 'resource_options'
+                                ? translate('Resource option')
+                                : null}
+                      </span>
                     </span>
-                  </span>
-                  <CopyToClipboardButton
-                    value={option.label}
-                    size={20}
-                    onlyButton
-                  />
-                </>
-              )}
-            </DropdownItem>
-          );
-        })}
-      </ActionsDropdownComponent>
+                    <CopyToClipboardButton
+                      value={option.label}
+                      size={20}
+                      onlyButton
+                    />
+                  </>
+                )}
+              </Menu.Item>
+            );
+          })}
+        </MenuPopover.Content>
+      </MenuPopover>
     </>
   );
 };

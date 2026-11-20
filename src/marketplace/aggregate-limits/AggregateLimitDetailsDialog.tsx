@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   ComponentsUsageStats,
   Customer,
@@ -8,19 +7,22 @@ import {
   Project,
 } from 'waldur-js-client';
 
-import { getAllPages } from '@waldur/core/api';
-import { Select } from '@waldur/form/themed-select';
-import { translate } from '@waldur/i18n';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { showErrorResponse } from '@waldur/store/notify';
-import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
-import Table from '@waldur/table/Table';
-import { useTable } from '@waldur/table/useTable';
+import { getAllPages, MAX_PAGE_SIZE } from '@/core/api';
+import { Select } from '@/form/select';
+import { translate } from '@/i18n';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { ScopeSubtitle } from '@/modal/ScopeSubtitle';
+import { useNotify } from '@/store/notify';
+import { createClientPaginatedFetcher } from '@/table/api';
+import { DASH_ESCAPE_CODE } from '@/table/constants';
+import Table from '@/table/Table';
+import { useTable } from '@/table/useTable';
 
 import { NON_TERMINATED_STATES } from '../resources/list/constants';
 import { PublicResourceLink } from '../resources/list/PublicResourceLink';
 
 import { AggregateLimitsExpandableRow } from './AggregateLimitsExpandableRow';
+import { getComponentKey, getComponentDisplayName } from './utils';
 
 const requiredFields: MarketplaceResourcesListData['query']['field'] = [
   'name',
@@ -31,15 +33,16 @@ const requiredFields: MarketplaceResourcesListData['query']['field'] = [
 ];
 
 export const AggregateLimitDetailsDialog = ({
-  resolve: { project, customer, components },
+  resolve: { project, customer, components, includeTerminated },
 }: {
   resolve: {
     project?: Project;
     customer?: Customer;
     components: ComponentsUsageStats['components'];
+    includeTerminated?: boolean;
   };
 }) => {
-  const dispatch = useDispatch();
+  const { showErrorResponse } = useNotify();
   const initialComponent = components?.[0] || null;
   const [selectedComponentType, setSelectedComponentType] =
     useState(initialComponent);
@@ -53,6 +56,7 @@ export const AggregateLimitDetailsDialog = ({
         marketplaceResourcesList({
           query: {
             page,
+            page_size: MAX_PAGE_SIZE,
             project_uuid: project?.uuid,
             customer_uuid: customer?.uuid,
             state: NON_TERMINATED_STATES,
@@ -63,9 +67,7 @@ export const AggregateLimitDetailsDialog = ({
       );
       setAllRows(response || []);
     } catch (error) {
-      dispatch(
-        showErrorResponse(error, translate('Unable to load resource data.')),
-      );
+      showErrorResponse(error, translate('Unable to load resource data.'));
     }
   };
 
@@ -75,7 +77,7 @@ export const AggregateLimitDetailsDialog = ({
 
   const handleChange = (value) => {
     const selected = components.find(
-      (component) => component.type === value.value,
+      (component) => getComponentKey(component) === value.value,
     );
     setSelectedComponentType(selected || null);
   };
@@ -84,19 +86,19 @@ export const AggregateLimitDetailsDialog = ({
     if (!components) return [];
 
     return components.map((component) => ({
-      value: component.type,
-      label: component.name,
+      value: getComponentKey(component),
+      label: getComponentDisplayName(component, components),
     }));
   };
 
   const tableProps = useTable({
     table: 'aggregateLimitDetailsDialog',
-    fetchData: () =>
-      Promise.resolve({
-        rows: allRows,
-        resultCount: allRows.length,
-      }),
+    fetchData: createClientPaginatedFetcher(allRows),
   });
+
+  useEffect(() => {
+    tableProps.fetch();
+  }, [allRows]);
 
   const columns = [
     {
@@ -132,10 +134,15 @@ export const AggregateLimitDetailsDialog = ({
 
   return (
     <ModalDialog
-      title={translate('Usage and limits details for {object}', {
-        object: project?.name || customer.name,
-      })}
-      closeButton
+      title={translate('Usage and limits details')}
+      subtitle={
+        <ScopeSubtitle
+          label={
+            project ? translate('Project name') : translate('Organization')
+          }
+          name={project?.name || customer.name}
+        />
+      }
     >
       <div className="row d-flex justify-content-end">
         <div className="col-md-4">
@@ -145,8 +152,11 @@ export const AggregateLimitDetailsDialog = ({
             value={
               selectedComponentType
                 ? {
-                    value: selectedComponentType.type,
-                    label: selectedComponentType.name,
+                    value: getComponentKey(selectedComponentType),
+                    label: getComponentDisplayName(
+                      selectedComponentType,
+                      components,
+                    ),
                   }
                 : null
             }
@@ -157,9 +167,16 @@ export const AggregateLimitDetailsDialog = ({
         </div>
       </div>
 
+      {includeTerminated && (
+        <p className="text-muted fs-7 mb-2">
+          {translate(
+            'Usage of terminated resources is included in the totals, but only active resources are listed.',
+          )}
+        </p>
+      )}
+
       <Table
         {...tableProps}
-        rows={allRows}
         columns={columns}
         verboseName={translate('Resources')}
         expandableRow={renderExpandableRow}

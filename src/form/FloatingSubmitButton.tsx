@@ -1,20 +1,19 @@
 import { FC } from 'react';
-import { Button } from 'react-bootstrap';
-import { Variant } from 'react-bootstrap/types';
 
-import { LoadingSpinnerIcon } from '@waldur/core/LoadingSpinner';
-import { Tip } from '@waldur/core/Tooltip';
-import { translate } from '@waldur/i18n';
+import { ButtonVariant, Tooltip } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 import { FieldErrorMessage } from './FieldError';
 import { FloatingButton } from './FloatingButton';
+import { SubmitButton } from './SubmitButton';
 
 interface OwnProps {
   label?: any;
   disabled?: boolean;
   submitting: boolean;
   errors?: Record<string, any>;
-  variant?: Variant;
+  variant?: ButtonVariant;
 }
 
 export const FloatingSubmitButton: FC<OwnProps> = ({
@@ -27,23 +26,19 @@ export const FloatingSubmitButton: FC<OwnProps> = ({
   const errorsExist = errors && Object.keys(errors).length > 0;
   return (
     <FloatingButton>
-      <Tip
+      <Tooltip
         label={errorsExist ? <FieldErrorMessage error={errors} center /> : null}
-        id="floating-button-errors"
         autoWidth
-        className="w-100"
-        tipClassName="mw-225px"
+        contentClassName="mw-225px"
       >
-        <Button
+        <SubmitButton
+          submitting={submitting}
           variant={variant}
-          type="submit"
-          disabled={disabled || submitting || errorsExist}
-          className="w-100"
-        >
-          {submitting && <LoadingSpinnerIcon className="me-1" />}
-          {label || translate('Submit')}
-        </Button>
-      </Tip>
+          disabled={disabled || errorsExist}
+          label={label || translate('Submit')}
+          className="w-100 w-100"
+        />
+      </Tooltip>
     </FloatingButton>
   );
 };

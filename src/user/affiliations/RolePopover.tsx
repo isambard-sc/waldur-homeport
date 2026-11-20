@@ -1,13 +1,18 @@
 import { QuestionIcon } from '@phosphor-icons/react';
-import { Accordion, Card } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
 
-import { PermissionOptions } from '@waldur/administration/roles/PermissionOptions';
-import { ENV } from '@waldur/core/config';
-import { translate } from '@waldur/i18n';
-import { openModalDialog } from '@waldur/modal/actions';
-import { ModalDialog } from '@waldur/modal/ModalDialog';
-import { DASH_ESCAPE_CODE } from '@waldur/table/constants';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from 'waldur-ui';
+
+import { PermissionOptions } from '@/administration/roles/PermissionOptions';
+import { ENV } from '@/core/config';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
+import { ModalDialog } from '@/modal/ModalDialog';
+import { DASH_ESCAPE_CODE } from '@/table/constants';
 
 const RoleDetailsDialog = ({ role }) => (
   <ModalDialog
@@ -15,15 +20,18 @@ const RoleDetailsDialog = ({ role }) => (
       roleName: role?.description || role?.name,
     })}
   >
-    {PermissionOptions.filter((entity) =>
-      entity.options.find((option) =>
-        (role?.permissions || []).includes(option.value),
-      ),
-    ).map((entity, entityIndex) => (
-      <Accordion key={entityIndex}>
-        <Card>
-          <Accordion.Header>{entity.label}</Accordion.Header>
-          <Accordion.Body>
+    <Accordion
+      type="multiple"
+      className="rounded-md border-[1px] border-solid border-[var(--surface-card-border)]"
+    >
+      {PermissionOptions.filter((entity) =>
+        entity.options.find((option) =>
+          (role?.permissions || []).includes(option.value),
+        ),
+      ).map((entity, entityIndex) => (
+        <AccordionItem key={entityIndex} value={String(entityIndex)}>
+          <AccordionTrigger>{entity.label}</AccordionTrigger>
+          <AccordionContent>
             <ul>
               {entity.options
                 .filter((option) => role.permissions.includes(option.value))
@@ -31,23 +39,30 @@ const RoleDetailsDialog = ({ role }) => (
                   <li key={optionIndex}>{option.label}</li>
                 ))}
             </ul>
-          </Accordion.Body>
-        </Card>
-      </Accordion>
-    ))}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   </ModalDialog>
 );
 
 export const RolePopover = ({ roleName }) => {
   const role = ENV.roles.find((role) => role.name === roleName);
-  const dispatch = useDispatch();
+  const { openDialog } = useModal();
+  if (!role) {
+    // A role the cache does not know: deleted, or private to an organization
+    // the viewer cannot see. There are no details to open, and the dialog would
+    // render an empty body titled "Role details: undefined" - formatTemplate
+    // interpolates a missing value as the literal string.
+    return <>{roleName}</>;
+  }
   return (
     <>
-      {role?.description || role?.name || roleName}{' '}
+      {role.description || role.name}{' '}
       <QuestionIcon
         size={12}
         weight="bold"
-        onClick={() => dispatch(openModalDialog(RoleDetailsDialog, { role }))}
+        onClick={() => openDialog(RoleDetailsDialog, { role })}
       />
     </>
   );

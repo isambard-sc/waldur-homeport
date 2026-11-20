@@ -1,40 +1,41 @@
 import { ErrorBoundary } from '@sentry/react';
 import classNames from 'classnames';
 import React, { FunctionComponent } from 'react';
-import { Modal } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
 
-import { ErrorMessage } from '@waldur/ErrorMessage';
-import { type RootState } from '@waldur/store/reducers';
+import { ErrorMessage } from '@/ErrorMessage';
+import { useModal } from '@/modal/actions';
 
-import { closeModalDialog } from './actions';
-
-interface TState {
-  confirmComponent: React.ComponentType | string;
-  confirmProps: any;
-}
+import { ModalShell } from './ModalShell';
 
 export const ConfirmModalRoot: FunctionComponent = () => {
-  const { confirmComponent, confirmProps } = useSelector<
-    { modal: TState },
-    TState
-  >((state: RootState) => state.modal);
-  const { modalStyle, className, backdropClassName, resolve, ...rest } =
-    confirmProps || {};
-  const dispatch = useDispatch();
+  const { confirmComponent, confirmProps, closeDialog } = useModal();
+  const {
+    modalStyle,
+    className,
+    dialogClassName,
+    backdropClassName,
+    resolve,
+    size = 'sm',
+    animation,
+  } = confirmProps || {};
+
   const onHide = () => {
-    if (resolve.deferred) resolve.deferred.reject();
-    dispatch(closeModalDialog('HIDE_CONFIRM'));
+    if (resolve?.deferred) resolve.deferred.reject();
+    closeDialog('HIDE_CONFIRM');
   };
+
   return (
-    <Modal
-      show={confirmComponent ? true : false}
+    <ModalShell
+      open={Boolean(confirmComponent)}
       onHide={onHide}
-      style={modalStyle}
+      title={resolve?.title}
+      size={size}
       centered
       className={classNames('confirm-modal', className)}
+      dialogClassName={dialogClassName}
       backdropClassName={classNames('confirm-backdrop', backdropClassName)}
-      {...rest}
+      modalStyle={modalStyle}
+      animation={animation}
     >
       <ErrorBoundary fallback={ErrorMessage}>
         {confirmComponent
@@ -44,6 +45,6 @@ export const ConfirmModalRoot: FunctionComponent = () => {
             })
           : null}
       </ErrorBoundary>
-    </Modal>
+    </ModalShell>
   );
 };

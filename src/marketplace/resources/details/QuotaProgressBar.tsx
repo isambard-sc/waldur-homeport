@@ -1,18 +1,21 @@
-import { ProgressBar } from 'react-bootstrap';
+import { Progress, type ProgressSize } from 'waldur-ui';
 
 export const QuotaProgressBar = ({
   percent,
-  height = 4,
+  size,
   className = undefined,
-}) => {
-  return (
-    <ProgressBar
-      variant={percent < 33 ? 'primary' : percent < 66 ? 'warning' : 'danger'}
-      now={percent}
-      className={
-        `h-${height}px resource-progress shadow-none w-100` +
-        (className ? ' ' + className : '')
-      }
-    />
-  );
-};
+  label,
+}: {
+  percent: number;
+  size?: ProgressSize;
+  className?: string;
+  label?: string;
+}) => (
+  <Progress
+    value={percent}
+    variant={percent < 33 ? 'primary' : percent < 66 ? 'warning' : 'danger'}
+    size={size}
+    className={className}
+    label={label}
+  />
+);

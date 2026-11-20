@@ -5,14 +5,16 @@ import { Card } from 'react-bootstrap';
 import {
   bookingResourcesList,
   BookingResourcesListData,
+  ProviderOfferingDetails as Offering,
 } from 'waldur-js-client';
 
-import { OFFERING_TYPE_BOOKING } from '@waldur/booking/constants';
-import { getBookingFilterOptionStates } from '@waldur/booking/utils';
-import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { Offering } from '@waldur/marketplace/types';
+import { BaseButton } from 'waldur-ui';
+
+import { OFFERING_TYPE_BOOKING } from '@/booking/constants';
+import { getBookingFilterOptionStates } from '@/booking/utils';
+import { LoadingErred } from '@/core/LoadingErred';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
 
 import { BookingResource } from '../types';
 
@@ -76,12 +78,11 @@ export const OfferingBookingResourcesCalendarContainer: FunctionComponent<
           {isRefetching ? (
             <LoadingSpinner />
           ) : (
-            <button
-              className="btn btn-icon btn-text-secondary"
+            <BaseButton
+              variant="text-secondary"
               onClick={() => refetch()}
-            >
-              <ArrowsClockwiseIcon weight="bold" />
-            </button>
+              iconNode={<ArrowsClockwiseIcon weight="bold" />}
+            />
           )}
         </Card.Title>
       </Card.Header>

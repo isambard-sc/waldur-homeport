@@ -1,14 +1,19 @@
-import { FormCheck } from 'react-bootstrap';
+import { ChangeEventHandler, FC } from 'react';
 
-import { translate } from '@waldur/i18n';
+import { Checkbox } from 'waldur-ui';
 
-export const SkipErrorsCheck = ({ checked, onChange }) => (
-  <FormCheck
+import { translate } from '@/i18n';
+
+export const SkipErrorsCheck: FC<{
+  checked: boolean;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+}> = ({ checked, onChange }) => (
+  <Checkbox
     id="confirm-skip-errors"
-    type="checkbox"
-    className="form-check-custom form-check-sm border-top pt-3"
+    size="sm"
     checked={checked}
     onChange={onChange}
+    className="border-top pt-3"
     label={translate('Skip records with errors')}
   />
 );

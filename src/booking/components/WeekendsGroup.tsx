@@ -1,7 +1,9 @@
 import { FunctionComponent } from 'react';
 
-import { translate } from '@waldur/i18n';
-import { FormGroup } from '@waldur/marketplace/offerings/FormGroup';
+import { Switch } from 'waldur-ui';
+
+import { FormGroup } from '@/form';
+import { translate } from '@/i18n';
 
 interface WeekendsGroupProps {
   weekends: boolean;
@@ -16,15 +18,11 @@ export const WeekendsGroup: FunctionComponent<WeekendsGroupProps> = ({
     label={translate('Include weekends')}
     help={translate('Allow bookings to be scheduled at weekends')}
   >
-    <div className="checkbox-toggle">
-      <input
-        type="checkbox"
-        id="weekendsToggle"
-        checked={weekends}
-        onChange={() => setWeekends(!weekends)}
-      />
-
-      <label htmlFor="weekendsToggle">Toggle weekends</label>
-    </div>
+    <Switch
+      id="weekendsToggle"
+      aria-label={translate('Include weekends')}
+      checked={weekends}
+      onCheckedChange={setWeekends}
+    />
   </FormGroup>
 );

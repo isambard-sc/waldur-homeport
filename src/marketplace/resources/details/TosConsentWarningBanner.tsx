@@ -1,15 +1,22 @@
-import { WarningCircleIcon } from '@phosphor-icons/react';
+import { useQuery } from '@tanstack/react-query';
 import { FC, useMemo } from 'react';
-import { Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
+import {
+  marketplaceOfferingTermsOfServiceList,
+  OfferingState,
+} from 'waldur-js-client';
 
-import { ENV } from '@waldur/core/config';
-import { RadarIcon } from '@waldur/core/RadarIcon';
-import { translate } from '@waldur/i18n';
-import { router } from '@waldur/router';
-import { setFilterQuery } from '@waldur/table/actions';
-import { USER_TOS_MANAGEMENT_TABLE_ID } from '@waldur/user/constants';
-import { useUser } from '@waldur/workspace/hooks';
+import { BaseButton } from 'waldur-ui';
+
+import { ENV } from '@/core/config';
+import { STALE_TIME } from '@/core/constants';
+import { translate } from '@/i18n';
+import { router } from '@/router';
+import { setFilterQuery } from '@/table/actions';
+import { USER_TOS_MANAGEMENT_TABLE_ID } from '@/user/constants';
+import { useUser } from '@/workspace/hooks';
+
+import { ResourceWarningBar } from './ResourceWarningBar';
 
 interface TosConsentWarningBannerProps {
   offering: {
@@ -18,16 +25,30 @@ interface TosConsentWarningBannerProps {
     plugin_options?: {
       service_provider_can_create_offering_user?: boolean;
     };
+    state?: OfferingState;
   };
   userHasConsent?: boolean;
+  userHasOfferingUser?: boolean;
 }
 
 export const TosConsentWarningBanner: FC<TosConsentWarningBannerProps> = ({
   offering,
   userHasConsent,
+  userHasOfferingUser,
 }) => {
   const user = useUser();
   const dispatch = useDispatch();
+  const { data: hasActiveTos = false } = useQuery({
+    queryKey: ['offering-active-tos', offering.uuid],
+    enabled: Boolean(offering?.uuid),
+    queryFn: async () => {
+      const response = await marketplaceOfferingTermsOfServiceList({
+        query: { offering_uuid: offering.uuid!, is_active: true },
+      });
+      return (response.data?.length || 0) > 0;
+    },
+    staleTime: STALE_TIME,
+  });
   const handleViewTos = () => {
     router.stateService.go('profile.tos-management').then(() => {
       setTimeout(() => {
@@ -46,11 +67,16 @@ export const TosConsentWarningBanner: FC<TosConsentWarningBannerProps> = ({
       !user.is_staff &&
       enforceConsent &&
       canCreateUser &&
+      hasActiveTos &&
+      userHasOfferingUser === true &&
       userHasConsent === false
     );
   }, [
     offering.plugin_options?.service_provider_can_create_offering_user,
+    hasActiveTos,
+    userHasOfferingUser,
     userHasConsent,
+    user.is_staff,
   ]);
 
   if (!shouldShowBanner) {
@@ -58,34 +84,26 @@ export const TosConsentWarningBanner: FC<TosConsentWarningBannerProps> = ({
   }
 
   return (
-    <div className="h-60px bg-body border-bottom">
-      <div className="container-fluid d-flex align-items-center h-100">
-        <div className="d-flex align-items-center">
-          <RadarIcon
-            IconComponent={WarningCircleIcon}
-            variant="warning"
-            className="me-2"
-          />
-          <p className="mb-0">
-            <strong>{translate('Access restricted: ToS not accepted.')}</strong>{' '}
-            <span className="text-gray-500">
-              {translate(
-                "Accept the Terms of Service for this resource's offering before using it.",
-              )}
-            </span>
-          </p>
-        </div>
-        <div className="ms-auto">
-          <Button
-            variant="tertiary"
-            size="sm"
-            onClick={handleViewTos}
-            className="ms-3"
-          >
-            {translate('Review in profile')}
-          </Button>
-        </div>
-      </div>
-    </div>
+    <ResourceWarningBar
+      className={offering.state === 'Unavailable' ? 'disabled-view' : undefined}
+      actions={
+        <BaseButton
+          variant="warning"
+          size="sm"
+          className="text-orange fw-semibold px-4 py-2 ms-3"
+          onClick={handleViewTos}
+          label={translate('Review in profile')}
+        />
+      }
+    >
+      <p className="mb-0">
+        <strong>{translate('Access restricted: ToS not accepted.')}</strong>{' '}
+        <span>
+          {translate(
+            "Accept the Terms of Service for this resource's offering before using it.",
+          )}
+        </span>
+      </p>
+    </ResourceWarningBar>
   );
 };

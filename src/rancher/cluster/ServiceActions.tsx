@@ -1,19 +1,18 @@
 import { FC } from 'react';
-import { ButtonGroup } from 'react-bootstrap';
 import {
   rancherServicesDestroy,
   rancherServicesYamlRetrieve,
   rancherServicesYamlUpdate,
 } from 'waldur-js-client';
 
-import { translate } from '@waldur/i18n';
-import { ResourceDeleteButton } from '@waldur/resource/actions/ResourceDeleteButton';
+import { translate } from '@/i18n';
+import { ResourceDeleteButton } from '@/resource/actions/ResourceDeleteButton';
 
 import { ViewYAMLButton } from './ViewYAMLButton';
 
 export const ServiceActions: FC<{ row; fetch }> = ({ row, fetch }) => {
   return (
-    <ButtonGroup>
+    <div className="d-flex gap-2">
       <ViewYAMLButton
         yamlRetrieve={rancherServicesYamlRetrieve}
         yamlUpdate={rancherServicesYamlUpdate}
@@ -25,6 +24,6 @@ export const ServiceActions: FC<{ row; fetch }> = ({ row, fetch }) => {
         resourceType={translate('Service')}
         refetch={fetch}
       />
-    </ButtonGroup>
+    </div>
   );
 };

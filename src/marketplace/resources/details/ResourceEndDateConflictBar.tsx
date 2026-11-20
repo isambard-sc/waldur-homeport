@@ -1,8 +1,9 @@
 import { WarningCircleIcon, XIcon } from '@phosphor-icons/react';
 import { useToggle } from 'react-use';
 
-import { RadarIcon } from '@waldur/core/RadarIcon';
-import { translate } from '@waldur/i18n';
+import { FeaturedIcon } from 'waldur-ui';
+
+import { translate } from '@/i18n';
 
 export const ResourceEndDateConflictBar = () => {
   const [show, toggle] = useToggle(true);
@@ -12,8 +13,8 @@ export const ResourceEndDateConflictBar = () => {
   return (
     <div className="bar bg-body border-bottom h-60px">
       <div className="container-fluid w-100 d-flex align-items-center gap-2">
-        <RadarIcon
-          IconComponent={WarningCircleIcon}
+        <FeaturedIcon
+          icon={<WarningCircleIcon weight="bold" />}
           variant="warning"
           size="sm"
         />

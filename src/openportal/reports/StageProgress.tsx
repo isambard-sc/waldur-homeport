@@ -1,6 +1,10 @@
-import React, { FC } from 'react';
+import { FC } from 'react';
 
-export interface StageProgressProps {
+import { Progress } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+
+interface StageProgressProps {
   stage: number;
   total: number;
   label: string;
@@ -27,20 +31,23 @@ export const StageProgress: FC<StageProgressProps> = ({
     <div className="mb-3">
       <div className="d-flex justify-content-between small text-muted mb-1">
         <span>
-          Stage {stage} of {total} — {label}
+          {translate('Stage {stage} of {total} — {label}', {
+            stage,
+            total,
+            label,
+          })}
         </span>
         {statusMsg ? (
           <span>{statusMsg}</span>
         ) : (
-          !indeterminate && <span>{done} / {max}</span>
+          !indeterminate && (
+            <span>
+              {done} / {max}
+            </span>
+          )
         )}
       </div>
-      <div className="progress" style={{ height: 8 }}>
-        <div
-          className="progress-bar progress-bar-striped progress-bar-animated"
-          style={{ width: indeterminate ? '100%' : `${pct}%` }}
-        />
-      </div>
+      {indeterminate ? <Progress indeterminate /> : <Progress value={pct} />}
     </div>
   );
 };

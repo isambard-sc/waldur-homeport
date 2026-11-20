@@ -1,12 +1,14 @@
-import { useCurrentStateAndParams, useRouter } from '@uirouter/react';
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { FC, useMemo } from 'react';
-import { Tab, Tabs } from 'react-bootstrap';
 import { User } from 'waldur-js-client';
 
-import { LoadingErred } from '@waldur/core/LoadingErred';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { isDescendantOf } from '@waldur/navigation/useTabs';
+import { TabNav } from 'waldur-ui';
+
+import { Link } from '@/core/Link';
+import { LoadingErred } from '@/core/LoadingErred';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+import { isDescendantOf } from '@/navigation/useTabs';
 
 import { UsersService } from '../UsersService';
 
@@ -26,8 +28,6 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
   error,
 }) => {
   const { state } = useCurrentStateAndParams();
-  const router = useRouter();
-  const goTo = (stateName) => router.stateService.go(stateName);
 
   const isValidUser = useMemo(
     () =>
@@ -39,6 +39,11 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
   );
 
   const showViewTab = isDescendantOf('profile', state);
+  const editActive = state.name === 'profile-manage' || !showViewTab;
+
+  const disabledReason = !user?.agreement_date
+    ? translate('Terms of service not accepted')
+    : translate('Profile is incomplete');
 
   return isLoading ? (
     <LoadingSpinner />
@@ -46,31 +51,30 @@ export const UserProfileHero: FC<UserProfileHeroProps> = ({
     <LoadingErred loadData={refetch} />
   ) : (
     <div className="container-fluid my-5">
-      <Tabs
-        defaultActiveKey={
-          state.name === 'profile-manage' || !showViewTab
-            ? 'profile-manage'
-            : 'profile.details'
-        }
-        className="nav-line-tabs mb-4"
-        onSelect={showViewTab ? goTo : null}
-      >
-        {showViewTab && (
-          <Tab
-            eventKey="profile.details"
-            title={translate('View')}
-            disabled={!isValidUser}
-            tabClassName={
-              'text-center min-w-60px' + (isValidUser ? '' : ' opacity-50')
-            }
-          />
-        )}
-        <Tab
-          eventKey="profile-manage"
-          title={translate('Edit')}
-          tabClassName="text-center min-w-60px"
-        />
-      </Tabs>
+      <TabNav
+        listClassName="mb-4"
+        activeKey={editActive ? 'edit' : 'view'}
+        items={[
+          ...(showViewTab
+            ? [
+                {
+                  key: 'view',
+                  title: translate('View'),
+                  link: <Link state="profile.details" />,
+                  className: 'text-center min-w-60px',
+                  disabled: !isValidUser,
+                  tooltip: isValidUser ? undefined : disabledReason,
+                },
+              ]
+            : []),
+          {
+            key: 'edit',
+            title: translate('Edit'),
+            link: <Link state="profile-manage" />,
+            className: 'text-center min-w-60px',
+          },
+        ]}
+      />
       <UserProfile user={user} />
     </div>
   );

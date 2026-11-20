@@ -1,17 +1,27 @@
 import { UIView } from '@uirouter/react';
 
-import { lazyComponent } from '@waldur/core/lazyComponent';
-import { StateDeclaration } from '@waldur/core/types';
-import { userHasCustomerPermission } from '@waldur/customer/utils';
-import { fetchCustomer } from '@waldur/customer/workspace/fetchCustomer';
-import { isFeatureVisible } from '@waldur/features/connect';
-import { MarketplaceFeatures } from '@waldur/FeaturesEnums';
-import { translate } from '@waldur/i18n';
-import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@waldur/marketplace/constants';
-import { PermissionEnum } from '@waldur/permissions/enums';
-import { isOwnerOrStaff } from '@waldur/workspace/selectors';
+import { ENV } from '@/core/config';
+import { lazyComponent } from '@/core/lazyComponent';
+import { StateDeclaration } from '@/core/types';
+import { userHasCustomerPermission } from '@/customer/utils';
+import { isFeatureVisible } from '@/features/connect';
+import { MarketplaceFeatures, ProjectFeatures } from '@/FeaturesEnums';
+import { translate } from '@/i18n';
+import { ANONYMOUS_LAYOUT_ROUTE_CONFIG } from '@/marketplace/constants';
+import { PermissionEnum } from '@/permissions/enums';
+import {
+  canAccessProviderOffering,
+  canAccessServiceProviderWorkspace,
+  canViewServiceProviderTeam,
+  hasServiceProviderPermission,
+  isOwnerOrStaff,
+  isServiceManagerOnly,
+  isStaff,
+} from '@/workspace/selectors';
 
-import { fetchProvider } from './resolve';
+import { canAccessMarketplaceRouteGuard as canAccessMarketplace } from './canUseMarketplaceShopUi';
+import { fetchProvider, fetchProviderCustomer } from './resolve';
+import { getMarketplaceTitle } from './title';
 
 export const states: StateDeclaration[] = [
   {
@@ -27,20 +37,43 @@ export const states: StateDeclaration[] = [
 
   {
     name: 'marketplace-offering-public',
-    url: '/marketplace-provider-offering/:offering_uuid/',
+    // organization_uuid/project_uuid preselect the deploy form. They were
+    // already read from the URL by resolveCustomer/resolveProject, but were
+    // undeclared — so stateService.go dropped them and only a hand-typed URL
+    // carried them through.
+    url: '/marketplace-provider-offering/:offering_uuid/?organization_uuid&project_uuid',
+    params: {
+      organization_uuid: { dynamic: true, squash: true, value: null },
+      project_uuid: { dynamic: true, squash: true, value: null },
+    },
     component: lazyComponent(() =>
       import('./details/DetailsPage').then((module) => ({
         default: module.OfferingDetailsPage,
       })),
     ),
     parent: 'public',
+    data: {
+      permissions: [canAccessMarketplace],
+      showGoBack: true,
+    },
   },
 
+  {
+    name: 'provider-offering',
+    url: '',
+    abstract: true,
+    parent: 'marketplace-provider',
+    component: lazyComponent(() =>
+      import('./offerings/OfferingUIView').then((module) => ({
+        default: module.OfferingUIView,
+      })),
+    ),
+  },
   {
     name: 'provider-offering-details',
     url: '',
     abstract: true,
-    parent: 'marketplace-provider',
+    parent: 'provider-offering',
     component: lazyComponent(() =>
       import('./offerings/OfferingDetailsUIView').then((module) => ({
         default: module.OfferingDetailsUIView,
@@ -49,7 +82,14 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'marketplace-offering-details',
-    url: 'marketplace-provider-offering-details/:offering_uuid/?tab',
+    url: 'marketplace-provider-offering-details/:offering_uuid/?tab&customerTab&team_tab',
+    params: {
+      tab: { dynamic: true },
+      customerTab: { dynamic: true },
+      // Sub-tab of the Team tab (active / invitations / log). Dynamic so
+      // switching it re-renders only the tab body, not the whole page.
+      team_tab: { dynamic: true },
+    },
     component: lazyComponent(() =>
       import('./offerings/details/OfferingContainer').then((module) => ({
         default: module.OfferingContainer,
@@ -58,6 +98,9 @@ export const states: StateDeclaration[] = [
     parent: 'provider-offering-details',
     data: {
       skipHero: true,
+      // Replaces the inherited workspace guard so an offering manager can open
+      // this offering without a role on the provider workspace.
+      permissions: [canAccessProviderOffering],
     },
   },
 
@@ -71,6 +114,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
+      permissions: [canAccessMarketplace],
     },
   },
 
@@ -88,6 +132,7 @@ export const states: StateDeclaration[] = [
       breadcrumb: () => translate('Orders'),
       permissions: [
         () => !isFeatureVisible(MarketplaceFeatures.catalogue_only),
+        canAccessMarketplace,
       ],
     },
   },
@@ -106,6 +151,7 @@ export const states: StateDeclaration[] = [
   {
     name: 'public-offering.marketplace-public-offering',
     url: '/marketplace-public-offering/:uuid/?tab',
+    params: { tab: { dynamic: true } },
     component: lazyComponent(() =>
       import('./offerings/details/PublicOfferingDetailsContainer').then(
         (module) => ({ default: module.PublicOfferingDetailsContainer }),
@@ -114,6 +160,7 @@ export const states: StateDeclaration[] = [
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
+      permissions: [canAccessMarketplace],
     },
   },
   {
@@ -127,6 +174,7 @@ export const states: StateDeclaration[] = [
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
+      permissions: [canAccessMarketplace],
     },
   },
   {
@@ -140,6 +188,7 @@ export const states: StateDeclaration[] = [
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
+      permissions: [canAccessMarketplace],
     },
   },
   {
@@ -153,6 +202,7 @@ export const states: StateDeclaration[] = [
     data: {
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
       useExtraTabs: true,
+      permissions: [canAccessMarketplace],
     },
   },
 
@@ -184,18 +234,19 @@ export const states: StateDeclaration[] = [
     url: '/providers/:uuid/',
     parent: 'layout',
     component: lazyComponent(() =>
-      import('@waldur/organization/OrganizationUIView').then((module) => ({
+      import('@/organization/OrganizationUIView').then((module) => ({
         default: module.OrganizationUIView,
       })),
     ),
     data: {
       auth: true,
       title: () => translate('Service provider'),
+      permissions: [canAccessServiceProviderWorkspace],
     },
     resolve: [
       {
         token: 'fetchCustomer',
-        resolveFn: fetchCustomer,
+        resolveFn: fetchProviderCustomer,
         deps: ['$transition$'],
       },
       {
@@ -217,6 +268,7 @@ export const states: StateDeclaration[] = [
   {
     name: 'marketplace-providers.details',
     url: ':customer_uuid/?tab',
+    params: { tab: { dynamic: true } },
     component: lazyComponent(() =>
       import('./service-providers/details/ProviderDetailsContainer').then(
         (module) => ({ default: module.ProviderDetailsContainer }),
@@ -228,9 +280,9 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-dashboard',
     url: 'dashboard/',
     component: lazyComponent(() =>
-      import(
-        '@waldur/marketplace/service-providers/dashboard/ProviderDashboard'
-      ).then((module) => ({ default: module.ProviderDashboard })),
+      import('@/marketplace/service-providers/dashboard/ProviderDashboard').then(
+        (module) => ({ default: module.ProviderDashboard }),
+      ),
     ),
     parent: 'marketplace-provider',
     data: {
@@ -251,6 +303,14 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Audit logs'),
       priority: 160,
+      // These are the organization's events, which Mastermind does not show a
+      // service provider manager (waldur/waldur-mastermind#396). The guard hides
+      // the tab, and the router refuses the URL too, as it checks the target
+      // state's own `data.permissions`.
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        (state) => !isServiceManagerOnly(state),
+      ],
     },
   },
 
@@ -264,6 +324,14 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Customers'),
       priority: 110,
+      // The provider workspace is open to custom provider roles, so each tab
+      // asks for the permission its endpoints check rather than for a role.
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        hasServiceProviderPermission(
+          PermissionEnum.LIST_SERVICE_PROVIDER_CUSTOMERS,
+        ),
+      ],
     },
   },
 
@@ -279,6 +347,10 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Team'),
       priority: 155,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        canViewServiceProviderTeam,
+      ],
     },
   },
 
@@ -292,8 +364,37 @@ export const states: StateDeclaration[] = [
       })),
     ),
     data: {
-      breadcrumb: () => translate('Maintenance'),
-      feature: MarketplaceFeatures.show_experimental_ui_components,
+      breadcrumb: () => translate('Maintenance announcements'),
+      // Announcements are created and scheduled with this permission; a
+      // provider role without it has nothing to do on the page.
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        hasServiceProviderPermission(
+          PermissionEnum.MANAGE_MAINTENANCE_ANNOUNCEMENT,
+        ),
+      ],
+    },
+  },
+
+  {
+    name: 'marketplace-provider-compliance',
+    parent: 'marketplace-provider',
+    url: 'compliance/',
+    component: lazyComponent(() =>
+      import('./service-providers/compliance/ProviderComplianceTable').then(
+        (module) => ({
+          default: module.ProviderComplianceTable,
+        }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Compliance'),
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        hasServiceProviderPermission(
+          PermissionEnum.LIST_SERVICE_PROVIDER_CUSTOMERS,
+        ),
+      ],
     },
   },
 
@@ -303,9 +404,25 @@ export const states: StateDeclaration[] = [
     parent: 'marketplace-provider',
     component: UIView,
     url: '',
+    redirectTo: 'marketplace-vendor-offerings',
     data: {
-      breadcrumb: () => translate('Marketplace'),
+      breadcrumb: () => getMarketplaceTitle(),
       priority: 120,
+    },
+  },
+
+  {
+    // The accounts people get on the provider's offerings: who has one, how
+    // they are named, and where their POSIX IDs come from.
+    name: 'provider-accounts',
+    abstract: true,
+    parent: 'marketplace-provider',
+    component: UIView,
+    url: '',
+    redirectTo: 'marketplace-vendor-offering-users',
+    data: {
+      breadcrumb: () => translate('Accounts'),
+      priority: 125,
     },
   },
 
@@ -315,6 +432,7 @@ export const states: StateDeclaration[] = [
     parent: 'marketplace-provider',
     component: UIView,
     url: '',
+    redirectTo: 'marketplace-provider-orders',
     data: {
       breadcrumb: () => translate('Resources'),
       priority: 130,
@@ -327,6 +445,7 @@ export const states: StateDeclaration[] = [
     parent: 'marketplace-provider',
     component: UIView,
     url: '',
+    redirectTo: 'marketplace-provider-offering-requests',
     data: {
       feature: MarketplaceFeatures.show_call_management_functionality,
       breadcrumb: () => translate('Calls for proposals'),
@@ -340,8 +459,12 @@ export const states: StateDeclaration[] = [
     parent: 'marketplace-provider',
     component: UIView,
     url: '',
+    redirectTo: 'marketplace-provider-project-templates',
     data: {
-      feature: MarketplaceFeatures.show_managed_projects,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => ENV.plugins.WALDUR_OPENPORTAL?.ENABLED,
+      ],
       breadcrumb: () => translate('Managed projects'),
       priority: 150,
     },
@@ -358,22 +481,96 @@ export const states: StateDeclaration[] = [
     parent: 'provider-marketplace',
     data: {
       breadcrumb: () => translate('Offerings'),
+      priority: 10,
     },
   },
 
   {
     name: 'marketplace-vendor-offering-users',
-    url: 'offering-users/',
+    // Offering users and provider accounts are tabs of one page; the tab is
+    // kept in `tab`, dynamic so switching does not reload the page.
+    url: 'offering-users/?tab',
+    params: {
+      tab: { dynamic: true },
+    },
     component: lazyComponent(() =>
-      import('./service-providers/ProviderOfferingUsersList').then(
+      import('./service-providers/offering-users/ProviderOfferingUsersWithTabs').then(
         (module) => ({
-          default: module.ProviderOfferingUsersList,
+          default: module.ProviderOfferingUsersWithTabs,
         }),
       ),
     ),
-    parent: 'provider-marketplace',
+    parent: 'provider-accounts',
     data: {
-      breadcrumb: () => translate('Offering users'),
+      // Without provider accounts the page lists offering users only.
+      breadcrumb: () =>
+        isFeatureVisible(MarketplaceFeatures.show_provider_accounts)
+          ? translate('Users')
+          : translate('Offering users'),
+      priority: 10,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-username-conflicts',
+    url: 'username-conflicts/',
+    component: lazyComponent(() =>
+      import('./service-providers/accounts/ProviderUsernameConflicts').then(
+        (module) => ({
+          default: module.ProviderUsernameConflicts,
+        }),
+      ),
+    ),
+    parent: 'provider-accounts',
+    data: {
+      breadcrumb: () => translate('Username conflicts'),
+      priority: 30,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => isFeatureVisible(MarketplaceFeatures.show_provider_accounts),
+      ],
+    },
+  },
+
+  {
+    name: 'marketplace-provider-account-directory',
+    url: 'account-directory/',
+    component: lazyComponent(() =>
+      import('./service-providers/accounts/ProviderDirectory').then(
+        (module) => ({
+          default: module.ProviderDirectory,
+        }),
+      ),
+    ),
+    parent: 'provider-accounts',
+    data: {
+      breadcrumb: () => translate('GLAuth directory'),
+      priority: 40,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => isFeatureVisible(MarketplaceFeatures.show_provider_accounts),
+      ],
+    },
+  },
+
+  {
+    name: 'marketplace-provider-account-settings',
+    url: 'account-settings/',
+    component: lazyComponent(() =>
+      import('./service-providers/ProviderAccountSettingsPage').then(
+        (module) => ({
+          default: module.ProviderAccountSettingsPage,
+        }),
+      ),
+    ),
+    parent: 'provider-accounts',
+    data: {
+      breadcrumb: () => translate('Account settings'),
+      priority: 50,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => isFeatureVisible(MarketplaceFeatures.show_provider_accounts),
+      ],
     },
   },
 
@@ -390,6 +587,13 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       skipBreadcrumb: true,
+      // The group guard only hides the tab; the router checks this state.
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        hasServiceProviderPermission(
+          PermissionEnum.LIST_SERVICE_PROVIDER_CUSTOMERS,
+        ),
+      ],
     },
   },
 
@@ -404,6 +608,13 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       skipBreadcrumb: true,
+      // The group guard only hides the tab; the router checks this state.
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        hasServiceProviderPermission(
+          PermissionEnum.LIST_SERVICE_PROVIDER_USERS,
+        ),
+      ],
     },
   },
 
@@ -418,14 +629,36 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       skipBreadcrumb: true,
+      // The group guard only hides the tab; the router checks this state.
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        hasServiceProviderPermission(
+          PermissionEnum.LIST_SERVICE_PROVIDER_PROJECTS,
+        ),
+      ],
+    },
+  },
+  {
+    name: 'marketplace-provider-user-manage-container',
+    url: '',
+    parent: 'marketplace-provider-customers',
+    component: lazyComponent(() =>
+      import('@/user/UserManageContainer').then((module) => ({
+        default: module.UserManageContainer,
+      })),
+    ),
+    abstract: true,
+    data: {
+      skipBreadcrumb: true,
     },
   },
   {
     name: 'marketplace-provider-user-manage',
     parent: 'marketplace-provider-user-manage-container',
     url: 'users/:user_uuid/?tab',
+    params: { tab: { dynamic: true } },
     component: lazyComponent(() =>
-      import('@waldur/user/UserManage').then((module) => ({
+      import('@/user/UserManage').then((module) => ({
         default: module.UserManage,
       })),
     ),
@@ -442,6 +675,7 @@ export const states: StateDeclaration[] = [
     parent: 'provider-marketplace',
     data: {
       breadcrumb: () => translate('Offering managers'),
+      priority: 40,
     },
   },
 
@@ -456,7 +690,10 @@ export const states: StateDeclaration[] = [
     parent: 'organization',
     data: {
       breadcrumb: () => translate('My offerings'),
-      permissions: [isOwnerOrStaff],
+      permissions: [
+        isOwnerOrStaff,
+        (state) => Boolean(state.workspace.customer?.has_my_offerings),
+      ],
       priority: 130,
     },
   },
@@ -465,7 +702,7 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-projects',
     url: 'marketplace-projects/',
     component: lazyComponent(() =>
-      import('@waldur/project/ProjectsListWithTabs').then((module) => ({
+      import('@/project/ProjectsListWithTabs').then((module) => ({
         default: module.ProjectsListWithTabs,
       })),
     ),
@@ -481,7 +718,7 @@ export const states: StateDeclaration[] = [
     name: 'provider-offering-update',
     url: '',
     abstract: true,
-    parent: 'marketplace-provider',
+    parent: 'provider-offering',
     component: lazyComponent(() =>
       import('./offerings/OfferingEditUIView').then((module) => ({
         default: module.OfferingEditUIView,
@@ -490,7 +727,11 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'marketplace-offering-update',
-    url: 'offering-update/:offering_uuid/?tab',
+    url: 'offering-update/:offering_uuid/?tab&section',
+    params: {
+      tab: { dynamic: true },
+      section: { dynamic: true },
+    },
     component: lazyComponent(() =>
       import('./offerings/update/OfferingUpdateContainer').then((module) => ({
         default: module.OfferingUpdateContainer,
@@ -499,6 +740,9 @@ export const states: StateDeclaration[] = [
     parent: 'provider-offering-update',
     data: {
       skipHero: true,
+      // Replaces the inherited workspace guard so an offering manager can open
+      // this offering without a role on the provider workspace.
+      permissions: [canAccessProviderOffering],
     },
   },
 
@@ -518,6 +762,11 @@ export const states: StateDeclaration[] = [
         default: module.OrderDetailsContainer,
       })),
     ),
+    params: {
+      tab: {
+        dynamic: true,
+      },
+    },
   },
 
   {
@@ -538,13 +787,16 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-robots',
     url: 'robots/',
     component: lazyComponent(() =>
-      import(
-        '@waldur/marketplace/robot-accounts/ProviderRobotAccountList'
-      ).then((module) => ({ default: module.ProviderRobotAccountList })),
+      import('@/marketplace/robot-accounts/ProviderRobotAccountList').then(
+        (module) => ({ default: module.ProviderRobotAccountList }),
+      ),
     ),
-    parent: 'provider-resources',
+    // Robot accounts get POSIX IDs from the pools and appear in the directory
+    // like people's accounts, so they are listed with them.
+    parent: 'provider-accounts',
     data: {
       breadcrumb: () => translate('Robot accounts'),
+      priority: 25,
     },
   },
 
@@ -552,7 +804,7 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-orders',
     url: 'orders/',
     component: lazyComponent(() =>
-      import('@waldur/marketplace/service-providers/ProviderOrdersList').then(
+      import('@/marketplace/service-providers/ProviderOrdersList').then(
         (module) => ({ default: module.ProviderOrdersList }),
       ),
     ),
@@ -560,6 +812,7 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Orders'),
       permissions: [
+        canAccessServiceProviderWorkspace,
         () => !isFeatureVisible(MarketplaceFeatures.catalogue_only),
       ],
     },
@@ -569,7 +822,7 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-offering-requests',
     url: 'offering-requests/',
     component: lazyComponent(() =>
-      import('@waldur/proposals/offering-requests/OfferingRequestsList').then(
+      import('@/proposals/offering-requests/OfferingRequestsList').then(
         (module) => ({ default: module.OfferingRequestsList }),
       ),
     ),
@@ -584,29 +837,17 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-managed-projects',
     url: 'managed-projects/',
     component: lazyComponent(() =>
-      import('@waldur/openportal/managed-projects/ManagedProjectsList').then(
+      import('@/openportal/managed-projects/ManagedProjectsList').then(
         (module) => ({ default: module.ManagedProjectsList }),
       ),
     ),
     parent: 'managed-projects',
     data: {
-      //feature: MarketplaceFeatures.show_managed_project_functionality,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => ENV.plugins.WALDUR_OPENPORTAL?.ENABLED,
+      ],
       breadcrumb: () => translate('Externally managed projects'),
-    },
-  },
-
-  {
-    name: 'marketplace-provider-managed-projects-audit',
-    url: 'managed-projects/audit/',
-    component: lazyComponent(() =>
-      import('@waldur/openportal/managed-projects/AllManagedProjectsAuditLog').then(
-        (module) => ({ default: module.AllManagedProjectsAuditLog }),
-      ),
-    ),
-    parent: 'managed-projects',
-    data: {
-      breadcrumb: () => translate('Audit Log'),
-      skipBreadcrumb: true,
     },
   },
 
@@ -614,29 +855,39 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-managed-project-detail',
     url: 'managed-projects/:identifier/:destination/',
     component: lazyComponent(() =>
-      import('@waldur/openportal/managed-projects/ManagedProjectDetail').then(
+      import('@/openportal/managed-projects/ManagedProjectDetail').then(
         (module) => ({ default: module.ManagedProjectDetail }),
       ),
     ),
     parent: 'managed-projects',
     data: {
-      breadcrumb: () => translate('Managed Project'),
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => ENV.plugins.WALDUR_OPENPORTAL?.ENABLED,
+      ],
+      breadcrumb: () => translate('Managed project'),
+      // Reached by clicking a row, and its URL needs an identifier and a
+      // destination. Without this it also rendered as a tab beside its own
+      // list, where there is no row to take those from, so the link was dead.
       skipBreadcrumb: true,
     },
   },
 
   {
-    name: 'marketplace-provider-managed-project-audit',
-    url: 'managed-projects/:identifier/:destination/audit/',
+    name: 'marketplace-provider-managed-projects-audit',
+    url: 'managed-projects-audit/',
     component: lazyComponent(() =>
-      import('@waldur/openportal/managed-projects/ManagedProjectAuditLog').then(
-        (module) => ({ default: module.ManagedProjectAuditLog }),
+      import('@/openportal/managed-projects/AllManagedProjectsAuditLog').then(
+        (module) => ({ default: module.AllManagedProjectsAuditLog }),
       ),
     ),
     parent: 'managed-projects',
     data: {
-      breadcrumb: () => translate('Audit Log'),
-      skipBreadcrumb: true,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => ENV.plugins.WALDUR_OPENPORTAL?.ENABLED,
+      ],
+      breadcrumb: () => translate('Managed Projects Audit Log'),
     },
   },
 
@@ -644,29 +895,17 @@ export const states: StateDeclaration[] = [
     name: 'marketplace-provider-project-templates',
     url: 'project-templates/',
     component: lazyComponent(() =>
-      import('@waldur/openportal/project-templates/ProjectTemplateList').then(
+      import('@/openportal/project-templates/ProjectTemplateList').then(
         (module) => ({ default: module.ProjectTemplateList }),
       ),
     ),
     parent: 'managed-projects',
     data: {
-      //feature: MarketplaceFeatures.show_managed_project_functionality,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => ENV.plugins.WALDUR_OPENPORTAL?.ENABLED,
+      ],
       breadcrumb: () => translate('Available managed project templates'),
-    },
-  },
-
-  {
-    name: 'marketplace-provider-project-template-detail',
-    url: 'project-templates/:templateUuid/',
-    component: lazyComponent(() =>
-      import('@waldur/openportal/project-templates/ProjectTemplateDetail').then(
-        (module) => ({ default: module.ProjectTemplateDetail }),
-      ),
-    ),
-    parent: 'managed-projects',
-    data: {
-      breadcrumb: () => translate('Project Template'),
-      skipBreadcrumb: true,
     },
   },
 
@@ -683,10 +922,47 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'marketplace-resource-details',
-    url: '/resource-details/:resource_uuid?tab',
+    url: '/resource-details/:resource_uuid?tab&team_tab&object',
     parent: 'marketplace-resource-container',
+    params: {
+      tab: { dynamic: true },
+      team_tab: { dynamic: true },
+      object: { dynamic: true },
+    },
     component: lazyComponent(() =>
-      import('@waldur/marketplace/resources/details/ResourceDetailsPage').then(
+      import('@/marketplace/resources/details/ResourceDetailsPage').then(
+        (module) => ({ default: module.ResourceDetailsPage }),
+      ),
+    ),
+    data: {
+      useExtraTabs: true,
+      skipBreadcrumb: true,
+      skipHero: true,
+    },
+  },
+  // The same page opened from the provider workspace. Provider-side roles
+  // cannot read a consumer's resource through the consumer endpoints, so this
+  // variant loads it through the provider ones and keeps to provider tabs.
+  {
+    name: 'marketplace-provider-resource-container',
+    url: '',
+    abstract: true,
+    parent: 'marketplace-provider',
+    component: lazyComponent(() =>
+      import('./resources/details/ResourceDetailsContainer').then((module) => ({
+        default: module.ProviderResourceDetailsContainer,
+      })),
+    ),
+  },
+  {
+    name: 'marketplace-provider-resource-details',
+    url: 'resource-details/:resource_uuid?tab',
+    parent: 'marketplace-provider-resource-container',
+    params: {
+      tab: { dynamic: true },
+    },
+    component: lazyComponent(() =>
+      import('@/marketplace/resources/details/ResourceDetailsPage').then(
         (module) => ({ default: module.ResourceDetailsPage }),
       ),
     ),
@@ -699,22 +975,106 @@ export const states: StateDeclaration[] = [
   {
     name: 'admin-marketplace-offerings',
     parent: 'admin-marketplace',
-    url: 'offerings/',
+    url: 'offerings/?tab',
+    params: { tab: { dynamic: true } },
     component: lazyComponent(() =>
-      import('@waldur/marketplace/offerings/admin/AdminOfferingsList').then(
-        (module) => ({ default: module.AdminOfferingsList }),
+      import('@/administration/marketplace/OfferingsPage').then((module) => ({
+        default: module.OfferingsPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Offerings'),
+      priority: 10,
+    },
+  },
+  {
+    name: 'admin-marketplace-metrics',
+    parent: 'admin-marketplace',
+    url: 'metrics/',
+    component: lazyComponent(() =>
+      import('@/administration/metrics/MetricCatalogPage').then((module) => ({
+        default: module.MetricCatalogPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('Custom metrics'),
+      priority: 40,
+      feature: ProjectFeatures.show_custom_metrics,
+    },
+  },
+  // Folded into a tabbed Marketplace page; kept as a redirect so bookmarks,
+  // the chaos route sweep and external links keep resolving. See
+  // admin-role-availabilities for why `skipBreadcrumb` is needed.
+  {
+    name: 'admin-marketplace-offering-merges',
+    url: 'offering-merges/',
+    parent: 'admin-marketplace',
+    // Never rendered: the redirect fires first. `component` is required by the
+    // local StateDeclaration type.
+    component: UIView,
+    redirectTo: {
+      state: 'admin-marketplace-offerings',
+      params: { tab: 'merges' },
+    },
+    data: {
+      skipBreadcrumb: true,
+    },
+  },
+  {
+    name: 'admin-marketplace-offering-merge-wizard',
+    parent: 'admin-marketplace',
+    url: 'offering-merges/new/?merge&step&sources&target',
+    params: {
+      merge: { dynamic: true, value: null, squash: true },
+      step: { dynamic: true, value: null, squash: true },
+      sources: { dynamic: true, value: null, squash: true },
+      target: { dynamic: true, value: null, squash: true },
+      // A duplicate group's suggested mapping; not in the URL, so a reload
+      // falls back to asking the backend for a suggestion.
+      mapping: { dynamic: true, value: null },
+    },
+    component: lazyComponent(() =>
+      import('@/marketplace/offering-merges/wizard/OfferingMergeWizard').then(
+        (module) => ({ default: module.OfferingMergeWizard }),
       ),
     ),
     data: {
-      breadcrumb: () => translate('Available offerings'),
+      breadcrumb: () => translate('New offering merge'),
+      skipBreadcrumb: true,
+      permissions: [isStaff],
+    },
+  },
+  {
+    name: 'admin-marketplace-offering-merge-details',
+    parent: 'admin-marketplace',
+    url: 'offering-merges/:merge_uuid/',
+    component: lazyComponent(() =>
+      import('@/marketplace/offering-merges/OfferingMergeDetails').then(
+        (module) => ({ default: module.OfferingMergeDetails }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Offering merge'),
+      skipBreadcrumb: true,
     },
   },
 
   {
-    name: 'admin-offering-details',
+    name: 'admin-offering',
     url: '',
     abstract: true,
     parent: 'admin',
+    component: lazyComponent(() =>
+      import('./offerings/OfferingUIView').then((module) => ({
+        default: module.OfferingUIView,
+      })),
+    ),
+  },
+  {
+    name: 'admin-offering-details',
+    url: '',
+    abstract: true,
+    parent: 'admin-offering',
     component: lazyComponent(() =>
       import('./offerings/OfferingDetailsUIView').then((module) => ({
         default: module.OfferingDetailsUIView,
@@ -723,7 +1083,11 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'admin-marketplace-offering-details',
-    url: 'offerings/:offering_uuid/?tab',
+    url: 'offerings/:offering_uuid/?tab&customerTab',
+    params: {
+      tab: { dynamic: true },
+      customerTab: { dynamic: true },
+    },
     component: lazyComponent(() =>
       import('./offerings/details/OfferingContainer').then((module) => ({
         default: module.OfferingContainer,
@@ -736,7 +1100,7 @@ export const states: StateDeclaration[] = [
     name: 'admin-offering-update',
     url: '',
     abstract: true,
-    parent: 'admin',
+    parent: 'admin-offering',
     component: lazyComponent(() =>
       import('./offerings/OfferingEditUIView').then((module) => ({
         default: module.OfferingEditUIView,
@@ -745,7 +1109,11 @@ export const states: StateDeclaration[] = [
   },
   {
     name: 'admin-marketplace-offering-update',
-    url: 'offerings/:offering_uuid/update/?tab',
+    url: 'offerings/:offering_uuid/update/?tab&section',
+    params: {
+      tab: { dynamic: true },
+      section: { dynamic: true },
+    },
     component: lazyComponent(() =>
       import('./offerings/update/OfferingUpdateContainer').then((module) => ({
         default: module.OfferingUpdateContainer,
@@ -765,6 +1133,66 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Campaigns'),
+      priority: 50,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-offering-groups',
+    parent: 'provider-marketplace',
+    url: 'offering-groups/',
+    component: lazyComponent(() =>
+      import('./service-providers/offering-groups/ProviderOfferingGroupsList').then(
+        (module) => ({
+          default: module.ProviderOfferingGroupsList,
+        }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Offering groups'),
+      priority: 20,
+    },
+  },
+
+  {
+    name: 'marketplace-provider-posix-id-pools',
+    parent: 'provider-accounts',
+    url: 'posix-id-pools/',
+    component: lazyComponent(() =>
+      import('./service-providers/posix-id-pools/ProviderPosixIdPoolsList').then(
+        (module) => ({
+          default: module.ProviderPosixIdPoolsList,
+        }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('POSIX ID pools'),
+      priority: 60,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => isFeatureVisible(MarketplaceFeatures.show_posix_id_pools),
+      ],
+    },
+  },
+
+  {
+    name: 'marketplace-provider-project-groups',
+    parent: 'provider-accounts',
+    url: 'project-groups/',
+    component: lazyComponent(() =>
+      import('./service-providers/project-groups/ProviderProjectGroupsList').then(
+        (module) => ({
+          default: module.ProviderProjectGroupsList,
+        }),
+      ),
+    ),
+    data: {
+      breadcrumb: () => translate('Project groups'),
+      priority: 65,
+      permissions: [
+        canAccessServiceProviderWorkspace,
+        () => isFeatureVisible(MarketplaceFeatures.show_posix_id_pools),
+      ],
     },
   },
 
@@ -778,6 +1206,7 @@ export const states: StateDeclaration[] = [
     ),
     data: {
       breadcrumb: () => translate('Service providers'),
+      permissions: [canAccessMarketplace],
       ...ANONYMOUS_LAYOUT_ROUTE_CONFIG,
     },
   },

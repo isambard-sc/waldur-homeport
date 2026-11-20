@@ -1,3 +1,5 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+
 import eslint from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
@@ -7,10 +9,12 @@ import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import storybook from 'eslint-plugin-storybook';
+import testingLibrary from 'eslint-plugin-testing-library';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import enforceButtonVariants from './eslint-rules/enforce-button-variants.js';
-import noTemplateInTranslate from './eslint-rules/no-template-in-translate.js';
+
+import waldurCustom from 'eslint-plugin-waldur';
 
 const browserGlobals = {
   ...globals.browser,
@@ -19,11 +23,130 @@ const browserGlobals = {
 
 delete browserGlobals['AudioWorkletGlobalScope '];
 
+const RESTRICTED_IMPORTS = [
+  {
+    name: 'react-bootstrap',
+    importNames: ['Badge'],
+    message: 'Use Badge from "waldur-ui" instead of react-bootstrap.',
+  },
+  {
+    name: 'react-bootstrap/Badge',
+    message: 'Use Badge from "waldur-ui" instead of react-bootstrap/Badge.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Tooltip'],
+    message: 'Use Tooltip from "waldur-ui" instead of react-bootstrap.',
+  },
+  {
+    name: 'react-bootstrap/Tooltip',
+    message: 'Use Tooltip from "waldur-ui" instead of react-bootstrap/Tooltip.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['OverlayTrigger'],
+    message:
+      'Use Tooltip or Popover from "waldur-ui" instead of react-bootstrap/OverlayTrigger.',
+  },
+  {
+    name: 'react-bootstrap/OverlayTrigger',
+    message:
+      'Use Tooltip or Popover from "waldur-ui" instead of react-bootstrap/OverlayTrigger.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Popover'],
+    message: 'Use Popover from "waldur-ui" instead of react-bootstrap.',
+  },
+  {
+    name: 'react-bootstrap/Popover',
+    message: 'Use Popover from "waldur-ui" instead of react-bootstrap/Popover.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Alert'],
+    message: 'Use AlertItem from "waldur-ui" instead of react-bootstrap.',
+  },
+  {
+    name: 'react-bootstrap/Alert',
+    message: 'Use AlertItem from "waldur-ui" instead of react-bootstrap/Alert.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Button'],
+    message:
+      'Avoid importing Button directly from react-bootstrap. Use Waldur wrapper components instead:\n' +
+      '  - BaseButton: the general-purpose wrapper from waldur-ui (page actions, dialogs, icon buttons)\n' +
+      '  - SubmitButton: for form submit and action buttons\n' +
+      '  - CloseDialogButton: for modal cancel/close buttons',
+  },
+  {
+    name: 'react-bootstrap/Button',
+    message:
+      'Use BaseButton (or another Waldur wrapper) from "waldur-ui" instead of react-bootstrap/Button.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['DropdownButton'],
+    message:
+      'Avoid importing DropdownButton from react-bootstrap. Use Menu with Menu.TriggerButton from "waldur-ui" (or ActionsMenu from "@/table/ActionsDropdown") instead.',
+  },
+  {
+    name: 'react-bootstrap/DropdownButton',
+    message:
+      'Use Menu with Menu.TriggerButton from "waldur-ui" (or ActionsMenu from "@/table/ActionsDropdown") instead of react-bootstrap/DropdownButton.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Accordion', 'AccordionContext', 'useAccordionButton'],
+    message:
+      'Use Accordion (a group of panels) or Collapsible (one panel; keepMounted for form fields) from "waldur-ui" instead of react-bootstrap.',
+  },
+  {
+    name: 'react-bootstrap/Accordion',
+    message:
+      'Use Accordion or Collapsible from "waldur-ui" instead of react-bootstrap/Accordion.',
+  },
+  {
+    name: 'react-bootstrap',
+    importNames: ['Pagination', 'PageItem'],
+    message:
+      'Use TablePagination (or Pagination for the page numbers alone) from "waldur-ui" instead of react-bootstrap. The Bootstrap pagination CSS has been removed.',
+  },
+  {
+    name: 'react-bootstrap/Pagination',
+    message:
+      'Use TablePagination or Pagination from "waldur-ui" instead of react-bootstrap/Pagination.',
+  },
+  {
+    name: 'react-bootstrap/PageItem',
+    message:
+      'Use TablePagination or Pagination from "waldur-ui" instead of react-bootstrap/PageItem.',
+  },
+];
+
+// Menus and popovers are built from waldur-ui's Menu / MenuPopover (see
+// docs/menus.md), which wrap these Radix packages with the app's looks and
+// defaults. Only packages/ui may import them directly.
+const RADIX_MENU_IMPORTS = [
+  {
+    name: '@radix-ui/react-dropdown-menu',
+    message:
+      'Use Menu from "waldur-ui" (or ActionsMenu / ActionsDropdown from "@/table/ActionsDropdown" for action menus) instead of @radix-ui/react-dropdown-menu. See docs/menus.md.',
+  },
+  {
+    name: '@radix-ui/react-popover',
+    message:
+      'Use MenuPopover (or Popover) from "waldur-ui" instead of @radix-ui/react-popover. See docs/menus.md.',
+  },
+];
+
 export default tseslint
   .config(
     eslint.configs.recommended,
     tseslint.configs.recommended,
     jsxA11yPlugin.flatConfigs.recommended,
+    ...storybook.configs['flat/recommended'],
     {
       files: ['**/*.{js,ts,tsx}'],
       plugins: {
@@ -33,12 +156,7 @@ export default tseslint
         prettier: prettier,
         import: importPlugin,
         'react-refresh': reactRefresh,
-        'waldur-custom': {
-          rules: {
-            ...noTemplateInTranslate.rules,
-            'enforce-button-variants': enforceButtonVariants,
-          },
-        },
+        'waldur-custom': waldurCustom,
       },
       languageOptions: {
         parserOptions: {
@@ -52,7 +170,7 @@ export default tseslint
         },
         'import/resolver': {
           alias: {
-            map: [['@waldur', './src']],
+            map: [['@', './src']],
             extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
           },
           typescript: {
@@ -65,7 +183,50 @@ export default tseslint
 
         // Custom local rules
         'waldur-custom/no-template-in-translate': 'error',
-        'waldur-custom/enforce-button-variants': 'error',
+        'waldur-custom/no-undefined-in-mutation-body': 'warn',
+        'waldur-custom/enforce-actions-dropdown-in-tables': 'warn',
+        'waldur-custom/enforce-badge-icon-patterns': 'error',
+        'waldur-custom/enforce-badge-props-consistency': 'error',
+        'waldur-custom/no-manual-icon-colors-in-badges': 'error',
+        'waldur-custom/enforce-badge-right-icon-pattern': 'error',
+        // Zero instances remain; see the rule's docblock.
+        'waldur-custom/no-bootstrap-button-markup': 'error',
+        // Warnings rather than errors: the tree still carries dozens of each,
+        // and converting one is a per-screen judgement rather than a mechanical
+        // swap. They steer new code; promote to 'error' once the count is down.
+        'waldur-custom/no-hand-rolled-table': 'warn',
+        'waldur-custom/no-hand-rolled-modal-footer': 'error',
+        // Zero instances remain: every native date/time input was replaced by
+        // the waldur-ui pickers. See the rule's docblock.
+        'waldur-custom/no-native-date-input': 'error',
+        'waldur-custom/enforce-dialog-button-order': 'error',
+        'waldur-custom/no-direct-client-usage': 'error',
+        'waldur-custom/no-edit-button-size-override': 'error',
+        // Zero instances remain: every checkbox, radio and switch is a waldur-ui
+        // Checkbox/Radio/Switch, and the .form-check styles are deleted.
+        'waldur-custom/no-bootstrap-form-check': 'error',
+        // Zero instances remain: every progress bar is a waldur-ui Progress and
+        // the .progress styles are deleted.
+        'waldur-custom/no-bootstrap-progress': 'error',
+        'waldur-custom/no-bootstrap-tabs': 'error',
+        'waldur-custom/no-interactive-in-tab-trigger': 'error',
+        'waldur-custom/check-needs-accessible-name': 'error',
+        // Existing call sites are migrated to HelpIcon incrementally; promote to
+        // 'error' once the count is zero.
+        'waldur-custom/no-tooltip-on-bare-icon': 'warn',
+        'waldur-custom/enforce-phosphor-icon-weight': 'error',
+        'waldur-custom/prefer-classnames-utility': 'error',
+        'waldur-custom/enforce-render-field-or-dash': 'error',
+        'waldur-custom/prefer-mutate-over-mutateAsync': 'warn',
+        'waldur-custom/no-direct-field-adapter': 'error',
+        'waldur-custom/enforce-disabled-button-tooltip': 'error',
+        'waldur-custom/enforce-noresult-with-cta': 'error',
+
+        // Design system rules
+        'waldur-custom/enforce-featured-icon': 'error',
+        'waldur-custom/enforce-border-radius-tokens': 'error',
+        'waldur-custom/enforce-breadcrumb-colors': 'error',
+        'waldur-custom/no-redundant-vi-mock': 'error',
 
         // React Hooks rules
         'react-hooks/rules-of-hooks': 'off',
@@ -101,7 +262,7 @@ export default tseslint
             'newlines-between': 'always',
             pathGroups: [
               {
-                pattern: '@waldur/**',
+                pattern: '@/**',
                 group: 'internal',
                 position: 'after',
               },
@@ -121,13 +282,57 @@ export default tseslint
           },
         ],
         'no-console': 'error',
-        'import/no-named-as-default': 'error',
+        // 'import/no-named-as-default': 'error',
         'require-await': 'error',
         'jsx-a11y/no-autofocus': ['error', { ignoreNonDOM: true }],
+        // waldur-ui's Checkbox, Radio and Switch render a native <input>, so a
+        // <label> wrapping one is labelled the same as one wrapping <input>.
+        'jsx-a11y/label-has-associated-control': [
+          'error',
+          { controlComponents: ['Checkbox', 'Radio', 'Switch'] },
+        ],
         'no-restricted-globals': [
           'error',
           {
             name: 'close',
+          },
+        ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [...RESTRICTED_IMPORTS, ...RADIX_MENU_IMPORTS],
+          },
+        ],
+      },
+    },
+    {
+      // Route definitions only: other objects with a `url` (API paths such as
+      // `…?q=…`) are not UI-Router states.
+      files: ['src/**/*routes*.ts'],
+      ignores: ['**/*.test.ts'],
+      rules: {
+        'waldur-custom/dynamic-tab-params': 'error',
+      },
+    },
+    {
+      // Off elsewhere until its existing violations are fixed. Homeport's
+      // tests run without React's hook-order check, so a hook after an early
+      // return passes them and only breaks in the browser. Test files are
+      // left out: hooks called inside vi.mock factories trip the rule.
+      files: ['src/matrix/**/*.{ts,tsx}'],
+      ignores: ['**/*.test.{ts,tsx}'],
+      rules: {
+        'react-hooks/rules-of-hooks': 'error',
+      },
+    },
+    {
+      // waldur-ui is where Menu and MenuPopover wrap Radix.
+      files: ['packages/ui/**/*.{ts,tsx}'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: RESTRICTED_IMPORTS,
           },
         ],
       },
@@ -139,7 +344,7 @@ export default tseslint
         '*.fixture.ts',
         'typings.d.ts',
         '.cache-loader',
-        'cypress',
+        'e2e',
         'src/permissions/enums.ts',
         'src/EventsEnums.ts',
         'src/FeaturesEnums.ts',
@@ -167,6 +372,44 @@ export default tseslint
         'no-prototype-builtins': 'off',
         '@typescript-eslint/no-require-imports': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
+      },
+    },
+    {
+      files: ['**/*.test.{ts,tsx}'],
+      ...testingLibrary.configs['flat/react'],
+      settings: {
+        'testing-library/custom-renders': ['renderWithProviders'],
+      },
+      rules: {
+        'testing-library/no-node-access': 'error',
+        'testing-library/no-container': 'error',
+        'testing-library/no-render-in-lifecycle': 'error',
+        'testing-library/prefer-user-event': 'error',
+        'testing-library/prefer-screen-queries': 'error',
+        'no-restricted-syntax': [
+          'error',
+          {
+            selector:
+              'MemberExpression[object.name="document"][property.name=/^(querySelector|querySelectorAll|getElementById|getElementsByClassName|getElementsByTagName)$/]',
+            message:
+              'Use screen.getBy... or other Testing Library queries instead of direct document access.',
+          },
+        ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              ...RESTRICTED_IMPORTS,
+              ...RADIX_MENU_IMPORTS,
+              {
+                name: '@/i18n',
+                importNames: ['translate'],
+                message:
+                  'Do not use translate() in unit tests. Use raw strings instead.',
+              },
+            ],
+          },
+        ],
       },
     },
   )

@@ -1,9 +1,11 @@
 import classNames from 'classnames';
 import { FunctionComponent } from 'react';
 
-import { CountryFlagIcon } from '@waldur/core/CountryFlagIcon';
-import { translate } from '@waldur/i18n';
-import { useLanguageSelector } from '@waldur/i18n/useLanguageSelector';
+import { Menu } from 'waldur-ui';
+
+import { CountryFlagIcon } from '@/core/CountryFlagIcon';
+import { translate } from '@/i18n';
+import { useLanguageSelector } from '@/i18n/useLanguageSelector';
 
 export const LanguageCountry = {
   ar: 'sa',
@@ -16,12 +18,16 @@ export const LanguageCountry = {
   es: 'es',
   et: 'ee',
   fr: 'fr',
+  hr: 'hr',
   it: 'it',
+  km: 'kh',
   lt: 'lt',
   lv: 'lv',
+  mk: 'mk',
   nb: 'no',
   ru: 'ru',
   sl: 'si',
+  sq: 'al',
   sv: 'se',
   uk: 'ua',
 };
@@ -30,15 +36,14 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
   const { currentLanguage, languageChoices, setLanguage } =
     useLanguageSelector();
 
+  if (!currentLanguage) {
+    return null;
+  }
+
   return (
-    <div
-      className="menu-item"
-      data-kt-menu-trigger="hover"
-      data-kt-menu-placement="left-start"
-      data-kt-menu-flip="bottom"
-    >
-      <div className="menu-link">
-        <span className="menu-title position-relative">
+    <Menu.Sub>
+      <Menu.SubTrigger>
+        <span className="relative flex grow items-center">
           {translate('Language')}
           <span className="d-flex flex-center gap-2 fs-8 rounded bg-light px-3 py-1 position-absolute translate-middle-y top-50 end-0">
             {currentLanguage.label}{' '}
@@ -48,32 +53,24 @@ export const LanguageSelectorDropdown: FunctionComponent = () => {
             />
           </span>
         </span>
-      </div>
+      </Menu.SubTrigger>
 
-      <div className="menu-sub menu-sub-dropdown w-175px py-4">
+      <Menu.SubContent className="fw-bold w-175px py-4">
         {languageChoices.map((language) => (
-          <div
-            className="menu-item"
+          <Menu.Item
             key={language.code}
-            data-kt-menu-trigger="click"
-            aria-hidden="true"
-            onClick={() => {
-              setLanguage(language);
-            }}
+            className={classNames({
+              active: language.code === currentLanguage.code,
+            })}
+            onSelect={() => setLanguage(language)}
           >
-            <div
-              className={classNames('menu-link d-flex', {
-                active: language.code === currentLanguage.code,
-              })}
-            >
-              <span className="symbol symbol-20px me-4">
-                <CountryFlagIcon countryCode={LanguageCountry[language.code]} />
-              </span>
-              {language.label}
-            </div>
-          </div>
+            <span className="symbol symbol-20px me-4">
+              <CountryFlagIcon countryCode={LanguageCountry[language.code]} />
+            </span>
+            {language.label}
+          </Menu.Item>
         ))}
-      </div>
-    </div>
+      </Menu.SubContent>
+    </Menu.Sub>
   );
 };

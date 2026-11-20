@@ -1,28 +1,27 @@
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { marketplaceServiceProvidersListUsersList } from 'waldur-js-client';
 
-import { TeamTableComponent } from '@waldur/customer/team/TeamTableComponent';
-import { translate } from '@waldur/i18n';
-import { GenericPermission } from '@waldur/permissions/types';
-import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
-import { createFetcher } from '@waldur/table/api';
-import { useTable } from '@waldur/table/useTable';
-import { getCustomer } from '@waldur/workspace/selectors';
+import { TeamTableComponent } from '@/customer/team/TeamTableComponent';
+import { translate } from '@/i18n';
+import { GenericPermission } from '@/permissions/types';
+import { ActionsMenu } from '@/table/ActionsDropdown';
+import { createFetcher } from '@/table/api';
+import { useTable } from '@/table/useTable';
+import { useCustomer } from '@/workspace/hooks';
 
 import { UserAddButton } from './UserAddButton';
 import { UserRemoveButton } from './UserRemoveButton';
 
 const RowActions = ({ row, fetch }) => {
   return (
-    <ActionsDropdownComponent>
+    <ActionsMenu>
       <UserRemoveButton user={row} refetch={fetch} />
-    </ActionsDropdownComponent>
+    </ActionsMenu>
   );
 };
 
 export const ProviderTeamPage = () => {
-  const customer = useSelector(getCustomer);
+  const customer = useCustomer();
   const usersFilter = useMemo(
     () => ({
       scope: customer.service_provider,

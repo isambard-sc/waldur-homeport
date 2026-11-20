@@ -1,23 +1,49 @@
 import { useCallback } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   BroadcastMessage,
   broadcastMessagesCreate,
   broadcastMessagesSchedule,
   broadcastMessagesSend,
   broadcastMessagesUpdate,
+  ProposalStatesEnum,
 } from 'waldur-js-client';
 
-import { formatDate } from '@waldur/core/dateUtils';
-import { translate } from '@waldur/i18n';
-import { closeModalDialog } from '@waldur/modal/actions';
-import { showErrorResponse, showSuccess } from '@waldur/store/notify';
+import { formatDate } from '@/core/dateUtils';
+import { translate } from '@/i18n';
+import { useModal } from '@/modal/actions';
+import { useNotify } from '@/store/notify';
 
 import { BroadcastFormData, BroadcastRequestData } from './types';
 
 type SubmitAction = 'submit' | 'template' | 'draft';
 
-export const serializeBroadcast = (
+/** The states a round's broadcast can be narrowed to. */
+export const PROPOSAL_STATES: ProposalStatesEnum[] = [
+  'draft',
+  'submitted',
+  'in_review',
+  'accepted',
+  'rejected',
+  'canceled',
+];
+
+/** The round targeting, sent only when rounds are picked. */
+export const roundQuery = (
+  formData: Pick<
+    BroadcastFormData,
+    'rounds' | 'proposal_states' | 'proposal_teams' | 'reviewers'
+  >,
+) =>
+  formData.rounds?.length
+    ? {
+        rounds: formData.rounds.map((round) => round.uuid),
+        proposal_states: formData.proposal_states ?? [],
+        proposal_teams: formData.proposal_teams ?? true,
+        reviewers: formData.reviewers ?? false,
+      }
+    : {};
+
+const serializeBroadcast = (
   formData: BroadcastFormData,
 ): BroadcastRequestData => ({
   subject: formData.subject,
@@ -26,12 +52,7 @@ export const serializeBroadcast = (
     customers: formData.customers?.map((c) => c.uuid),
     offerings: formData.offerings?.map((c) => c.uuid),
     all_users: formData.all_users,
-    round: formData.round?.uuid,
-    proposal_states: formData.proposal_states,
-    include_reviewers: formData.include_reviewers,
-    send_to_me: formData.send_to_me,
-    additional_recipients: formData.additional_recipients?.map((u) => u.email),
-    excluded_recipients: formData.excluded_recipients,
+    ...roundQuery(formData),
   },
   send_at: formData.send_at,
 });
@@ -44,17 +65,20 @@ export const parseBroadcast = (
   offerings: broadcast.query['offerings'],
   customers: broadcast.query['customers'],
   all_users: broadcast.query['all_users'],
-  round: broadcast.query['round'],
-  proposal_states: broadcast.query['proposal_states'],
-  include_reviewers: broadcast.query['include_reviewers'],
-  send_to_me: broadcast.query['send_to_me'] ?? true,
-  additional_recipients: broadcast.query['additional_recipients'],
-  excluded_recipients: broadcast.query['excluded_recipients'],
+  rounds: broadcast.query.rounds ?? [],
+  // The stored query echoes plain strings; keep the ones that are states.
+  proposal_states: PROPOSAL_STATES.filter((state) =>
+    broadcast.query.proposal_states?.includes(state),
+  ),
+  proposal_teams: broadcast.query.proposal_teams ?? true,
+  reviewers: broadcast.query.reviewers ?? false,
   send_at: broadcast.send_at,
 });
 
 export const useBroadcastFormSubmit = (refetch, broadcastId = null) => {
-  const dispatch = useDispatch();
+  const { showErrorResponse, showSuccess } = useNotify();
+
+  const { closeDialog } = useModal();
 
   const saveAsDraft = useCallback(
     async (formData: BroadcastFormData) => {
@@ -68,15 +92,13 @@ export const useBroadcastFormSubmit = (refetch, broadcastId = null) => {
           await broadcastMessagesCreate({ body: serializeBroadcast(formData) });
         }
         await refetch();
-        dispatch(
-          showSuccess(translate('Broadcast has been saved as a draft.')),
-        );
-        dispatch(closeModalDialog());
+        showSuccess(translate('Broadcast has been saved as a draft.'));
+        closeDialog();
       } catch (e) {
-        dispatch(showErrorResponse(e, translate('Unable to save broadcast.')));
+        showErrorResponse(e, translate('Unable to save broadcast.'));
       }
     },
-    [dispatch, refetch, broadcastId],
+    [refetch, broadcastId],
   );
 
   const saveAndSend = useCallback(
@@ -102,30 +124,24 @@ export const useBroadcastFormSubmit = (refetch, broadcastId = null) => {
         }
         await refetch();
         if (formData.send_at) {
-          dispatch(
-            showSuccess(
-              translate('This message will be sent on {date}.', {
-                date: formatDate(formData.send_at),
-              }),
-            ),
+          showSuccess(
+            translate('This message will be sent on {date}.', {
+              date: formatDate(formData.send_at),
+            }),
           );
         } else {
-          dispatch(showSuccess(translate('Broadcast has been sent.')));
+          showSuccess(translate('Broadcast has been sent.'));
         }
-        dispatch(closeModalDialog());
+        closeDialog();
       } catch (e) {
         if (formData.send_at) {
-          dispatch(
-            showErrorResponse(e, translate('Unable to schedule broadcast.')),
-          );
+          showErrorResponse(e, translate('Unable to schedule broadcast.'));
         } else {
-          dispatch(
-            showErrorResponse(e, translate('Unable to send broadcast.')),
-          );
+          showErrorResponse(e, translate('Unable to send broadcast.'));
         }
       }
     },
-    [dispatch, refetch, broadcastId],
+    [refetch, broadcastId],
   );
 
   const onSubmit = ({

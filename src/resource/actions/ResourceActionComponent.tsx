@@ -1,129 +1,119 @@
 import { FunctionComponent } from 'react';
-import { Dropdown } from 'react-bootstrap';
-import { DropDirection } from 'react-bootstrap/esm/DropdownContext';
-import { useSelector } from 'react-redux';
 
-import { translate } from '@waldur/i18n';
-import { ActionsDropdownComponent } from '@waldur/table/ActionsDropdown';
-import { getUser } from '@waldur/workspace/selectors';
+import { Menu } from 'waldur-ui';
 
-import { ActionItemType } from './types';
+import { translate } from '@/i18n';
+import { ActionList } from '@/marketplace/resources/actions/ActionList';
+import { ModalActionsDialog } from '@/marketplace/resources/actions/ModalActionsDialog';
+import { useModal } from '@/modal/actions';
+import { ActionsMenu } from '@/table/ActionsDropdown';
 
-interface ResourceActionComponentProps {
+import {
+  ResourceActionsList,
+  ResourceActionsListProps,
+} from './ResourceActionsList';
+import { ShowAllMenuItem } from './ShowAllMenuItem';
+
+interface ResourceActionComponentProps extends ResourceActionsListProps {
   onToggle?: (isOpen: boolean) => void;
   disabled?: boolean;
   open?: boolean;
   loading?: boolean;
   error?: object;
-  customerResourceActions?: ActionItemType[];
-  providerResourceActions?: ActionItemType[];
-  staffActions?: ActionItemType[];
-  resourceTypeActions?: ActionItemType[];
-  extraActions?: ActionItemType[];
-  resource: any;
-  scope?: any;
-  marketplaceResource?: any;
-  refetch?(): void;
   labeled?: boolean;
-  drop?: DropDirection;
+  side?: 'top' | 'right' | 'bottom' | 'left';
+  size?: 'sm' | 'lg';
 }
 
+/**
+ * A resource's row menu: the actions marked `important`, then "Show all" for
+ * the rest in a searchable dialog. A resource carries twenty-odd actions
+ * across its three groups, which as a single menu runs the full height of the
+ * window. The OpenStack resources already used this shape through
+ * ActionsPopover; this gives every other resource the same one.
+ */
 export const ResourceActionComponent: FunctionComponent<
   ResourceActionComponentProps
-> = (props) => {
-  const user = useSelector(getUser);
+> = ({
+  onToggle,
+  disabled,
+  open,
+  loading,
+  error,
+  labeled,
+  side,
+  size,
+  ...listProps
+}) => {
+  const { openDialog } = useModal();
 
-  const extraAndResourceTypeActions = (props.extraActions || []).concat(
-    props.resourceTypeActions || [],
-  );
+  // Collapse the row menu only. It is the one that covers the screen: the
+  // kebab sits at the edge of a table row and its panel opens over the page.
+  // The labeled Actions button on a resource's own page is somewhere the user
+  // navigated to on purpose, and both that page and the e2e suite expect its
+  // full list. Collapsing also needs the marketplace groups to collapse — a
+  // menu of type actions alone is a few rows already.
+  const isLongMenu =
+    !labeled &&
+    Boolean(
+      listProps.customerResourceActions?.length ||
+      listProps.providerResourceActions?.length ||
+      listProps.staffActions?.length,
+    );
+
+  const showAll = () =>
+    openDialog(ModalActionsDialog, {
+      name: listProps.resource?.name,
+      refetch: listProps.refetch,
+      resource: listProps.resource,
+      marketplaceResource: listProps.marketplaceResource,
+      className: 'resource-actions-modal',
+      title: listProps.resource?.name
+        ? translate('Actions for {name}', { name: listProps.resource.name })
+        : translate('Resource actions'),
+      ActionsList: () => <ResourceActionsList {...listProps} />,
+    });
 
   return (
-    <ActionsDropdownComponent
-      labeled={props.labeled}
-      onToggle={props.onToggle}
-      disabled={props.disabled}
-      drop={props.drop}
+    <ActionsMenu
+      toggle={labeled ? 'labeled' : 'kebab'}
+      onOpenChange={onToggle}
+      disabled={disabled}
+      side={side}
+      size={size}
     >
-      {props.open ? (
-        props.loading ? (
-          <Dropdown.Item eventKey="1">
-            {translate('Loading actions')}
-          </Dropdown.Item>
-        ) : props.error ? (
-          <Dropdown.Item eventKey="1">
-            {translate('Unable to load actions')}
-          </Dropdown.Item>
-        ) : props.customerResourceActions ||
-          props.staffActions ||
-          extraAndResourceTypeActions?.length > 0 ? (
-          <>
-            {/* If we also have Resource actions, move the extra and resource type actions into it. */}
-            {extraAndResourceTypeActions?.length > 0 &&
-              !props.customerResourceActions?.length &&
-              extraAndResourceTypeActions.map((ActionComponent, index) => (
-                <ActionComponent
-                  key={`resource-${index}`}
-                  resource={props.scope || props.resource}
-                  marketplaceResource={props.marketplaceResource}
-                  refetch={props.refetch}
-                />
-              ))}
-            {props.customerResourceActions?.length > 0 && (
-              <>
-                <Dropdown.Header>
-                  {translate('Resource actions')}
-                </Dropdown.Header>
-                {props.customerResourceActions
-                  .concat(extraAndResourceTypeActions)
-                  .map((ActionComponent, index) => (
-                    <ActionComponent
-                      key={`resource-${index}`}
-                      resource={
-                        props.extraActions?.includes(ActionComponent)
-                          ? props.scope || props.resource
-                          : props.resource
-                      }
-                      marketplaceResource={props.marketplaceResource}
-                      refetch={props.refetch}
-                    />
-                  ))}
-              </>
-            )}
-            {props.providerResourceActions && (
-              <>
-                <Dropdown.Header>
-                  {translate('Provider actions')}
-                </Dropdown.Header>
-                {props.providerResourceActions.map((ActionComponent, index) => (
-                  <ActionComponent
-                    key={`provider-${index}`}
-                    resource={props.resource}
-                    marketplaceResource={props.marketplaceResource}
-                    refetch={props.refetch}
-                  />
-                ))}
-              </>
-            )}
-            {props.staffActions?.length > 0 && user.is_staff && (
-              <>
-                <Dropdown.Header>{translate('Staff actions')}</Dropdown.Header>
-                {props.staffActions.map((ActionComponent, index) => (
-                  <ActionComponent
-                    key={`staff-${index}`}
-                    resource={props.resource}
-                    marketplaceResource={props.marketplaceResource}
-                    refetch={props.refetch}
-                  />
-                ))}
-              </>
-            )}
-          </>
-        ) : (
-          <Dropdown.Item eventKey="2">
-            {translate('There are no actions.')}
-          </Dropdown.Item>
-        )
-      ) : null}
-    </ActionsDropdownComponent>
+      {!open ? null : loading ? (
+        <Menu.Item disabled>{translate('Loading actions')}</Menu.Item>
+      ) : error ? (
+        <Menu.Item disabled>{translate('Unable to load actions')}</Menu.Item>
+      ) : !isLongMenu ? (
+        // A nested resource (router, subnet, port) carries only its own few
+        // type actions. Collapsing those behind "Show all" would hide a
+        // three-row menu behind a click, so they stay as they were.
+        <ResourceActionsList {...listProps} />
+      ) : (
+        <>
+          {/* The resource's own operations (Start, Stop, Reset, …) stay in
+              the menu whatever happens: they are what the menu is for, and
+              burying them behind "Show all" is what the collapse is meant to
+              spare them from. Only the marketplace, provider and staff groups
+              are filtered down to the important few. */}
+          <ResourceActionsList
+            {...listProps}
+            customerResourceActions={undefined}
+            providerResourceActions={undefined}
+            staffActions={undefined}
+          />
+          <ActionList hideGroupName hideNonImportant>
+            <ResourceActionsList
+              {...listProps}
+              extraActions={undefined}
+              resourceTypeActions={undefined}
+            />
+          </ActionList>
+          <ShowAllMenuItem onSelect={showAll} />
+        </>
+      )}
+    </ActionsMenu>
   );
 };

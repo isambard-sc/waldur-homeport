@@ -4,21 +4,25 @@ import { Card } from 'react-bootstrap';
 
 interface PanelProps {
   title?: React.ReactNode;
+  subtitle?: React.ReactNode;
   id?: string;
   actions?: React.ReactNode;
   className?: string;
   bodyClassName?: string;
   titleClassName?: string;
+  subtitleClassName?: string;
   cardBordered?: boolean;
 }
 
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({
   title,
+  subtitle,
   id,
   children,
   className,
   bodyClassName,
   titleClassName,
+  subtitleClassName,
   cardBordered,
   actions,
 }) => (
@@ -28,10 +32,21 @@ export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({
   >
     {title && (
       <Card.Header>
-        <Card.Title>
-          <h3 className={titleClassName}>{title}</h3>
-        </Card.Title>
-        <div className="card-toolbar">{actions}</div>
+        <div className="d-flex flex-column">
+          <Card.Title className="mb-0">
+            <h3 className={titleClassName}>{title}</h3>
+          </Card.Title>
+          {subtitle && (
+            <Card.Subtitle
+              className={classNames('text-muted mt-1', subtitleClassName)}
+            >
+              <p className="fs-6 mb-0">{subtitle}</p>
+            </Card.Subtitle>
+          )}
+        </div>
+        {/* Never wider than the header, so a wide toolbar (e.g. a scrollable
+            tab strip) wraps or scrolls instead of overflowing the card. */}
+        <div className="card-toolbar max-w-full">{actions}</div>
       </Card.Header>
     )}
     <Card.Body className={bodyClassName}>{children}</Card.Body>

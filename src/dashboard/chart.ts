@@ -1,9 +1,19 @@
 import { EChartsOption, MarkLineComponentOption, SeriesOption } from 'echarts';
 
-import { translate } from '@waldur/i18n';
+import { escapeHtml } from '@/core/utils';
+import { translate } from '@/i18n';
 
-import { CHART_BAR_ROUNDING, LINE_CHART_COLOR } from './constants';
+import { CHART_BAR_ROUNDING, getChartBrandColor } from './constants';
 import { Chart, ChartData } from './types';
+
+// Mid grey in both themes (the ramp mirrors), so reference lines and crosshairs
+// stay readable on either background instead of a fixed hex.
+const getNeutralLineColor = () =>
+  typeof document === 'undefined'
+    ? undefined
+    : getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-gray-500')
+        .trim() || undefined;
 
 type Value = string | number;
 interface HLine {
@@ -29,7 +39,7 @@ const generateMarkLines = (
               formatter: line.label,
             },
             emphasis: { label: { show: true } },
-            lineStyle: { type: 'solid', color: '#0072ff' },
+            lineStyle: { type: 'solid', color: getNeutralLineColor() },
             yAxis: line.value,
             x: '0%',
             symbol: 'none',
@@ -81,7 +91,7 @@ export const getLineChartOptions = (chart: Chart, hLines?: HLine[]) =>
     chart.data.map((item) => item.label),
     chart.data.map((item) => item.value),
     hLines,
-    LINE_CHART_COLOR,
+    getChartBrandColor(),
   );
 
 export const getCostWidgetChartOptions = (
@@ -102,20 +112,22 @@ export const getCostWidgetChartOptions = (
       axisPointer: {
         type: 'cross',
         crossStyle: {
-          color: '#999',
+          color: getNeutralLineColor(),
         },
       },
       formatter: function (params) {
         if (!params.length) return '';
 
-        const xLabel = params[0].axisValueLabel;
+        // Series and axis names can come from data (a provider's metric name),
+        // and ECharts inserts this string as HTML.
+        const xLabel = escapeHtml(params[0].axisValueLabel);
         params = params.filter((param) => param.value !== undefined);
 
         let tooltipText = `${xLabel}<br/>`;
         params.forEach((param) => {
           tooltipText += `
             <div class="d-flex justify-content-between gap-6">
-              <span>${param.marker} ${param.seriesName}</span>
+              <span>${param.marker} ${escapeHtml(param.seriesName)}</span>
               <strong class="text-end">${param.value}</strong>
             </div>
           `;
@@ -149,11 +161,10 @@ export const getCostWidgetChartOptions = (
       itemHeight: 8,
       textStyle: {
         fontSize: 12,
-        color: '#555',
       },
       itemGap: 8,
-      left: '0%',
-      align: 'left',
+      top: 0,
+      right: 0,
     },
     series: series.map((serie) => ({
       barCategoryGap: 6,
@@ -248,7 +259,7 @@ export const getCreditWidgetChartOptions = (
       axisPointer: {
         type: 'cross',
         crossStyle: {
-          color: '#999',
+          color: getNeutralLineColor(),
         },
       },
     },
@@ -295,11 +306,10 @@ export const getCreditWidgetChartOptions = (
       itemHeight: 8,
       textStyle: {
         fontSize: 12,
-        color: '#555',
       },
       itemGap: 8,
-      left: '0%',
-      align: 'left',
+      top: 0,
+      right: 0,
     },
     series: series.map((serie) => ({
       barCategoryGap: 6,

@@ -6,11 +6,12 @@ import {
   ProposalReview,
 } from 'waldur-js-client';
 
-import { formatDateTime } from '@waldur/core/dateUtils';
-import { LoadingSpinner } from '@waldur/core/LoadingSpinner';
-import { translate } from '@waldur/i18n';
-import { Field } from '@waldur/resource/summary';
-import { ExpandableContainer } from '@waldur/table/ExpandableContainer';
+import { formatDateTime } from '@/core/dateUtils';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { translate } from '@/i18n';
+import { formatSubmitted } from '@/proposals/utils';
+import { Field } from '@/resource/summary';
+import { ExpandableContainer } from '@/table/ExpandableContainer';
 
 const loadProposalData = async (proposal_uuid: string) => {
   const proposal = await proposalProposalsRetrieve({
@@ -50,9 +51,14 @@ export const ReviewsExpandableRow = ({ row }: { row: ProposalReview }) => {
             value={data.proposal.created_by_name}
           />
 
+          {/* "Submission date" used to label the created time. */}
           <Field
-            label={translate('Submission date')}
+            label={translate('Created')}
             value={formatDateTime(data.proposal.created)}
+          />
+          <Field
+            label={translate('Submitted')}
+            value={formatSubmitted(data.proposal.submitted_at)}
           />
 
           {data.proposal.project && (

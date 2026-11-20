@@ -2,10 +2,12 @@ import { TrashIcon } from '@phosphor-icons/react';
 import { FunctionComponent } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
-import { FileUploadField } from '@waldur/form';
-import { FileUploadFieldProps } from '@waldur/form/FileUploadField';
-import { translate } from '@waldur/i18n';
-import { ActionButton } from '@waldur/table/ActionButton';
+import { BaseButton } from 'waldur-ui';
+
+import { FileUploadField } from '@/form';
+import { FileUploadFieldProps } from '@/form/FileUploadField';
+import { withFormGroup } from '@/form/withFormGroup';
+import { translate } from '@/i18n';
 
 const getImageUrl = (image) => {
   if (image instanceof File) {
@@ -17,9 +19,7 @@ const getImageUrl = (image) => {
   return '';
 };
 
-export const ImageUploadField: FunctionComponent<FileUploadFieldProps> = (
-  props,
-) => {
+const ImageUploadField: FunctionComponent<FileUploadFieldProps> = (props) => {
   if (!props.input.value) {
     return <FileUploadField {...props} />;
   }
@@ -42,16 +42,20 @@ export const ImageUploadField: FunctionComponent<FileUploadFieldProps> = (
         <Col md={7}>
           <div>
             <FileUploadField
-              className="btn btn-sm btn-primary mb-2"
+              variant="primary"
+              size="sm"
+              className="mb-2"
               {...props}
             />
           </div>
           {props.input.value && (
-            <ActionButton
-              className="btn btn-sm btn-danger mb-2"
-              title={translate('Remove')}
-              action={() => props.input.onChange(null)}
-              iconNode={<TrashIcon />}
+            <BaseButton
+              variant="danger"
+              size="sm"
+              className="mb-2"
+              label={translate('Remove')}
+              onClick={() => props.input.onChange(null)}
+              iconNode={<TrashIcon weight="bold" />}
             />
           )}
         </Col>
@@ -59,3 +63,5 @@ export const ImageUploadField: FunctionComponent<FileUploadFieldProps> = (
     </div>
   );
 };
+
+export const ImageUploadGroup = withFormGroup(ImageUploadField);

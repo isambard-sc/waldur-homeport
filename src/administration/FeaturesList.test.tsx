@@ -1,24 +1,17 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useCurrentStateAndParams } from '@uirouter/react';
 import { vi, describe, expect, beforeEach, it } from 'vitest';
 import { featureValues } from 'waldur-js-client';
 
-import { useNotify } from '@waldur/store/hooks';
+import { ENV } from '@/core/config';
+import { useNotify } from '@/store/notify';
+import { useUser } from '@/workspace/hooks';
 
 import { FeaturesList } from './FeaturesList';
 
 // Mock dependencies
-vi.mock('waldur-js-client');
-vi.mock('@waldur/store/hooks', () => ({
-  useNotify: vi.fn().mockReturnValue({
-    showSuccess: vi.fn(),
-    showErrorResponse: vi.fn(),
-  }),
-}));
-vi.mock('@waldur/i18n', () => ({
-  translate: (message) => message,
-}));
-vi.mock('@waldur/features/FeaturesDescription', () => ({
+vi.mock('@/features/FeaturesDescription', () => ({
   FeaturesDescription: [
     {
       key: 'billing',
@@ -42,35 +35,39 @@ vi.mock('@waldur/features/FeaturesDescription', () => ({
     },
   ],
 }));
-vi.mock('@waldur/core/config', () => ({
-  ENV: {
-    FEATURES: {
+
+describe('FeaturesList', () => {
+  beforeEach(() => {
+    vi.mocked(useUser).mockReturnValue({ is_staff: true } as any);
+    ENV.FEATURES = {
       billing: {
         enabled: true,
       },
       support: {
         enabled: false,
       },
-    },
-  },
-}));
-
-describe('FeaturesList', () => {
-  // Setup mocks before each test
-  beforeEach(() => {
-    // Mock notifications
-    const mockShowSuccess = vi.fn();
-    const mockShowErrorResponse = vi.fn();
-    vi.mocked(useNotify).mockReturnValue({
-      showError: vi.fn(),
-      showSuccess: mockShowSuccess,
-      showErrorResponse: mockShowErrorResponse,
+    } as any;
+    vi.clearAllMocks();
+    vi.mocked(useCurrentStateAndParams).mockReturnValue({
+      state: { name: 'admin-features' } as any,
+      params: {},
     });
-
-    // Mock post function
     vi.mocked(featureValues).mockReset();
+  });
 
-    vi.spyOn(window, 'location', 'get');
+  it('shows feature values without switches for support', () => {
+    vi.mocked(useUser).mockReturnValue({
+      is_staff: false,
+      is_support: true,
+    } as any);
+    render(<FeaturesList />);
+
+    expect(screen.queryByTestId('billing.enabled')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Save/i }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Yes')).toBeInTheDocument();
+    expect(screen.getByText('No')).toBeInTheDocument();
   });
 
   it('renders all feature sections', () => {
@@ -102,8 +99,6 @@ describe('FeaturesList', () => {
   });
 
   it('handles successful form submission', async () => {
-    const { showSuccess } = useNotify();
-
     render(<FeaturesList />);
 
     // Get checkboxes
@@ -136,12 +131,13 @@ describe('FeaturesList', () => {
 
     // Verify success notification
     await waitFor(() => {
-      expect(showSuccess).toHaveBeenCalledWith('Features have been updated.');
+      expect(useNotify().showSuccess).toHaveBeenCalledWith(
+        'Features have been updated.',
+      );
     });
   });
 
   it('handles failed form submission', async () => {
-    const { showErrorResponse } = useNotify();
     const error = new Error('API Error');
     vi.mocked(featureValues).mockRejectedValueOnce(error as never);
 
@@ -153,23 +149,63 @@ describe('FeaturesList', () => {
 
     // Verify error handling
     await waitFor(() => {
-      expect(showErrorResponse).toHaveBeenCalledWith(
+      expect(useNotify().showErrorResponse).toHaveBeenCalledWith(
         error,
         'Unable to update features.',
       );
     });
   });
 
+  it('shows a single empty state when the search matches nothing', () => {
+    vi.mocked(useCurrentStateAndParams).mockReturnValue({
+      state: { name: 'admin-features' } as any,
+      params: { q: 'zzz-no-match' },
+    });
+
+    render(<FeaturesList />);
+
+    // Only the top-level "no results" empty state should render, exactly once.
+    // Previously the active tab pane rendered a second one (duplication bug).
+    expect(screen.getAllByText('No results found')).toHaveLength(1);
+    expect(
+      screen.getByText(
+        'No matching features found. Try a different search term.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'No matching features in this section. Try a different search term.',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it('filters features and hides the empty state when the search matches', () => {
+    vi.mocked(useCurrentStateAndParams).mockReturnValue({
+      state: { name: 'admin-features' } as any,
+      params: { q: 'billing' },
+    });
+
+    render(<FeaturesList />);
+
+    expect(
+      screen.getByText('Enable billing functionality'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'No matching features found. Try a different search term.',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
   it('disables submit button while submitting', async () => {
     vi.mocked(featureValues).mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100)),
+      () => new Promise((resolve) => setTimeout(resolve, 100)) as any,
     );
 
     render(<FeaturesList />);
 
     const submitButton = screen.getByRole('button', { name: /Save/i });
 
-    // Click submit button
     await userEvent.click(submitButton);
 
     // Verify button is disabled during submission

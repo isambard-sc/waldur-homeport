@@ -1,10 +1,11 @@
 import { CopyIcon } from '@phosphor-icons/react';
 import classNames from 'classnames';
 import { useCallback, FunctionComponent } from 'react';
-import { useDispatch } from 'react-redux';
 
-import { translate } from '@waldur/i18n';
-import { showSuccess } from '@waldur/store/notify';
+import { BaseButton } from 'waldur-ui';
+
+import { translate } from '@/i18n';
+import { useNotify } from '@/store/notify';
 
 interface CopyToClipboardProps {
   value;
@@ -21,13 +22,13 @@ export const CopyToClipboard: FunctionComponent<CopyToClipboardProps> = ({
   textButton,
   rightIcon,
 }) => {
-  const dispatch = useDispatch();
+  const { showSuccess } = useNotify();
 
   const onClick = useCallback(() => {
     navigator.clipboard.writeText(value).then(() => {
-      dispatch(showSuccess(translate('Value has been copied')));
+      showSuccess(translate('Value has been copied'));
     });
-  }, [dispatch, value]);
+  }, [value]);
 
   return textButton ? (
     <button
@@ -44,16 +45,13 @@ export const CopyToClipboard: FunctionComponent<CopyToClipboardProps> = ({
       {!rightIcon && label}
     </button>
   ) : (
-    <button
-      className={classNames('btn', className, rightIcon && 'btn-icon-right')}
-      type="button"
+    <BaseButton
+      variant="tertiary"
+      className={className}
       onClick={onClick}
-    >
-      {rightIcon && label}
-      <span className="svg-icon svg-icon-2">
-        <CopyIcon weight="bold" />
-      </span>
-      {!rightIcon && label}
-    </button>
+      iconNode={<CopyIcon weight="bold" />}
+      iconRight={rightIcon}
+      label={label}
+    />
   );
 };

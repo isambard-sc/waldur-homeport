@@ -1,8 +1,11 @@
+import classNames from 'classnames';
 import { FunctionComponent, useMemo } from 'react';
+import { ProviderOfferingDetails as Offering } from 'waldur-js-client';
 
-import { usePermissionView } from '@waldur/auth/PermissionLayout';
-import { translate } from '@waldur/i18n';
-import { Category, Offering } from '@waldur/marketplace/types';
+import { usePermissionView } from '@/auth/PermissionLayout';
+import { translate } from '@/i18n';
+import { Category } from '@/marketplace/types';
+import { ActionsUnavailable } from '@/table/ActionsDropdown';
 
 interface PublicOfferingDetailsProps {
   offering: Offering;
@@ -53,12 +56,25 @@ export const PublicOfferingDetails: FunctionComponent<
   }, [offering]);
 
   return tabSpec ? (
-    <div className="publicOfferingDetails">
-      <tabSpec.component
-        offering={offering}
-        category={category}
-        canDeploy={canDeploy}
-      />
+    <div
+      className={classNames(
+        'publicOfferingDetails',
+        offering.state === 'Unavailable' && 'disabled-view',
+      )}
+    >
+      <ActionsUnavailable
+        reason={
+          offering.state === 'Unavailable'
+            ? translate('This offering is unavailable.')
+            : undefined
+        }
+      >
+        <tabSpec.component
+          offering={offering}
+          category={category}
+          canDeploy={canDeploy}
+        />
+      </ActionsUnavailable>
     </div>
   ) : null;
 };
