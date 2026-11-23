@@ -1903,6 +1903,12 @@ export const SettingsDescription = [
       {
         key: 'AI_REPORTING_MAX_CONCURRENT_QUESTIONS',
         description: translate('Maximum questions answered at once across all users, at least 1. Each holds a background worker.'),
+        default: 6,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_MAX_QUESTIONS_PER_USER',
+        description: translate('Maximum questions one user can have running at once, each in its own conversation. At least 1.'),
         default: 3,
         type: 'integer',
       },
