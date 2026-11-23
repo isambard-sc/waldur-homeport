@@ -147,6 +147,9 @@ interface CoreConfiguration {
   AI_ASSISTANT_ENABLED: boolean;
   AI_ASSISTANT_ENABLED_ROLES:
     'disabled' | 'staff' | 'staff_and_support' | 'all' | 'anonymous';
+  AI_REPORTING_ENABLED_ROLES:
+    'disabled' | 'staff' | 'staff_and_support' | 'all';
+  AI_REPORTING_FILE_RETENTION_DAYS: number;
   MATRIX_ENABLED: boolean;
   MATRIX_EXTERNAL_LOGIN_METHOD?: MatrixExternalLoginMethod;
   SRAM_INTEGRATION_ENABLED?: boolean;

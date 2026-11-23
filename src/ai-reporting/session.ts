@@ -1,0 +1,26 @@
+let activeSessionUuid: string | undefined;
+
+/** The session this browser tab is talking to, or undefined before its
+ * first question. Kept in memory rather than sessionStorage, so it
+ * survives navigating within the app but not a reload. */
+export const getActiveReportingSessionUuid = (): string | undefined =>
+  activeSessionUuid;
+
+export const setActiveReportingSessionUuid = (uuid: string): void => {
+  activeSessionUuid = uuid;
+};
+
+/** Open a conversation from the History or Files list. */
+export const openReportingSession = (
+  uuid: string,
+  go: (state: string) => unknown,
+): void => {
+  activeSessionUuid = uuid;
+  go('reporting-ai-reporting');
+};
+
+/** Start the next question in a new conversation. Also called on logout,
+ * so the next user in this tab doesn't inherit it. */
+export const clearActiveReportingSessionUuid = (): void => {
+  activeSessionUuid = undefined;
+};

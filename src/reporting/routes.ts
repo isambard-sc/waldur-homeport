@@ -1,6 +1,7 @@
 import { UIView } from '@uirouter/react';
 import React from 'react';
 
+import { isAIReportingEnabledForUser } from '@/ai-reporting/utils';
 import { lazyComponent } from '@/core/lazyComponent';
 import { StateDeclaration } from '@/core/types';
 import { MarketplaceFeatures, SupportFeatures } from '@/FeaturesEnums';
@@ -56,6 +57,78 @@ export const states: StateDeclaration[] = [
     data: {
       breadcrumb: () => translate('Dashboard'),
       priority: 10,
+    },
+  },
+
+  // AI reporting is a tool, not a settings form, so it lives here rather
+  // than under administration.
+  {
+    name: 'reporting-ai-reporting',
+    url: 'ai-reporting/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingPage').then((module) => ({
+        default: module.AIReportingPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting'),
+      priority: 20,
+      // A child state's permissions replace the parent's (see access.ts), so
+      // this needs its own check, matching the backend's.
+      permissions: [isAIReportingEnabledForUser],
+    },
+  },
+
+  // Staff/support only, whatever the AI reporting settings say, like the
+  // backend's usage_stats.
+  {
+    name: 'reporting-ai-reporting-usage',
+    url: 'ai-reporting-usage/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingUsagePage').then((module) => ({
+        default: module.AIReportingUsagePage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting usage'),
+      priority: 21,
+      permissions: [isStaffOrSupport],
+    },
+  },
+
+  // The caller's own files, so the same check as the tool itself.
+  {
+    name: 'reporting-ai-reporting-files',
+    url: 'ai-reporting-files/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingFilesPage').then((module) => ({
+        default: module.AIReportingFilesPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting files'),
+      priority: 22,
+      permissions: [isAIReportingEnabledForUser],
+    },
+  },
+
+  // The caller's own past conversations, same check as the tool itself.
+  {
+    name: 'reporting-ai-reporting-history',
+    url: 'ai-reporting-history/',
+    parent: 'reporting-dashboard-layout',
+    component: lazyComponent(() =>
+      import('../ai-reporting/AIReportingHistoryPage').then((module) => ({
+        default: module.AIReportingHistoryPage,
+      })),
+    ),
+    data: {
+      breadcrumb: () => translate('AI reporting history'),
+      priority: 23,
+      permissions: [isAIReportingEnabledForUser],
     },
   },
 
