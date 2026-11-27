@@ -1,3 +1,4 @@
+import { isAIReportingEnabledForUser } from '@/ai-reporting/utils';
 import { isStateVisible } from '@/core/stateVisibility';
 import { isFeatureVisible } from '@/features/connect';
 import { translate } from '@/i18n';
@@ -28,6 +29,15 @@ export const getReportingTabs = (workspace): ReportingTab[] => {
   const tabs: ReportingTab[] = [
     { title: translate('Overview'), state: 'reporting-dashboard' },
   ];
+  // One tool, not a report category, so it skips the category loop but
+  // needs the same check as its route. Usage is reached from inside the
+  // tool (AIReportingNav), not as a tab here.
+  if (isAIReportingEnabledForUser({ workspace } as any)) {
+    tabs.push({
+      title: translate('AI reporting'),
+      state: 'reporting-ai-reporting',
+    });
+  }
 
   Object.entries(categories).forEach(([key, category]) => {
     const state = `reporting-${key}-list`;

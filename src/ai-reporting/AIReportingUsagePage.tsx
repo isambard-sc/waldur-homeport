@@ -1,0 +1,86 @@
+import { FC, useState } from 'react';
+
+import { formatUsageValue } from '@/core/formatNumber';
+import { LoadingErred } from '@/core/LoadingErred';
+import { LoadingSpinner } from '@/core/LoadingSpinner';
+import { SummaryWidget } from '@/core/SummaryWidget';
+import { translate } from '@/i18n';
+import { NoResult } from '@/navigation/header/search/NoResult';
+
+import { OrdersFilter } from '../reporting/orders/OrdersFilter';
+
+import { AIReportingNav } from './AIReportingNav';
+import { UsageByUserTable } from './UsageByUserTable';
+import { UsageDailyChart } from './UsageDailyChart';
+import { useUsageStats } from './useUsageStats';
+
+// A standalone page rather than part of the report catalogue, like the
+// other AI reporting pages.
+export const AIReportingUsagePage: FC = () => {
+  const [days, setDays] = useState(30);
+  const { isLoading, error, refetch, data } = useUsageStats(days);
+
+  return (
+    <>
+      <AIReportingNav />
+      <div className="d-flex justify-content-between align-items-center flex-wrap gap-4 mb-5">
+        <div>
+          <h3 className="mb-1">{translate('AI reporting usage')}</h3>
+          <p className="text-muted mb-0">
+            {translate(
+              'Token usage across every AI reporting question asked, for staff and support. Token counts are approximate.',
+            )}
+          </p>
+        </div>
+        <OrdersFilter days={days} onDaysChange={setDays} />
+      </div>
+
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : error ? (
+        <LoadingErred loadData={refetch} />
+      ) : data ? (
+        <>
+          <SummaryWidget
+            stats={[
+              {
+                label: translate('Requests'),
+                value: formatUsageValue(data.total_requests),
+              },
+              {
+                label: translate('Input tokens'),
+                value: formatUsageValue(data.total_input_tokens, true),
+              },
+              {
+                label: translate('Output tokens'),
+                value: formatUsageValue(data.total_output_tokens, true),
+              },
+              {
+                label: translate('Cache reads'),
+                value: formatUsageValue(data.total_cache_read_tokens, true),
+              },
+              {
+                label: translate('Cache writes'),
+                value: formatUsageValue(data.total_cache_write_tokens, true),
+              },
+            ]}
+          />
+
+          <div className="mb-6">
+            <UsageDailyChart daily={data.daily} />
+          </div>
+
+          <UsageByUserTable byUser={data.by_user} days={days} />
+        </>
+      ) : (
+        <NoResult
+          title={translate('No data available')}
+          message={translate(
+            'No AI reporting usage found for the selected period.',
+          )}
+          noAction
+        />
+      )}
+    </>
+  );
+};

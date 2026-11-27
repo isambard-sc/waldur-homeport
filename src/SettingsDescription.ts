@@ -1838,6 +1838,100 @@ export const SettingsDescription = [
     ],
   },
   {
+    description: translate('AI reporting general'),
+    items: [
+      {
+        key: 'AI_REPORTING_NAME',
+        description: translate('Display name of the AI reporting assistant.'),
+        default: 'Isambard Reporting Assistant',
+        type: 'string',
+      },
+      {
+        key: 'AI_REPORTING_ENABLED',
+        description: translate('Enable AI reporting.'),
+        default: false,
+        type: 'boolean',
+      },
+      {
+        key: 'AI_REPORTING_ENABLED_ROLES',
+        description: translate('Controls which user roles can access AI reporting. \'disabled\': No one. \'staff\': Staff users only. \'staff_and_support\': Staff and support users.'),
+        default: 'staff_and_support',
+        type: 'choice_field',
+        options: [{ value: 'disabled', label: 'Disabled' }, { value: 'staff', label: 'Staff users' }, { value: 'staff_and_support', label: 'Staff and support users' }],
+      },
+      {
+        key: 'AI_REPORTING_CUSTOM_INSTRUCTIONS',
+        description: translate('Additional instructions added to the AI reporting system prompt.'),
+        default: '',
+        type: 'text_field',
+      },
+      {
+        key: 'AI_REPORTING_LINK_DOMAINS',
+        description: translate('Domains whose links in AI reporting answers are clickable, comma-separated, e.g. \'docs.isambard.ac.uk, bristol.ac.uk\'. Subdomains are included. Other links are shown as text.'),
+        default: '',
+        type: 'string',
+      },
+      {
+        key: 'AI_REPORTING_HISTORY_QUESTIONS',
+        description: translate('Number of earlier questions in a conversation sent with each new one. -1 for all.'),
+        default: 10,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_MAX_TURNS',
+        description: translate('Maximum number of steps the assistant may take to answer a question, 1 to 40.'),
+        default: 25,
+        type: 'integer',
+      },
+    ],
+  },
+  {
+    description: translate('AI reporting limits'),
+    items: [
+      {
+        key: 'AI_REPORTING_TOKEN_LIMIT_DAILY',
+        description: translate('Maximum tokens per user per day. -1 for unlimited.'),
+        default: -1,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_GLOBAL_DAILY_TOKEN_BUDGET',
+        description: translate('Maximum tokens per day (UTC) across all users. -1 for unlimited.'),
+        default: 5000000,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_MAX_CONCURRENT_QUESTIONS',
+        description: translate('Maximum questions answered at once across all users, at least 1. Each holds a background worker.'),
+        default: 6,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_MAX_QUESTIONS_PER_USER',
+        description: translate('Maximum questions one user can have running at once, each in its own conversation. At least 1.'),
+        default: 3,
+        type: 'integer',
+      },
+    ],
+  },
+  {
+    description: translate('AI reporting retention'),
+    items: [
+      {
+        key: 'AI_REPORTING_MESSAGE_RETENTION_DAYS',
+        description: translate('Number of days to keep questions and answers, including their files. -1 to keep them indefinitely.'),
+        default: 90,
+        type: 'integer',
+      },
+      {
+        key: 'AI_REPORTING_FILE_RETENTION_DAYS',
+        description: translate('Number of days to keep generated files. -1 to keep them indefinitely.'),
+        default: 21,
+        type: 'integer',
+      },
+    ],
+  },
+  {
     description: translate('Software catalog general'),
     items: [
       {
